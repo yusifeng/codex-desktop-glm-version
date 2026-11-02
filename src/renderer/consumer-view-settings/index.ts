@@ -1,12 +1,52 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import { n as initializeBillingAnalytics, t as BillingAnalytics } from "@rchunk/billing-analytics";
-
-interface ConsumerViewSettingsProps { isPolling?: boolean }
-let jsx: JsxRuntime | undefined;
-let initialized = false;
-function initializeConsumerViewSettings(): void { if (initialized) return; initialized = true; initializeBillingAnalytics(); jsx = getJsxRuntime(); }
-function ConsumerViewSettings({ isPolling = true }: ConsumerViewSettingsProps): unknown { initializeConsumerViewSettings(); return jsx!.jsxs(jsx!.Fragment, { children: [jsx!.jsx("p", { className: "text-sm text-secondary", children: "Restricted view used solely for OpenAI internal testing. Shows your real usage in this workspace." }), jsx!.jsx(BillingAnalytics, { isPolling, canViewCreditSettings: false, reduceMotion: false, scope: "consumer", workspaceTaskUsage: true })] }); }
-initializeConsumerViewSettings();
-export { ConsumerViewSettings };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i } from "@rchunk/app-shared";
+import { Slt as a, xlt as o } from "@rchunk/app-initial";
+import { n as s, t as c } from "@rchunk/billing-analytics";
+function l(e) {
+  let t = (0, u.c)(4),
+    { isPolling: n } = e,
+    r = n === void 0 || n,
+    o = a(),
+    s;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = (0, d.jsx)(`p`, {
+        className: `text-sm text-secondary`,
+        children: (0, d.jsx)(i, {
+          id: `settings.usage.enterprise.consumerOverride.subtitle`,
+          defaultMessage: `Restricted view used solely for OpenAI internal testing. Shows your real usage in this workspace.`,
+          description: `Explains that this restricted consumer analytics view is only for OpenAI internal testing and shows the signed-in member's real usage in the active workspace`,
+        }),
+      })),
+      (t[0] = s))
+    : (s = t[0]);
+  let l;
+  return (
+    t[1] !== r || t[2] !== o
+      ? ((l = (0, d.jsxs)(d.Fragment, {
+          children: [
+            s,
+            (0, d.jsx)(c, {
+              isPolling: r,
+              canViewCreditSettings: !1,
+              reduceMotion: o,
+              scope: `consumer`,
+              workspaceTaskUsage: !0,
+            }),
+          ],
+        })),
+        (t[1] = r),
+        (t[2] = o),
+        (t[3] = l))
+      : (l = t[3]),
+    l
+  );
+}
+var u, d;
+function f() {
+  return (f = e(() => {
+    ((u = t()), r(), o(), s(), (d = n()));
+  }))();
+}
+f();
+export { l as ConsumerViewSettings };

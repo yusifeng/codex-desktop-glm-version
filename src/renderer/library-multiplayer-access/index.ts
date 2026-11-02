@@ -1,8 +1,47 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-interface LibraryAccessState { accountFeatures?: readonly string[]; access: "allowed" | "denied" | "loading"; featureGateEnabled?: boolean; isInternal?: boolean; isLoadingAccount?: boolean; sharedContentGateEnabled?: boolean }
-const r = { evaluate(state: LibraryAccessState): boolean { if (state.access === "denied") return false; if (state.isInternal || state.featureGateEnabled) return true; return state.sharedContentGateEnabled === true ? state.isLoadingAccount !== true : false; } };
-const n = { evaluate(state: LibraryAccessState): boolean { return state.sharedContentGateEnabled === true && state.accountFeatures?.includes("library_shared_content_available") === true; } };
-function t(): void {}
-export { n, r, t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, QI as n, ZI as r, sZ as i } from "@rchunk/app-shared";
+import {
+  Sun as a,
+  _fn as o,
+  bun as s,
+  ldn as c,
+  mfn as l,
+  mun as u,
+  pfn as d,
+  sdn as f,
+  vfn as p,
+} from "@rchunk/app-initial";
+var m, h;
+function g() {
+  return (g = e(() => {
+    (t(),
+      c(),
+      a(),
+      n(),
+      (m = i(r, ({ get: e }) => {
+        let t = e(u);
+        if (t != null && e(s) === `allowed`) return e(f, t).data?.accounts[t]?.features;
+      })),
+      (h = i(r, ({ get: e }) => {
+        let t = e(s);
+        return t === `loading` || (t === `allowed` && e(f, e(u)).isPending);
+      })));
+  }))();
+}
+var _, v, y;
+function b() {
+  return (b = e(() => {
+    (t(),
+      a(),
+      n(),
+      d(),
+      g(),
+      (_ = i(r, ({ get: e }) =>
+        e(s) === `denied` ? !1 : e(p) || e(o, `3813052382`) ? !0 : e(l, `3813052382`) ? e(h) : !1,
+      )),
+      (v = i(r, ({ get: e }) => e(y) && e(l, `3813052382`))),
+      (y = i(r, ({ get: e }) => e(m)?.includes(`library_shared_content_available`) === !0)));
+  }))();
+}
+export { v as n, _ as r, b as t };

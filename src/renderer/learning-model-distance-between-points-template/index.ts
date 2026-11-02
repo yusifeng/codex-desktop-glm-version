@@ -1,6 +1,50 @@
-import "@rchunk/rolldown-runtime";
-import * as Classify from "@rchunk/classify";
-let coordinateBounds: { min: number; max: number; step: number }, defaults: { x1: number; y1: number; x2: number; y2: number };
-function parse(input = ""): typeof defaults { const normalized = input.replace(/\s+|[{}]/g, "").replace(/\^\{2\}/g, "^2"); const points = [...normalized.matchAll(/\(([+\-]?(?:\d+(?:\.\d+)?|\.\d+)),([+\-]?(?:\d+(?:\.\d+)?|\.\d+))\)/g)]; if (points.length >= 2) { const values = points.slice(0, 2).flatMap((m) => [Number(m[1]), Number(m[2])]); if (values.every((v) => Number.isFinite(v) && v >= coordinateBounds.min && v <= coordinateBounds.max)) return { x1: values[0], y1: values[1], x2: values[2], y2: values[3] }; } const differences = [...normalized.matchAll(/\(\(?([+\-]?(?:\d+(?:\.\d+)?|\.\d+))\)?-\(?([+\-]?(?:\d+(?:\.\d+)?|\.\d+))\)?\)\^2/g)]; if (differences.length >= 2) { const values = [Number(differences[0][1]), Number(differences[1][1]), Number(differences[0][2]), Number(differences[1][2])]; if (values.every((v) => Number.isFinite(v) && v >= coordinateBounds.min && v <= coordinateBounds.max)) return { x1: values[0], y1: values[1], x2: values[2], y2: values[3] }; } return { ...defaults }; }
-function initialize(): void { (Classify as unknown as { a(): void }).a(); coordinateBounds = { min: -10, max: 10, step: .5 }; defaults = { x1: 6, y1: 6, x2: -6, y2: -6 }; }
-export { initialize as n, parse as r, coordinateBounds as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { a as t, c as n, l as r, u as i } from "@rchunk/classify";
+var a, o, s, c, l, u, d, f, p, m, h, g;
+function _() {
+  return (_ = e(() => {
+    (t(),
+      (a = { min: -10, max: 10, step: 0.5 }),
+      (o = { x1: 6, y1: 6, x2: -6, y2: -6 }),
+      (s = `[+-]?(?:\\d+(?:\\.\\d+)?|\\.\\d+)`),
+      (c = RegExp(`\\((${s}),(${s})\\)`, `g`)),
+      (l = RegExp(`\\((\\(?${s}\\)?)-(\\(?${s}\\)?)\\)\\^2`, `g`)),
+      (u = (e) =>
+        r(n(i(e)))
+          .replace(/\s+/g, ``)
+          .replace(/\^\{2\}/g, `^2`)
+          .replace(/[{}]/g, ``)),
+      (d = (e) => {
+        let t = Number(e.replace(/[()]/g, ``));
+        return Number.isFinite(t) ? t : null;
+      }),
+      (f = (e) => e >= a.min && e <= a.max),
+      (p = (e) => Object.values(e).every((e) => Number.isFinite(e) && f(e))),
+      (m = (e) => {
+        let t = [...e.matchAll(c)];
+        if (t.length < 2) return null;
+        let [n, r] = t,
+          i = [d(n[1]), d(n[2]), d(r[1]), d(r[2])];
+        if (i.some((e) => e == null)) return null;
+        let [a, o, s, l] = i,
+          u = { x1: a, y1: o, x2: s, y2: l };
+        return p(u) ? u : null;
+      }),
+      (h = (e) => {
+        let t = [...e.matchAll(l)];
+        if (t.length < 2) return null;
+        let [n, r] = t,
+          i = [d(n[1]), d(r[1]), d(n[2]), d(r[2])];
+        if (i.some((e) => e == null)) return null;
+        let [a, o, s, c] = i,
+          u = { x1: a, y1: o, x2: s, y2: c };
+        return p(u) ? u : null;
+      }),
+      (g = (e = ``) => {
+        let t = u(e);
+        return m(t) ?? h(t) ?? { ...o };
+      }));
+  }))();
+}
+export { _ as n, g as r, a as t };

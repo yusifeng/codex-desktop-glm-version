@@ -1,4 +1,12 @@
-import "@rchunk/rolldown-runtime";
-function invariant(condition: unknown, _message?: string): asserts condition { if (!condition) throw new Error("Invariant failed"); }
-function initializeInvariant(): void {}
-export { invariant as n, initializeInvariant as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e, t) {
+  if (!e) throw Error(n);
+}
+var n;
+function r() {
+  return (r = e(() => {
+    n = `Invariant failed`;
+  }))();
+}
+export { t as n, r as t };

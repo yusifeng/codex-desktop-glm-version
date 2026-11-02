@@ -1,82 +1,124 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeCompilerRuntime,
-  Cz as codeThemeConfig,
-  FX as initializeSignalRuntime,
-  HX as useSignalValue,
-  I3 as getJsxRuntime,
-  e6 as getReactRuntime,
-  wL as initializeWindowRuntime,
+  $3 as t,
+  Cz as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  e6 as o,
+  wL as s,
 } from "@rchunk/app-shared";
 import {
-  CW as resolveColorScheme,
-  GO as wordDiffEnabledSignal,
-  Kcn as getSettingSignal,
-  SW as useTheme,
-  VO as initializeColorScheme,
-  Vcn as initializeSettings,
-  r_t as resolveCodeTheme,
-  wk as initializeTheme,
-  xW as initializeDiffPreferences,
+  CW as c,
+  GO as l,
+  Kcn as u,
+  SW as d,
+  VO as f,
+  Vcn as p,
+  r_t as m,
+  wk as h,
+  xW as g,
 } from "@rchunk/app-initial";
-import {
-  a as useHighlighterPool,
-  i as initializePierreThemeRegistry,
-  r as HighlighterPoolProvider,
-  t as initializeHighlighterPool,
-} from "@rchunk/register-pierre-themes";
-
-const React = getReactRuntime();
-const jsx = getJsxRuntime();
-const workerUrl = new URL(
-  "worker-49a232674c13.js",
-  typeof window === "undefined" ? "https://desktop.invalid/" : import.meta.url,
-).href;
-const supportedLanguages = ["typescript", "javascript", "css", "html", "python"];
-
-function createHighlightWorker(): Worker {
-  return new Worker(workerUrl, { type: "module" });
+import { a as _, i as v, r as y, t as b } from "@rchunk/register-pierre-themes";
+var x;
+function S() {
+  return (S = e(() => {
+    x = `` + new URL(`worker-49a232674c13.js`, import.meta.url).href;
+  }))();
 }
-
-interface ShikiHighlightProviderProps { children?: unknown; }
-
-function RenderOptionsBridge({ lineDiffType, theme }: { lineDiffType: string; theme: string }): null {
-  const pool = useHighlighterPool();
-  React.useEffect(() => {
-    pool?.setRenderOptions({ lineDiffType, theme });
-  }, [lineDiffType, theme, pool]);
-  return null;
+function C() {
+  return new Worker(x, { type: `module` });
 }
-
-function ShikiHighlightProvider({ children }: ShikiHighlightProviderProps): unknown {
-  const theme = useTheme();
-  const colorScheme = resolveColorScheme(theme);
-  const lightTheme = useSignalValue(getSettingSignal(codeThemeConfig.lightCodeThemeId));
-  const darkTheme = useSignalValue(getSettingSignal(codeThemeConfig.darkCodeThemeId));
-  const useWordDiff = useSignalValue(wordDiffEnabledSignal);
-  const resolvedTheme = colorScheme === "light"
-    ? resolveCodeTheme(lightTheme, "light")
-    : resolveCodeTheme(darkTheme, "dark");
-  const lineDiffType = useWordDiff ? "word-alt" : "none";
-  return jsx.jsxs(HighlighterPoolProvider, {
-    poolOptions: { workerFactory: createHighlightWorker, poolSize: 4, totalASTLRUCacheSize: 100 },
-    highlighterOptions: { theme: resolvedTheme.name, lineDiffType, langs: supportedLanguages },
-    children: [jsx.jsx(RenderOptionsBridge, { lineDiffType, theme: resolvedTheme.name }), children],
-  });
+function w() {
+  return (w = e(() => {
+    S();
+  }))();
 }
-
-function initializeShikiHighlightProvider(): void {
-  initializeCompilerRuntime();
-  initializePierreThemeRegistry();
-  initializeSignalRuntime();
-  initializeWindowRuntime();
-  initializeSettings();
-  initializeTheme();
-  initializeDiffPreferences();
-  initializeColorScheme();
-  initializeHighlighterPool();
+function T(e) {
+  let t = (0, D.c)(13),
+    { children: r } = e,
+    a = d(),
+    o = c(a),
+    s = u(n.lightCodeThemeId),
+    f = u(n.darkCodeThemeId),
+    p = i(l),
+    h;
+  t[0] !== o || t[1] !== f || t[2] !== s
+    ? ((h = o === `light` ? m(s, `light`) : m(f, `dark`)),
+      (t[0] = o),
+      (t[1] = f),
+      (t[2] = s),
+      (t[3] = h))
+    : (h = t[3]);
+  let g = h.name,
+    _ = p ? `word-alt` : `none`,
+    v;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((v = { workerFactory: C, poolSize: A, totalASTLRUCacheSize: j }), (t[4] = v))
+    : (v = t[4]);
+  let b, x;
+  t[5] !== _ || t[6] !== g
+    ? ((b = { theme: g, lineDiffType: _, langs: M }),
+      (x = (0, k.jsx)(E, { lineDiffType: _, theme: g })),
+      (t[5] = _),
+      (t[6] = g),
+      (t[7] = b),
+      (t[8] = x))
+    : ((b = t[7]), (x = t[8]));
+  let S;
+  return (
+    t[9] !== r || t[10] !== b || t[11] !== x
+      ? ((S = (0, k.jsxs)(y, { poolOptions: v, highlighterOptions: b, children: [x, r] })),
+        (t[9] = r),
+        (t[10] = b),
+        (t[11] = x),
+        (t[12] = S))
+      : (S = t[12]),
+    S
+  );
 }
-
-initializeShikiHighlightProvider();
-
-export { ShikiHighlightProvider };
+function E(e) {
+  let t = (0, D.c)(5),
+    { lineDiffType: n, theme: r } = e,
+    i = _(),
+    a,
+    o;
+  return (
+    t[0] !== n || t[1] !== r || t[2] !== i
+      ? ((a = () => {
+          i?.setRenderOptions({ lineDiffType: n, theme: r });
+        }),
+        (o = [n, r, i]),
+        (t[0] = n),
+        (t[1] = r),
+        (t[2] = i),
+        (t[3] = a),
+        (t[4] = o))
+      : ((a = t[3]), (o = t[4])),
+    (0, O.useEffect)(a, o),
+    null
+  );
+}
+var D, O, k, A, j, M;
+function N() {
+  return (N = e(() => {
+    ((D = t()),
+      v(),
+      r(),
+      s(),
+      (O = o()),
+      p(),
+      h(),
+      g(),
+      f(),
+      w(),
+      b(),
+      (k = a()),
+      (A = 4),
+      (j = 100),
+      (M = [`typescript`, `javascript`, `css`, `html`, `python`]));
+  }))();
+}
+N();
+export { T as ShikiHighlightProvider };

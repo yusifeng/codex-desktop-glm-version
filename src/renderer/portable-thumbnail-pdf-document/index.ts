@@ -1,82 +1,138 @@
-import "@rchunk/rolldown-runtime";
-import { $3 as initializeCompilerRuntime, e6 as getReactRuntime } from "@rchunk/app-shared";
-
-interface PdfDocumentProxy {
-  destroyed?: boolean;
-  numPages: number;
-  destroy(): void;
-  getPage(pageNumber: number): Promise<{ getViewport(options: { scale: number }): { height: number; width: number } }>;
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/portable-pdfjs-runtime",
+      "@rchunk/pdfjs-core",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, H3 as n, V3 as r, e6 as i } from "@rchunk/app-shared";
+function a(e) {
+  let t = (0, c.c)(10),
+    { fileDataUrl: n } = e,
+    [r, i] = (0, l.useState)(null),
+    [a, u] = (0, l.useState)(`loading`),
+    [d, f] = (0, l.useState)(n),
+    [p, m] = (0, l.useState)(0),
+    [h, g] = (0, l.useState)(null),
+    [_, v] = (0, l.useState)(null),
+    y,
+    b;
+  (t[0] === n
+    ? ((y = t[1]), (b = t[2]))
+    : ((y = () => {
+        let e = !1,
+          t = null;
+        return (
+          i(null),
+          f(n),
+          u(`loading`),
+          m(0),
+          g(null),
+          v(null),
+          (async function () {
+            try {
+              let r = await o();
+              if (e) return;
+              let a = s(n);
+              if (a == null) {
+                u(`error`);
+                return;
+              }
+              t = r.getDocument({ data: a });
+              let c = await t.promise;
+              if (e) {
+                c.destroy();
+                return;
+              }
+              if (!Number.isSafeInteger(c.numPages) || c.numPages <= 0) {
+                (c.destroy(), u(`error`));
+                return;
+              }
+              let l = (await c.getPage(1)).getViewport({ scale: 1 });
+              if (e) {
+                c.destroy();
+                return;
+              }
+              (v(c), i(n), m(c.numPages), g({ height: l.height, width: l.width }), u(`ready`));
+            } catch {
+              if (e) return;
+              (v(null), i(null), m(0), g(null), u(`error`));
+            }
+          })(),
+          () => {
+            ((e = !0), t != null && !t.destroyed && t.destroy());
+          }
+        );
+      }),
+      (b = [n]),
+      (t[0] = n),
+      (t[1] = y),
+      (t[2] = b)),
+    (0, l.useEffect)(y, b));
+  let x;
+  return (
+    t[3] !== a || t[4] !== d || t[5] !== r || t[6] !== p || t[7] !== h || t[8] !== _
+      ? ((x = {
+          loadedFileDataUrl: r,
+          loadState: a,
+          loadStateFileDataUrl: d,
+          numPages: p,
+          pageViewportSize: h,
+          pdfDocument: _,
+        }),
+        (t[3] = a),
+        (t[4] = d),
+        (t[5] = r),
+        (t[6] = p),
+        (t[7] = h),
+        (t[8] = _),
+        (t[9] = x))
+      : (x = t[9]),
+    x
+  );
 }
-interface PdfJsRuntime {
-  GlobalWorkerOptions: { workerSrc: string };
-  getDocument(options: { data: Uint8Array }): { promise: Promise<PdfDocumentProxy>; destroy?(): void; destroyed?: boolean };
+async function o() {
+  if (typeof window > `u`) throw Error(`pdf.js can only be loaded in the browser`);
+  d ??= r(() => import(`@rchunk/portable-pdfjs-runtime`), __vite__mapDeps([0, 1, 2, 3, 4]), import.meta.url);
+  let e = await d;
+  return (
+    (!f || e.GlobalWorkerOptions.workerSrc !== u) &&
+      ((e.GlobalWorkerOptions.workerSrc = u), (f = !0)),
+    e
+  );
 }
-interface PdfDocumentState {
-  loadedFileDataUrl: string | null;
-  loadState: "error" | "loading" | "ready";
-  loadStateFileDataUrl: string;
-  numPages: number;
-  pageViewportSize: { height: number; width: number } | null;
-  pdfDocument: PdfDocumentProxy | null;
-}
-
-const React = getReactRuntime();
-const workerSource = new URL("pdf.worker.min-2ac0aeeaff32.mjs", typeof window === "undefined" ? "https://desktop.invalid/" : import.meta.url).toString();
-let pdfRuntimePromise: Promise<PdfJsRuntime> | null = null;
-let workerConfigured = false;
-
-async function loadPdfJs(): Promise<PdfJsRuntime> {
-  if (typeof window === "undefined") throw new Error("pdf.js can only be loaded in the browser");
-  pdfRuntimePromise ??= import("@rchunk/portable-pdfjs-runtime") as Promise<PdfJsRuntime>;
-  const runtime = await pdfRuntimePromise;
-  if (!workerConfigured || runtime.GlobalWorkerOptions.workerSrc !== workerSource) {
-    runtime.GlobalWorkerOptions.workerSrc = workerSource;
-    workerConfigured = true;
+function s(e) {
+  let t = e.indexOf(`base64,`);
+  if (!e.startsWith(`data:`) || t < 0) return null;
+  let n;
+  try {
+    n = window.atob(e.slice(t + 7));
+  } catch {
+    return null;
   }
-  return runtime;
+  let r = new Uint8Array(n.length);
+  for (let e = 0; e < n.length; e += 1) r[e] = n.charCodeAt(e);
+  return r;
 }
-
-function decodePdfDataUrl(value: string): Uint8Array | null {
-  const marker = value.indexOf("base64,");
-  if (!value.startsWith("data:") || marker < 0) return null;
-  let decoded: string;
-  try { decoded = window.atob(value.slice(marker + 7)); } catch { return null; }
-  return Uint8Array.from(decoded, (character) => character.charCodeAt(0));
+var c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    ((c = t()),
+      (l = i()),
+      n(),
+      (u = new URL(
+        `` + new URL(`pdf.worker.min-2ac0aeeaff32.mjs`, import.meta.url).href,
+        `` + import.meta.url,
+      ).toString()),
+      (d = null),
+      (f = !1));
+  }))();
 }
-
-function usePdfDocument({ fileDataUrl }: { fileDataUrl: string }): PdfDocumentState {
-  const [loadedFileDataUrl, setLoadedFileDataUrl] = React.useState<string | null>(null);
-  const [loadState, setLoadState] = React.useState<PdfDocumentState["loadState"]>("loading");
-  const [loadStateFileDataUrl, setLoadStateFileDataUrl] = React.useState(fileDataUrl);
-  const [numPages, setNumPages] = React.useState(0);
-  const [pageViewportSize, setPageViewportSize] = React.useState<PdfDocumentState["pageViewportSize"]>(null);
-  const [pdfDocument, setPdfDocument] = React.useState<PdfDocumentProxy | null>(null);
-  React.useEffect(() => {
-    let cancelled = false;
-    let loadingTask: ReturnType<PdfJsRuntime["getDocument"]> | null = null;
-    setLoadedFileDataUrl(null); setLoadStateFileDataUrl(fileDataUrl); setLoadState("loading");
-    setNumPages(0); setPageViewportSize(null); setPdfDocument(null);
-    void (async () => {
-      try {
-        const runtime = await loadPdfJs();
-        if (cancelled) return;
-        const data = decodePdfDataUrl(fileDataUrl);
-        if (data == null) { setLoadState("error"); return; }
-        loadingTask = runtime.getDocument({ data });
-        const document = await loadingTask.promise;
-        if (cancelled) { document.destroy(); return; }
-        if (!Number.isSafeInteger(document.numPages) || document.numPages <= 0) { document.destroy(); setLoadState("error"); return; }
-        const viewport = (await document.getPage(1)).getViewport({ scale: 1 });
-        if (cancelled) { document.destroy(); return; }
-        setPdfDocument(document); setLoadedFileDataUrl(fileDataUrl); setNumPages(document.numPages);
-        setPageViewportSize({ height: viewport.height, width: viewport.width }); setLoadState("ready");
-      } catch { if (!cancelled) { setPdfDocument(null); setLoadedFileDataUrl(null); setNumPages(0); setPageViewportSize(null); setLoadState("error"); } }
-    })();
-    return () => { cancelled = true; if (loadingTask != null && !loadingTask.destroyed) loadingTask.destroy?.(); };
-  }, [fileDataUrl]);
-  return { loadedFileDataUrl, loadState, loadStateFileDataUrl, numPages, pageViewportSize, pdfDocument };
-}
-
-function initializePortablePdfDocument(): void { initializeCompilerRuntime(); }
-
-export { initializePortablePdfDocument as n, usePdfDocument as r, loadPdfJs as t };
+export { p as n, a as r, o as t };

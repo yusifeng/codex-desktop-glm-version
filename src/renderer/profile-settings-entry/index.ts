@@ -1,17 +1,94 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, m4 as classNames, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import { n as initializeProfileView, t as ProfileView } from "@rchunk/profile-view";
-
-interface ProfileSettingsProps { today?: Date | string }
-interface ProfileLayoutProps { children?: unknown; header?: unknown; isEditPaneOpen?: boolean; isError?: boolean; ref?: unknown }
-let jsx: JsxRuntime | undefined;
-let initialized = false;
-function initializeProfileSettings(): void { if (initialized) return; initialized = true; initializeProfileView(); jsx = getJsxRuntime(); }
-function ProfileLayout({ children, header, isEditPaneOpen = false, isError = false, ref }: ProfileLayoutProps): unknown {
-  initializeProfileSettings(); if (isError) return jsx!.jsxs("section", { "data-profile-error": "true", children: [header, children] });
-  return jsx!.jsxs("div", { ref, className: classNames("relative flex h-full min-h-0 min-w-0 flex-1 flex-col electron:overflow-hidden electron:bg-surface windows:rounded-tl-lg", isEditPaneOpen && "@max-2xl:hidden"), children: [jsx!.jsx("div", { className: "flex items-center px-panel draggable electron:h-toolbar extension:h-toolbar-sm", children: header }), jsx!.jsx("div", { className: "flex-1 scrollbar-stable overflow-y-auto p-panel", children })] });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, h4 as r, m4 as i } from "@rchunk/app-shared";
+import { au as a, su as o } from "@rchunk/app-initial";
+import { n as s, t as c } from "@rchunk/profile-view";
+function l(e) {
+  let t = (0, d.c)(2),
+    { today: n } = e,
+    r;
+  return (
+    t[0] === n
+      ? (r = t[1])
+      : ((r = (0, f.jsx)(c, { today: n, isProfileV2Enabled: !1, Layout: u })),
+        (t[0] = n),
+        (t[1] = r)),
+    r
+  );
 }
-function ProfileSettings({ today }: ProfileSettingsProps): unknown { initializeProfileSettings(); return jsx!.jsx(ProfileView, { today, isProfileV2Enabled: false, Layout: ProfileLayout }); }
-initializeProfileSettings();
-export { ProfileSettings };
+function u(e) {
+  let t = (0, d.c)(15),
+    { children: n, header: r, isEditPaneOpen: o, isError: s, ref: c } = e;
+  if (s) {
+    let e;
+    return (
+      t[0] !== n || t[1] !== r
+        ? ((e = (0, f.jsx)(a, {
+            contentClassName: `h-full justify-center`,
+            fullWidth: !0,
+            backSlot: r,
+            children: n,
+          })),
+          (t[0] = n),
+          (t[1] = r),
+          (t[2] = e))
+        : (e = t[2]),
+      e
+    );
+  }
+  let l = o && `@max-2xl:hidden`,
+    u;
+  t[3] === l
+    ? (u = t[4])
+    : ((u = i(
+        `relative flex h-full min-h-0 min-w-0 flex-1 flex-col electron:overflow-hidden electron:bg-surface windows:rounded-tl-lg`,
+        l,
+      )),
+      (t[3] = l),
+      (t[4] = u));
+  let p;
+  t[5] === r
+    ? (p = t[6])
+    : ((p = (0, f.jsx)(`div`, {
+        className: `flex items-center px-panel draggable electron:h-toolbar extension:h-toolbar-sm`,
+        children: r,
+      })),
+      (t[5] = r),
+      (t[6] = p));
+  let m;
+  t[7] === Symbol.for(`react.memo_cache_sentinel`) ? ((m = !1), (t[7] = m)) : (m = t[7]);
+  let h;
+  t[8] === n
+    ? (h = t[9])
+    : ((h = (0, f.jsx)(`div`, {
+        className: `flex-1 scrollbar-stable overflow-y-auto p-panel`,
+        children: (0, f.jsx)(a, {
+          embedded: !0,
+          fullWidth: !0,
+          contentClassName: `max-w-[732px] pt-12`,
+          children: n,
+        }),
+      })),
+      (t[8] = n),
+      (t[9] = h));
+  let g;
+  return (
+    t[10] !== c || t[11] !== u || t[12] !== p || t[13] !== h
+      ? ((g = (0, f.jsxs)(`div`, { ref: c, className: u, children: [p, m, h] })),
+        (t[10] = c),
+        (t[11] = u),
+        (t[12] = p),
+        (t[13] = h),
+        (t[14] = g))
+      : (g = t[14]),
+    g
+  );
+}
+var d, f;
+function p() {
+  return (p = e(() => {
+    ((d = t()), r(), o(), s(), (f = n()));
+  }))();
+}
+p();
+export { l as ProfileSettings };

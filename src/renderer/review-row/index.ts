@@ -1,8 +1,94 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/diff-comment-card";
-const jsx = getJsxRuntime();
-interface ReviewRowProps { authorAvatar?: unknown; children?: unknown; disabled?: boolean; loading?: boolean; layout?: "inline" | "card"; showSubmit?: boolean; submitLabel?: string; submitType?: "button" | "submit"; onSubmit?(): void }
-function ReviewRow({ authorAvatar, children, disabled, loading = false, layout = "inline", showSubmit = true, submitLabel, submitType = "button", onSubmit }: ReviewRowProps): unknown { const action = showSubmit ? jsx.jsx("button", { type: submitType, "aria-label": submitLabel, disabled, "aria-busy": loading, onClick: onSubmit, children: loading ? null : "Send" }) : jsx.jsx("span", { "aria-hidden": true }); if (layout === "card") return jsx.jsxs("article", { children: [children, action] }); return jsx.jsxs("div", { className: "review-row", children: [authorAvatar ? jsx.jsx("div", { children: authorAvatar }) : null, jsx.jsx("div", { children }), action] }); }
-function initializeReviewRow(): void {}
-export { initializeReviewRow as n, ReviewRow as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, Yh as r, Zh as i, lw as a, ov as o } from "@rchunk/app-shared";
+import { n as s, r as c } from "@rchunk/diff-comment-card";
+function l(e) {
+  let t = (0, u.c)(18),
+    {
+      authorAvatar: n,
+      children: i,
+      disabled: a,
+      loading: c,
+      layout: l,
+      showSubmit: f,
+      submitLabel: p,
+      submitType: m,
+      onSubmit: h,
+    } = e,
+    g = c !== void 0 && c,
+    _ = l === void 0 ? `inline` : l,
+    v = f === void 0 || f,
+    y;
+  t[0] !== a || t[1] !== g || t[2] !== h || t[3] !== v || t[4] !== p || t[5] !== m
+    ? ((y = v
+        ? (0, d.jsx)(r, {
+            className: `self-end`,
+            "aria-label": p,
+            color: `primary`,
+            disabled: a,
+            loading: g,
+            size: `composerSm`,
+            type: m,
+            uniform: !0,
+            onClick: h,
+            children: g ? null : (0, d.jsx)(o, {}),
+          })
+        : (0, d.jsx)(`span`, {
+            "aria-hidden": `true`,
+            className: `size-token-button-composer-sm shrink-0 self-end`,
+          })),
+      (t[0] = a),
+      (t[1] = g),
+      (t[2] = h),
+      (t[3] = v),
+      (t[4] = p),
+      (t[5] = m),
+      (t[6] = y))
+    : (y = t[6]);
+  let b = y;
+  if (_ === `card`) {
+    let e;
+    return (
+      t[7] !== b || t[8] !== i
+        ? ((e = (0, d.jsx)(s, { action: b, children: i })), (t[7] = b), (t[8] = i), (t[9] = e))
+        : (e = t[9]),
+      e
+    );
+  }
+  let x;
+  t[10] === n
+    ? (x = t[11])
+    : ((x =
+        n == null
+          ? null
+          : (0, d.jsx)(`div`, { className: `flex h-7 shrink-0 items-center`, children: n })),
+      (t[10] = n),
+      (t[11] = x));
+  let S;
+  t[12] === i
+    ? (S = t[13])
+    : ((S = (0, d.jsx)(`div`, { className: `min-w-0 flex-1 self-center`, children: i })),
+      (t[12] = i),
+      (t[13] = S));
+  let C;
+  return (
+    t[14] !== b || t[15] !== x || t[16] !== S
+      ? ((C = (0, d.jsxs)(`div`, {
+          className: `flex min-w-0 items-start gap-2.5 px-3 pt-2 pb-3`,
+          children: [x, S, b],
+        })),
+        (t[14] = b),
+        (t[15] = x),
+        (t[16] = S),
+        (t[17] = C))
+      : (C = t[17]),
+    C
+  );
+}
+var u, d;
+function f() {
+  return (f = e(() => {
+    ((u = t()), i(), a(), c(), (d = n()));
+  }))();
+}
+export { f as n, l as t };

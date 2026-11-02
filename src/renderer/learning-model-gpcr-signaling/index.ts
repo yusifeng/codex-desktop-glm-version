@@ -1,34 +1,45 @@
-// G-protein-coupled receptor signaling pathways and activation stages.
-import "@rchunk/rolldown-runtime";
-
-type GpcrPathway = "Gs" | "Gi" | "Gq";
-interface GpcrValues { pathway?: string | null; stage?: number | null }
-
-const gpcrSignalingType = "GPCR_SIGNALING";
-const gpcrSignalingThumbnail = "gpcr-signaling-v1";
-const gpcrSignalingParameters = { pathway: { kind: "enum" as const, defaultValue: "Gs" as GpcrPathway, allowedValues: ["Gs", "Gi", "Gq"] as GpcrPathway[] } };
-const gpcrSignalingSpecification = { type: gpcrSignalingType, version: 1, thumbnailAssetKey: gpcrSignalingThumbnail, parameters: gpcrSignalingParameters };
-const pathways = gpcrSignalingSpecification.parameters.pathway.allowedValues;
-const pathwayControl = { min: 0, max: pathways.length - 1, step: 1, defaultValue: gpcrSignalingSpecification.parameters.pathway.defaultValue };
-const signalingStageControl = { min: 0, max: 3, step: 1, defaultValue: 2 };
-const isGpcrPathway = (value: unknown): value is GpcrPathway => pathways.some((pathway) => pathway === value);
-const normalizeGpcrValues = (values: GpcrValues) => ({
-  pathway: isGpcrPathway(values.pathway) ? values.pathway : pathwayControl.defaultValue,
-  stage: typeof values.stage === "number" && Number.isFinite(values.stage) ? Math.min(signalingStageControl.max, Math.max(0, Math.round(values.stage))) : signalingStageControl.defaultValue,
-});
-const pathwayForIndex = (index: number): GpcrPathway => pathways[Math.min(pathwayControl.max, Math.max(0, Math.round(index)))] ?? pathwayControl.defaultValue;
-const indexForPathway = (pathway: GpcrPathway): number => Math.max(0, pathways.indexOf(pathway));
-const calculateGpcrSignaling = (values: GpcrValues) => {
-  const normalized = normalizeGpcrValues(values);
-  const isGq = normalized.pathway === "Gq";
-  const isGi = normalized.pathway === "Gi";
-  return {
-    ...normalized, ligandBound: normalized.stage !== 0, exchanged: normalized.stage === 1 || normalized.stage === 2, separated: normalized.stage === 2, signaling: normalized.stage === 2, resetting: normalized.stage === 3,
-    effector: isGq ? "plc-beta" : "adenylyl-cyclase", outcome: isGq ? "ip3-and-dag" : isGi ? "camp-decreases" : "camp-increases",
-  };
-};
-
-function initializeGpcrSignalingSpecification(): void {}
-function initializeGpcrSignalingModel(): void {}
-
-export { pathwayForIndex as a, initializeGpcrSignalingSpecification as c, initializeGpcrSignalingModel as i, gpcrSignalingSpecification as l, signalingStageControl as n, indexForPathway as o, calculateGpcrSignaling as r, normalizeGpcrValues as s, pathwayControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `GPCR_SIGNALING`),
+      (n = `gpcr-signaling-v1`),
+      (r = { pathway: { kind: `enum`, defaultValue: `Gs`, allowedValues: [`Gs`, `Gi`, `Gq`] } }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    (a(),
+      (o = i.parameters.pathway.allowedValues),
+      (s = { min: 0, max: o.length - 1, step: 1, defaultValue: i.parameters.pathway.defaultValue }),
+      (c = { min: 0, max: 3, step: 1, defaultValue: 2 }),
+      (l = (e) => ({
+        pathway: o.includes(e.pathway ?? ``) ? e.pathway : s.defaultValue,
+        stage:
+          typeof e.stage == `number` && Number.isFinite(e.stage)
+            ? Math.min(c.max, Math.max(0, Math.round(e.stage)))
+            : c.defaultValue,
+      })),
+      (u = (e) => o[Math.min(s.max, Math.max(0, Math.round(e)))] ?? s.defaultValue),
+      (d = (e) => Math.max(0, o.indexOf(e))),
+      (f = (e) => {
+        let t = l(e),
+          n = t.pathway === `Gq`,
+          r = t.pathway === `Gi`;
+        return {
+          ...t,
+          ligandBound: t.stage !== 0,
+          exchanged: t.stage === 1 || t.stage === 2,
+          separated: t.stage === 2,
+          signaling: t.stage === 2,
+          resetting: t.stage === 3,
+          effector: n ? `plc-beta` : `adenylyl-cyclase`,
+          outcome: n ? `ip3-and-dag` : r ? `camp-decreases` : `camp-increases`,
+        };
+      }));
+  }))();
+}
+export { u as a, a as c, p as i, i as l, c as n, d as o, f as r, l as s, s as t };

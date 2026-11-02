@@ -1,227 +1,309 @@
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/thread-user-message-navigation-rail-app",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/plan-implementation-request",
+      "@rchunk/commit-icon",
+      "@rchunk/pull-request",
+      "@rchunk/thread-scroll-controller-context-value",
+      "./thread-user-message-navigation-rail-app-33e1d82a93e0.css",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  BX as useParameterizedSignal,
-  FX as initializeSignalRuntime,
-  I3 as getJsxRuntime,
-  LX as useScope,
-  __ as useEffectEvent,
-  e6 as getReactRuntime,
-  g_ as initializeIconRuntime,
-  qm as initializeMenuRuntime,
+  $3 as t,
+  BX as n,
+  FX as r,
+  H3 as i,
+  I3 as a,
+  Jm as o,
+  LX as s,
+  V3 as c,
+  __ as l,
+  e6 as u,
+  g_ as d,
+  qm as f,
 } from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import { AppThreadUserMessageNavigationRail } from "@rchunk/thread-user-message-navigation-rail-app";
-
-interface NavigationItem {
-  bookmarkId?: string;
-  id: string;
-  isBookmarked?: boolean;
-  turnKey: string;
-  [key: string]: unknown;
+import {
+  $en as p,
+  d1t as m,
+  f1t as h,
+  ifn as g,
+  itn as _,
+  ofn as v,
+  p1t as y,
+  u1t as b,
+} from "@rchunk/app-initial";
+function x(e) {
+  let t = (0, O.c)(17),
+    { enabled: n, getItems: r, onBookmarkChange: i, onPreviewItem: a, onRevealItem: o } = e,
+    s = n === void 0 || n,
+    [c, u] = (0, k.useState)(!1),
+    d;
+  t[0] !== r || t[1] !== o
+    ? ((d = (e) => {
+        if (
+          e.defaultPrevented ||
+          !e.altKey ||
+          e.shiftKey ||
+          e.ctrlKey ||
+          e.metaKey ||
+          (e.key !== `ArrowUp` && e.key !== `ArrowDown`)
+        )
+          return;
+        let t = S(e.target);
+        if (t == null) return;
+        let n = C(r(), t, e.key === `ArrowUp` ? `previous` : `next`);
+        if (n == null) return;
+        let i = w(t, n.id);
+        if (i != null) {
+          (e.preventDefault(), D(t, i));
+          return;
+        }
+        o != null && (e.preventDefault(), T(t, n, o));
+      }),
+      (t[0] = r),
+      (t[1] = o),
+      (t[2] = d))
+    : (d = t[2]);
+  let f = l(d),
+    p,
+    m;
+  (t[3] === f
+    ? ((p = t[4]), (m = t[5]))
+    : ((p = () => (
+        document.addEventListener(`keydown`, f),
+        () => {
+          document.removeEventListener(`keydown`, f);
+        }
+      )),
+      (m = [f]),
+      (t[3] = f),
+      (t[4] = p),
+      (t[5] = m)),
+    (0, k.useEffect)(p, m));
+  let h, g;
+  if (
+    (t[6] !== s || t[7] !== c
+      ? ((h = () => {
+          if (!s || c) return;
+          let e = () => {
+              u(!0);
+            },
+            t = window.requestIdleCallback?.bind(window),
+            n = window.cancelIdleCallback?.bind(window);
+          if (t && n) {
+            let r = t(e, { timeout: 2e3 });
+            return () => {
+              n(r);
+            };
+          }
+          let r = globalThis.setTimeout(e, 0);
+          return () => {
+            globalThis.clearTimeout(r);
+          };
+        }),
+        (g = [s, c]),
+        (t[6] = s),
+        (t[7] = c),
+        (t[8] = h),
+        (t[9] = g))
+      : ((h = t[8]), (g = t[9])),
+    (0, k.useEffect)(h, g),
+    !s || !c)
+  )
+    return null;
+  let _;
+  t[10] === r ? (_ = t[11]) : ((_ = r()), (t[10] = r), (t[11] = _));
+  let v;
+  return (
+    t[12] !== i || t[13] !== a || t[14] !== o || t[15] !== _
+      ? ((v = (0, A.jsx)(j, { items: _, onBookmarkChange: i, onPreviewItem: a, onRevealItem: o })),
+        (t[12] = i),
+        (t[13] = a),
+        (t[14] = o),
+        (t[15] = _),
+        (t[16] = v))
+      : (v = t[16]),
+    v
+  );
 }
-
-interface NavigationProps {
-  bookmarkKey?: string | null;
-  enabled?: boolean;
-  getItems(): NavigationItem[];
-  onBookmarkChange?(item: NavigationItem, bookmarked: boolean): void;
-  onPreviewItem?(item: NavigationItem): void;
-  onRevealItem?(item: NavigationItem): void | Promise<void>;
+function S(e) {
+  let t =
+    (e instanceof Element ? e.closest(`.thread-scroll-container`) : null) ??
+    document.querySelector(`.thread-scroll-container`);
+  return t instanceof HTMLDivElement ? t : null;
 }
-
-interface ScrollTarget {
-  measureElement: Element;
-  scrollElement: Element;
-}
-
-const TOP_TOLERANCE_PX = 24;
-const SCROLL_RECHECK_DELAY_MS = 350;
-const TARGET_WAIT_TIMEOUT_MS = 1_500;
-const ATTACHMENT_SELECTOR = '[aria-label="User attachment"], img[alt="User attachment"]';
-
-let React: ReturnType<typeof getReactRuntime>;
-let jsx: ReturnType<typeof getJsxRuntime>;
-let initialized = false;
-const initial = initialChunk as unknown as Record<string, any>;
-
-function normalizeTurnKey(turnKey: string): string {
-  const separator = turnKey.indexOf(":transcript:");
-  return separator === -1 ? turnKey : turnKey.slice(0, separator);
-}
-
-function findScrollContainer(target: EventTarget | null): HTMLDivElement | null {
-  const candidate =
-    (target instanceof Element ? target.closest(".thread-scroll-container") : null) ??
-    document.querySelector(".thread-scroll-container");
-  return candidate instanceof HTMLDivElement ? candidate : null;
-}
-
-function findItemTarget(container: HTMLDivElement, itemId: string): ScrollTarget | null {
-  for (const unit of container.querySelectorAll<HTMLElement>("[data-content-search-unit-key]")) {
-    if (unit.dataset.contentSearchUnitKey !== itemId) continue;
-    const messageBubble = unit.querySelector("[data-user-message-bubble]");
-    if (messageBubble != null) return { measureElement: messageBubble, scrollElement: unit };
-    const attachment = unit.querySelector(ATTACHMENT_SELECTOR);
-    return attachment == null
-      ? { measureElement: unit, scrollElement: unit }
-      : { measureElement: attachment, scrollElement: attachment };
+function C(e, t, n) {
+  let r = new Map();
+  for (let e of t.querySelectorAll(`[data-content-search-unit-key]`)) {
+    let t = e.dataset.contentSearchUnitKey;
+    t != null && !r.has(t) && r.set(t, e);
   }
+  let i = e.flatMap((e, t) => {
+    let n = r.get(e.id),
+      i = n?.querySelector(`[data-user-message-bubble]`) ?? n?.querySelector(F) ?? n;
+    return i == null ? [] : [{ element: i, index: t, item: e }];
+  });
+  if (i.length === 0) return n === `next` ? (e[0] ?? null) : (e.at(-1) ?? null);
+  let a = t.getBoundingClientRect().top;
+  if (n === `next`) {
+    let t = i.findIndex(({ element: e }) => e.getBoundingClientRect().top > a + M);
+    return t === -1
+      ? (e[(i.at(-1)?.index ?? -1) + 1] ?? null)
+      : (e[(i[t - 1]?.index ?? -1) + 1] ?? null);
+  }
+  for (let t = i.length - 1; t >= 0; --t) {
+    let n = i[t],
+      r = n.element.getBoundingClientRect();
+    if (Math.abs(r.top - a) <= M) return e[n.index - 1] ?? null;
+    if (r.top < a) return n.item;
+  }
+  return i[0]?.item ?? null;
+}
+function w(e, t) {
+  for (let n of e.querySelectorAll(`[data-content-search-unit-key]`))
+    if (n.dataset.contentSearchUnitKey === t) {
+      let e = n.querySelector(`[data-user-message-bubble]`);
+      if (e != null) return { measureElement: e, scrollElement: n };
+      let t = n.querySelector(F);
+      return t == null
+        ? { measureElement: n, scrollElement: n }
+        : { measureElement: t, scrollElement: t };
+    }
   return null;
 }
-
-function pickAdjacentItem(
-  items: NavigationItem[],
-  container: HTMLDivElement,
-  direction: "next" | "previous",
-): NavigationItem | null {
-  const unitsByKey = new Map<string, Element>();
-  for (const unit of container.querySelectorAll<HTMLElement>("[data-content-search-unit-key]")) {
-    const key = unit.dataset.contentSearchUnitKey;
-    if (key != null && !unitsByKey.has(key)) unitsByKey.set(key, unit);
-  }
-  const rendered = items.flatMap((item, index) => {
-    const unit = unitsByKey.get(item.id);
-    const element = unit?.querySelector("[data-user-message-bubble]") ?? unit?.querySelector(ATTACHMENT_SELECTOR) ?? unit;
-    return element == null ? [] : [{ element, index, item }];
-  });
-  if (rendered.length === 0) return direction === "next" ? (items[0] ?? null) : (items.at(-1) ?? null);
-
-  const containerTop = container.getBoundingClientRect().top;
-  if (direction === "next") {
-    const nextIndex = rendered.findIndex(({ element }) => element.getBoundingClientRect().top > containerTop + TOP_TOLERANCE_PX);
-    return nextIndex === -1
-      ? (items[(rendered.at(-1)?.index ?? -1) + 1] ?? null)
-      : (items[(rendered[nextIndex - 1]?.index ?? -1) + 1] ?? null);
-  }
-  for (let index = rendered.length - 1; index >= 0; index -= 1) {
-    const renderedItem = rendered[index];
-    const rect = renderedItem.element.getBoundingClientRect();
-    if (Math.abs(rect.top - containerTop) <= TOP_TOLERANCE_PX) return items[renderedItem.index - 1] ?? null;
-    if (rect.top < containerTop) return renderedItem.item;
-  }
-  return rendered[0]?.item ?? null;
+async function T(e, t, n) {
+  await n(t);
+  let r = await E(e, t.id);
+  r != null && D(e, r);
 }
-
-function scrollToTarget(container: HTMLDivElement, target: ScrollTarget): void {
-  target.scrollElement.scrollIntoView({ behavior: "smooth", block: "start" });
-  window.setTimeout(() => {
-    if (!container.isConnected || !target.measureElement.isConnected || !target.scrollElement.isConnected) return;
-    const containerTop = container.getBoundingClientRect().top;
-    const itemTop = target.measureElement.getBoundingClientRect().top;
-    if (Math.abs(itemTop - containerTop) > TOP_TOLERANCE_PX) {
-      target.scrollElement.scrollIntoView({ behavior: "smooth", block: "start" });
-    }
-  }, SCROLL_RECHECK_DELAY_MS);
-}
-
-function waitForItemTarget(container: HTMLDivElement, itemId: string): Promise<ScrollTarget | null> {
-  const startedAt = performance.now();
-  return new Promise((resolve) => {
-    const check = () => {
-      const target = container.isConnected ? findItemTarget(container, itemId) : null;
-      if (target != null || !container.isConnected || performance.now() - startedAt > TARGET_WAIT_TIMEOUT_MS) {
-        resolve(target);
-      } else {
-        window.requestAnimationFrame(check);
+function E(e, t) {
+  let n = performance.now();
+  return new Promise((r) => {
+    let i = () => {
+      let a = e.isConnected ? w(e, t) : null;
+      if (a != null || !e.isConnected || performance.now() - n > P) {
+        r(a);
+        return;
       }
+      window.requestAnimationFrame(i);
     };
-    check();
+    i();
   });
 }
-
-async function revealAndScroll(
-  container: HTMLDivElement,
-  item: NavigationItem,
-  reveal: (item: NavigationItem) => void | Promise<void>,
-): Promise<void> {
-  await reveal(item);
-  const target = await waitForItemTarget(container, item.id);
-  if (target != null) scrollToTarget(container, target);
+function D(e, t) {
+  (t.scrollElement.scrollIntoView({ behavior: `smooth`, block: `start` }),
+    window.setTimeout(() => {
+      if (!e.isConnected || !t.measureElement.isConnected || !t.scrollElement.isConnected) return;
+      let n = e.getBoundingClientRect().top,
+        r = t.measureElement.getBoundingClientRect().top;
+      Math.abs(r - n) <= M ||
+        t.scrollElement.scrollIntoView({ behavior: `smooth`, block: `start` });
+    }, N));
 }
-
-function NavigationRail(props: Omit<NavigationProps, "bookmarkKey">): unknown {
-  const enabled = props.enabled ?? true;
-  const [idleReady, setIdleReady] = React.useState(false);
-  const onKeyDown = (useEffectEvent as unknown as <Callback extends (...args: any[]) => any>(callback: Callback) => Callback)((event: KeyboardEvent) => {
-    if (
-      event.defaultPrevented || !event.altKey || event.shiftKey || event.ctrlKey || event.metaKey ||
-      (event.key !== "ArrowUp" && event.key !== "ArrowDown")
-    ) return;
-    const container = findScrollContainer(event.target);
-    if (container == null) return;
-    const item = pickAdjacentItem(props.getItems(), container, event.key === "ArrowUp" ? "previous" : "next");
-    if (item == null) return;
-    const target = findItemTarget(container, item.id);
-    if (target != null) {
-      event.preventDefault();
-      scrollToTarget(container, target);
-    } else if (props.onRevealItem != null) {
-      event.preventDefault();
-      void revealAndScroll(container, item, props.onRevealItem);
-    }
-  });
-  React.useEffect(() => {
-    document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
-  }, [onKeyDown]);
-  React.useEffect(() => {
-    if (!enabled || idleReady) return;
-    const markReady = () => setIdleReady(true);
-    const requestIdle = window.requestIdleCallback?.bind(window);
-    const cancelIdle = window.cancelIdleCallback?.bind(window);
-    if (requestIdle != null && cancelIdle != null) {
-      const handle = requestIdle(markReady, { timeout: 2_000 });
-      return () => cancelIdle(handle);
-    }
-    const handle = globalThis.setTimeout(markReady, 0);
-    return () => globalThis.clearTimeout(handle);
-  }, [enabled, idleReady]);
-  if (!enabled || !idleReady) return null;
-  return jsx.jsx(AppThreadUserMessageNavigationRail, {
-    items: props.getItems(),
-    onBookmarkChange: props.onBookmarkChange,
-    onPreviewItem: props.onPreviewItem,
-    onRevealItem: props.onRevealItem,
-  });
+var O, k, A, j, M, N, P, F;
+function I() {
+  return (I = e(() => {
+    ((O = t()),
+      (k = u()),
+      f(),
+      d(),
+      (A = a()),
+      i(),
+      (j = o(
+        async () =>
+          (
+            await c(
+              async () => {
+                let { AppThreadUserMessageNavigationRail: e } = await import(
+                  `@rchunk/thread-user-message-navigation-rail-app`
+                );
+                return { AppThreadUserMessageNavigationRail: e };
+              },
+              __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+              import.meta.url,
+            )
+          ).AppThreadUserMessageNavigationRail,
+        { propagateLoadError: !0 },
+      )),
+      (M = 24),
+      (N = 350),
+      (P = 1500),
+      (F = `[aria-label="User attachment"], img[alt="User attachment"]`));
+  }))();
 }
-
-function BookmarkedThreadUserMessageNavigation({ bookmarkKey, getItems, ...props }: NavigationProps): unknown {
-  const scope = useScope(initial.$en);
-  const bookmarksEnabled = (initial.ofn as (gate: unknown) => boolean)(initial.u1t);
-  const bookmarkedIds = useParameterizedSignal(initial.d1t, bookmarksEnabled ? bookmarkKey : null) as unknown as Set<string>;
-  const getDecoratedItems = () => {
-    const items = getItems();
-    if (bookmarkedIds.size === 0) return items;
-    const unmatched = new Set(bookmarkedIds);
-    return items.map((item) => {
-      const turnKey = normalizeTurnKey(item.turnKey);
-      return unmatched.delete(turnKey) || bookmarkedIds.has(item.bookmarkId ?? item.id)
-        ? { ...item, isBookmarked: true }
-        : item;
-    });
-  };
-  const onBookmarkChange = bookmarksEnabled && bookmarkKey != null
-    ? (item: NavigationItem, bookmarked: boolean) => {
-        initial.p1t(scope, bookmarkKey, item.bookmarkId ?? item.id, bookmarked);
-        const turnKey = normalizeTurnKey(item.turnKey);
-        if (!bookmarked && bookmarkedIds.has(turnKey) && getItems().find((candidate) => normalizeTurnKey(candidate.turnKey) === turnKey)?.id === item.id) {
-          initial.p1t(scope, bookmarkKey, turnKey, false);
-        }
-      }
-    : undefined;
-  return jsx.jsx(NavigationRail, { ...props, getItems: getDecoratedItems, onBookmarkChange });
+function L(e) {
+  let t = (0, z.c)(17),
+    r,
+    i,
+    a;
+  t[0] === e
+    ? ((r = t[1]), (i = t[2]), (a = t[3]))
+    : (({ bookmarkKey: r, getItems: i, ...a } = e), (t[0] = e), (t[1] = r), (t[2] = i), (t[3] = a));
+  let o = s(p),
+    c = v(b),
+    l = n(m, c ? r : null),
+    u;
+  t[4] !== l || t[5] !== i
+    ? ((u = () => {
+        let e = i();
+        if (l.size === 0) return e;
+        let t = new Set(l);
+        return e.map((e) => {
+          let n = R(e.turnKey);
+          return t.delete(n) || l.has(e.bookmarkId ?? e.id) ? { ...e, isBookmarked: !0 } : e;
+        });
+      }),
+      (t[4] = l),
+      (t[5] = i),
+      (t[6] = u))
+    : (u = t[6]);
+  let d;
+  t[7] !== r || t[8] !== l || t[9] !== i || t[10] !== c || t[11] !== o
+    ? ((d =
+        c && r != null
+          ? (e, t) => {
+              y(o, r, e.bookmarkId ?? e.id, t);
+              let n = R(e.turnKey);
+              !t && l.has(n) && i().find((e) => R(e.turnKey) === n)?.id === e.id && y(o, r, n, !1);
+            }
+          : void 0),
+      (t[7] = r),
+      (t[8] = l),
+      (t[9] = i),
+      (t[10] = c),
+      (t[11] = o),
+      (t[12] = d))
+    : (d = t[12]);
+  let f;
+  return (
+    t[13] !== a || t[14] !== u || t[15] !== d
+      ? ((f = (0, B.jsx)(x, { ...a, getItems: u, onBookmarkChange: d })),
+        (t[13] = a),
+        (t[14] = u),
+        (t[15] = d),
+        (t[16] = f))
+      : (f = t[16]),
+    f
+  );
 }
-
-function initializeBookmarkedNavigation(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeSignalRuntime();
-  initial.itn();
-  initial.ifn();
-  initial.f1t();
-  initializeMenuRuntime();
-  initializeIconRuntime();
-  React = getReactRuntime();
-  jsx = getJsxRuntime();
+function R(e) {
+  let t = e.indexOf(`:transcript:`);
+  return t === -1 ? e : e.slice(0, t);
 }
-
-export { initializeBookmarkedNavigation as n, BookmarkedThreadUserMessageNavigation as t };
+var z, B;
+function V() {
+  return (V = e(() => {
+    ((z = t()), r(), _(), g(), h(), I(), (B = a()));
+  }))();
+}
+export { V as n, L as t };

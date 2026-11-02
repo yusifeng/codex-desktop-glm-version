@@ -1,9 +1,92 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/library-cloud-file-preview";
-import "@rchunk/cloud-file-preview";
-interface SearchFilePreviewProps { accountId: string; authenticatedAccountId: string; item: { cloudFile: { name: string }; [key: string]: unknown }; onClose(): void; renderPreview?(item: SearchFilePreviewProps["item"]): unknown; sessionReady?: boolean; userId: string; authenticatedUserId?: string }
-let runtime: JsxRuntime | undefined; function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function ChatGptSearchFilePreview(props: SearchFilePreviewProps): unknown { if (props.accountId !== props.authenticatedAccountId || (props.authenticatedUserId != null && props.userId !== props.authenticatedUserId) || props.sessionReady === false) return null; return jsx().jsxs("section", { role: "dialog", "aria-modal": true, "aria-label": props.item.cloudFile.name, children: [jsx().jsx("h2", { className: "sr-only", children: props.item.cloudFile.name }), props.renderPreview?.(props.item) ?? jsx().jsx("div", { children: "File preview" }), jsx().jsx("button", { type: "button", onClick: props.onClose, children: "Close" })] }); }
-export { ChatGptSearchFilePreview };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  HX as r,
+  I3 as i,
+  Ih as a,
+  Rh as o,
+  zh as s,
+} from "@rchunk/app-shared";
+import {
+  CY as c,
+  SY as l,
+  Sqt as u,
+  Sun as d,
+  U6t as f,
+  _un as p,
+  mun as m,
+  xun as h,
+} from "@rchunk/app-initial";
+import { n as g } from "@rchunk/library-cloud-file-preview";
+import { t as _ } from "@rchunk/cloud-file-preview";
+function v(e) {
+  "use forget";
+  let t = (0, y.c)(13),
+    { accountId: n, authenticatedAccountId: i, item: s, userId: c, onClose: u } = e,
+    d = r(f),
+    _ = r(m),
+    v = r(p),
+    x = r(h);
+  if (d !== n || _ !== i || v !== c || !x) return null;
+  let S;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((S = { "aria-describedby": void 0 }), (t[0] = S))
+    : (S = t[0]);
+  let C;
+  t[1] === u
+    ? (C = t[2])
+    : ((C = (e) => {
+        e || u();
+      }),
+      (t[1] = u),
+      (t[2] = C));
+  let w;
+  t[3] === s.cloudFile.name
+    ? (w = t[4])
+    : ((w = (0, b.jsx)(o, { className: `sr-only`, children: s.cloudFile.name })),
+      (t[3] = s.cloudFile.name),
+      (t[4] = w));
+  let T;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((T = { pathname: `/library`, routeKind: `other`, routeTemplate: `/library` }), (t[5] = T))
+    : (T = t[5]);
+  let E;
+  t[6] !== s || t[7] !== u
+    ? ((E = (0, b.jsx)(l, {
+        route: T,
+        children: (0, b.jsx)(g, { item: s, openTarget: `external-browser`, onClose: u }),
+      })),
+      (t[6] = s),
+      (t[7] = u),
+      (t[8] = E))
+    : (E = t[8]);
+  let D;
+  return (
+    t[9] !== C || t[10] !== w || t[11] !== E
+      ? ((D = (0, b.jsxs)(a, {
+          contentProps: S,
+          open: !0,
+          showDialogClose: !1,
+          size: `xxxwideTall`,
+          variant: `chatgpt`,
+          onOpenChange: C,
+          children: [w, E],
+        })),
+        (t[9] = C),
+        (t[10] = w),
+        (t[11] = E),
+        (t[12] = D))
+      : (D = t[12]),
+    D
+  );
+}
+var y, b;
+function x() {
+  return (x = e(() => {
+    ((y = t()), n(), d(), u(), s(), _(), c(), (b = i()));
+  }))();
+}
+x();
+export { v as ChatGptSearchFilePreview };

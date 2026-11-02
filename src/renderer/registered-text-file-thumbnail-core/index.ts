@@ -1,29 +1,79 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as textThumbnailChunk from "@rchunk/thumbnail-386f09e9e7b3";
-
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>): unknown }
-interface ReactRuntime { useState<T>(initial: () => T): [T, (value: T) => void] }
-interface QueryClient { getQueryData(key: unknown): unknown }
-const { $3: initializeRuntime, FX: initializeSignals, I3: getJsxRuntime, LX: useScope, aJ: contentSampleMaxFileBytes, e6: getReactRuntime, lW: contentSampleByteLimit, wL: initializeLinks } = appSharedChunk as unknown as { $3(): void; FX(): void; I3(): JsxRuntime; LX(signal: unknown): { queryClient: QueryClient }; aJ: number; e6(): ReactRuntime; lW: number; wL(): void };
-const { $ln: queryKey, cet: appScope, let: initializeAppScope, nun: initializeQueries } = appInitialChunk as unknown as { $ln(name: string, input?: Record<string, unknown>): unknown; cet: unknown; let(): void; nun(): void };
-const { n: initializeTextThumbnail, t: TextThumbnail } = textThumbnailChunk as unknown as { n(): void; t: unknown };
-interface Draft { content: string; document?: { baseContent?: string; kind?: string } }
-interface TextFileState { draft?: Draft; markdownMode?: string; pierreDraft?: Draft; textDraft?: Draft }
-interface Props { hostId?: string; icon?: unknown; hideFilePath?: boolean; path: string; readState(): TextFileState | null; title: string }
-let jsx: JsxRuntime;
-function RegisteredTextFileThumbnail({ hostId, icon, hideFilePath, path, readState, title }: Props): unknown {
-  const { queryClient } = useScope(appScope);
-  const [snapshot] = getReactRuntime().useState(() => {
-    const state = readState();
-    const draft = state != null && "draft" in state ? state.draft : state?.markdownMode === "source" ? state.pierreDraft : state?.textDraft ?? state?.pierreDraft;
-    const metadata = queryClient.getQueryData(queryKey("read-file-metadata", { hostId, path, contentSampleByteLimit, contentSampleMaxFileBytes })) as { contentKind?: string } | undefined;
-    const file = metadata?.contentKind === "text" ? queryClient.getQueryData(queryKey("read-file", { hostId, path })) as { contents?: string } | undefined : undefined;
-    return { hasUnsavedChanges: draft != null && (draft.document == null || draft.document.kind === "conflict" || draft.content !== draft.document.baseContent), content: draft?.content ?? file?.contents ?? null };
-  });
-  return jsx.jsx(TextThumbnail, { title, path, icon, hideFilePath, ...snapshot });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  I3 as r,
+  LX as i,
+  aJ as a,
+  e6 as o,
+  lW as s,
+  wL as c,
+} from "@rchunk/app-shared";
+import { $ln as l, cet as u, let as d, nun as f } from "@rchunk/app-initial";
+import { n as p, t as m } from "@rchunk/text-file-thumbnail";
+function h(e) {
+  let t = (0, g.c)(11),
+    { hostId: n, icon: r, hideFilePath: o, path: c, readState: d, title: f } = e,
+    p = i(u),
+    h;
+  t[0] !== n || t[1] !== c || t[2] !== d || t[3] !== p.queryClient
+    ? ((h = () => {
+        let e = d(),
+          t;
+        t =
+          e != null && `draft` in e
+            ? e.draft
+            : e?.markdownMode === `source`
+              ? e.pierreDraft
+              : (e?.textDraft ?? e?.pierreDraft);
+        let r = p.queryClient.getQueryData(
+          l(`read-file-metadata`, {
+            hostId: n,
+            path: c,
+            contentSampleByteLimit: s,
+            contentSampleMaxFileBytes: a,
+          }),
+        );
+        return {
+          hasUnsavedChanges:
+            t != null &&
+            (!(`document` in t) ||
+              t.document.kind === `conflict` ||
+              t.content !== t.document.baseContent),
+          content:
+            t?.content ??
+            (r?.contentKind === `text`
+              ? (p.queryClient.getQueryData(l(`read-file`, { hostId: n, path: c }))?.contents ??
+                null)
+              : null),
+        };
+      }),
+      (t[0] = n),
+      (t[1] = c),
+      (t[2] = d),
+      (t[3] = p.queryClient),
+      (t[4] = h))
+    : (h = t[4]);
+  let [y] = (0, _.useState)(h),
+    b;
+  return (
+    t[5] !== o || t[6] !== r || t[7] !== c || t[8] !== y || t[9] !== f
+      ? ((b = (0, v.jsx)(m, { title: f, path: c, icon: r, hideFilePath: o, ...y })),
+        (t[5] = o),
+        (t[6] = r),
+        (t[7] = c),
+        (t[8] = y),
+        (t[9] = f),
+        (t[10] = b))
+      : (b = t[10]),
+    b
+  );
 }
-let initialized = false;
-function initializeRegisteredTextFileThumbnail(): void { if (initialized) return; initialized = true; initializeRuntime(); initializeSignals(); initializeLinks(); initializeAppScope(); initializeQueries(); initializeTextThumbnail(); jsx = getJsxRuntime(); }
-export { initializeRegisteredTextFileThumbnail as n, RegisteredTextFileThumbnail as t };
+var g, _, v;
+function y() {
+  return (y = e(() => {
+    ((g = t()), n(), c(), (_ = o()), d(), f(), p(), (v = r()));
+  }))();
+}
+export { y as n, h as t };

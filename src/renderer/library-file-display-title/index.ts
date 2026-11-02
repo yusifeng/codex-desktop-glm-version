@@ -1,5 +1,49 @@
-import "@rchunk/rolldown-runtime";
-interface MessageFormatter { formatMessage(descriptor: { defaultMessage: string; id: string }, values?: Record<string, string>): string }
-function displayTitle(name: string, kind: string | null | undefined, intl: MessageFormatter): string { if (kind === "flashcards") { const title = name.replace(/\.flashcards$/i, ""); const duplicate = title.match(/^(.*?)\s*\((\d+)\)$/); if (duplicate?.[1]?.trim()) return intl.formatMessage({ id: "recall.flashcards.library.artifact.display_title.duplicate", defaultMessage: "{title} Flashcards ({duplicateIndex})" }, { title: duplicate[1].trim(), duplicateIndex: duplicate[2] }); if (/^flashcards$/i.test(title.trim())) return intl.formatMessage({ id: "recall.flashcards.library.artifact.display_title.untitled", defaultMessage: "Flashcards" }); return intl.formatMessage({ id: "recall.flashcards.library.artifact.display_title", defaultMessage: "{title} Flashcards" }, { title }); } if (kind === "learning_quiz") return name.replace(/\.learningquiz$/i, ""); if (kind === "writing_block" || kind === "chat_message_snapshot") return name.replace(/\.md$/i, ""); if (kind === "app_block" || kind === "site_preview") return name.replace(/\.html?$/i, ""); return name; }
-function initialize(): void {}
-export { initialize as n, displayTitle as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e, t, n) {
+  switch (t) {
+    case `flashcards`: {
+      let t = e.replace(/\.flashcards$/i, ``),
+        r = t.match(/^(.*?)\s*\((\d+)\)$/);
+      return r?.[1]?.trim()
+        ? n.formatMessage(
+            {
+              id: `recall.flashcards.library.artifact.display_title.duplicate`,
+              defaultMessage: `{title} Flashcards ({duplicateIndex})`,
+              description: `Title shown for an automatically numbered saved flashcard deck in ChatGPT Library. Placeholder {title} is the learner’s original deck title, and {duplicateIndex} is the Library-generated number. Translate Flashcards and reorder it around the title as needed for the interface language.`,
+            },
+            { title: r[1].trim(), duplicateIndex: r[2] },
+          )
+        : /^flashcards$/i.test(t.trim())
+          ? n.formatMessage({
+              id: `recall.flashcards.library.artifact.display_title.untitled`,
+              defaultMessage: `Flashcards`,
+              description: `Standalone title for a saved flashcard deck without a meaningful name in ChatGPT Library lists, grids, viewer headers, sharing dialogs, and file pickers. Translate Flashcards as a concise name for a deck of study cards.`,
+            })
+          : n.formatMessage(
+              {
+                id: `recall.flashcards.library.artifact.display_title`,
+                defaultMessage: `{title} Flashcards`,
+                description: `Title shown for a saved flashcard deck in ChatGPT Library lists, grids, viewer headers, and sharing dialogs. Placeholder {title} is the learner’s original deck title without its internal .flashcards file extension; translate the word Flashcards and reorder it around the title as needed for the interface language.`,
+              },
+              { title: t },
+            );
+    }
+    case `learning_quiz`:
+      return e.replace(/\.learningquiz$/i, ``);
+    case `writing_block`:
+    case `chat_message_snapshot`:
+      return e.replace(/\.md$/i, ``);
+    case `app_block`:
+    case `site_preview`:
+      return e.replace(/\.html?$/i, ``);
+    case null:
+    case void 0:
+    default:
+      return e;
+  }
+}
+function n() {
+  return (n = e(() => {}))();
+}
+export { n, t };

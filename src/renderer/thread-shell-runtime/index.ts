@@ -1,399 +1,474 @@
-// Terminal/session integration for local thread shells.  The public exports
-// intentionally match the release chunk: c/l/u are reactive signals, while
-// a/f/i/m/o/p/r/s/t are scope operations.
-
-import * as shared from "@rchunk/app-shared";
-import * as initial from "@rchunk/app-initial";
-import * as workspaceWarning from "@rchunk/terminal-workspace-warning-state";
-
-export type TerminalPanel = "bottom" | "right";
-export interface ThreadTerminalContext { conversationId: string; conversationTitle?: string | null; cwd?: string | null; hostId?: string }
-export interface TerminalSession { context: ThreadTerminalContext; id: string; panel: TerminalPanel; snapshot?: unknown }
-export interface TerminalScope {
-  activePanel?: TerminalPanel;
-  context?: ThreadTerminalContext | null;
-  defaultTerminalLocation?: TerminalPanel;
-  sessions: TerminalSession[];
-  terminalHidden?: boolean;
-}
-interface AppScope {
-  value: { routeKind?: string; clientThreadId?: string; conversationId?: string };
-  get<T = unknown>(signal: unknown, ...args: unknown[]): T;
-  set?(signal: unknown, ...values: unknown[]): void;
-  watch?(listener: (scope: AppScope) => void): () => void;
-}
-interface OpenOptions { revealAndFocus?: boolean; cwd?: string | null; hostId?: string; insertPosition?: unknown; snapshot?: unknown }
-interface TerminalManager {
-  addSessionForConversation?(conversationId: string, sessionId?: string, options?: { activate?: boolean }): string;
-  attachExistingForConversation?(conversationId: string, sessionId: string, snapshot: unknown, options?: unknown): Promise<boolean>;
-  canTransferSessionToConversation?(from: string, to: string, sessionId: string): boolean;
-  claimPreloadedSessionForConversation?(conversationId: string, sessionId: string): void;
-  closeSessionForConversation?(conversationId: string, sessionId: string): void;
-  getConversationSnapshot?(conversationId: string): { activeSessionId?: string; cwdBySessionId?: Record<string, string>; sessionIds: string[]; tabTitlesBySessionId?: Record<string, string> } | null;
-  getSnapshot?(sessionId: string): unknown;
-  getWorkspaceBinding?(sessionId: string): { hostId?: string; workspaceRoot?: string } | null;
-  seedSessionForConversation?(conversationId: string, sessionId: string, snapshot: unknown, cwd?: string | null): void;
-  setActiveSessionForConversation?(conversationId: string, sessionId: string): void;
-  subscribeToConversation?(conversationId: string, listener: () => void): () => void;
-  transferSessionOwnership?(from: string, to: string, sessionId: string, options?: unknown): unknown;
-}
-interface PanelController {
-  activeTab$?: unknown;
-  tabs$?: unknown;
-  activateTab?(scope: AppScope, tabId: string): void;
-  closeTab?(scope: AppScope, tabId: string, options?: { recordCloseUndo?: boolean }): void;
-  updateTab?(scope: AppScope, tabId: string, patch: Record<string, unknown>): void;
-}
-
-const init = initial as Record<string, unknown>;
-const sh = shared as Record<string, unknown>;
-let sequence = 0;
-let bottomTerminalActiveSignal: unknown;
-let rightTerminalActiveSignal: unknown;
-let defaultTerminalLocationSignal: unknown;
-let terminalEntityController: Record<string, unknown>;
-let initialized = false;
-const subscriptions = new Map<string, { panels: Set<TerminalPanel>; target: ThreadTerminalContext; unsubscribe(): void }>();
-const closingSessions = new Set<string>();
-const fallbackDeferredSignal = Symbol("deferred-terminal");
-
-function terminalTabId(sessionId: string): string {
-  const formatter = init.Gst;
-  return typeof formatter === "function" ? String((formatter as (id: string) => unknown)(sessionId)) : `terminal:${sessionId}`;
-}
-function sessionIdFromTab(tabId: string | null | undefined): string | null {
-  if (tabId == null) return null;
-  const prefix = typeof init.Wst === "string" ? init.Wst : "terminal:";
-  return tabId.startsWith(prefix) ? tabId.slice(prefix.length) : null;
-}
-function isAppScope(scope: AppScope | TerminalScope): scope is AppScope {
-  return typeof (scope as AppScope).get === "function" && (scope as AppScope).value != null;
-}
-function getSignal<T>(scope: AppScope, alias: string, fallback: T, ...args: unknown[]): T {
-  const signal = init[alias];
-  if (signal == null) return fallback;
-  try { return scope.get<T>(signal, ...args); } catch { return fallback; }
-}
-function call<T>(alias: string, ...args: unknown[]): T | undefined {
-  const fn = init[alias];
-  if (typeof fn !== "function") return undefined;
-  return (fn as (...values: unknown[]) => T)(...args);
-}
-function manager(): TerminalManager {
-  return (init.Rgn ?? {}) as TerminalManager;
-}
-function controller(panel: TerminalPanel): PanelController {
-  return (panel === "bottom" ? init.Vvt : init.qvt) as PanelController ?? {};
-}
-function panelTabs(scope: AppScope, panel: TerminalPanel): Array<{ tabId: string; props?: Record<string, unknown>; title?: string }> {
-  const signal = controller(panel).tabs$;
-  if (signal == null) return [];
-  try { return scope.get(signal) as Array<{ tabId: string; props?: Record<string, unknown>; title?: string }>; } catch { return []; }
-}
-function activeTabId(scope: AppScope, panel: TerminalPanel): string | null {
-  const signal = controller(panel).activeTab$;
-  if (signal == null) return null;
-  try { return (scope.get(signal) as { tabId?: string } | null)?.tabId ?? null; } catch { return null; }
-}
-
-function terminalContext(scope: AppScope | TerminalScope): ThreadTerminalContext | null {
-  if (!isAppScope(scope)) return scope.terminalHidden ? null : scope.context ?? null;
-  if (getSignal(scope, "atn", false)) return null;
-  const cwd = getSignal<string | null>(scope, "Syt", null);
-  const hostId = getSignal<string | undefined>(scope, "Dyt", undefined);
-  if (scope.value.routeKind === "home" && scope.value.clientThreadId != null) {
-    return { conversationId: scope.value.clientThreadId, conversationTitle: null, cwd, hostId };
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  FX as n,
+  II as r,
+  RI as i,
+  iz as a,
+  l3 as o,
+  pZ as s,
+  sZ as c,
+  wL as l,
+} from "@rchunk/app-shared";
+import {
+  $en as u,
+  AD as d,
+  Bcn as f,
+  Dyt as p,
+  Ebt as m,
+  Evt as h,
+  Ftn as g,
+  Gst as _,
+  Gvt as ee,
+  Ibt as v,
+  Jvt as y,
+  Kst as b,
+  LCt as x,
+  Lbt as te,
+  Lgn as ne,
+  RCt as re,
+  Rgn as S,
+  Syt as ie,
+  T_t as ae,
+  Vcn as oe,
+  Vvt as C,
+  Wst as se,
+  Wvt as ce,
+  Yvt as le,
+  _vt as ue,
+  atn as w,
+  byt as de,
+  hvt as T,
+  itn as fe,
+  jD as pe,
+  mbt as E,
+  mpn as me,
+  pbt as he,
+  ppn as ge,
+  pvt as D,
+  qbt as _e,
+  qst as ve,
+  qvt as O,
+  v_t as ye,
+  vbt as k,
+  vvt as A,
+  wtn as be,
+  wvt as xe,
+  xvt as Se,
+} from "@rchunk/app-initial";
+import { r as j, t as Ce } from "@rchunk/terminal-workspace-warning-state";
+function M(e, t, n, i, a) {
+  let o = e?.trim();
+  if (o != null && o.length > 0) return o;
+  if (t != null && t.trim().length > 0) {
+    let e = r(t) || t;
+    return i > 1 ? `${e} ${n + 1}` : e;
   }
-  if (scope.value.routeKind === "local-thread" && scope.value.conversationId != null) {
-    const resolveConversationId = init.AD;
-    const conversationId = typeof resolveConversationId === "function"
-      ? String((resolveConversationId as (scope: AppScope, id: string) => unknown)(scope, scope.value.conversationId))
-      : scope.value.conversationId;
-    return { conversationId, conversationTitle: getSignal<string | null>(scope, "RCt", null, scope.value.conversationId), cwd, hostId };
+  return a.formatMessage(
+    {
+      id: `terminal.tabs.title`,
+      defaultMessage: `Terminal {index}`,
+      description: `Terminal tab title with a 1-based tab index`,
+    },
+    { index: n + 1 },
+  );
+}
+function N() {
+  return (N = e(() => {
+    i();
+  }))();
+}
+function we(e) {
+  (D(e, `right`), requestAnimationFrame(Se));
+}
+function Te(e) {
+  P(e, void 0, `bottom`);
+}
+function Ee(e, t, n = B(e), r = {}) {
+  return Q.open(e, t, n, r);
+}
+function P(e, t, n = B(e), { revealAndFocus: r = !0, cwd: i, hostId: a, insertPosition: o } = {}) {
+  let s = t == null ? n : je(e, t, n),
+    c = W(e);
+  if (c == null) return null;
+  let l = { ...c, cwd: i === void 0 ? c.cwd : i, hostId: a === void 0 ? c.hostId : a },
+    u = S.getConversationSnapshot(l.conversationId);
+  t != null &&
+    !u?.sessionIds.includes(t) &&
+    S.addSessionForConversation(l.conversationId, t, { activate: r });
+  let d =
+    t ??
+    Pe(e, s, u?.sessionIds ?? []) ??
+    S.addSessionForConversation(l.conversationId, void 0, { activate: r });
+  return (
+    S.claimPreloadedSessionForConversation(l.conversationId, d),
+    r && S.setActiveSessionForConversation(l.conversationId, d),
+    U(e, l, s),
+    V(e, l, {
+      activeSessionId: d,
+      revealAndFocus: r,
+      panel: s,
+      addedSessionId: d,
+      insertPosition: o,
+    }),
+    d
+  );
+}
+function F(e) {
+  return W(e) != null;
+}
+function I(e) {
+  R(e, `bottom`);
+}
+function De(e) {
+  A(e, `bottom`, { allowEmpty: !0 }) && e.set(J, !0);
+}
+function Oe(e) {
+  return e.watch((e) => {
+    if (e.get(J)) {
+      if (!e.get(E) || e.get(C.tabs$).length > 0 || e.get(ae) === `failed`) {
+        e.set(J, !1);
+        return;
+      }
+      e.get(te) && F(e) && (e.set(J, !1), I(e));
+    }
+  });
+}
+function L(e) {
+  R(e, `right`);
+}
+function R(e, t, n) {
+  let r = W(e);
+  if (r == null) return;
+  let i = S.addSessionForConversation(r.conversationId);
+  (U(e, r, t),
+    V(e, r, {
+      activeSessionId: i,
+      revealAndFocus: !0,
+      panel: t,
+      addedSessionId: i,
+      replaceTabId: n,
+    }));
+}
+function ke(e, { panel: t, sessionId: n, snapshot: r }) {
+  let i = W(e);
+  i != null &&
+    (S.seedSessionForConversation(i.conversationId, n, r, i.cwd),
+    U(e, i, t),
+    V(e, i, { activeSessionId: n, revealAndFocus: !1, panel: t, addedSessionId: n }));
+}
+function z(e) {
+  if (!e.get(w)) {
+    if (e.get(Y)) {
+      D(e, `bottom`);
+      return;
+    }
+    Te(e);
+  }
+}
+function Ae(e, t = B(e)) {
+  if (!e.get(w)) {
+    if (t === `bottom`) {
+      z(e);
+      return;
+    }
+    if (e.get(X)) {
+      we(e);
+      return;
+    }
+    P(e, void 0, `right`);
+  }
+}
+function B(e) {
+  return e.get(Z);
+}
+function je(e, t, n) {
+  let r = _(t);
+  return e.get(C.tabs$).some((e) => e.tabId === r)
+    ? `bottom`
+    : e.get(O.tabs$).some((e) => e.tabId === r)
+      ? `right`
+      : n;
+}
+function V(
+  e,
+  t,
+  {
+    activeSessionId: n,
+    revealAndFocus: r,
+    panel: i,
+    addedSessionId: a,
+    insertPosition: o,
+    replaceTabId: s,
+  },
+) {
+  let c = S.getConversationSnapshot(t.conversationId),
+    l = c?.sessionIds ?? [],
+    u = e.get(me),
+    d = T(i);
+  Ne(e, l, i);
+  let f = Fe(e, i, l, a),
+    p = new Map(e.get(d.tabs$).map((e) => [e.tabId, e]));
+  for (let [n, r] of f.entries()) {
+    let l = _(r),
+      m = S.getWorkspaceBinding(r),
+      h = c?.cwdBySessionId[r] || (m == null ? t.cwd : m.workspaceRoot),
+      g = m == null ? t.hostId : m.hostId,
+      v = M(c?.tabTitlesBySessionId[r], h, n, f.length, u),
+      y = { ...t, cwd: h, hostId: g, onNewTerminalTab: i === `bottom` ? I : L, sessionId: r },
+      b = p.get(l);
+    if (b != null) {
+      (b.title !== v || !(0, Le.default)(b.props, y)) && d.updateTab(e, l, { props: y, title: v });
+      continue;
+    }
+    let x = null;
+    ee(e, Q, {
+      revealAndFocus: !1,
+      insertPosition: r === a ? o : void 0,
+      target: i,
+      replaceTabId: r === a ? s : void 0,
+      onActivate: (e) => {
+        H(e, t, r, i);
+      },
+      onClose: (e) => {
+        let n = S.getSnapshot(r);
+        if (n != null) {
+          ((x = n), e.set(j, r, null), q.add(r));
+          try {
+            S.closeSessionForConversation(t.conversationId, r);
+          } finally {
+            q.delete(r);
+          }
+        }
+      },
+      onUndoClose: (e, n) => {
+        x != null && (S.seedSessionForConversation(t.conversationId, r, x, h), U(e, t, n));
+      },
+      onMove: (e, n) => {
+        if (n.panelId !== `bottom` && n.panelId !== `right`) return;
+        let i = n.panelId;
+        return (
+          U(e, t, i),
+          {
+            onActivate: (e) => {
+              H(e, t, r, i);
+            },
+            props: {
+              ...t,
+              cwd: h,
+              hostId: g,
+              onNewTerminalTab: i === `bottom` ? I : L,
+              sessionId: r,
+            },
+          }
+        );
+      },
+      requiresWorkspaceReady: !1,
+      props: y,
+    });
+  }
+  r && (d.activateTab(e, _(n)), A(e, i));
+}
+function Me(e, { conversationId: t, cwd: n, onNewTerminalTab: r, sessionId: i }) {
+  let a = S.getConversationSnapshot(t),
+    o = Fe(e, r === I ? `bottom` : `right`, a?.sessionIds ?? [], i),
+    s = S.getWorkspaceBinding(i);
+  return M(
+    a?.tabTitlesBySessionId[i],
+    a?.cwdBySessionId[i] || (s == null ? n : s.workspaceRoot),
+    o.indexOf(i),
+    o.length,
+    e.get(me),
+  );
+}
+function H(e, t, n, r) {
+  let i = T(r);
+  if (!S.getConversationSnapshot(t.conversationId)?.sessionIds.includes(n)) {
+    let t = _(n);
+    i.closeTab(e, t, { recordCloseUndo: !1 });
+    return;
+  }
+  (S.setActiveSessionForConversation(t.conversationId, n),
+    V(e, t, { activeSessionId: n, revealAndFocus: !1, panel: r }));
+  let a = _(n),
+    o = r === `bottom` ? `bottom-panel` : `right-panel`;
+  requestAnimationFrame(() => {
+    let t = document.querySelector(
+      `[role="tabpanel"][data-app-shell-tab-panel-controller="${r}"][data-tab-id="${a}"]`,
+    );
+    if (t == null) return;
+    let n = () =>
+      !(r === `bottom` ? e.get(E) : e.get(k)) ||
+      e.get(v) !== o ||
+      e.get(i.activeTab$)?.tabId !== a ||
+      !t.isConnected ||
+      (t.querySelector(`textarea`) != null && (xe(t), !0));
+    if (n()) return;
+    let s = new MutationObserver(() => {
+      n() && s.disconnect();
+    });
+    s.observe(t, { childList: !0, subtree: !0 });
+  });
+}
+function U(e, t, n) {
+  let r = String(t.conversationId),
+    i = K.get(r);
+  if (i != null) {
+    i.panels.add(n);
+    return;
+  }
+  let a = S.subscribeToConversation(t.conversationId, () => {
+    let n = S.getConversationSnapshot(t.conversationId);
+    if (n == null) {
+      let t = K.get(r);
+      if (t != null) {
+        for (let n of t.panels) Ne(e, [], n);
+        t.unsubscribe();
+      }
+      K.delete(r);
+      return;
+    }
+    let i = K.get(r);
+    if (i != null) {
+      i.target = W(e) ?? i.target;
+      for (let t of i.panels)
+        V(e, i.target, { activeSessionId: n.activeSessionId, revealAndFocus: !1, panel: t });
+    }
+  });
+  K.set(r, { panels: new Set([n]), target: t, unsubscribe: a });
+}
+function Ne(e, t, n) {
+  let r = T(n),
+    i = new Set(t),
+    a = !1;
+  for (let t of e.get(r.tabs$)) {
+    let n = G(t.tabId);
+    n != null &&
+      !i.has(n) &&
+      !q.has(n) &&
+      !le(e, r, t.tabId) &&
+      (e.set(j, n, null), r.closeTab(e, t.tabId, { recordCloseUndo: !1 }), (a = !0));
+  }
+  a && e.get(r.tabs$).length === 0 && D(e, n);
+}
+function Pe(e, t, n) {
+  let r = new Set(n),
+    i = T(t),
+    a = G(e.get(i.activeTab$)?.tabId ?? null);
+  if (a != null && r.has(a)) return a;
+  for (let t of e.get(i.tabs$)) {
+    let e = G(t.tabId);
+    if (e != null && r.has(e)) return e;
   }
   return null;
 }
-
-function hasTerminalContext(scope: AppScope | TerminalScope): boolean {
-  return terminalContext(scope) != null;
+function Fe(e, t, n, r) {
+  let i = new Set(n),
+    a = e.get(T(t).tabs$).flatMap((e) => {
+      let t = G(e.tabId);
+      return t != null && i.has(t) ? [t] : [];
+    });
+  return r == null || !i.has(r) || a.includes(r) ? a : [...a, r];
 }
-function defaultTerminalLocation(scope: AppScope | TerminalScope): TerminalPanel {
-  if (!isAppScope(scope)) return scope.defaultTerminalLocation ?? "bottom";
-  if (defaultTerminalLocationSignal != null) {
-    try { return scope.get<TerminalPanel>(defaultTerminalLocationSignal); } catch { /* fall through */ }
-  }
-  return getSignal<boolean>(scope, "pbt", true) === false ? "right" : "bottom";
-}
-function existingPanel(scope: AppScope, sessionId: string, fallback: TerminalPanel): TerminalPanel {
-  const tabId = terminalTabId(sessionId);
-  if (panelTabs(scope, "bottom").some((tab) => tab.tabId === tabId)) return "bottom";
-  if (panelTabs(scope, "right").some((tab) => tab.tabId === tabId)) return "right";
-  return fallback;
-}
-
-function openTerminal(scope: AppScope | TerminalScope, sessionId?: string, panel: TerminalPanel = defaultTerminalLocation(scope), options: OpenOptions = {}): string | null {
-  const context = terminalContext(scope);
-  if (context == null) return null;
-  const targetPanel = sessionId == null || !isAppScope(scope) ? panel : existingPanel(scope, sessionId, panel);
-  if (!isAppScope(scope)) {
-    const id = sessionId ?? `terminal-${++sequence}`;
-    const existing = scope.sessions.find((session) => session.id === id);
-    if (existing == null) scope.sessions.push({ context: { ...context, cwd: options.cwd ?? context.cwd, hostId: options.hostId ?? context.hostId }, id, panel: targetPanel, snapshot: options.snapshot });
-    else { existing.panel = targetPanel; existing.snapshot = options.snapshot ?? existing.snapshot; }
-    scope.activePanel = targetPanel;
-    scope.terminalHidden = false;
-    return id;
-  }
-  const terminalManager = manager();
-  const revealAndFocus = options.revealAndFocus !== false;
-  const snapshot = terminalManager.getConversationSnapshot?.(context.conversationId);
-  if (sessionId != null && !snapshot?.sessionIds.includes(sessionId)) terminalManager.addSessionForConversation?.(context.conversationId, sessionId, { activate: revealAndFocus });
-  const id = sessionId ?? pickExistingSession(scope, targetPanel, snapshot?.sessionIds ?? []) ?? terminalManager.addSessionForConversation?.(context.conversationId, undefined, { activate: revealAndFocus }) ?? `terminal-${++sequence}`;
-  terminalManager.claimPreloadedSessionForConversation?.(context.conversationId, id);
-  if (revealAndFocus) terminalManager.setActiveSessionForConversation?.(context.conversationId, id);
-  const target = { ...context, cwd: options.cwd === undefined ? context.cwd : options.cwd, hostId: options.hostId === undefined ? context.hostId : options.hostId };
-  subscribe(scope, target, targetPanel);
-  syncPanel(scope, target, targetPanel, id, revealAndFocus, id, options.insertPosition);
-  return id;
-}
-
-function pickExistingSession(scope: AppScope, panel: TerminalPanel, sessionIds: string[]): string | null {
-  const available = new Set(sessionIds);
-  const active = sessionIdFromTab(activeTabId(scope, panel));
-  if (active != null && available.has(active)) return active;
-  for (const tab of panelTabs(scope, panel)) {
-    const id = sessionIdFromTab(tab.tabId);
-    if (id != null && available.has(id)) return id;
-  }
-  return null;
-}
-
-function orderedPanelSessions(scope: AppScope, panel: TerminalPanel, sessionIds: string[], addedSessionId?: string): string[] {
-  const available = new Set(sessionIds);
-  const ordered = panelTabs(scope, panel).flatMap((tab) => {
-    const id = sessionIdFromTab(tab.tabId);
-    return id != null && available.has(id) ? [id] : [];
-  });
-  return addedSessionId == null || !available.has(addedSessionId) || ordered.includes(addedSessionId) ? ordered : [...ordered, addedSessionId];
-}
-
-function sessionTitle(scope: AppScope, context: ThreadTerminalContext, sessionId: string, index: number, count: number): string {
-  const snapshot = manager().getConversationSnapshot?.(context.conversationId);
-  const explicit = snapshot?.tabTitlesBySessionId?.[sessionId]?.trim();
-  if (explicit) return explicit;
-  const binding = manager().getWorkspaceBinding?.(sessionId);
-  const cwd = snapshot?.cwdBySessionId?.[sessionId] || binding?.workspaceRoot || context.cwd;
-  if (cwd?.trim()) {
-    const base = cwd.split(/[\\/]/).filter(Boolean).at(-1) ?? cwd;
-    return count > 1 ? `${base} ${index + 1}` : base;
-  }
-  const intl = getSignal<{ formatMessage?(descriptor: unknown, values: { index: number }): string } | null>(scope, "mpn", null);
-  return intl?.formatMessage?.({}, { index: index + 1 }) ?? `Terminal ${index + 1}`;
-}
-
-function syncPanel(scope: AppScope, context: ThreadTerminalContext, panel: TerminalPanel, activeSessionId?: string, revealAndFocus = false, addedSessionId?: string, insertPosition?: unknown, replaceTabId?: string): void {
-  const terminalManager = manager();
-  const snapshot = terminalManager.getConversationSnapshot?.(context.conversationId);
-  const sessionIds = snapshot?.sessionIds ?? [];
-  removeStaleTabs(scope, panel, sessionIds);
-  const ordered = orderedPanelSessions(scope, panel, sessionIds, addedSessionId);
-  const tabs = new Map(panelTabs(scope, panel).map((tab) => [tab.tabId, tab]));
-  ordered.forEach((sessionId, index) => {
-    const tabId = terminalTabId(sessionId);
-    const binding = terminalManager.getWorkspaceBinding?.(sessionId);
-    const props = { ...context, cwd: snapshot?.cwdBySessionId?.[sessionId] || binding?.workspaceRoot || context.cwd, hostId: binding?.hostId ?? context.hostId, onNewTerminalTab: panel === "bottom" ? openBottomTerminal : openRightTerminal, sessionId };
-    const title = sessionTitle(scope, context, sessionId, index, ordered.length);
-    const existing = tabs.get(tabId);
-    if (existing != null) {
-      if (existing.title !== title) controller(panel).updateTab?.(scope, tabId, { props, title });
-      return;
+function W(e) {
+  if (e.get(w)) return null;
+  switch (e.value.routeKind) {
+    case `home`: {
+      let t = e.get(ie),
+        n = e.get(p);
+      return { conversationId: e.value.clientThreadId, conversationTitle: null, cwd: t, hostId: n };
     }
-    const register = init.Gvt;
-    if (typeof register === "function") {
-      let closedSnapshot: unknown = null;
-      (register as (...args: unknown[]) => unknown)(scope, terminalEntityController, {
-        revealAndFocus: false, insertPosition, target: panel, replaceTabId, requiresWorkspaceReady: false, props,
-        onActivate: (current: AppScope) => activateTerminal(current, context, sessionId, panel),
-        onClose: (current: AppScope) => {
-          closedSnapshot = terminalManager.getSnapshot?.(sessionId) ?? null;
-          closingSessions.add(sessionId);
-          try { terminalManager.closeSessionForConversation?.(context.conversationId, sessionId); }
-          finally { closingSessions.delete(sessionId); }
-          current.set?.((workspaceWarning as Record<string, unknown>).r, sessionId, null);
+    case `local-thread`:
+      return {
+        conversationId: d(e, e.value.conversationId),
+        conversationTitle: e.get(re, e.value.conversationId),
+        cwd: e.get(ie),
+        hostId: e.get(p),
+      };
+    case `new-thread-panel`:
+    case `chatgpt-thread`:
+    case `client-local-thread`:
+    case `remote-thread`:
+    case `other`:
+      return null;
+  }
+}
+function G(e) {
+  return e?.startsWith(`terminal:`) ? e.slice(se.length) : null;
+}
+function Ie(e) {
+  return e.startsWith(se);
+}
+var Le, K, q, J, Y, X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((Le = t(o(), 1)),
+      n(),
+      l(),
+      _e(),
+      ce(),
+      y(),
+      m(),
+      h(),
+      ge(),
+      x(),
+      fe(),
+      de(),
+      g(),
+      oe(),
+      pe(),
+      ne(),
+      N(),
+      Ce(),
+      ue(),
+      ye(),
+      b(),
+      (K = new Map()),
+      (q = new Set()),
+      (J = s(be, !1)),
+      (Y = c(u, ({ get: e }) => {
+        let t = e(C.activeTab$);
+        return e(E) && t != null && Ie(t.tabId);
+      })),
+      (X = c(u, ({ get: e }) => {
+        let t = e(O.activeTab$);
+        return e(k) && t != null && Ie(t.tabId);
+      })),
+      (Z = c(u, ({ get: e, scope: t }) =>
+        e(he) === !1 ? `right` : f(t.get, a.defaultTerminalLocation),
+      )),
+      (Q = ve({
+        conversationTransfer: {
+          canTransfer: (e, t, n) =>
+            S.canTransferSessionToConversation(t.conversationId, d(e, n.threadId), t.sessionId),
+          start: (e, t, n, r) =>
+            S.transferSessionOwnership(t.conversationId, d(e, n.threadId), t.sessionId, r),
         },
-        onUndoClose: (current: AppScope, movedPanel: TerminalPanel) => {
-          if (closedSnapshot != null) terminalManager.seedSessionForConversation?.(context.conversationId, sessionId, closedSnapshot, props.cwd);
-          subscribe(current, context, movedPanel);
+        getId: _,
+        getTitle: Me,
+        open: P,
+        preloadExisting: (e, t, n, r) => {
+          let i = W(e);
+          return i == null
+            ? Promise.resolve(!1)
+            : S.attachExistingForConversation(i.conversationId, t, n, r);
         },
-        onMove: (current: AppScope, move: { panelId?: string }) => {
-          if (move.panelId !== "bottom" && move.panelId !== "right") return undefined;
-          const movedPanel = move.panelId;
-          subscribe(current, context, movedPanel);
-          return {
-            onActivate: (nextScope: AppScope) => activateTerminal(nextScope, context, sessionId, movedPanel),
-            props: { ...props, onNewTerminalTab: movedPanel === "bottom" ? openBottomTerminal : openRightTerminal },
-          };
-        },
-      });
-    }
-  });
-  if (revealAndFocus && activeSessionId != null) {
-    controller(panel).activateTab?.(scope, terminalTabId(activeSessionId));
-    call("vvt", scope, panel);
-  }
+      })));
+  }))();
 }
-
-function removeStaleTabs(scope: AppScope, panel: TerminalPanel, sessionIds: string[]): void {
-  const live = new Set(sessionIds);
-  for (const tab of panelTabs(scope, panel)) {
-    const sessionId = sessionIdFromTab(tab.tabId);
-    if (sessionId != null && !live.has(sessionId) && !closingSessions.has(sessionId)) {
-      scope.set?.((workspaceWarning as Record<string, unknown>).r, sessionId, null);
-      controller(panel).closeTab?.(scope, tab.tabId, { recordCloseUndo: false });
-    }
-  }
-}
-
-function subscribe(scope: AppScope, context: ThreadTerminalContext, panel: TerminalPanel): void {
-  const key = String(context.conversationId);
-  const existing = subscriptions.get(key);
-  if (existing != null) { existing.panels.add(panel); existing.target = context; return; }
-  const unsubscribe = manager().subscribeToConversation?.(context.conversationId, () => {
-    const subscription = subscriptions.get(key);
-    const snapshot = manager().getConversationSnapshot?.(context.conversationId);
-    if (subscription == null) return;
-    if (snapshot == null) {
-      for (const currentPanel of subscription.panels) removeStaleTabs(scope, currentPanel, []);
-      subscription.unsubscribe();
-      subscriptions.delete(key);
-      return;
-    }
-    subscription.target = terminalContext(scope) ?? subscription.target;
-    for (const currentPanel of subscription.panels) syncPanel(scope, subscription.target, currentPanel, snapshot.activeSessionId, false);
-  }) ?? (() => {});
-  subscriptions.set(key, { panels: new Set([panel]), target: context, unsubscribe });
-}
-
-function activateTerminal(scope: AppScope, context: ThreadTerminalContext, sessionId: string, panel: TerminalPanel): void {
-  const snapshot = manager().getConversationSnapshot?.(context.conversationId);
-  if (!snapshot?.sessionIds.includes(sessionId)) {
-    controller(panel).closeTab?.(scope, terminalTabId(sessionId), { recordCloseUndo: false });
-    return;
-  }
-  manager().setActiveSessionForConversation?.(context.conversationId, sessionId);
-  syncPanel(scope, context, panel, sessionId, false);
-}
-
-function openBottomTerminal(scope: AppScope | TerminalScope): void { openNewTerminal(scope, "bottom"); }
-function openRightTerminal(scope: AppScope | TerminalScope): void { openNewTerminal(scope, "right"); }
-function openNewTerminal(scope: AppScope | TerminalScope, panel: TerminalPanel, replaceTabId?: string): void {
-  if (!isAppScope(scope)) {
-    if (replaceTabId != null) scope.sessions = scope.sessions.filter((session) => terminalTabId(session.id) !== replaceTabId);
-    void openTerminal(scope, undefined, panel);
-    return;
-  }
-  const context = terminalContext(scope);
-  if (context == null) return;
-  const id = manager().addSessionForConversation?.(context.conversationId) ?? `terminal-${++sequence}`;
-  subscribe(scope, context, panel);
-  syncPanel(scope, context, panel, id, true, id, undefined, replaceTabId);
-}
-function seedTerminalSession(scope: AppScope | TerminalScope, { panel, sessionId, snapshot }: { panel: TerminalPanel; sessionId: string; snapshot: unknown }): void {
-  if (!isAppScope(scope)) { void openTerminal(scope, sessionId, panel, { snapshot, revealAndFocus: false }); return; }
-  const context = terminalContext(scope);
-  if (context == null) return;
-  manager().seedSessionForConversation?.(context.conversationId, sessionId, snapshot, context.cwd);
-  subscribe(scope, context, panel);
-  syncPanel(scope, context, panel, sessionId, false, sessionId);
-}
-function ensureBottomTerminal(scope: AppScope | TerminalScope): void {
-  if (!isAppScope(scope)) { if (!scope.terminalHidden) void openTerminal(scope, undefined, "bottom"); return; }
-  if (getSignal(scope, "atn", false)) return;
-  if (isSignalActive(scope, bottomTerminalActiveSignal, "bottom")) call("pvt", scope, "bottom");
-  else void openTerminal(scope, undefined, "bottom");
-}
-function revealTerminal(scope: AppScope | TerminalScope, panel: TerminalPanel = defaultTerminalLocation(scope)): void {
-  if (!isAppScope(scope)) { if (!scope.terminalHidden) { const existing = scope.sessions.some((session) => session.panel === panel); if (existing) scope.activePanel = panel; else void openTerminal(scope, undefined, panel); } return; }
-  if (getSignal(scope, "atn", false)) return;
-  const signal = panel === "bottom" ? bottomTerminalActiveSignal : rightTerminalActiveSignal;
-  if (isSignalActive(scope, signal, panel)) call("pvt", scope, panel);
-  else void openTerminal(scope, undefined, panel);
-}
-function isSignalActive(scope: AppScope, signal: unknown, panel: TerminalPanel): boolean {
-  if (signal != null) { try { return Boolean(scope.get(signal)); } catch { /* fall through */ } }
-  return activeTabId(scope, panel)?.startsWith("terminal:") === true;
-}
-function requestDeferredTerminal(scope: AppScope | TerminalScope): void {
-  if (!isAppScope(scope)) { if (scope.sessions.length === 0) openBottomTerminal(scope); return; }
-  const signal = init.wtn ?? fallbackDeferredSignal;
-  if (!isSignalActive(scope, bottomTerminalActiveSignal, "bottom")) scope.set?.(signal, true);
-}
-function watchDeferredTerminal(scope: AppScope | TerminalScope): () => void {
-  if (!isAppScope(scope) || scope.watch == null) { requestDeferredTerminal(scope); return () => {}; }
-  const signal = init.wtn ?? fallbackDeferredSignal;
-  return scope.watch((current) => {
-    if (!current.get<boolean>(signal)) return;
-    const workspaceState = getSignal<string>(current, "T_t", "ready");
-    if (getSignal(current, "mbt", false) === false || panelTabs(current, "bottom").length > 0 || workspaceState === "failed") {
-      current.set?.(signal, false);
-      return;
-    }
-    if (getSignal(current, "Lbt", false) && hasTerminalContext(current)) { current.set?.(signal, false); openBottomTerminal(current); }
-  });
-}
-
-function initializeThreadShellRuntime(): void {
-  if (initialized) return;
-  initialized = true;
-  for (const alias of ["qbt", "Wvt", "Jvt", "Ebt", "Evt", "ppn", "LCt", "itn", "byt", "Ftn", "Vcn", "jD", "Lgn", "v_t", "Kst"] as const) {
-    const initializer = init[alias];
-    if (typeof initializer === "function") (initializer as () => void)();
-  }
-  const derived = sh.sZ;
-  const routeSignal = init.$en;
-  if (typeof derived === "function" && routeSignal != null) {
-    bottomTerminalActiveSignal = (derived as (root: unknown, read: (input: { get(signal: unknown): unknown }) => unknown) => unknown)(routeSignal, ({ get }) => Boolean(get(init.mbt)) && (get(init.Vvt && (init.Vvt as PanelController).activeTab$) as { tabId?: string } | null)?.tabId?.startsWith("terminal:") === true);
-    rightTerminalActiveSignal = (derived as (root: unknown, read: (input: { get(signal: unknown): unknown }) => unknown) => unknown)(routeSignal, ({ get }) => Boolean(get(init.vbt)) && (get(init.qvt && (init.qvt as PanelController).activeTab$) as { tabId?: string } | null)?.tabId?.startsWith("terminal:") === true);
-    defaultTerminalLocationSignal = (derived as (root: unknown, read: (input: { get(signal: unknown): unknown; scope?: AppScope }) => unknown) => unknown)(routeSignal, ({ get }) => get(init.pbt) === false ? "right" : "bottom");
-  } else {
-    bottomTerminalActiveSignal = Symbol("bottom-terminal-active");
-    rightTerminalActiveSignal = Symbol("right-terminal-active");
-    defaultTerminalLocationSignal = Symbol("default-terminal-location");
-  }
-  const descriptor = {
-    conversationTransfer: {
-      canTransfer: (scope: AppScope, source: { conversationId: string; sessionId: string }, target: { threadId: string }) => manager().canTransferSessionToConversation?.(source.conversationId, resolveConversationId(scope, target.threadId), source.sessionId) ?? false,
-      start: (scope: AppScope, source: { conversationId: string; sessionId: string }, target: { threadId: string }, options?: unknown) => manager().transferSessionOwnership?.(source.conversationId, resolveConversationId(scope, target.threadId), source.sessionId, options),
-    },
-    getId: (session: { sessionId?: string; id?: string }) => terminalTabId(session.sessionId ?? session.id ?? ""),
-    getTitle: (scope: AppScope, props: ThreadTerminalContext & { sessionId: string }) => sessionTitle(scope, props, props.sessionId, 0, 1),
-    open: openTerminal,
-    preloadExisting: (scope: AppScope | TerminalScope, sessionId: string, snapshot: unknown, options?: unknown) => {
-      const context = terminalContext(scope);
-      return context == null ? Promise.resolve(false) : manager().attachExistingForConversation?.(context.conversationId, sessionId, snapshot, options) ?? Promise.resolve(false);
-    },
-  };
-  const factory = init.qst;
-  terminalEntityController = typeof factory === "function" ? (factory as (value: unknown) => Record<string, unknown>)(descriptor) : descriptor;
-}
-function resolveConversationId(scope: AppScope, threadId: string): string {
-  const resolver = init.AD;
-  return typeof resolver === "function" ? String((resolver as (scope: AppScope, id: string) => unknown)(scope, threadId)) : threadId;
-}
-
 export {
-  openBottomTerminal as a,
-  bottomTerminalActiveSignal as c,
-  terminalEntityController as d,
-  ensureBottomTerminal as f,
-  seedTerminalSession as i,
-  defaultTerminalLocationSignal as l,
-  watchDeferredTerminal as m,
-  initializeThreadShellRuntime as n,
-  openNewTerminal as o,
-  revealTerminal as p,
-  openTerminal as r,
-  requestDeferredTerminal as s,
-  hasTerminalContext as t,
-  rightTerminalActiveSignal as u,
+  I as a,
+  Y as c,
+  Q as d,
+  z as f,
+  ke as i,
+  Z as l,
+  Oe as m,
+  $ as n,
+  R as o,
+  Ae as p,
+  Ee as r,
+  De as s,
+  F as t,
+  X as u,
 };

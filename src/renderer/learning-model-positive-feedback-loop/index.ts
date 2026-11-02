@@ -1,20 +1,34 @@
-// Positive-feedback-loop model: step through childbirth and ice-albedo examples.
-import "@rchunk/rolldown-runtime";
-
-type FeedbackExample = "childbirth" | "ice-albedo";
-interface FeedbackInput { example?: string | null; step?: number | null }
-
-const positiveFeedbackSchema = { type: "POSITIVE_FEEDBACK_LOOP", version: 2, thumbnailAssetKey: "positive-feedback-loop-v3", parameters: { example: { kind: "enum", defaultValue: "childbirth" as FeedbackExample, allowedValues: ["childbirth", "ice-albedo"] as const } } };
-const feedbackExamples = positiveFeedbackSchema.parameters.example.allowedValues;
-const exampleControl = { min: 0, max: feedbackExamples.length - 1, step: 1, defaultValue: positiveFeedbackSchema.parameters.example.defaultValue };
-const stepControl = { min: 0, max: 3, step: 1, defaultValue: 0 };
-const exampleFromIndex = (index: number): FeedbackExample => feedbackExamples[Math.min(Math.max(Math.round(index), 0), feedbackExamples.length - 1)] ?? exampleControl.defaultValue;
-const exampleToIndex = (example: string): number => Math.max(0, feedbackExamples.indexOf(example as FeedbackExample));
-const normalizeFeedbackInput = (input: FeedbackInput) => ({
-  example: feedbackExamples.includes((input.example ?? "") as FeedbackExample) ? input.example as FeedbackExample : exampleControl.defaultValue,
-  step: Math.min(Math.max(Math.round(input.step ?? stepControl.defaultValue), stepControl.min), stepControl.max),
-});
-function initializePositiveFeedbackSchema(): void {}
-function initializePositiveFeedbackModel(): void {}
-
-export { initializePositiveFeedbackModel as a, positiveFeedbackSchema as c, exampleToIndex as i, stepControl as n, normalizeFeedbackInput as o, exampleFromIndex as r, initializePositiveFeedbackSchema as s, exampleControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `POSITIVE_FEEDBACK_LOOP`),
+      (n = `positive-feedback-loop-v3`),
+      (r = {
+        example: {
+          kind: `enum`,
+          defaultValue: `childbirth`,
+          allowedValues: [`childbirth`, `ice-albedo`],
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    (a(),
+      (o = i.parameters.example),
+      (s = o.allowedValues),
+      (c = { min: 0, max: s.length - 1, step: 1, defaultValue: o.defaultValue }),
+      (l = { min: 0, max: 3, step: 1, defaultValue: 0 }),
+      (u = (e) => s[Math.min(Math.max(Math.round(e), 0), s.length - 1)] ?? c.defaultValue),
+      (d = (e) => Math.max(0, s.indexOf(e))),
+      (f = (e) => ({
+        example: s.includes(e.example ?? ``) ? e.example : c.defaultValue,
+        step: Math.min(Math.max(Math.round(e.step ?? l.defaultValue), l.min), l.max),
+      })));
+  }))();
+}
+export { p as a, i as c, d as i, l as n, f as o, u as r, a as s, c as t };

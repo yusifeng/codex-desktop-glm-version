@@ -1,38 +1,57 @@
-import "@rchunk/rolldown-runtime";
-import { a as isPlainObject } from "@rchunk/analytics-type-helpers";
-import { t as gracefulDecodeURIComponent } from "@rchunk/graceful-decode-uri-component";
-
-interface AnalyticsClient {
-  options: { useQueryString?: unknown };
-  identify(userId: string, traits: Record<string, string | undefined>): unknown;
-  setAnonymousId(id: string): void;
-  track(event: string, properties: Record<string, string | undefined>): unknown;
-}
-function prefixedValues(prefix: string, values: Record<string, string | undefined>): Record<string, string | undefined> {
-  return Object.keys(values).reduce<Record<string, string | undefined>>((result, key) => {
-    if (key.startsWith(prefix)) result[key.slice(prefix.length)] = values[key];
-    return result;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { a as t } from "@rchunk/analytics-type-helpers";
+import { t as n } from "@rchunk/graceful-uri-decoder";
+function r(e, t) {
+  return Object.keys(t).reduce(function (n, r) {
+    if (r.startsWith(e)) {
+      var i = r.substr(e.length);
+      n[i] = t[r];
+    }
+    return n;
   }, {});
 }
-function queryString(client: AnalyticsClient, url: string): Promise<unknown[]> {
-  const anchor = document.createElement("a");
-  anchor.href = url;
-  const values = anchor.search.slice(1).split("&").reduce<Record<string, string | undefined>>((result, pair) => {
-    const [key, value] = pair.split("=");
-    result[key] = gracefulDecodeURIComponent(value);
-    return result;
-  }, {});
-  const operations: unknown[] = [];
-  const options = isPlainObject(client.options.useQueryString) ? client.options.useQueryString : {};
-  const anonymousIdPattern = options.aid instanceof RegExp ? options.aid : /.+/;
-  const userIdPattern = options.uid instanceof RegExp ? options.uid : /.+/;
-  const anonymousId = values.ajs_aid;
-  if (anonymousId && anonymousIdPattern.test(anonymousId)) client.setAnonymousId(anonymousId);
-  const userId = values.ajs_uid;
-  if (userId && userIdPattern.test(userId)) operations.push(client.identify(userId, prefixedValues("ajs_trait_", values)));
-  const event = values.ajs_event;
-  if (event) operations.push(client.track(event, prefixedValues("ajs_prop_", values)));
-  return Promise.all(operations);
+function i(e, i) {
+  var a = document.createElement(`a`);
+  a.href = i;
+  var o = a.search
+      .slice(1)
+      .split(`&`)
+      .reduce(function (e, t) {
+        var r = t.split(`=`),
+          i = r[0],
+          a = r[1];
+        return ((e[i] = n(a)), e);
+      }, {}),
+    s = [],
+    c = o.ajs_uid,
+    l = o.ajs_event,
+    u = o.ajs_aid,
+    d = t(e.options.useQueryString) ? e.options.useQueryString : {},
+    f = d.aid,
+    p = f === void 0 ? /.+/ : f,
+    m = d.uid,
+    h = m === void 0 ? /.+/ : m;
+  if (u) {
+    var g = Array.isArray(o.ajs_aid) ? o.ajs_aid[0] : o.ajs_aid;
+    p.test(g) && e.setAnonymousId(g);
+  }
+  if (c) {
+    var _ = Array.isArray(o.ajs_uid) ? o.ajs_uid[0] : o.ajs_uid;
+    if (h.test(_)) {
+      var v = r(`ajs_trait_`, o);
+      s.push(e.identify(_, v));
+    }
+  }
+  if (l) {
+    var y = Array.isArray(o.ajs_event) ? o.ajs_event[0] : o.ajs_event,
+      b = r(`ajs_prop_`, o);
+    s.push(e.track(y, b));
+  }
+  return Promise.all(s);
 }
-
-export { queryString };
+function a() {
+  return (a = e(() => {}))();
+}
+a();
+export { i as queryString };

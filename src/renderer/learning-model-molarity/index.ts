@@ -1,21 +1,24 @@
-// Molarity teaching model. Release chunk: model-df6cdf0cba2f.js.
-import "@rchunk/rolldown-runtime";
-
-interface MolarityInput { moles?: number; volumeLiters?: number }
-
-const molesControl = { variable: "n", unit: "mol", min: 0.1, max: 2, step: 0.05, defaultValue: 1.2 };
-const volumeControl = { variable: "V", unit: "L", min: 0.5, max: 2, step: 0.05, defaultValue: 0.8 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeFinite = (value: number | undefined, fallback: number, minimum: number, maximum: number): number =>
-  Number.isFinite(value) ? clamp(value ?? fallback, minimum, maximum) : fallback;
-const normalizeMolarityInput = (input: MolarityInput) => ({
-  moles: normalizeFinite(input.moles, molesControl.defaultValue, molesControl.min, molesControl.max),
-  volumeLiters: normalizeFinite(input.volumeLiters, volumeControl.defaultValue, volumeControl.min, volumeControl.max),
-});
-const calculateMolarity = (input: MolarityInput) => {
-  const normalized = normalizeMolarityInput(input);
-  return { ...normalized, molarity: normalized.moles / normalized.volumeLiters, volumeMilliliters: normalized.volumeLiters * 1e3 };
-};
-function initializeMolarityModel(): void {}
-
-export { normalizeMolarityInput as a, initializeMolarityModel as i, volumeControl as n, calculateMolarity as r, molesControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((t = { variable: `n`, unit: `mol`, min: 0.1, max: 2, step: 0.05, defaultValue: 1.2 }),
+      (n = { variable: `V`, unit: `L`, min: 0.5, max: 2, step: 0.05, defaultValue: 0.8 }),
+      (r = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (i = (e, t, n, i) => (Number.isFinite(e) ? r(e ?? t, n, i) : t)),
+      (a = (e) => ({
+        moles: i(e.moles, t.defaultValue, t.min, t.max),
+        volumeLiters: i(e.volumeLiters, n.defaultValue, n.min, n.max),
+      })),
+      (o = (e) => {
+        let t = a(e);
+        return {
+          ...t,
+          molarity: t.moles / t.volumeLiters,
+          volumeMilliliters: t.volumeLiters * 1e3,
+        };
+      }));
+  }))();
+}
+export { a, s as i, n, o as r, t };

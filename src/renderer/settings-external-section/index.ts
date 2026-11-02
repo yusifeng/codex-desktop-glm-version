@@ -1,10 +1,30 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-
-let jsx: JsxRuntime | undefined;
-let initialized = false;
-function initializeSettingsExternalSection(): void { if (initialized) return; initialized = true; jsx = getJsxRuntime(); }
-function SettingsExternalSection(): unknown { initializeSettingsExternalSection(); return jsx!.jsxs("section", { "data-settings-section": "environments", children: [jsx!.jsx("h1", { children: "Environments" }), jsx!.jsx("p", { children: "Opens in your browser during Alpha" })] }); }
-initializeSettingsExternalSection();
-export { SettingsExternalSection };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i } from "@rchunk/app-shared";
+import { Xl as a, Yl as o, au as s, su as c } from "@rchunk/app-initial";
+function l() {
+  let e = (0, u.c)(1),
+    t;
+  return (
+    e[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, d.jsx)(s, {
+          title: (0, d.jsx)(o, { slug: `environments` }),
+          subtitle: (0, d.jsx)(i, {
+            id: `settings.section.external`,
+            defaultMessage: `Opens in your browser during Alpha`,
+            description: `Subtitle for settings sections that open in a browser during the Alpha build`,
+          }),
+        })),
+        (e[0] = t))
+      : (t = e[0]),
+    t
+  );
+}
+var u, d;
+function f() {
+  return (f = e(() => {
+    ((u = t()), r(), c(), a(), (d = n()));
+  }))();
+}
+f();
+export { l as SettingsExternalSection };

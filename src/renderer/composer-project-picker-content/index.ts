@@ -1,248 +1,327 @@
-import "@rchunk/rolldown-runtime";
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import * as primaryChunk from "@rchunk/app-primary";
-
-export interface CloudProject {
-  gizmo: { display: { name: string }; id: string };
-}
-
-export interface LocalProject {
-  gitRepos: Array<{ rootFolder?: string }>;
-  hostDisplayName?: string;
-  id?: string;
-  label: string;
-  path?: string;
-}
-
-export interface LocalProjectOptions {
-  onSelectProject(project: LocalProject): void;
-  projects: LocalProject[];
-}
-
-export interface ComposerProjectPickerContentProps {
-  cloudProjectsEnabled: boolean;
-  isPending?: boolean;
-  localProjectOptions?: LocalProjectOptions | null;
-  onClose(): void;
-  onCreateProject?(): void;
-  onProjectChange(id: string | null, name: string | null): void;
-  onSearchQueryChange(query: string): void;
-  onSelectLocalProject(): void;
-  onSelectProject(id: string, name: string): void;
-  projectId?: string | null;
-  searchQuery: string;
-}
-
-interface CloudProjectState {
-  isError: boolean;
-  isLoading: boolean;
-  projects: CloudProject[];
-}
-
-interface MenuRegistry {
-  Action: (props: Record<string, unknown>) => unknown;
-  Item: (props: Record<string, unknown>) => unknown;
-}
-
-const shared = sharedChunk as unknown as Record<string, unknown>;
-const initial = initialChunk as unknown as Record<string, unknown>;
-const primary = primaryChunk as unknown as Record<string, unknown>;
-
-function callInitializer(value: unknown): void {
-  if (typeof value === "function") value();
-}
-
-for (const value of [
-  shared.kE,
-  shared.FX,
-  shared.K2,
-  primary.ac,
-  shared.If,
-  shared.C_,
-  shared.$h,
-  shared.tm,
-  initial.Xg,
-  initial.Mrt,
-  shared.ag,
-  initial.vm,
-  primary.B,
-  primary.Q,
-  primary.R,
-  initial.Yp,
-]) callInitializer(value);
-
-const jsx = (shared.I3 as () => {
-  Fragment: unknown;
-  jsx(component: unknown, props: unknown, key?: string): unknown;
-  jsxs(component: unknown, props: unknown, key?: string): unknown;
-})();
-const useSignalValue = shared.HX as (
-  signal: unknown,
-  options: { enabled: boolean },
-) => CloudProjectState;
-const useIntl = shared.n4 as () => {
-  formatMessage(message: Record<string, string>): string;
-};
-const FormattedMessage = shared.Y2;
-const MenuMessage = (shared.jf as { Message: unknown }).Message;
-const Spinner = shared.Qh;
-const ProjectIcon = initial._m;
-const CloudProjects = initial.Jp;
-const PlusIcon = initial.jrt;
-const LocalProjectIcon = initial.Yg;
-const ClearIcon = shared.ig;
-const CheckIcon = shared.em;
-const IconAsset = shared.S_;
-const projectFallbackAsset = shared.OE;
-const Menu = primary.ic as MenuRegistry;
-const ProjectPickerFrame = primary.z;
-const LocalProjectGroups = primary.L;
-const searchProjects = primary.$ as <T>(
-  items: readonly T[],
-  query: string,
-  getSearchValues: (item: T) => Array<string | undefined>,
-) => T[];
-
-function cloudSearchValues(project: CloudProject): string[] {
-  return [project.gizmo.display.name.trim() || project.gizmo.id, project.gizmo.id];
-}
-
-function localSearchValues(project: LocalProject): Array<string | undefined> {
-  return [project.label, project.gitRepos[0]?.rootFolder, project.path, project.hostDisplayName];
-}
-
-function LocalProjectDetails(): unknown {
-  return jsx.jsx(LocalProjectIcon, {
-    "aria-hidden": true,
-    className: "icon-xs shrink-0 text-tertiary opacity-0 group-hover:opacity-100",
-  });
-}
-
-function ComposerProjectPickerContent({
-  cloudProjectsEnabled,
-  isPending,
-  localProjectOptions,
-  projectId,
-  searchQuery,
-  onSearchQueryChange,
-  onCreateProject,
-  onProjectChange,
-  onSelectProject,
-  onSelectLocalProject,
-  onClose,
-}: ComposerProjectPickerContentProps): unknown {
-  const intl = useIntl();
-  const cloudState = useSignalValue(CloudProjects, { enabled: cloudProjectsEnabled });
-  const cloudProjects = searchProjects(
-    cloudProjectsEnabled ? cloudState.projects : [],
-    searchQuery,
-    cloudSearchValues,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $h as n,
+  C_ as r,
+  FX as i,
+  HX as a,
+  I3 as o,
+  If as s,
+  K2 as c,
+  OE as l,
+  Qh as u,
+  S_ as d,
+  Y2 as f,
+  ag as p,
+  em as m,
+  ig as h,
+  jf as g,
+  kE as _,
+  n4 as v,
+  tm as y,
+} from "@rchunk/app-shared";
+import {
+  Jp as b,
+  Mrt as x,
+  Xg as S,
+  Yg as C,
+  Yp as w,
+  _m as T,
+  jrt as E,
+  vm as D,
+} from "@rchunk/app-initial";
+import {
+  $ as O,
+  B as k,
+  L as A,
+  Q as j,
+  R as M,
+  ac as N,
+  ic as P,
+  z as F,
+} from "@rchunk/app-primary";
+function I(e) {
+  let t = (0, B.c)(53),
+    {
+      cloudProjectsEnabled: n,
+      isPending: r,
+      localProjectOptions: i,
+      projectId: o,
+      searchQuery: s,
+      onSearchQueryChange: c,
+      onCreateProject: p,
+      onProjectChange: _,
+      onSelectProject: y,
+      onSelectLocalProject: x,
+      onClose: S,
+    } = e,
+    C = v(),
+    w;
+  t[0] === n ? (w = t[1]) : ((w = { enabled: n }), (t[0] = n), (t[1] = w));
+  let { isError: D, isLoading: k, projects: j } = a(b, w),
+    M,
+    N,
+    I,
+    H,
+    U;
+  if (
+    t[2] !== D ||
+    t[3] !== k ||
+    t[4] !== n ||
+    t[5] !== C ||
+    t[6] !== r ||
+    t[7] !== j ||
+    t[8] !== i ||
+    t[9] !== y ||
+    t[10] !== o ||
+    t[11] !== s
+  ) {
+    let e = n ? j : [],
+      a;
+    (t[17] !== i || t[18] !== s
+      ? ((a = i == null ? void 0 : O(i.projects, s, z)), (t[17] = i), (t[18] = s), (t[19] = a))
+      : (a = t[19]),
+      (I = a),
+      (N = O(e, s, R)));
+    let c;
+    if (
+      (t[20] === C
+        ? (c = t[21])
+        : ((c = C.formatMessage({
+            id: `chatgptConversations.composer.projectSelector.clearProject`,
+            defaultMessage: `Don't work in a project`,
+            description: `Menu item in the composer project picker that clears the selected local or cloud project`,
+          })),
+          (t[20] = C),
+          (t[21] = c)),
+      (H = c),
+      (M = null),
+      n && k)
+    ) {
+      let e;
+      (t[22] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, V.jsx)(g.Message, {
+            children: (0, V.jsx)(f, {
+              id: `chatgptConversations.composer.projectSelector.loading`,
+              defaultMessage: `Loading projects…`,
+              description: `Loading message for the cloud project section of the composer project picker`,
+            }),
+          })),
+          (t[22] = e))
+        : (e = t[22]),
+        (M = e));
+    } else if (n && D) {
+      let e;
+      (t[23] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, V.jsx)(g.Message, {
+            tone: `error`,
+            children: (0, V.jsx)(f, {
+              id: `chatgptConversations.composer.projectSelector.error`,
+              defaultMessage: `Projects couldn't be loaded`,
+              description: `Error message for the cloud project section of the composer project picker`,
+            }),
+          })),
+          (t[23] = e))
+        : (e = t[23]),
+        (M = e));
+    }
+    let p;
+    (t[24] !== r || t[25] !== y || t[26] !== o
+      ? ((p = (e) => {
+          let t = e.gizmo.display.name.trim() || e.gizmo.id,
+            n = e.gizmo.id === o;
+          return (0, V.jsx)(
+            P.Item,
+            {
+              icon:
+                n && r
+                  ? (0, V.jsx)(u, { className: `icon-xs` })
+                  : (0, V.jsx)(T, {
+                      className: `icon-xs`,
+                      size: 16,
+                      fallbackIcon: (0, V.jsx)(d, {
+                        className: `shrink-0`,
+                        "aria-hidden": !1,
+                        asset: l,
+                      }),
+                      isRemoteProject: !1,
+                      projectId: e.gizmo.id,
+                    }),
+              RightIcon: n ? m : void 0,
+              value: e.gizmo.id,
+              onSelect: () => {
+                y(e.gizmo.id, t);
+              },
+              children: t,
+            },
+            e.gizmo.id,
+          );
+        }),
+        (t[24] = r),
+        (t[25] = y),
+        (t[26] = o),
+        (t[27] = p))
+      : (p = t[27]),
+      (U = N.map(p)),
+      (t[2] = D),
+      (t[3] = k),
+      (t[4] = n),
+      (t[5] = C),
+      (t[6] = r),
+      (t[7] = j),
+      (t[8] = i),
+      (t[9] = y),
+      (t[10] = o),
+      (t[11] = s),
+      (t[12] = M),
+      (t[13] = N),
+      (t[14] = I),
+      (t[15] = H),
+      (t[16] = U));
+  } else ((M = t[12]), (N = t[13]), (I = t[14]), (H = t[15]), (U = t[16]));
+  let W = U,
+    G;
+  t[28] !== S || t[29] !== p || t[30] !== _ || t[31] !== o || t[32] !== H
+    ? ((G =
+        p != null || o != null
+          ? (0, V.jsxs)(V.Fragment, {
+              children: [
+                p == null
+                  ? null
+                  : (0, V.jsx)(P.Action, {
+                      LeftIcon: E,
+                      onClick: () => {
+                        (p(), S());
+                      },
+                      children: (0, V.jsx)(f, {
+                        id: `chatgptConversations.composer.projectSelector.createProject`,
+                        defaultMessage: `New project`,
+                        description: `Menu item in the composer project picker that opens the project creation flow`,
+                      }),
+                    }),
+                o == null
+                  ? null
+                  : (0, V.jsx)(P.Action, {
+                      LeftIcon: h,
+                      onClick: () => {
+                        (_(null, null), S());
+                      },
+                      children: H,
+                    }),
+              ],
+            })
+          : null),
+      (t[28] = S),
+      (t[29] = p),
+      (t[30] = _),
+      (t[31] = o),
+      (t[32] = H),
+      (t[33] = G))
+    : (G = t[33]);
+  let K = G,
+    q = (I?.length ?? 0) + N.length > 0,
+    J;
+  t[34] !== I || t[35] !== i || t[36] !== x || t[37] !== o
+    ? ((J =
+        i == null
+          ? null
+          : (0, V.jsx)(A, {
+              groups: I ?? [],
+              selectedProjectIds: o == null ? [] : [o],
+              getProjectDetails: L,
+              onSelectProject: (e) => {
+                (i.onSelectProject(e), x());
+              },
+            })),
+      (t[34] = I),
+      (t[35] = i),
+      (t[36] = x),
+      (t[37] = o),
+      (t[38] = J))
+    : (J = t[38]);
+  let Y;
+  t[39] !== W || t[40] !== J
+    ? ((Y = (0, V.jsxs)(V.Fragment, { children: [W, J] })), (t[39] = W), (t[40] = J), (t[41] = Y))
+    : (Y = t[41]);
+  let X;
+  t[42] !== i || t[43] !== s
+    ? ((X =
+        i == null && s.trim().length === 0
+          ? (0, V.jsx)(f, {
+              id: `chatgptConversations.composer.projectSelector.empty`,
+              defaultMessage: `No projects`,
+              description: `Empty message for the cloud project section of the composer project picker`,
+            })
+          : void 0),
+      (t[42] = i),
+      (t[43] = s),
+      (t[44] = X))
+    : (X = t[44]);
+  let Z;
+  return (
+    t[45] !== M ||
+    t[46] !== c ||
+    t[47] !== K ||
+    t[48] !== s ||
+    t[49] !== q ||
+    t[50] !== Y ||
+    t[51] !== X
+      ? ((Z = (0, V.jsx)(F, {
+          searchQuery: s,
+          onSearchQueryChange: c,
+          hasProjectItems: q,
+          projectItems: Y,
+          status: M,
+          footerItems: K,
+          emptyMessage: X,
+        })),
+        (t[45] = M),
+        (t[46] = c),
+        (t[47] = K),
+        (t[48] = s),
+        (t[49] = q),
+        (t[50] = Y),
+        (t[51] = X),
+        (t[52] = Z))
+      : (Z = t[52]),
+    Z
   );
-  const localGroups = localProjectOptions == null
-    ? undefined
-    : searchProjects(localProjectOptions.projects, searchQuery, localSearchValues);
-
-  let status: unknown = null;
-  if (cloudProjectsEnabled && cloudState.isLoading) {
-    status = jsx.jsx(MenuMessage, {
-      children: jsx.jsx(FormattedMessage, {
-        id: "chatgptConversations.composer.projectSelector.loading",
-        defaultMessage: "Loading projects…",
-        description: "Loading message for the cloud project section of the composer project picker",
-      }),
-    });
-  } else if (cloudProjectsEnabled && cloudState.isError) {
-    status = jsx.jsx(MenuMessage, {
-      tone: "error",
-      children: jsx.jsx(FormattedMessage, {
-        id: "chatgptConversations.composer.projectSelector.error",
-        defaultMessage: "Projects couldn't be loaded",
-        description: "Error message for the cloud project section of the composer project picker",
-      }),
-    });
-  }
-
-  const cloudItems = cloudProjects.map((project) => {
-    const name = project.gizmo.display.name.trim() || project.gizmo.id;
-    const selected = project.gizmo.id === projectId;
-    return jsx.jsx(Menu.Item, {
-      icon: selected && isPending
-        ? jsx.jsx(Spinner, { className: "icon-xs" })
-        : jsx.jsx(ProjectIcon, {
-            className: "icon-xs",
-            fallbackIcon: jsx.jsx(IconAsset, {
-              asset: projectFallbackAsset,
-              "aria-hidden": false,
-              className: "shrink-0",
-            }),
-            isRemoteProject: false,
-            projectId: project.gizmo.id,
-            size: 16,
-          }),
-      RightIcon: selected ? CheckIcon : undefined,
-      value: project.gizmo.id,
-      onSelect: () => onSelectProject(project.gizmo.id, name),
-      children: name,
-    }, project.gizmo.id);
-  });
-
-  const localItems = localProjectOptions == null
-    ? null
-    : jsx.jsx(LocalProjectGroups, {
-        getProjectDetails: LocalProjectDetails,
-        groups: localGroups ?? [],
-        selectedProjectIds: projectId == null ? [] : [projectId],
-        onSelectProject: (project: LocalProject) => {
-          localProjectOptions.onSelectProject(project);
-          onSelectLocalProject();
-        },
-      });
-
-  const clearLabel = intl.formatMessage({
-    id: "chatgptConversations.composer.projectSelector.clearProject",
-    defaultMessage: "Don't work in a project",
-    description: "Menu item in the composer project picker that clears the selected local or cloud project",
-  });
-  const footerItems = onCreateProject == null && projectId == null
-    ? null
-    : jsx.jsxs(jsx.Fragment, {
-        children: [
-          onCreateProject == null ? null : jsx.jsx(Menu.Action, {
-            LeftIcon: PlusIcon,
-            onClick: () => { onCreateProject(); onClose(); },
-            children: jsx.jsx(FormattedMessage, {
-              id: "chatgptConversations.composer.projectSelector.createProject",
-              defaultMessage: "New project",
-              description: "Menu item in the composer project picker that opens the project creation flow",
-            }),
-          }),
-          projectId == null ? null : jsx.jsx(Menu.Action, {
-            LeftIcon: ClearIcon,
-            onClick: () => { onProjectChange(null, null); onClose(); },
-            children: clearLabel,
-          }),
-        ],
-      });
-
-  const hasProjectItems = cloudProjects.length + (localGroups?.length ?? 0) > 0;
-  const emptyMessage = localProjectOptions == null && searchQuery.trim().length === 0
-    ? jsx.jsx(FormattedMessage, {
-        id: "chatgptConversations.composer.projectSelector.empty",
-        defaultMessage: "No projects",
-        description: "Empty message for the cloud project section of the composer project picker",
-      })
-    : undefined;
-
-  return jsx.jsx(ProjectPickerFrame, {
-    emptyMessage,
-    footerItems,
-    hasProjectItems,
-    projectItems: jsx.jsxs(jsx.Fragment, { children: [cloudItems, localItems] }),
-    searchQuery,
-    status,
-    onSearchQueryChange,
+}
+function L() {
+  return (0, V.jsx)(C, {
+    "aria-hidden": !0,
+    className: `icon-xs shrink-0 text-tertiary opacity-0 group-hover:opacity-100`,
   });
 }
-
-export { ComposerProjectPickerContent };
+function R(e) {
+  return [e.gizmo.display.name.trim() || e.gizmo.id, e.gizmo.id];
+}
+function z(e) {
+  return [e.label, e.gitRepos[0]?.rootFolder, e.path, e.hostDisplayName];
+}
+var B, V;
+function H() {
+  return (H = e(() => {
+    ((B = t()),
+      _(),
+      i(),
+      c(),
+      N(),
+      s(),
+      r(),
+      n(),
+      y(),
+      S(),
+      x(),
+      p(),
+      D(),
+      k(),
+      j(),
+      M(),
+      w(),
+      (V = o()));
+  }))();
+}
+H();
+export { I as ComposerProjectPickerContent };

@@ -1,41 +1,109 @@
-// Bacterial growth-curve learning model. Release chunk: model-4298405efab5.js.
-import "@rchunk/rolldown-runtime";
-
-interface GrowthValues { generation_time_minutes?: number | null; selectedTimeHours?: number | null }
-interface GrowthManifest { type: string; version: number; thumbnailAssetKey: string; parameters: { generation_time_minutes: { kind: "number"; defaultValue: number; min: number; max: number } } }
-interface GrowthBoundaries { lagEnd: number; logEnd: number; stationaryEnd: number; end: number }
-type GrowthPhase = "lag" | "log" | "stationary" | "death";
-
-let bacterialGrowthManifest: GrowthManifest;
-let defaultGrowthValues: { generation_time_minutes: number; selectedTimeHours: number };
-let tangentMinimum = 0.25;
-let growthChartBounds: { min: number; max: number };
-let calculateGrowthCurve: (values: GrowthValues) => { values: { generation_time_minutes: number; selectedTimeHours: number }; boundaries: GrowthBoundaries; phase: GrowthPhase; slope: number; logViableCount: number; tangentStart: { x: number; y: number }; tangentEnd: { x: number; y: number } };
-let growthCurvePoints: (generationTimeMinutes: number) => Array<{ x: number; y: number }>;
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeBacterialGrowthManifest(): void {
-  if (manifestInitialized) return; manifestInitialized = true;
-  bacterialGrowthManifest = { type: "BACTERIAL_GROWTH_CURVE", version: 3, thumbnailAssetKey: "bacterial-growth-curve-v2", parameters: { generation_time_minutes: { kind: "number", defaultValue: 30, min: 15, max: 90 } } };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `BACTERIAL_GROWTH_CURVE`),
+      (n = `bacterial-growth-curve-v2`),
+      (r = { generation_time_minutes: { kind: `number`, defaultValue: 30, min: 15, max: 90 } }),
+      (i = { type: t, version: 3, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-function initializeBacterialGrowthModel(): void {
-  if (modelInitialized) return; modelInitialized = true; initializeBacterialGrowthManifest();
-  const generationParameter = bacterialGrowthManifest.parameters.generation_time_minutes;
-  const lagCount = 4; const stationaryCount = 9; const lagDuration = 3; const stationaryDuration = 6; const deathDuration = 8; const deathDrop = 3; const logTwo = Math.log10(2);
-  const boundariesFor = (generationTime: number): GrowthBoundaries => { const logEnd = lagDuration + 5 / logTwo * (generationTime / 60); const stationaryEnd = logEnd + stationaryDuration; return { lagEnd: lagDuration, logEnd, stationaryEnd, end: stationaryEnd + deathDuration }; };
-  defaultGrowthValues = { generation_time_minutes: generationParameter.defaultValue, selectedTimeHours: 7 };
-  const finite = (value: number | null | undefined, fallback: number): number => typeof value === "number" && Number.isFinite(value) ? value : fallback;
-  const normalize = (values: GrowthValues) => { const generation_time_minutes = Math.min(generationParameter.max, Math.max(generationParameter.min, finite(values.generation_time_minutes, defaultGrowthValues.generation_time_minutes))); const { end } = boundariesFor(generation_time_minutes); return { generation_time_minutes, selectedTimeHours: Math.min(end, Math.max(0, finite(values.selectedTimeHours, defaultGrowthValues.selectedTimeHours))) }; };
-  const countAt = (time: number, generation: number, boundaries = boundariesFor(generation)): number => time <= boundaries.lagEnd ? lagCount : time <= boundaries.logEnd ? lagCount + (time - boundaries.lagEnd) * 60 * logTwo / generation : time <= boundaries.stationaryEnd ? stationaryCount : stationaryCount - (time - boundaries.stationaryEnd) * deathDrop / deathDuration;
-  calculateGrowthCurve = values => {
-    const normalized = normalize(values); const boundaries = boundariesFor(normalized.generation_time_minutes); const time = normalized.selectedTimeHours;
-    const phase: GrowthPhase = time < boundaries.lagEnd ? "lag" : time < boundaries.logEnd ? "log" : time < boundaries.stationaryEnd ? "stationary" : "death";
-    const slope = phase === "log" ? 60 * logTwo / normalized.generation_time_minutes : phase === "death" ? -3 / deathDuration : 0;
-    const span = Math.min(2.2, boundaries.end / 7); const segmentStart = phase === "lag" ? 0 : phase === "log" ? boundaries.lagEnd : phase === "stationary" ? boundaries.logEnd : boundaries.stationaryEnd; const segmentEnd = phase === "lag" ? boundaries.lagEnd : phase === "log" ? boundaries.logEnd : phase === "stationary" ? boundaries.stationaryEnd : boundaries.end; const start = Math.max(segmentStart, Math.min(time - span / 2, segmentEnd - span)); const end = Math.min(segmentEnd, start + span); const count = countAt(time, normalized.generation_time_minutes, boundaries);
-    return { values: normalized, boundaries, phase, slope, logViableCount: count, tangentStart: { x: start, y: count + slope * (start - time) }, tangentEnd: { x: end, y: count + slope * (end - time) } };
-  };
-  growthCurvePoints = generation => { const boundaries = boundariesFor(generation); return [{ x: 0, y: lagCount }, { x: boundaries.lagEnd, y: lagCount }, { x: boundaries.logEnd, y: stationaryCount }, { x: boundaries.stationaryEnd, y: stationaryCount }, { x: boundaries.end, y: 6 }]; };
-  growthChartBounds = { min: 3.55, max: 11.05 };
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S;
+function C() {
+  return (C = e(() => {
+    (a(),
+      (o = i.parameters.generation_time_minutes),
+      (s = 4),
+      (c = 9),
+      (l = 3),
+      (u = 6),
+      (d = 8),
+      (f = 3),
+      (p = Math.log10(2)),
+      (m = 0.25),
+      (h = (e, t) => (typeof e == `number` && Number.isFinite(e) ? e : t)),
+      (g = (e) => {
+        let t = (5 / p) * (e / 60),
+          n = l + t,
+          r = n + u,
+          i = r + d;
+        return { lagEnd: l, logEnd: n, stationaryEnd: r, end: i };
+      }),
+      (_ = { generation_time_minutes: o.defaultValue, selectedTimeHours: 7 }),
+      (v = (e) => {
+        let t = Math.min(
+            o.max,
+            Math.max(o.min, h(e.generation_time_minutes, _.generation_time_minutes)),
+          ),
+          { end: n } = g(t);
+        return {
+          generation_time_minutes: t,
+          selectedTimeHours: Math.min(n, Math.max(0, h(e.selectedTimeHours, _.selectedTimeHours))),
+        };
+      }),
+      (y = (e, t, n = g(t)) =>
+        e <= n.lagEnd
+          ? s
+          : e <= n.logEnd
+            ? s + ((e - n.lagEnd) * 60 * p) / t
+            : e <= n.stationaryEnd
+              ? c
+              : c - ((e - n.stationaryEnd) * f) / d),
+      (b = (e) => {
+        let t = v(e),
+          n = g(t.generation_time_minutes),
+          r = t.selectedTimeHours,
+          i =
+            r < n.lagEnd
+              ? `lag`
+              : r < n.logEnd
+                ? `log`
+                : r < n.stationaryEnd
+                  ? `stationary`
+                  : `death`,
+          a = i === `log` ? (60 * p) / t.generation_time_minutes : i === `death` ? -3 / d : 0,
+          o = Math.min(2.2, n.end / 7),
+          s =
+            i === `lag`
+              ? 0
+              : i === `log`
+                ? n.lagEnd
+                : i === `stationary`
+                  ? n.logEnd
+                  : n.stationaryEnd,
+          c =
+            i === `lag`
+              ? n.lagEnd
+              : i === `log`
+                ? n.logEnd
+                : i === `stationary`
+                  ? n.stationaryEnd
+                  : n.end,
+          l = Math.max(s, Math.min(r - o / 2, c - o)),
+          u = Math.min(c, l + o),
+          f = y(r, t.generation_time_minutes, n);
+        return {
+          values: t,
+          boundaries: n,
+          phase: i,
+          slope: a,
+          logViableCount: f,
+          tangentStart: { x: l, y: f + a * (l - r) },
+          tangentEnd: { x: u, y: f + a * (u - r) },
+        };
+      }),
+      (x = (e) => {
+        let t = g(e);
+        return [
+          { x: 0, y: s },
+          { x: t.lagEnd, y: s },
+          { x: t.logEnd, y: c },
+          { x: t.stationaryEnd, y: c },
+          { x: t.end, y: 6 },
+        ];
+      }),
+      (S = { min: 3.55, max: 11.05 }));
+  }))();
 }
-export { growthCurvePoints as a, bacterialGrowthManifest as c, calculateGrowthCurve as i, growthChartBounds as n, initializeBacterialGrowthModel as o, tangentMinimum as r, initializeBacterialGrowthManifest as s, defaultGrowthValues as t };
+export { x as a, i as c, b as i, S as n, C as o, m as r, a as s, _ as t };

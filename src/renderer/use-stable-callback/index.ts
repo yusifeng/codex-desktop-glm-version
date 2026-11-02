@@ -1,21 +1,26 @@
-// use-stable-callback — stable function identity that always invokes the latest callback.
-
-import "@rchunk/rolldown-runtime";
-import { e6 as getReactRuntime } from "@rchunk/app-shared";
-
-interface StableCallbackReactRuntime {
-  useInsertionEffect(effect: () => void, dependencies: readonly unknown[]): void;
-  useMemo<Value>(factory: () => Value, dependencies: readonly unknown[]): Value;
-  useRef<Value>(value: Value): { current: Value };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { e6 as t } from "@rchunk/app-shared";
+function n(e) {
+  let t = (0, r.useRef)(e);
+  return (
+    (0, r.useInsertionEffect)(() => {
+      t.current = e;
+    }, [e]),
+    (0, r.useMemo)(
+      () =>
+        (...e) => {
+          let { current: n } = t;
+          return n(...e);
+        },
+      [],
+    )
+  );
 }
-
-let React: StableCallbackReactRuntime;
-function initializeStableCallback(): void { React ??= getReactRuntime() as unknown as StableCallbackReactRuntime; }
-function useStableCallback<Arguments extends unknown[], Result>(callback: (...arguments_: Arguments) => Result): (...arguments_: Arguments) => Result {
-  initializeStableCallback();
-  const callbackReference = React.useRef(callback);
-  React.useInsertionEffect(() => { callbackReference.current = callback; }, [callback]);
-  return React.useMemo(() => (...arguments_: Arguments): Result => callbackReference.current(...arguments_), []);
+var r;
+function i() {
+  return (i = e(() => {
+    r = t();
+  }))();
 }
-
-export { useStableCallback as n, initializeStableCallback as t };
+export { n, i as t };

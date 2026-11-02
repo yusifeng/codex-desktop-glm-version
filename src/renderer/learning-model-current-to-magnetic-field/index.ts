@@ -1,42 +1,49 @@
-// Magnetic-field circulation around a straight current-carrying wire.
-import "@rchunk/rolldown-runtime";
-
-type CurrentDirection = "up" | "down";
-interface CurrentValues { currentDirection?: unknown; currentStrengthAmperes?: unknown }
-
-const currentToMagneticFieldType = "CURRENT_TO_MAGNETIC_FIELD";
-const currentToMagneticFieldThumbnail = "current-to-magnetic-field-v3";
-const currentToMagneticFieldFormula = "B = \\frac{\\mu_0 I}{2\\pi r}";
-const currentToMagneticFieldParameters = {
-  currentDirection: { kind: "enum" as const, defaultValue: "up" as CurrentDirection, allowedValues: ["up", "down"] as CurrentDirection[] },
-  currentStrengthAmperes: { kind: "number" as const, defaultValue: 5, min: 1, max: 10 },
-};
-const currentToMagneticFieldSpecification = { type: currentToMagneticFieldType, version: 1, thumbnailAssetKey: currentToMagneticFieldThumbnail, canonicalFormula: currentToMagneticFieldFormula, parameters: currentToMagneticFieldParameters };
-const currentDefaults = {
-  currentDirection: currentToMagneticFieldSpecification.parameters.currentDirection.defaultValue,
-  currentStrengthAmperes: currentToMagneticFieldSpecification.parameters.currentStrengthAmperes.defaultValue,
-  allowedDirections: currentToMagneticFieldSpecification.parameters.currentDirection.allowedValues,
-  minStrength: currentToMagneticFieldSpecification.parameters.currentStrengthAmperes.min,
-  maxStrength: currentToMagneticFieldSpecification.parameters.currentStrengthAmperes.max,
-};
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const isCurrentDirection = (value: unknown): value is CurrentDirection => currentDefaults.allowedDirections.some((direction) => direction === value);
-const normalizeCurrentValues = (values: CurrentValues) => {
-  const direction = isCurrentDirection(values.currentDirection) ? values.currentDirection : currentDefaults.currentDirection;
-  const strength = typeof values.currentStrengthAmperes === "number" && Number.isFinite(values.currentStrengthAmperes) ? values.currentStrengthAmperes : currentDefaults.currentStrengthAmperes;
-  return { currentDirection: direction, currentStrengthAmperes: clamp(strength, currentDefaults.minStrength, currentDefaults.maxStrength) };
-};
-const magneticFieldCirculation = (direction: CurrentDirection): "counterclockwise" | "clockwise" => direction === "up" ? "counterclockwise" : "clockwise";
-const magneticFieldDirectionVector = (direction: CurrentDirection, angle: number, radius: number, arrowLength: number) => {
-  const directionSign = direction === "up" ? -1 : 1;
-  const x = -radius * Math.sin(angle) * directionSign;
-  const y = arrowLength * Math.cos(angle) * directionSign;
-  const magnitude = Math.hypot(x, y) || 1;
-  return { x: x / magnitude, y: y / magnitude };
-};
-const normalizedCurrentStrength = (strength: number): number => clamp(strength, 0, currentDefaults.maxStrength) / currentDefaults.maxStrength;
-
-function initializeCurrentToMagneticFieldSpecification(): void {}
-function initializeCurrentToMagneticFieldModel(): void {}
-
-export { initializeCurrentToMagneticFieldModel as a, currentToMagneticFieldSpecification as c, normalizedCurrentStrength as i, magneticFieldCirculation as n, normalizeCurrentValues as o, magneticFieldDirectionVector as r, initializeCurrentToMagneticFieldSpecification as s, currentDefaults as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `CURRENT_TO_MAGNETIC_FIELD`),
+      (n = `current-to-magnetic-field-v3`),
+      (r = `B = \\frac{\\mu_0 I}{2\\pi r}`),
+      (i = {
+        currentDirection: { kind: `enum`, defaultValue: `up`, allowedValues: [`up`, `down`] },
+        currentStrengthAmperes: { kind: `number`, defaultValue: 5, min: 1, max: 10 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+var s, c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    (o(),
+      (s = {
+        currentDirection: a.parameters.currentDirection.defaultValue,
+        currentStrengthAmperes: a.parameters.currentStrengthAmperes.defaultValue,
+        allowedDirections: a.parameters.currentDirection.allowedValues,
+        minStrength: a.parameters.currentStrengthAmperes.min,
+        maxStrength: a.parameters.currentStrengthAmperes.max,
+      }),
+      (c = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (l = (e) => {
+        let t = s.allowedDirections.includes(e.currentDirection)
+            ? e.currentDirection
+            : s.currentDirection,
+          n =
+            typeof e.currentStrengthAmperes == `number` && Number.isFinite(e.currentStrengthAmperes)
+              ? e.currentStrengthAmperes
+              : s.currentStrengthAmperes;
+        return { currentDirection: t, currentStrengthAmperes: c(n, s.minStrength, s.maxStrength) };
+      }),
+      (u = (e) => (e === `up` ? `counterclockwise` : `clockwise`)),
+      (d = (e, t, n, r) => {
+        let i = e === `up` ? -1 : 1,
+          a = -n * Math.sin(t) * i,
+          o = r * Math.cos(t) * i,
+          s = Math.hypot(a, o) || 1;
+        return { x: a / s, y: o / s };
+      }),
+      (f = (e) => c(e, 0, s.maxStrength) / s.maxStrength));
+  }))();
+}
+export { p as a, a as c, f as i, u as n, l as o, d as r, o as s, s as t };

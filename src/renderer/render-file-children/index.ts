@@ -1,11 +1,44 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/codex-diff-css";
-interface LineAnnotation { id?: string | number; line?: number; [key: string]: unknown }
-interface RenderFileChildrenProps<FileValue> { file: FileValue; getAnnotationSlotName?(annotation: LineAnnotation): string; getHoveredLine?(): number | null; lineAnnotations?: LineAnnotation[]; renderAnnotation?(annotation: LineAnnotation): unknown; renderCustomHeader?(file: FileValue): unknown; renderGutterUtility?(getHoveredLine?: () => number | null): unknown; renderHeaderFilenameSuffix?(file: FileValue): unknown; renderHeaderMetadata?(file: FileValue): unknown; renderHeaderPrefix?(file: FileValue): unknown }
-let runtime: JsxRuntime | undefined;
-function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function RenderFileChildren<FileValue>(props: RenderFileChildrenProps<FileValue>): unknown { const custom = props.renderCustomHeader?.(props.file); const children: unknown[] = []; if (custom != null) children.push(jsx().jsx("div", { slot: "header", children: custom })); else { const entries: Array<[string, unknown]> = [["header-prefix", props.renderHeaderPrefix?.(props.file)], ["header-filename-suffix", props.renderHeaderFilenameSuffix?.(props.file)], ["header-metadata", props.renderHeaderMetadata?.(props.file)]]; for (const [slot, value] of entries) if (value != null) children.push(jsx().jsx("div", { slot, children: value })); } if (props.renderAnnotation != null) for (const [index, annotation] of (props.lineAnnotations ?? []).entries()) children.push(jsx().jsx("div", { slot: props.getAnnotationSlotName?.(annotation) ?? `line-${annotation.line ?? index}`, children: props.renderAnnotation(annotation) }, index)); if (props.renderGutterUtility != null) children.push(jsx().jsx("div", { slot: "gutter-utility-slot", children: props.renderGutterUtility(props.getHoveredLine) })); return jsx().jsx(jsx().Fragment, { children }); }
-function initialize(): void {}
-export { RenderFileChildren as n, initialize as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { I3 as t } from "@rchunk/app-shared";
+import { KSn as n, SSn as r, xbn as i } from "@rchunk/app-initial";
+import { d as a, l as o } from "@rchunk/codex-diff-css";
+function s({
+  file: e,
+  renderCustomHeader: t,
+  renderHeaderPrefix: n,
+  renderHeaderFilenameSuffix: a,
+  renderHeaderMetadata: s,
+  renderAnnotation: l,
+  lineAnnotations: u,
+  renderGutterUtility: d,
+  getHoveredLine: f,
+  getAnnotationSlotName: p = i,
+}) {
+  let m = t?.(e),
+    h = n?.(e),
+    g = a?.(e),
+    _ = s?.(e);
+  return (0, c.jsxs)(c.Fragment, {
+    children: [
+      m == null
+        ? (0, c.jsxs)(c.Fragment, {
+            children: [
+              h != null && (0, c.jsx)(`div`, { slot: `header-prefix`, children: h }),
+              g != null && (0, c.jsx)(`div`, { slot: `header-filename-suffix`, children: g }),
+              _ != null && (0, c.jsx)(`div`, { slot: `header-metadata`, children: _ }),
+            ],
+          })
+        : (0, c.jsx)(`div`, { slot: r, children: m }),
+      l != null && u?.map((e, t) => (0, c.jsx)(`div`, { slot: p(e), children: l(e) }, t)),
+      d != null && (0, c.jsx)(`div`, { slot: `gutter-utility-slot`, style: o, children: d(f) }),
+    ],
+  });
+}
+var c;
+function l() {
+  return (l = e(() => {
+    (n(), a(), (c = t()));
+  }))();
+}
+export { s as n, l as t };

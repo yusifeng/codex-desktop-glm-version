@@ -1,206 +1,285 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/mermaid-editable-preview",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/mermaid-image-rendering",
+      "@rchunk/mermaid-support",
+      "@rchunk/chart-colors",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeSharedRuntime,
-  H3 as initializePreloadRuntime,
-  I3 as getJsxRuntime,
-  Jm as createLazyComponent,
-  K2 as initializeUiRuntime,
-  V3 as loadWithPreload,
-  e6 as getReactRuntime,
-  g_ as initializeToastRuntime,
-  h4 as initializeClassNames,
-  lk as initializeImperativeHandleRuntime,
-  m4 as classNames,
-  n4 as useIntl,
-  qm as initializeQueryRuntime,
-  type JsxRuntime,
+  $3 as t,
+  H3 as n,
+  I3 as r,
+  Jm as i,
+  K2 as a,
+  V3 as o,
+  __ as s,
+  ck as ee,
+  e6 as c,
+  g_ as l,
+  h4 as u,
+  lk as d,
+  m4 as f,
+  n4 as te,
+  qm as p,
 } from "@rchunk/app-shared";
-import { ck as getToastManager } from "@rchunk/app-shared";
-import { Nat as LoadingRow, Pat as initializeLoadingRow } from "@rchunk/app-initial";
-import { a as initializeMermaidImage, i as MermaidSvgRenderer, n as cloneMermaidSvg, r as initializeMermaidRasterizer, t as rasterizeMermaidSvg } from "@rchunk/image";
-
-interface MermaidPreviewActions {
-  captureScreenshotDataUrl(): Promise<string | null>;
-  focus(): void;
-  openFullscreen(): Promise<void>;
-}
-interface MermaidPreviewProps {
-  actions?: unknown;
-  chatTheme?: string;
-  code: string;
-  diagramId?: string;
-  errorFallback?: unknown;
-  isStreaming: boolean;
-  onCodeBlur?: () => void;
-  onCodeChange?: (code: string) => void;
-  ref?: unknown;
-}
-interface SvgClone { height: number; src: string; width: number }
-interface FocusTarget { focus(): void }
-interface IntlRuntime { formatMessage(descriptor: { defaultMessage: string; description?: string; id: string }): string }
-interface ReactHooks {
-  useCallback<Callback>(callback: Callback, dependencies: readonly unknown[]): Callback;
-  useImperativeHandle(ref: unknown, create: () => MermaidPreviewActions, dependencies: readonly unknown[]): void;
-  useRef<Value>(initialValue: Value): { current: Value };
-  useState<Value>(initialValue: Value): [Value, (value: Value | ((current: Value) => Value)) => void];
-}
-interface EditablePreviewProps extends Record<string, unknown> {
-  alt: string;
-  chatTheme?: string;
-  code: string;
-  downloadAriaLabel: string;
-  image: SvgClone | null;
-  onCodeBlur?: () => void;
-  onCodeChange?: (code: string) => void;
-  onOpenChange(open: boolean): void;
-}
-interface ToastManager { danger(message: string, options?: { errorAnalytics?: { toastId: string } }): void }
-
-const cloneSvg = cloneMermaidSvg as unknown as (element: SVGSVGElement | null) => SvgClone | null;
-const rasterizeSvg = rasterizeMermaidSvg as unknown as (source: string) => Promise<string | null>;
-let React: ReactHooks;
-let jsx: JsxRuntime;
-let MermaidEditablePreview: (props: EditablePreviewProps) => unknown;
-let initialized = false;
-
-function ChatGptMermaidPreview({
-  ref,
-  actions,
-  chatTheme,
-  code,
-  diagramId,
-  errorFallback,
-  isStreaming,
-  onCodeChange,
-  onCodeBlur,
-}: MermaidPreviewProps): unknown {
-  const intl = useIntl() as IntlRuntime;
-  const trimmedCode = code.trim();
-  const [renderedCode, setRenderedCode] = React.useState<string | null>(null);
-  const [failedCode, setFailedCode] = React.useState<string | null>(null);
-  const [fullscreenImage, setFullscreenImage] = React.useState<SvgClone | null>(null);
-  const containerRef = React.useRef<FocusTarget | null>(null);
-  const svgRef = React.useRef<SVGSVGElement | null>(null);
-  const ready = !isStreaming && (renderedCode === trimmedCode || failedCode === trimmedCode);
-  const ariaLabel = intl.formatMessage({
-    id: "mermaidDiagram.ariaLabel",
-    defaultMessage: "Mermaid diagram",
-    description: "Accessible description of a Mermaid diagram generated in a ChatGPT message",
-  });
-  const downloadLabel = intl.formatMessage({
-    id: "chatgpt.codeBlocks.mermaid.downloadPng",
-    defaultMessage: "Download as PNG",
-    description: "Action that downloads the rendered Mermaid diagram as a PNG image",
-  });
-  const setSvg = React.useCallback((element: SVGSVGElement | null): void => {
-    svgRef.current = element;
-    setRenderedCode(element == null ? null : trimmedCode);
-  }, [trimmedCode]);
-  const captureScreenshotDataUrl = React.useCallback(async (): Promise<string | null> => {
-    const source = cloneSvg(svgRef.current)?.src;
-    return source == null ? null : rasterizeSvg(source);
-  }, []);
-  const showOpenError = React.useCallback((): void => {
-    (getToastManager() as ToastManager).danger(
-      intl.formatMessage({
-        id: "mermaidDiagram.openPreviewFailed",
-        defaultMessage: "Couldn’t open diagram preview",
-        description: "Error shown when preparing a Mermaid diagram for the full-size image viewer fails",
+import { Nat as ne, Pat as m } from "@rchunk/app-initial";
+import { a as h, i as re, n as g, r as _, t as ie } from "@rchunk/mermaid-image-rendering";
+function v(e) {
+  let t = (0, y.c)(50),
+    {
+      ref: n,
+      actions: r,
+      chatTheme: i,
+      code: a,
+      diagramId: o,
+      errorFallback: c,
+      isStreaming: l,
+      onCodeChange: u,
+      onCodeBlur: d,
+    } = e,
+    p = te(),
+    m;
+  t[0] === a ? (m = t[1]) : ((m = a.trim()), (t[0] = a), (t[1] = m));
+  let h = m,
+    [_, v] = (0, b.useState)(null),
+    [C, ae] = (0, b.useState)(null),
+    [w, T] = (0, b.useState)(null),
+    E = (0, b.useRef)(null),
+    D = (0, b.useRef)(null),
+    O = !l && (_ === h || C === h),
+    k;
+  t[2] === p
+    ? (k = t[3])
+    : ((k = p.formatMessage({
+        id: `mermaidDiagram.ariaLabel`,
+        defaultMessage: `Mermaid diagram`,
+        description: `Accessible description of a Mermaid diagram generated in a ChatGPT message`,
+      })),
+      (t[2] = p),
+      (t[3] = k));
+  let A = k,
+    j;
+  t[4] === p
+    ? (j = t[5])
+    : ((j = p.formatMessage({
+        id: `chatgpt.codeBlocks.mermaid.downloadPng`,
+        defaultMessage: `Download as PNG`,
+        description: `Action that downloads the rendered Mermaid diagram as a PNG image`,
+      })),
+      (t[4] = p),
+      (t[5] = j));
+  let M = j,
+    N;
+  t[6] === h
+    ? (N = t[7])
+    : ((N = (e) => {
+        ((D.current = e), v(e == null ? null : h));
       }),
-      { errorAnalytics: { toastId: "mermaidDiagram.openPreviewFailed" } },
-    );
-  }, [intl]);
-  const openFullscreen = React.useCallback(async (): Promise<void> => {
-    try {
-      await document.fonts.ready;
-      const image = cloneSvg(svgRef.current);
-      if (image == null && onCodeChange == null) return;
-      setFullscreenImage(image);
-    } catch {
-      showOpenError();
-    }
-  }, [onCodeChange, showOpenError]);
-  React.useImperativeHandle(ref, () => ({
-    focus: () => containerRef.current?.focus(),
-    captureScreenshotDataUrl,
-    openFullscreen,
-  }), [captureScreenshotDataUrl, openFullscreen]);
-
-  const rootClassName = classNames(
-    "group/mermaid-preview relative isolate flex w-full items-center justify-center",
-    !isStreaming && "min-h-60",
+      (t[6] = h),
+      (t[7] = N));
+  let P = s(N),
+    F;
+  t[8] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((F = async () => {
+        let e = g(D.current)?.src;
+        return e == null ? null : ie(e);
+      }),
+      (t[8] = F))
+    : (F = t[8]);
+  let I = s(F),
+    L;
+  t[9] === p
+    ? (L = t[10])
+    : ((L = () => {
+        ee().danger(
+          p.formatMessage({
+            id: `mermaidDiagram.openPreviewFailed`,
+            defaultMessage: `Couldn’t open diagram preview`,
+            description: `Error shown when preparing a Mermaid diagram for the full-size image viewer fails`,
+          }),
+          { errorAnalytics: { toastId: `mermaidDiagram.openPreviewFailed` } },
+        );
+      }),
+      (t[9] = p),
+      (t[10] = L));
+  let R = L,
+    z;
+  t[11] !== u || t[12] !== R
+    ? ((z = async () => {
+        try {
+          await document.fonts.ready;
+          let e = g(D.current);
+          if (e == null && u == null) return;
+          T({ image: e });
+        } catch {
+          R();
+        }
+      }),
+      (t[11] = u),
+      (t[12] = R),
+      (t[13] = z))
+    : (z = t[13]);
+  let B = s(z),
+    V,
+    H;
+  (t[14] !== I || t[15] !== B
+    ? ((V = () => ({
+        focus: () => {
+          E.current?.focus();
+        },
+        captureScreenshotDataUrl: I,
+        openFullscreen: B,
+      })),
+      (H = [I, B]),
+      (t[14] = I),
+      (t[15] = B),
+      (t[16] = V),
+      (t[17] = H))
+    : ((V = t[16]), (H = t[17])),
+    (0, b.useImperativeHandle)(n, V, H));
+  let U = !l && `min-h-60`,
+    W;
+  t[18] === U
+    ? (W = t[19])
+    : ((W = f(`group/mermaid-preview relative isolate flex w-full items-center justify-center`, U)),
+      (t[18] = U),
+      (t[19] = W));
+  let G;
+  t[20] !== l || t[21] !== O
+    ? ((G = O ? null : (0, x.jsx)(ne, { isStreaming: l })), (t[20] = l), (t[21] = O), (t[22] = G))
+    : (G = t[22]);
+  let K = O ? `opacity-100` : `pointer-events-none absolute inset-0 opacity-0`,
+    q = !l && `min-h-60`,
+    J;
+  t[23] !== K || t[24] !== q
+    ? ((J = f(
+        `flex h-full w-full items-center justify-center overflow-hidden rounded-lg transition-opacity duration-[180ms] ease-enter-snappy`,
+        K,
+        q,
+      )),
+      (t[23] = K),
+      (t[24] = q),
+      (t[25] = J))
+    : (J = t[25]);
+  let Y;
+  t[26] !== i || t[27] !== h || t[28] !== o || t[29] !== c || t[30] !== l || t[31] !== P
+    ? ((Y = l
+        ? null
+        : (0, x.jsx)(
+            re,
+            {
+              chatTheme: i,
+              code: h,
+              diagramId: o,
+              errorFallback: c,
+              onError: () => ae(h),
+              svgRef: P,
+            },
+            h,
+          )),
+      (t[26] = i),
+      (t[27] = h),
+      (t[28] = o),
+      (t[29] = c),
+      (t[30] = l),
+      (t[31] = P),
+      (t[32] = Y))
+    : (Y = t[32]);
+  let X;
+  t[33] !== J || t[34] !== Y
+    ? ((X = (0, x.jsx)(`div`, { className: J, children: Y })),
+      (t[33] = J),
+      (t[34] = Y),
+      (t[35] = X))
+    : (X = t[35]);
+  let Z = O ? r : null,
+    Q;
+  t[36] !== i ||
+  t[37] !== A ||
+  t[38] !== M ||
+  t[39] !== w ||
+  t[40] !== d ||
+  t[41] !== u ||
+  t[42] !== a
+    ? ((Q =
+        w == null
+          ? null
+          : (0, x.jsx)(S, {
+              alt: A,
+              code: a,
+              chatTheme: i,
+              image: w.image,
+              onCodeChange: u,
+              onCodeBlur: d,
+              downloadAriaLabel: M,
+              onOpenChange: (e) => {
+                e || T(null);
+              },
+            })),
+      (t[36] = i),
+      (t[37] = A),
+      (t[38] = M),
+      (t[39] = w),
+      (t[40] = d),
+      (t[41] = u),
+      (t[42] = a),
+      (t[43] = Q))
+    : (Q = t[43]);
+  let $;
+  return (
+    t[44] !== W || t[45] !== G || t[46] !== X || t[47] !== Z || t[48] !== Q
+      ? (($ = (0, x.jsxs)(`div`, { ref: E, className: W, tabIndex: -1, children: [G, X, Z, Q] })),
+        (t[44] = W),
+        (t[45] = G),
+        (t[46] = X),
+        (t[47] = Z),
+        (t[48] = Q),
+        (t[49] = $))
+      : ($ = t[49]),
+    $
   );
-  const contentClassName = classNames(
-    "flex h-full w-full items-center justify-center overflow-hidden rounded-lg transition-opacity duration-[180ms] ease-enter-snappy",
-    ready ? "opacity-100" : "pointer-events-none absolute inset-0 opacity-0",
-    !isStreaming && "min-h-60",
-  );
-  const loading = ready ? null : jsx.jsx(LoadingRow, { isStreaming });
-  const diagram = isStreaming ? null : jsx.jsx(MermaidSvgRenderer, {
-    chatTheme,
-    code: trimmedCode,
-    diagramId,
-    errorFallback,
-    onError: () => setFailedCode(trimmedCode),
-    svgRef: setSvg,
-  }, trimmedCode);
-  const fullscreen = fullscreenImage == null ? null : jsx.jsx(MermaidEditablePreview, {
-    alt: ariaLabel,
-    chatTheme,
-    code,
-    downloadAriaLabel: downloadLabel,
-    image: fullscreenImage,
-    onCodeBlur,
-    onCodeChange,
-    onOpenChange: (open: boolean) => { if (!open) setFullscreenImage(null); },
-  });
-
-  return jsx.jsxs("div", {
-    ref: containerRef,
-    className: rootClassName,
-    tabIndex: -1,
-    children: [
-      loading,
-      jsx.jsx("div", { className: contentClassName, children: diagram }),
-      ready ? actions : null,
-      fullscreen,
-    ],
-  });
 }
-
-function initializeChatGptMermaidPreview(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeSharedRuntime();
-  initializeClassNames();
-  React = getReactRuntime() as unknown as ReactHooks;
-  initializeUiRuntime();
-  initializeQueryRuntime();
-  initializeImperativeHandleRuntime();
-  initializeToastRuntime();
-  initializeMermaidImage();
-  initializeMermaidRasterizer();
-  initializeLoadingRow();
-  jsx = getJsxRuntime();
-  initializePreloadRuntime();
-  MermaidEditablePreview = createLazyComponent<EditablePreviewProps>(async () => {
-    const { MermaidEditablePreview: component } = await loadWithPreload(
-      () => import("@rchunk/mermaid-editable-preview"),
-      [
-        "./editable-preview-8cca22390870.js",
-        "./rolldown-runtime-2d059c5e81f4.js",
-        "./app-shared-7b9edc1bfb7f.js",
-        "./app-shared-fa570b9eb9dd.css",
-        "./app-initial-51da50e6c6e3.js",
-        "./app-initial-e8ceb32eb626.css",
-        "./image-1b6037d6ba79.js",
-        "./chunk-ZW26E7AF-c8fea83f7f61.js",
-        "./chart-colors-7214911051c2.js",
-      ],
-      import.meta.url,
-    );
-    return component;
-  });
+var y, b, x, S;
+function C() {
+  return (C = e(() => {
+    ((y = t()),
+      u(),
+      (b = c()),
+      a(),
+      p(),
+      d(),
+      l(),
+      h(),
+      _(),
+      m(),
+      (x = r()),
+      n(),
+      (S = i(
+        async () =>
+          (
+            await o(
+              async () => {
+                let { MermaidEditablePreview: e } = await import(
+                  `@rchunk/mermaid-editable-preview`
+                );
+                return { MermaidEditablePreview: e };
+              },
+              __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7, 8]),
+              import.meta.url,
+            )
+          ).MermaidEditablePreview,
+      )));
+  }))();
 }
-
-export { initializeChatGptMermaidPreview as n, ChatGptMermaidPreview as t };
+export { C as n, v as t };

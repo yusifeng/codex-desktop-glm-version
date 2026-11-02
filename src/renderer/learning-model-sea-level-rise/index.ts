@@ -1,51 +1,60 @@
-// Global mean sea-level rise learning model using the 1993–2024 record.
-import "@rchunk/rolldown-runtime";
-
-type ObservationInterval = "earlier" | "later";
-interface SeaLevelValues { interval?: unknown; selectedYear?: number | null }
-
-const yearControl = { min: 1993, max: 2024, step: 1, defaultValue: 2024 };
-const defaultSeaLevelValues = { interval: "later" as ObservationInterval, selectedYear: yearControl.defaultValue };
-const annualSeaLevelChange = [0, 2, 5, 7, 10, 11, 14, 17, 20, 19, 24, 28, 31, 35, 39, 38, 43, 48, 46, 52, 56, 59, 65, 68, 72, 75, 79, 84, 90, 95, 101, 107];
-const seaLevelSeries = annualSeaLevelChange.map((change, index) => ({ x: yearControl.min + index, y: change }));
-const observationIntervals = { earlier: { start: 1993, end: 2002, rate: 2.1 }, later: { start: 2015, end: 2024, rate: 4.7 } };
-const isObservationInterval = (value: unknown): value is ObservationInterval => value === "earlier" || value === "later";
-const finiteOr = (value: number | null | undefined, fallback: number): number => typeof value === "number" && Number.isFinite(value) ? value : fallback;
-const seaLevelChangeAt = (year: number): number => {
-  const clampedYear = Math.min(yearControl.max, Math.max(yearControl.min, year));
-  const lowerIndex = Math.floor(clampedYear) - yearControl.min;
-  const upperIndex = Math.min(annualSeaLevelChange.length - 1, lowerIndex + 1);
-  const fraction = clampedYear - Math.floor(clampedYear);
-  return annualSeaLevelChange[lowerIndex] * (1 - fraction) + annualSeaLevelChange[upperIndex] * fraction;
-};
-
-function deriveSeaLevelRiseState(values: SeaLevelValues) {
-  const selectedYear = Math.round(Math.min(yearControl.max, Math.max(yearControl.min, finiteOr(values.selectedYear, yearControl.defaultValue))));
-  const intervalKey = isObservationInterval(values.interval) ? values.interval : defaultSeaLevelValues.interval;
-  const interval = observationIntervals[intervalKey];
-  const intervalYears = interval.end - interval.start;
-  const intervalStartChange = seaLevelChangeAt(interval.start);
-  const intervalEndChange = intervalStartChange + interval.rate * intervalYears;
-  return {
-    values: { interval: intervalKey, selectedYear },
-    selectedChange: seaLevelChangeAt(selectedYear),
-    elapsedYears: selectedYear - yearControl.min,
-    interval,
-    intervalYears,
-    intervalChange: intervalEndChange - intervalStartChange,
-    intervalStart: { x: interval.start, y: intervalStartChange },
-    intervalEnd: { x: interval.end, y: intervalEndChange },
-    earlyGuide: { from: { x: observationIntervals.earlier.start, y: seaLevelChangeAt(observationIntervals.earlier.start) }, to: { x: observationIntervals.earlier.end, y: seaLevelChangeAt(observationIntervals.earlier.start) + observationIntervals.earlier.rate * (observationIntervals.earlier.end - observationIntervals.earlier.start) } },
-    lateGuide: { from: { x: observationIntervals.later.start, y: seaLevelChangeAt(observationIntervals.later.start) }, to: { x: observationIntervals.later.end, y: seaLevelChangeAt(observationIntervals.later.start) + observationIntervals.later.rate * (observationIntervals.later.end - observationIntervals.later.start) } },
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l;
+function u() {
+  return (u = e(() => {
+    ((t = { min: 1993, max: 2024, step: 1, defaultValue: 2024 }),
+      (n = { interval: `later`, selectedYear: t.defaultValue }),
+      (r = [
+        0, 2, 5, 7, 10, 11, 14, 17, 20, 19, 24, 28, 31, 35, 39, 38, 43, 48, 46, 52, 56, 59, 65, 68,
+        72, 75, 79, 84, 90, 95, 101, 107,
+      ]),
+      (i = r.map((e, n) => ({ x: t.min + n, y: e }))),
+      (a = {
+        earlier: { start: 1993, end: 2002, rate: 2.1 },
+        later: { start: 2015, end: 2024, rate: 4.7 },
+      }),
+      (o = (e) => e === `earlier` || e === `later`),
+      (s = (e, t) => (typeof e == `number` && Number.isFinite(e) ? e : t)),
+      (c = (e) => {
+        let n = Math.min(t.max, Math.max(t.min, e)),
+          i = Math.floor(n) - t.min,
+          a = Math.min(r.length - 1, i + 1),
+          o = n - Math.floor(n);
+        return r[i] * (1 - o) + r[a] * o;
+      }),
+      (l = (e) => {
+        let r = Math.round(Math.min(t.max, Math.max(t.min, s(e.selectedYear, t.defaultValue)))),
+          i = o(e.interval) ? e.interval : n.interval,
+          l = a[i],
+          u = l.end - l.start,
+          d = c(l.start),
+          f = d + l.rate * u;
+        return {
+          values: { interval: i, selectedYear: r },
+          selectedChange: c(r),
+          elapsedYears: r - t.min,
+          interval: l,
+          intervalYears: u,
+          intervalChange: f - d,
+          intervalStart: { x: l.start, y: d },
+          intervalEnd: { x: l.end, y: f },
+          earlyGuide: {
+            from: { x: a.earlier.start, y: c(a.earlier.start) },
+            to: {
+              x: a.earlier.end,
+              y: c(a.earlier.start) + a.earlier.rate * (a.earlier.end - a.earlier.start),
+            },
+          },
+          lateGuide: {
+            from: { x: a.later.start, y: c(a.later.start) },
+            to: {
+              x: a.later.end,
+              y: c(a.later.start) + a.later.rate * (a.later.end - a.later.start),
+            },
+          },
+        };
+      }));
+  }))();
 }
-
-function initializeSeaLevelRiseModel(): void {}
-
-export {
-  initializeSeaLevelRiseModel as a,
-  deriveSeaLevelRiseState as i,
-  seaLevelSeries as n,
-  yearControl as r,
-  defaultSeaLevelValues as t,
-};
+export { u as a, l as i, i as n, t as r, n as t };

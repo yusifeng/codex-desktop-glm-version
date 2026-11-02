@@ -1,48 +1,50 @@
-import "@rchunk/rolldown-runtime";
-import { LX as useScope, e6 as ReactRuntime } from "@rchunk/app-shared";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, FX as n, LX as r, e6 as i } from "@rchunk/app-shared";
 import {
-  $en as routeScope,
-  Rl as openSitePreviewTab,
-  _Bt as conversationHasSitePreview,
+  $en as a,
+  Ll as o,
+  Rl as s,
+  _Bt as c,
+  itn as l,
+  vBt as u,
 } from "@rchunk/app-initial";
-import { pf as pendingSitePreviewSignal } from "@rchunk/app-primary";
-
-interface PendingSitePreview {
-  projectId: string;
-  title: string;
-  url?: string | null;
+import { df as d, pf as f } from "@rchunk/app-primary";
+function p(e) {
+  let t = (0, m.c)(4),
+    { pending: n } = e,
+    i = r(a),
+    o,
+    l;
+  return (
+    t[0] !== n || t[1] !== i
+      ? ((o = () => {
+          let e = n.url;
+          if (e == null) return;
+          let t = !1;
+          return i.watch((r) => {
+            t ||
+              r.get(f) !== n ||
+              (r.value.routeKind === `chatgpt-thread` && r.get(c, r.value.conversationId)) ||
+              ((t = s(r, { type: `appgen-app`, projectId: n.projectId, title: n.title, url: e })),
+              t && r.set(f, null));
+          });
+        }),
+        (l = [n, i]),
+        (t[0] = n),
+        (t[1] = i),
+        (t[2] = o),
+        (t[3] = l))
+      : ((o = t[2]), (l = t[3])),
+    (0, h.useEffect)(o, l),
+    null
+  );
 }
-interface ScopeSnapshot {
-  get(signal: unknown, parameter?: unknown): unknown;
-  set(signal: unknown, value: unknown): void;
-  value: { conversationId?: string; routeKind?: string };
+var m, h;
+function g() {
+  return (g = e(() => {
+    ((m = t()), n(), (h = i()), u(), l(), o(), d());
+  }))();
 }
-interface WatchableScope {
-  watch(effect: (scope: ScopeSnapshot) => void | (() => void)): () => void;
-}
-
-function OpenPendingSitePreview(props: { pending: PendingSitePreview }): null {
-  const scope = useScope(routeScope) as unknown as WatchableScope;
-  ReactRuntime.useEffect(() => {
-    const url = props.pending.url;
-    if (url == null) return;
-    let opened = false;
-    return scope.watch((snapshot) => {
-      const currentPending = snapshot.get(pendingSitePreviewSignal);
-      const alreadyOpen = snapshot.value.routeKind === "chatgpt-thread" &&
-        snapshot.value.conversationId != null &&
-        conversationHasSitePreview(snapshot, snapshot.value.conversationId);
-      if (opened || currentPending !== props.pending || alreadyOpen) return;
-      opened = openSitePreviewTab(snapshot, {
-        type: "appgen-app",
-        projectId: props.pending.projectId,
-        title: props.pending.title,
-        url,
-      });
-      if (opened) snapshot.set(pendingSitePreviewSignal, null);
-    });
-  }, [props.pending, scope]);
-  return null;
-}
-
-export { OpenPendingSitePreview };
+g();
+export { p as OpenPendingSitePreview };

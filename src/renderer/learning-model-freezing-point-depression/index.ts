@@ -1,55 +1,101 @@
-// Colligative freezing-point depression and its phase-diagram shift.
-import "@rchunk/rolldown-runtime";
-
-type Solvent = "water" | "benzene" | "cyclohexane";
-interface FreezingPointValues { solvent?: unknown; molality?: number | null; particles?: number | null }
-
-const freezingPointSpecification = {
-  type: "FREEZING_POINT_DEPRESSION", version: 2, thumbnailAssetKey: "freezing-point-depression-v1", canonicalFormula: "\\Delta T_f = iK_fm",
-  parameters: { solvent: { kind: "enum" as const, defaultValue: "water" as Solvent, allowedValues: ["water", "benzene", "cyclohexane"] as Solvent[] } },
-};
-const molalityControl = { min: 0, max: 0.5, step: 0.05, defaultValue: 0.25 };
-const particleControl = { min: 1, max: 3, step: 1, defaultValue: 2 };
-const solventProperties: Record<Solvent, { pureFreezingC: number; cryoscopicConstant: number }> = { water: { pureFreezingC: 0, cryoscopicConstant: 1.86 }, benzene: { pureFreezingC: 5.5, cryoscopicConstant: 5.12 }, cyclohexane: { pureFreezingC: 6.5, cryoscopicConstant: 20.1 } };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const isSolvent = (value: unknown): value is Solvent => value === "water" || value === "benzene" || value === "cyclohexane";
-const linearSamples = (start: number, end: number, count: number): number[] => Array.from({ length: count }, (_, index) => start + (end - start) * index / (count - 1));
-const normalizeFreezingPointValues = (values: FreezingPointValues) => ({
-  solvent: isSolvent(values.solvent) ? values.solvent : freezingPointSpecification.parameters.solvent.defaultValue,
-  molality: typeof values.molality === "number" && Number.isFinite(values.molality) ? clamp(values.molality, molalityControl.min, molalityControl.max) : molalityControl.defaultValue,
-  particles: typeof values.particles === "number" && Number.isFinite(values.particles) ? clamp(Math.round(values.particles), particleControl.min, particleControl.max) : particleControl.defaultValue,
-});
-const calculateFreezingPointDepression = (values: FreezingPointValues) => {
-  const normalized = normalizeFreezingPointValues(values);
-  const { pureFreezingC, cryoscopicConstant } = solventProperties[normalized.solvent];
-  const particleMolality = normalized.particles * normalized.molality;
-  const depressionC = cryoscopicConstant * particleMolality;
-  return { ...normalized, pureFreezingC, cryoscopicConstant, particleMolality, depressionC, solutionFreezingC: pureFreezingC - depressionC, maxDepressionC: cryoscopicConstant * particleControl.max * molalityControl.max };
-};
-const buildFreezingPointPhaseDiagram = (result: ReturnType<typeof calculateFreezingPointDepression>) => {
-  const pressureMin = 0.05;
-  const pureTriplePressure = 0.19;
-  const xMin = result.pureFreezingC - result.maxDepressionC - 3;
-  const xMax = result.pureFreezingC + Math.max(5, result.maxDepressionC * 0.7);
-  const pressureScale = Math.max(0.72, result.maxDepressionC * 0.055);
-  const direction = result.solvent === "water" ? -1 : 1;
-  const pureTripleX = result.pureFreezingC + direction * -0.81 * pressureScale;
-  const curveScale = Math.max(2.6, result.maxDepressionC * 0.36);
-  const sublimationPressure = (temperature: number): number => pressureMin + 0.14 * Math.exp((temperature - pureTripleX) / curveScale);
-  let solutionTripleX = result.solutionFreezingC + direction * -0.81 * pressureScale;
-  for (let iteration = 0; iteration < 8; iteration += 1) solutionTripleX = result.solutionFreezingC + direction * (sublimationPressure(solutionTripleX) - 1) * pressureScale;
-  const solutionTriplePressure = sublimationPressure(solutionTripleX);
-  const depressionRatio = result.depressionC / result.maxDepressionC;
-  const pureTopX = result.pureFreezingC + direction * 0.17 * pressureScale;
-  const solutionTopX = result.solutionFreezingC + direction * 0.17 * pressureScale;
-  const sublimation = linearSamples(xMin, pureTripleX, 42).map((x) => ({ x, y: sublimationPressure(x) }));
-  const solidBoundary = [...sublimation.filter(({ x }) => x < solutionTripleX), { x: solutionTripleX, y: solutionTriplePressure }];
-  const pureVapor = linearSamples(pureTripleX, xMax, 42).map((x) => { const progress = (x - pureTripleX) / (xMax - pureTripleX); return { x, y: pureTriplePressure + 0.33 * progress + 0.11 * progress ** 2 }; });
-  const solutionVapor = linearSamples(solutionTripleX, xMax, 42).map((x) => { const progress = (x - solutionTripleX) / (xMax - solutionTripleX); return { x, y: solutionTriplePressure + (0.31 - 0.09 * depressionRatio) * progress + (0.09 - 0.04 * depressionRatio) * progress ** 2 }; });
-  return { xMin, xMax, pressureMin, pressureMax: 1.17, fixedPressure: 1, pureTriple: { x: pureTripleX, y: pureTriplePressure }, solutionTriple: { x: solutionTripleX, y: solutionTriplePressure }, pureTopX, solutionTopX, sublimation, solidBoundary, pureVapor, solutionVapor };
-};
-
-function initializeFreezingPointSpecification(): void {}
-function initializeFreezingPointModel(): void {}
-
-export { initializeFreezingPointModel as a, freezingPointSpecification as c, buildFreezingPointPhaseDiagram as i, particleControl as n, normalizeFreezingPointValues as o, calculateFreezingPointDepression as r, initializeFreezingPointSpecification as s, molalityControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `FREEZING_POINT_DEPRESSION`),
+      (n = `freezing-point-depression-v1`),
+      (r = `\\Delta T_f = iK_fm`),
+      (i = {
+        solvent: {
+          kind: `enum`,
+          defaultValue: `water`,
+          allowedValues: [`water`, `benzene`, `cyclohexane`],
+        },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+var s, c, l, u, d, f, p, m, h;
+function g() {
+  return (g = e(() => {
+    (o(),
+      (s = { min: 0, max: 0.5, step: 0.05, defaultValue: 0.25 }),
+      (c = { min: 1, max: 3, step: 1, defaultValue: 2 }),
+      (l = {
+        water: { pureFreezingC: 0, cryoscopicConstant: 1.86 },
+        benzene: { pureFreezingC: 5.5, cryoscopicConstant: 5.12 },
+        cyclohexane: { pureFreezingC: 6.5, cryoscopicConstant: 20.1 },
+      }),
+      (u = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (d = (e) => e === `water` || e === `benzene` || e === `cyclohexane`),
+      (f = (e, t, n) => Array.from({ length: n }, (r, i) => e + ((t - e) * i) / (n - 1))),
+      (p = (e) => ({
+        solvent: d(e.solvent) ? e.solvent : a.parameters.solvent.defaultValue,
+        molality: Number.isFinite(e.molality)
+          ? u(e.molality ?? s.defaultValue, s.min, s.max)
+          : s.defaultValue,
+        particles: Number.isFinite(e.particles)
+          ? u(Math.round(e.particles ?? c.defaultValue), c.min, c.max)
+          : c.defaultValue,
+      })),
+      (m = (e) => {
+        let t = p(e),
+          { pureFreezingC: n, cryoscopicConstant: r } = l[t.solvent],
+          i = t.particles * t.molality,
+          a = r * i;
+        return {
+          ...t,
+          pureFreezingC: n,
+          cryoscopicConstant: r,
+          particleMolality: i,
+          depressionC: a,
+          solutionFreezingC: n - a,
+          maxDepressionC: r * c.max * s.max,
+        };
+      }),
+      (h = (e) => {
+        let t = 0.05,
+          n = 0.19,
+          r = e.pureFreezingC - e.maxDepressionC - 3,
+          i = e.pureFreezingC + Math.max(5, e.maxDepressionC * 0.7),
+          a = Math.max(0.72, e.maxDepressionC * 0.055),
+          o = e.solvent === `water` ? -1 : 1,
+          s = e.pureFreezingC + o * -0.81 * a,
+          c = Math.max(2.6, e.maxDepressionC * 0.36),
+          l = (e) => t + 0.14 * Math.exp((e - s) / c),
+          u = e.solutionFreezingC + o * -0.81 * a;
+        for (let t = 0; t < 8; t += 1) u = e.solutionFreezingC + o * (l(u) - 1) * a;
+        let d = l(u),
+          p = e.depressionC / e.maxDepressionC,
+          m = e.pureFreezingC + o * 0.16999999999999993 * a,
+          h = e.solutionFreezingC + o * 0.16999999999999993 * a,
+          g = f(r, s, 42).map((e) => ({ x: e, y: l(e) })),
+          _ = [...g.filter((e) => e.x < u), { x: u, y: d }],
+          v = f(s, i, 42).map((e) => {
+            let t = (e - s) / (i - s);
+            return { x: e, y: n + 0.33 * t + 0.11 * t ** 2 };
+          }),
+          y = f(u, i, 42).map((e) => {
+            let t = (e - u) / (i - u);
+            return { x: e, y: d + (0.31 - 0.09 * p) * t + (0.09 - 0.04 * p) * t ** 2 };
+          });
+        return {
+          xMin: r,
+          xMax: i,
+          pressureMin: t,
+          pressureMax: 1.17,
+          fixedPressure: 1,
+          pureTriple: { x: s, y: n },
+          solutionTriple: { x: u, y: d },
+          pureTopX: m,
+          solutionTopX: h,
+          sublimation: g,
+          solidBoundary: _,
+          pureVapor: v,
+          solutionVapor: y,
+        };
+      }));
+  }))();
+}
+export { g as a, a as c, h as i, c as n, p as o, m as r, o as s, s as t };

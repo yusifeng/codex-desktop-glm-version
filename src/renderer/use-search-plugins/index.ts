@@ -1,256 +1,311 @@
-// Plugin directory search hook. Restores local AppServer and hosted plugin
-// search, pagination, project-root context, visibility filtering, and merging
-// with installed plugin state.
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-
-type DirectoryTab = "openai" | "workspace" | "personal";
-
-export interface UseSearchPluginsOptions {
-  directoryTab?: DirectoryTab;
-  hostId?: string;
-  limit?: number;
-  searchTerm: string;
-}
-
-export interface PluginSearchResult {
-  data: Array<Record<string, any>> | undefined;
-  error: unknown;
-  fetchNextPage(): Promise<void>;
-  hasNextPage: boolean;
-  isFetchNextPageError: boolean;
-  isFetchingNextPage: boolean;
-  isLoading: boolean;
-}
-
-const shared = appSharedChunk as unknown as Record<string, any>;
-const initial = appInitialChunk as unknown as Record<string, any>;
-
-const DEFAULT_LIMIT = 50;
-const DEBOUNCE_MS = 200;
-const MINIMUM_SEARCH_VERSION = "0.147.0-alpha.6";
-const DIRECTORY_SCOPE: Record<DirectoryTab, string> = {
-  openai: "global",
-  workspace: "workspace",
-  personal: "personal",
-};
-const HOSTED_SCOPE: Record<string, string> = {
-  global: "GLOBAL",
-  workspace: "WORKSPACE",
-  personal: "USER",
-};
-
-let initialized = false;
-
-function buildSearchQueryOptions({
-  appScope,
-  accountId,
-  enabled,
-  hostId,
-  hostedBrowserPlugins,
-  limit,
-  queryClient,
-  roots,
-  scope,
-  searchTerm,
-}: {
-  appScope: unknown;
-  accountId: string | null;
-  enabled: boolean;
-  hostId: string;
-  hostedBrowserPlugins: boolean;
-  limit: number;
-  queryClient: unknown;
-  roots?: string[];
-  scope?: string;
-  searchTerm: string;
-}): unknown {
-  return shared.uL({
-    enabled,
-    getNextPageParam: (page: { nextCursor?: string | null }) => page.nextCursor ?? undefined,
-    initialPageParam: null,
-    placeholderData: shared.MZ,
-    queryFn: async ({ pageParam, signal }: { pageParam?: string | null; signal?: AbortSignal }) => {
-      if (hostedBrowserPlugins) {
-        const response = await initial.udn.safeGet("/ps/plugins/search", {
-          parameters: {
-            query: {
-              q: searchTerm,
-              scope: scope == null ? undefined : HOSTED_SCOPE[scope],
-              limit,
-              pageToken: pageParam ?? undefined,
-            },
-          },
-          additionalHeaders: initial.G3t(),
-          signal: initial.d4t(signal),
-        });
-        return {
-          nextCursor: response.pagination.next_page_token,
-          plugins: response.plugins.map((plugin: unknown) => ({
-            plugin: initial.r4t(plugin),
-            pluginServicePlugin: plugin,
-          })),
-        };
-      }
-
-      const response = await initial.Ugn(appScope, hostId).sendRequest(
-        "plugin/search",
-        {
-          searchTerm,
-          scope,
-          ...(roots == null || roots.length === 0 ? {} : { cwds: roots }),
-          cursor: pageParam ?? null,
-          limit,
-        },
-        { timeoutMs: initial.p4t },
-      );
-      const plugins = await initial.D4t({
-        hostId,
-        plugins: initial.v4t(
-          response.data.map(({ marketplaceName, marketplacePath, plugin }: Record<string, any>) => ({
-            interface: null,
-            name: marketplaceName,
-            path: marketplacePath,
-            plugins: [plugin],
-          })),
-        ),
-        queryClient,
-        signal: initial.d4t(signal),
-      });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $I as n,
+  $O as r,
+  BX as i,
+  CL as a,
+  FX as o,
+  HX as s,
+  LX as c,
+  MZ as l,
+  QI as u,
+  SL as d,
+  ZI as ee,
+  eL as te,
+  ek as f,
+  jZ as p,
+  tY as ne,
+  uL as m,
+  wL as h,
+} from "@rchunk/app-shared";
+import {
+  $6t as g,
+  Bfn as _,
+  Bv as re,
+  Cht as ie,
+  D4t as v,
+  E4t as y,
+  G3t as b,
+  G6t as x,
+  H6t as ae,
+  HZt as S,
+  Ifn as oe,
+  K3t as C,
+  L4t as se,
+  M6t as w,
+  P6t as ce,
+  R3t as T,
+  Sht as E,
+  Ugn as D,
+  Wgn as O,
+  _cn as le,
+  _v as k,
+  afn as ue,
+  bcn as de,
+  c4t as fe,
+  d4t as A,
+  dv as pe,
+  e8t as me,
+  f4t as j,
+  gv as he,
+  i4t as M,
+  ifn as N,
+  jv as ge,
+  m4t as P,
+  p4t as F,
+  pdn as I,
+  r4t as L,
+  udn as R,
+  ugn as _e,
+  v4t as z,
+  xv as B,
+  z3t as V,
+  zv as H,
+} from "@rchunk/app-initial";
+function U(e) {
+  let t = (0, W.c)(26),
+    { directoryTab: n, hostId: r, limit: o, searchTerm: l } = e,
+    u = r === void 0 ? _e : r,
+    d = o === void 0 ? G : o,
+    f = c(ee),
+    p;
+  t[0] === l ? (p = t[1]) : ((p = l.trim()), (t[0] = l), (t[1] = p));
+  let m = p,
+    h = ie(m, K),
+    g = a(),
+    _ = ce(u);
+  s(ae);
+  let v = i(oe, u),
+    y =
+      (se(_?.authMethod ?? null) || _?.authMethod === `apikey`) &&
+      v != null &&
+      (v === `0.0.0` || ne(v, q) >= 0),
+    b;
+  t[2] === u ? (b = t[3]) : ((b = { hostId: u }), (t[2] = u), (t[3] = b));
+  let x;
+  t[4] === !0 ? (x = t[5]) : ((x = { enabled: !0 }), (t[4] = !0), (t[5] = x));
+  let { data: S, error: C, isLoading: w } = i(de, b, x),
+    E = S?.roots,
+    D;
+  t[6] !== u || t[7] !== E
+    ? ((D = { hostId: u, roots: E }), (t[6] = u), (t[7] = E), (t[8] = D))
+    : (D = t[8]);
+  let { data: O, error: le, isLoading: k } = fe(D),
+    A = me(),
+    { value: j } = ue(`1349514884`),
+    { hiddenPluginIds: M } = re(j),
+    N = m !== h,
+    P = y && m.length > 0 && !N,
+    {
+      data: F,
+      error: I,
+      fetchNextPage: L,
+      hasNextPage: R,
+      isFetchNextPageError: z,
+      isFetchingNextPage: B,
+      isLoading: V,
+    } = te(
+      ye({
+        appScope: f,
+        accountId: null,
+        enabled: P,
+        hostId: u,
+        hostedBrowserPlugins: !1,
+        limit: d,
+        queryClient: g,
+        roots: S?.roots,
+        scope: n == null ? void 0 : J[n],
+        searchTerm: h,
+      }),
+    ),
+    H = C ?? le ?? I,
+    U = m.length > 0 && (w || k || (y && ((N && F == null) || V))),
+    Y;
+  t[9] !== L || t[10] !== R || t[11] !== P
+    ? ((Y = async () => {
+        P && R && (await L());
+      }),
+      (t[9] = L),
+      (t[10] = R),
+      (t[11] = P),
+      (t[12] = Y))
+    : (Y = t[12]);
+  let X = Y;
+  if (m.length === 0 || U || O == null || (P && F == null && I == null)) {
+    let e;
+    return (
+      t[13] !== H || t[14] !== X || t[15] !== z || t[16] !== B || t[17] !== U
+        ? ((e = {
+            data: void 0,
+            error: H,
+            fetchNextPage: X,
+            hasNextPage: !1,
+            isFetchNextPageError: z,
+            isFetchingNextPage: B,
+            isLoading: U,
+          }),
+          (t[13] = H),
+          (t[14] = X),
+          (t[15] = z),
+          (t[16] = B),
+          (t[17] = U),
+          (t[18] = e))
+        : (e = t[18]),
+      e
+    );
+  }
+  let be = new Map();
+  for (let e of O) be.set(T(e.plugin), e);
+  let xe = (F ?? []).map(ve),
+    Se = new Map();
+  for (let { plugin: e, pluginServicePlugin: t } of F ?? []) t != null && Se.set(T(e.plugin), t);
+  let Z = ge(xe, M, A).map((e) => {
+      let t = T(e.plugin),
+        n = be.get(t) ?? null,
+        r = Se.get(t);
       return {
-        nextCursor: response.nextCursor,
-        plugins: plugins.map((plugin: unknown) => ({ plugin, pluginServicePlugin: null })),
+        ...(r == null ? pe(e) : he(r, n)),
+        enabled: n?.plugin.enabled ?? e.plugin.enabled,
+        installed: n?.plugin.installed ?? e.plugin.installed,
+        ...(n == null ? {} : { installedPlugin: n }),
+        logoDarkPath: e.logoDarkPath ?? n?.logoDarkPath ?? null,
+        logoPath: e.logoPath ?? n?.logoPath ?? null,
       };
-    },
-    queryKey: [
-      ...initial.m4t,
-      "search",
-      hostId,
-      scope,
-      searchTerm,
-      limit,
-      ...(roots ?? []),
-      ...(accountId == null ? [] : [accountId]),
-    ],
-    retry: false,
-    select: (data: { pages: Array<{ plugins: unknown[] }> }) => data.pages.flatMap((page) => page.plugins),
-    staleTime: shared.$O.ONE_MINUTE,
-  });
-}
-
-function useSearchPlugins({
-  directoryTab,
-  hostId = initial.ugn,
-  limit = DEFAULT_LIMIT,
-  searchTerm,
-}: UseSearchPluginsOptions): PluginSearchResult {
-  initializeSearchPlugins();
-  const appScope = shared.LX(shared.ZI);
-  const trimmedSearchTerm = searchTerm.trim();
-  const debouncedSearchTerm = initial.Cht(trimmedSearchTerm, DEBOUNCE_MS);
-  const queryClient = shared.CL();
-  const host = initial.P6t(hostId);
-  shared.HX(initial.H6t);
-  const appServerVersion = shared.BX(initial.Ifn, hostId);
-  const searchSupported =
-    (initial.L4t(host?.authMethod ?? null) || host?.authMethod === "apikey") &&
-    appServerVersion != null &&
-    (appServerVersion === "0.0.0" || shared.tY(appServerVersion, MINIMUM_SEARCH_VERSION) >= 0);
-
-  const projectRootsQuery = shared.BX(initial.bcn, { hostId }, { enabled: true });
-  const roots = projectRootsQuery.data?.roots;
-  const installedPluginsQuery = initial.c4t({ hostId, roots });
-  const pluginSettings = initial.e8t();
-  const { value: hiddenPluginGate } = initial.afn("1349514884");
-  const { hiddenPluginIds } = initial.Bv(hiddenPluginGate);
-  const debouncePending = trimmedSearchTerm !== debouncedSearchTerm;
-  const remoteSearchEnabled = searchSupported && trimmedSearchTerm.length > 0 && !debouncePending;
-
-  const remoteSearch = shared.eL(buildSearchQueryOptions({
-    appScope,
-    accountId: null,
-    enabled: remoteSearchEnabled,
-    hostId,
-    hostedBrowserPlugins: false,
-    limit,
-    queryClient,
-    roots,
-    scope: directoryTab == null ? undefined : DIRECTORY_SCOPE[directoryTab],
-    searchTerm: debouncedSearchTerm,
-  }));
-
-  const error = projectRootsQuery.error ?? installedPluginsQuery.error ?? remoteSearch.error;
-  const isLoading = trimmedSearchTerm.length > 0 && (
-    projectRootsQuery.isLoading ||
-    installedPluginsQuery.isLoading ||
-    (searchSupported && ((debouncePending && remoteSearch.data == null) || remoteSearch.isLoading))
+    }),
+    Q = P && R,
+    $;
+  return (
+    t[19] !== Z || t[20] !== H || t[21] !== X || t[22] !== z || t[23] !== B || t[24] !== Q
+      ? (($ = {
+          data: Z,
+          error: H,
+          fetchNextPage: X,
+          hasNextPage: Q,
+          isFetchNextPageError: z,
+          isFetchingNextPage: B,
+          isLoading: !1,
+        }),
+        (t[19] = Z),
+        (t[20] = H),
+        (t[21] = X),
+        (t[22] = z),
+        (t[23] = B),
+        (t[24] = Q),
+        (t[25] = $))
+      : ($ = t[25]),
+    $
   );
-  const fetchNextPage = async () => {
-    if (remoteSearchEnabled && remoteSearch.hasNextPage) await remoteSearch.fetchNextPage();
-  };
-
-  if (
-    trimmedSearchTerm.length === 0 ||
-    isLoading ||
-    installedPluginsQuery.data == null ||
-    (remoteSearchEnabled && remoteSearch.data == null && remoteSearch.error == null)
-  ) {
-    return {
-      data: undefined,
-      error,
-      fetchNextPage,
-      hasNextPage: false,
-      isFetchNextPageError: remoteSearch.isFetchNextPageError,
-      isFetchingNextPage: remoteSearch.isFetchingNextPage,
-      isLoading,
-    };
-  }
-
-  const installedByKey = new Map<string, any>();
-  for (const installed of installedPluginsQuery.data) {
-    installedByKey.set(initial.R3t(installed.plugin), installed);
-  }
-  const remotePlugins = (remoteSearch.data ?? []).map(({ plugin }: Record<string, any>) => plugin);
-  const servicePluginByKey = new Map<string, any>();
-  for (const { plugin, pluginServicePlugin } of remoteSearch.data ?? []) {
-    if (pluginServicePlugin != null) servicePluginByKey.set(initial.R3t(plugin.plugin), pluginServicePlugin);
-  }
-
-  const data = initial.jv(remotePlugins, hiddenPluginIds, pluginSettings).map((plugin: Record<string, any>) => {
-    const key = initial.R3t(plugin.plugin);
-    const installed = installedByKey.get(key) ?? null;
-    const pluginServicePlugin = servicePluginByKey.get(key);
-    return {
-      ...(pluginServicePlugin == null ? initial.dv(plugin) : initial.gv(pluginServicePlugin, installed)),
-      enabled: installed?.plugin.enabled ?? plugin.plugin.enabled,
-      installed: installed?.plugin.installed ?? plugin.plugin.installed,
-      ...(installed == null ? {} : { installedPlugin: installed }),
-      logoDarkPath: plugin.logoDarkPath ?? installed?.logoDarkPath ?? null,
-      logoPath: plugin.logoPath ?? installed?.logoPath ?? null,
-    };
-  });
-
-  return {
-    data,
-    error,
-    fetchNextPage,
-    hasNextPage: remoteSearchEnabled && remoteSearch.hasNextPage,
-    isFetchNextPageError: remoteSearch.isFetchNextPageError,
-    isFetchingNextPage: remoteSearch.isFetchingNextPage,
-    isLoading: false,
-  };
 }
-
-function initializeSearchPlugins(): void {
-  if (initialized) return;
-  initialized = true;
-  for (const name of ["jZ", "$I", "SL", "FX", "wL"]) shared[name]?.();
-  for (const name of ["z3t", "Wgn", "HZt", "G6t", "M6t", "$6t", "zv", "K3t", "xv", "E4t"]) initial[name]?.();
-  shared.QI?.();
-  for (const name of ["_cn", "Bfn", "ifn"]) initial[name]?.();
-  shared.ek?.();
-  for (const name of ["pdn", "Sht", "_v", "P6t", "i4t"]) initial[name]?.();
+function ve(e) {
+  let { plugin: t } = e;
+  return t;
 }
-
-export { useSearchPlugins as n, initializeSearchPlugins as t };
+var W, G, K, q, J, Y, ye;
+function X() {
+  return (X = e(() => {
+    ((W = t()),
+      p(),
+      n(),
+      d(),
+      o(),
+      h(),
+      V(),
+      O(),
+      S(),
+      x(),
+      w(),
+      g(),
+      H(),
+      C(),
+      B(),
+      y(),
+      u(),
+      le(),
+      _(),
+      N(),
+      f(),
+      I(),
+      E(),
+      k(),
+      F(),
+      M(),
+      (G = 50),
+      (K = 200),
+      (q = `0.147.0-alpha.6`),
+      (J = { openai: `global`, workspace: `workspace`, personal: `personal` }),
+      (Y = { global: `GLOBAL`, workspace: `WORKSPACE`, personal: `USER` }),
+      (ye = ({
+        appScope: e,
+        accountId: t,
+        enabled: n,
+        hostId: i,
+        hostedBrowserPlugins: a,
+        limit: o,
+        queryClient: s,
+        roots: c,
+        scope: u,
+        searchTerm: d,
+      }) =>
+        m({
+          enabled: n,
+          getNextPageParam: (e) => e.nextCursor ?? void 0,
+          initialPageParam: null,
+          placeholderData: l,
+          queryFn: async ({ pageParam: t, signal: n }) => {
+            if (a) {
+              let e = await R.safeGet(`/ps/plugins/search`, {
+                parameters: {
+                  query: {
+                    q: d,
+                    scope: u == null ? void 0 : Y[u],
+                    limit: o,
+                    pageToken: t ?? void 0,
+                  },
+                },
+                additionalHeaders: b(),
+                signal: j(n),
+              });
+              return {
+                nextCursor: e.pagination.next_page_token,
+                plugins: e.plugins.map((e) => ({ plugin: L(e), pluginServicePlugin: e })),
+              };
+            }
+            let r = await D(e, i).sendRequest(
+                `plugin/search`,
+                {
+                  searchTerm: d,
+                  scope: u,
+                  ...(c == null || c.length === 0 ? {} : { cwds: c }),
+                  cursor: t,
+                  limit: o,
+                },
+                { timeoutMs: A },
+              ),
+              l = await v({
+                hostId: i,
+                plugins: z(
+                  r.data.map(({ marketplaceName: e, marketplacePath: t, plugin: n }) => ({
+                    interface: null,
+                    name: e,
+                    path: t,
+                    plugins: [n],
+                  })),
+                ),
+                queryClient: s,
+                signal: j(n),
+              });
+            return {
+              nextCursor: r.nextCursor,
+              plugins: l.map((e) => ({ plugin: e, pluginServicePlugin: null })),
+            };
+          },
+          queryKey: [...P, `search`, i, u, d, o, ...(c ?? []), ...(t == null ? [] : [t])],
+          retry: !1,
+          select: (e) => e.pages.flatMap((e) => e.plugins),
+          staleTime: r.ONE_MINUTE,
+        })));
+  }))();
+}
+export { U as n, X as t };

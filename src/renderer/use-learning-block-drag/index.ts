@@ -1,75 +1,84 @@
-// use-learning-block-drag — pointer-capture drag state with optional RAF throttling.
-
-import "@rchunk/rolldown-runtime";
-import { e6 as getReactRuntime } from "@rchunk/app-shared";
-import { n as useStableCallback, t as initializeStableCallback } from "@rchunk/use-stable-callback";
-
-interface DragReactRuntime {
-  useCallback<Value extends (...arguments_: never[]) => unknown>(callback: Value, dependencies: readonly unknown[]): Value;
-  useEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void;
-  useRef<Value>(value: Value): { current: Value };
-  useState<Value>(value: Value): [Value, (value: Value) => void];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { e6 as t } from "@rchunk/app-shared";
+import { n, t as r } from "@rchunk/use-stable-callback";
+var i, a;
+function o() {
+  return (o = e(() => {
+    ((i = t()),
+      r(),
+      (a = ({ elementRef: e, onDrag: t, shouldThrottle: r = () => !0, disabled: a = !1 }) => {
+        let o = (0, i.useRef)(null),
+          s = (0, i.useRef)(null),
+          c = (0, i.useRef)(null),
+          [l, u] = (0, i.useState)(null),
+          d = n(t),
+          f = (0, i.useCallback)(() => {
+            c.current = null;
+            let e = o.current,
+              t = s.current;
+            ((s.current = null), e && t && d({ ...e, ...t }));
+          }, [d]),
+          p = (0, i.useCallback)(
+            (t, n) => {
+              let r = e.current;
+              if (a || !r) return;
+              let i = r.getBoundingClientRect();
+              if (i.width <= 0 || i.height <= 0) return;
+              let s = {
+                target: t,
+                pointerId: n.pointerId,
+                bounds: { left: i.left, top: i.top, width: i.width, height: i.height },
+              };
+              ((o.current = s), u(t));
+              try {
+                r.setPointerCapture?.(n.pointerId);
+              } catch {}
+              (d({ ...s, clientX: n.clientX, clientY: n.clientY }),
+                n.preventDefault(),
+                n.stopPropagation());
+            },
+            [a, e, d],
+          ),
+          m = (0, i.useCallback)(
+            (e) => {
+              let t = o.current;
+              return !t || t.pointerId !== e.pointerId
+                ? !1
+                : r(t.target)
+                  ? ((s.current = { clientX: e.clientX, clientY: e.clientY }),
+                    (c.current ??= requestAnimationFrame(f)),
+                    e.preventDefault(),
+                    !0)
+                  : (d({ ...t, clientX: e.clientX, clientY: e.clientY }), e.preventDefault(), !0);
+            },
+            [d, f, r],
+          ),
+          h = (0, i.useCallback)(
+            (t) => {
+              let n = o.current;
+              if (!n || n.pointerId !== t.pointerId) return !1;
+              (c.current != null && (cancelAnimationFrame(c.current), (c.current = null), f()),
+                (o.current = null),
+                (s.current = null),
+                u(null));
+              try {
+                e.current?.releasePointerCapture?.(t.pointerId);
+              } catch {}
+              return !0;
+            },
+            [e, f],
+          );
+        return (
+          (0, i.useEffect)(
+            () => () => {
+              c.current != null && cancelAnimationFrame(c.current);
+            },
+            [],
+          ),
+          { activeTarget: l, startDrag: p, handlePointerMove: m, handlePointerEnd: h }
+        );
+      }));
+  }))();
 }
-interface DragBounds { height: number; left: number; top: number; width: number }
-interface DragStart<Target> { bounds: DragBounds; pointerId: number; target: Target }
-interface DragUpdate<Target> extends DragStart<Target> { clientX: number; clientY: number }
-interface PointerLike { clientX: number; clientY: number; pointerId: number; preventDefault(): void; stopPropagation(): void }
-interface LearningBlockDragOptions<Target> { disabled?: boolean; elementRef: { current: HTMLElement | null }; onDrag(update: DragUpdate<Target>): void; shouldThrottle?(target: Target): boolean }
-
-let React: DragReactRuntime;
-function initializeLearningBlockDrag(): void { initializeStableCallback(); React ??= getReactRuntime() as unknown as DragReactRuntime; }
-function useLearningBlockDrag<Target>({ elementRef, onDrag, shouldThrottle = () => true, disabled = false }: LearningBlockDragOptions<Target>): { activeTarget: Target | null; handlePointerEnd(event: PointerLike): boolean; handlePointerMove(event: PointerLike): boolean; startDrag(target: Target, event: PointerLike): void } {
-  initializeLearningBlockDrag();
-  const dragStart = React.useRef<DragStart<Target> | null>(null);
-  const pendingPoint = React.useRef<{ clientX: number; clientY: number } | null>(null);
-  const frame = React.useRef<number | null>(null);
-  const [activeTarget, setActiveTarget] = React.useState<Target | null>(null);
-  const stableOnDrag = useStableCallback(onDrag);
-  const flush = React.useCallback((): void => {
-    frame.current = null;
-    const start = dragStart.current;
-    const point = pendingPoint.current;
-    pendingPoint.current = null;
-    if (start != null && point != null) stableOnDrag({ ...start, ...point });
-  }, [stableOnDrag]);
-  const startDrag = React.useCallback((target: Target, event: PointerLike): void => {
-    const element = elementRef.current;
-    if (disabled || element == null) return;
-    const rectangle = element.getBoundingClientRect();
-    if (rectangle.width <= 0 || rectangle.height <= 0) return;
-    const start = { target, pointerId: event.pointerId, bounds: { left: rectangle.left, top: rectangle.top, width: rectangle.width, height: rectangle.height } };
-    dragStart.current = start;
-    setActiveTarget(target);
-    try { element.setPointerCapture?.(event.pointerId); } catch {}
-    stableOnDrag({ ...start, clientX: event.clientX, clientY: event.clientY });
-    event.preventDefault();
-    event.stopPropagation();
-  }, [disabled, elementRef, stableOnDrag]);
-  const handlePointerMove = React.useCallback((event: PointerLike): boolean => {
-    const start = dragStart.current;
-    if (start == null || start.pointerId !== event.pointerId) return false;
-    if (shouldThrottle(start.target)) {
-      pendingPoint.current = { clientX: event.clientX, clientY: event.clientY };
-      frame.current ??= requestAnimationFrame(flush);
-      event.preventDefault();
-      return true;
-    }
-    stableOnDrag({ ...start, clientX: event.clientX, clientY: event.clientY });
-    event.preventDefault();
-    return true;
-  }, [flush, shouldThrottle, stableOnDrag]);
-  const handlePointerEnd = React.useCallback((event: PointerLike): boolean => {
-    const start = dragStart.current;
-    if (start == null || start.pointerId !== event.pointerId) return false;
-    if (frame.current != null) { cancelAnimationFrame(frame.current); frame.current = null; flush(); }
-    dragStart.current = null;
-    pendingPoint.current = null;
-    setActiveTarget(null);
-    try { elementRef.current?.releasePointerCapture?.(event.pointerId); } catch {}
-    return true;
-  }, [elementRef, flush]);
-  React.useEffect(() => () => { if (frame.current != null) cancelAnimationFrame(frame.current); }, []);
-  return { activeTarget, startDrag, handlePointerMove, handlePointerEnd };
-}
-
-export { useLearningBlockDrag as n, initializeLearningBlockDrag as t };
+export { a as n, o as t };

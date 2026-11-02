@@ -1,98 +1,142 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import { dun as createPersistedState } from "@rchunk/app-initial";
-
-interface WritableState<Value> { value: Value }
-interface StateScope { set<Value>(state: WritableState<Value>, value: Value): void }
-interface TargetRules { domains?: string[]; urls?: string[] }
-interface DiscoveryInput {
-  bannerAlreadyVisible?: boolean;
-  bannerDismissedAtMs?: number | null;
-  experimentAvailable?: boolean;
-  experimentEnabled?: boolean;
-  hasImported?: boolean;
-  hasLoadedBrowserPage?: boolean;
-  hasSeenBanner?: boolean;
-  hasSeenModal?: boolean;
-  isModalExperimentAssignment?: boolean;
-  isPanelSettled?: boolean;
-  isVisible?: boolean;
-  modalDismissedAtMs?: number | null;
-  nowMs: number;
-  profiles?: readonly unknown[] | null;
-  profilesQuerySucceeded?: boolean;
-  serviceAvailable?: boolean;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { E4 as t, H4 as n, g4 as r, q4 as i } from "@rchunk/app-shared";
+import {
+  $x as a,
+  Qx as o,
+  Xx as s,
+  Yx as c,
+  Zx as l,
+  dun as u,
+  uun as d,
+} from "@rchunk/app-initial";
+function f(e, t) {
+  if (!URL.canParse(t)) return !1;
+  let n = new URL(t),
+    { domains: r, urls: i } = w.parse(e);
+  return (
+    r.some((e) => {
+      let t = e.trim().toLowerCase();
+      return n.hostname === t || n.hostname.endsWith(`.${t}`);
+    }) ||
+    i.some((e) => {
+      let t = e.trim();
+      return URL.canParse(t) && n.href.startsWith(new URL(t).href);
+    })
+  );
 }
-
-const n = "1161538056";
-const r = "show_modal";
-const i = "target_specific_urls";
-const a = "178837158";
-const t = 86_400_000;
-let f: WritableState<boolean>;
-let p: WritableState<boolean>;
-let s: WritableState<number | null>;
-let c: WritableState<number | null>;
-
-function h(rules: TargetRules, candidate: string): boolean {
-  if (!URL.canParse(candidate)) return false;
-  const url = new URL(candidate);
-  return (rules.domains ?? []).some((domain) => {
-    const normalized = domain.trim().toLowerCase();
-    return normalized !== "" && (url.hostname === normalized || url.hostname.endsWith(`.${normalized}`));
-  }) || (rules.urls ?? []).some((prefix) => {
-    const normalized = prefix.trim();
-    return URL.canParse(normalized) && url.href.startsWith(new URL(normalized).href);
-  });
+function p(e) {
+  let {
+      bannerDismissedAtMs: t,
+      experimentAvailable: n,
+      hasImported: r,
+      hasSeenBanner: i,
+      hasSeenModal: a,
+      isPanelSettled: o,
+      isVisible: s,
+      modalDismissedAtMs: c,
+      serviceAvailable: l,
+    } = e,
+    u = t ?? c;
+  return (
+    t != null && c != null && (u = Math.max(t, c)),
+    {
+      cooldownEndsAtMs: u == null ? null : u + C,
+      presentation: m(e),
+      shouldDiscoverProfiles:
+        s && o && l && r === !1 && (i === !1 || c != null || (n && (a === !1 || t != null))),
+    }
+  );
 }
-
-function cooledDown(timestamp: number, now: number): boolean { return now - timestamp >= t; }
-
-function presentation(input: DiscoveryInput): "banner" | "modal" | null {
-  const {
-    bannerAlreadyVisible = false, bannerDismissedAtMs, experimentEnabled = false,
-    hasImported, hasLoadedBrowserPage = false, hasSeenBanner, hasSeenModal,
-    isModalExperimentAssignment = false, isVisible = false, modalDismissedAtMs,
-    nowMs, profiles, profilesQuerySucceeded = false, serviceAvailable = false,
-  } = input;
-  if (hasImported !== false || hasSeenBanner === undefined || hasSeenModal === undefined ||
-      bannerDismissedAtMs === undefined || modalDismissedAtMs === undefined || !isVisible ||
-      !serviceAvailable || !profilesQuerySucceeded || profiles == null || profiles.length === 0 ||
-      (isModalExperimentAssignment && !hasLoadedBrowserPage && !bannerAlreadyVisible)) return null;
-  if (bannerDismissedAtMs != null && (modalDismissedAtMs == null || bannerDismissedAtMs > modalDismissedAtMs)) {
-    return experimentEnabled && !hasSeenModal && cooledDown(bannerDismissedAtMs, nowMs) ? "modal" : null;
-  }
-  if (modalDismissedAtMs != null && (bannerDismissedAtMs == null || modalDismissedAtMs > bannerDismissedAtMs)) {
-    return cooledDown(modalDismissedAtMs, nowMs) ? "banner" : null;
-  }
-  if (experimentEnabled && !hasSeenModal && !bannerAlreadyVisible) return "modal";
-  return !hasSeenBanner && !hasSeenModal ? "banner" : null;
+function m({
+  bannerAlreadyVisible: e,
+  bannerDismissedAtMs: t,
+  experimentEnabled: n,
+  hasImported: r,
+  hasLoadedBrowserPage: i,
+  hasSeenBanner: a,
+  hasSeenModal: o,
+  isModalExperimentAssignment: s,
+  isVisible: c,
+  modalDismissedAtMs: l,
+  nowMs: u,
+  profiles: d,
+  profilesQuerySucceeded: f,
+  serviceAvailable: p,
+}) {
+  return r !== !1 ||
+    a === void 0 ||
+    o === void 0 ||
+    t === void 0 ||
+    l === void 0 ||
+    !c ||
+    !p ||
+    !f ||
+    d == null ||
+    d.length === 0 ||
+    (s && !i && !e)
+    ? null
+    : t != null && (l == null || t > l)
+      ? n && !o && v(t, u)
+        ? `modal`
+        : null
+      : l != null && (t == null || l > t)
+        ? v(l, u)
+          ? `banner`
+          : null
+        : n && !o && !e
+          ? `modal`
+          : !a && !o
+            ? `banner`
+            : null;
 }
-
-function d(input: DiscoveryInput): { cooldownEndsAtMs: number | null; presentation: "banner" | "modal" | null; shouldDiscoverProfiles: boolean } {
-  const latestDismissal = input.bannerDismissedAtMs == null
-    ? input.modalDismissedAtMs
-    : input.modalDismissedAtMs == null
-      ? input.bannerDismissedAtMs
-      : Math.max(input.bannerDismissedAtMs, input.modalDismissedAtMs);
-  return {
-    cooldownEndsAtMs: latestDismissal == null ? null : latestDismissal + t,
-    presentation: presentation(input),
-    shouldDiscoverProfiles: input.isVisible === true && input.isPanelSettled === true &&
-      input.serviceAvailable === true && input.hasImported === false &&
-      (input.hasSeenBanner === false || input.modalDismissedAtMs != null ||
-        (input.experimentAvailable === true && (input.hasSeenModal === false || input.bannerDismissedAtMs != null))),
-  };
+function h(e) {
+  (e.set(T, !0), e.set(D, Date.now()));
 }
-
-function l(scope: StateScope): void { scope.set(f, true); scope.set(s, Date.now()); }
-function u(scope: StateScope): void { scope.set(p, true); scope.set(c, Date.now()); }
-function o(scope: StateScope): void { scope.set(f, true); scope.set(p, true); }
-function m(): void {
-  f ??= createPersistedState("browser-profile-import-banner-seen", false) as unknown as WritableState<boolean>;
-  p ??= createPersistedState("browser-profile-import-modal-seen", false) as unknown as WritableState<boolean>;
-  s ??= createPersistedState<number | null>("browser-profile-import-banner-dismissed-at", null) as unknown as WritableState<number | null>;
-  c ??= createPersistedState<number | null>("browser-profile-import-modal-dismissed-at", null) as unknown as WritableState<number | null>;
+function g(e) {
+  (e.set(E, !0), e.set(O, Date.now()));
 }
-
-export { a, c, d, f, h, i, l, m, n, o, p, r, s, t, u };
+function _(e) {
+  (e.set(T, !0), e.set(E, !0));
+}
+function v(e, t) {
+  return t - e >= C;
+}
+var y, b, x, S, C, w, T, E, D, O;
+function k() {
+  return (k = e(() => {
+    (r(),
+      d(),
+      a(),
+      (y = `1161538056`),
+      (b = `show_modal`),
+      (x = `target_specific_urls`),
+      (S = `178837158`),
+      (C = 864e5),
+      (w = n({ domains: t(i()).catch([]), urls: t(i()).catch([]) }).catch({
+        domains: [],
+        urls: [],
+      })),
+      (T = u(o, !1)),
+      (E = u(l, !1)),
+      (D = u(c, null)),
+      (O = u(s, null)));
+  }))();
+}
+export {
+  S as a,
+  O as c,
+  p as d,
+  T as f,
+  f as h,
+  x as i,
+  h as l,
+  k as m,
+  y as n,
+  _ as o,
+  E as p,
+  b as r,
+  D as s,
+  C as t,
+  g as u,
+};

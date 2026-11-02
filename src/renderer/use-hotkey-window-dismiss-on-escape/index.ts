@@ -1,31 +1,35 @@
-// use-hotkey-window-dismiss-on-escape — dismiss the hotkey window on an unmodified Escape.
-
-import "@rchunk/rolldown-runtime";
-import { e6 as getReactRuntime } from "@rchunk/app-shared";
-import { mnt as initializeHotkeyWindow, pnt as hotkeyWindowState } from "@rchunk/app-initial";
-
-interface EffectReactRuntime { useEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void }
-interface HotkeyWindowState { hotkeyWindowHotkeys?: { dismiss(): void } }
-
-let React: EffectReactRuntime;
-function initializeHotkeyWindowDismiss(): void {
-  if (React != null) return;
-  initializeHotkeyWindow();
-  React = getReactRuntime() as unknown as EffectReactRuntime;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, e6 as n } from "@rchunk/app-shared";
+import { mnt as r, pnt as i } from "@rchunk/app-initial";
+function a() {
+  let e = (0, c.c)(1),
+    t;
+  (e[0] === Symbol.for(`react.memo_cache_sentinel`) ? ((t = []), (e[0] = t)) : (t = e[0]),
+    (0, l.useEffect)(o, t));
 }
-function handleEscape(event: KeyboardEvent): void {
-  if (event.key !== "Escape" || event.defaultPrevented || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
-  event.preventDefault();
-  event.stopPropagation();
-  (hotkeyWindowState as unknown as HotkeyWindowState).hotkeyWindowHotkeys?.dismiss();
+function o() {
+  let e = s;
+  return (
+    window.addEventListener(`keydown`, e),
+    () => {
+      window.removeEventListener(`keydown`, e);
+    }
+  );
 }
-function subscribeToEscape(): () => void {
-  window.addEventListener("keydown", handleEscape);
-  return () => window.removeEventListener("keydown", handleEscape);
+function s(e) {
+  e.key !== `Escape` ||
+    e.defaultPrevented ||
+    e.metaKey ||
+    e.ctrlKey ||
+    e.altKey ||
+    e.shiftKey ||
+    (e.preventDefault(), e.stopPropagation(), i.hotkeyWindowHotkeys?.dismiss());
 }
-function useHotkeyWindowDismissOnEscape(): void {
-  initializeHotkeyWindowDismiss();
-  React.useEffect(subscribeToEscape, []);
+var c, l;
+function u() {
+  return (u = e(() => {
+    ((c = t()), (l = n()), r());
+  }))();
 }
-
-export { useHotkeyWindowDismissOnEscape as n, initializeHotkeyWindowDismiss as t };
+export { a as n, u as t };

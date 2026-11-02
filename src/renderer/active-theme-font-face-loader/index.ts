@@ -1,54 +1,63 @@
-// Loads font faces required by the active theme. Release chunk: active-theme-font-face-loader-932b256c28db.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as fontFamilyChunk from "@rchunk/theme-font-family";
-import * as fontFaceLoaderChunk from "@rchunk/theme-font-face-loader";
-
-interface Fonts {
-  code: unknown;
-  codeFace?: unknown;
-  content?: unknown;
-  contentFace?: unknown;
-  ui: unknown;
-  uiFace?: unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, _L as r, gL as i } from "@rchunk/app-shared";
+import { t as a } from "@rchunk/theme-font-family";
+import { r as o, t as s } from "@rchunk/theme-font-face-loader";
+function c(e) {
+  let t = (0, u.c)(10),
+    { fonts: n } = e,
+    r;
+  t[0] !== n.code ||
+  t[1] !== n.codeFace ||
+  t[2] !== n.content ||
+  t[3] !== n.contentFace ||
+  t[4] !== n.ui ||
+  t[5] !== n.uiFace
+    ? ((r =
+        (n.codeFace != null && a(n.code, n.codeFace)) ||
+        (n.contentFace != null && a(n.content ?? null, n.contentFace)) ||
+        (n.uiFace != null && a(n.ui, n.uiFace))),
+      (t[0] = n.code),
+      (t[1] = n.codeFace),
+      (t[2] = n.content),
+      (t[3] = n.contentFace),
+      (t[4] = n.ui),
+      (t[5] = n.uiFace),
+      (t[6] = r))
+    : (r = t[6]);
+  let i = r,
+    o;
+  return (
+    t[7] !== n || t[8] !== i
+      ? ((o = i ? (0, d.jsx)(l, { fonts: n }) : null), (t[7] = n), (t[8] = i), (t[9] = o))
+      : (o = t[9]),
+    o
+  );
 }
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>): unknown;
+function l(e) {
+  let t = (0, u.c)(2),
+    { fonts: n } = e,
+    i;
+  return (
+    t[0] === n
+      ? (i = t[1])
+      : ((i = {
+          queryFn: () => o([n]),
+          queryKey: [`active-theme-font-faces`, n],
+          retry: !1,
+          staleTime: 1 / 0,
+        }),
+        (t[0] = n),
+        (t[1] = i)),
+    r(i),
+    null
+  );
 }
-const shared = appSharedChunk as unknown as Record<string, unknown>;
-let jsxRuntime: JsxRuntime;
-function ActiveThemeFontFaceLoader({ fonts }: { fonts: Fonts }): unknown {
-  const matches = (
-    fontFamilyChunk as unknown as { t(value: unknown, face: unknown): boolean }
-  ).t;
-  const shouldLoad =
-    (fonts.codeFace != null && matches(fonts.code, fonts.codeFace)) ||
-    (fonts.contentFace != null &&
-      matches(fonts.content ?? null, fonts.contentFace)) ||
-    (fonts.uiFace != null && matches(fonts.ui, fonts.uiFace));
-  if (!shouldLoad) return null;
-  return jsxRuntime.jsx(FontFaceQuery, { fonts });
+var u, d;
+function f() {
+  return (f = e(() => {
+    ((u = t()), i(), s(), (d = n()));
+  }))();
 }
-
-function FontFaceQuery({ fonts }: { fonts: Fonts }): null {
-  const useQuery = shared._L as ((options: unknown) => unknown) | undefined;
-  const load = (
-    fontFaceLoaderChunk as unknown as { r(fonts: Fonts[]): Promise<unknown> }
-  ).r;
-  useQuery?.({
-    queryFn: () => load([fonts]),
-    queryKey: ["active-theme-font-faces", fonts],
-    retry: false,
-    staleTime: Number.POSITIVE_INFINITY,
-  });
-  return null;
-}
-function initializeActiveThemeFontFaceLoader(): void {
-  (shared.gL as (() => void) | undefined)?.();
-  (fontFaceLoaderChunk as unknown as { t?: () => void }).t?.();
-  jsxRuntime = (shared.I3 as () => JsxRuntime)();
-  void jsxRuntime;
-}
-initializeActiveThemeFontFaceLoader();
-
-export { ActiveThemeFontFaceLoader };
+f();
+export { c as ActiveThemeFontFaceLoader };

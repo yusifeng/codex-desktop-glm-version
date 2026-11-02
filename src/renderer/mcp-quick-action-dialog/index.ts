@@ -1,164 +1,188 @@
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  I3 as getJsxRuntime,
-  Ih as Dialog,
-  LX as useScope,
-  Rh as DialogTitle,
-  Yh as Button,
-  ZI as appScope,
-  Zh as initializeButton,
-  c_ as initializeTooltip,
-  e6 as getReactRuntime,
-  o_ as Tooltip,
-  tU as createId,
-  zh as initializeDialog,
+  $3 as t,
+  FX as n,
+  I3 as r,
+  Ih as i,
+  LX as a,
+  QI as o,
+  Rh as s,
+  Yh as c,
+  ZI as l,
+  Zh as u,
+  c_ as d,
+  e6 as f,
+  o_ as p,
+  tU as m,
+  wL as h,
+  zh as g,
 } from "@rchunk/app-shared";
 import {
-  Gdt as initializeMcpAppAnalytics,
-  LR as McpActionIcon,
-  Mk as recordMcpAppOpened,
-  RR as initializeMcpActionIcon,
-  Wdt as getMcpActionIcon,
-  kk as initializeMcpAppIds,
+  Gdt as _,
+  LR as v,
+  Mk as y,
+  RR as b,
+  Wdt as x,
+  kk as S,
 } from "@rchunk/app-initial";
-import {
-  n as initializeViewFrame,
-  t as ViewFrame,
-} from "@rchunk/view-frame";
-
-export interface McpQuickAction {
-  target: { arguments: unknown };
-  title: string;
-  [key: string]: unknown;
-}
-
-export interface McpQuickActionDialogProps {
-  action: McpQuickAction;
-  onOpen(): Promise<{ toolResult: unknown } | null | undefined>;
-  pending: boolean;
-  quickActionView: unknown;
-  tooltipText?: string;
-  trigger?: unknown;
-  view: {
-    tool: { _meta?: Record<string, unknown> };
-    [key: string]: unknown;
-  };
-}
-
-interface OpenedMcpApp {
-  mcpAppId: string;
-  toolResult: unknown;
-}
-
-function McpQuickActionDialog({
-  action,
-  pending,
-  quickActionView,
-  onOpen,
-  view,
-  trigger,
-  tooltipText,
-}: McpQuickActionDialogProps): unknown {
-  const scope = useScope(appScope);
-  const React = getReactRuntime();
-  const [openedApp, setOpenedApp] = React.useState<OpenedMcpApp | null>(null);
-  const [contentContainer, setContentContainer] =
-    React.useState<unknown>(null);
-  const jsx = getJsxRuntime();
-
-  const setOpen = (open: boolean) => {
-    if (!open) {
-      setOpenedApp(null);
-      return;
-    }
-    if (pending) return;
-    recordMcpAppOpened(scope, { view: quickActionView });
-    const mcpAppId = createId();
-    setOpenedApp({ mcpAppId, toolResult: null });
-    void onOpen().then((result) => {
-      setOpenedApp((current) =>
-        current?.mcpAppId === mcpAppId
-          ? result == null
-            ? null
-            : { mcpAppId, toolResult: result.toolResult }
-          : current,
-      );
-    });
-  };
-
-  const triggerContent =
-    trigger ??
-    jsx.jsx(Button, {
-      "aria-label": action.title,
-      color: "ghost",
-      disabled: pending && openedApp == null,
-      size: "compact",
-      uniform: true,
-      children: jsx.jsx(McpActionIcon, {
-        icon: getMcpActionIcon(action),
-        monochrome: view.tool._meta?.["openai/iconStyle"] === "monochrome",
+import { n as C, t as w } from "@rchunk/view-frame";
+function T(e) {
+  let t = (0, E.c)(34),
+    {
+      action: n,
+      pending: r,
+      quickActionView: o,
+      onOpen: u,
+      view: d,
+      trigger: f,
+      tooltipText: h,
+    } = e,
+    g = a(l),
+    [_, b] = (0, D.useState)(null),
+    [S, C] = (0, D.useState)(null),
+    T;
+  t[0] !== u || t[1] !== r || t[2] !== o || t[3] !== g
+    ? ((T = (e) => {
+        if (!e) {
+          b(null);
+          return;
+        }
+        if (r) return;
+        y(g, { view: o });
+        let t = m();
+        (b({ mcpAppId: t, toolResult: null }),
+          u().then((e) => {
+            b((n) => (n?.mcpAppId === t ? (e == null ? null : { mcpAppId: t, toolResult: e }) : n));
+          }));
       }),
-    });
-  const framedView =
-    openedApp == null
-      ? null
-      : jsx.jsx(ViewFrame, {
-          autoFocus: contentContainer != null,
-          contentContainer,
-          fullSurface: false,
-          inDialog: true,
-          lifetime: "component",
-          mcpAppId: openedApp.mcpAppId,
-          onRequestClose: () => setOpen(false),
-          toolResult: openedApp.toolResult,
-          toolArguments: action.target.arguments,
-          useHostThread: true,
-          view: quickActionView,
-        });
-
-  return jsx.jsxs(jsx.Fragment, {
-    children: [
-      jsx.jsxs(Dialog, {
-        open: openedApp != null,
-        onOpenChange: setOpen,
-        size: "compact",
-        dialogCloseClassName: "z-10",
-        contentProps: { "aria-describedby": undefined },
-        triggerContent: jsx.jsx(Tooltip, {
-          tooltipContent: tooltipText ?? action.title,
-          cloneCustomTrigger: true,
-          delayOpen: true,
-          children: triggerContent,
-        }),
-        children: [
-          jsx.jsx(DialogTitle, {
-            className: "sr-only",
-            children: action.title,
+      (t[0] = u),
+      (t[1] = r),
+      (t[2] = o),
+      (t[3] = g),
+      (t[4] = T))
+    : (T = t[4]);
+  let k = T,
+    A;
+  t[5] !== n || t[6] !== r || t[7] !== _ || t[8] !== f || t[9] !== d
+    ? ((A =
+        f ??
+        (0, O.jsx)(c, {
+          "aria-label": n.title,
+          color: `ghost`,
+          disabled: r && _ == null,
+          size: `compact`,
+          uniform: !0,
+          children: (0, O.jsx)(v, {
+            icon: x(n),
+            monochrome: d.tool._meta?.[`openai/iconStyle`] === `monochrome`,
           }),
-          jsx.jsx("div", {
-            ref: setContentContainer,
-            "data-mcp-app-portal-target": "true",
-            className:
-              "relative max-h-[calc(100dvh/var(--codex-window-zoom)-6rem)] min-h-0 overflow-y-auto",
-          }),
-        ],
-      }),
-      jsx.jsx("div", {
-        className: "pointer-events-none invisible fixed w-96",
-        inert: true,
-        children: framedView,
-      }),
-    ],
-  });
+        })),
+      (t[5] = n),
+      (t[6] = r),
+      (t[7] = _),
+      (t[8] = f),
+      (t[9] = d),
+      (t[10] = A))
+    : (A = t[10]);
+  let j = A,
+    M = _ != null,
+    N;
+  t[11] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((N = { "aria-describedby": void 0 }), (t[11] = N))
+    : (N = t[11]);
+  let P = h ?? n.title,
+    F;
+  t[12] !== j || t[13] !== P
+    ? ((F = (0, O.jsx)(p, {
+        tooltipContent: P,
+        cloneCustomTrigger: !0,
+        delayOpen: !0,
+        children: j,
+      })),
+      (t[12] = j),
+      (t[13] = P),
+      (t[14] = F))
+    : (F = t[14]);
+  let I;
+  t[15] === n.title
+    ? (I = t[16])
+    : ((I = (0, O.jsx)(s, { className: `sr-only`, children: n.title })),
+      (t[15] = n.title),
+      (t[16] = I));
+  let L;
+  t[17] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((L = (0, O.jsx)(`div`, {
+        ref: C,
+        "data-mcp-app-portal-target": `true`,
+        className: `relative max-h-[calc(100dvh/var(--codex-window-zoom)-6rem)] min-h-0 overflow-y-auto`,
+      })),
+      (t[17] = L))
+    : (L = t[17]);
+  let R;
+  t[18] !== k || t[19] !== M || t[20] !== F || t[21] !== I
+    ? ((R = (0, O.jsxs)(i, {
+        open: M,
+        onOpenChange: k,
+        size: `compact`,
+        dialogCloseClassName: `z-10`,
+        contentProps: N,
+        triggerContent: F,
+        children: [I, L],
+      })),
+      (t[18] = k),
+      (t[19] = M),
+      (t[20] = F),
+      (t[21] = I),
+      (t[22] = R))
+    : (R = t[22]);
+  let z;
+  t[23] !== n.target || t[24] !== k || t[25] !== S || t[26] !== o || t[27] !== _
+    ? ((z =
+        _ == null
+          ? null
+          : (0, O.jsx)(w, {
+              autoFocus: S != null,
+              contentContainer: S,
+              fullSurface: !1,
+              inDialog: !0,
+              lifetime: `component`,
+              mcpAppId: _.mcpAppId,
+              onRequestClose: () => k(!1),
+              toolResult: _.toolResult,
+              toolArguments: n.target.arguments,
+              useHostThread: !0,
+              view: o,
+            })),
+      (t[23] = n.target),
+      (t[24] = k),
+      (t[25] = S),
+      (t[26] = o),
+      (t[27] = _),
+      (t[28] = z))
+    : (z = t[28]);
+  let B;
+  t[29] === z
+    ? (B = t[30])
+    : ((B = (0, O.jsx)(`div`, {
+        className: `pointer-events-none invisible fixed w-96`,
+        inert: !0,
+        children: z,
+      })),
+      (t[29] = z),
+      (t[30] = B));
+  let V;
+  return (
+    t[31] !== B || t[32] !== R
+      ? ((V = (0, O.jsxs)(O.Fragment, { children: [R, B] })), (t[31] = B), (t[32] = R), (t[33] = V))
+      : (V = t[33]),
+    V
+  );
 }
-
-function initializeMcpQuickActionDialog(): void {
-  initializeButton();
-  initializeDialog();
-  initializeTooltip();
-  initializeMcpAppAnalytics();
-  initializeMcpActionIcon();
-  initializeViewFrame();
-  initializeMcpAppIds();
+var E, D, O;
+function k() {
+  return (k = e(() => {
+    ((E = t()), n(), h(), (D = f()), u(), g(), d(), o(), _(), b(), C(), S(), (O = r()));
+  }))();
 }
-
-export { initializeMcpQuickActionDialog as n, McpQuickActionDialog as t };
+export { k as n, T as t };

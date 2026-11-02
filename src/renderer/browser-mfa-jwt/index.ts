@@ -1,6 +1,55 @@
-import "@rchunk/rolldown-runtime";
-class InvalidTokenError extends Error { override name = "InvalidTokenError"; }
-function decodePart(value: string): string { let normalized = value.replace(/-/g, "+").replace(/_/g, "/"); if (normalized.length % 4 === 2) normalized += "=="; else if (normalized.length % 4 === 3) normalized += "="; else if (normalized.length % 4 === 1) throw new Error("base64 string is not of the correct length"); const binary = atob(normalized); try { return decodeURIComponent([...binary].map(character => `%${character.charCodeAt(0).toString(16).padStart(2, "0")}`).join("")); } catch { return binary; } }
-function n(token: string, options: { header?: boolean } = {}): Record<string, unknown> { if (typeof token !== "string") throw new InvalidTokenError("Invalid token specified: must be a string"); const partIndex = options.header === true ? 0 : 1, part = token.split(".")[partIndex]; if (part == null) throw new InvalidTokenError(`Invalid token specified: missing part #${partIndex + 1}`); let decoded: string; try { decoded = decodePart(part); } catch (error) { throw new InvalidTokenError(`Invalid token specified: invalid base64 for part #${partIndex + 1} (${error instanceof Error ? error.message : "invalid payload"})`); } try { return JSON.parse(decoded) as Record<string, unknown>; } catch (error) { throw new InvalidTokenError(`Invalid token specified: invalid json for part #${partIndex + 1} (${error instanceof Error ? error.message : "invalid payload"})`); } }
-function t(): void {}
-export { n, t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e) {
+  return decodeURIComponent(
+    atob(e).replace(/(.)/g, (e, t) => {
+      let n = t.charCodeAt(0).toString(16).toUpperCase();
+      return (n.length < 2 && (n = `0` + n), `%` + n);
+    }),
+  );
+}
+function n(e) {
+  let n = e.replace(/-/g, `+`).replace(/_/g, `/`);
+  switch (n.length % 4) {
+    case 0:
+      break;
+    case 2:
+      n += `==`;
+      break;
+    case 3:
+      n += `=`;
+      break;
+    default:
+      throw Error(`base64 string is not of the correct length`);
+  }
+  try {
+    return t(n);
+  } catch {
+    return atob(n);
+  }
+}
+function r(e, t) {
+  if (typeof e != `string`) throw new i(`Invalid token specified: must be a string`);
+  t ||= {};
+  let r = t.header === !0 ? 0 : 1,
+    a = e.split(`.`)[r];
+  if (typeof a != `string`) throw new i(`Invalid token specified: missing part #${r + 1}`);
+  let o;
+  try {
+    o = n(a);
+  } catch (e) {
+    throw new i(`Invalid token specified: invalid base64 for part #${r + 1} (${e.message})`);
+  }
+  try {
+    return JSON.parse(o);
+  } catch (e) {
+    throw new i(`Invalid token specified: invalid json for part #${r + 1} (${e.message})`);
+  }
+}
+var i;
+function a() {
+  return (a = e(() => {
+    ((i = class extends Error {}), (i.prototype.name = `InvalidTokenError`));
+  }))();
+}
+export { r as n, a as t };

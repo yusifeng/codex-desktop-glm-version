@@ -1,33 +1,50 @@
-// Multiplication represented as equal groups and repeated addition.
-import "@rchunk/rolldown-runtime";
-
-interface IntegerParameter { kind: "integer"; defaultValue: number; min: number; max: number }
-interface RepeatedAdditionValues { groupCount?: number | null; itemsPerGroup?: number | null }
-
-const repeatedAdditionType = "MULTIPLICATION_AS_REPEATED_ADDITION";
-const repeatedAdditionThumbnail = "multiplication-as-repeated-addition-v1";
-const repeatedAdditionParameters: { groupCount: IntegerParameter; itemsPerGroup: IntegerParameter } = {
-  groupCount: { kind: "integer", defaultValue: 4, min: 1, max: 6 },
-  itemsPerGroup: { kind: "integer", defaultValue: 3, min: 1, max: 6 },
-};
-const repeatedAdditionSpecification = { type: repeatedAdditionType, version: 1, thumbnailAssetKey: repeatedAdditionThumbnail, parameters: repeatedAdditionParameters };
-const groupCountControl = { min: repeatedAdditionSpecification.parameters.groupCount.min, max: repeatedAdditionSpecification.parameters.groupCount.max, step: 1, defaultValue: repeatedAdditionSpecification.parameters.groupCount.defaultValue };
-const itemsPerGroupControl = { min: repeatedAdditionSpecification.parameters.itemsPerGroup.min, max: repeatedAdditionSpecification.parameters.itemsPerGroup.max, step: 1, defaultValue: repeatedAdditionSpecification.parameters.itemsPerGroup.defaultValue };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeInteger = (value: number | null | undefined, defaultValue: number, minimum: number, maximum: number): number =>
-  Number.isFinite(value) ? clamp(Math.round(value ?? defaultValue), minimum, maximum) : defaultValue;
-const normalizeRepeatedAdditionValues = (values: RepeatedAdditionValues) => ({
-  groupCount: normalizeInteger(values.groupCount, groupCountControl.defaultValue, groupCountControl.min, groupCountControl.max),
-  itemsPerGroup: normalizeInteger(values.itemsPerGroup, itemsPerGroupControl.defaultValue, itemsPerGroupControl.min, itemsPerGroupControl.max),
-});
-const calculateRepeatedAddition = (values: RepeatedAdditionValues) => {
-  const safeValues = normalizeRepeatedAdditionValues(values);
-  const addends = Array.from({ length: safeValues.groupCount }, () => safeValues.itemsPerGroup);
-  const total = safeValues.groupCount * safeValues.itemsPerGroup;
-  return { safeValues, total, relationshipLatex: `${addends.join(" + ")} = ${safeValues.groupCount} \\times ${safeValues.itemsPerGroup} = ${total}` };
-};
-
-function initializeRepeatedAdditionSpecification(): void {}
-function initializeRepeatedAdditionModel(): void {}
-
-export { normalizeRepeatedAdditionValues as a, initializeRepeatedAdditionModel as i, itemsPerGroupControl as n, initializeRepeatedAdditionSpecification as o, calculateRepeatedAddition as r, repeatedAdditionSpecification as s, groupCountControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `MULTIPLICATION_AS_REPEATED_ADDITION`),
+      (n = `multiplication-as-repeated-addition-v1`),
+      (r = {
+        groupCount: { kind: `integer`, defaultValue: 4, min: 1, max: 6 },
+        itemsPerGroup: { kind: `integer`, defaultValue: 3, min: 1, max: 6 },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    (a(),
+      (o = {
+        min: i.parameters.groupCount.min,
+        max: i.parameters.groupCount.max,
+        step: 1,
+        defaultValue: i.parameters.groupCount.defaultValue,
+      }),
+      (s = {
+        min: i.parameters.itemsPerGroup.min,
+        max: i.parameters.itemsPerGroup.max,
+        step: 1,
+        defaultValue: i.parameters.itemsPerGroup.defaultValue,
+      }),
+      (c = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (l = (e, t, n, r) => (Number.isFinite(e) ? c(Math.round(e ?? t), n, r) : t)),
+      (u = (e) => ({
+        groupCount: l(e.groupCount, o.defaultValue, o.min, o.max),
+        itemsPerGroup: l(e.itemsPerGroup, s.defaultValue, s.min, s.max),
+      })),
+      (d = (e) => {
+        let t = u(e),
+          { groupCount: n, itemsPerGroup: r } = t,
+          i = Array.from({ length: n }, () => r),
+          a = n * r;
+        return {
+          safeValues: t,
+          total: a,
+          relationshipLatex: `${i.join(` + `)} = ${n} \\times ${r} = ${a}`,
+        };
+      }));
+  }))();
+}
+export { u as a, f as i, s as n, a as o, d as r, i as s, o as t };

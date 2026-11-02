@@ -1,72 +1,73 @@
-// pasted-link-connect-modal —— 粘贴链接触发的 App 连接弹窗组合层。
-
-import * as appConnectModalChunk from "@rchunk/app-connect-modal";
-import * as appInfoChunk from "@rchunk/app-info";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as useConnectFlowChunk from "@rchunk/use-app-connect-flow";
-import type { ConnectorApp } from "@rchunk/app-info";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-const { n: initializeAppConnectModal, t: AppConnectModal } =
-  appConnectModalChunk;
-const { t: toAppInfo } = appInfoChunk;
-const { $3: initializeJsxRuntime, I3: getJsxRuntime } = appSharedChunk;
-const { n: useAppConnectFlow, t: initializeAppConnectFlow } =
-  useConnectFlowChunk;
-
-let jsxRuntime: JsxRuntime | null = null;
-
-interface LibraryPastedLinkConnectModalProps {
-  app: ConnectorApp;
-  area: unknown;
-  onConnected(): void;
-  onOpenChange(open: boolean): void;
-  reauthLinkId?: string;
-}
-
-function LibraryPastedLinkConnectModal({
-  app,
-  area,
-  onConnected,
-  onOpenChange,
-  reauthLinkId,
-}: LibraryPastedLinkConnectModalProps): unknown {
-  const jsx = initializePastedLinkConnectModal();
-  const { handleAppConnected, handleAppConnectOAuthStarted } =
-    useAppConnectFlow();
-  const normalizedApp = toAppInfo(app);
-  const authReason = reauthLinkId == null ? "missing_link" : "reauth_required";
-  return jsx.jsx(AppConnectModal, {
-    app: normalizedApp,
-    connectorAuth: { authReason, linkId: reauthLinkId },
-    isReconnecting: reauthLinkId != null,
-    onConnected: () => {
-      handleAppConnected(app.id);
-      onConnected();
-    },
-    onOAuthStarted: (event: Record<string, unknown>) =>
-      handleAppConnectOAuthStarted({
-        ...event,
-        pastedLinkProductExperience: area,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n } from "@rchunk/app-shared";
+import { n as r, t as i } from "@rchunk/app-connect-modal";
+import { n as a, t as o } from "@rchunk/use-app-connect-flow";
+import { t as s } from "@rchunk/app-info";
+function c(e) {
+  let t = (0, l.c)(20),
+    { app: n, area: r, onConnected: o, onOpenChange: c, reauthLinkId: d } = e,
+    { handleAppConnected: f, handleAppConnectOAuthStarted: p } = a(),
+    m;
+  t[0] === n ? (m = t[1]) : ((m = s(n)), (t[0] = n), (t[1] = m));
+  let h = d == null ? `missing_link` : `reauth_required`,
+    g;
+  t[2] !== d || t[3] !== h
+    ? ((g = { authReason: h, linkId: d }), (t[2] = d), (t[3] = h), (t[4] = g))
+    : (g = t[4]);
+  let _ = d != null,
+    v;
+  t[5] !== n.id || t[6] !== f || t[7] !== o
+    ? ((v = () => {
+        (f(n.id), o());
       }),
-    onOpenChange,
-    reauthLinkId,
-  });
+      (t[5] = n.id),
+      (t[6] = f),
+      (t[7] = o),
+      (t[8] = v))
+    : (v = t[8]);
+  let y;
+  t[9] !== r || t[10] !== p
+    ? ((y = (e) => p({ ...e, pastedLinkProductExperience: r })),
+      (t[9] = r),
+      (t[10] = p),
+      (t[11] = y))
+    : (y = t[11]);
+  let b;
+  return (
+    t[12] !== c ||
+    t[13] !== d ||
+    t[14] !== m ||
+    t[15] !== g ||
+    t[16] !== _ ||
+    t[17] !== v ||
+    t[18] !== y
+      ? ((b = (0, u.jsx)(i, {
+          app: m,
+          connectorAuth: g,
+          isReconnecting: _,
+          onConnected: v,
+          onOAuthStarted: y,
+          onOpenChange: c,
+          reauthLinkId: d,
+        })),
+        (t[12] = c),
+        (t[13] = d),
+        (t[14] = m),
+        (t[15] = g),
+        (t[16] = _),
+        (t[17] = v),
+        (t[18] = y),
+        (t[19] = b))
+      : (b = t[19]),
+    b
+  );
 }
-
-function initializePastedLinkConnectModal(): JsxRuntime {
-  if (jsxRuntime != null) return jsxRuntime;
-  initializeJsxRuntime?.();
-  initializeAppConnectFlow();
-  initializeAppConnectModal();
-  jsxRuntime =
-    typeof getJsxRuntime === "function" ? getJsxRuntime() : getJsxRuntime;
-  return jsxRuntime;
+var l, u;
+function d() {
+  return (d = e(() => {
+    ((l = t()), o(), r(), (u = n()));
+  }))();
 }
-
-initializePastedLinkConnectModal();
-
-export { LibraryPastedLinkConnectModal };
+d();
+export { c as LibraryPastedLinkConnectModal };

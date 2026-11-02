@@ -1,68 +1,95 @@
-// ER-diagram to relational-table mapping learning model.
-import "@rchunk/rolldown-runtime";
-
-type RelationshipKind = "one-to-one" | "one-to-many" | "many-to-many";
-interface ErMappingValues { relationship_kind?: unknown; include_relationship_attribute?: unknown; mappingStage?: number | null }
-interface RelationalColumn { name: string; badges: string[]; mapped: boolean }
-interface RelationalTable { name: string; columns: RelationalColumn[]; compositeKey: boolean; junction: boolean }
-
-const erDiagramType = "ER_DIAGRAM_RELATIONAL_TABLES";
-const erDiagramThumbnail = "er-diagram-relational-tables-v1";
-const erDiagramParameters = {
-  relationship_kind: { kind: "enum", defaultValue: "one-to-many" as RelationshipKind, allowedValues: ["one-to-one", "one-to-many", "many-to-many"] as RelationshipKind[] },
-  include_relationship_attribute: { kind: "boolean", defaultValue: true },
-};
-const erDiagramDefinition = { type: erDiagramType, version: 2, thumbnailAssetKey: erDiagramThumbnail, parameters: erDiagramParameters };
-const relationshipParameter = erDiagramDefinition.parameters.relationship_kind;
-const relationshipAttributeParameter = erDiagramDefinition.parameters.include_relationship_attribute;
-const relationshipKinds = relationshipParameter.allowedValues;
-const defaultRelationshipKind = relationshipParameter.defaultValue;
-const defaultErMappingValues = { relationship_kind: defaultRelationshipKind, include_relationship_attribute: relationshipAttributeParameter.defaultValue, mappingStage: 2 };
-const isRelationshipKind = (value: unknown): value is RelationshipKind => relationshipKinds.some((kind) => kind === value);
-const normalizeMappingStage = (value: number | null | undefined): number => typeof value === "number" && Number.isFinite(value) ? Math.min(2, Math.max(0, Math.round(value))) : defaultErMappingValues.mappingStage;
-const normalizeErMappingValues = (values: ErMappingValues) => ({
-  relationship_kind: isRelationshipKind(values.relationship_kind) ? values.relationship_kind : defaultRelationshipKind,
-  include_relationship_attribute: typeof values.include_relationship_attribute === "boolean" ? values.include_relationship_attribute : relationshipAttributeParameter.defaultValue,
-  mappingStage: normalizeMappingStage(values.mappingStage),
-});
-const instructorColumns: RelationalColumn[] = [{ name: "inst_id", badges: ["PK"], mapped: false }, { name: "name", badges: [], mapped: false }];
-const courseColumns: RelationalColumn[] = [{ name: "course_id", badges: ["PK"], mapped: false }, { name: "title", badges: [], mapped: false }];
-const relationshipAttributeColumns = (include: boolean): RelationalColumn[] => include ? [{ name: "assigned_on", badges: [], mapped: true }] : [];
-const createTable = (name: string, columns: RelationalColumn[], compositeKey = false, junction = false): RelationalTable => ({ name, columns, compositeKey, junction });
-
-function deriveRelationalTables(values: ErMappingValues): RelationalTable[] {
-  const normalized = normalizeErMappingValues(values);
-  if (normalized.mappingStage === 0) return [];
-  const instructor = createTable("Instructor", instructorColumns);
-  const course = createTable("Course", courseColumns);
-  if (normalized.mappingStage === 1) return [instructor, course];
-  if (normalized.relationship_kind === "many-to-many") {
-    return [instructor, course, createTable("Teaches", [
-      { name: "inst_id", badges: ["PK", "FK"], mapped: true },
-      { name: "course_id", badges: ["PK", "FK"], mapped: true },
-      ...relationshipAttributeColumns(normalized.include_relationship_attribute),
-    ], true, true)];
-  }
-  const foreignKeyBadges = normalized.relationship_kind === "one-to-one" ? ["FK", "UNIQUE"] : ["FK"];
-  return [instructor, createTable("Course", [
-    ...courseColumns,
-    { name: "inst_id", badges: foreignKeyBadges, mapped: true },
-    ...relationshipAttributeColumns(normalized.include_relationship_attribute),
-  ])];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `ER_DIAGRAM_RELATIONAL_TABLES`),
+      (n = `er-diagram-relational-tables-v1`),
+      (r = {
+        relationship_kind: {
+          kind: `enum`,
+          defaultValue: `one-to-many`,
+          allowedValues: [`one-to-one`, `one-to-many`, `many-to-many`],
+        },
+        include_relationship_attribute: { kind: `boolean`, defaultValue: !0 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-const relationshipCardinality = (kind: RelationshipKind): [string, string] => kind === "one-to-one" ? ["1", "1"] : kind === "one-to-many" ? ["1", "N"] : ["M", "N"];
-function initializeErDiagramSchema(): void {}
-function initializeErDiagramModel(): void {}
-
-export {
-  relationshipCardinality as a,
-  initializeErDiagramSchema as c,
-  deriveRelationalTables as i,
-  erDiagramDefinition as l,
-  defaultRelationshipKind as n,
-  initializeErDiagramModel as o,
-  relationshipKinds as r,
-  normalizeErMappingValues as s,
-  defaultErMappingValues as t,
-};
+var o, s, c, l, u, d, f, p, m, h, g, _, v;
+function y() {
+  return (y = e(() => {
+    (a(),
+      (o = i.parameters.relationship_kind),
+      (s = i.parameters.include_relationship_attribute),
+      (c = o.allowedValues),
+      (l = o.defaultValue),
+      (u = {
+        relationship_kind: l,
+        include_relationship_attribute: s.defaultValue,
+        mappingStage: 2,
+      }),
+      (d = (e) => c.some((t) => t === e)),
+      (f = (e) =>
+        typeof e != `number` || !Number.isFinite(e)
+          ? u.mappingStage
+          : Math.min(2, Math.max(0, Math.round(e)))),
+      (p = (e) => ({
+        relationship_kind: d(e.relationship_kind) ? e.relationship_kind : l,
+        include_relationship_attribute:
+          typeof e.include_relationship_attribute == `boolean`
+            ? e.include_relationship_attribute
+            : s.defaultValue,
+        mappingStage: f(e.mappingStage),
+      })),
+      (m = [
+        { name: `inst_id`, badges: [`PK`], mapped: !1 },
+        { name: `name`, badges: [], mapped: !1 },
+      ]),
+      (h = [
+        { name: `course_id`, badges: [`PK`], mapped: !1 },
+        { name: `title`, badges: [], mapped: !1 },
+      ]),
+      (g = (e) => (e ? [{ name: `assigned_on`, badges: [], mapped: !0 }] : [])),
+      (_ = (e) => {
+        if (e.mappingStage === 0) return [];
+        let t = { name: `Instructor`, columns: m, compositeKey: !1, junction: !1 },
+          n = { name: `Course`, columns: h, compositeKey: !1, junction: !1 };
+        return e.mappingStage === 1
+          ? [t, n]
+          : e.relationship_kind === `many-to-many`
+            ? [
+                t,
+                n,
+                {
+                  name: `Teaches`,
+                  columns: [
+                    { name: `inst_id`, badges: [`PK`, `FK`], mapped: !0 },
+                    { name: `course_id`, badges: [`PK`, `FK`], mapped: !0 },
+                    ...g(e.include_relationship_attribute),
+                  ],
+                  compositeKey: !0,
+                  junction: !0,
+                },
+              ]
+            : [
+                t,
+                {
+                  ...n,
+                  columns: [
+                    ...h,
+                    {
+                      name: `inst_id`,
+                      badges: e.relationship_kind === `one-to-one` ? [`FK`, `UNIQUE`] : [`FK`],
+                      mapped: !0,
+                    },
+                    ...g(e.include_relationship_attribute),
+                  ],
+                },
+              ];
+      }),
+      (v = (e) =>
+        e === `one-to-one` ? [`1`, `1`] : e === `one-to-many` ? [`1`, `N`] : [`M`, `N`]));
+  }))();
+}
+export { v as a, a as c, _ as i, i as l, l as n, y as o, c as r, p as s, u as t };

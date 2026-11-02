@@ -1,32 +1,34 @@
-// use-learning-block-wide-layout — ResizeObserver-backed wide-layout state.
-
-import "@rchunk/rolldown-runtime";
-import { e6 as getReactRuntime } from "@rchunk/app-shared";
-
-interface WideLayoutReactRuntime {
-  useCallback<Value extends (...arguments_: never[]) => unknown>(callback: Value, dependencies: readonly unknown[]): Value;
-  useEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void;
-  useState<Value>(value: Value): [Value, (value: Value) => void];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { e6 as t } from "@rchunk/app-shared";
+var n, r;
+function i() {
+  return (i = e(() => {
+    ((n = t()),
+      (r = ({ disabled: e = !1, minWidth: t = 448 } = {}) => {
+        let [r, i] = (0, n.useState)(null),
+          [a, o] = (0, n.useState)(!1),
+          s = (0, n.useCallback)((e) => {
+            i(e);
+          }, []);
+        return (
+          (0, n.useEffect)(() => {
+            if (e || r == null) {
+              o(!1);
+              return;
+            }
+            let n = (e) => {
+              e > 0 && o(e >= t);
+            };
+            if ((n(r.getBoundingClientRect().width), typeof ResizeObserver > `u`)) return;
+            let i = new ResizeObserver(([e]) => {
+              e && n(e.contentRect.width);
+            });
+            return (i.observe(r), () => i.disconnect());
+          }, [e, t, r]),
+          { isWideLayout: a, visualizationRef: s }
+        );
+      }));
+  }))();
 }
-interface WideLayoutOptions { disabled?: boolean; minWidth?: number }
-
-let React: WideLayoutReactRuntime;
-function initializeLearningBlockWideLayout(): void { React ??= getReactRuntime() as unknown as WideLayoutReactRuntime; }
-function useLearningBlockWideLayout({ disabled = false, minWidth = 448 }: WideLayoutOptions = {}): { isWideLayout: boolean; visualizationRef(element: HTMLElement | null): void } {
-  initializeLearningBlockWideLayout();
-  const [element, setElement] = React.useState<HTMLElement | null>(null);
-  const [isWideLayout, setWideLayout] = React.useState(false);
-  const visualizationRef = React.useCallback((nextElement: HTMLElement | null): void => setElement(nextElement), []);
-  React.useEffect(() => {
-    if (disabled || element == null) { setWideLayout(false); return; }
-    const update = (width: number): void => { if (width > 0) setWideLayout(width >= minWidth); };
-    update(element.getBoundingClientRect().width);
-    if (typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(([entry]) => { if (entry != null) update(entry.contentRect.width); });
-    observer.observe(element);
-    return () => observer.disconnect();
-  }, [disabled, minWidth, element]);
-  return { isWideLayout, visualizationRef };
-}
-
-export { useLearningBlockWideLayout as n, initializeLearningBlockWideLayout as t };
+export { r as n, i as t };

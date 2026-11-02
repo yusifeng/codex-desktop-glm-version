@@ -1,71 +1,140 @@
-import "@rchunk/rolldown-runtime";
-import * as skillIconAssetsChunk from "@rchunk/text-bubble-figure-light";
-
-const {
-  V: defaultLight, U: defaultDark,
-  E: boltLight, O: boltDark,
-  G: chartLight, q: chartDark,
-  n: chatLight, i: chatDark,
-  L: codeLight, z: codeDark,
-  u: cursorLight, f: cursorDark,
-  N: heartLight, F: heartDark,
-  k: hierarchyLight, j: hierarchyDark,
-  v: pdfLight, b: pdfDark,
-  m: penLight, g: penDark,
-  o: radarLight, c: radarDark,
-  S: searchLight, w: searchDark,
-} = skillIconAssetsChunk;
-
-interface SkillIconRecord {
-  description: string;
-  display_name?: string | null;
-  icon_small?: string | null;
-  iconography?: string | null;
-  id: string;
-  name: string;
-  short_description?: string | null;
-  updated_at: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  A as t,
+  B as n,
+  C as r,
+  D as ee,
+  E as i,
+  F as a,
+  G as o,
+  H as s,
+  I as te,
+  J as c,
+  K as l,
+  L as u,
+  M as d,
+  N as f,
+  O as p,
+  P as m,
+  R as h,
+  S as g,
+  T as _,
+  U as v,
+  V as y,
+  W as b,
+  _ as x,
+  a as S,
+  b as C,
+  c as w,
+  d as T,
+  f as E,
+  g as D,
+  h as O,
+  i as k,
+  j as A,
+  k as ne,
+  l as j,
+  m as M,
+  n as N,
+  o as P,
+  p as F,
+  q as I,
+  r as L,
+  s as R,
+  t as z,
+  u as B,
+  v as V,
+  w as H,
+  x as U,
+  y as W,
+  z as G,
+} from "@rchunk/text-bubble-figure-light";
+function K(e) {
+  let t = e.icon_small?.trim();
+  if (!t) return null;
+  if (t.startsWith(`data:`)) return t;
+  let n = `image/png`;
+  return (
+    t.startsWith(`PHN2Zy`) || t.startsWith(`PD94bWw`)
+      ? (n = `image/svg+xml`)
+      : t.startsWith(`/9j/`)
+        ? (n = `image/jpeg`)
+        : t.startsWith(`R0lGOD`)
+          ? (n = `image/gif`)
+          : t.startsWith(`UklGR`) && (n = `image/webp`),
+    `data:${n};base64,${t}`
+  );
 }
-
-const iconSources: Record<string, { dark: string; light: string }> = {
-  default: { light: defaultLight, dark: defaultDark }, bolt: { light: boltLight, dark: boltDark },
-  chart: { light: chartLight, dark: chartDark }, chat: { light: chatLight, dark: chatDark },
-  code: { light: codeLight, dark: codeDark }, cursor: { light: cursorLight, dark: cursorDark },
-  heart: { light: heartLight, dark: heartDark }, hierarchy: { light: hierarchyLight, dark: hierarchyDark },
-  pdf: { light: pdfLight, dark: pdfDark }, pen: { light: penLight, dark: penDark },
-  radar: { light: radarLight, dark: radarDark }, search: { light: searchLight, dark: searchDark },
-};
-
-function inlineSkillIcon(skill: SkillIconRecord): string | null {
-  const icon = skill.icon_small?.trim();
-  if (!icon) return null;
-  if (icon.startsWith("data:")) return icon;
-  const mediaType = icon.startsWith("PHN2Zy") || icon.startsWith("PD94bWw") ? "image/svg+xml"
-    : icon.startsWith("/9j/") ? "image/jpeg"
-      : icon.startsWith("R0lGOD") ? "image/gif"
-        : icon.startsWith("UklGR") ? "image/webp" : "image/png";
-  return `data:${mediaType};base64,${icon}`;
+function q(e) {
+  return e.toSorted(
+    (e, t) =>
+      Date.parse(t.updated_at) - Date.parse(e.updated_at) ||
+      e.name.localeCompare(t.name) ||
+      e.id.localeCompare(t.id),
+  );
 }
-
-function sortSkillsByUpdatedAt(skills: SkillIconRecord[]): SkillIconRecord[] {
-  return skills.toSorted((left, right) => Date.parse(right.updated_at) - Date.parse(left.updated_at) || left.name.localeCompare(right.name) || left.id.localeCompare(right.id));
+function J(e, t) {
+  let n = (e) =>
+    e
+      .toLowerCase()
+      .replaceAll(/[-_\s]+/g, ` `)
+      .trim();
+  return n(
+    `${e.name} ${e.display_name ?? ``} ${e.description} ${e.short_description ?? ``}`,
+  ).includes(n(t));
 }
-
-function skillMatchesSearch(skill: SkillIconRecord, search: string): boolean {
-  const normalize = (value: string) => value.toLowerCase().replaceAll(/[-_\s]+/g, " ").trim();
-  return normalize(`${skill.name} ${skill.display_name ?? ""} ${skill.description} ${skill.short_description ?? ""}`).includes(normalize(search));
+function Y() {
+  return (Y = e(() => {}))();
 }
-
-function getBundledSkillIcon(skill: SkillIconRecord, dark: boolean): string {
-  const source = iconSources[skill.iconography ?? "default"] ?? iconSources.default;
-  return dark ? source.dark : source.light;
+function X(e, t) {
+  let n = Q[e.iconography ?? `default`] ?? Q.default;
+  return t ? n.dark : n.light;
 }
-
-function getSkillIconUrl(skill: SkillIconRecord, dark: boolean): string {
-  return new URL(inlineSkillIcon(skill) ?? getBundledSkillIcon(skill, dark), window.location.href).href;
+function Z(e, t) {
+  return new URL(K(e) ?? X(e, t), window.location.href).href;
 }
-
-function initializeSkillIconSource(): void {}
-function initializeSkillIconAssets(): void {}
-
-export { initializeSkillIconAssets as a, inlineSkillIcon as i, getSkillIconUrl as n, skillMatchesSearch as o, initializeSkillIconSource as r, sortSkillsByUpdatedAt as s, getBundledSkillIcon as t };
+var Q;
+function $() {
+  return ($ = e(() => {
+    (c(),
+      l(),
+      b(),
+      s(),
+      n(),
+      h(),
+      te(),
+      m(),
+      d(),
+      t(),
+      ee(),
+      _(),
+      r(),
+      U(),
+      W(),
+      x(),
+      O(),
+      F(),
+      T(),
+      j(),
+      R(),
+      S(),
+      L(),
+      z(),
+      (Q = {
+        default: { light: y, dark: v },
+        bolt: { light: i, dark: p },
+        chart: { light: o, dark: I },
+        chat: { light: N, dark: k },
+        code: { light: u, dark: G },
+        cursor: { light: B, dark: E },
+        heart: { light: f, dark: a },
+        hierarchy: { light: ne, dark: A },
+        pdf: { light: V, dark: C },
+        pen: { light: M, dark: D },
+        radar: { light: P, dark: w },
+        search: { light: g, dark: H },
+      }));
+  }))();
+}
+export { Y as a, K as i, Z as n, J as o, $ as r, q as s, X as t };

@@ -1,44 +1,76 @@
-// Fundamental and realized niches under interspecific competition.
-import "@rchunk/rolldown-runtime";
-
-type ResourceDimension = "food size" | "habitat space" | "feeding time";
-interface CompetitionValues { resource_dimension?: unknown; resourceSimilarity?: number | null; competitorPresent?: number | null }
-
-const competitionAndNichesType = "COMPETITION_AND_NICHES";
-const competitionAndNichesThumbnail = "competition-and-niches-v3";
-const competitionAndNichesParameters = { resource_dimension: { kind: "enum" as const, defaultValue: "food size" as ResourceDimension, allowedValues: ["food size", "habitat space", "feeding time"] as ResourceDimension[] } };
-const competitionAndNichesSpecification = { type: competitionAndNichesType, version: 2, thumbnailAssetKey: competitionAndNichesThumbnail, parameters: competitionAndNichesParameters };
-const resourceDimensionParameter = competitionAndNichesSpecification.parameters.resource_dimension;
-const isResourceDimension = (value: unknown): value is ResourceDimension => value === "food size" || value === "habitat space" || value === "feeding time";
-const resourceDimensions = resourceDimensionParameter.allowedValues.filter(isResourceDimension);
-const defaultResourceDimension = isResourceDimension(resourceDimensionParameter.defaultValue) ? resourceDimensionParameter.defaultValue : "food size";
-const resourceSimilarityControl = { defaultValue: 58, min: 0, max: 100, step: 1 };
-const competitorPresentControl = { defaultValue: 1, min: 0, max: 1, step: 1 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const normalizeCompetitionValues = (values: CompetitionValues) => ({ resource_dimension: isResourceDimension(values.resource_dimension) ? values.resource_dimension : defaultResourceDimension, resourceSimilarity: Number.isFinite(values.resourceSimilarity) ? clamp(values.resourceSimilarity ?? resourceSimilarityControl.defaultValue, resourceSimilarityControl.min, resourceSimilarityControl.max) : resourceSimilarityControl.defaultValue, competitorPresent: +((values.competitorPresent ?? 0) >= 0.5) });
-const gaussian = (x: number, center: number, width: number, amplitude: number): number => amplitude * Math.exp(-0.5 * ((x - center) / width) ** 2);
-const calculateCompetitionAndNiches = (values: CompetitionValues) => {
-  const normalized = normalizeCompetitionValues(values);
-  const similarity = normalized.resourceSimilarity / 100;
-  const speciesACenter = 3.65;
-  const speciesBCenter = 7.35 - similarity * 2.9;
-  const transitionCenter = (speciesACenter + speciesBCenter) / 2 + 0.38;
-  const speciesA: { x: number; y: number }[] = [];
-  const speciesBFundamental: { x: number; y: number }[] = [];
-  const speciesBRealized: { x: number; y: number }[] = [];
-  const shared: { x: number; y: number }[] = [];
-  for (let index = 0; index <= 160; index += 1) {
-    const x = index / 160 * 12;
-    const speciesAValue = gaussian(x, speciesACenter, 1.12, 0.92);
-    const speciesBFundamentalValue = gaussian(x, speciesBCenter, 1.36, 0.84);
-    const speciesBRealizedValue = speciesBFundamentalValue * (normalized.competitorPresent === 1 ? 0.08 + 0.82 / (1 + Math.exp(-(x - transitionCenter) / 0.18)) : 1);
-    speciesA.push({ x, y: speciesAValue }); speciesBFundamental.push({ x, y: speciesBFundamentalValue }); speciesBRealized.push({ x, y: speciesBRealizedValue }); shared.push({ x, y: Math.min(speciesAValue, speciesBRealizedValue) });
-  }
-  const sharedArea = shared.reduce((area, point, index) => index === 0 ? area : area + (shared[index - 1].y + point.y) / 2 * (point.x - shared[index - 1].x), 0);
-  return { ...normalized, speciesACenter, speciesBCenter, speciesA, speciesBFundamental, speciesBRealized, shared, sharedArea, overlapLevel: sharedArea > 0.74 ? "high" : sharedArea > 0.42 ? "partial" : "low" };
-};
-
-function initializeCompetitionAndNichesSpecification(): void {}
-function initializeCompetitionAndNichesModel(): void {}
-
-export { calculateCompetitionAndNiches as a, initializeCompetitionAndNichesSpecification as c, resourceSimilarityControl as i, competitionAndNichesSpecification as l, defaultResourceDimension as n, initializeCompetitionAndNichesModel as o, resourceDimensions as r, normalizeCompetitionValues as s, competitorPresentControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `COMPETITION_AND_NICHES`),
+      (n = `competition-and-niches-v3`),
+      (r = {
+        resource_dimension: {
+          kind: `enum`,
+          defaultValue: `food size`,
+          allowedValues: [`food size`, `habitat space`, `feeding time`],
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h;
+function g() {
+  return (g = e(() => {
+    (a(),
+      (o = i.parameters.resource_dimension),
+      (s = (e) => e === `food size` || e === `habitat space` || e === `feeding time`),
+      (c = o.allowedValues.filter(s)),
+      (l = s(o.defaultValue) ? o.defaultValue : `food size`),
+      (u = { defaultValue: 58, min: 0, max: 100, step: 1 }),
+      (d = { defaultValue: 1, min: 0, max: 1, step: 1 }),
+      (f = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (p = (e) => ({
+        resource_dimension: s(e.resource_dimension) ? e.resource_dimension : l,
+        resourceSimilarity: Number.isFinite(e.resourceSimilarity)
+          ? f(e.resourceSimilarity, u.min, u.max)
+          : u.defaultValue,
+        competitorPresent: +(e.competitorPresent >= 0.5),
+      })),
+      (m = (e, t, n, r) => r * Math.exp(-0.5 * ((e - t) / n) ** 2)),
+      (h = (e) => {
+        let t = p(e),
+          n = t.resourceSimilarity / 100,
+          r = 3.65,
+          i = 7.35 - n * 2.9,
+          a = (r + i) / 2 + 0.38,
+          o = [],
+          s = [],
+          c = [],
+          l = [];
+        for (let e = 0; e <= 160; e += 1) {
+          let n = (e / 160) * 12,
+            u = m(n, r, 1.12, 0.92),
+            d = m(n, i, 1.36, 0.84),
+            f = d * (t.competitorPresent === 1 ? 0.08 + 0.82 / (1 + Math.exp(-(n - a) / 0.18)) : 1);
+          (o.push({ x: n, y: u }),
+            s.push({ x: n, y: d }),
+            c.push({ x: n, y: f }),
+            l.push({ x: n, y: Math.min(u, f) }));
+        }
+        let u = l.reduce((e, t, n) => {
+          if (n === 0) return e;
+          let r = l[n - 1];
+          return e + ((r.y + t.y) / 2) * (t.x - r.x);
+        }, 0);
+        return {
+          ...t,
+          speciesACenter: r,
+          speciesBCenter: i,
+          speciesA: o,
+          speciesBFundamental: s,
+          speciesBRealized: c,
+          shared: l,
+          sharedArea: u,
+          overlapLevel: u > 0.74 ? `high` : u > 0.42 ? `partial` : `low`,
+        };
+      }));
+  }))();
+}
+export { h as a, a as c, u as i, i as l, l as n, g as o, c as r, p as s, d as t };

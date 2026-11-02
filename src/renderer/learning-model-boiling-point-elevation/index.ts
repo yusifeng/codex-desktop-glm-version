@@ -1,69 +1,92 @@
-// Boiling-point elevation learning model using Raoult and Antoine relations.
-import "@rchunk/rolldown-runtime";
-
-type Solvent = "water" | "benzene";
-interface BoilingPointValues { solvent?: unknown; initial_solute_molality?: number | null; initial_particle_factor?: number | null }
-
-const boilingPointElevationType = "BOILING_POINT_ELEVATION";
-const boilingPointElevationThumbnail = "boiling-point-elevation-v1";
-const boilingPointElevationFormula = "\\Delta T_b=iK_bm";
-const boilingPointElevationParameters = {
-  solvent: { kind: "enum", defaultValue: "benzene" as Solvent, allowedValues: ["water", "benzene"] as Solvent[] },
-  initial_solute_molality: { kind: "number", defaultValue: 0.15, min: 0, max: 0.25 },
-  initial_particle_factor: { kind: "integer", defaultValue: 2, min: 1, max: 3 },
-};
-const boilingPointElevationDefinition = { type: boilingPointElevationType, version: 2, thumbnailAssetKey: boilingPointElevationThumbnail, canonicalFormula: boilingPointElevationFormula, parameters: boilingPointElevationParameters };
-const solventProperties: Record<Solvent, { boilingPointCelsius: number; boilingPointConstant: number; molesPerKilogram: number; antoineB: number; antoineC: number }> = {
-  water: { boilingPointCelsius: 100, boilingPointConstant: 0.512, molesPerKilogram: 55.51, antoineB: 1730.63, antoineC: 233.426 },
-  benzene: { boilingPointCelsius: 80.1, boilingPointConstant: 2.53, molesPerKilogram: 12.8, antoineB: 1211.033, antoineC: 220.79 },
-};
-const parameters = boilingPointElevationDefinition.parameters;
-const molalityControl = { min: parameters.initial_solute_molality.min, max: parameters.initial_solute_molality.max, step: 0.01, defaultValue: parameters.initial_solute_molality.defaultValue };
-const particleFactorControl = { min: parameters.initial_particle_factor.min, max: parameters.initial_particle_factor.max, step: 1, defaultValue: parameters.initial_particle_factor.defaultValue };
-const defaultSolvent = parameters.solvent.defaultValue;
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const normalizeBoilingPointValues = (values: BoilingPointValues) => ({
-  solvent: values.solvent === "water" || values.solvent === "benzene" ? values.solvent : defaultSolvent,
-  initial_solute_molality: Number.isFinite(values.initial_solute_molality) ? clamp(values.initial_solute_molality ?? molalityControl.defaultValue, molalityControl.min, molalityControl.max) : molalityControl.defaultValue,
-  initial_particle_factor: Number.isFinite(values.initial_particle_factor) ? clamp(Math.round(values.initial_particle_factor ?? particleFactorControl.defaultValue), particleFactorControl.min, particleFactorControl.max) : particleFactorControl.defaultValue,
-});
-
-function deriveBoilingPointElevation(values: BoilingPointValues) {
-  const normalized = normalizeBoilingPointValues(values);
-  const properties = solventProperties[normalized.solvent];
-  const particleMolality = normalized.initial_solute_molality * normalized.initial_particle_factor;
-  const solventMoleFraction = properties.molesPerKilogram / (properties.molesPerKilogram + particleMolality);
-  const referenceAntoineValue = properties.antoineB / (properties.antoineC + properties.boilingPointCelsius);
-  const solutionBoilingPointCelsius = properties.antoineB / (referenceAntoineValue - Math.log10(1 / solventMoleFraction)) - properties.antoineC;
-  return {
-    ...normalized,
-    pureBoilingPointCelsius: properties.boilingPointCelsius,
-    solutionBoilingPointCelsius,
-    boilingPointConstant: properties.boilingPointConstant,
-    particleMolality,
-    deltaBoilingPointCelsius: solutionBoilingPointCelsius - properties.boilingPointCelsius,
-    diluteEstimateCelsius: properties.boilingPointConstant * particleMolality,
-    solventMoleFraction,
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `BOILING_POINT_ELEVATION`),
+      (n = `boiling-point-elevation-v1`),
+      (r = `\\Delta T_b=iK_bm`),
+      (i = {
+        solvent: { kind: `enum`, defaultValue: `benzene`, allowedValues: [`water`, `benzene`] },
+        initial_solute_molality: { kind: `number`, defaultValue: 0.15, min: 0, max: 0.25 },
+        initial_particle_factor: { kind: `integer`, defaultValue: 2, min: 1, max: 3 },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-
-const relativeVaporPressure = (temperatureCelsius: number, solvent: Solvent): number => {
-  const properties = solventProperties[solvent];
-  return 10 ** (properties.antoineB / (properties.antoineC + properties.boilingPointCelsius) - properties.antoineB / (properties.antoineC + temperatureCelsius));
-};
-const solutionRelativeVaporPressure = (temperatureCelsius: number, state: ReturnType<typeof deriveBoilingPointElevation>): number => relativeVaporPressure(temperatureCelsius, state.solvent) * state.solventMoleFraction;
-function initializeBoilingPointElevationSchema(): void {}
-function initializeBoilingPointElevationModel(): void {}
-
-export {
-  initializeBoilingPointElevationModel as a,
-  relativeVaporPressure as c,
-  deriveBoilingPointElevation as i,
-  initializeBoilingPointElevationSchema as l,
-  particleFactorControl as n,
-  normalizeBoilingPointValues as o,
-  defaultSolvent as r,
-  solutionRelativeVaporPressure as s,
-  molalityControl as t,
-  boilingPointElevationDefinition as u,
-};
+var s, c, l, u, d, f, p, m, h, g;
+function _() {
+  return (_ = e(() => {
+    (o(),
+      (s = {
+        water: {
+          boilingPointCelsius: 100,
+          boilingPointConstant: 0.512,
+          molesPerKilogram: 55.51,
+          antoineB: 1730.63,
+          antoineC: 233.426,
+        },
+        benzene: {
+          boilingPointCelsius: 80.1,
+          boilingPointConstant: 2.53,
+          molesPerKilogram: 12.8,
+          antoineB: 1211.033,
+          antoineC: 220.79,
+        },
+      }),
+      (c = a.parameters),
+      (l = {
+        min: c.initial_solute_molality.min,
+        max: c.initial_solute_molality.max,
+        step: 0.01,
+        defaultValue: c.initial_solute_molality.defaultValue,
+      }),
+      (u = {
+        min: c.initial_particle_factor.min,
+        max: c.initial_particle_factor.max,
+        step: 1,
+        defaultValue: c.initial_particle_factor.defaultValue,
+      }),
+      (d = c.solvent.defaultValue),
+      (f = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (p = (e) => ({
+        solvent: e.solvent === `water` || e.solvent === `benzene` ? e.solvent : d,
+        initial_solute_molality: Number.isFinite(e.initial_solute_molality)
+          ? f(e.initial_solute_molality ?? l.defaultValue, l.min, l.max)
+          : l.defaultValue,
+        initial_particle_factor: Number.isFinite(e.initial_particle_factor)
+          ? f(Math.round(e.initial_particle_factor ?? u.defaultValue), u.min, u.max)
+          : u.defaultValue,
+      })),
+      (m = (e) => {
+        let t = p(e),
+          n = s[t.solvent],
+          r = n.boilingPointCelsius,
+          i = n.boilingPointConstant,
+          a = t.initial_solute_molality * t.initial_particle_factor,
+          o = n.molesPerKilogram / (n.molesPerKilogram + a),
+          c = n.antoineB / (n.antoineC + r),
+          l = n.antoineB / (c - Math.log10(1 / o)) - n.antoineC,
+          u = l - r,
+          d = i * a;
+        return {
+          ...t,
+          pureBoilingPointCelsius: r,
+          solutionBoilingPointCelsius: l,
+          boilingPointConstant: i,
+          particleMolality: a,
+          deltaBoilingPointCelsius: u,
+          diluteEstimateCelsius: d,
+          solventMoleFraction: o,
+        };
+      }),
+      (h = (e, t) => {
+        let n = s[t];
+        return (
+          10 ** (n.antoineB / (n.antoineC + n.boilingPointCelsius) - n.antoineB / (n.antoineC + e))
+        );
+      }),
+      (g = (e, t) => h(e, t.solvent) * t.solventMoleFraction));
+  }))();
+}
+export { _ as a, h as c, m as i, o as l, u as n, p as o, d as r, g as s, l as t, a as u };

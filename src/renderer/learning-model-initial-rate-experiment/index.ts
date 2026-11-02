@@ -1,62 +1,82 @@
-// Initial-rate experiment learning model for inferring reaction orders.
-import "@rchunk/rolldown-runtime";
-
-type ReactionOrder = "zero" | "first" | "second";
-type Reactant = "A" | "B";
-interface InitialRateValues { order_a?: unknown; order_b?: unknown; variedReactant?: unknown; concentrationMultiplier?: number | null }
-
-const initialRateType = "INITIAL_RATE_EXPERIMENT";
-const initialRateThumbnail = "initial-rate-experiment-v1";
-const initialRateFormula = "\\frac{r_{0,2}}{r_{0,1}}=\\left(\\frac{[X]_{0,2}}{[X]_{0,1}}\\right)^p";
-const initialRateParameters = {
-  order_a: { kind: "enum", defaultValue: "first" as ReactionOrder, allowedValues: ["zero", "first", "second"] as ReactionOrder[] },
-  order_b: { kind: "enum", defaultValue: "second" as ReactionOrder, allowedValues: ["zero", "first", "second"] as ReactionOrder[] },
-};
-const initialRateDefinition = { type: initialRateType, version: 2, thumbnailAssetKey: initialRateThumbnail, canonicalFormula: initialRateFormula, parameters: initialRateParameters };
-const isReactionOrder = (value: unknown): value is ReactionOrder => value === "zero" || value === "first" || value === "second";
-const isReactant = (value: unknown): value is Reactant => value === "A" || value === "B";
-const orderAParameter = initialRateDefinition.parameters.order_a;
-const orderBParameter = initialRateDefinition.parameters.order_b;
-if (!isReactionOrder(orderAParameter.defaultValue) || !isReactionOrder(orderBParameter.defaultValue) || !orderAParameter.allowedValues.every(isReactionOrder) || !orderBParameter.allowedValues.every(isReactionOrder)) {
-  throw Error("Initial-rate experiment manifest contains an invalid order");
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `INITIAL_RATE_EXPERIMENT`),
+      (n = `initial-rate-experiment-v1`),
+      (r = `\\frac{r_{0,2}}{r_{0,1}}=\\left(\\frac{[X]_{0,2}}{[X]_{0,1}}\\right)^p`),
+      (i = {
+        order_a: {
+          kind: `enum`,
+          defaultValue: `first`,
+          allowedValues: [`zero`, `first`, `second`],
+        },
+        order_b: {
+          kind: `enum`,
+          defaultValue: `second`,
+          allowedValues: [`zero`, `first`, `second`],
+        },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-const concentrationMultiplierControl = { defaultValue: 2, min: 1, max: 4, step: 1 };
-const defaultInitialRateValues = { order_a: orderAParameter.defaultValue, order_b: orderBParameter.defaultValue, variedReactant: "A" as Reactant, concentrationMultiplier: concentrationMultiplierControl.defaultValue };
-const normalizeMultiplier = (value: number | null | undefined): number => Number.isFinite(value)
-  ? Math.min(concentrationMultiplierControl.max, Math.max(concentrationMultiplierControl.min, Math.round(value as number)))
-  : concentrationMultiplierControl.defaultValue;
-const normalizeInitialRateValues = (values: InitialRateValues) => ({
-  order_a: isReactionOrder(values.order_a) ? values.order_a : defaultInitialRateValues.order_a,
-  order_b: isReactionOrder(values.order_b) ? values.order_b : defaultInitialRateValues.order_b,
-  variedReactant: isReactant(values.variedReactant) ? values.variedReactant : defaultInitialRateValues.variedReactant,
-  concentrationMultiplier: normalizeMultiplier(values.concentrationMultiplier),
-});
-const orderExponents: Record<ReactionOrder, number> = { zero: 0, first: 1, second: 2 };
-
-function deriveInitialRateState(values: InitialRateValues) {
-  const safeValues = normalizeInitialRateValues(values);
-  const order = safeValues.variedReactant === "A" ? safeValues.order_a : safeValues.order_b;
-  const exponent = orderExponents[order];
-  const rateRatio = safeValues.concentrationMultiplier ** exponent;
-  return { safeValues, variedReactant: safeValues.variedReactant, heldReactant: safeValues.variedReactant === "A" ? "B" : "A", order, exponent, concentrationRatio: safeValues.concentrationMultiplier, baselineRate: 1, comparisonRate: rateRatio, rateRatio, tangentEndTime: Math.min(1.15, 3.8 / rateRatio), canInferOrder: safeValues.concentrationMultiplier > 1 };
+var s, c, l, u, d, f, p, m, h, g, _, v;
+function y() {
+  return (y = e(() => {
+    if (
+      (o(),
+      (s = (e) => e === `zero` || e === `first` || e === `second`),
+      (c = (e) => e === `A` || e === `B`),
+      (l = a.parameters.order_a),
+      (u = a.parameters.order_b),
+      !s(l.defaultValue) ||
+        !s(u.defaultValue) ||
+        !l.allowedValues.every(s) ||
+        !u.allowedValues.every(s))
+    )
+      throw Error(`Initial-rate experiment manifest contains an invalid order`);
+    ((d = { defaultValue: 2, min: 1, max: 4, step: 1 }),
+      (f = {
+        order_a: l.defaultValue,
+        order_b: u.defaultValue,
+        variedReactant: `A`,
+        concentrationMultiplier: d.defaultValue,
+      }),
+      (p = (e) =>
+        Number.isFinite(e) ? Math.min(d.max, Math.max(d.min, Math.round(e))) : d.defaultValue),
+      (m = (e) => ({
+        order_a: s(e.order_a) ? e.order_a : f.order_a,
+        order_b: s(e.order_b) ? e.order_b : f.order_b,
+        variedReactant: c(e.variedReactant) ? e.variedReactant : f.variedReactant,
+        concentrationMultiplier: p(e.concentrationMultiplier),
+      })),
+      (h = { zero: 0, first: 1, second: 2 }),
+      (g = (e) => {
+        let t = m(e),
+          n = t.variedReactant === `A` ? t.order_a : t.order_b,
+          r = h[n],
+          i = t.concentrationMultiplier ** r;
+        return {
+          safeValues: t,
+          variedReactant: t.variedReactant,
+          heldReactant: t.variedReactant === `A` ? `B` : `A`,
+          order: n,
+          exponent: r,
+          concentrationRatio: t.concentrationMultiplier,
+          baselineRate: 1,
+          comparisonRate: i,
+          rateRatio: i,
+          tangentEndTime: Math.min(1.15, 3.8 / i),
+          canInferOrder: t.concentrationMultiplier > 1,
+        };
+      }),
+      (_ = (e, t) => 5 * (1 - Math.exp((-t * e) / 5))),
+      (v = (e) =>
+        Array.from({ length: 121 }, (t, n) => {
+          let r = (4 * n) / 120;
+          return { x: r, y: _(r, e) };
+        })));
+  }))();
 }
-const productConcentrationAt = (time: number, rate: number): number => 5 * (1 - Math.exp(-time * rate / 5));
-const buildInitialRateCurve = (rate: number) => Array.from({ length: 121 }, (_unused, index) => {
-  const time = 4 * index / 120;
-  return { x: time, y: productConcentrationAt(time, rate) };
-});
-
-function initializeInitialRateSchema(): void {}
-function initializeInitialRateModel(): void {}
-
-export {
-  initializeInitialRateModel as a,
-  initializeInitialRateSchema as c,
-  buildInitialRateCurve as i,
-  initialRateDefinition as l,
-  defaultInitialRateValues as n,
-  productConcentrationAt as o,
-  deriveInitialRateState as r,
-  normalizeInitialRateValues as s,
-  concentrationMultiplierControl as t,
-};
+export { y as a, o as c, v as i, a as l, f as n, _ as o, g as r, m as s, d as t };

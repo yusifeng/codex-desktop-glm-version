@@ -1,44 +1,67 @@
-// Two-digit multiplication decomposed into four place-value products.
-import "@rchunk/rolldown-runtime";
-
-interface IntegerParameter { kind: "integer"; defaultValue: number; min: number; max: number }
-interface TwoDigitMultiplicationValues { factor1?: number | null; factor2?: number | null; lessonStep?: number | null }
-
-const twoDigitMultiplicationType = "TWO_DIGIT_MULTIPLY";
-const twoDigitMultiplicationThumbnail = "two-digit-multiply-v2";
-const twoDigitMultiplicationParameters: { factor1: IntegerParameter; factor2: IntegerParameter } = {
-  factor1: { kind: "integer", defaultValue: 24, min: 10, max: 99 },
-  factor2: { kind: "integer", defaultValue: 87, min: 10, max: 99 },
-};
-const twoDigitMultiplicationSpecification = { type: twoDigitMultiplicationType, version: 1, thumbnailAssetKey: twoDigitMultiplicationThumbnail, parameters: twoDigitMultiplicationParameters };
-const factor1Control = { ...twoDigitMultiplicationSpecification.parameters.factor1, step: 1 };
-const factor2Control = { ...twoDigitMultiplicationSpecification.parameters.factor2, step: 1 };
-const lessonStepControl = { min: 1, max: 7, step: 1, defaultValue: 1 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeInteger = (value: number | null | undefined, control: { defaultValue: number; min: number; max: number }): number => Number.isFinite(value) ? clamp(Math.round(value ?? control.defaultValue), control.min, control.max) : control.defaultValue;
-const normalizeTwoDigitMultiplicationValues = (values: TwoDigitMultiplicationValues) => ({ factor1: normalizeInteger(values.factor1, factor1Control), factor2: normalizeInteger(values.factor2, factor2Control), lessonStep: normalizeInteger(values.lessonStep, lessonStepControl) });
-const calculateTwoDigitMultiplication = (values: TwoDigitMultiplicationValues) => {
-  const { factor1, factor2, lessonStep } = normalizeTwoDigitMultiplicationValues(values);
-  const factor1TensDigit = Math.floor(factor1 / 10);
-  const factor1TensValue = factor1TensDigit * 10;
-  const factor1Ones = factor1 % 10;
-  const factor2TensDigit = Math.floor(factor2 / 10);
-  const factor2TensValue = factor2TensDigit * 10;
-  const factor2Ones = factor2 % 10;
-  const terms = [
-    { id: "ones-ones", left: factor1Ones, right: factor2Ones, product: factor1Ones * factor2Ones, stage: 1 },
-    { id: "tens-ones", left: factor1TensValue, right: factor2Ones, product: factor1TensValue * factor2Ones, stage: 2 },
-    { id: "ones-tens", left: factor1Ones, right: factor2TensValue, product: factor1Ones * factor2TensValue, stage: 3 },
-    { id: "tens-tens", left: factor1TensValue, right: factor2TensValue, product: factor1TensValue * factor2TensValue, stage: 4 },
-  ];
-  const onesPartial = factor1 * factor2Ones;
-  const tensPartial = factor1 * factor2TensValue;
-  const product = factor1 * factor2;
-  if (terms.reduce((sum, term) => sum + term.product, 0) !== product || onesPartial + tensPartial !== product) throw Error("Two-digit multiplication analysis is inconsistent.");
-  return { factor1, factor2, lessonStep, factor1TensDigit, factor1TensValue, factor1Ones, factor2TensDigit, factor2TensValue, factor2Ones, onesPartial, tensPartial, product, terms };
-};
-
-function initializeTwoDigitMultiplicationSpecification(): void {}
-function initializeTwoDigitMultiplicationModel(): void {}
-
-export { initializeTwoDigitMultiplicationModel as a, twoDigitMultiplicationSpecification as c, calculateTwoDigitMultiplication as i, factor2Control as n, normalizeTwoDigitMultiplicationValues as o, lessonStepControl as r, initializeTwoDigitMultiplicationSpecification as s, factor1Control as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `TWO_DIGIT_MULTIPLY`),
+      (n = `two-digit-multiply-v2`),
+      (r = {
+        factor1: { kind: `integer`, defaultValue: 24, min: 10, max: 99 },
+        factor2: { kind: `integer`, defaultValue: 87, min: 10, max: 99 },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    (a(),
+      (o = { ...i.parameters.factor1, step: 1 }),
+      (s = { ...i.parameters.factor2, step: 1 }),
+      (c = { min: 1, max: 7, step: 1, defaultValue: 1 }),
+      (l = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (u = (e, t) =>
+        Number.isFinite(e) ? l(Math.round(e ?? t.defaultValue), t.min, t.max) : t.defaultValue),
+      (d = (e) => ({
+        factor1: u(e.factor1, o),
+        factor2: u(e.factor2, s),
+        lessonStep: u(e.lessonStep, c),
+      })),
+      (f = (e) => {
+        let { factor1: t, factor2: n, lessonStep: r } = d(e),
+          i = Math.floor(t / 10),
+          a = i * 10,
+          o = t % 10,
+          s = Math.floor(n / 10),
+          c = s * 10,
+          l = n % 10,
+          u = [
+            { id: `ones-ones`, left: o, right: l, product: o * l, stage: 1 },
+            { id: `tens-ones`, left: a, right: l, product: a * l, stage: 2 },
+            { id: `ones-tens`, left: o, right: c, product: o * c, stage: 3 },
+            { id: `tens-tens`, left: a, right: c, product: a * c, stage: 4 },
+          ],
+          f = t * l,
+          p = t * c,
+          m = t * n;
+        if (u.reduce((e, t) => e + t.product, 0) !== m || f + p !== m)
+          throw Error(`Two-digit multiplication analysis is inconsistent.`);
+        return {
+          factor1: t,
+          factor2: n,
+          lessonStep: r,
+          factor1TensDigit: i,
+          factor1TensValue: a,
+          factor1Ones: o,
+          factor2TensDigit: s,
+          factor2TensValue: c,
+          factor2Ones: l,
+          onesPartial: f,
+          tensPartial: p,
+          product: m,
+          terms: u,
+        };
+      }));
+  }))();
+}
+export { p as a, i as c, f as i, s as n, d as o, c as r, a as s, o as t };

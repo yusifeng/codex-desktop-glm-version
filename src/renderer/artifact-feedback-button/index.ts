@@ -1,291 +1,309 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/artifact-feedback-dialog",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/feedback-legal-notice",
+      "@rchunk/google-drive-resource-icon",
+      "@rchunk/artifact-file-preview-icon",
+      "@rchunk/feedback-upload",
+      "@rchunk/submit-artifact-feedback",
+      "@rchunk/submit-feedback",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  FX as initializeQueryRuntime,
-  H3 as initializeLazyRuntime,
-  I3 as getJsxRuntime,
-  Jm as createLazyComponentExport,
-  K2 as initializeToastRuntime,
-  LX as useApplicationScopeExport,
-  Q3 as logger,
-  Y2 as FormattedMessage,
-  Yh as Button,
-  Z3 as initializeIconAssetRuntime,
-  Zh as initializeButtonRuntime,
-  _w as feedbackIcon16,
-  c_ as initializeFeedbackIconRuntime,
-  e6 as getReactRuntime,
-  gw as initializeFeedbackAssetsRuntime,
-  hw as feedbackIcon20,
-  lg as Icon,
-  lk as initializeIconRuntime,
-  mw as initializeFeedbackRuntime,
-  n4 as useIntl,
-  o_ as Tooltip,
-  pk as toastService,
-  qm as initializeIntlRuntime,
-  ug as initializeTooltipRuntime,
-  type JsxRuntime,
-  type ReactRuntime,
+  $3 as t,
+  FX as n,
+  H3 as r,
+  I3 as i,
+  Jm as a,
+  K2 as o,
+  LX as s,
+  Q3 as c,
+  V3 as l,
+  Y2 as u,
+  Yh as d,
+  Z3 as f,
+  Zh as p,
+  _w as m,
+  c_ as h,
+  e6 as g,
+  gw as _,
+  hw as v,
+  lg as y,
+  lk as b,
+  mw as x,
+  n4 as S,
+  o_ as C,
+  pk as w,
+  qm as T,
+  ug as E,
 } from "@rchunk/app-shared";
 import {
-  $en as applicationScopeSignal,
-  $rt as ManualEditHeaderButton,
-  Hi as initializeArtifactFeedbackRuntime,
-  Uzt as openDialogExport,
-  Vi as DialogErrorFallback,
-  Vzt as initializeDialogRuntime,
-  gfn as planContextSignal,
-  itn as initializePlanContextRuntime,
-  mnt as initializeApplicationScopeRuntime,
-  pfn as initializeFeedbackTransportRuntime,
-  pnt as desktopApi,
-  rit as initializeFeedbackCorrelationRuntime,
-  rtn as createFeedbackCorrelationIdExport,
-  zzt as closeDialogExport,
+  $en as D,
+  $rt as O,
+  Hi as k,
+  Uzt as A,
+  Vi as j,
+  Vzt as M,
+  gfn as N,
+  itn as P,
+  mnt as F,
+  pfn as I,
+  pnt as L,
+  rit as R,
+  rtn as z,
+  zzt as B,
 } from "@rchunk/app-initial";
-import {
-  n as initializeThumbMixed,
-  t as ThumbMixed,
-} from "@rchunk/thumb-mixed";
-import type {
-  ArtifactFeedbackDialogProps,
-  ArtifactFeedbackValue,
-  FeedbackArtifact,
-} from "@rchunk/artifact-feedback-dialog";
-
-type ArtifactFeedbackButtonVariant = "icon" | "text" | "manualEditHeader";
-interface ArtifactFeedbackButtonProps {
-  artifacts: readonly FeedbackArtifact[];
-  fileSizeBytes?: number;
-  hostId?: string;
-  showArtifactSelector?: boolean;
-  variant?: ArtifactFeedbackButtonVariant;
-}
-interface ApplicationScope {
-  value: unknown;
-  get<Value>(signal: unknown): Value;
-}
-interface ToastService {
-  danger(
-    message: string,
-    options: { errorAnalytics: { toastId: string } },
-  ): void;
-}
-
-const once = onceExport as (initializer: () => void) => () => void;
-const useApplicationScope = useApplicationScopeExport as unknown as (
-  signal: unknown,
-) => ApplicationScope;
-const createLazyComponent = createLazyComponentExport as unknown as (
-  loader: () => Promise<(props: ArtifactFeedbackDialogProps) => unknown>,
-  options: { errorFallback: unknown },
-) => (props: ArtifactFeedbackDialogProps) => unknown;
-const openDialog = openDialogExport as unknown as (
-  scope: ApplicationScope,
-  component: (props: ArtifactFeedbackDialogProps) => unknown,
-  props: Omit<ArtifactFeedbackDialogProps, "onClose">,
-) => void;
-const closeDialog = closeDialogExport as unknown as (
-  scope: ApplicationScope,
-  component: unknown,
-) => void;
-const createFeedbackCorrelationId =
-  createFeedbackCorrelationIdExport as unknown as (
-    scopeValue: unknown,
-  ) => string;
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let ArtifactFeedbackDialog: (props: ArtifactFeedbackDialogProps) => unknown;
-let loadFeedbackUpload: () => Promise<typeof import("@rchunk/feedback-upload")>;
-let loadSubmitArtifactFeedback: () => Promise<
-  typeof import("@rchunk/submit-artifact-feedback")
->;
-
-function feedbackClassification(
-  rating: ArtifactFeedbackValue["rating"],
-): "bad-result" | "good-result" | "other" {
-  switch (rating) {
-    case "better":
-      return "good-result";
-    case "same":
-      return "other";
-    case "worse":
-      return "bad-result";
-  }
-}
-
-function ArtifactFeedbackButton({
-  artifacts,
-  fileSizeBytes,
-  hostId,
-  showArtifactSelector = false,
-  variant = "icon",
-}: ArtifactFeedbackButtonProps): unknown {
-  const scope = useApplicationScope(applicationScopeSignal);
-  const intl = useIntl();
-  const appInfoPromise = React.useRef<Promise<unknown> | null>(null);
-  const showSubmitError = () => {
-    scope.get<ToastService>(toastService).danger(
-      String(
-        intl.formatMessage({
-          id: "feedback.dialog.submitError",
-          defaultMessage:
-            "We couldn't submit your feedback. Please try again in a moment",
-          description: "Toast shown when feedback submission fails",
-        }),
-      ),
-      { errorAnalytics: { toastId: "feedback.dialog.submitError" } },
-    );
-  };
-  const submit = async (
-    value: ArtifactFeedbackValue,
-    selectedArtifact?: FeedbackArtifact,
-  ): Promise<boolean> => {
-    const artifact = selectedArtifact ?? artifacts[0]!;
-    let appInfo: unknown;
-    let startFeedbackUpload: typeof import("@rchunk/feedback-upload").startFeedbackUpload;
-    let submitArtifactFeedback: typeof import("@rchunk/submit-artifact-feedback").submitArtifactFeedback;
-    try {
-      [appInfo, { startFeedbackUpload }, { submitArtifactFeedback }] =
-        await Promise.all([
-          Promise.resolve(appInfoPromise.current).then(
-            (resolved) => resolved ?? desktopApi.appInfo.get(),
-          ),
-          loadFeedbackUpload(),
-          loadSubmitArtifactFeedback(),
-        ]);
-    } catch (error) {
-      logger.error("Failed to prepare artifact feedback submission", {
-        safe: {},
-        sensitive: { error },
-      });
-      showSubmitError();
-      return false;
-    }
-    const correlationId = createFeedbackCorrelationId(scope.value);
-    const classification = feedbackClassification(value.rating);
-    const description = value.details || "No additional details provided";
-    startFeedbackUpload({
-      scope,
-      hostId,
-      initialCorrelationId: correlationId,
-      internalSlackMessage: undefined,
-      submit: async () => {
-        const planType = scope
-          .get<{
-            getContext(): { user?: { custom?: { plan_type?: unknown } } };
-          } | null>(planContextSignal)
-          ?.getContext().user?.custom?.plan_type;
-        return (
-          await (
-            submitArtifactFeedback as unknown as (
-              scope: ApplicationScope,
-              context: Record<string, unknown>,
-              answers: ArtifactFeedbackValue,
-            ) => Promise<{ feedbackId: string }>
-          )(
-            scope,
-            {
-              appInfo,
-              artifactType: artifact.artifactType,
-              classification,
-              description,
-              fileFormat: artifact.fileFormat,
-              fileSizeBytes,
-              hostId,
-              path: artifact.path,
-              planType: typeof planType === "string" ? planType : null,
-              threadId: correlationId,
-            },
-            value,
-          )
-        ).feedbackId;
-      },
-    });
-    return true;
-  };
-  const open = () => {
-    appInfoPromise.current = desktopApi.appInfo.get().catch(() => null);
-    openDialog(scope, ArtifactFeedbackDialog, {
-      artifacts,
-      onSubmit: submit,
-      showArtifactSelector,
-    });
-  };
-
-  if (variant === "text") {
-    return jsx.jsx(Button, {
-      className: "text-xs",
-      color: "ghostTertiary",
-      onClick: open,
-      children: jsx.jsx(FormattedMessage, {
-        id: "artifactFeedback.button.giveFeedback",
-        defaultMessage: "Give feedback",
-        description:
-          "Text button that opens the artifact feedback survey from a citation file card",
-      }),
-    });
-  }
-  const label = intl.formatMessage({
-    id: "artifactFeedback.button.label",
-    defaultMessage: "Feedback",
-    description:
-      "Tooltip and accessible label for the button that opens the artifact preview feedback survey",
-  });
-  const button =
-    variant === "manualEditHeader"
-      ? jsx.jsx(ManualEditHeaderButton, {
-          uniform: true,
-          "aria-label": label,
-          onClick: open,
-          children: jsx.jsx(Icon, {
-            icon: { assets: { 16: feedbackIcon16, 20: feedbackIcon20 } },
+import { n as V, t as H } from "@rchunk/thumb-mixed";
+function U(e) {
+  let t = (0, q.c)(26),
+    { artifacts: n, fileSizeBytes: r, hostId: i, showArtifactSelector: a, variant: o } = e,
+    l = a !== void 0 && a,
+    f = o === void 0 ? `icon` : o,
+    p = s(D),
+    h = S(),
+    g = (0, J.useRef)(null),
+    _;
+  t[0] !== h || t[1] !== p
+    ? ((_ = () => {
+        p.get(w).danger(
+          h.formatMessage({
+            id: `feedback.dialog.submitError`,
+            defaultMessage: `We couldn't submit your feedback. Please try again in a moment`,
+            description: `Toast shown when feedback submission fails`,
           }),
-        })
-      : jsx.jsx(Button, {
-          color: "ghost",
-          size: "icon",
-          "aria-label": label,
-          onClick: open,
-          children: jsx.jsx(ThumbMixed, { className: "icon-sm" }),
-        });
-  return jsx.jsx(Tooltip, { tooltipContent: label, children: button });
-}
-
-const initializeArtifactFeedbackButton = once(() => {
-  initializeQueryRuntime();
-  initializeFeedbackAssetsRuntime();
-  initializeFeedbackRuntime();
-  React = getReactRuntime();
-  initializeToastRuntime();
-  initializeButtonRuntime();
-  initializeIntlRuntime();
-  initializeDialogRuntime();
-  initializeTooltipRuntime();
-  initializeIconRuntime();
-  initializeFeedbackIconRuntime();
-  initializeArtifactFeedbackRuntime();
-  initializeThumbMixed();
-  initializeApplicationScopeRuntime();
-  initializePlanContextRuntime();
-  initializeFeedbackTransportRuntime();
-  initializeIconAssetRuntime();
-  initializeFeedbackCorrelationRuntime();
-  jsx = getJsxRuntime();
-  initializeLazyRuntime();
-  ArtifactFeedbackDialog = createLazyComponent(
-    async () =>
-      (await import("@rchunk/artifact-feedback-dialog")).ArtifactFeedbackDialog,
-    {
-      errorFallback: jsx.jsx(DialogErrorFallback, {
-        onClose: (scope: ApplicationScope) =>
-          closeDialog(scope, ArtifactFeedbackDialog),
+          { errorAnalytics: { toastId: `feedback.dialog.submitError` } },
+        );
       }),
-    },
+      (t[0] = h),
+      (t[1] = p),
+      (t[2] = _))
+    : (_ = t[2]);
+  let b = _,
+    x;
+  t[3] !== n || t[4] !== r || t[5] !== i || t[6] !== p || t[7] !== b
+    ? ((x = async (e, t) => {
+        let a = t ?? n[0],
+          o,
+          s,
+          l;
+        try {
+          let [e, t, n] = await Promise.all([Promise.resolve(g.current).then(G), Z(), Q()]);
+          ((o = e), ({ startFeedbackUpload: s } = t));
+          let { submitArtifactFeedback: r } = n;
+          l = r;
+        } catch (e) {
+          let t = e;
+          return (
+            c.error(`Failed to prepare artifact feedback submission`, {
+              safe: {},
+              sensitive: { error: t },
+            }),
+            b(),
+            !1
+          );
+        }
+        let u = K(e.rating),
+          d = e.details || `No additional details provided`,
+          f = z(p.value);
+        return (
+          s({
+            scope: p,
+            hostId: i,
+            initialCorrelationId: f,
+            internalSlackMessage: void 0,
+            submit: async () => {
+              let t = p.get(N)?.getContext().user?.custom?.plan_type;
+              return (
+                await l(
+                  p,
+                  {
+                    appInfo: o,
+                    artifactType: a.artifactType,
+                    classification: u,
+                    description: d,
+                    fileFormat: a.fileFormat,
+                    fileSizeBytes: r,
+                    hostId: i,
+                    path: a.path,
+                    planType: typeof t == `string` ? t : null,
+                    threadId: f,
+                  },
+                  e,
+                )
+              ).feedbackId;
+            },
+          }),
+          !0
+        );
+      }),
+      (t[3] = n),
+      (t[4] = r),
+      (t[5] = i),
+      (t[6] = p),
+      (t[7] = b),
+      (t[8] = x))
+    : (x = t[8]);
+  let T = x,
+    E;
+  t[9] !== n || t[10] !== T || t[11] !== p || t[12] !== l
+    ? ((E = () => {
+        ((g.current = L.appInfo.get().catch(W)),
+          A(p, X, { artifacts: n, onSubmit: T, showArtifactSelector: l }));
+      }),
+      (t[9] = n),
+      (t[10] = T),
+      (t[11] = p),
+      (t[12] = l),
+      (t[13] = E))
+    : (E = t[13]);
+  let k = E;
+  if (f === `text`) {
+    let e;
+    t[14] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, Y.jsx)(u, {
+          id: `artifactFeedback.button.giveFeedback`,
+          defaultMessage: `Give feedback`,
+          description: `Text button that opens the artifact feedback survey from a citation file card`,
+        })),
+        (t[14] = e))
+      : (e = t[14]);
+    let n;
+    return (
+      t[15] === k
+        ? (n = t[16])
+        : ((n = (0, Y.jsx)(d, {
+            className: `text-xs`,
+            color: `ghostTertiary`,
+            onClick: k,
+            children: e,
+          })),
+          (t[15] = k),
+          (t[16] = n)),
+      n
+    );
+  }
+  let j;
+  t[17] === h
+    ? (j = t[18])
+    : ((j = h.formatMessage({
+        id: `artifactFeedback.button.label`,
+        defaultMessage: `Feedback`,
+        description: `Tooltip and accessible label for the button that opens the artifact preview feedback survey`,
+      })),
+      (t[17] = h),
+      (t[18] = j));
+  let M = j,
+    P;
+  t[19] !== M || t[20] !== k || t[21] !== f
+    ? ((P =
+        f === `manualEditHeader`
+          ? (0, Y.jsx)(O, {
+              uniform: !0,
+              "aria-label": M,
+              onClick: k,
+              children: (0, Y.jsx)(y, { icon: { assets: { 16: m, 20: v } } }),
+            })
+          : (0, Y.jsx)(d, {
+              color: `ghost`,
+              size: `icon`,
+              "aria-label": M,
+              onClick: k,
+              children: (0, Y.jsx)(H, { className: `icon-sm` }),
+            })),
+      (t[19] = M),
+      (t[20] = k),
+      (t[21] = f),
+      (t[22] = P))
+    : (P = t[22]);
+  let F;
+  return (
+    t[23] !== M || t[24] !== P
+      ? ((F = (0, Y.jsx)(C, { tooltipContent: M, children: P })),
+        (t[23] = M),
+        (t[24] = P),
+        (t[25] = F))
+      : (F = t[25]),
+    F
   );
-  loadFeedbackUpload = () => import("@rchunk/feedback-upload");
-  loadSubmitArtifactFeedback = () => import("@rchunk/submit-artifact-feedback");
-});
-
-export { initializeArtifactFeedbackButton as n, ArtifactFeedbackButton as t };
+}
+function W() {
+  return null;
+}
+function G(e) {
+  return e ?? L.appInfo.get();
+}
+function K(e) {
+  switch (e) {
+    case `better`:
+      return `good-result`;
+    case `same`:
+      return `other`;
+    case `worse`:
+      return `bad-result`;
+  }
+}
+var q, J, Y, X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((q = t()),
+      _(),
+      x(),
+      n(),
+      (J = g()),
+      o(),
+      p(),
+      T(),
+      M(),
+      E(),
+      b(),
+      h(),
+      k(),
+      V(),
+      F(),
+      P(),
+      I(),
+      f(),
+      R(),
+      (Y = i()),
+      r(),
+      (X = a(
+        async () =>
+          (
+            await l(
+              async () => {
+                let { ArtifactFeedbackDialog: e } = await import(
+                  `@rchunk/artifact-feedback-dialog`
+                );
+                return { ArtifactFeedbackDialog: e };
+              },
+              __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7, 8]),
+              import.meta.url,
+            )
+          ).ArtifactFeedbackDialog,
+        { errorFallback: (0, Y.jsx)(j, { onClose: (e) => B(e, X) }) },
+      )),
+      (Z = () =>
+        l(
+          () => import(`@rchunk/feedback-upload`),
+          __vite__mapDeps([9, 1, 2, 3, 4, 5]),
+          import.meta.url,
+        )),
+      (Q = () =>
+        l(
+          () => import(`@rchunk/submit-artifact-feedback`),
+          __vite__mapDeps([10, 1, 2, 3, 4, 5, 11]),
+          import.meta.url,
+        )));
+  }))();
+}
+export { $ as n, U as t };

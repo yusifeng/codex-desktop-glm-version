@@ -1,14 +1,59 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import { n as initializeTerminalThumbnail, t as TerminalThumbnail } from "@rchunk/terminal-thumbnail";
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>): unknown }
-interface ReactRuntime { useState<T>(initial: () => T): [T, (value: T) => void] }
-const { $3: initializeRuntime, FX: initializeSignals, I3: getJsxRuntime, LX: useScope, e6: getReactRuntime } = appSharedChunk as unknown as { $3(): void; FX(): void; I3(): JsxRuntime; LX(signal: unknown): { queryClient: { getQueryData(key: unknown): unknown } }; e6(): ReactRuntime };
-const { $ln: queryKey, Lgn: initializeTerminalSnapshots, Rgn: terminalSnapshots, cet: appScope, let: initializeAppScope, nun: initializeQueries } = appInitialChunk as unknown as { $ln(name: string, input: Record<string, unknown>): unknown; Lgn(): void; Rgn: { getRenderedOutput(id: string): unknown; getSnapshot(id: string): { cwd?: string | null } | null }; cet: unknown; let(): void; nun(): void };
-interface Props { cwd?: string | null; hostId?: string; sessionId: string; title: string }
-let jsx: JsxRuntime;
-function RegisteredTerminalThumbnail({ cwd, hostId, sessionId, title }: Props): unknown { const { queryClient } = useScope(appScope); const [snapshot] = getReactRuntime().useState(() => ({ cwd: terminalSnapshots.getSnapshot(sessionId)?.cwd ?? null, outputTail: terminalSnapshots.getRenderedOutput(sessionId), homeDirectory: hostId == null ? undefined : (queryClient.getQueryData(queryKey("home-directory", { hostId })) as { homeDirectory?: string } | undefined)?.homeDirectory })); return jsx.jsx(TerminalThumbnail, { title, cwd: snapshot.cwd || cwd, homeDirectory: snapshot.homeDirectory, outputTail: snapshot.outputTail }); }
-let initialized = false; function initializeRegisteredTerminalThumbnail(): void { if (initialized) return; initialized = true; initializeRuntime(); initializeSignals(); initializeAppScope(); initializeQueries(); initializeTerminalThumbnail(); initializeTerminalSnapshots(); jsx = getJsxRuntime(); }
-initializeRegisteredTerminalThumbnail();
-export { RegisteredTerminalThumbnail };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, FX as n, I3 as r, LX as i, e6 as a } from "@rchunk/app-shared";
+import {
+  $ln as o,
+  Lgn as s,
+  Rgn as c,
+  cet as l,
+  let as u,
+  nun as d,
+} from "@rchunk/app-initial";
+import { n as f, t as p } from "@rchunk/terminal-thumbnail";
+function m(e) {
+  let t = (0, h.c)(9),
+    { cwd: n, hostId: r, sessionId: a, title: s } = e,
+    u = i(l),
+    d;
+  t[0] !== r || t[1] !== u || t[2] !== a
+    ? ((d = () => ({
+        cwd: c.getSnapshot(a)?.cwd ?? null,
+        outputTail: c.getRenderedOutput(a),
+        homeDirectory:
+          r == null
+            ? void 0
+            : u.queryClient.getQueryData(o(`home-directory`, { hostId: r }))?.homeDirectory,
+      })),
+      (t[0] = r),
+      (t[1] = u),
+      (t[2] = a),
+      (t[3] = d))
+    : (d = t[3]);
+  let [f] = (0, g.useState)(d),
+    m = f.cwd || n,
+    v;
+  return (
+    t[4] !== f.homeDirectory || t[5] !== f.outputTail || t[6] !== m || t[7] !== s
+      ? ((v = (0, _.jsx)(p, {
+          title: s,
+          cwd: m,
+          homeDirectory: f.homeDirectory,
+          outputTail: f.outputTail,
+        })),
+        (t[4] = f.homeDirectory),
+        (t[5] = f.outputTail),
+        (t[6] = m),
+        (t[7] = s),
+        (t[8] = v))
+      : (v = t[8]),
+    v
+  );
+}
+var h, g, _;
+function v() {
+  return (v = e(() => {
+    ((h = t()), n(), (g = a()), u(), d(), f(), s(), (_ = r()));
+  }))();
+}
+v();
+export { m as RegisteredTerminalThumbnail };

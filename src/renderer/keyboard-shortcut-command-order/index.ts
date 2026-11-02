@@ -1,88 +1,120 @@
-import { Dp as commandMenuGroupOrder, Ep as initializeCommandRegistry, Np as getCommand, kp as unifiedTabCommands } from "@rchunk/app-shared";
-import { hasRequiredCommandAccess, isRealtimeVoiceCommand } from "../app-shared/runtime/command-visibility-predicates";
-import "@rchunk/rolldown-runtime";
-
-export interface CommandAccess { codexLocal: boolean; workLocal: boolean; }
-export interface CommandVisibilityOptions {
-  allowDebugMenu?: boolean;
-  browserEnabled?: boolean;
-  commandAccess: CommandAccess;
-  fileLanguageFeaturesEnabled?: boolean;
-  isAutomationsEnabled?: boolean;
-  isDictationEnabled?: boolean;
-  isGlobalDictationEnabled?: boolean;
-  isHotkeyWindowEnabled?: boolean;
-  isPriorityFilterEnabled?: boolean;
-  isRealtimeVoiceCommandEnabled?: boolean;
-  isUnifiedTabStripEnabled?: boolean;
-  modeSwitchAvailable?: boolean;
-  platform?: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { Dp as t, Ep as n, Gp as r, Np as i, kp as a, zp as o } from "@rchunk/app-shared";
+function s(
+  e,
+  {
+    allowDebugMenu: t,
+    browserEnabled: n,
+    commandAccess: r,
+    fileLanguageFeaturesEnabled: a,
+    isAutomationsEnabled: s,
+    isDictationEnabled: l,
+    isGlobalDictationEnabled: u,
+    isHotkeyWindowEnabled: d,
+    isPriorityFilterEnabled: f,
+    isRealtimeVoiceCommandEnabled: p,
+    isUnifiedTabStripEnabled: m,
+    modeSwitchAvailable: h,
+    platform: g,
+  },
+) {
+  let _ = i(e);
+  return (_ != null && !o(_, r)) ||
+    !c(e, {
+      allowDebugMenu: t,
+      fileLanguageFeaturesEnabled: a,
+      isAutomationsEnabled: s,
+      isDictationEnabled: l,
+      isGlobalDictationEnabled: u,
+      isHotkeyWindowEnabled: d,
+      isPriorityFilterEnabled: f,
+      isRealtimeVoiceCommandEnabled: p,
+      isUnifiedTabStripEnabled: m,
+      modeSwitchAvailable: h,
+    })
+    ? !1
+    : e === `copyConversationPath`
+      ? g === `macOS`
+      : e === `stepWorkspaceLayout`
+        ? m || n
+        : e === `hardReloadBrowserPage` || e === `openBrowserTab` || e === `reloadBrowserPage`
+          ? n
+          : e !== `toggleTraceRecording`;
 }
-export interface ShortcutCommand extends Record<string, unknown> {
-  commandMenuGroupKey?: string | null;
-  id: string;
-  kind: string;
-  requiredAccess?: "codexLocal" | "codexOrWorkLocal";
+function c(
+  e,
+  {
+    allowDebugMenu: t,
+    fileLanguageFeaturesEnabled: n,
+    isAutomationsEnabled: i,
+    isDictationEnabled: o,
+    isGlobalDictationEnabled: s,
+    isHotkeyWindowEnabled: c,
+    isPriorityFilterEnabled: l,
+    isRealtimeVoiceCommandEnabled: u,
+    isUnifiedTabStripEnabled: d,
+    modeSwitchAvailable: f,
+  },
+) {
+  return e === `showWorkspaceTabView` || a.some((t) => t === e)
+    ? d
+    : e === `toggleDebugModal`
+      ? t === !0
+      : !n &&
+          (e === `file.goToDefinition` || e === `file.navigateBack` || e === `file.navigateForward`)
+        ? !1
+        : e === `hotkeyWindow`
+          ? c
+          : e === `manageTasks`
+            ? i
+            : e === `switchToMode1` || e === `switchToMode2` || e === `switchToMode3`
+              ? f
+              : e === `togglePriorityFilter`
+                ? l
+                : r(e)
+                  ? u
+                  : e === `composer.startDictation`
+                    ? o
+                    : e === `globalDictationHold` || e === `globalDictationToggle`
+                      ? s
+                      : !0;
 }
-
-function isCommandAvailable(commandId: string, options: Omit<CommandVisibilityOptions, "browserEnabled" | "commandAccess" | "platform">): boolean {
-  if (commandId === "showWorkspaceTabView" || unifiedTabCommands.some(id => id === commandId)) return options.isUnifiedTabStripEnabled === true;
-  if (commandId === "toggleDebugModal") return options.allowDebugMenu === true;
-  if (!options.fileLanguageFeaturesEnabled && ["file.goToDefinition", "file.navigateBack", "file.navigateForward"].includes(commandId)) return false;
-  if (commandId === "hotkeyWindow") return options.isHotkeyWindowEnabled === true;
-  if (commandId === "manageTasks") return options.isAutomationsEnabled === true;
-  if (["switchToMode1", "switchToMode2", "switchToMode3"].includes(commandId)) return options.modeSwitchAvailable === true;
-  if (commandId === "togglePriorityFilter") return options.isPriorityFilterEnabled === true;
-  if (isRealtimeVoiceCommand(commandId)) return options.isRealtimeVoiceCommandEnabled === true;
-  if (commandId === "composer.startDictation") return options.isDictationEnabled === true;
-  if (commandId === "globalDictationHold" || commandId === "globalDictationToggle") return options.isGlobalDictationEnabled === true;
-  return true;
+function l(e, t) {
+  return e.id === `personalitySettings` || !o(e, t) ? !1 : c(e.id, t);
 }
-
-function shouldShowShortcutCommand(commandId: string, options: CommandVisibilityOptions): boolean {
-  const command = getCommand(commandId);
-  if (command != null && !hasRequiredCommandAccess(command, options.commandAccess)) return false;
-  if (!isCommandAvailable(commandId, options)) return false;
-  if (commandId === "copyConversationPath") return options.platform === "macOS";
-  if (commandId === "stepWorkspaceLayout") return options.isUnifiedTabStripEnabled === true || options.browserEnabled === true;
-  if (["hardReloadBrowserPage", "openBrowserTab", "reloadBrowserPage"].includes(commandId)) return options.browserEnabled === true;
-  return commandId !== "toggleTraceRecording";
+function u() {
+  return (u = e(() => {
+    n();
+  }))();
 }
-
-function shouldShowShortcutDefinition(command: ShortcutCommand, options: Omit<CommandVisibilityOptions, "browserEnabled" | "platform">): boolean {
-  return command.id !== "personalitySettings" && hasRequiredCommandAccess(command, options.commandAccess) && isCommandAvailable(command.id, options);
+function d(e, t) {
+  let n = p(e) - p(t);
+  if (n !== 0) return n;
+  let r = f(e.id) - f(t.id);
+  return r === 0 ? e.id.localeCompare(t.id) : r;
 }
-
-let priorityCommandIds: string[] | undefined;
-function commandPriority(commandId: string): number {
-  if (priorityCommandIds == null) throw new Error("Keyboard shortcut command order is not initialized");
-  const index = priorityCommandIds.indexOf(commandId);
-  return index === -1 ? priorityCommandIds.length : index;
+function f(e) {
+  let t = m.indexOf(e);
+  return t === -1 ? m.length : t;
 }
-function groupPriority(command: ShortcutCommand): number {
-  return command.kind !== "webview" || command.commandMenuGroupKey == null
-    ? commandMenuGroupOrder.length
-    : commandMenuGroupOrder.indexOf(command.commandMenuGroupKey);
+function p(e) {
+  return e.kind !== `webview` || e.commandMenuGroupKey == null
+    ? t.length
+    : t.indexOf(e.commandMenuGroupKey);
 }
-function compareShortcutCommands(left: ShortcutCommand, right: ShortcutCommand): number {
-  const groupDifference = groupPriority(left) - groupPriority(right);
-  if (groupDifference !== 0) return groupDifference;
-  const commandDifference = commandPriority(left.id) - commandPriority(right.id);
-  return commandDifference === 0 ? left.id.localeCompare(right.id) : commandDifference;
+var m;
+function h() {
+  return (h = e(() => {
+    (n(),
+      (m = [
+        `newTask`,
+        `temporaryChat`,
+        `quickChat`,
+        `archiveThread`,
+        `newProjectlessTask`,
+        `openSideChat`,
+      ]));
+  }))();
 }
-
-let availabilityInitialized = false;
-function initializeShortcutAvailability(): void {
-  if (availabilityInitialized) return;
-  availabilityInitialized = true;
-  initializeCommandRegistry();
-}
-let initialized = false;
-function initializeKeyboardShortcutCommandOrder(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeCommandRegistry();
-  priorityCommandIds = ["newTask", "temporaryChat", "quickChat", "archiveThread", "newProjectlessTask", "openSideChat"];
-}
-
-export { shouldShowShortcutDefinition as a, shouldShowShortcutCommand as i, initializeKeyboardShortcutCommandOrder as n, initializeShortcutAvailability as r, compareShortcutCommands as t };
+export { l as a, s as i, h as n, u as r, d as t };

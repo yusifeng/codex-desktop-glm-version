@@ -1,8 +1,38 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-interface EditorHeaderControls { annotationControl: unknown; commentsControl: unknown; editingControls: unknown; navigationControl: unknown; supplementalActions: unknown; zoomControl: unknown }
-let runtime: JsxRuntime | undefined; function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function t({ paginated }: { paginated: boolean }): EditorHeaderControls { const placeholder = (kind: string) => jsx().jsx("span", { inert: true, "aria-hidden": true, "data-control": kind }); return { annotationControl: null, commentsControl: null, editingControls: null, navigationControl: paginated ? placeholder("navigation") : null, supplementalActions: null, zoomControl: placeholder("zoom") }; }
-function n(): void {}
-export { n, t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { I3 as t } from "@rchunk/app-shared";
+import { Grt as n, Irt as r, Lrt as i, Rrt as a } from "@rchunk/app-initial";
+function o({ paginated: e }) {
+  return {
+    annotationControl: null,
+    commentsControl: null,
+    editingControls: null,
+    navigationControl: e
+      ? (0, s.jsx)(`span`, {
+          inert: !0,
+          "aria-hidden": !0,
+          className: `pointer-events-none`,
+          children: (0, s.jsx)(r, {
+            currentPage: 1,
+            onNextPage: c,
+            onPreviousPage: c,
+            totalPages: 1,
+          }),
+        })
+      : null,
+    supplementalActions: null,
+    zoomControl: (0, s.jsx)(`span`, {
+      inert: !0,
+      "aria-hidden": !0,
+      className: `pointer-events-none`,
+      children: (0, s.jsx)(n, { zoomPercent: 100, onZoomPercentChange: c }),
+    }),
+  };
+}
+var s, c;
+function l() {
+  return (l = e(() => {
+    (a(), i(), (s = t()), (c = () => void 0));
+  }))();
+}
+export { l as n, o as t };

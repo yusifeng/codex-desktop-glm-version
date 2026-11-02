@@ -1,33 +1,125 @@
-import "@rchunk/rolldown-runtime";
-import { rZ as createDerivedState } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/app-primary";
-
-export interface ConversationAction { action_v2: { action_enum: string; conversation_id?: string; current_node_id?: string; items?: ConversationAction[]; model_slug?: string; title?: string; update_model_picker?: boolean } }
-export interface ActionScope { get(key: unknown, parameter: unknown): unknown }
-export type ActionOverride = (action: ConversationAction) => boolean | Promise<boolean>;
-export interface RegenerateServices { getCurrentMessageId(scope: ActionScope, conversationId: string): string | null; getConversationModel(scope: ActionScope, conversationId: string): unknown; getMessage(scope: ActionScope, conversationId: string, messageId: string): { message: unknown } | null; resolveModel(model: unknown, slug?: string): unknown; retry(input: { conversationId: string; isTemporaryChat?: boolean; messageId: string; model: unknown }): Promise<void>; updateModel?(scope: ActionScope, conversationId: string, model: unknown): void }
-
-function createRegenerateActionOverride(input: { allowedModelSlug?: string | null; conversationId: string; isTemporaryChat?: boolean; scope: ActionScope; services?: RegenerateServices }): ActionOverride {
-  return async action => {
-    const target = action.action_v2;
-    if (target.action_enum !== "regenerate" || (input.allowedModelSlug != null && target.model_slug !== input.allowedModelSlug) || !input.services) return false;
-    const messageId = input.services.getCurrentMessageId(input.scope, input.conversationId); if (!messageId) return false;
-    const message = input.services.getMessage(input.scope, input.conversationId, messageId); if (!message) return false;
-    const model = input.services.resolveModel(input.services.getConversationModel(input.scope, input.conversationId), target.model_slug);
-    if (target.update_model_picker) input.services.updateModel?.(input.scope, input.conversationId, model);
-    await input.services.retry({ conversationId: input.conversationId, isTemporaryChat: input.isTemporaryChat, messageId, model });
-    return true;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, QI as n, ZI as r, rZ as i } from "@rchunk/app-shared";
+import {
+  $Bt as a,
+  B0 as o,
+  BBt as s,
+  G0 as c,
+  H0 as l,
+  IAt as u,
+  K0 as d,
+  LAt as f,
+  NVt as p,
+  QI as m,
+  RIt as h,
+  V0 as g,
+  VVt as _,
+  WIt as v,
+  YHt as y,
+  ZI as b,
+  aUt as x,
+  cjt as S,
+  iln as C,
+  jVt as w,
+  nln as T,
+  q0 as E,
+  uHt as D,
+  ujt as O,
+  wVt as k,
+  z0 as A,
+} from "@rchunk/app-initial";
+import { Hm as j, Km as M, Vm as N } from "@rchunk/app-primary";
+function P({ scope: e, allowedModelSlug: t, conversationId: n, isTemporaryChat: r }) {
+  return async (i) => {
+    let a = i.action_v2;
+    if (a.action_enum !== `regenerate` || (t != null && a.model_slug !== t)) return !1;
+    let o = e.get(w, n);
+    if (o == null) return !1;
+    let s = e.get(l, { conversationId: n, messageId: o }),
+      u = e.get(g, n);
+    if (s == null) return !1;
+    let d = T(u, a.model_slug),
+      f = {
+        ...c(s.message, u, { slug: a.model_slug, thinkingEffort: null, versionId: d }),
+        slug: a.model_slug,
+        versionId: d,
+      };
+    return (
+      a.update_model_picker && v(e, n, { slug: a.model_slug, thinkingEffort: null, versionId: d }),
+      await E(e, {
+        conversationId: n,
+        isTemporaryChat: r,
+        messageId: o,
+        retry: { model: f, source: `beacon` },
+      }),
+      !0
+    );
   };
 }
-function createShareConversationOverride(input: { canShare: boolean; conversationId?: string | null; onShare?(scope: ActionScope, conversationId: string, title: string | undefined, currentNodeId: string): boolean | Promise<boolean>; scope: ActionScope }): ActionOverride | undefined {
-  if (!input.canShare || input.conversationId == null) return undefined;
-  return action => { const target = action.action_v2, nodeId = target.current_node_id?.trim() ?? ""; return target.action_enum !== "share_conversation" || target.conversation_id !== input.conversationId || nodeId.length === 0 ? false : input.onShare?.(input.scope, input.conversationId, target.title, nodeId) ?? false; };
+function F() {
+  return (F = e(() => {
+    (h(), C(), D(), d());
+  }))();
 }
-function containsShareConversation(actions: ConversationAction[]): boolean { return actions.some(action => action.action_v2.action_enum === "share_conversation" || action.action_v2.action_enum === "dropdown" && (action.action_v2.items ?? []).some(item => item.action_v2.action_enum === "share_conversation")); }
-const SHARE_ACTION_PENDING = Symbol("share-action-pending"), SHARE_ACTION_UNAVAILABLE = Symbol("share-action-unavailable");
-function resolveConversationActionOverride(input: { action: ConversationAction; getActionOverride?(action: ConversationAction): unknown; shareConversationEligible?: boolean | null; shareConversationOverride?: ActionOverride }): unknown { return input.action.action_v2.action_enum === "share_conversation" ? input.shareConversationEligible == null ? SHARE_ACTION_PENDING : input.shareConversationEligible && input.shareConversationOverride ? input.shareConversationOverride : SHARE_ACTION_UNAVAILABLE : input.getActionOverride?.(input.action); }
-const shareConversationEligibility = createDerivedState({} as never, () => undefined);
-function initializeShareConversationAction(): void { void shareConversationEligibility; }
-function initializeRegenerateAction(): void {}
-export { initializeShareConversationAction as a, containsShareConversation as i, createShareConversationOverride as n, createRegenerateActionOverride as o, resolveConversationActionOverride as r, initializeRegenerateAction as s, shareConversationEligibility as t };
+function I({ scope: e, canShare: t, conversationId: n }) {
+  if (t && n != null)
+    return (t) => {
+      let r = t.action_v2;
+      return r.action_enum !== `share_conversation` ||
+        r.conversation_id !== n ||
+        r.current_node_id.trim().length === 0
+        ? !1
+        : m(e, n, r.title, null, r.current_node_id, A.CHATGPT_SHARE_FLOW_SOURCE_BEACON);
+    };
+}
+function L(e) {
+  return e.some(
+    (e) =>
+      e.action_v2.action_enum === `share_conversation` ||
+      (e.action_v2.action_enum === `dropdown` &&
+        e.action_v2.items.some((e) => e.action_v2.action_enum === `share_conversation`)),
+  );
+}
+function R({
+  action: e,
+  getActionOverride: t,
+  shareConversationEligible: n,
+  shareConversationOverride: r,
+}) {
+  return e.action_v2.action_enum === `share_conversation`
+    ? n == null
+      ? N
+      : n && r != null
+        ? r
+        : j
+    : t?.(e);
+}
+var z;
+function B() {
+  return (B = e(() => {
+    (o(),
+      t(),
+      M(),
+      n(),
+      a(),
+      b(),
+      O(),
+      y(),
+      D(),
+      f(),
+      (z = i(r, (e, { get: t }) => {
+        let n = t(k, e),
+          r = t(p, e),
+          i = t(s, n),
+          a = i.data;
+        if (!r && n != null && a == null && i.isLoading) return;
+        let o = t(_, e) ?? (a == null ? null : u(a)),
+          c = t(S, o),
+          l = c.data;
+        if (!(o != null && l == null && c.isLoading))
+          return (r || a != null) && (o == null || x(l));
+      })));
+  }))();
+}
+export { B as a, L as i, I as n, P as o, R as r, F as s, z as t };

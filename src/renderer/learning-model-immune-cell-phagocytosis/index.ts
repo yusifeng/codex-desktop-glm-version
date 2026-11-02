@@ -1,20 +1,75 @@
-// Immune-cell phagocytosis stage learning model.
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-
-interface StageValues { stage?: number | null } interface MessageDescriptor { id: string; defaultMessage: string } interface MessageFormatter { formatMessage(descriptor: MessageDescriptor): string }
-const phagocytosisStageControl = { min: 1, max: 5, step: 1, defaultValue: 1 };
-const phagocytosisStages = [
-  { id: "recognition", label: { id: "learningBlock.immuneCellPhagocytosis.stage.recognition", defaultMessage: "Recognition" }, caption: { id: "learningBlock.immuneCellPhagocytosis.caption.recognition", defaultMessage: "Recognition: receptors bind the pathogen." } },
-  { id: "cup", label: { id: "learningBlock.immuneCellPhagocytosis.stage.cup", defaultMessage: "Membrane wrapping" }, caption: { id: "learningBlock.immuneCellPhagocytosis.caption.cup", defaultMessage: "Membrane wrapping: the cell surrounds it." } },
-  { id: "phagosome", label: { id: "learningBlock.immuneCellPhagocytosis.stage.phagosome", defaultMessage: "Sealed phagosome" }, caption: { id: "learningBlock.immuneCellPhagocytosis.caption.phagosome", defaultMessage: "Sealed phagosome: a vesicle encloses it." } },
-  { id: "fusion", label: { id: "learningBlock.immuneCellPhagocytosis.stage.fusion", defaultMessage: "Lysosome fusion" }, caption: { id: "learningBlock.immuneCellPhagocytosis.caption.fusion", defaultMessage: "Lysosome fusion: the compartments merge." } },
-  { id: "digestion", label: { id: "learningBlock.immuneCellPhagocytosis.stage.digestion", defaultMessage: "Digestion" }, caption: { id: "learningBlock.immuneCellPhagocytosis.caption.digestion", defaultMessage: "Digestion: enzymes break down the pathogen." } },
-] as const;
-const normalizePhagocytosisStage = (values: StageValues) => ({ stage: Math.min(phagocytosisStageControl.max, Math.max(phagocytosisStageControl.min, Number.isFinite(values.stage) ? Math.round(Number(values.stage)) : phagocytosisStageControl.defaultValue)) });
-const derivePhagocytosisStage = (values: StageValues) => { const safeValues = normalizePhagocytosisStage(values); return { safeValues, activeStage: phagocytosisStages[safeValues.stage - 1] }; };
-const formatMessage = (descriptor: MessageDescriptor, formatter?: MessageFormatter): string => formatter ? formatter.formatMessage(descriptor) : descriptor.defaultMessage;
-const formatPhagocytosisLabel = (stage: (typeof phagocytosisStages)[number], formatter?: MessageFormatter): string => formatMessage(stage.label, formatter);
-const formatPhagocytosisCaption = (stage: (typeof phagocytosisStages)[number], formatter?: MessageFormatter): string => formatMessage(stage.caption, formatter);
-function initializePhagocytosisModel(): void {}
-export { initializePhagocytosisModel as a, formatPhagocytosisLabel as i, derivePhagocytosisStage as n, normalizePhagocytosisStage as o, formatPhagocytosisCaption as r, phagocytosisStageControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { G2 as t, K2 as n } from "@rchunk/app-shared";
+var r, i, a, o, s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    (n(),
+      (r = { min: 1, max: 5, step: 1, defaultValue: 1 }),
+      (i = t({
+        recognitionLabel: {
+          id: `learningBlock.immuneCellPhagocytosis.stage.recognition`,
+          defaultMessage: `Recognition`,
+        },
+        recognitionCaption: {
+          id: `learningBlock.immuneCellPhagocytosis.caption.recognition`,
+          defaultMessage: `Recognition: receptors bind the pathogen.`,
+        },
+        cupLabel: {
+          id: `learningBlock.immuneCellPhagocytosis.stage.cup`,
+          defaultMessage: `Membrane wrapping`,
+        },
+        cupCaption: {
+          id: `learningBlock.immuneCellPhagocytosis.caption.cup`,
+          defaultMessage: `Membrane wrapping: the cell surrounds it.`,
+        },
+        phagosomeLabel: {
+          id: `learningBlock.immuneCellPhagocytosis.stage.phagosome`,
+          defaultMessage: `Sealed phagosome`,
+        },
+        phagosomeCaption: {
+          id: `learningBlock.immuneCellPhagocytosis.caption.phagosome`,
+          defaultMessage: `Sealed phagosome: a vesicle encloses it.`,
+        },
+        fusionLabel: {
+          id: `learningBlock.immuneCellPhagocytosis.stage.fusion`,
+          defaultMessage: `Lysosome fusion`,
+        },
+        fusionCaption: {
+          id: `learningBlock.immuneCellPhagocytosis.caption.fusion`,
+          defaultMessage: `Lysosome fusion: the compartments merge.`,
+        },
+        digestionLabel: {
+          id: `learningBlock.immuneCellPhagocytosis.stage.digestion`,
+          defaultMessage: `Digestion`,
+        },
+        digestionCaption: {
+          id: `learningBlock.immuneCellPhagocytosis.caption.digestion`,
+          defaultMessage: `Digestion: enzymes break down the pathogen.`,
+        },
+      })),
+      (a = [
+        { id: `recognition`, label: i.recognitionLabel, caption: i.recognitionCaption },
+        { id: `cup`, label: i.cupLabel, caption: i.cupCaption },
+        { id: `phagosome`, label: i.phagosomeLabel, caption: i.phagosomeCaption },
+        { id: `fusion`, label: i.fusionLabel, caption: i.fusionCaption },
+        { id: `digestion`, label: i.digestionLabel, caption: i.digestionCaption },
+      ]),
+      (o = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (s = (e) => ({
+        stage: o(
+          Number.isFinite(e.stage) ? Math.round(Number(e.stage)) : r.defaultValue,
+          r.min,
+          r.max,
+        ),
+      })),
+      (c = (e) => {
+        let t = s(e);
+        return { safeValues: t, activeStage: a[t.stage - 1] };
+      }),
+      (l = (e, t) => (t ? t.formatMessage(e) : e.defaultMessage)),
+      (u = (e, t) => l(e.label, t)),
+      (d = (e, t) => l(e.caption, t)));
+  }))();
+}
+export { f as a, u as i, c as n, s as o, d as r, r as t };

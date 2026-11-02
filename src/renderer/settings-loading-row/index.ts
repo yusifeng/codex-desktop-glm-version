@@ -1,34 +1,36 @@
-import "@rchunk/rolldown-runtime";
-import {
-  I3 as getJsxRuntime,
-  Qh as LoadingSpinner,
-  rl as SettingsRow,
-} from "@rchunk/app-shared";
-
-interface SettingsLoadingRowProps {
-  children?: unknown;
-}
-
-const jsx = getJsxRuntime();
-
-function SettingsLoadingRow({ children }: SettingsLoadingRowProps): unknown {
-  return jsx.jsx("div", {
-    role: "status",
-    children: jsx.jsx(SettingsRow, {
-      label: jsx.jsxs("span", {
-        className: "flex items-center gap-2 font-normal text-secondary",
-        children: [
-          jsx.jsx(LoadingSpinner, {
-            className: "icon-xs shrink-0 text-secondary",
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, $h as n, I3 as r, Qh as i, al as a, rl as o } from "@rchunk/app-shared";
+function s(e) {
+  let t = (0, c.c)(3),
+    { children: n } = e,
+    r;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((r = (0, l.jsx)(i, { className: `icon-xs shrink-0 text-secondary` })), (t[0] = r))
+    : (r = t[0]);
+  let a;
+  return (
+    t[1] === n
+      ? (a = t[2])
+      : ((a = (0, l.jsx)(`div`, {
+          role: `status`,
+          children: (0, l.jsx)(o, {
+            label: (0, l.jsxs)(`span`, {
+              className: `flex items-center gap-2 font-normal text-secondary`,
+              children: [r, (0, l.jsx)(`span`, { className: `text-balance`, children: n })],
+            }),
+            control: null,
           }),
-          jsx.jsx("span", { className: "text-balance", children }),
-        ],
-      }),
-      control: null,
-    }),
-  });
+        })),
+        (t[1] = n),
+        (t[2] = a)),
+    a
+  );
 }
-
-function initializeSettingsLoadingRow(): void {}
-
-export { initializeSettingsLoadingRow as n, SettingsLoadingRow as t };
+var c, l;
+function u() {
+  return (u = e(() => {
+    ((c = t()), n(), a(), (l = r()));
+  }))();
+}
+export { u as n, s as t };

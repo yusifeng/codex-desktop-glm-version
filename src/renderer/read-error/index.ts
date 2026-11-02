@@ -1,8 +1,57 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/detail-section-state";
-interface ReadErrorProps { children?: unknown; loading?: boolean; onRetry?(): void }
-let runtime: JsxRuntime | undefined; function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function t({ children = "Unable to load this section", loading = false, onRetry }: ReadErrorProps): unknown { return jsx().jsxs("div", { role: "alert", children: [children, onRetry == null ? null : jsx().jsx("button", { type: "button", disabled: loading, onClick: onRetry, children: loading ? "Trying again…" : "Try again" })] }); }
-function n(): void {}
-export { n, t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i, Yh as a, Zh as o } from "@rchunk/app-shared";
+import { n as s, t as c } from "@rchunk/detail-section-state";
+function l(e) {
+  let t = (0, u.c)(8),
+    { children: n, loading: r, onRetry: o } = e,
+    s;
+  t[0] === n
+    ? (s = t[1])
+    : ((s =
+        n ??
+        (0, d.jsx)(i, {
+          id: `workspaceAgents.detail.readError`,
+          defaultMessage: `Unable to load this section`,
+          description: `Error shown when a Workspace Agent detail tab cannot load`,
+        })),
+      (t[0] = n),
+      (t[1] = s));
+  let l;
+  t[2] !== r || t[3] !== o
+    ? ((l =
+        o == null
+          ? null
+          : (0, d.jsx)(a, {
+              color: `secondary`,
+              size: `toolbar`,
+              loading: r,
+              onClick: o,
+              children: (0, d.jsx)(i, {
+                id: `workspaceAgents.detail.retry`,
+                defaultMessage: `Try again`,
+                description: `Button that retries loading a Workspace Agent detail section or memory file after a read fails`,
+              }),
+            })),
+      (t[2] = r),
+      (t[3] = o),
+      (t[4] = l))
+    : (l = t[4]);
+  let f;
+  return (
+    t[5] !== s || t[6] !== l
+      ? ((f = (0, d.jsxs)(c, { role: `alert`, children: [s, l] })),
+        (t[5] = s),
+        (t[6] = l),
+        (t[7] = f))
+      : (f = t[7]),
+    f
+  );
+}
+var u, d;
+function f() {
+  return (f = e(() => {
+    ((u = t()), r(), o(), s(), (d = n()));
+  }))();
+}
+export { f as n, l as t };

@@ -1,68 +1,72 @@
-import {
-  $3 as getCompilerRuntime,
-  I3 as getJsxRuntime,
-  K2 as initializeMessageRuntime,
-  Y2 as FormattedMessage,
-} from "@rchunk/app-shared";
-
-interface CompilerRuntime {
-  c(size: number): unknown[];
-}
-
-let compilerRuntime: CompilerRuntime;
-let jsx: ReturnType<typeof getJsxRuntime>;
-
-export type PullRequestStatus = "closed" | "draft" | "merged" | "open";
-
-export interface PullRequestStatusLabelProps {
-  status: PullRequestStatus;
-}
-
-function PullRequestStatusLabel({ status }: PullRequestStatusLabelProps): unknown {
-  const cache = compilerRuntime.c(4);
-  const slot = status === "closed"
-    ? 0
-    : status === "draft"
-      ? 1
-      : status === "merged"
-        ? 2
-        : status === "open"
-          ? 3
-          : -1;
-  if (slot < 0) return undefined;
-  if (cache[slot] === Symbol.for("react.memo_cache_sentinel")) {
-    const message = status === "closed"
-      ? {
-          id: "pullRequestSidePanel.state.closed",
-          defaultMessage: "Closed",
-          description: "Closed pull request state shown in the side panel header",
-        }
-      : status === "draft"
-        ? {
-            id: "pullRequestSidePanel.state.draft",
-            defaultMessage: "Draft",
-            description: "Draft pull request state shown in the side panel header",
-          }
-        : status === "merged"
-          ? {
-              id: "pullRequestSidePanel.state.merged",
-              defaultMessage: "Merged",
-              description: "Merged pull request state shown in the side panel header",
-            }
-          : {
-              id: "pullRequestSidePanel.state.open",
-              defaultMessage: "Ready for review",
-              description: "Ready for review pull request state shown in the side panel",
-            };
-    cache[slot] = jsx.jsx(FormattedMessage, message);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i } from "@rchunk/app-shared";
+function a(e) {
+  let t = (0, o.c)(4),
+    { status: n } = e;
+  switch (n) {
+    case `closed`: {
+      let e;
+      return (
+        t[0] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, s.jsx)(i, {
+              id: `pullRequestSidePanel.state.closed`,
+              defaultMessage: `Closed`,
+              description: `Closed pull request state shown in the side panel header`,
+            })),
+            (t[0] = e))
+          : (e = t[0]),
+        e
+      );
+    }
+    case `draft`: {
+      let e;
+      return (
+        t[1] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, s.jsx)(i, {
+              id: `pullRequestSidePanel.state.draft`,
+              defaultMessage: `Draft`,
+              description: `Draft pull request state shown in the side panel header`,
+            })),
+            (t[1] = e))
+          : (e = t[1]),
+        e
+      );
+    }
+    case `merged`: {
+      let e;
+      return (
+        t[2] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, s.jsx)(i, {
+              id: `pullRequestSidePanel.state.merged`,
+              defaultMessage: `Merged`,
+              description: `Merged pull request state shown in the side panel header`,
+            })),
+            (t[2] = e))
+          : (e = t[2]),
+        e
+      );
+    }
+    case `open`: {
+      let e;
+      return (
+        t[3] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, s.jsx)(i, {
+              id: `pullRequestSidePanel.state.open`,
+              defaultMessage: `Ready for review`,
+              description: `Ready for review pull request state shown in the side panel`,
+            })),
+            (t[3] = e))
+          : (e = t[3]),
+        e
+      );
+    }
   }
-  return cache[slot];
 }
-
-function initializePullRequestStatusLabel(): void {
-  compilerRuntime = getCompilerRuntime() as unknown as CompilerRuntime;
-  initializeMessageRuntime();
-  jsx = getJsxRuntime();
+var o, s;
+function c() {
+  return (c = e(() => {
+    ((o = t()), r(), (s = n()));
+  }))();
 }
-
-export { initializePullRequestStatusLabel as n, PullRequestStatusLabel as t };
+export { c as n, a as t };

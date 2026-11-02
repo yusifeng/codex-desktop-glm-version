@@ -1,21 +1,27 @@
-// Vector-components learning-model manifest. Release chunk: type-8f4414a8a97c.js.
-import "@rchunk/rolldown-runtime";
-
-const vectorComponentsSpecification = {
-  type: "VECTOR_COMPONENTS",
-  version: 1,
-  thumbnailAssetKey: "vector-components-v1",
-  canonicalFormula: "x=r\\cos\\theta,\\qquad y=r\\sin\\theta",
-  canonicalFormulaAliases: [
-    "\\vec v=\\langle r\\cos\\theta,\\ r\\sin\\theta\\rangle",
-    "(x,y)=(r\\cos\\theta,r\\sin\\theta)",
-  ],
-  parameters: {
-    magnitude: { kind: "number" as const, defaultValue: 6, min: 0.1, max: 100 },
-    angleDeg: { kind: "number" as const, defaultValue: 35, min: -180, max: 180 },
-  },
-};
-
-function initializeVectorComponentsSpecification(): void {}
-
-export { vectorComponentsSpecification as n, initializeVectorComponentsSpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((t = `VECTOR_COMPONENTS`),
+      (n = `vector-components-v1`),
+      (r = `x=r\\cos\\theta,\\qquad y=r\\sin\\theta`),
+      (i = [
+        `\\vec v=\\langle r\\cos\\theta,\\ r\\sin\\theta\\rangle`,
+        `(x,y)=(r\\cos\\theta,r\\sin\\theta)`,
+      ]),
+      (a = {
+        magnitude: { kind: `number`, defaultValue: 6, min: 0.1, max: 100 },
+        angleDeg: { kind: `number`, defaultValue: 35, min: -180, max: 180 },
+      }),
+      (o = {
+        type: t,
+        version: 1,
+        thumbnailAssetKey: n,
+        canonicalFormula: r,
+        canonicalFormulaAliases: i,
+        parameters: a,
+      }));
+  }))();
+}
+export { o as n, s as t };

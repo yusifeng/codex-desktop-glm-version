@@ -1,105 +1,181 @@
-// Voice reasoning downgrade notice. Release chunk: notice-2197fe51f059.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as announcementStateChunk from "@rchunk/task-announcement-state";
-
-interface Props {
-  conversationId: string;
-  hostId: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  I3 as i,
+  K2 as a,
+  LX as o,
+  QI as s,
+  Y2 as c,
+  ZI as l,
+  e6 as u,
+} from "@rchunk/app-shared";
+import {
+  S8 as d,
+  f8 as f,
+  n7 as p,
+  r7 as m,
+  u8 as h,
+  w8 as g,
+} from "@rchunk/app-initial";
+import { n as _, r as v, t as y } from "@rchunk/task-announcement-state";
+function b(e) {
+  let t = (0, T.c)(3),
+    r = n(v, e),
+    i;
+  return (
+    t[0] !== e || t[1] !== r
+      ? ((i = r == null ? null : (0, D.jsx)(x, { ...e, sessionId: r })),
+        (t[0] = e),
+        (t[1] = r),
+        (t[2] = i))
+      : (i = t[2]),
+    i
+  );
 }
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>): unknown;
-}
-interface SharedRuntime {
-  BX(signal: unknown, parameter: unknown): unknown;
-  I3(): JsxRuntime;
-  [key: string]: unknown;
-}
-
-const shared = appSharedChunk as unknown as SharedRuntime;
-const initial = appInitialChunk as unknown as Record<string, unknown>;
-const state = announcementStateChunk as unknown as Record<string, unknown>;
-const jsxRuntime = shared.I3();
-
-function VoiceReasoningNoticeController(props: Props): unknown {
-  const sessionId = shared.BX(state.r, props);
-  if (sessionId == null) return null;
-  return jsxRuntime.jsx(VoiceReasoningNotice, { ...props, sessionId });
-}
-
-function VoiceReasoningNotice({
-  conversationId,
-  hostId,
-  sessionId,
-}: Props & { sessionId: unknown }): unknown {
-  const useModelSettings = initial.f8 as
-    | ((conversationId: string) => {
-        modelSettings: {
-          model: string;
-          reasoningEffort?: string | null;
-          isLoading?: boolean;
-        };
-        setModelAndReasoningEffort(
-          model: string,
-          effort: string,
-        ): Promise<boolean>;
-      })
-    | undefined;
-  const settings = useModelSettings?.(conversationId);
+function x(e) {
+  let t = (0, T.c)(21),
+    { conversationId: n, hostId: r, sessionId: i } = e,
+    a = o(l),
+    { modelSettings: s, setModelAndReasoningEffort: c } = f(n),
+    u;
+  t[0] === s.model ? (u = t[1]) : ((u = new Set([s.model])), (t[0] = s.model), (t[1] = u));
+  let d;
+  t[2] !== r || t[3] !== u
+    ? ((d = { hostId: r, additionalAvailableModels: u }), (t[2] = r), (t[3] = u), (t[4] = d))
+    : (d = t[4]);
+  let { data: p } = g(d),
+    [m, h] = (0, E.useState)(!1),
+    v;
+  t[5] === a
+    ? (v = t[6])
+    : ((v = () => {
+        a.set(_, C);
+      }),
+      (t[5] = a),
+      (t[6] = v));
+  let y = v;
   if (
-    !settings ||
-    settings.modelSettings.isLoading ||
-    settings.modelSettings.reasoningEffort == null ||
-    ["none", "minimal", "low"].includes(settings.modelSettings.reasoningEffort)
-  ) {
+    s.isLoading ||
+    s.reasoningEffort == null ||
+    [`none`, `minimal`, `low`].includes(s.reasoningEffort) ||
+    !p?.models
+      .find((e) => {
+        let { model: t } = e;
+        return t === s.model;
+      })
+      ?.supportedReasoningEfforts.some(S)
+  )
     return null;
-  }
-  const store = (
-    shared.LX as
-      | ((signal: unknown) => { set(signal: unknown, updater: unknown): void })
-      | undefined
-  )?.(shared.ZI);
-  const dismiss = () =>
-    store?.set(state.n, (value: unknown) =>
-      typeof value === "object" && value !== null
-        ? { ...value, dismissed: true }
-        : value,
-    );
-  const useLight = () => {
-    void settings
-      .setModelAndReasoningEffort(settings.modelSettings.model, "low")
-      .then((changed) => {
-        if (changed) dismiss();
-      });
-  };
-  const Banner = initial.n7;
-  return jsxRuntime.jsx("div", {
-    "data-realtime-voice-reasoning-notice": true,
-    children: jsxRuntime.jsx(Banner, {
-      density: "compact",
-      layout: "inline",
-      content: "Switch to Light for faster Voice replies",
-      primaryCtaText: "Use Light",
-      secondaryCtaText: "Got it",
-      isPrimaryCtaDisabled: false,
-      onPrimaryCtaClick: useLight,
-      onSecondaryCtaClick: dismiss,
-      hostId,
-      sessionId,
-    }),
-  });
+  let b;
+  t[7] !== a || t[8] !== i
+    ? ((b = (e) => {
+        e != null &&
+          a.set(_, (e) =>
+            e == null || e.lastSessionId === i
+              ? e
+              : { ...e, impressions: e.impressions + 1, lastSessionId: i },
+          );
+      }),
+      (t[7] = a),
+      (t[8] = i),
+      (t[9] = b))
+    : (b = t[9]);
+  let x;
+  t[10] !== y || t[11] !== s.model || t[12] !== c
+    ? ((x = () => {
+        (h(!0),
+          c(s.model, `low`).then((e) => {
+            (e && y(), h(!1));
+          }));
+      }),
+      (t[10] = y),
+      (t[11] = s.model),
+      (t[12] = c),
+      (t[13] = x))
+    : (x = t[13]);
+  let O;
+  t[14] !== y || t[15] !== m || t[16] !== x
+    ? ((O = (0, D.jsx)(w, { isApplying: m, onDismiss: y, onUseLight: x })),
+      (t[14] = y),
+      (t[15] = m),
+      (t[16] = x),
+      (t[17] = O))
+    : (O = t[17]);
+  let k;
+  return (
+    t[18] !== b || t[19] !== O
+      ? ((k = (0, D.jsx)(`div`, { ref: b, children: O })), (t[18] = b), (t[19] = O), (t[20] = k))
+      : (k = t[20]),
+    k
+  );
 }
-
-for (const [runtime, names] of [
-  [shared as unknown as Record<string, unknown>, ["FX", "K2"]],
-  [initial, ["r7", "u8", "S8"]],
-  [state, ["t"]],
-] as Array<[Record<string, unknown>, string[]]>) {
-  for (const name of names) {
-    const value = runtime[name];
-    if (typeof value === "function") (value as () => void)();
-  }
+function S(e) {
+  let { reasoningEffort: t } = e;
+  return t === `low`;
 }
-
-export { VoiceReasoningNoticeController };
+function C(e) {
+  return e == null ? e : { ...e, dismissed: !0 };
+}
+function w(e) {
+  let t = (0, T.c)(7),
+    { isApplying: n, onDismiss: r, onUseLight: i } = e,
+    a = n !== void 0 && n,
+    o,
+    s,
+    l;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((o = (0, D.jsx)(c, {
+        id: `realtimeVoice.reasoningNotice.description`,
+        defaultMessage: `Switch to Light for faster Voice replies`,
+        description: `Voice chat notice recommending lower reasoning for faster spoken replies`,
+      })),
+      (s = (0, D.jsx)(c, {
+        id: `realtimeVoice.reasoningNotice.useLight`,
+        defaultMessage: `Use Light`,
+        description: `Button that changes the current Voice task to Light reasoning`,
+      })),
+      (l = (0, D.jsx)(c, {
+        id: `realtimeVoice.reasoningNotice.dismiss`,
+        defaultMessage: `Got it`,
+        description: `Button that permanently dismisses the Voice reasoning notice`,
+      })),
+      (t[0] = o),
+      (t[1] = s),
+      (t[2] = l))
+    : ((o = t[0]), (s = t[1]), (l = t[2]));
+  let u;
+  return (
+    t[3] !== a || t[4] !== r || t[5] !== i
+      ? ((u = (0, D.jsx)(`div`, {
+          className: `select-none`,
+          "data-realtime-voice-reasoning-notice": !0,
+          children: (0, D.jsx)(p, {
+            density: `compact`,
+            layout: `inline`,
+            content: o,
+            primaryCtaText: s,
+            secondaryCtaText: l,
+            isPrimaryCtaDisabled: a,
+            onPrimaryCtaClick: i,
+            onSecondaryCtaClick: r,
+          }),
+        })),
+        (t[3] = a),
+        (t[4] = r),
+        (t[5] = i),
+        (t[6] = u))
+      : (u = t[6]),
+    u
+  );
+}
+var T, E, D;
+function O() {
+  return (O = e(() => {
+    ((T = t()), r(), (E = u()), a(), m(), h(), d(), s(), y(), (D = i()));
+  }))();
+}
+O();
+export { b as VoiceReasoningNoticeController };

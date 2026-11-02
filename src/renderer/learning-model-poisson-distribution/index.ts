@@ -1,31 +1,80 @@
-// Poisson-distribution learning model. Release chunk: model-253b6086c636.js.
-import "@rchunk/rolldown-runtime";
-
-interface PoissonValues { lambda?: number | null; count?: number | null; question?: number | null }
-interface PoissonManifest { type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string; parameters: { lambda: { kind: "number"; defaultValue: number; min: number; max: number }; count: { kind: "integer"; defaultValue: number; min: number; max: number } } }
-type ProbabilityFormat = { relation: "<" | ">" | "="; value: number; maximumFractionDigits: number };
-
-let poissonManifest: PoissonManifest;
-let lambdaControl: { min: number; max: number; step: number; defaultValue: number };
-let countControl: { min: number; max: number; step: number; defaultValue: number };
-let questionControl: { min: number; max: number; step: number; defaultValue: number };
-let normalizePoissonValues: (values: PoissonValues) => { lambda: number; count: number; question: number };
-let formatProbability: (probability: number) => ProbabilityFormat;
-let calculatePoissonDistribution: (values: PoissonValues) => { lambda: number; count: number; question: number; exactProbability: number; atMostProbability: number; atLeastProbability: number; tailProbability: number; selectedProbability: number; modeCounts: number[]; outcomes: Array<{ count: number; probability: number; probabilityPercent: number; included: boolean; isMode: boolean }> };
-let manifestInitialized = false; let modelInitialized = false;
-function initializePoissonManifest(): void { if (manifestInitialized) return; manifestInitialized = true; poissonManifest = { type: "POISSON_DISTRIBUTION", version: 2, thumbnailAssetKey: "poisson-distribution-v1", canonicalFormula: "P(X=k)=\\frac{e^{-\\lambda}\\lambda^k}{k!}", parameters: { lambda: { kind: "number", defaultValue: 5, min: 0.5, max: 20 }, count: { kind: "integer", defaultValue: 5, min: 0, max: 40 } } }; }
-function initializePoissonModel(): void {
-  if (modelInitialized) return; modelInitialized = true; initializePoissonManifest();
-  const lambda = poissonManifest.parameters.lambda; const count = poissonManifest.parameters.count;
-  lambdaControl = { min: lambda.min, max: lambda.max, step: 0.1, defaultValue: lambda.defaultValue }; countControl = { min: count.min, max: count.max, step: 1, defaultValue: count.defaultValue }; questionControl = { min: 0, max: 2, step: 1, defaultValue: 0 };
-  const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max); const finite = (value: number | null | undefined, fallback: number) => typeof value === "number" && Number.isFinite(value) ? value : fallback;
-  normalizePoissonValues = values => ({ lambda: clamp(finite(values.lambda, lambdaControl.defaultValue), lambdaControl.min, lambdaControl.max), count: Math.round(clamp(finite(values.count, countControl.defaultValue), countControl.min, countControl.max)), question: Math.round(clamp(finite(values.question, questionControl.defaultValue), questionControl.min, questionControl.max)) });
-  formatProbability = probability => probability > 0 && probability < 1e-8 ? { relation: "<", value: 1e-8, maximumFractionDigits: 6 } : probability < 1 && probability > 0.9999 ? { relation: ">", value: 0.9999, maximumFractionDigits: 2 } : { relation: "=", value: probability, maximumFractionDigits: probability * 100 < 0.01 ? 4 : probability * 100 < 1 ? 2 : 1 };
-  calculatePoissonDistribution = values => {
-    const normalized = normalizePoissonValues(values); const probabilities = [Math.exp(-normalized.lambda)];
-    for (let outcome = 1; outcome <= countControl.max; outcome += 1) probabilities.push((probabilities[outcome - 1] ?? 0) * normalized.lambda / outcome);
-    const tailProbability = Math.max(0, 1 - probabilities.reduce((sum, probability) => sum + probability, 0)); const exactProbability = probabilities[normalized.count] ?? 0; const atMostProbability = probabilities.slice(0, normalized.count + 1).reduce((sum, probability) => sum + probability, 0); const atLeastProbability = Math.min(1, probabilities.slice(normalized.count).reduce((sum, probability) => sum + probability, tailProbability)); const selectedProbability = normalized.question === 0 ? exactProbability : normalized.question === 1 ? atMostProbability : atLeastProbability; const floor = Math.floor(normalized.lambda); const modeCounts = Number.isInteger(normalized.lambda) ? [floor - 1, floor] : [floor];
-    return { ...normalized, exactProbability, atMostProbability, atLeastProbability, tailProbability, selectedProbability, modeCounts, outcomes: probabilities.map((probability, outcome) => ({ count: outcome, probability, probabilityPercent: probability * 100, included: normalized.question === 0 ? outcome === normalized.count : normalized.question === 1 ? outcome <= normalized.count : outcome >= normalized.count, isMode: modeCounts.includes(outcome) })) };
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `POISSON_DISTRIBUTION`),
+      (n = `poisson-distribution-v1`),
+      (r = `P(X=k)=\\frac{e^{-\\lambda}\\lambda^k}{k!}`),
+      (i = {
+        lambda: { kind: `number`, defaultValue: 5, min: 0.5, max: 20 },
+        count: { kind: `integer`, defaultValue: 5, min: 0, max: 40 },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-export { formatProbability as a, initializePoissonManifest as c, calculatePoissonDistribution as i, poissonManifest as l, lambdaControl as n, initializePoissonModel as o, questionControl as r, normalizePoissonValues as s, countControl as t };
+var s, c, l, u, d, f, p, m, h, g;
+function _() {
+  return (_ = e(() => {
+    (o(),
+      (s = a.parameters.lambda),
+      (c = a.parameters.count),
+      (l = { min: s.min, max: s.max, step: 0.1, defaultValue: s.defaultValue }),
+      (u = { min: c.min, max: c.max, step: 1, defaultValue: c.defaultValue }),
+      (d = { min: 0, max: 2, step: 1, defaultValue: 0 }),
+      (f = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (p = (e, t) => (Number.isFinite(e) ? (e ?? t) : t)),
+      (m = (e) => ({
+        lambda: f(p(e.lambda, l.defaultValue), l.min, l.max),
+        count: Math.round(f(p(e.count, u.defaultValue), u.min, u.max)),
+        question: Math.round(f(p(e.question, d.defaultValue), d.min, d.max)),
+      })),
+      (h = (e) =>
+        e > 0 && e < 1e-8
+          ? { relation: `<`, value: 1e-8, maximumFractionDigits: 6 }
+          : e < 1 && e > 0.9999
+            ? { relation: `>`, value: 0.9999, maximumFractionDigits: 2 }
+            : {
+                relation: `=`,
+                value: e,
+                maximumFractionDigits: e * 100 < 0.01 ? 4 : e * 100 < 1 ? 2 : 1,
+              }),
+      (g = (e) => {
+        let t = m(e),
+          n = [Math.exp(-t.lambda)];
+        for (let e = 1; e <= u.max; e += 1) {
+          let r = n[e - 1] ?? 0;
+          n.push((r * t.lambda) / e);
+        }
+        let r = n.reduce((e, t) => e + t, 0),
+          i = Math.max(0, 1 - r),
+          a = n[t.count] ?? 0,
+          o = n.slice(0, t.count + 1).reduce((e, t) => e + t, 0),
+          s = Math.min(
+            1,
+            n.slice(t.count).reduce((e, t) => e + t, i),
+          ),
+          c = t.question === 0 ? a : t.question === 1 ? o : s,
+          l = Math.floor(t.lambda),
+          d = Number.isInteger(t.lambda) ? [l - 1, l] : [l];
+        return {
+          ...t,
+          exactProbability: a,
+          atMostProbability: o,
+          atLeastProbability: s,
+          tailProbability: i,
+          selectedProbability: c,
+          modeCounts: d,
+          outcomes: n.map((e, n) => ({
+            count: n,
+            probability: e,
+            probabilityPercent: e * 100,
+            included:
+              t.question === 0 ? n === t.count : t.question === 1 ? n <= t.count : n >= t.count,
+            isMode: d.includes(n),
+          })),
+        };
+      }));
+  }))();
+}
+export { h as a, o as c, g as i, a as l, l as n, _ as o, d as r, m as s, u as t };

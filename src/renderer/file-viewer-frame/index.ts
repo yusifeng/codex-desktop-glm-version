@@ -1,9 +1,44 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/view-frame";
-interface FileViewerFrameProps { className?: string; filePath: string; fileViewer: { hostId?: string; [key: string]: unknown }; lifetime?: unknown; mcpAppId: string; recipient?: unknown }
-let runtime: JsxRuntime | undefined; function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function t(props: FileViewerFrameProps): unknown { return jsx().jsx("iframe", { className: props.className, "data-file-path": props.filePath, "data-host-id": props.fileViewer.hostId, "data-lifetime": props.lifetime, "data-mcp-app-id": props.mcpAppId, "data-recipient": props.recipient, src: `codex-resource://${props.mcpAppId}` }); }
-function n(): void {}
-export { n, t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n } from "@rchunk/app-shared";
+import { $dt as r, tft as i } from "@rchunk/app-initial";
+import { n as a, t as o } from "@rchunk/view-frame";
+function s(e) {
+  let t = (0, c.c)(11),
+    { recipient: n, className: i, filePath: a, fileViewer: s, mcpAppId: u, lifetime: d } = e,
+    f = `codex-resource://${u}`,
+    p;
+  t[0] !== a || t[1] !== s || t[2] !== f
+    ? ((p = r({ fileViewer: s, hostId: s.hostId, path: a, resourceUri: f })),
+      (t[0] = a),
+      (t[1] = s),
+      (t[2] = f),
+      (t[3] = p))
+    : (p = t[3]);
+  let m = p,
+    h;
+  return (
+    t[4] !== i || t[5] !== s || t[6] !== m || t[7] !== d || t[8] !== u || t[9] !== n
+      ? ((h = (0, l.jsx)(
+          o,
+          { recipient: n, lifetime: d, className: i, ...m, mcpAppId: u, view: s },
+          u,
+        )),
+        (t[4] = i),
+        (t[5] = s),
+        (t[6] = m),
+        (t[7] = d),
+        (t[8] = u),
+        (t[9] = n),
+        (t[10] = h))
+      : (h = t[10]),
+    h
+  );
+}
+var c, l;
+function u() {
+  return (u = e(() => {
+    ((c = t()), i(), a(), (l = n()));
+  }))();
+}
+export { u as n, s as t };

@@ -1,229 +1,303 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-
-const {
-  $3: initializeRuntimeLazy,
-  Cq: debugPolicy,
-  HX: useSignalValue,
-  I3: getJsxRuntime,
-  LX: useScope,
-  ZI: AppScope,
-  e6: getReactRuntime,
-  n4: useIntl,
-} = appSharedChunk;
-
-type GpuDebugSettingKey =
-  | "disableScrollFadeMask"
-  | "disableScrollFadeMaskAnimation"
-  | "disableBackdropBlur"
-  | "disableCssMotion"
-  | "disableSquircles"
-  | "forceOpaqueRendererBackground";
-
-type GpuDebugSettings = Record<GpuDebugSettingKey, boolean>;
-interface SettingDescriptor { key: string }
-
-const debugRuntime = appInitialChunk as unknown as {
-  Kcn: (setting: SettingDescriptor) => unknown;
-  Sn: (scope: unknown, settingKey: GpuDebugSettingKey, value: boolean) => void;
-  Ucn: (scope: unknown, setting: SettingDescriptor, value: boolean) => Promise<void> | void;
-  bn: import("@rchunk/app-shared").ReadableSignal<GpuDebugSettings>;
-  vz: { debugChromePagesEnabled: SettingDescriptor };
-};
-const {
-  Kcn: useSetting,
-  Sn: setGpuDebugSetting,
-  Ucn: setSetting,
-  bn: gpuDebugSettingsSignal,
-  vz: settingDescriptors,
-} = debugRuntime;
-
-const GPU_DEBUG_SETTINGS: readonly {
-  description: string;
-  label: string;
-  settingKey: GpuDebugSettingKey;
-}[] = [
-  {
-    settingKey: "disableScrollFadeMask",
-    label: "Disable scroll fade mask",
-    description: "Removes scroll-edge fade masks entirely to isolate mask compositing as a tearing trigger",
-  },
-  {
-    settingKey: "disableScrollFadeMaskAnimation",
-    label: "Disable scroll fade animation",
-    description: "Keeps static fade masks but removes the scroll-linked animation timeline",
-  },
-  {
-    settingKey: "disableBackdropBlur",
-    label: "Disable backdrop blur",
-    description: "Forces backdrop filters off across the web UI to reduce layered blur composition",
-  },
-  {
-    settingKey: "disableCssMotion",
-    label: "Disable CSS motion",
-    description: "Turns off CSS animations and transitions to isolate compositor animation work",
-  },
-  {
-    settingKey: "disableSquircles",
-    label: "Disable squircles",
-    description: "Uses standard round corners instead of CSS superellipses to isolate squircle rendering cost",
-  },
-  {
-    settingKey: "forceOpaqueRendererBackground",
-    label: "Force opaque web background",
-    description: "Paints the renderer root and body with opaque backgrounds to isolate transparent-window composition",
-  },
-] as const;
-
-let React: import("@rchunk/app-shared").ReactRuntime;
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function Toggle({
-  ariaLabel,
-  checked,
-  onChange,
-}: {
-  ariaLabel: string;
-  checked: boolean;
-  onChange(value: boolean): void;
-}): unknown {
-  return jsx.jsx("button", {
-    type: "button",
-    role: "switch",
-    "aria-label": ariaLabel,
-    "aria-checked": checked,
-    className: "rounded-full border px-3 py-1 text-sm",
-    onClick: () => onChange(!checked),
-    children: checked ? "On" : "Off",
-  });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Cq as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  K2 as o,
+  LX as s,
+  Lf as c,
+  QI as l,
+  Qc as u,
+  Rf as d,
+  Y2 as f,
+  ZI as p,
+  Zc as m,
+  al as h,
+  e6 as g,
+  n4 as _,
+  qm as v,
+  rl as y,
+  vz as b,
+  wL as x,
+} from "@rchunk/app-shared";
+import {
+  Kcn as S,
+  Sn as C,
+  Ucn as w,
+  Vcn as T,
+  Xl as E,
+  Yl as D,
+  aa as O,
+  au as k,
+  bn as A,
+  oa as j,
+  su as M,
+  xn as N,
+} from "@rchunk/app-initial";
+function P() {
+  let e = (0, L.c)(2),
+    t;
+  e[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((t = n.allowDebugMenu(`prod`)), (e[0] = t))
+    : (t = e[0]);
+  let r = t,
+    i;
+  return (
+    e[1] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((i = (0, R.jsxs)(k, {
+          title: (0, R.jsx)(D, { slug: `debug` }),
+          children: [r && (0, R.jsx)(F, {}), null, null, (0, R.jsx)(I, {})],
+        })),
+        (e[1] = i))
+      : (i = e[1]),
+    i
+  );
 }
-
-function SettingRow({
-  control,
-  description,
-  label,
-}: {
-  control: unknown;
-  description?: string;
-  label: string;
-}): unknown {
-  return jsx.jsxs("div", {
-    className: "flex min-h-14 items-center justify-between gap-4 px-4 py-3",
-    children: [
-      jsx.jsxs("div", {
-        className: "min-w-0",
-        children: [
-          jsx.jsx("div", { className: "font-medium", children: label }),
-          description == null ? null : jsx.jsx("div", { className: "mt-0.5 text-sm text-secondary", children: description }),
-        ],
-      }),
-      jsx.jsx("div", { className: "shrink-0", children: control }),
-    ],
-  });
-}
-
-function Section({
-  children,
-  subtitle,
-  title,
-}: {
-  children: unknown;
-  subtitle: string;
-  title: string;
-}): unknown {
-  return jsx.jsxs("section", {
-    className: "rounded-xl border border-token-border-light bg-surface-primary",
-    children: [
-      jsx.jsxs("header", {
-        className: "border-b border-token-border-light px-4 py-3",
-        children: [
-          jsx.jsx("h2", { className: "font-semibold", children: title }),
-          jsx.jsx("p", { className: "mt-0.5 text-sm text-secondary", children: subtitle }),
-        ],
-      }),
-      jsx.jsx("div", { className: "divide-y divide-token-border-light", children }),
-    ],
-  });
-}
-
-function ChromeDebugPages(): unknown {
-  const scope = useScope(AppScope);
-  const intl = useIntl();
-  const descriptor = settingDescriptors.debugChromePagesEnabled;
-  const enabled = Boolean(useSetting(descriptor));
-  const label = String(intl.formatMessage({
-    id: "settings.debug.chromePages.label",
-    defaultMessage: "Enable Chrome debug pages",
-  }));
-  return jsx.jsx(Section, {
-    title: "Chrome debug pages",
-    subtitle: "Allow Browser Use to open trusted chrome:// diagnostics such as version and histograms. chrome-untrusted:// stays blocked.",
-    children: jsx.jsx(SettingRow, {
-      label,
-      control: jsx.jsx(Toggle, {
-        checked: enabled,
-        ariaLabel: "Toggle Chrome debug pages",
-        onChange: (value) => { void setSetting(scope, descriptor, value); },
-      }),
-    }),
-  });
-}
-
-function GpuTearingDebug(): unknown {
-  const scope = useScope(AppScope);
-  const intl = useIntl();
-  const settings = useSignalValue(gpuDebugSettingsSignal);
-  return jsx.jsx(Section, {
-    title: "GPU Tearing Debug",
-    subtitle: "Temporary compositor isolation toggles. Changes apply immediately and are only active while the debug gate is enabled.",
-    children: GPU_DEBUG_SETTINGS.map(({ description, label, settingKey }) => jsx.jsx(SettingRow, {
-      label,
-      description,
-      control: jsx.jsx(Toggle, {
-        checked: settings[settingKey],
-        ariaLabel: String(intl.formatMessage(
-          { id: "settings.general.gpuTearingDebug.toggle", defaultMessage: "Toggle {settingName}" },
-          { settingName: label },
-        )),
-        onChange: (value) => setGpuDebugSetting(scope, settingKey, value),
-      }),
-    }, settingKey)),
-  });
-}
-
-function DebugSettings(): unknown {
-  initializeDebugSettings();
-  const showChromeDebugPages = debugPolicy.allowDebugMenu("prod");
-  return jsx.jsxs("div", {
-    className: "flex h-full min-h-0 flex-col",
-    children: [
-      jsx.jsx("header", {
-        className: "border-b border-token-border-light px-5 py-4",
-        children: jsx.jsx("h1", { className: "text-lg font-semibold", children: "Debug" }),
-      }),
-      jsx.jsx("div", {
-        className: "flex-1 overflow-auto p-5",
-        children: jsx.jsxs("div", {
-          className: "mx-auto flex max-w-3xl flex-col gap-5",
-          children: [
-            showChromeDebugPages ? jsx.jsx(ChromeDebugPages, {}) : null,
-            jsx.jsx(GpuTearingDebug, {}),
-          ],
+function F() {
+  let e = (0, L.c)(14),
+    t = s(p),
+    n = _(),
+    r = S(b.debugChromePagesEnabled),
+    i;
+  e[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((i = (0, R.jsx)(O.Header, {
+        title: (0, R.jsx)(f, {
+          id: `settings.debug.chromePages.title`,
+          defaultMessage: `Chrome debug pages`,
+          description: `Heading for the debug-only Chrome pages setting`,
         }),
+        subtitle: (0, R.jsx)(f, {
+          id: `settings.debug.chromePages.subtitle`,
+          defaultMessage: `Allow Browser Use to open trusted chrome:// diagnostics such as version and histograms. chrome-untrusted:// stays blocked.`,
+          description: `Description of the debug-only Chrome pages setting`,
+        }),
+      })),
+      (e[0] = i))
+    : (i = e[0]);
+  let a;
+  e[1] === n
+    ? (a = e[2])
+    : ((a = n.formatMessage({
+        id: `settings.debug.chromePages.label`,
+        defaultMessage: `Enable Chrome debug pages`,
+        description: `Label for the debug-only Chrome pages toggle`,
+      })),
+      (e[1] = n),
+      (e[2] = a));
+  let o;
+  e[3] === t
+    ? (o = e[4])
+    : ((o = (e) => {
+        w(t, b.debugChromePagesEnabled, e);
       }),
-    ],
-  });
+      (e[3] = t),
+      (e[4] = o));
+  let l;
+  e[5] === n
+    ? (l = e[6])
+    : ((l = n.formatMessage({
+        id: `settings.debug.chromePages.toggle`,
+        defaultMessage: `Toggle Chrome debug pages`,
+        description: `Aria label for the Chrome debug pages toggle`,
+      })),
+      (e[5] = n),
+      (e[6] = l));
+  let u;
+  e[7] !== r || e[8] !== o || e[9] !== l
+    ? ((u = (0, R.jsx)(c, { checked: r, onChange: o, ariaLabel: l })),
+      (e[7] = r),
+      (e[8] = o),
+      (e[9] = l),
+      (e[10] = u))
+    : (u = e[10]);
+  let d;
+  return (
+    e[11] !== a || e[12] !== u
+      ? ((d = (0, R.jsxs)(O, {
+          children: [
+            i,
+            (0, R.jsx)(O.Content, {
+              children: (0, R.jsx)(m, { children: (0, R.jsx)(y, { label: a, control: u }) }),
+            }),
+          ],
+        })),
+        (e[11] = a),
+        (e[12] = u),
+        (e[13] = d))
+      : (d = e[13]),
+    d
+  );
 }
-
-let initialized = false;
-function initializeDebugSettings(): void {
-  if (initialized) return;
-  initializeRuntimeLazy();
-  React = getReactRuntime();
-  jsx = getJsxRuntime();
-  initialized = true;
+function I() {
+  let e = (0, L.c)(19),
+    t = s(p),
+    n = _(),
+    r = i(A),
+    a,
+    o,
+    l,
+    u,
+    d;
+  if (e[0] !== n || e[1] !== t || e[2] !== r) {
+    let i = [
+      {
+        settingKey: `disableScrollFadeMask`,
+        label: n.formatMessage({
+          id: `settings.general.gpuTearingDebug.disableScrollFadeMask.label`,
+          defaultMessage: `Disable scroll fade mask`,
+          description: `Label for GPU tearing debug setting that disables scroll fade masks`,
+        }),
+        description: n.formatMessage({
+          id: `settings.general.gpuTearingDebug.disableScrollFadeMask.description`,
+          defaultMessage: `Removes scroll-edge fade masks entirely to isolate mask compositing as a tearing trigger`,
+          description: `Description for GPU tearing debug setting that disables scroll fade masks`,
+        }),
+      },
+      {
+        settingKey: `disableScrollFadeMaskAnimation`,
+        label: n.formatMessage({
+          id: `settings.general.gpuTearingDebug.disableScrollFadeMaskAnimation.label`,
+          defaultMessage: `Disable scroll fade animation`,
+          description: `Label for GPU tearing debug setting that disables scroll fade mask animation`,
+        }),
+        description: n.formatMessage({
+          id: `settings.general.gpuTearingDebug.disableScrollFadeMaskAnimation.description`,
+          defaultMessage: `Keeps static fade masks but removes the scroll-linked animation timeline`,
+          description: `Description for GPU tearing debug setting that disables scroll fade mask animation`,
+        }),
+      },
+      {
+        settingKey: `disableBackdropBlur`,
+        label: n.formatMessage({
+          id: `settings.general.gpuTearingDebug.disableBackdropBlur.label`,
+          defaultMessage: `Disable backdrop blur`,
+          description: `Label for GPU tearing debug setting that disables backdrop blur`,
+        }),
+        description: n.formatMessage({
+          id: `settings.general.gpuTearingDebug.disableBackdropBlur.description`,
+          defaultMessage: `Forces backdrop filters off across the web UI to reduce layered blur composition`,
+          description: `Description for GPU tearing debug setting that disables backdrop blur`,
+        }),
+      },
+      {
+        settingKey: `disableCssMotion`,
+        label: n.formatMessage({
+          id: `settings.general.gpuTearingDebug.disableCssMotion.label`,
+          defaultMessage: `Disable CSS motion`,
+          description: `Label for GPU tearing debug setting that disables CSS animations and transitions`,
+        }),
+        description: n.formatMessage({
+          id: `settings.general.gpuTearingDebug.disableCssMotion.description`,
+          defaultMessage: `Turns off CSS animations and transitions to isolate compositor animation work`,
+          description: `Description for GPU tearing debug setting that disables CSS animations and transitions`,
+        }),
+      },
+      {
+        settingKey: `disableSquircles`,
+        label: n.formatMessage({
+          id: `settings.general.gpuTearingDebug.disableSquircles.label`,
+          defaultMessage: `Disable squircles`,
+          description: `Label for a GPU debug switch that replaces CSS superellipse (squircle) corners with ordinary rounded corners`,
+        }),
+        description: n.formatMessage({
+          id: `settings.general.gpuTearingDebug.disableSquircles.description`,
+          defaultMessage: `Uses standard round corners instead of CSS superellipses to isolate squircle rendering cost`,
+          description: `Explains a GPU debug switch; squircle refers to the interface's CSS superellipse corner shape`,
+        }),
+      },
+      {
+        settingKey: `forceOpaqueRendererBackground`,
+        label: n.formatMessage({
+          id: `settings.general.gpuTearingDebug.forceOpaqueRendererBackground.label`,
+          defaultMessage: `Force opaque web background`,
+          description: `Label for GPU tearing debug setting that forces an opaque web background`,
+        }),
+        description: n.formatMessage({
+          id: `settings.general.gpuTearingDebug.forceOpaqueRendererBackground.description`,
+          defaultMessage: `Paints the renderer root and body with opaque backgrounds to isolate transparent-window composition`,
+          description: `Description for GPU tearing debug setting that forces an opaque web background`,
+        }),
+      },
+    ];
+    ((l = O),
+      e[8] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((d = (0, R.jsx)(O.Header, {
+            title: (0, R.jsx)(f, {
+              id: `settings.general.gpuTearingDebug`,
+              defaultMessage: `GPU Tearing Debug`,
+              description: `Heading for GPU tearing debug settings group`,
+            }),
+            subtitle: (0, R.jsx)(f, {
+              id: `settings.general.gpuTearingDebug.subtitle`,
+              defaultMessage: `Temporary compositor isolation toggles. Changes apply immediately and are only active while the debug gate is enabled.`,
+              description: `Subtitle for GPU tearing debug settings group`,
+            }),
+          })),
+          (e[8] = d))
+        : (d = e[8]),
+      (o = O.Content),
+      (a = m),
+      (u = i.map((e) =>
+        (0, R.jsx)(
+          y,
+          {
+            label: e.label,
+            description: e.description,
+            control: (0, R.jsx)(c, {
+              checked: r[e.settingKey],
+              onChange: (n) => {
+                C(t, e.settingKey, n);
+              },
+              ariaLabel: n.formatMessage(
+                {
+                  id: `settings.general.gpuTearingDebug.toggle`,
+                  defaultMessage: `Toggle {settingName}`,
+                  description: `Aria label for toggling a GPU tearing debug setting`,
+                },
+                { settingName: e.label },
+              ),
+            }),
+          },
+          e.settingKey,
+        ),
+      )),
+      (e[0] = n),
+      (e[1] = t),
+      (e[2] = r),
+      (e[3] = a),
+      (e[4] = o),
+      (e[5] = l),
+      (e[6] = u),
+      (e[7] = d));
+  } else ((a = e[3]), (o = e[4]), (l = e[5]), (u = e[6]), (d = e[7]));
+  let h;
+  e[9] !== a || e[10] !== u
+    ? ((h = (0, R.jsx)(a, { children: u })), (e[9] = a), (e[10] = u), (e[11] = h))
+    : (h = e[11]);
+  let g;
+  e[12] !== o || e[13] !== h
+    ? ((g = (0, R.jsx)(o, { children: h })), (e[12] = o), (e[13] = h), (e[14] = g))
+    : (g = e[14]);
+  let v;
+  return (
+    e[15] !== l || e[16] !== d || e[17] !== g
+      ? ((v = (0, R.jsxs)(l, { children: [d, g] })),
+        (e[15] = l),
+        (e[16] = d),
+        (e[17] = g),
+        (e[18] = v))
+      : (v = e[18]),
+    v
+  );
 }
-
-initializeDebugSettings();
-export { DebugSettings };
+var L, R;
+function z() {
+  return (z = e(() => {
+    ((L = t()), r(), x(), g(), o(), v(), d(), l(), N(), T(), M(), j(), h(), E(), u(), (R = a()));
+  }))();
+}
+z();
+export { P as DebugSettings };

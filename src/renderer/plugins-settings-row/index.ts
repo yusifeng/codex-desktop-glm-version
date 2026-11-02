@@ -1,91 +1,116 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  BX as useSignalFamilyValue,
-  I3 as getJsxRuntime,
-  K2 as initializeInternationalization,
-  Lf as Switch,
-  Y2 as FormattedMessage,
-  e6 as getReact,
-  n4 as useCurrentAccount,
-  rl as SettingsRow,
+  $3 as t,
+  BX as n,
+  FX as r,
+  I3 as i,
+  K2 as a,
+  Lf as o,
+  Rf as s,
+  Y2 as c,
+  al as l,
+  e6 as u,
+  n4 as d,
+  rl as f,
 } from "@rchunk/app-shared";
-import {
-  Mdn as applicationName,
-  cnt as useUpdateFeatureMutation,
-  ont as hostFeaturesQuery,
-} from "@rchunk/app-initial";
-
-interface PluginsSettingsRowProps {
-  hostId: string;
-}
-
-interface HostFeature {
-  enabled?: boolean;
-  name?: string;
-}
-
-interface ReactLike {
-  useState<Value>(value: Value): [Value, (next: Value) => void];
-}
-
-interface UpdateFeatureMutation {
-  isPending: boolean;
-  mutate(
-    input: { enabled: boolean; featureName: string },
-    options: { onSuccess(): void },
-  ): void;
-}
-
-const jsx = getJsxRuntime();
-
-function PluginsSettingsRow({ hostId }: PluginsSettingsRowProps): unknown {
-  const React = getReact() as ReactLike;
-  const intl = useCurrentAccount();
-  const result = useSignalFamilyValue(hostFeaturesQuery, hostId) as {
-    data?: HostFeature[];
-  };
-  const mutation = useUpdateFeatureMutation({ hostId }) as unknown as UpdateFeatureMutation;
-  const [restartRequired, setRestartRequired] = React.useState(false);
-  if (!result.data?.some((feature) => feature.name === "apps" && feature.enabled)) {
-    return null;
-  }
-  const plugins = result.data.find((feature) => feature.name === "plugins");
-  const checked = plugins?.enabled ?? true;
-  const description = restartRequired
-    ? jsx.jsx(FormattedMessage, {
-        id: "settings.general.plugins.restartNotice",
-        defaultMessage: "Restart {appName} to apply this change",
-        values: { appName: applicationName },
-      })
-    : jsx.jsx(FormattedMessage, {
-        id: "settings.general.plugins.description",
-        defaultMessage: "Allow ChatGPT to use installed plugins",
-      });
-  return jsx.jsx(SettingsRow, {
-    label: jsx.jsx(FormattedMessage, {
-      id: "settings.general.plugins.label",
-      defaultMessage: "Plugins",
-    }),
-    description,
-    control: jsx.jsx(Switch, {
-      checked,
-      disabled: mutation.isPending,
-      onChange: (enabled: boolean) => {
-        mutation.mutate(
-          { featureName: "plugins", enabled },
-          { onSuccess: () => setRestartRequired(true) },
+import { Mdn as p, Ndn as m, cnt as h, ont as g, snt as _ } from "@rchunk/app-initial";
+function v(e) {
+  let t = (0, x.c)(19),
+    { hostId: r } = e,
+    i = d(),
+    { data: a } = n(g, r),
+    s;
+  t[0] === r ? (s = t[1]) : ((s = { hostId: r }), (t[0] = r), (t[1] = s));
+  let l = h(s),
+    [u, m] = (0, S.useState)(!1);
+  if (!a?.some(b)) return null;
+  let _;
+  t[2] === a ? (_ = t[3]) : ((_ = a.find(y)), (t[2] = a), (t[3] = _));
+  let v = _,
+    w;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((w = (0, C.jsx)(c, {
+        id: `settings.general.plugins.label`,
+        defaultMessage: `Plugins`,
+        description: `Label for the plugins setting`,
+      })),
+      (t[4] = w))
+    : (w = t[4]);
+  let T;
+  t[5] === u
+    ? (T = t[6])
+    : ((T = u
+        ? (0, C.jsx)(c, {
+            id: `settings.general.plugins.restartNotice`,
+            defaultMessage: `Restart {appName} to apply this change`,
+            description: `Notice shown after changing the plugins setting`,
+            values: { appName: p },
+          })
+        : (0, C.jsx)(c, {
+            id: `settings.general.plugins.description`,
+            defaultMessage: `Allow ChatGPT to use installed plugins`,
+            description: `Description for the plugins setting`,
+          })),
+      (t[5] = u),
+      (t[6] = T));
+  let E = v?.enabled ?? !0,
+    D = l.isPending,
+    O;
+  t[7] === l
+    ? (O = t[8])
+    : ((O = (e) => {
+        l.mutate(
+          { featureName: `plugins`, enabled: e },
+          {
+            onSuccess: () => {
+              m(!0);
+            },
+          },
         );
-      },
-      ariaLabel: intl.formatMessage({
-        id: "settings.general.plugins.toggle",
-        defaultMessage: "Toggle plugins",
       }),
-    }),
-  });
+      (t[7] = l),
+      (t[8] = O));
+  let k;
+  t[9] === i
+    ? (k = t[10])
+    : ((k = i.formatMessage({
+        id: `settings.general.plugins.toggle`,
+        defaultMessage: `Toggle plugins`,
+        description: `Aria label for the plugins setting toggle`,
+      })),
+      (t[9] = i),
+      (t[10] = k));
+  let A;
+  t[11] !== l.isPending || t[12] !== E || t[13] !== O || t[14] !== k
+    ? ((A = (0, C.jsx)(o, { checked: E, disabled: D, onChange: O, ariaLabel: k })),
+      (t[11] = l.isPending),
+      (t[12] = E),
+      (t[13] = O),
+      (t[14] = k),
+      (t[15] = A))
+    : (A = t[15]);
+  let j;
+  return (
+    t[16] !== T || t[17] !== A
+      ? ((j = (0, C.jsx)(f, { label: w, description: T, control: A })),
+        (t[16] = T),
+        (t[17] = A),
+        (t[18] = j))
+      : (j = t[18]),
+    j
+  );
 }
-
-function initializePluginsSettingsRow(): void {
-  initializeInternationalization();
+function y(e) {
+  return e.name === `plugins`;
 }
-
-export { initializePluginsSettingsRow as n, PluginsSettingsRow as t };
+function b(e) {
+  return e.name === `apps` && e.enabled;
+}
+var x, S, C;
+function w() {
+  return (w = e(() => {
+    ((x = t()), r(), (S = u()), a(), m(), s(), _(), l(), (C = i()));
+  }))();
+}
+export { w as n, v as t };

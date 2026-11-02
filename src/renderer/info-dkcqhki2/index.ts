@@ -1,9 +1,11 @@
-// Mermaid info diagram service facade. Release chunk: info-DKCQHKI2-6cd828785a90.js.
-import "@rchunk/rolldown-runtime";
-import { w as initializeMermaidServiceRuntime } from "@rchunk/chunk-KEIR6QF5";
-import { n as createInfoServices, r as initializeInfoServices } from "@rchunk/chunk-BIQX33UG";
-
-initializeInfoServices();
-initializeMermaidServiceRuntime();
-
-export { createInfoServices };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { w as t } from "@rchunk/chunk-KEIR6QF5";
+import { n, r } from "@rchunk/chunk-BIQX33UG";
+function i() {
+  return (i = e(() => {
+    (r(), t());
+  }))();
+}
+i();
+export { n as createInfoServices };

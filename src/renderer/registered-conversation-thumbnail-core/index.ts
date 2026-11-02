@@ -1,57 +1,116 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
-  BX as useSignalFamilyValue,
-  FX as initializeSignalRuntime,
-  I3 as getJsxRuntime,
-  ZI as appScope,
-  oZ as createSignalFamily,
-  type ScopedSignalFamily,
+  $3 as n,
+  BX as r,
+  FX as i,
+  I3 as a,
+  l3 as o,
+  rZ as s,
+  yV as c,
 } from "@rchunk/app-shared";
-import { HZt as initializeConversationModel } from "@rchunk/app-initial";
-import { n as initializeConversationThumbnailUi, t as ConversationThumbnail } from "@rchunk/conversation-thumbnail-ui";
-
-interface ConversationThumbnailProps {
-  conversationId: string;
-  draft?: string;
-  hostId?: string;
-  title: string;
+import {
+  $mn as l,
+  Bhn as u,
+  HZt as d,
+  IZt as f,
+  Iin as p,
+  Mfn as m,
+  Mhn as h,
+  Min as g,
+  Nfn as _,
+  Nhn as v,
+  Vhn as y,
+  WQt as b,
+  cet as x,
+  ehn as S,
+  f$t as C,
+  let as w,
+  m$t as T,
+  p$t as E,
+  vZt as D,
+} from "@rchunk/app-initial";
+import { n as O, t as k } from "@rchunk/conversation-thumbnail-ui";
+function A(e) {
+  let t = (0, j.c)(7),
+    { conversationId: n, hostId: i, title: a, draft: o } = e,
+    s;
+  t[0] !== n || t[1] !== i
+    ? ((s = { conversationId: n, hostId: i }), (t[0] = n), (t[1] = i), (t[2] = s))
+    : (s = t[2]);
+  let c = r(F, s),
+    l;
+  return (
+    t[3] !== o || t[4] !== c || t[5] !== a
+      ? ((l = c == null ? null : (0, P.jsx)(k, { title: a, draft: o, ...c })),
+        (t[3] = o),
+        (t[4] = c),
+        (t[5] = a),
+        (t[6] = l))
+      : (l = t[6]),
+    l
+  );
 }
-interface ConversationThumbnailState extends Record<string, unknown> {
-  requestExcerpt?: string | null;
-  responseExcerpt?: string | null;
-  statusState: { type: "error" | "idle" | "loading"; unread?: boolean; unreadCount?: number };
-  waitingFor?: "waitingOnApproval" | "waitingOnUserInput" | null;
+var j, M, N, P, F;
+function I() {
+  return (I = e(() => {
+    ((j = n()),
+      (M = t(c(), 1)),
+      (N = t(o(), 1)),
+      i(),
+      l(),
+      y(),
+      v(),
+      d(),
+      m(),
+      p(),
+      O(),
+      w(),
+      E(),
+      (P = a()),
+      (F = s(
+        x,
+        ({ conversationId: e, hostId: t }, { get: n, scope: r }) => {
+          if (e == null) return null;
+          let i = t == null ? f(r, e) : n(D, t);
+          if (i == null) return null;
+          let a = n(b, { hostId: i.getHostId(), threadId: e }),
+            o = i.getConversation(e);
+          if (o == null) return null;
+          let s = g(o),
+            c = (0, M.default)(s?.items, (e) => e?.type === `userMessage`),
+            l = (0, M.default)(s?.items, (e) => e?.type === `agentMessage`),
+            d = l > c ? s?.items[l] : null,
+            p = a?.threadRuntimeStatus ?? o.threadRuntimeStatus,
+            m = (a?.lastTurnStatus ?? s?.status) === `inProgress`;
+          (o.unconfirmedTurnSubmissions?.length ?? 0) > 0
+            ? (m = !0)
+            : o.resumeState === `needs_resume`
+              ? (m = p?.type === `active`)
+              : (s ?? (m = o.resumeState === `resuming`));
+          let v = null;
+          p?.type === `active` &&
+            (p.activeFlags.includes(`waitingOnApproval`)
+              ? (v = `waitingOnApproval`)
+              : p.activeFlags.includes(`waitingOnUserInput`) && (v = `waitingOnUserInput`));
+          let y = { type: m ? `loading` : `idle`, unread: a?.hasUnreadTurn ?? o.hasUnreadTurn };
+          (p?.type === `systemError` || (a?.lastTurnStatus ?? s?.status) === `failed`) &&
+            (y.type = `error`);
+          let x = C(o.requests, n(_));
+          x != null && (v = T(x) ? `waitingOnApproval` : `waitingOnUserInput`);
+          let w = !m || s?.status === `inProgress`,
+            E = s?.items[c],
+            O = E?.type === `userMessage` ? E.content : s?.params.input,
+            k = u(h({ input: O }).displayRawText);
+          return {
+            waitingFor: v,
+            statusState: y,
+            requestExcerpt: w ? S(k.slice(0, 1e3)) : null,
+            responseExcerpt: w && d?.type === `agentMessage` ? S(d.text.slice(0, 1e3)) : null,
+          };
+        },
+        { isEqual: N.default },
+      )));
+  }))();
 }
-
-let conversationThumbnailSignal: ScopedSignalFamily<
-  Record<string, unknown>,
-  { conversationId: string; hostId?: string },
-  ConversationThumbnailState | null
->;
-
-function RegisteredConversationThumbnail(props: ConversationThumbnailProps): unknown {
-  const preview = useSignalFamilyValue(conversationThumbnailSignal, {
-    conversationId: props.conversationId,
-    hostId: props.hostId,
-  }) as ConversationThumbnailState | null;
-  if (preview == null) return null;
-  return getJsxRuntime().jsx(ConversationThumbnail, {
-    ...preview,
-    draft: props.draft,
-    title: props.title,
-  });
-}
-
-let initialized = false;
-function initializeRegisteredConversationThumbnail(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeSignalRuntime();
-  initializeConversationModel();
-  initializeConversationThumbnailUi();
-  conversationThumbnailSignal = createSignalFamily(appScope, () => null);
-  getJsxRuntime();
-}
-
-initializeRegisteredConversationThumbnail();
-export { initializeRegisteredConversationThumbnail as n, RegisteredConversationThumbnail as t };
+export { I as n, A as t };

@@ -1,244 +1,250 @@
-// sketch-composer-state —— Sketch composer 的编辑、上传、撤销保留和关闭确认状态机。
-// 原版：app/webview/assets/composer-state-422d489ae887.js。
-
-import "@rchunk/app-shared";
-import { n as createSketchEditor, t as initializeSketch } from "@rchunk/sketch";
-
-type UploadStatus = "success" | "canceled" | "blocked" | "error";
-interface Environment { composerId: string; canOpenSketch: boolean; canEditSketch: boolean; isDarkMode: boolean }
-interface SketchDocument { objects: unknown[]; [key: string]: unknown }
-interface Editor {
-  pointerCancel(): void; discardPendingTextEdit(): void; commitPendingTextEdit(): void;
-  replaceDocument(document: SketchDocument): void;
-  getSnapshot(): { document: SketchDocument; effectiveDocument: SketchDocument; hasActiveGesture: boolean };
-  export(options: unknown): Promise<{ kind: "success"; blob: Blob } | { kind: "empty" | "unavailable" | "busy" | "too-large" }>;
-}
-interface UploadService {
-  subscribe(listener: (ids: string[]) => void): () => void;
-  track(event: string): void;
-  createFileName(): string;
-  save(file: File, options: {
-    id: string; replaceUploadId: string | null; signal: AbortSignal; isAvailable(): boolean;
-    onQueued(id: string): void; onComplete(status: UploadStatus): void;
-  }): Promise<void>;
-}
-interface Entry {
-  id: string; editor: Editor; uploadId: string | null; fileName: string | null;
-  savedDocument: SketchDocument | null; saving: AbortController | null; undoRetentionCount: number;
-  onSave?: () => void;
-}
-
-const documentsEqual = (left: SketchDocument, right: SketchDocument) => JSON.stringify(left) === JSON.stringify(right);
-
-function createSketchComposerState(
-  getEnvironment: () => Environment,
-  uploads: UploadService,
-  options: { createEditor?(options: unknown): Editor; createId?(): string } = {},
-) {
-  initializeSketch();
-  const composerId = getEnvironment().composerId;
-  const entries = new Map<string, Entry>();
-  const history: Entry[] = [];
-  const listeners = new Set<() => void>();
-  let uploadIds: string[] = [];
-  let disposed = false;
-  let keepEditingCallback: (() => void) | undefined;
-  let snapshot = { active: null as Entry | null, confirmingDiscard: false, transition: null as any };
-  const available = () => !disposed && getEnvironment().composerId === composerId;
-  const publish = (patch: Partial<typeof snapshot>) => {
-    snapshot = { ...snapshot, ...patch };
-    listeners.forEach((listener) => listener());
-  };
-  const remove = (entry: Entry) => {
-    entry.onSave = undefined;
-    entry.editor.pointerCancel();
-    entry.editor.discardPendingTextEdit();
-    entries.delete(entry.id);
-    const index = history.indexOf(entry);
-    if (index !== -1) history.splice(index, 1);
-  };
-  const close = () => {
-    keepEditingCallback = undefined;
-    publish({ active: history.at(-1) ?? null, confirmingDiscard: false });
-  };
-  const completeTransition = (transition: any) => {
-    if (snapshot.transition !== transition) return;
-    if (transition?.imageUrl != null) URL.revokeObjectURL(transition.imageUrl);
-    publish({ transition: null });
-  };
-  const unsubscribe = uploads.subscribe((ids) => {
-    uploadIds = ids;
-    let closeActive = false;
-    if (snapshot.transition != null && !ids.includes(snapshot.transition.targetUploadId)) completeTransition(snapshot.transition);
-    for (const entry of entries.values()) {
-      if (entry.saving == null && entry.uploadId != null && !ids.includes(entry.uploadId)) {
-        closeActive ||= snapshot.active === entry;
-        if (entry.undoRetentionCount === 0) remove(entry);
-      }
-    }
-    if (closeActive) close();
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import { l3 as n } from "@rchunk/app-shared";
+import { n as r, t as i } from "@rchunk/sketch";
+function a(e, t) {
+  let n = e().composerId,
+    i = new Map(),
+    a = [],
+    s = new Set(),
+    c = [],
+    l = !1,
+    u,
+    d = { active: null, confirmingDiscard: !1, transition: null },
+    f = () => !l && e().composerId === n,
+    p = (e) => {
+      ((d = { ...d, ...e }), s.forEach((e) => e()));
+    },
+    m = (e) => {
+      ((e.onSave = void 0),
+        e.editor.pointerCancel(),
+        e.editor.discardPendingTextEdit(),
+        i.delete(e.id));
+      let t = a.indexOf(e);
+      t !== -1 && a.splice(t, 1);
+    },
+    h = () => {
+      ((u = void 0), p({ active: a.at(-1) ?? null, confirmingDiscard: !1 }));
+    };
+  function g(e) {
+    d.transition === e && (URL.revokeObjectURL(e.imageUrl), p({ transition: null }));
+  }
+  let _ = t.subscribe((e) => {
+    c = e;
+    let t = !1;
+    d.transition != null && !c.includes(d.transition.targetUploadId) && g(d.transition);
+    for (let e of i.values())
+      e.saving == null &&
+        e.uploadId != null &&
+        !c.includes(e.uploadId) &&
+        ((t ||= d.active === e), e.undoRetentionCount === 0 && m(e));
+    t && h();
   });
-
-  function openNew(onSave?: () => void): boolean {
-    const environment = getEnvironment();
-    if (!available() || !environment.canOpenSketch || snapshot.active != null) return false;
-    let entry = history.at(-1);
-    if (entry == null) {
-      entry = {
-        id: options.createId?.() ?? crypto.randomUUID(),
-        editor: (options.createEditor ?? createSketchEditor)({ style: { color: environment.isDarkMode ? "#ffffff" : "#000000" } }),
-        uploadId: null, fileName: null, savedDocument: null, saving: null, undoRetentionCount: 0, onSave,
-      };
-      entries.set(entry.id, entry);
-      history.push(entry);
-    } else entry.onSave = onSave;
-    if (snapshot.transition != null) completeTransition(snapshot.transition);
-    publish({ active: entry, confirmingDiscard: false });
-    uploads.track("opened");
-    return true;
+  function v(n) {
+    let o = e();
+    if (!f() || !o.canOpenSketch || d.active != null) return !1;
+    let s = a.at(-1);
+    return (
+      s == null
+        ? ((s = {
+            id: crypto.randomUUID(),
+            editor: r({ style: { color: o.isDarkMode ? `#ffffff` : `#000000` } }),
+            uploadId: null,
+            fileName: null,
+            savedDocument: null,
+            saving: null,
+            undoRetentionCount: 0,
+            onSave: n,
+          }),
+          i.set(s.id, s),
+          a.push(s))
+        : (s.onSave = n),
+      d.transition != null && g(d.transition),
+      p({ active: s, confirmingDiscard: !1 }),
+      t.track(`opened`),
+      !0
+    );
   }
-
-  function openAttachment(uploadId: string): boolean {
-    if (!available() || !getEnvironment().canEditSketch || !uploadIds.includes(uploadId)) return false;
-    const entry = [...entries.values()].find((item) => item.uploadId === uploadId);
-    if (entry == null || entry.saving != null) return false;
-    publish({ active: entry, confirmingDiscard: false });
-    uploads.track("reopened");
-    return true;
+  function y(n) {
+    if (!f() || !e().canEditSketch || !c.includes(n)) return !1;
+    let r = Array.from(i.values()).find((e) => e.uploadId === n);
+    return r == null || r.saving != null
+      ? !1
+      : (d.transition != null && g(d.transition),
+        p({ active: r, confirmingDiscard: !1 }),
+        t.track(`reopened`),
+        !0);
   }
-
-  function retainAttachmentForUndo(uploadId: string): (() => void) | undefined {
-    const entry = [...entries.values()].find((item) => item.uploadId === uploadId);
-    if (entry == null || entry.saving != null || !uploadIds.includes(uploadId)) return;
-    entry.undoRetentionCount += 1;
+  function b(e) {
+    let t = Array.from(i.values()).find((t) => t.uploadId === e);
+    if (t == null || t.saving != null || !c.includes(e)) return;
+    t.undoRetentionCount += 1;
+    let n = t.id;
     return () => {
-      const current = entries.get(entry.id);
-      if (current != null && --current.undoRetentionCount === 0 && !uploadIds.includes(uploadId)) remove(current);
+      let t = i.get(n);
+      t != null && (--t.undoRetentionCount, t.undoRetentionCount === 0 && !c.includes(e) && m(t));
     };
   }
-
-  function discard(): void {
-    const entry = snapshot.active;
-    if (entry == null || entry.saving != null) return;
-    if (entry.savedDocument == null) remove(entry);
-    else {
-      entry.onSave = undefined;
-      entry.editor.replaceDocument(entry.savedDocument);
-    }
-    close();
+  function x() {
+    let e = d.active;
+    e != null &&
+      e.saving == null &&
+      (e.savedDocument == null
+        ? m(e)
+        : ((e.onSave = void 0), e.editor.replaceDocument(e.savedDocument)),
+      h());
   }
-
-  function requestClose(callback?: () => void): void {
-    const entry = snapshot.active;
-    if (!available() || entry == null || entry.saving != null) return;
-    const current = entry.editor.getSnapshot();
-    const dirty = current.hasActiveGesture ||
-      (entry.savedDocument == null ? current.effectiveDocument.objects.length > 0 : !documentsEqual(current.effectiveDocument, entry.savedDocument));
-    if (dirty) {
-      keepEditingCallback = callback;
-      publish({ confirmingDiscard: true });
-    } else discard();
+  function S(e) {
+    let t = d.active;
+    if (!f() || t == null || t.saving != null) return;
+    let { effectiveDocument: n, hasActiveGesture: r } = t.editor.getSnapshot();
+    r || (t.savedDocument == null ? n.objects.length > 0 : !(0, o.default)(n, t.savedDocument))
+      ? ((u = e), p({ confirmingDiscard: !0 }))
+      : x();
   }
-
-  async function save(): Promise<void> {
-    const entry = snapshot.active;
-    const environment = getEnvironment();
-    if (!available() || entry == null || entry.saving != null || entry.editor.getSnapshot().hasActiveGesture ||
-      !environment.canEditSketch || (entry.uploadId == null && !environment.canOpenSketch)) return;
-    entry.editor.commitPendingTextEdit();
-    const document = entry.editor.getSnapshot().document;
-    if (document.objects.length === 0) return;
-    if (entry.savedDocument != null && documentsEqual(document, entry.savedDocument)) {
-      entry.editor.replaceDocument(document);
-      close();
+  async function C(n) {
+    let r = d.active,
+      i = e();
+    if (
+      !f() ||
+      r == null ||
+      r.saving != null ||
+      r.editor.getSnapshot().hasActiveGesture ||
+      !i.canEditSketch ||
+      (r.uploadId == null && !i.canOpenSketch)
+    )
+      return;
+    r.editor.commitPendingTextEdit();
+    let s = r.editor.getSnapshot().document;
+    if (s.objects.length === 0) return;
+    if (r.savedDocument != null && (0, o.default)(s, r.savedDocument)) {
+      (r.editor.replaceDocument(s), h());
       return;
     }
-    const controller = new AbortController();
-    entry.saving = controller;
-    publish({ confirmingDiscard: false });
-    let queuedId: string | null = null;
-    let completed = false;
-    const finish = (status: UploadStatus) => {
-      completed = true;
-      if (!available()) return;
-      entry.saving = null;
-      if (status === "success" && queuedId != null) {
-        entry.uploadId = queuedId;
-        entry.savedDocument = document;
-        uploads.track("saveCompleted");
-      } else if (status === "canceled") remove(entry);
-      else if (entry.uploadId == null && !history.includes(entry)) history.push(entry);
-      if (snapshot.active == null && status !== "canceled" && status !== "success") publish({ active: entry });
-      publish({});
-    };
+    let c = new AbortController();
+    ((r.saving = c), p({ confirmingDiscard: !1 }));
+    let l = null,
+      u = !1,
+      _ = null,
+      v = (e) => {
+        ((u = !0),
+          f() &&
+            (e !== `success` && d.transition?.targetUploadId === l && g(d.transition),
+            (r.saving = null),
+            e === `success` && l != null
+              ? ((r.uploadId = l), (r.savedDocument = s), t.track(`saveCompleted`))
+              : e === `canceled`
+                ? m(r)
+                : (r.uploadId == null && !a.includes(r) && a.push(r), d.active ?? p({ active: r })),
+            p({})));
+      };
     try {
-      const result = await entry.editor.export({
-        backgroundColor: environment.isDarkMode ? "#212121" : "#ffffff",
-        padding: 36, scale: 1, mimeType: "image/png",
+      let o = await r.editor.export({
+        backgroundColor: i.isDarkMode ? `#212121` : `#ffffff`,
+        padding: 36,
+        scale: 1,
+        mimeType: `image/png`,
       });
-      if (!available() || controller.signal.aborted) return;
-      if (result.kind !== "success") {
-        finish("error");
+      if (!f() || c.signal.aborted) return;
+      let s = e();
+      if (!s.canEditSketch || (r.uploadId == null && !s.canOpenSketch)) {
+        v(`blocked`);
         return;
       }
-      const fileName = entry.fileName ?? uploads.createFileName();
-      await uploads.save(new File([result.blob], fileName, { type: "image/png" }), {
-        id: entry.id,
-        replaceUploadId: entry.uploadId,
-        signal: controller.signal,
-        isAvailable: () => available() && getEnvironment().canEditSketch &&
-          (entry.uploadId != null || queuedId != null || getEnvironment().canOpenSketch),
-        onQueued: (id) => {
-          queuedId = id;
-          entry.fileName = fileName;
-          const index = history.indexOf(entry);
-          if (index !== -1) history.splice(index, 1);
-          if (snapshot.active === entry) close();
-          const callback = entry.onSave;
-          entry.onSave = undefined;
-          callback?.();
+      if (o.kind !== `success`) {
+        v(`error`);
+        return;
+      }
+      if (n != null) {
+        let e = null;
+        try {
+          e = URL.createObjectURL(o.blob);
+          let t = new Image();
+          t.src = e;
+          let r = t.decode(),
+            i = await new Promise((e) => {
+              let t = (t) => {
+                  (window.clearTimeout(i), c.signal.removeEventListener(`abort`, n), e(t));
+                },
+                n = () => t(!1),
+                i = window.setTimeout(n, 150);
+              (c.signal.addEventListener(`abort`, n, { once: !0 }), r.then(() => t(!0), n));
+            });
+          if (!f() || c.signal.aborted) return;
+          let a = i ? n(o.bounds) : null;
+          a != null &&
+            a.width > 0 &&
+            a.height > 0 &&
+            ((_ = { source: a, imageUrl: e }), (e = null));
+        } catch {
+        } finally {
+          e != null && URL.revokeObjectURL(e);
+        }
+      }
+      if (!f() || c.signal.aborted) return;
+      let u = r.fileName ?? t.createFileName();
+      await t.save(new File([o.blob], u, { type: `image/png` }), {
+        id: r.id,
+        replaceUploadId: r.uploadId,
+        signal: c.signal,
+        isAvailable: () => {
+          let t = e();
+          return f() && t.canEditSketch && (r.uploadId != null || l != null || t.canOpenSketch);
         },
-        onComplete: finish,
+        onQueued: (e) => {
+          if (((l = e), !f())) {
+            c.abort();
+            return;
+          }
+          r.fileName = u;
+          let t = a.indexOf(r);
+          (t !== -1 && a.splice(t, 1),
+            d.active === r && h(),
+            _ != null &&
+              (d.transition != null && g(d.transition),
+              p({ transition: { ..._, targetUploadId: e } }),
+              (_ = null)));
+          let n = r.onSave;
+          ((r.onSave = void 0), n?.());
+        },
+        onComplete: v,
       });
     } catch {
-      if (!completed) finish(controller.signal.aborted ? "canceled" : "error");
+      u || v(c.signal.aborted ? `canceled` : `error`);
     } finally {
-      entry.saving = null;
-      if (available()) publish({});
+      (_ != null && URL.revokeObjectURL(_.imageUrl), (r.saving = null), f() && p({}));
     }
   }
-
   return {
-    subscribe(listener: () => void) {
-      listeners.add(listener);
-      return () => listeners.delete(listener);
-    },
-    getSnapshot: () => snapshot,
-    openNew,
-    openAttachment,
-    retainAttachmentForUndo,
-    requestClose,
-    discard,
-    keepEditing() {
-      const callback = keepEditingCallback;
-      keepEditingCallback = undefined;
-      publish({ confirmingDiscard: false });
-      callback?.();
-    },
-    save,
-    completeTransition,
-    dispose() {
-      disposed = true;
-      keepEditingCallback = undefined;
-      unsubscribe();
-      listeners.clear();
-      if (snapshot.transition != null) completeTransition(snapshot.transition);
-      for (const entry of [...entries.values()]) {
-        entry.saving?.abort();
-        remove(entry);
+    subscribe: (e) => (
+      s.add(e),
+      () => {
+        s.delete(e);
       }
+    ),
+    getSnapshot: () => d,
+    openNew: v,
+    openAttachment: y,
+    retainAttachmentForUndo: b,
+    requestClose: S,
+    discard: x,
+    keepEditing: () => {
+      let e = u;
+      ((u = void 0), p({ confirmingDiscard: !1 }), e?.());
+    },
+    save: C,
+    completeTransition: g,
+    dispose: () => {
+      ((l = !0), (u = void 0), _(), s.clear(), d.transition != null && g(d.transition));
+      for (let e of i.values()) (e.saving?.abort(), m(e));
     },
   };
 }
-
-export { createSketchComposerState };
+var o;
+function s() {
+  return (s = e(() => {
+    (i(), (o = t(n(), 1)));
+  }))();
+}
+s();
+export { a as createSketchComposerState };

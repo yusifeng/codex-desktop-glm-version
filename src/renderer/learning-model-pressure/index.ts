@@ -1,18 +1,24 @@
-// Pressure learning-model manifest. Release chunk: type-e695696a56c8.js.
-import "@rchunk/rolldown-runtime";
-
-const pressureSpecification = {
-  type: "PRESSURE",
-  version: 1,
-  thumbnailAssetKey: "pressure-v1",
-  canonicalFormula: "P = \\frac{F}{A}",
-  canonicalFormulaAliases: ["P = F/A", "F = PA", "A = F/P"],
-  parameters: {
-    forceNewtons: { kind: "number" as const, defaultValue: 100, min: 0, max: 200 },
-    areaSquareMeters: { kind: "number" as const, defaultValue: 2, min: 0.25, max: 5 },
-  },
-};
-
-function initializePressureSpecification(): void {}
-
-export { pressureSpecification as n, initializePressureSpecification as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((t = `PRESSURE`),
+      (n = `pressure-v1`),
+      (r = `P = \\frac{F}{A}`),
+      (i = [`P = F/A`, `F = PA`, `A = F/P`]),
+      (a = {
+        forceNewtons: { kind: `number`, defaultValue: 100, min: 0, max: 200 },
+        areaSquareMeters: { kind: `number`, defaultValue: 2, min: 0.25, max: 5 },
+      }),
+      (o = {
+        type: t,
+        version: 1,
+        thumbnailAssetKey: n,
+        canonicalFormula: r,
+        canonicalFormulaAliases: i,
+        parameters: a,
+      }));
+  }))();
+}
+export { o as n, s as t };

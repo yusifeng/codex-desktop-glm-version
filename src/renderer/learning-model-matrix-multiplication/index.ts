@@ -1,27 +1,48 @@
-// Matrix-multiplication row-by-column model. Release chunk: model-f6e5e84f2aaf.js.
-import "@rchunk/rolldown-runtime";
-
-interface MatrixMultiplicationInput { selectedRow?: number; selectedColumn?: number }
-
-const selectedRowControl = { min: 1, max: 2, step: 1, defaultValue: 1 };
-const selectedColumnControl = { min: 1, max: 2, step: 1, defaultValue: 1 };
-const leftMatrix = [[2, 1, 3], [4, 0, 2]] as const;
-const rightMatrix = [[5, 2], [1, 4], [3, 7]] as const;
-const normalizeSelection = (value: number | undefined, fallback: number, minimum: number, maximum: number): number => Math.min(Math.max(typeof value === "number" && Number.isFinite(value) ? Math.round(value) : fallback, minimum), maximum);
-const normalizeMatrixSelection = (input: MatrixMultiplicationInput) => ({
-  selectedRow: normalizeSelection(input.selectedRow, selectedRowControl.defaultValue, selectedRowControl.min, selectedRowControl.max),
-  selectedColumn: normalizeSelection(input.selectedColumn, selectedColumnControl.defaultValue, selectedColumnControl.min, selectedColumnControl.max),
-});
-const multiplyMatrices = (): number[][] => leftMatrix.map((row) => rightMatrix[0].map((_unused, columnIndex) => row.reduce((sum, value, index) => sum + value * rightMatrix[index][columnIndex], 0)));
-const calculateMatrixMultiplication = (input: MatrixMultiplicationInput) => {
-  const normalized = normalizeMatrixSelection(input);
-  const rowIndex = normalized.selectedRow - 1;
-  const columnIndex = normalized.selectedColumn - 1;
-  const selectedRowValues = leftMatrix[rowIndex];
-  const selectedColumnValues = rightMatrix.map((row) => row[columnIndex]);
-  const terms = selectedRowValues.map((left, index) => ({ left, right: selectedColumnValues[index], product: left * selectedColumnValues[index] }));
-  return { ...normalized, rowIndex, columnIndex, selectedRowValues, selectedColumnValues, terms, result: terms.reduce((sum, term) => sum + term.product, 0), productMatrix: multiplyMatrices() };
-};
-function initializeMatrixMultiplicationModel(): void {}
-
-export { calculateMatrixMultiplication as a, selectedRowControl as i, rightMatrix as n, initializeMatrixMultiplicationModel as o, selectedColumnControl as r, normalizeMatrixSelection as s, leftMatrix as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c;
+function l() {
+  return (l = e(() => {
+    ((t = { min: 1, max: 2, step: 1, defaultValue: 1 }),
+      (n = { min: 1, max: 2, step: 1, defaultValue: 1 }),
+      (r = [
+        [2, 1, 3],
+        [4, 0, 2],
+      ]),
+      (i = [
+        [5, 2],
+        [1, 4],
+        [3, 7],
+      ]),
+      (a = (e, t, n) =>
+        Math.min(Math.max(typeof e == `number` && Number.isFinite(e) ? Math.round(e) : t, t), n)),
+      (o = (e) => ({
+        selectedRow: a(e.selectedRow ?? t.defaultValue, t.min, t.max),
+        selectedColumn: a(e.selectedColumn ?? n.defaultValue, n.min, n.max),
+      })),
+      (s = () => r.map((e) => i[0].map((t, n) => e.reduce((e, t, r) => e + t * i[r][n], 0)))),
+      (c = (e) => {
+        let t = o(e),
+          n = t.selectedRow - 1,
+          a = t.selectedColumn - 1,
+          c = r[n],
+          l = i.map((e) => e[a]),
+          u = c.map((e, t) => {
+            let n = l[t];
+            return { left: e, right: n, product: e * n };
+          }),
+          d = u.reduce((e, t) => e + t.product, 0);
+        return {
+          ...t,
+          rowIndex: n,
+          columnIndex: a,
+          selectedRowValues: c,
+          selectedColumnValues: l,
+          terms: u,
+          result: d,
+          productMatrix: s(),
+        };
+      }));
+  }))();
+}
+export { c as a, t as i, i as n, l as o, n as r, o as s, r as t };

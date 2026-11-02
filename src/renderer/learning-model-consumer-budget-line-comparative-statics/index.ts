@@ -1,18 +1,88 @@
-// Consumer budget-line comparative-statics model. Release chunk: model-f9b654a51eac.js.
-import "@rchunk/rolldown-runtime";
-
-type ChangeScenario = "income_increase" | "income_decrease" | "price_x_increase" | "price_x_decrease";
-interface BudgetValues { changeScenario?: string | null; changeMagnitudePercent?: number | null }
-interface BudgetLine { changeScenario: ChangeScenario; experiment: "income" | "price_x"; direction: "increase" | "decrease"; income: number; priceX: number; priceY: number; xIntercept: number; yIntercept: number; slope: number; opportunityCostOfX: number }
-interface BudgetManifest { type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string; parameters: { changeScenario: { kind: "enum"; defaultValue: ChangeScenario; allowedValues: ChangeScenario[] }; changeMagnitudePercent: { kind: "number"; defaultValue: number; min: number; max: number } } }
-let consumerBudgetManifest: BudgetManifest; let allowedScenarios: ChangeScenario[]; let budgetChartBounds: { xMin: number; xMax: number; yMin: number; yMax: number }; let defaultBudgetValues: { changeScenario: ChangeScenario; changeMagnitudePercent: number }; let normalizeBudgetValues: (values: BudgetValues) => { changeScenario: ChangeScenario; changeMagnitudePercent: number }; let calculateChangedBudgetLine: (values: BudgetValues) => BudgetLine; let baselineBudgetLine: BudgetLine; let budgetFeasiblePolygon: (line: BudgetLine) => Array<{ x: number; y: number }>; let manifestInitialized = false; let modelInitialized = false;
-function initializeConsumerBudgetManifest(): void { if (manifestInitialized) return; manifestInitialized = true; consumerBudgetManifest = { type: "CONSUMER_BUDGET_LINE_COMPARATIVE_STATICS", version: 1, thumbnailAssetKey: "consumer-budget-line-comparative-statics-v1", canonicalFormula: "M = P_x X + P_y Y", parameters: { changeScenario: { kind: "enum", defaultValue: "income_increase", allowedValues: ["income_increase", "income_decrease", "price_x_increase", "price_x_decrease"] }, changeMagnitudePercent: { kind: "number", defaultValue: 25, min: 5, max: 50 } } }; }
-function initializeConsumerBudgetModel(): void {
-  if (modelInitialized) return; modelInitialized = true; initializeConsumerBudgetManifest(); allowedScenarios = consumerBudgetManifest.parameters.changeScenario.allowedValues; budgetChartBounds = { xMin: 0, xMax: 21, yMin: 0, yMax: 10 }; defaultBudgetValues = { changeScenario: consumerBudgetManifest.parameters.changeScenario.defaultValue, changeMagnitudePercent: consumerBudgetManifest.parameters.changeMagnitudePercent.defaultValue };
-  const magnitude = consumerBudgetManifest.parameters.changeMagnitudePercent; const clampMagnitude = (value: number | null | undefined) => Math.min(magnitude.max, Math.max(magnitude.min, typeof value === "number" && Number.isFinite(value) ? value : magnitude.defaultValue)); const isScenario = (value: string | null | undefined): value is ChangeScenario => allowedScenarios.some(scenario => scenario === value);
-  normalizeBudgetValues = values => ({ changeScenario: isScenario(values.changeScenario) ? values.changeScenario : consumerBudgetManifest.parameters.changeScenario.defaultValue, changeMagnitudePercent: clampMagnitude(values.changeMagnitudePercent) });
-  const line = (changeScenario: ChangeScenario, experiment: "income" | "price_x", direction: "increase" | "decrease", income: number, priceX: number): BudgetLine => ({ changeScenario, experiment, direction, income, priceX, priceY: 10, xIntercept: income / priceX, yIntercept: income / 10, slope: -priceX / 10, opportunityCostOfX: priceX / 10 });
-  calculateChangedBudgetLine = values => { const normalized = normalizeBudgetValues(values); const experiment = normalized.changeScenario.startsWith("income") ? "income" : "price_x"; const direction = normalized.changeScenario.endsWith("increase") ? "increase" : "decrease"; const factor = 1 + (direction === "increase" ? 1 : -1) * normalized.changeMagnitudePercent / 100; return line(normalized.changeScenario, experiment, direction, experiment === "income" ? 60 * factor : 60, experiment === "price_x" ? 6 * factor : 6); };
-  baselineBudgetLine = line("income_increase", "income", "increase", 60, 6); budgetFeasiblePolygon = value => [{ x: 0, y: 0 }, { x: value.xIntercept, y: 0 }, { x: 0, y: value.yIntercept }];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `CONSUMER_BUDGET_LINE_COMPARATIVE_STATICS`),
+      (n = `consumer-budget-line-comparative-statics-v1`),
+      (r = `M = P_x X + P_y Y`),
+      (i = {
+        changeScenario: {
+          kind: `enum`,
+          defaultValue: `income_increase`,
+          allowedValues: [
+            `income_increase`,
+            `income_decrease`,
+            `price_x_increase`,
+            `price_x_decrease`,
+          ],
+        },
+        changeMagnitudePercent: { kind: `number`, defaultValue: 25, min: 5, max: 50 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-export { calculateChangedBudgetLine as a, normalizeBudgetValues as c, defaultBudgetValues as i, initializeConsumerBudgetManifest as l, budgetChartBounds as n, budgetFeasiblePolygon as o, allowedScenarios as r, initializeConsumerBudgetModel as s, baselineBudgetLine as t, consumerBudgetManifest as u };
+var s, c, l, u, d, f, p, m, h, g, _;
+function v() {
+  return (v = e(() => {
+    (o(),
+      (s = a.parameters.changeScenario.allowedValues),
+      (c = { xMin: 0, xMax: 21, yMin: 0, yMax: 10 }),
+      (l = {
+        changeScenario: a.parameters.changeScenario.defaultValue,
+        changeMagnitudePercent: a.parameters.changeMagnitudePercent.defaultValue,
+      }),
+      (u = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (d = (e) => {
+        let t = a.parameters.changeMagnitudePercent;
+        return u(Number.isFinite(e) ? e : t.defaultValue, t.min, t.max);
+      }),
+      (f = (e) => ({
+        changeScenario: s.includes(e.changeScenario)
+          ? e.changeScenario
+          : a.parameters.changeScenario.defaultValue,
+        changeMagnitudePercent: d(e.changeMagnitudePercent),
+      })),
+      (p = (e) => ({
+        experiment: e.startsWith(`income`) ? `income` : `price_x`,
+        direction: e.endsWith(`increase`) ? `increase` : `decrease`,
+      })),
+      (m = ({ changeScenario: e, experiment: t, direction: n, income: r, priceX: i }) => ({
+        changeScenario: e,
+        experiment: t,
+        direction: n,
+        income: r,
+        priceX: i,
+        priceY: 10,
+        xIntercept: r / i,
+        yIntercept: r / 10,
+        slope: -i / 10,
+        opportunityCostOfX: i / 10,
+      })),
+      (h = (e) => {
+        let t = f(e),
+          { experiment: n, direction: r } = p(t.changeScenario),
+          i = 1 + ((r === `increase` ? 1 : -1) * t.changeMagnitudePercent) / 100;
+        return m({
+          changeScenario: t.changeScenario,
+          experiment: n,
+          direction: r,
+          income: n === `income` ? 60 * i : 60,
+          priceX: n === `price_x` ? 6 * i : 6,
+        });
+      }),
+      (g = m({
+        changeScenario: `income_increase`,
+        experiment: `income`,
+        direction: `increase`,
+        income: 60,
+        priceX: 6,
+      })),
+      (_ = (e) => [
+        { x: 0, y: 0 },
+        { x: e.xIntercept, y: 0 },
+        { x: 0, y: e.yIntercept },
+      ]));
+  }))();
+}
+export { h as a, f as c, l as i, o as l, c as n, _ as o, s as r, v as s, g as t, a as u };

@@ -1,20 +1,118 @@
-// Beta-oxidation reaction-cycle learning model.
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-
-interface StepValues { stepIndex?: number | null } interface MessageDescriptor { id: string; defaultMessage: string } interface MessageFormatter { formatMessage(descriptor: MessageDescriptor): string }
-const betaOxidationControl = { min: 0, max: 4, step: 1, defaultValue: 0 };
-const betaOxidationSteps = [
-  { key: "start", label: { id: "learningBlock.betaOxidationCycle.step.start", defaultMessage: "Starting molecule" }, caption: { id: "learningBlock.betaOxidationCycle.caption.start", defaultMessage: "A saturated fatty acyl-CoA enters the cycle with its beta carbon two bonds from the CoA end." }, completedReactions: 0, hasFadh2: false, hasNadh: false, hasAcetylCoa: false },
-  { key: "fadOxidation", label: { id: "learningBlock.betaOxidationCycle.step.fadOxidation", defaultMessage: "First oxidation" }, caption: { id: "learningBlock.betaOxidationCycle.caption.fadOxidation", defaultMessage: "FAD accepts electrons as a double bond forms between the alpha and beta carbons." }, completedReactions: 1, hasFadh2: true, hasNadh: false, hasAcetylCoa: false },
-  { key: "hydration", label: { id: "learningBlock.betaOxidationCycle.step.hydration", defaultMessage: "Hydration" }, caption: { id: "learningBlock.betaOxidationCycle.caption.hydration", defaultMessage: "Water adds across the double bond, placing OH on the beta carbon." }, completedReactions: 2, hasFadh2: true, hasNadh: false, hasAcetylCoa: false },
-  { key: "nadOxidation", label: { id: "learningBlock.betaOxidationCycle.step.nadOxidation", defaultMessage: "Second oxidation" }, caption: { id: "learningBlock.betaOxidationCycle.caption.nadOxidation", defaultMessage: "NAD⁺ accepts electrons as the beta-carbon OH becomes a carbonyl." }, completedReactions: 3, hasFadh2: true, hasNadh: true, hasAcetylCoa: false },
-  { key: "thiolysis", label: { id: "learningBlock.betaOxidationCycle.step.thiolysis", defaultMessage: "Thiolysis" }, caption: { id: "learningBlock.betaOxidationCycle.caption.thiolysis", defaultMessage: "CoA-SH splits the bond between the alpha and beta carbons, releasing acetyl-CoA and a chain shortened by two carbons." }, completedReactions: 4, hasFadh2: true, hasNadh: true, hasAcetylCoa: true },
-] as const;
-const normalizeBetaOxidationValues = (values: StepValues) => ({ stepIndex: Math.min(betaOxidationControl.max, Math.max(betaOxidationControl.min, Math.round(Number.isFinite(values.stepIndex) ? Number(values.stepIndex) : betaOxidationControl.defaultValue))) });
-const deriveBetaOxidationStep = (values: StepValues) => { const safeValues = normalizeBetaOxidationValues(values); return { safeValues, activeStep: betaOxidationSteps[safeValues.stepIndex] }; };
-const formatMessage = (descriptor: MessageDescriptor, formatter?: MessageFormatter): string => formatter ? formatter.formatMessage(descriptor) : descriptor.defaultMessage;
-const formatBetaOxidationLabel = (step: (typeof betaOxidationSteps)[number], formatter?: MessageFormatter): string => formatMessage(step.label, formatter);
-const formatBetaOxidationCaption = (values: StepValues, formatter?: MessageFormatter): string => formatMessage(deriveBetaOxidationStep(values).activeStep.caption, formatter);
-function initializeBetaOxidationModel(): void {}
-export { initializeBetaOxidationModel as a, formatBetaOxidationLabel as i, deriveBetaOxidationStep as n, normalizeBetaOxidationValues as o, formatBetaOxidationCaption as r, betaOxidationControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { G2 as t, K2 as n } from "@rchunk/app-shared";
+var r, i, a, o, s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    (n(),
+      (r = { min: 0, max: 4, step: 1, defaultValue: 0 }),
+      (i = t({
+        startLabel: {
+          id: `learningBlock.betaOxidationCycle.step.start`,
+          defaultMessage: `Starting molecule`,
+        },
+        fadOxidationLabel: {
+          id: `learningBlock.betaOxidationCycle.step.fadOxidation`,
+          defaultMessage: `First oxidation`,
+        },
+        hydrationLabel: {
+          id: `learningBlock.betaOxidationCycle.step.hydration`,
+          defaultMessage: `Hydration`,
+        },
+        nadOxidationLabel: {
+          id: `learningBlock.betaOxidationCycle.step.nadOxidation`,
+          defaultMessage: `Second oxidation`,
+        },
+        thiolysisLabel: {
+          id: `learningBlock.betaOxidationCycle.step.thiolysis`,
+          defaultMessage: `Thiolysis`,
+        },
+        startCaption: {
+          id: `learningBlock.betaOxidationCycle.caption.start`,
+          defaultMessage: `A saturated fatty acyl-CoA enters the cycle with its beta carbon two bonds from the CoA end.`,
+        },
+        fadOxidationCaption: {
+          id: `learningBlock.betaOxidationCycle.caption.fadOxidation`,
+          defaultMessage: `FAD accepts electrons as a double bond forms between the alpha and beta carbons.`,
+        },
+        hydrationCaption: {
+          id: `learningBlock.betaOxidationCycle.caption.hydration`,
+          defaultMessage: `Water adds across the double bond, placing OH on the beta carbon.`,
+        },
+        nadOxidationCaption: {
+          id: `learningBlock.betaOxidationCycle.caption.nadOxidation`,
+          defaultMessage: `NAD⁺ accepts electrons as the beta-carbon OH becomes a carbonyl.`,
+        },
+        thiolysisCaption: {
+          id: `learningBlock.betaOxidationCycle.caption.thiolysis`,
+          defaultMessage: `CoA-SH splits the bond between the alpha and beta carbons, releasing acetyl-CoA and a chain shortened by two carbons.`,
+        },
+      })),
+      (a = [
+        {
+          key: `start`,
+          label: i.startLabel,
+          caption: i.startCaption,
+          completedReactions: 0,
+          hasFadh2: !1,
+          hasNadh: !1,
+          hasAcetylCoa: !1,
+        },
+        {
+          key: `fadOxidation`,
+          label: i.fadOxidationLabel,
+          caption: i.fadOxidationCaption,
+          completedReactions: 1,
+          hasFadh2: !0,
+          hasNadh: !1,
+          hasAcetylCoa: !1,
+        },
+        {
+          key: `hydration`,
+          label: i.hydrationLabel,
+          caption: i.hydrationCaption,
+          completedReactions: 2,
+          hasFadh2: !0,
+          hasNadh: !1,
+          hasAcetylCoa: !1,
+        },
+        {
+          key: `nadOxidation`,
+          label: i.nadOxidationLabel,
+          caption: i.nadOxidationCaption,
+          completedReactions: 3,
+          hasFadh2: !0,
+          hasNadh: !0,
+          hasAcetylCoa: !1,
+        },
+        {
+          key: `thiolysis`,
+          label: i.thiolysisLabel,
+          caption: i.thiolysisCaption,
+          completedReactions: 4,
+          hasFadh2: !0,
+          hasNadh: !0,
+          hasAcetylCoa: !0,
+        },
+      ]),
+      (o = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (s = (e) => ({
+        stepIndex: o(
+          Math.round(Number.isFinite(e.stepIndex) ? Number(e.stepIndex) : r.defaultValue),
+          r.min,
+          r.max,
+        ),
+      })),
+      (c = (e) => {
+        let t = s(e);
+        return { safeValues: t, activeStep: a[t.stepIndex] };
+      }),
+      (l = (e, t) => (t ? t.formatMessage(e) : e.defaultMessage)),
+      (u = (e, t) => l(e.label, t)),
+      (d = (e, t) => {
+        let { activeStep: n } = c(e);
+        return l(n.caption, t);
+      }));
+  }))();
+}
+export { f as a, u as i, c as n, s as o, d as r, r as t };

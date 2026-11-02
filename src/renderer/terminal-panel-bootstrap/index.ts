@@ -1,5 +1,6 @@
-import "@rchunk/rolldown-runtime";
-
-function initializeTerminalPanelBootstrap(): void {}
-
-export { initializeTerminalPanelBootstrap as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t() {
+  return (t = e(() => {}))();
+}
+export { t };

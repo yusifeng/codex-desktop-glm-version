@@ -1,10 +1,95 @@
-import "@rchunk/rolldown-runtime";
-import * as Classify from "@rchunk/classify";
-type FunctionName = "arcsin" | "arccos" | "arctan";
-let sineBounds: { min: number; max: number; step: number; defaultValue: number }, tangentBounds: typeof sineBounds;
-const boundsFor = (name: FunctionName) => name === "arctan" ? tangentBounds : sineBounds;
-const apply = (name: FunctionName, value: number) => name === "arccos" ? Math.acos(value) : name === "arctan" ? Math.atan(value) : Math.asin(value);
-const ratioLabel = (name: FunctionName) => name === "arccos" ? "x" : name === "arctan" ? "y/x" : "y";
-function parse(input = ""): { functionName: FunctionName; value: number } { const normalized = input.replace(/\\(?:sin|cos|tan)\^\{-1\}|\\(?:sin|cos|tan)\^-1/gi, (m) => "arc" + m.match(/sin|cos|tan/i)?.[0].toLowerCase()).replace(/\\(arcsin|arccos|arctan)/g, "$1").replace(/\\pi|π/g, "pi").replace(/\s+|[{}]/g, "").toLowerCase(); const match = /(arcsin|arccos|arctan)\(([^)]+)\)|(arcsin|arccos|arctan)([a-z0-9.+\-*/]+)/i.exec(normalized); const name = (match?.[1] ?? match?.[3] ?? "arcsin") as FunctionName; const expression = match?.[2] ?? match?.[4]; let value = boundsFor(name).defaultValue; if (expression && /^[0-9+\-*/().pi]+$/i.test(expression)) { try { const evaluated = Function('"use strict"; return (' + expression.replace(/pi/gi, "Math.PI") + ');')() as unknown; if (typeof evaluated === "number" && Number.isFinite(evaluated)) value = evaluated; } catch {} } return { functionName: name, value }; }
-function initialize(): void { (Classify as unknown as { a(): void }).a(); sineBounds = { min: -1, max: 1, step: .01, defaultValue: .5 }; tangentBounds = { min: -30, max: 30, step: .1, defaultValue: 0 }; }
-export { parse as a, initialize as i, ratioLabel as n, boundsFor as r, apply as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { a as t, c as n, l as r, u as i } from "@rchunk/classify";
+var a, o, s, c, l, u, d, f, p, m, h, g, _;
+function v() {
+  return (v = e(() => {
+    (t(),
+      (a = { min: -1, max: 1, step: 0.01, defaultValue: 0.5 }),
+      (o = { min: -30, max: 30, step: 0.1, defaultValue: 0 }),
+      (s =
+        /\\(?:dfrac|tfrac|frac)\{([+\-]?(?:\d+(?:\.\d+)?|\.\d+))\}\{([+\-]?(?:\d+(?:\.\d+)?|\.\d+))\}/g),
+      (c = /(?<function>arcsin|arccos|arctan)(?:\((?<paren>[^()]+)\)|(?<bare>[a-z0-9.+\-*/]+))/i),
+      (l = (e) =>
+        r(e)
+          .replace(s, `$1/$2`)
+          .replace(/\s+/g, ``)
+          .replace(/\\theta/g, `theta`)
+          .replace(/\\(?:left|right)/g, ``)
+          .replace(/\\sin\^\{-1\}|\\sin\^-1/gi, `arcsin`)
+          .replace(/\\cos\^\{-1\}|\\cos\^-1/gi, `arccos`)
+          .replace(/\\tan\^\{-1\}|\\tan\^-1/gi, `arctan`)
+          .replace(/sin\^\{-1\}|sin\^-1/gi, `arcsin`)
+          .replace(/cos\^\{-1\}|cos\^-1/gi, `arccos`)
+          .replace(/tan\^\{-1\}|tan\^-1/gi, `arctan`)
+          .replace(/\\arcsin/g, `arcsin`)
+          .replace(/\\arccos/g, `arccos`)
+          .replace(/\\arctan/g, `arctan`)
+          .replace(/\\pi|π/g, `pi`)
+          .replace(/[{}]/g, ``)
+          .toLowerCase()),
+      (u = (e) => {
+        let t = e.match(/^(arcsin|arccos|arctan)\(/);
+        if (!t) return null;
+        let n = 0;
+        for (let r = t[1].length; r < e.length; r += 1) {
+          let t = e[r];
+          if (t === `(`) n += 1;
+          else if (t === `)` && (--n, n === 0 && r !== e.length - 1)) return null;
+          if (n < 0) return null;
+        }
+        return n !== 0 || !e.endsWith(`)`)
+          ? null
+          : { functionName: t[1], argument: e.slice(t[1].length + 1, -1) };
+      }),
+      (d = (e) => {
+        let t = e.match(c),
+          n = t?.groups?.function;
+        return n ? { functionName: n, argument: t.groups?.paren ?? t.groups?.bare ?? `` } : null;
+      }),
+      (f = (e) => {
+        let t = e.replace(/\s+/g, ``);
+        if (!/^[0-9+\-*/().pi]+$/i.test(t)) return null;
+        let n = t.replace(/([+-])(?=[+-])/g, `$1 `).replace(/pi/gi, `Math.PI`);
+        try {
+          let e = Function(`"use strict"; return (${n});`)();
+          return Number.isFinite(e) ? Number(e) : null;
+        } catch {
+          return null;
+        }
+      }),
+      (p = (e) => (e === `arctan` ? o : a)),
+      (m = (e, t) => {
+        switch (e) {
+          case `arccos`:
+            return Math.acos(t);
+          case `arctan`:
+            return Math.atan(t);
+          default:
+            return Math.asin(t);
+        }
+      }),
+      (h = (e) => {
+        switch (e) {
+          case `arccos`:
+            return `x`;
+          case `arctan`:
+            return `y/x`;
+          default:
+            return `y`;
+        }
+      }),
+      (g = (e = `arcsin`) => ({ functionName: e, value: p(e).defaultValue })),
+      (_ = (e = ``) => {
+        let t = l(n(i(e))),
+          r =
+            (t.includes(`=`) ? t.split(`=`).filter(Boolean) : [t]).map(u).find((e) => e != null) ??
+            d(t);
+        if (!r) return g();
+        let a = r.functionName,
+          o = r.argument ? f(r.argument) : null;
+        return o == null ? g(a) : { functionName: a, value: o };
+      }));
+  }))();
+}
+export { _ as a, v as i, h as n, p as r, m as t };

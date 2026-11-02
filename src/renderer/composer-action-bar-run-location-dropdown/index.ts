@@ -1,215 +1,319 @@
-import "@rchunk/rolldown-runtime";
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import * as primaryChunk from "@rchunk/app-primary";
-
-export type RunLocation = "cloud" | "local";
-export type UnavailableReason = string | null | undefined;
-export interface RunLocationState {
-  effectiveLocation: RunLocation | null;
-  unavailableReasons: { cloud?: UnavailableReason; local?: UnavailableReason };
-}
-
-interface ComposerActionBarRunLocationDropdownProps {
-  cloudUsesLocalExecutor?: boolean;
-  isLocalExecutorStarting?: boolean;
-  onRunLocationChange(location: RunLocation): void;
-  runLocationState: RunLocationState;
-}
-
-const shared = sharedChunk as unknown as Record<string, unknown>;
-const initial = initialChunk as unknown as Record<string, unknown>;
-const primary = primaryChunk as unknown as Record<string, unknown>;
-
-function callInitializer(value: unknown): void {
-  if (typeof value === "function") value();
-}
-
-for (const value of [
-  shared.xD,
-  shared.WT,
-  shared.h4,
-  shared.K2,
-  initial.Mp,
-  shared.Zh,
-  shared.If,
-  shared.C_,
-  shared.c_,
-  initial.yb,
-  initial.aW,
-  primary.Ns,
-]) callInitializer(value);
-
-const jsx = (shared.I3 as () => {
-  jsx(component: unknown, props: unknown): unknown;
-  jsxs(component: unknown, props: unknown): unknown;
-})();
-const classNames = shared.m4 as (...values: unknown[]) => string;
-const useIntl = shared.n4 as () => {
-  formatMessage(message: Record<string, string>): string;
-};
-const FormattedMessage = shared.Y2;
-const Tooltip = shared.o_;
-const IconButton = shared.Yh;
-const IconAsset = shared.S_;
-const fallbackAsset = shared.GT;
-const checkAsset = shared.bD;
-const Dropdown = shared.kf;
-const Menu = shared.jf as { Item: unknown; Title: unknown };
-const CloudIcon = initial.vb;
-const LocalIcon = initial.iW;
-const parseUnavailableReason = initial.jp as (
-  reason: UnavailableReason,
-) => Record<string, unknown> | null | undefined;
-const useShortcut = primary.Ps as (
-  id: string,
-  callback: () => void,
-  options: { enabled: boolean },
-) => void;
-
-function workspaceDisabledTooltip(location: RunLocation): unknown {
-  return jsx.jsxs("span", {
-    children: [
-      jsx.jsx(IconAsset, {
-        "aria-hidden": false,
-        asset: fallbackAsset,
-        className: "me-1 inline-block align-middle",
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  C_ as n,
+  GT as r,
+  I3 as i,
+  If as a,
+  K2 as o,
+  S_ as s,
+  WT as c,
+  Y2 as l,
+  Yh as u,
+  Zh as d,
+  bD as f,
+  c_ as p,
+  h4 as m,
+  jf as h,
+  kf as g,
+  m4 as _,
+  n4 as ee,
+  o_ as te,
+  xD as v,
+} from "@rchunk/app-shared";
+import {
+  Mp as y,
+  aW as b,
+  iW as x,
+  jp as S,
+  vb as C,
+  yb as w,
+} from "@rchunk/app-initial";
+import { Ns as T, Ps as E } from "@rchunk/app-primary";
+function D(e) {
+  let t = (0, O.c)(62),
+    {
+      cloudUsesLocalExecutor: n,
+      isLocalExecutorStarting: i,
+      onRunLocationChange: a,
+      runLocationState: o,
+    } = e,
+    c = ee(),
+    { effectiveLocation: d, unavailableReasons: p } = o,
+    m;
+  t[0] === p.cloud ? (m = t[1]) : ((m = S(p.cloud)), (t[0] = p.cloud), (t[1] = m));
+  let v = m,
+    y;
+  t[2] !== d || t[3] !== p.cloud || t[4] !== p.local
+    ? ((y = null),
+      d === `cloud` && p.local == null
+        ? (y = `local`)
+        : d === `local` && p.cloud == null && (y = `cloud`),
+      (t[2] = d),
+      (t[3] = p.cloud),
+      (t[4] = p.local),
+      (t[5] = y))
+    : (y = t[5]);
+  let b;
+  t[6] !== y || t[7] !== a
+    ? ((b = () => {
+        y != null && a(y);
       }),
-      jsx.jsx(FormattedMessage, location === "local" ? {
-        id: "composer.runLocation.local.tooltip.workspaceDisabled",
-        defaultMessage: "Your workspace administrator has disabled Work on your computer",
-        description: "Tooltip on the disabled local Work composer option when the member's workspace role does not grant the Work Local permission",
-      } : {
-        id: "composer.runLocation.cloud.tooltip.workspaceDisabled",
-        defaultMessage: "Your workspace administrator has disabled Work in the cloud",
-        description: "Tooltip on the disabled Cloud Work composer option when the member's workspace role does not grant the Work Cloud permission",
-      }),
-    ],
-  });
-}
-
-function ComposerActionBarRunLocationDropdown({
-  cloudUsesLocalExecutor,
-  isLocalExecutorStarting,
-  onRunLocationChange,
-  runLocationState,
-}: ComposerActionBarRunLocationDropdownProps): unknown {
-  const intl = useIntl();
-  const { effectiveLocation, unavailableReasons } = runLocationState;
-  const parsedCloudUnavailableReason = parseUnavailableReason(unavailableReasons.cloud);
-  let alternateLocation: RunLocation | null = null;
-  if (effectiveLocation === "cloud" && unavailableReasons.local == null) {
-    alternateLocation = "local";
-  } else if (effectiveLocation === "local" && unavailableReasons.cloud == null) {
-    alternateLocation = "cloud";
-  }
-  useShortcut(
-    "composer.toggleWorkRunLocation",
-    () => { if (alternateLocation != null) onRunLocationChange(alternateLocation); },
-    { enabled: alternateLocation != null },
-  );
-  const triggerLabel = intl.formatMessage(isLocalExecutorStarting ? {
-    id: "composer.runLocation.triggerLabel.localExecutorStarting",
-    defaultMessage: "Choose where to run this task. Local execution is starting…",
-    description: "Accessible label for the run location menu while local execution starts",
-  } : {
-    id: "composer.runLocation.triggerLabel",
-    defaultMessage: "Choose where to run this chat",
-    description: "Accessible label for the run location menu",
-  });
-  const triggerButton = jsx.jsx(Tooltip, {
-    cloneCustomTrigger: true,
-    tooltipContent: triggerLabel,
-    children: jsx.jsxs(IconButton, {
-      "aria-busy": isLocalExecutorStarting,
-      "aria-label": triggerLabel,
-      "data-composer-navigation-target": "run-location",
-      color: "ghost",
-      size: "composerSm",
-      uniform: true,
-      children: [
-        effectiveLocation === "cloud" ? jsx.jsx(CloudIcon, {
-          className: classNames("icon-xs", isLocalExecutorStarting && "motion-safe:animate-pulse"),
-        }) : null,
-        effectiveLocation === "local" ? jsx.jsx(LocalIcon, { className: "icon-xs" }) : null,
-        effectiveLocation == null ? jsx.jsx(IconAsset, { "aria-hidden": false, asset: fallbackAsset }) : null,
-      ],
-    }),
-  });
-  const localDisabled = unavailableReasons.local != null;
-  const localItem = jsx.jsx(Menu.Item, {
-    LeftIcon: LocalIcon,
-    SubText: jsx.jsx("span", {
-      className: "text-codex-description",
-      children: jsx.jsx(FormattedMessage, {
-        id: "composer.runLocation.local.description",
-        defaultMessage: "Read and edit local files with permission",
-        description: "Description explaining file access when a task runs on the user's computer",
-      }),
-    }),
-    allowWrap: true,
-    disabled: localDisabled,
-    focusableWhenDisabled: localDisabled,
-    rightIconAsset: effectiveLocation === "local" ? checkAsset : undefined,
-    tooltipText: unavailableReasons.local === "workspace-disabled"
-      ? workspaceDisabledTooltip("local")
-      : undefined,
-    onClick: () => onRunLocationChange("local"),
-    children: jsx.jsx(FormattedMessage, {
-      id: "composer.runLocation.local.optionLabel",
-      defaultMessage: "On your computer",
-      description: "Option to run a task on the user's computer",
-    }),
-  });
-  const cloudDisabled = unavailableReasons.cloud != null;
-  const cloudTooltip = unavailableReasons.cloud === "workspace-disabled"
-    ? workspaceDisabledTooltip("cloud")
-    : parsedCloudUnavailableReason == null
-      ? undefined
-      : jsx.jsx(FormattedMessage, { ...parsedCloudUnavailableReason });
-  const cloudItem = jsx.jsx(Menu.Item, {
-    LeftIcon: CloudIcon,
-    SubText: jsx.jsx("span", {
-      className: "text-codex-description",
-      children: jsx.jsx(FormattedMessage, cloudUsesLocalExecutor ? {
-        id: "composer.runLocation.cloud.description.localExecutor",
-        defaultMessage: "Can read and edit local files",
-        description: "Description for the Cloud run location when local execution is enabled. Explains that ChatGPT runs in the cloud while retaining access to files on the user's computer.",
-      } : {
-        id: "composer.runLocation.cloud.description",
-        defaultMessage: "Can't access local files unless attached",
-        description: "Description explaining file access limitations when a task runs in the cloud",
-      }),
-    }),
-    allowWrap: true,
-    disabled: cloudDisabled,
-    focusableWhenDisabled: cloudDisabled,
-    rightIconAsset: effectiveLocation === "cloud" ? checkAsset : undefined,
-    tooltipText: cloudTooltip,
-    onClick: () => onRunLocationChange("cloud"),
-    children: jsx.jsx(FormattedMessage, {
-      id: "composer.runLocation.cloud",
-      defaultMessage: "In the cloud",
-      description: "Option to run a task in the cloud",
-    }),
-  });
-  return jsx.jsxs(Dropdown, {
-    align: "end",
-    contentWidth: "sm",
-    side: "top",
-    triggerButton,
-    children: [
-      jsx.jsx(Menu.Title, {
-        children: jsx.jsx(FormattedMessage, {
-          id: "composer.runLocation.title.question",
-          defaultMessage: "Where should this chat run?",
-          description: "Header above the run location options in the composer action bar",
+      (t[6] = y),
+      (t[7] = a),
+      (t[8] = b))
+    : (b = t[8]);
+  let w = y != null,
+    T;
+  (t[9] === w ? (T = t[10]) : ((T = { enabled: w }), (t[9] = w), (t[10] = T)),
+    E(`composer.toggleWorkRunLocation`, b, T));
+  let D;
+  t[11] !== c || t[12] !== i
+    ? ((D = i
+        ? c.formatMessage({
+            id: `composer.runLocation.triggerLabel.localExecutorStarting`,
+            defaultMessage: `Choose where to run this task. Local execution is starting…`,
+            description: `Accessible label for the run location menu while local execution starts`,
+          })
+        : c.formatMessage({
+            id: `composer.runLocation.triggerLabel`,
+            defaultMessage: `Choose where to run this chat`,
+            description: `Accessible label for the run location menu`,
+          })),
+      (t[11] = c),
+      (t[12] = i),
+      (t[13] = D))
+    : (D = t[13]);
+  let A = D,
+    j;
+  t[14] !== d || t[15] !== i
+    ? ((j =
+        d === `cloud`
+          ? (0, k.jsx)(C, { className: _(`icon-xs`, i && `motion-safe:animate-pulse`) })
+          : null),
+      (t[14] = d),
+      (t[15] = i),
+      (t[16] = j))
+    : (j = t[16]);
+  let M;
+  t[17] === d
+    ? (M = t[18])
+    : ((M = d === `local` ? (0, k.jsx)(x, { className: `icon-xs` }) : null),
+      (t[17] = d),
+      (t[18] = M));
+  let N;
+  t[19] === d
+    ? (N = t[20])
+    : ((N = d == null ? (0, k.jsx)(s, { "aria-hidden": !1, asset: r }) : null),
+      (t[19] = d),
+      (t[20] = N));
+  let P;
+  t[21] !== i || t[22] !== j || t[23] !== M || t[24] !== N || t[25] !== A
+    ? ((P = (0, k.jsxs)(u, {
+        "aria-busy": i,
+        "aria-label": A,
+        "data-composer-navigation-target": `run-location`,
+        color: `ghost`,
+        size: `composerSm`,
+        uniform: !0,
+        children: [j, M, N],
+      })),
+      (t[21] = i),
+      (t[22] = j),
+      (t[23] = M),
+      (t[24] = N),
+      (t[25] = A),
+      (t[26] = P))
+    : (P = t[26]);
+  let F;
+  t[27] !== P || t[28] !== A
+    ? ((F = (0, k.jsx)(te, { cloneCustomTrigger: !0, tooltipContent: A, children: P })),
+      (t[27] = P),
+      (t[28] = A),
+      (t[29] = F))
+    : (F = t[29]);
+  let I;
+  t[30] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((I = (0, k.jsx)(h.Title, {
+        children: (0, k.jsx)(l, {
+          id: `composer.runLocation.title.question`,
+          defaultMessage: `Where should this chat run?`,
+          description: `Header above the run location options in the composer action bar`,
         }),
-      }),
-      localItem,
-      cloudItem,
-    ],
-  });
+      })),
+      (t[30] = I))
+    : (I = t[30]);
+  let L = d === `local` ? f : void 0,
+    R = p.local != null,
+    z = p.local != null,
+    B;
+  t[31] === a ? (B = t[32]) : ((B = () => a(`local`)), (t[31] = a), (t[32] = B));
+  let V;
+  t[33] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((V = (0, k.jsx)(`span`, {
+        className: `text-codex-description`,
+        children: (0, k.jsx)(l, {
+          id: `composer.runLocation.local.description`,
+          defaultMessage: `Read and edit local files with permission`,
+          description: `Description explaining file access when a task runs on the user's computer`,
+        }),
+      })),
+      (t[33] = V))
+    : (V = t[33]);
+  let H;
+  t[34] === p.local
+    ? (H = t[35])
+    : ((H =
+        p.local === `workspace-disabled`
+          ? (0, k.jsxs)(`span`, {
+              children: [
+                (0, k.jsx)(s, {
+                  className: `me-1 inline-block align-middle`,
+                  "aria-hidden": !1,
+                  asset: r,
+                }),
+                (0, k.jsx)(l, {
+                  id: `composer.runLocation.local.tooltip.workspaceDisabled`,
+                  defaultMessage: `Your workspace administrator has disabled Work on your computer`,
+                  description: `Tooltip on the disabled local Work composer option when the member's workspace role does not grant the Work Local permission`,
+                }),
+              ],
+            })
+          : void 0),
+      (t[34] = p.local),
+      (t[35] = H));
+  let U;
+  t[36] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((U = (0, k.jsx)(l, {
+        id: `composer.runLocation.local.optionLabel`,
+        defaultMessage: `On your computer`,
+        description: `Option to run a task on the user's computer`,
+      })),
+      (t[36] = U))
+    : (U = t[36]);
+  let W;
+  t[37] !== L || t[38] !== R || t[39] !== z || t[40] !== B || t[41] !== H
+    ? ((W = (0, k.jsx)(h.Item, {
+        LeftIcon: x,
+        rightIconAsset: L,
+        disabled: R,
+        focusableWhenDisabled: z,
+        onClick: B,
+        allowWrap: !0,
+        SubText: V,
+        tooltipText: H,
+        children: U,
+      })),
+      (t[37] = L),
+      (t[38] = R),
+      (t[39] = z),
+      (t[40] = B),
+      (t[41] = H),
+      (t[42] = W))
+    : (W = t[42]);
+  let G = d === `cloud` ? f : void 0,
+    K = p.cloud != null,
+    q = p.cloud != null,
+    J;
+  t[43] === a ? (J = t[44]) : ((J = () => a(`cloud`)), (t[43] = a), (t[44] = J));
+  let Y;
+  t[45] === n
+    ? (Y = t[46])
+    : ((Y = (0, k.jsx)(`span`, {
+        className: `text-codex-description`,
+        children: n
+          ? (0, k.jsx)(l, {
+              id: `composer.runLocation.cloud.description.localExecutor`,
+              defaultMessage: `Can read and edit local files`,
+              description: `Description for the Cloud run location when local execution is enabled. Explains that ChatGPT runs in the cloud while retaining access to files on the user's computer.`,
+            })
+          : (0, k.jsx)(l, {
+              id: `composer.runLocation.cloud.description`,
+              defaultMessage: `Can't access local files unless attached`,
+              description: `Description explaining file access limitations when a task runs in the cloud`,
+            }),
+      })),
+      (t[45] = n),
+      (t[46] = Y));
+  let X;
+  t[47] !== v || t[48] !== p.cloud
+    ? ((X =
+        p.cloud === `workspace-disabled`
+          ? (0, k.jsxs)(`span`, {
+              children: [
+                (0, k.jsx)(s, {
+                  className: `me-1 inline-block align-middle`,
+                  "aria-hidden": !1,
+                  asset: r,
+                }),
+                (0, k.jsx)(l, {
+                  id: `composer.runLocation.cloud.tooltip.workspaceDisabled`,
+                  defaultMessage: `Your workspace administrator has disabled Work in the cloud`,
+                  description: `Tooltip on the disabled Cloud Work composer option when the member's workspace role does not grant the Work Cloud permission`,
+                }),
+              ],
+            })
+          : v == null
+            ? void 0
+            : (0, k.jsx)(l, { ...v })),
+      (t[47] = v),
+      (t[48] = p.cloud),
+      (t[49] = X))
+    : (X = t[49]);
+  let Z;
+  t[50] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((Z = (0, k.jsx)(l, {
+        id: `composer.runLocation.cloud`,
+        defaultMessage: `In the cloud`,
+        description: `Option to run a task in the cloud`,
+      })),
+      (t[50] = Z))
+    : (Z = t[50]);
+  let Q;
+  t[51] !== G || t[52] !== K || t[53] !== q || t[54] !== J || t[55] !== Y || t[56] !== X
+    ? ((Q = (0, k.jsx)(h.Item, {
+        LeftIcon: C,
+        rightIconAsset: G,
+        disabled: K,
+        focusableWhenDisabled: q,
+        onClick: J,
+        allowWrap: !0,
+        SubText: Y,
+        tooltipText: X,
+        children: Z,
+      })),
+      (t[51] = G),
+      (t[52] = K),
+      (t[53] = q),
+      (t[54] = J),
+      (t[55] = Y),
+      (t[56] = X),
+      (t[57] = Q))
+    : (Q = t[57]);
+  let $;
+  return (
+    t[58] !== F || t[59] !== W || t[60] !== Q
+      ? (($ = (0, k.jsxs)(g, {
+          align: `end`,
+          side: `top`,
+          contentWidth: `sm`,
+          triggerButton: F,
+          children: [I, W, Q],
+        })),
+        (t[58] = F),
+        (t[59] = W),
+        (t[60] = Q),
+        (t[61] = $))
+      : ($ = t[61]),
+    $
+  );
 }
-
-export { ComposerActionBarRunLocationDropdown };
+var O, k;
+function A() {
+  return (A = e(() => {
+    ((O = t()), v(), c(), m(), o(), y(), d(), a(), n(), p(), w(), b(), T(), (k = i()));
+  }))();
+}
+A();
+export { D as ComposerActionBarRunLocationDropdown };

@@ -1,24 +1,34 @@
-// Magnet-induced-current model: estimate galvanometer response from changing magnetic flux.
-import "@rchunk/rolldown-runtime";
-
-type MotionMode = "automatic" | "manual";
-interface MagnetInput { magnetPosition?: number; motionMode?: string; playbackRevision?: number }
-
-const magnetPositionControl = { min: 62, max: 304, defaultValue: 82 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeMagnetPosition = (value: number | undefined): number => clamp(typeof value === "number" && Number.isFinite(value) ? value : magnetPositionControl.defaultValue, magnetPositionControl.min, magnetPositionControl.max);
-const normalizeMotionMode = (value: string | undefined): MotionMode => value === "automatic" ? "automatic" : "manual";
-const normalizeRevision = (value: number | undefined): number => typeof value === "number" && Number.isSafeInteger(value) && value >= 0 ? value : 0;
-const normalizeMagnetInput = (input: MagnetInput) => ({ magnetPosition: normalizeMagnetPosition(input.magnetPosition), motionMode: normalizeMotionMode(input.motionMode), playbackRevision: normalizeRevision(input.playbackRevision) });
-const magneticFlux = (position: number): number => { const offset = position - 230; return Math.exp(-(offset * offset) / 2888); };
-const inducedCurrent = (position: number, velocity: number): number => {
-  if (!Number.isFinite(velocity) || Math.abs(velocity) < 0.5) return 0;
-  const normalizedPosition = normalizeMagnetPosition(position);
-  const offset = normalizedPosition - 230;
-  const current = -(-offset / 1444 * magneticFlux(normalizedPosition)) * velocity;
-  return Math.abs(current) < 0.035 ? 0 : clamp(current, -1, 1);
-};
-const currentDirection = (current: number): "right" | "left" | "none" => current > 0 ? "right" : current < 0 ? "left" : "none";
-function initializeMagnetInducedCurrentModel(): void {}
-
-export { initializeMagnetInducedCurrentModel as a, currentDirection as i, inducedCurrent as n, normalizeMagnetInput as o, clamp as r, normalizeMotionMode as s, magnetPositionControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l;
+function u() {
+  return (u = e(() => {
+    ((t = { min: 62, max: 304, defaultValue: 82 }),
+      (n = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (r = (e) => {
+        let r = typeof e == `number` && Number.isFinite(e) ? e : t.defaultValue;
+        return n(r, t.min, t.max);
+      }),
+      (i = (e) => (e === `automatic` ? `automatic` : `manual`)),
+      (a = (e) => (typeof e == `number` && Number.isSafeInteger(e) && e >= 0 ? e : 0)),
+      (o = (e) => ({
+        magnetPosition: r(e.magnetPosition),
+        motionMode: i(e.motionMode),
+        playbackRevision: a(e.playbackRevision),
+      })),
+      (s = (e) => {
+        let t = e - 230;
+        return Math.exp(-(t * t) / 2888);
+      }),
+      (c = (e, t) => {
+        if (!Number.isFinite(t) || Math.abs(t) < 0.5) return 0;
+        let i = r(e),
+          a = i - 230,
+          o = s(i),
+          c = -((-a / 1444) * o) * t;
+        return Math.abs(c) < 0.035 ? 0 : n(c, -1, 1);
+      }),
+      (l = (e) => (e > 0 ? `right` : e < 0 ? `left` : `none`)));
+  }))();
+}
+export { u as a, l as i, c as n, o, n as r, i as s, t };

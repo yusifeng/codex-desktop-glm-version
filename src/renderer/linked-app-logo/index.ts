@@ -1,162 +1,208 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  AS as ConnectedAppsGlyph,
-  I3 as getJsxRuntime,
-  Ot as GeneratedSiteDetailGlyph,
-  R_ as AppleGlyph,
-  S_ as Icon,
-  e6 as getReact,
-  h4 as initializeClassNames,
-  m4 as classNames,
-  zw as GeneratedSiteListGlyph,
+  $3 as t,
+  AS as n,
+  C_ as r,
+  Dt as i,
+  I3 as a,
+  Ot as o,
+  R_ as s,
+  Rw as c,
+  S_ as l,
+  e6 as u,
+  h4 as d,
+  lw as f,
+  m4 as p,
+  zw as m,
 } from "@rchunk/app-shared";
-import {
-  n6 as CodexGlyph,
-  r6 as initializeAccountConnectionGlyphs,
-} from "@rchunk/app-initial";
-
-interface LinkedApplication {
-  client_app_type?: string;
-  logo_uri?: string | null;
-  name: string;
+import { n6 as h, r6 as g } from "@rchunk/app-initial";
+function _(e) {
+  let t = (0, x.c)(18),
+    { app: n, size: r, borderless: i } = e,
+    a = r === void 0 ? `list` : r,
+    s = i !== void 0 && i,
+    c = n.client_app_type === `codex_generated_site`,
+    u;
+  t[0] !== n.logo_uri || t[1] !== c
+    ? ((u = c ? null : b(n.logo_uri)), (t[0] = n.logo_uri), (t[1] = c), (t[2] = u))
+    : (u = t[2]);
+  let d = u,
+    [f, h] = (0, S.useState)(null),
+    [g, _] = (0, S.useState)(null),
+    v = d != null && g === d,
+    w = d != null && f === d && !v,
+    T;
+  t[3] !== n.name || t[4] !== w || t[5] !== c || t[6] !== a
+    ? ((T =
+        !w &&
+        (c
+          ? (0, C.jsx)(l, {
+              className: `shrink-0`,
+              asset: a === `detail` ? o : m,
+              focusable: `false`,
+            })
+          : (0, C.jsx)(`span`, {
+              className: `text-sm font-medium text-secondary`,
+              children: Array.from(n.name.trim())[0]?.toUpperCase(),
+            }))),
+      (t[3] = n.name),
+      (t[4] = w),
+      (t[5] = c),
+      (t[6] = a),
+      (t[7] = T))
+    : (T = t[7]);
+  let E;
+  t[8] !== v || t[9] !== w || t[10] !== d || t[11] !== a
+    ? ((E =
+        d != null && !v
+          ? (0, C.jsx)(
+              `img`,
+              {
+                className: p(
+                  a === `detail` ? `size-10` : `size-6`,
+                  `object-contain`,
+                  !w && `hidden`,
+                ),
+                alt: ``,
+                src: d,
+                referrerPolicy: `no-referrer`,
+                onLoad: () => {
+                  (h(d), _(null));
+                },
+                onError: () => _(d),
+              },
+              d,
+            )
+          : null),
+      (t[8] = v),
+      (t[9] = w),
+      (t[10] = d),
+      (t[11] = a),
+      (t[12] = E))
+    : (E = t[12]);
+  let D;
+  return (
+    t[13] !== s || t[14] !== a || t[15] !== T || t[16] !== E
+      ? ((D = (0, C.jsxs)(y, { size: a, borderless: s, children: [T, E] })),
+        (t[13] = s),
+        (t[14] = a),
+        (t[15] = T),
+        (t[16] = E),
+        (t[17] = D))
+      : (D = t[17]),
+    D
+  );
 }
-
-interface AccountConnection {
-  name: string;
-  type: "apple" | "codex_cli" | "kakao_talk" | "oai_apps" | "viber";
+function v(e) {
+  let t = (0, x.c)(10),
+    { app: r, borderless: i } = e,
+    a = i !== void 0 && i,
+    o;
+  bb0: switch (r.type) {
+    case `apple`: {
+      let e;
+      (t[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, C.jsx)(s, {})), (t[0] = e))
+        : (e = t[0]),
+        (o = e));
+      break bb0;
+    }
+    case `codex_cli`: {
+      let e;
+      (t[1] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, C.jsx)(h, { className: `size-5`, "aria-hidden": !0 })), (t[1] = e))
+        : (e = t[1]),
+        (o = e));
+      break bb0;
+    }
+    case `oai_apps`: {
+      let e;
+      (t[2] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, C.jsx)(n, {})), (t[2] = e))
+        : (e = t[2]),
+        (o = e));
+      break bb0;
+    }
+    case `kakao_talk`:
+    case `viber`: {
+      let e;
+      t[3] === r.name
+        ? (e = t[4])
+        : ((e = Array.from(r.name.trim())[0]?.toUpperCase()), (t[3] = r.name), (t[4] = e));
+      let n;
+      (t[5] === e
+        ? (n = t[6])
+        : ((n = (0, C.jsx)(`span`, {
+            className: `text-sm font-medium text-secondary`,
+            children: e,
+          })),
+          (t[5] = e),
+          (t[6] = n)),
+        (o = n));
+    }
+  }
+  let c;
+  return (
+    t[7] !== a || t[8] !== o
+      ? ((c = (0, C.jsx)(y, { borderless: a, children: o })), (t[7] = a), (t[8] = o), (t[9] = c))
+      : (c = t[9]),
+    c
+  );
 }
-
-interface LogoFrameProps {
-  borderless?: boolean;
-  children?: unknown;
-  size?: "detail" | "list";
+function y(e) {
+  let t = (0, x.c)(6),
+    { children: n, size: r, borderless: i } = e,
+    a = r === void 0 ? `list` : r,
+    o = !(i !== void 0 && i) && `border border-default`,
+    s = a === `detail` ? `size-12 rounded-xl` : `size-8 rounded-lg`,
+    c;
+  t[0] !== o || t[1] !== s
+    ? ((c = p(`flex shrink-0 items-center justify-center select-none`, o, s)),
+      (t[0] = o),
+      (t[1] = s),
+      (t[2] = c))
+    : (c = t[2]);
+  let l;
+  return (
+    t[3] !== n || t[4] !== c
+      ? ((l = (0, C.jsx)(`span`, { className: c, "aria-hidden": !0, children: n })),
+        (t[3] = n),
+        (t[4] = c),
+        (t[5] = l))
+      : (l = t[5]),
+    l
+  );
 }
-
-interface LinkedAppLogoProps {
-  app: LinkedApplication;
-  borderless?: boolean;
-  size?: "detail" | "list";
-}
-
-interface AccountConnectionLogoProps {
-  app: AccountConnection;
-  borderless?: boolean;
-}
-
-interface ReactLike {
-  useState<Value>(value: Value): [Value, (next: Value) => void];
-}
-
-const allowedLogoHosts = new Set([
-  "assets.chatgpt.site",
-  "auth-cdn.oaistatic.com",
-  "cdn.openai.com",
-  "cdn.oaistatic.com",
-  "files.openai.com",
-  "persistent.oaistatic.com",
-]);
-const jsx = getJsxRuntime();
-
-function safeLinkedAppLogoUrl(value: string | null | undefined): string | null {
-  if (value == null || value.trim() === "") return null;
+function b(e) {
+  if (e == null || e.trim() === ``) return null;
   try {
-    const url = new URL(value.trim());
-    return url.protocol === "https:" && allowedLogoHosts.has(url.hostname)
-      ? url.href
-      : null;
+    let t = new URL(e.trim());
+    return t.protocol === `https:` && w.has(t.hostname) ? t.href : null;
   } catch {
     return null;
   }
 }
-
-function LogoFrame({ children, size = "list", borderless = false }: LogoFrameProps): unknown {
-  return jsx.jsx("span", {
-    className: classNames(
-      "flex shrink-0 items-center justify-center select-none",
-      !borderless && "border border-default",
-      size === "detail" ? "size-12 rounded-xl" : "size-8 rounded-lg",
-    ),
-    "aria-hidden": true,
-    children,
-  });
+var x, S, C, w;
+function T() {
+  return (T = e(() => {
+    ((x = t()),
+      c(),
+      i(),
+      d(),
+      (S = u()),
+      r(),
+      f(),
+      g(),
+      (C = a()),
+      (w = new Set([
+        `assets.chatgpt.site`,
+        `auth-cdn.oaistatic.com`,
+        `cdn.openai.com`,
+        `cdn.oaistatic.com`,
+        `files.openai.com`,
+        `persistent.oaistatic.com`,
+      ])));
+  }))();
 }
-
-function LinkedAppLogo({ app, size = "list", borderless = false }: LinkedAppLogoProps): unknown {
-  const React = getReact() as ReactLike;
-  const isGeneratedSite = app.client_app_type === "codex_generated_site";
-  const source = isGeneratedSite ? null : safeLinkedAppLogoUrl(app.logo_uri);
-  const [loadedSource, setLoadedSource] = React.useState<string | null>(null);
-  const [failedSource, setFailedSource] = React.useState<string | null>(null);
-  const failed = source != null && failedSource === source;
-  const loaded = source != null && loadedSource === source && !failed;
-  const fallback = loaded
-    ? null
-    : isGeneratedSite
-      ? jsx.jsx(Icon, {
-          asset: size === "detail" ? GeneratedSiteDetailGlyph : GeneratedSiteListGlyph,
-          className: "shrink-0",
-          focusable: "false",
-        })
-      : jsx.jsx("span", {
-          className: "text-sm font-medium text-secondary",
-          children: Array.from(app.name.trim())[0]?.toUpperCase(),
-        });
-  const image = source == null || failed
-    ? null
-    : jsx.jsx("img", {
-        alt: "",
-        className: classNames(
-          size === "detail" ? "size-10" : "size-6",
-          "object-contain",
-          !loaded && "hidden",
-        ),
-        src: source,
-        referrerPolicy: "no-referrer",
-        onLoad: () => {
-          setLoadedSource(source);
-          setFailedSource(null);
-        },
-        onError: () => setFailedSource(source),
-      });
-  return jsx.jsxs(LogoFrame, {
-    size,
-    borderless,
-    children: [fallback, image],
-  });
-}
-
-function AccountConnectionLogo({ app, borderless = false }: AccountConnectionLogoProps): unknown {
-  let glyph: unknown = null;
-  switch (app.type) {
-    case "apple":
-      glyph = jsx.jsx(AppleGlyph as (props: Record<string, unknown>) => unknown, {});
-      break;
-    case "codex_cli":
-      glyph = jsx.jsx(CodexGlyph as (props: Record<string, unknown>) => unknown, {
-        className: "size-5",
-        "aria-hidden": true,
-      });
-      break;
-    case "oai_apps":
-      glyph = jsx.jsx(ConnectedAppsGlyph as (props: Record<string, unknown>) => unknown, {});
-      break;
-    case "kakao_talk":
-    case "viber":
-      glyph = jsx.jsx("span", {
-        className: "text-sm font-medium text-secondary",
-        children: Array.from(app.name.trim())[0]?.toUpperCase(),
-      });
-  }
-  return jsx.jsx(LogoFrame, { borderless, children: glyph });
-}
-
-function initializeLinkedAppLogo(): void {
-  initializeClassNames();
-  initializeAccountConnectionGlyphs();
-}
-
-export {
-  LinkedAppLogo as n,
-  initializeLinkedAppLogo as r,
-  AccountConnectionLogo as t,
-};
+export { _ as n, T as r, v as t };

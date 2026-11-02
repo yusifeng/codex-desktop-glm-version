@@ -1,42 +1,86 @@
-// Dice-roll counts, summaries, and deterministic random sampling.
-import "@rchunk/rolldown-runtime";
-
-interface CountControl { defaultValue: number; min: number; max: number }
-interface DiceRollValues { count1?: number | null; count2?: number | null; count3?: number | null; count4?: number | null; count5?: number | null; count6?: number | null; lastRoll?: number | null }
-
-const dieFaces = [1, 2, 3, 4, 5, 6];
-const countControl: CountControl = { defaultValue: 0, min: 0, max: 1_000_000 };
-const countControls = [countControl, countControl, countControl, countControl, countControl, countControl];
-const lastRollControl = { defaultValue: 0, min: 0, max: 6 };
-const defaultDiceRollValues = { count1: 0, count2: 0, count3: 0, count4: 0, count5: 0, count6: 0, lastRoll: 0 };
-const normalizeCount = (value: number | null | undefined, control: CountControl): number => Number.isFinite(value) ? Math.min(control.max, Math.max(control.min, Math.round(value ?? control.defaultValue))) : control.defaultValue;
-const isDieFace = (value: number): boolean => Number.isInteger(value) && value >= 1 && value <= 6;
-const normalizeLastRoll = (value: number | null | undefined): number => {
-  if (!Number.isFinite(value)) return lastRollControl.defaultValue;
-  const rounded = Math.round(value ?? lastRollControl.defaultValue);
-  return rounded < lastRollControl.min || rounded > lastRollControl.max ? lastRollControl.defaultValue : rounded;
-};
-const normalizeDiceRollValues = (values: DiceRollValues) => {
-  const counts = [normalizeCount(values.count1, countControls[0]), normalizeCount(values.count2, countControls[1]), normalizeCount(values.count3, countControls[2]), normalizeCount(values.count4, countControls[3]), normalizeCount(values.count5, countControls[4]), normalizeCount(values.count6, countControls[5])];
-  const lastRoll = normalizeLastRoll(values.lastRoll);
-  const validLastRoll = isDieFace(lastRoll) && counts[lastRoll - 1] > 0 ? lastRoll : lastRollControl.defaultValue;
-  return { count1: counts[0], count2: counts[1], count3: counts[2], count4: counts[3], count5: counts[4], count6: counts[5], lastRoll: validLastRoll };
-};
-const summarizeDiceRolls = (values: DiceRollValues) => {
-  const normalized = normalizeDiceRollValues(values);
-  const counts = [normalized.count1, normalized.count2, normalized.count3, normalized.count4, normalized.count5, normalized.count6];
-  return { counts, lastRoll: isDieFace(normalized.lastRoll) ? normalized.lastRoll : null, maximumCount: Math.max(0, ...counts), totalRolls: counts.reduce((sum, count) => sum + count, 0) };
-};
-const rollDie = (random: () => number): number => { const value = Math.min(Math.max(random(), 0), 1 - 2 ** -52); return Math.floor(value * 6) + 1; };
-const rollDice = (values: DiceRollValues, rollCount: number, random: () => number) => {
-  const normalized = normalizeDiceRollValues(values);
-  const counts = [normalized.count1, normalized.count2, normalized.count3, normalized.count4, normalized.count5, normalized.count6];
-  const count = Math.max(0, Math.floor(rollCount));
-  let lastRoll = normalized.lastRoll;
-  for (let roll = 0; roll < count; roll += 1) { const face = rollDie(random); const control = countControls[face - 1]; counts[face - 1] = Math.min(control.max, (counts[face - 1] ?? control.defaultValue) + 1); lastRoll = face; }
-  return { count1: counts[0] ?? 0, count2: counts[1] ?? 0, count3: counts[2] ?? 0, count4: counts[3] ?? 0, count5: counts[4] ?? 0, count6: counts[5] ?? 0, lastRoll };
-};
-
-function initializeDiceRollFrequencyModel(): void {}
-
-export { initializeDiceRollFrequencyModel as a, summarizeDiceRolls as i, defaultDiceRollValues as n, rollDice as r, dieFaces as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    ((t = [1, 2, 3, 4, 5, 6]),
+      (n = { defaultValue: 0, min: 0, max: 1e6 }),
+      (r = [n, n, n, n, n, n]),
+      (i = { defaultValue: 0, min: 0, max: 6 }),
+      (a = {
+        count1: n.defaultValue,
+        count2: n.defaultValue,
+        count3: n.defaultValue,
+        count4: n.defaultValue,
+        count5: n.defaultValue,
+        count6: n.defaultValue,
+        lastRoll: i.defaultValue,
+      }),
+      (o = (e, t) =>
+        Number.isFinite(e)
+          ? Math.min(t.max, Math.max(t.min, Math.round(e ?? t.defaultValue)))
+          : t.defaultValue),
+      (s = (e) => Number.isInteger(e) && e >= 1 && e <= 6),
+      (c = (e) => {
+        if (!Number.isFinite(e)) return i.defaultValue;
+        let t = Math.round(e ?? i.defaultValue);
+        return t < i.min || t > i.max ? i.defaultValue : t;
+      }),
+      (l = (e) => {
+        let t = [
+            o(e.count1, r[0]),
+            o(e.count2, r[1]),
+            o(e.count3, r[2]),
+            o(e.count4, r[3]),
+            o(e.count5, r[4]),
+            o(e.count6, r[5]),
+          ],
+          n = c(e.lastRoll),
+          a = s(n) && t[n - 1] > 0 ? n : i.defaultValue;
+        return {
+          count1: t[0],
+          count2: t[1],
+          count3: t[2],
+          count4: t[3],
+          count5: t[4],
+          count6: t[5],
+          lastRoll: a,
+        };
+      }),
+      (u = (e) => {
+        let t = l(e),
+          n = [t.count1, t.count2, t.count3, t.count4, t.count5, t.count6];
+        return {
+          counts: n,
+          lastRoll: s(t.lastRoll) ? t.lastRoll : null,
+          maximumCount: Math.max(0, ...n),
+          totalRolls: n.reduce((e, t) => e + t, 0),
+        };
+      }),
+      (d = (e) => {
+        let t = Math.min(Math.max(e(), 0), 1 - 2 ** -52);
+        return Math.floor(t * 6) + 1;
+      }),
+      (f = (e, t, n) => {
+        let i = l(e),
+          a = [i.count1, i.count2, i.count3, i.count4, i.count5, i.count6],
+          o = Math.max(0, Math.floor(t)),
+          s = i.lastRoll;
+        for (let e = 0; e < o; e += 1) {
+          let e = d(n),
+            t = r[e - 1];
+          ((a[e - 1] = Math.min(t.max, (a[e - 1] ?? t.defaultValue) + 1)), (s = e));
+        }
+        return {
+          count1: a[0] ?? 0,
+          count2: a[1] ?? 0,
+          count3: a[2] ?? 0,
+          count4: a[3] ?? 0,
+          count5: a[4] ?? 0,
+          count6: a[5] ?? 0,
+          lastRoll: s,
+        };
+      }));
+  }))();
+}
+export { p as a, u as i, a as n, f as r, t };

@@ -1,1261 +1,1276 @@
-// home-artifact-templates —— Home composer 上方的 artifact 模板选择器。
-//
-// 原版：app/webview/assets/home-artifact-templates-1e0738b7ddeb.js。
-// 该 chunk 把 reusable skill、Template Creator 和内置 Office 模板统一为
-// 一个可横向滚动的画廊，并负责把选择结果写回 composer。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  extractSkillKindFromDocument,
-  type SkillMentionDocument,
-} from "../app-primary/runtime/extract-skill-kind";
-import { isActiveEntity } from "../app-primary/runtime/is-active-entity";
-import * as staggeredItemChunk from "@rchunk/home-suggestion-staggered-item";
-import * as templateCardChunk from "@rchunk/home-artifact-template-card";
-import type {
-  AnimationPlaybackControls,
-  IntlShape,
-  MaitaiScope,
-  MaitaiScopeApi,
-  ReadableSignal,
-  ScopedQueryFamily,
+  $3 as t,
+  BX as n,
+  C_ as r,
+  Ct as i,
+  FX as a,
+  G2 as o,
+  HX as s,
+  I3 as c,
+  JQ as l,
+  K2 as u,
+  LX as d,
+  QI as f,
+  QX as p,
+  S_ as m,
+  W2 as h,
+  Xd as g,
+  Y2 as ee,
+  Yd as _,
+  Yh as v,
+  ZI as y,
+  Zh as te,
+  __ as ne,
+  dw as re,
+  e6 as ie,
+  g_ as ae,
+  h4 as oe,
+  iQ as b,
+  lk as se,
+  m4 as x,
+  n4 as ce,
+  pk as S,
+  qQ as le,
+  rQ as ue,
+  uw as de,
+  wt as C,
 } from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-type StateSetter<T> = (value: T | ((current: T) => T)) => void;
-type Component = string | ((props: Record<string, unknown>) => unknown);
-
-interface ReactRuntime {
-  Fragment: unknown;
-  useEffect(
-    effect: () => void | (() => void),
-    dependencies?: readonly unknown[],
-  ): void;
-  useRef<T>(initialValue: T): { current: T };
-  useState<T>(initialValue: T): [T, StateSetter<T>];
-}
-
-interface JsxRuntime {
-  Fragment: unknown;
-  jsx(type: unknown, props: Record<string, unknown>, key?: unknown): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>, key?: unknown): unknown;
-}
-
-interface ArtifactSkill {
-  enabled?: boolean;
-  name: string;
-  path: string;
-  title?: string;
-}
-
-interface GalleryMetadata {
-  galleryKind: TemplateKind | string;
-  sourceUrl?: string | null;
-}
-
-interface ArtifactTemplateMetadataParams {
-  hostId: string;
-  paths: string[];
-  skillsRefreshNonce: number;
-}
-
-interface FileMetadata {
-  createdAtMs?: number;
-  mtimeMs?: number;
-}
-
-interface EditorTransaction {
-  readonly doc: unknown;
-  insertText(text: string, from: number, to: number): EditorTransaction;
-  setSelection(selection: unknown): EditorTransaction;
-}
-
-interface EditorState {
-  readonly doc: unknown;
-  readonly selection: { readonly from: number };
-  readonly tr: EditorTransaction;
-}
-
-interface ComposerController {
-  appendPromptText?(text: string | undefined): void;
-  focus?(): void;
-  insertSkillMentionAtSelection?(skill: ArtifactSkill): void;
-  insertTextAtSelection?(text: string): void;
-  view?: {
-    dispatch(transaction: EditorTransaction): void;
-    state: EditorState;
-  };
-}
-
-interface SkillQueryResult {
-  forceReload(): Promise<unknown>;
-  isLoading: boolean;
-  skills: ArtifactSkill[];
-}
-
-interface GalleryQueryResult {
-  data: Map<string, GalleryMetadata> | undefined;
-  isLoading: boolean;
-}
-
-interface RemoveSkillInput {
-  hostId: string;
-  skillPath: string;
-}
-
-interface RemoveSkillMutation {
-  isPending: boolean;
-  mutate(input: RemoveSkillInput): void;
-}
-
-interface ComposerSelector {
-  <T>(
-    composer: ComposerController | undefined,
-    selector: (composer: ComposerController) => T,
-  ): T | undefined;
-  <T>(
-    composer: ComposerController | undefined,
-    selector: (composer: ComposerController) => T,
-    fallback: T,
-  ): T;
-}
-
-interface AppInitialBindings {
-  Body: Component;
-  Header: Component;
-  Panel: Component;
-  Surface: Component;
-  buildEditPrompt(templateCreator: ArtifactSkill, skill: ArtifactSkill): string;
-  canDeleteTemplate(skill: ArtifactSkill, hostCapability: boolean): boolean;
-  composerContextSignal: ReadableSignal<unknown>;
-  dismissReasons?: {
-    CODEX_ARTIFACT_TEMPLATE_CAROUSEL_DISMISS_REASON_CLOSE_BUTTON?: unknown;
-  };
-  filterSkills(
-    skills: ArtifactSkill[],
-    kind: TemplateKind,
-    metadata: Map<string, GalleryMetadata>,
-  ): ArtifactSkill[];
-  getGallery(
-    skills: ArtifactSkill[],
-    hostId: string,
-    refreshNonce: number,
-  ): GalleryQueryResult;
-  getScrollBounds(element: HTMLElement): { minimum: number; maximum: number };
-  getSkillDisplayName(skill: ArtifactSkill): string;
-  getTemplateKind(kind: string): TemplateKind | string;
-  hostIdSignal: ReadableSignal<string>;
-  initializeArtifactTemplates(): void;
-  initializeGallery(): void;
-  initializeTemplateCard(): void;
-  invalidateQueries(): (queryKey: readonly unknown[]) => Promise<unknown>;
-  mergeMetadata(
-    skills: ArtifactSkill[],
-    creationTimes: Map<string, number | null> | undefined,
-    deletablePaths: Set<string>,
-  ): ArtifactSkill[];
-  nextScrollPosition(element: HTMLElement, direction: number): number;
-  pickerScope: MaitaiScope<Record<string, unknown>>;
-  readFileMetadata(event: string, payload: unknown): Promise<FileMetadata>;
-  selectComposer: ComposerSelector;
-  settingsSignal: ReadableSignal<boolean>;
-  skillsQueryKey: readonly unknown[];
-  useComposer(): ComposerController | undefined;
-  useHostCapability(hostId: string): boolean;
-  useRemoveSkillMutation(
-    name: string,
-    options: {
-      onError(): void;
-      onSuccess(result: { success: boolean }): Promise<void> | void;
-    },
-  ): RemoveSkillMutation;
-  useSkills(
-    context: unknown,
-    hostId: string,
-    options: { enabled: boolean },
-  ): SkillQueryResult;
-  useStoredNumber(key: string): [number, StateSetter<number>];
-}
-
-interface AppPrimaryBindings {
-  closePicker(scope: MaitaiScopeApi<unknown> | undefined): void;
-  dismissPicker(
-    scope: MaitaiScopeApi<unknown> | undefined,
-    reason: unknown,
-  ): void;
-  journeySignal: unknown;
-  recordAttachment(
-    scope: MaitaiScopeApi<unknown> | undefined,
-    event: { attachmentPath: string; journey: unknown; templateId: string },
-  ): void;
-  recordCreate(scope: MaitaiScopeApi<unknown> | undefined, url: string): void;
-  recordOpen(
-    scope: MaitaiScopeApi<unknown> | undefined,
-    kind: TemplateKind,
-  ): void;
-  recordUse(
-    scope: MaitaiScopeApi<unknown> | undefined,
-    skill: ArtifactSkill,
-  ): void;
-  templateFormatSignal: ReadableSignal<unknown>;
-  templatesEnabledSignal: ReadableSignal<boolean>;
-}
-
-const {
-  BX: useSignalFamilyValue,
-  Ct: initializeSharedRuntime,
-  HX: useSignalValue,
-  I3: jsxRuntimeExport,
-  LX: useScope,
-  QX: createQueryFamily,
-  S_: IconAsset,
-  Yd: arrowRightIcon,
-  Yh: Button,
-  ZI: appScope,
-  dw: closeIcon,
-  e6: reactRuntimeExport,
-  m4: classNames,
-  n4: useIntl,
-  pk: toastSignal,
-  qQ: animateNumber,
-  rQ: TextSelection,
-  wu: composerMentionState,
-  wt: plusIcon,
-} = appSharedChunk;
-
-const {
-  C5t: filterSkills,
-  D5t: getTemplateKind,
-  Dyt: hostIdSignal,
-  E5t: mergeMetadata,
-  G1: getGallery,
-  Gfn: useStoredNumber,
-  HZ: useComposer,
-  Lz: getScrollBounds,
-  M5t: getSkillDisplayName,
-  O5t: initializeArtifactTemplates,
-  P5t: initializeGallery,
-  Qln: readFileMetadata,
-  Rz: nextScrollPosition,
-  Syt: composerContextSignal,
-  T5t: canDeleteTemplate,
-  UZ: selectComposer,
-  Ukt: settingsSignal,
-  XX: Body,
-  YX: Panel,
-  Z6t: useHostCapability,
-  ZX: Header,
-  _: Surface,
-  b5t: buildEditPrompt,
-  iun: useRemoveSkillMutation,
-  kht: pickerScope,
-  lEt: useSkills,
-  qs: dismissReasons,
-  sEt: skillsQueryKey,
-  sun: invalidateQueries,
-  w5t: initializeTemplateCard,
-} = appInitialChunk as unknown as {
-  C5t: AppInitialBindings["filterSkills"];
-  D5t: AppInitialBindings["getTemplateKind"];
-  Dyt: AppInitialBindings["hostIdSignal"];
-  E5t: AppInitialBindings["mergeMetadata"];
-  G1: AppInitialBindings["getGallery"];
-  Gfn: AppInitialBindings["useStoredNumber"];
-  HZ: AppInitialBindings["useComposer"];
-  Lz: AppInitialBindings["getScrollBounds"];
-  M5t: AppInitialBindings["getSkillDisplayName"];
-  O5t: AppInitialBindings["initializeArtifactTemplates"];
-  P5t: AppInitialBindings["initializeGallery"];
-  Qln: AppInitialBindings["readFileMetadata"];
-  Rz: AppInitialBindings["nextScrollPosition"];
-  Syt: AppInitialBindings["composerContextSignal"];
-  T5t: AppInitialBindings["canDeleteTemplate"];
-  UZ: AppInitialBindings["selectComposer"];
-  Ukt: AppInitialBindings["settingsSignal"];
-  XX: AppInitialBindings["Body"];
-  YX: AppInitialBindings["Panel"];
-  Z6t: AppInitialBindings["useHostCapability"];
-  ZX: AppInitialBindings["Header"];
-  _: AppInitialBindings["Surface"];
-  b5t: AppInitialBindings["buildEditPrompt"];
-  iun: AppInitialBindings["useRemoveSkillMutation"];
-  kht: AppInitialBindings["pickerScope"];
-  lEt: AppInitialBindings["useSkills"];
-  qs: AppInitialBindings["dismissReasons"];
-  sEt: AppInitialBindings["skillsQueryKey"];
-  sun: AppInitialBindings["invalidateQueries"];
-  w5t: AppInitialBindings["initializeTemplateCard"];
-};
-
-const {
-  Ci: dismissPicker,
-  Ei: recordUse,
-  Si: recordAttachment,
-  Ti: recordCreate,
-  bi: journeySignal,
-  gg: templateFormatSignal,
-  hg: templatesEnabledSignal,
-  vi: closePicker,
-  wi: recordOpen,
-} = appPrimaryChunk as unknown as {
-  Ci: AppPrimaryBindings["dismissPicker"];
-  Ei: AppPrimaryBindings["recordUse"];
-  Si: AppPrimaryBindings["recordAttachment"];
-  Ti: AppPrimaryBindings["recordCreate"];
-  bi: AppPrimaryBindings["journeySignal"];
-  gg: AppPrimaryBindings["templateFormatSignal"];
-  hg: AppPrimaryBindings["templatesEnabledSignal"];
-  vi: AppPrimaryBindings["closePicker"];
-  wi: AppPrimaryBindings["recordOpen"];
-};
-
-const { n: initializeStaggeredItem, t: StaggeredItem } = staggeredItemChunk;
-const { n: initializeTemplateCardChunk, t: TemplateCard } = templateCardChunk;
-
-type TemplateKind =
-  | "document"
-  | "presentation"
-  | "spreadsheet"
-  | "site"
-  | "google-drive"
-  | "google-docs"
-  | "google-slides"
-  | "google-sheets"
-  | "imagegen"
-  | "product-design"
-  | "email"
-  | "slack";
-
-function selectedKindFromDocument(
-  document: unknown,
-  preferred: unknown,
-): TemplateKind | null {
-  return extractSkillKindFromDocument(
-    document as SkillMentionDocument,
-    typeof preferred === "string" ? preferred : null,
-  ) as TemplateKind | null;
-}
-
-interface BuiltInTemplate {
-  id: string;
-  kind: "document" | "presentation" | "spreadsheet";
-  title: MessageDescriptor;
-  filename: string;
-  assetUrl: string;
-  previewUrl: string;
-}
-
-interface MessageDescriptor {
-  id: string;
-  defaultMessage: string;
-  description: string;
-}
-
-interface ArtifactTemplatePickerProps {
-  canUseTemplateAttachments?: boolean;
-  onAddFileAssetAttachment?: (input: {
-    assetUrl: string;
-    label: string;
-  }) => Promise<{ path: string } | null | undefined>;
-  placement?: "top" | "bottom" | string;
-}
-
-const TEMPLATE_CREATOR_URL = "plugin://template-creator@openai-primary-runtime";
-const TEMPLATE_CREATOR_MENTION = `[@Template Creator](${TEMPLATE_CREATOR_URL})`;
-const TEMPLATE_NAME_PLACEHOLDER = "__CODEX_TEMPLATE_NAME_PLACEHOLDER__";
-
-const CREATE_PROMPTS: Record<TemplateKind, MessageDescriptor> = {
-  document: {
-    id: "home.artifactTemplates.createDocument.prompt",
-    defaultMessage:
-      "Create a new document template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to upload a reference file and if needed interview me on how and when to use the template.",
-    description:
-      "Composer prefill for creating a document template from a reference file",
-  },
-  presentation: {
-    id: "home.artifactTemplates.createPresentation.prompt",
-    defaultMessage:
-      "Create a new presentation template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to upload a reference file and if needed interview me on how and when to use the template.",
-    description:
-      "Composer prefill for creating a presentation template from a reference file",
-  },
-  spreadsheet: {
-    id: "home.artifactTemplates.createSpreadsheet.prompt",
-    defaultMessage:
-      "Create a new spreadsheet template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to upload a reference file and if needed interview me on how and when to use the template.",
-    description:
-      "Composer prefill for creating a spreadsheet template from a reference file",
-  },
-  site: {
-    id: "home.artifactTemplates.createSite.prompt",
-    defaultMessage:
-      "Create a new Site template using {templateCreator}. First, explain how templates work and how to use them. Then ask me which existing Site project to use and if needed interview me on how and when to use the template.",
-    description:
-      "Composer prefill for creating a Site template from an existing Site project",
-  },
-  "google-drive": {
-    id: "home.artifactTemplates.createGoogleWorkspace.prompt",
-    defaultMessage:
-      "Create a new Google Workspace template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to provide a Google Docs, Slides, or Sheets link and if needed interview me on how and when to use the template.",
-    description:
-      "Composer prefill for creating a Google Workspace template from a Google Drive link",
-  },
-  "google-docs": {
-    id: "home.artifactTemplates.createGoogleDoc.prompt",
-    defaultMessage:
-      "Create a new Google Doc template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to provide a Google Doc link and if needed interview me on how and when to use the template.",
-    description:
-      "Composer prefill for creating a Google Doc template from a Google Doc link",
-  },
-  "google-slides": {
-    id: "home.artifactTemplates.createGoogleSlides.prompt",
-    defaultMessage:
-      "Create a new Google Slides template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to provide a Google Slides link and if needed interview me on how and when to use the template.",
-    description:
-      "Composer prefill for creating a Google Slides template from a Google Slides link",
-  },
-  "google-sheets": {
-    id: "home.artifactTemplates.createGoogleSheet.prompt",
-    defaultMessage:
-      "Create a new Google Sheet template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to provide a Google Sheet link and if needed interview me on how and when to use the template.",
-    description:
-      "Composer prefill for creating a Google Sheet template from a Google Sheet link",
-  },
-  imagegen: {
-    id: "home.artifactTemplates.createImagegen.prompt",
-    defaultMessage:
-      "Create a new image template for ImageGen using {templateCreator}. First, explain how templates work and how to use them. Then ask me to upload a PNG reference and if needed interview me on how and when to use the template.",
-    description:
-      "Composer prefill for creating an ImageGen template from a PNG reference",
-  },
-  "product-design": {
-    id: "home.artifactTemplates.createProductDesign.prompt",
-    defaultMessage:
-      "Create a new image template for Product Design using {templateCreator}. First, explain how templates work and how to use them. Then ask me to upload a PNG reference and if needed interview me on how and when to use the template.",
-    description:
-      "Composer prefill for creating a Product Design template from a PNG reference",
-  },
-  email: {
-    id: "home.artifactTemplates.createEmail.prompt",
-    defaultMessage:
-      "Create a new email template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to paste or upload the reference email text and if needed interview me on how and when to use the template.",
-    description:
-      "Composer prefill for creating an email template from reference text",
-  },
-  slack: {
-    id: "home.artifactTemplates.createSlack.prompt",
-    defaultMessage:
-      "Create a new Slack template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to paste or upload the reference Slack message and if needed interview me on how and when to use the template.",
-    description:
-      "Composer prefill for creating a Slack template from a reference message",
-  },
-};
-
-const BUILT_IN_TEMPLATES: readonly BuiltInTemplate[] = [
-  builtIn(
-    "project-brief",
-    "document",
-    "Project brief",
-    "project-brief.docx",
-    "project-brief-e08b85749970.docx",
-    "project-brief-1b2fde67dca7.png",
-  ),
-  builtIn(
-    "meeting-notes",
-    "document",
-    "Meeting notes",
-    "meeting-notes.docx",
-    "meeting-notes-217e093e29da.docx",
-    "meeting-notes-7b6594a27c56.png",
-  ),
-  builtIn(
-    "report-outline",
-    "document",
-    "Report outline",
-    "report-outline.docx",
-    "report-outline-d47cda7d5af6.docx",
-    "report-outline-905623fd6794.png",
-  ),
-  builtIn(
-    "monthly-business-review",
-    "presentation",
-    "Monthly Business Review",
-    "monthly-business-review.pptx",
-    "monthly-business-review-aa25b4112c50.pptx",
-    "monthly-business-review-22cb5f8fa897.png",
-  ),
-  builtIn(
-    "sales-discovery",
-    "presentation",
-    "Sales discovery",
-    "sales-discovery.pptx",
-    "sales-discovery-c8f07eacd6f2.pptx",
-    "sales-discovery-85b7f00aa916.png",
-  ),
-  builtIn(
-    "design-review",
-    "presentation",
-    "Design review",
-    "design-review.pptx",
-    "design-review-df0c95705aed.pptx",
-    "design-review-f9653b2f8191.png",
-  ),
-  builtIn(
-    "project-tracker",
-    "spreadsheet",
-    "Project tracker",
-    "project-tracker.xlsx",
-    "project-tracker-12f7a4dcd6be.xlsx",
-    "project-tracker-6cad71e02486.png",
-  ),
-  builtIn(
-    "budget-planner",
-    "spreadsheet",
-    "Budget planner",
-    "budget-planner.xlsx",
-    "budget-planner-7fc57dcf2653.xlsx",
-    "budget-planner-ddcc27bcc140.png",
-  ),
-  builtIn(
-    "content-calendar",
-    "spreadsheet",
-    "Content calendar",
-    "content-calendar.xlsx",
-    "content-calendar-f684eeebe28d.xlsx",
-    "content-calendar-addfb8f880a9.png",
-  ),
-];
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let initialized = false;
-let artifactTemplateMetadataQuery: ScopedQueryFamily<
-  Record<string, unknown>,
-  ArtifactTemplateMetadataParams,
-  Map<string, number | null>
->;
-
-function builtIn(
-  id: string,
-  kind: BuiltInTemplate["kind"],
-  title: string,
-  filename: string,
-  asset: string,
-  preview: string,
-): BuiltInTemplate {
-  return {
-    id,
-    kind,
-    title: {
-      id: `home.artifactTemplates.${id.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase())}`,
-      defaultMessage: title,
-      description: `Title for a ${kind} template card`,
-    },
-    filename,
-    assetUrl: new URL(asset, import.meta.url).href,
-    previewUrl: new URL(preview, import.meta.url).href,
-  };
-}
-
-function format(
-  intl: IntlShape | undefined,
-  descriptor: MessageDescriptor,
-  values: Record<string, unknown> = {},
-): string {
-  if (intl?.formatMessage != null)
-    return intl.formatMessage(descriptor, values);
-  return descriptor.defaultMessage.replace(/\{([^}]+)\}/g, (_, key: string) =>
-    String(values[key] ?? `{${key}}`),
-  );
-}
-
-function useSignal<T>(signal: ReadableSignal<T>): T {
-  return useSignalValue(signal);
-}
-
-function createArtifactTemplateMetadataQuery(): ScopedQueryFamily<
-  Record<string, unknown>,
-  ArtifactTemplateMetadataParams,
-  Map<string, number | null>
-> {
-  return createQueryFamily<
-    Record<string, unknown>,
-    ArtifactTemplateMetadataParams,
-    Map<string, number | null>
-  >(appScope, ({ hostId, paths, skillsRefreshNonce }) => ({
-    queryKey: [
-      "artifact-template-skill-creation-times",
-      hostId,
-      skillsRefreshNonce,
-      ...paths,
-    ],
-    queryFn: async ({ signal }: { signal: AbortSignal }) => {
-      const entries = await Promise.all(
-        paths.map(async (path: string) => {
-          try {
-            const metadata = await readFileMetadata("read-file-metadata", {
-              params: { hostId, path },
-              signal,
-            });
-            const createdAt = metadata?.createdAtMs;
-            return [
-              path,
-              createdAt != null && createdAt > 0
-                ? createdAt
-                : (metadata?.mtimeMs ?? null),
-            ] as const;
-          } catch (error) {
-            if (signal.aborted) throw error;
-            return [path, null] as const;
-          }
-        }),
-      );
-      return new Map(entries);
-    },
-    enabled: paths.length > 0,
-    staleTime: 0,
-  }));
-}
-
-function isTemplateCreator(skill: ArtifactSkill): boolean {
-  return Boolean(
-    skill?.enabled &&
-    (skill.name === "template-creator" ||
-      skill.name?.endsWith(":template-creator")),
-  );
-}
-
-function skillPath(skill: ArtifactSkill): string {
-  return skill.path;
-}
-
-function showDangerToast(
-  scope: MaitaiScopeApi<unknown> | undefined,
-  intl: IntlShape | undefined,
-  descriptor: MessageDescriptor,
-): void {
-  scope?.get(toastSignal).danger(format(intl, descriptor), {
-    errorAnalytics: { toastId: descriptor.id },
-  });
-}
-
-function useRemoveTemplate(forceReload: () => Promise<unknown>): {
-  isPending: boolean;
-  mutate(input: RemoveSkillInput): void;
-} {
-  const scope = useScope(appScope);
-  const intl = useIntl();
-  const invalidate = invalidateQueries();
-  const [, setNonce] = useStoredNumber("skills_refresh_nonce");
-  const onError = () =>
-    showDangerToast(scope, intl, {
-      id: "home.artifactTemplates.deleteFailed",
-      defaultMessage: "Unable to delete template",
-      description:
-        "Toast shown when deleting a personal artifact template fails",
-    });
-  const onSuccess = async ({ success }: { success: boolean }) => {
-    if (!success) return onError();
-    try {
-      await forceReload();
-      await invalidate(skillsQueryKey);
-      setNonce((value) => value + 1);
-      scope.get(toastSignal).success(
-        format(intl, {
-          id: "home.artifactTemplates.deleteSuccess",
-          defaultMessage: "Template deleted",
-          description:
-            "Toast shown after deleting a personal artifact template succeeds",
-        }),
-      );
-    } catch {
-      showDangerToast(scope, intl, {
-        id: "home.artifactTemplates.refreshAfterDeleteFailed",
-        defaultMessage: "Template deleted, but the gallery could not refresh",
-        description:
-          "Toast shown when the template was deleted but refreshing the template gallery fails",
-      });
-    }
-  };
-  return useRemoveSkillMutation("remove-skill", { onSuccess, onError });
-}
-
-interface TemplateCreatorCardProps {
-  isDocumentTemplates: boolean;
-  label: string;
-  onClick(): void;
-}
-
-function TemplateCreatorCard({
-  isDocumentTemplates,
-  label,
-  onClick,
-}: TemplateCreatorCardProps): unknown {
-  return jsx.jsxs("button", {
-    type: "button",
-    className:
-      "group relative flex w-full cursor-interaction flex-col gap-2 rounded-2xl text-start outline-none focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring",
-    onClick,
-    children: [
-      jsx.jsx("div", {
-        className: classNames(
-          "relative flex items-center justify-center overflow-hidden rounded-xl border border-default bg-surface-secondary/85 shadow-sm ring-4 ring-transparent group-hover:border-strong group-hover:bg-text/5 group-focus-visible:ring-ring",
-          isDocumentTemplates ? "aspect-[4/5]" : "aspect-video",
-        ),
-        children: jsx.jsx(IconAsset, {
-          className: "text-text-tertiary/60 group-hover:text-codex-icon",
-          "aria-hidden": true,
-          asset: plusIcon,
-        }),
-      }),
-      jsx.jsx("div", {
-        className:
-          "min-w-0 -translate-y-0.5 truncate ps-0.5 pe-2 pb-1 text-sm leading-5 font-normal tracking-normal text-secondary group-hover:text-default group-focus-visible:text-default",
-        children: label,
-      }),
-    ],
-  });
-}
-
-interface BuiltInTemplateGalleryProps {
-  createTemplateCard: unknown;
-  kind: TemplateKind | string;
-  onAttachTemplate(
-    template: BuiltInTemplate,
-  ): Promise<{ path: string } | null | undefined>;
-}
-
-function BuiltInTemplateGallery({
-  createTemplateCard,
-  kind,
-  onAttachTemplate,
-}: BuiltInTemplateGalleryProps): unknown {
-  const scope = useScope(appScope);
-  const composer = useComposer();
-  const intl = useIntl();
-  const [attachingId, setAttachingId] = React.useState<string | null>(null);
-  const portrait = kind === "document" || kind === "google-docs";
-  const all = BUILT_IN_TEMPLATES.filter((template) => template.kind === kind);
-  const templates = all.slice(
-    0,
-    !portrait && createTemplateCard != null ? 2 : undefined,
-  );
-
-  const attach = async (template: BuiltInTemplate) => {
-    setAttachingId(template.id);
-    try {
-      if ((await onAttachTemplate(template)) != null) composer?.focus?.();
-    } catch {
-      showDangerToast(scope, intl, {
-        id: "home.artifactTemplates.attachError",
-        defaultMessage: "Unable to attach template",
-        description:
-          "Toast shown when attaching a document, presentation, or spreadsheet template fails",
-      });
-    } finally {
-      setAttachingId(null);
-    }
-  };
-
-  return jsx.jsxs("div", {
-    className: classNames(
-      "hide-scrollbar grid snap-x snap-mandatory grid-flow-col gap-4 overflow-x-auto scroll-pe-4 scroll-ps-3 pe-4 ps-3 py-1 sm:snap-none sm:grid-flow-row sm:auto-cols-auto sm:overflow-visible",
-      portrait
-        ? "auto-cols-[min(14rem,80vw)] sm:grid-cols-4"
-        : "auto-cols-[min(18rem,85vw)] sm:grid-cols-3",
-    ),
-    role: "group",
-    "aria-label": format(intl, {
-      id: "home.artifactTemplates.gallery",
-      defaultMessage: "Templates",
-      description:
-        "Accessible label for the document, presentation, or spreadsheet template gallery",
-    }),
-    children: [
-      templates.map((template, index) =>
-        jsx.jsx(
-          StaggeredItem,
-          {
-            className: "-m-1 min-w-0 snap-start p-1 sm:snap-none",
-            index,
-            variant: "card",
-            children: jsx.jsxs("button", {
-              type: "button",
-              className:
-                "group relative flex w-full cursor-interaction flex-col gap-2 rounded-2xl text-start outline-none focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring disabled:cursor-default disabled:opacity-70",
-              "aria-label": `Attach ${format(intl, template.title)}`,
-              disabled: attachingId != null,
-              onClick: () => void attach(template),
-              children: [
-                jsx.jsxs("div", {
-                  className: classNames(
-                    "relative overflow-hidden rounded-xl border border-default bg-surface shadow-sm ring-4 ring-transparent group-hover:border-strong group-focus-visible:ring-ring",
-                    portrait ? "aspect-[4/5]" : "aspect-video",
-                  ),
-                  children: [
-                    jsx.jsx("img", {
-                      src: template.previewUrl,
-                      alt: "",
-                      className: classNames(
-                        "h-full w-full object-top",
-                        portrait ? "object-contain" : "object-cover",
-                        attachingId === template.id &&
-                          "motion-safe:animate-pulse",
-                      ),
-                      draggable: false,
-                    }),
-                    jsx.jsx("div", {
-                      "aria-hidden": true,
-                      className:
-                        "pointer-events-none absolute inset-0 flex items-center justify-center bg-text/0 text-text-primary-solid/0 group-hover:bg-text/25 group-hover:text-primary-solid group-focus-visible:bg-text/25 group-focus-visible:text-primary-solid",
-                      children: jsx.jsx(IconAsset, {
-                        "aria-hidden": true,
-                        asset: plusIcon,
-                      }),
-                    }),
-                  ],
-                }),
-                jsx.jsx("div", {
-                  className:
-                    "min-w-0 -translate-y-0.5 truncate ps-0.5 pe-2 pb-1 text-sm leading-5 font-normal tracking-normal text-secondary group-hover:text-default group-focus-visible:text-default",
-                  children: format(intl, template.title),
-                }),
-              ],
-            }),
-          },
-          template.id,
-        ),
-      ),
-      createTemplateCard == null
-        ? null
-        : jsx.jsx(StaggeredItem, {
-            className: "-m-1 min-w-0 snap-start p-1 sm:snap-none",
-            index: templates.length,
-            variant: "card",
-            children: createTemplateCard,
+import {
+  C5t as fe,
+  D5t as pe,
+  Dyt as me,
+  E5t as he,
+  G1 as ge,
+  Gfn as _e,
+  HZ as ve,
+  Hkt as ye,
+  Lz as be,
+  M5t as xe,
+  O5t as w,
+  P5t as Se,
+  QX as Ce,
+  Qln as we,
+  Rht as T,
+  Rz as Te,
+  Syt as Ee,
+  T5t as De,
+  UZ as Oe,
+  Ukt as ke,
+  VZ as Ae,
+  W1 as je,
+  Wfn as Me,
+  X6t as E,
+  XX as Ne,
+  YX as Pe,
+  Z6t as Fe,
+  ZX as Ie,
+  _ as Le,
+  aun as D,
+  b5t as Re,
+  byt as ze,
+  cEt as Be,
+  iun as Ve,
+  kht as He,
+  lEt as Ue,
+  nc as We,
+  nun as O,
+  qs as Ge,
+  sEt as Ke,
+  sun as qe,
+  v as Je,
+  w5t as Ye,
+  zz as k,
+} from "@rchunk/app-initial";
+import {
+  Ci as Xe,
+  Ei as Ze,
+  Si as Qe,
+  Ti as $e,
+  _g as et,
+  bg as tt,
+  bi as nt,
+  fo as rt,
+  gg as it,
+  hg as at,
+  po as ot,
+  vg as st,
+  vi as ct,
+  wi as lt,
+  xi as A,
+  yi as ut,
+} from "@rchunk/app-primary";
+import { n as j, t as dt } from "@rchunk/home-suggestion-staggered-item";
+import { n as ft, t as pt } from "@rchunk/home-artifact-template-card";
+function mt(e) {
+  let t = (0, M.c)(13),
+    n = d(y),
+    r = ce(),
+    i = qe(),
+    [, a] = _e(`skills_refresh_nonce`),
+    o;
+  t[0] !== r || t[1] !== n
+    ? ((o = () => {
+        n.get(S).danger(
+          r.formatMessage({
+            id: `home.artifactTemplates.deleteFailed`,
+            defaultMessage: `Unable to delete template`,
+            description: `Toast shown when deleting a personal artifact template fails`,
           }),
-    ],
-  });
-}
-
-function insertTemplateMention(
-  composer: ComposerController | undefined,
-  scope: MaitaiScopeApi<unknown> | undefined,
-  intl: IntlShape | undefined,
-  skill: ArtifactSkill,
-): void {
-  const editor = composer?.view;
-  if (editor?.state != null) {
-    const end = TextSelection.atEnd(editor.state.doc);
-    const before = end.$from?.nodeBefore;
-    editor.dispatch(editor.state.tr.setSelection(end));
-    if (before != null && (!before.isText || !/\s$/.test(before.text ?? ""))) {
-      composer.insertTextAtSelection?.(" ");
-    }
-  }
-
-  const prompt = format(
-    intl,
-    {
-      id: "home.artifactTemplates.useTemplate.prompt",
-      defaultMessage: `Use the ${TEMPLATE_NAME_PLACEHOLDER} template.`,
-      description: "Composer text added after selecting an artifact template",
-    },
-    { templateName: TEMPLATE_NAME_PLACEHOLDER },
-  );
-  const placeholder = prompt.indexOf(TEMPLATE_NAME_PLACEHOLDER);
-  if (placeholder < 0) {
-    composer?.insertSkillMentionAtSelection?.(skill);
-    composer?.insertTextAtSelection?.(prompt);
-  } else {
-    composer?.insertTextAtSelection?.(prompt.slice(0, placeholder));
-    composer?.insertSkillMentionAtSelection?.(skill);
-    const suffix = prompt
-      .slice(placeholder + TEMPLATE_NAME_PLACEHOLDER.length)
-      .replaceAll(
-        TEMPLATE_NAME_PLACEHOLDER,
-        getSkillDisplayName(skill) ?? skill.title ?? skill.name,
-      );
-    if (editor?.state != null) {
-      const { state, dispatch } = editor;
-      const from = state.selection.from - 1;
-      const transaction = state.tr.insertText(
-        suffix,
-        from,
-        state.selection.from,
-      );
-      transaction.setSelection(
-        TextSelection.create(transaction.doc, from + suffix.length),
-      );
-      dispatch(transaction);
-    } else {
-      composer?.insertTextAtSelection?.(suffix);
-    }
-  }
-  recordUse(scope, skill);
-}
-
-function ArtifactTemplatePicker({
-  canUseTemplateAttachments = false,
-  onAddFileAssetAttachment,
-  placement = "top",
-}: ArtifactTemplatePickerProps): unknown {
-  initializeHomeArtifactTemplates();
-  const scope = useScope(pickerScope);
-  const composer = useComposer();
-  const scrollRef = React.useRef<HTMLElement | null>(null);
-  const resizeObserverRef = React.useRef<ResizeObserver | null>(null);
-  const scrollKeyRef = React.useRef("");
-  const scrollAnimationRef = React.useRef<AnimationPlaybackControls | null>(
-    null,
-  );
-  const [canScrollBackward, setCanScrollBackward] = React.useState(false);
-  const [canScrollForward, setCanScrollForward] = React.useState(false);
-  const context = useSignal(composerContextSignal);
-  const hostId = useSignal(hostIdSignal);
-  const hostCapability = useHostCapability(hostId);
-  const setting = useSignal(settingsSignal);
-  const [skillsRefreshNonce] = useStoredNumber("skills_refresh_nonce");
-  const templatesEnabled = useSignal(templatesEnabledSignal);
-  const templateFormat = useSignal(templateFormatSignal);
-  const intl = useIntl();
-  const composerState =
-    selectComposer(composer, (value) =>
-      isActiveEntity(composerMentionState, value.view?.state),
-    ) ??
-    false;
-  const selectedKind = selectComposer(
-    composer,
-    (value) => selectedKindFromDocument(value.view?.state.doc, templateFormat),
-    "document",
-  );
-  const activeKind: TemplateKind | null =
-    templatesEnabled && !composerState ? selectedKind : null;
-  const queryOptions = { enabled: activeKind != null && !hostCapability };
-  const skillResult = useSkills(context ?? undefined, hostId, queryOptions);
-  const { forceReload, isLoading: skillsLoading, skills = [] } = skillResult;
-  const { isPending: deletePending, mutate: removeSkill } =
-    useRemoveTemplate(forceReload);
-  const relevantSkills = activeKind == null ? [] : skills;
-  const galleryResult = getGallery(relevantSkills, hostId, skillsRefreshNonce);
-  const galleryMetadata = galleryResult.data;
-  const galleryLoading = galleryResult.isLoading === true;
-  const reusableSkills =
-    activeKind == null || galleryMetadata == null
-      ? []
-      : filterSkills(skills, activeKind, galleryMetadata);
-  const canDelete = (skill: ArtifactSkill) =>
-    canDeleteTemplate(skill, useHostCapability(hostId));
-  const deletablePaths = new Set(
-    reusableSkills.filter(canDelete).map(skillPath),
-  );
-  const metadataPaths = [...deletablePaths];
-  const creationTimes = useSignalFamilyValue(artifactTemplateMetadataQuery, {
-    hostId,
-    paths: metadataPaths,
-    skillsRefreshNonce,
-  }).data;
-  const visibleSkills = mergeMetadata(
-    reusableSkills,
-    creationTimes,
-    deletablePaths,
-  );
-  const templateCreator = skills.find(isTemplateCreator);
-  const canCreate = templateCreator != null && canUseTemplateAttachments;
-  const galleryKind =
-    activeKind === "google-drive" ? null : getTemplateKind(activeKind);
-  const isDocumentTemplates =
-    activeKind === "document" || activeKind === "google-docs";
-  const cardWidth = isDocumentTemplates
-    ? "basis-[min(14rem,80vw)] sm:basis-[calc((100%_+_2rem)/5)]"
-    : "basis-[min(18rem,85vw)] sm:basis-1/3";
-  const isGoogleDriveGallery = activeKind === "google-drive";
-
-  React.useEffect(() => {
-    if (activeKind != null) recordOpen(scope, activeKind);
-  }, [scope, activeKind]);
-
-  const hadTemplates = React.useRef(false);
-  React.useEffect(() => {
-    if (!templatesEnabled) {
-      hadTemplates.current = false;
-    } else if (!composerState) {
-      if (visibleSkills.length > 0) hadTemplates.current = true;
-      else if (!skillsLoading && !galleryLoading && hadTemplates.current)
-        closePicker(scope);
-    }
-  }, [
-    skillsLoading,
-    galleryLoading,
-    scope,
-    composerState,
-    templatesEnabled,
-    visibleSkills.length,
-  ]);
-
-  if (activeKind == null) return null;
-
-  const updateScrollState = (element: HTMLElement) => {
-    const bounds = getScrollBounds(element);
-    setCanScrollBackward(element.scrollLeft > bounds.minimum + 1);
-    setCanScrollForward(element.scrollLeft < bounds.maximum - 1);
-  };
-  const galleryKey = [
-    ...visibleSkills.map(skillPath),
-    ...(canCreate ? ["create-template"] : []),
-  ].join("\n");
-  const bindScrollContainer = (element: HTMLElement | null) => {
-    resizeObserverRef.current?.disconnect?.();
-    scrollRef.current = element;
-    if (element == null || galleryKey === "") return;
-    if (scrollKeyRef.current !== galleryKey) {
-      scrollKeyRef.current = galleryKey;
-      scrollAnimationRef.current?.stop?.();
-      element.style.removeProperty("scroll-snap-type");
-      const bounds = getScrollBounds(element);
-      element.scrollTo({ left: bounds.minimum });
-    }
-    updateScrollState(element);
-    if (typeof ResizeObserver === "undefined") return;
-    const observer = new ResizeObserver(() => updateScrollState(element));
-    observer.observe(element);
-    for (const child of element.children) observer.observe(child);
-    resizeObserverRef.current = observer;
-  };
-  const scroll = (direction: number) => {
-    const element = scrollRef.current;
-    if (element == null) return;
-    scrollAnimationRef.current?.stop?.();
-    const left = nextScrollPosition(element, direction);
-    if (setting) {
-      element.scrollTo({ left });
-      element.style.removeProperty("scroll-snap-type");
-      updateScrollState(element);
-    } else {
-      element.style.scrollSnapType = "none";
-      scrollAnimationRef.current = animateNumber(element.scrollLeft, left, {
-        duration: 0.2,
-        ease: [0.165, 0.84, 0.44, 1],
-        onUpdate: (value: number) => element.scrollTo({ left: value }),
-        onComplete: () => {
-          element.style.removeProperty("scroll-snap-type");
-          if (scrollRef.current === element) updateScrollState(element);
-        },
-      });
-    }
-  };
-  const useTemplate = (skill: ArtifactSkill) =>
-    insertTemplateMention(composer, scope, intl, skill);
-  const createTemplate = () => {
-    recordCreate(scope, TEMPLATE_CREATOR_URL);
-    composer?.appendPromptText?.(
-      format(intl, CREATE_PROMPTS[activeKind], {
-        templateCreator: TEMPLATE_CREATOR_MENTION,
+          { errorAnalytics: { toastId: `home.artifactTemplates.deleteFailed` } },
+        );
       }),
-    );
-  };
-  const createCard = canCreate
-    ? jsx.jsx(TemplateCreatorCard, {
-        isDocumentTemplates,
-        label: format(intl, {
-          id: "home.artifactTemplates.create",
-          defaultMessage: "Create a template",
-          description:
-            "Accessible label for adding the Template Creator skill from the artifact template gallery",
-        }),
-        onClick: createTemplate,
-      })
-    : null;
-  const builtInGallery =
-    visibleSkills.length === 0 &&
-    !skillsLoading &&
-    !galleryLoading &&
-    galleryKind != null &&
-    canUseTemplateAttachments &&
-    onAddFileAssetAttachment != null
-      ? jsx.jsx(BuiltInTemplateGallery, {
-          createTemplateCard: createCard,
-          kind: galleryKind,
-          onAttachTemplate: async (template: BuiltInTemplate) => {
-            const journey = scope.get(journeySignal);
-            const attachment = await onAddFileAssetAttachment({
-              assetUrl: template.assetUrl,
-              label: template.filename,
-            });
-            if (attachment == null) return null;
-            recordAttachment(scope, {
-              attachmentPath: attachment.path,
-              journey,
-              templateId: template.id,
-            });
-            return attachment;
-          },
-        })
-      : null;
-  const reusableGallery =
-    visibleSkills.length > 0 || (galleryKind == null && createCard != null)
-      ? jsx.jsxs("div", {
-          ref: bindScrollContainer,
-          className:
-            "hide-scrollbar flex snap-x snap-mandatory scroll-px-3 gap-3 overflow-x-auto px-3 py-1",
-          role: "group",
-          "aria-label": "Templates",
-          onScroll: (event: { currentTarget: HTMLElement }) =>
-            updateScrollState(event.currentTarget),
-          children: [
-            visibleSkills.map((skill: ArtifactSkill, index: number) => {
-              const metadata = galleryMetadata?.get?.(skill.path);
-              if (metadata == null) return null;
-              return jsx.jsx(
-                StaggeredItem,
-                {
-                  className: classNames(
-                    "-m-1 min-w-0 shrink-0 snap-start p-1",
-                    isGoogleDriveGallery ? "w-fit" : cardWidth,
-                  ),
-                  index,
-                  variant: "card",
-                  children: jsx.jsx(TemplateCard, {
-                    hostId,
-                    deleteDisabled: deletePending,
-                    onDelete: deletablePaths.has(skill.path)
-                      ? () => removeSkill({ hostId, skillPath: skill.path })
-                      : undefined,
-                    onEdit:
-                      templateCreator == null
-                        ? undefined
-                        : () =>
-                            composer?.appendPromptText?.(
-                              buildEditPrompt(templateCreator, skill),
-                            ),
-                    onUse: () => useTemplate(skill),
-                    skill,
-                    sourceUrl: metadata.sourceUrl,
-                    templateKind: getTemplateKind(metadata.galleryKind),
-                    isGoogleDriveGallery,
-                  }),
-                },
-                skill.path,
-              );
-            }),
-            createCard == null
-              ? null
-              : jsx.jsx(StaggeredItem, {
-                  className: classNames(
-                    "-m-1 min-w-0 shrink-0 snap-start p-1",
-                    cardWidth,
-                  ),
-                  index: visibleSkills.length,
-                  variant: "card",
-                  children: createCard,
+      (t[0] = r),
+      (t[1] = n),
+      (t[2] = o))
+    : (o = t[2]);
+  let s = o,
+    c;
+  t[3] !== r || t[4] !== i || t[5] !== e || t[6] !== n || t[7] !== a || t[8] !== s
+    ? ((c = async (t) => {
+        let { success: o } = t;
+        if (!o) {
+          s();
+          return;
+        }
+        try {
+          (await e(),
+            await i(Ke),
+            a(ht),
+            n
+              .get(S)
+              .success(
+                r.formatMessage({
+                  id: `home.artifactTemplates.deleteSuccess`,
+                  defaultMessage: `Template deleted`,
+                  description: `Toast shown after deleting a personal artifact template succeeds`,
                 }),
-          ],
-        })
-      : null;
-
-  const scrollButtons =
-    visibleSkills.length === 0
-      ? null
-      : jsx.jsxs(jsx.Fragment, {
-          children: [
-            jsx.jsx(Button, {
-              "aria-label": "Show previous templates",
-              color: "ghost",
-              disabled: !canScrollBackward,
-              onClick: () => scroll(-1),
-              size: "toolbar",
-              uniform: true,
-              children: jsx.jsx(IconAsset, {
-                className: "rotate-180",
-                "aria-hidden": true,
-                asset: arrowRightIcon,
-              }),
+              ));
+        } catch {
+          n.get(S).danger(
+            r.formatMessage({
+              id: `home.artifactTemplates.refreshAfterDeleteFailed`,
+              defaultMessage: `Template deleted, but the gallery could not refresh`,
+              description: `Toast shown when the template was deleted but refreshing the template gallery fails`,
             }),
-            jsx.jsx(Button, {
-              "aria-label": "Show more templates",
-              color: "ghost",
-              disabled: !canScrollForward,
-              onClick: () => scroll(1),
-              size: "toolbar",
-              uniform: true,
-              children: jsx.jsx(IconAsset, {
-                "aria-hidden": true,
-                asset: arrowRightIcon,
-              }),
-            }),
-          ],
-        });
-  const close = () => {
-    dismissPicker(
-      scope,
-      dismissReasons?.CODEX_ARTIFACT_TEMPLATE_CAROUSEL_DISMISS_REASON_CLOSE_BUTTON,
-    );
-    closePicker(scope);
-  };
-
-  return jsx.jsx(Surface, {
-    isActive: true,
-    placement,
-    spacing: "compact",
-    children: jsx.jsxs(Panel, {
-      className: "max-h-[320px]",
-      padded: false,
-      children: [
-        jsx.jsxs(Header, {
-          background: "transparent",
-          className: "flex h-9 items-center justify-between gap-3 ps-3 pe-1",
-          children: [
-            jsx.jsx("div", {
-              className: "min-w-0 truncate",
-              children: "Templates",
-            }),
-            jsx.jsxs("div", {
-              className: "flex shrink-0 items-center gap-1",
-              children: [
-                scrollButtons,
-                jsx.jsx(Button, {
-                  "aria-label": "Close templates",
-                  color: "ghost",
-                  onClick: close,
-                  size: "toolbar",
-                  uniform: true,
-                  children: jsx.jsx(IconAsset, {
-                    "aria-hidden": true,
-                    asset: closeIcon,
+            { errorAnalytics: { toastId: `home.artifactTemplates.refreshAfterDeleteFailed` } },
+          );
+        }
+      }),
+      (t[3] = r),
+      (t[4] = i),
+      (t[5] = e),
+      (t[6] = n),
+      (t[7] = a),
+      (t[8] = s),
+      (t[9] = c))
+    : (c = t[9]);
+  let l;
+  return (
+    t[10] !== s || t[11] !== c
+      ? ((l = { onSuccess: c, onError: s }), (t[10] = s), (t[11] = c), (t[12] = l))
+      : (l = t[12]),
+    Ve(`remove-skill`, l)
+  );
+}
+function ht(e) {
+  return (e ?? 0) + 1;
+}
+var M;
+function gt() {
+  return (gt = e(() => {
+    ((M = t()), a(), u(), se(), D(), f(), Me(), Be(), O());
+  }))();
+}
+var N;
+function P() {
+  return (P = e(() => {
+    N = `` + new URL(`budget-planner-7fc57dcf2653.xlsx`, import.meta.url).href;
+  }))();
+}
+var _t;
+function F() {
+  return (F = e(() => {
+    _t = `` + new URL(`content-calendar-f684eeebe28d.xlsx`, import.meta.url).href;
+  }))();
+}
+var I;
+function L() {
+  return (L = e(() => {
+    I = `` + new URL(`design-review-df0c95705aed.pptx`, import.meta.url).href;
+  }))();
+}
+var vt;
+function yt() {
+  return (yt = e(() => {
+    vt = `` + new URL(`meeting-notes-217e093e29da.docx`, import.meta.url).href;
+  }))();
+}
+var bt;
+function xt() {
+  return (xt = e(() => {
+    bt = `` + new URL(`monthly-business-review-aa25b4112c50.pptx`, import.meta.url).href;
+  }))();
+}
+var St;
+function Ct() {
+  return (Ct = e(() => {
+    St = `` + new URL(`budget-planner-ddcc27bcc140.png`, import.meta.url).href;
+  }))();
+}
+var wt;
+function R() {
+  return (R = e(() => {
+    wt = `` + new URL(`content-calendar-addfb8f880a9.png`, import.meta.url).href;
+  }))();
+}
+var Tt;
+function z() {
+  return (z = e(() => {
+    Tt = `` + new URL(`design-review-f9653b2f8191.png`, import.meta.url).href;
+  }))();
+}
+var Et;
+function Dt() {
+  return (Dt = e(() => {
+    Et = `` + new URL(`meeting-notes-7b6594a27c56.png`, import.meta.url).href;
+  }))();
+}
+var B;
+function V() {
+  return (V = e(() => {
+    B = `` + new URL(`monthly-business-review-22cb5f8fa897.png`, import.meta.url).href;
+  }))();
+}
+var H;
+function U() {
+  return (U = e(() => {
+    H = `` + new URL(`project-brief-1b2fde67dca7.png`, import.meta.url).href;
+  }))();
+}
+var W;
+function G() {
+  return (G = e(() => {
+    W = `` + new URL(`project-tracker-6cad71e02486.png`, import.meta.url).href;
+  }))();
+}
+var K;
+function Ot() {
+  return (Ot = e(() => {
+    K = `` + new URL(`report-outline-905623fd6794.png`, import.meta.url).href;
+  }))();
+}
+var q;
+function kt() {
+  return (kt = e(() => {
+    q = `` + new URL(`sales-discovery-85b7f00aa916.png`, import.meta.url).href;
+  }))();
+}
+var J;
+function Y() {
+  return (Y = e(() => {
+    J = `` + new URL(`project-brief-e08b85749970.docx`, import.meta.url).href;
+  }))();
+}
+var X;
+function At() {
+  return (At = e(() => {
+    X = `` + new URL(`project-tracker-12f7a4dcd6be.xlsx`, import.meta.url).href;
+  }))();
+}
+var jt;
+function Mt() {
+  return (Mt = e(() => {
+    jt = `` + new URL(`report-outline-d47cda7d5af6.docx`, import.meta.url).href;
+  }))();
+}
+var Nt;
+function Pt() {
+  return (Pt = e(() => {
+    Nt = `` + new URL(`sales-discovery-c8f07eacd6f2.pptx`, import.meta.url).href;
+  }))();
+}
+function Ft(e) {
+  return It.filter((t) => t.kind === e);
+}
+var It;
+function Lt() {
+  return (Lt = e(() => {
+    (u(),
+      P(),
+      F(),
+      L(),
+      yt(),
+      xt(),
+      Ct(),
+      R(),
+      z(),
+      Dt(),
+      V(),
+      U(),
+      G(),
+      Ot(),
+      kt(),
+      Y(),
+      At(),
+      Mt(),
+      Pt(),
+      (It = [
+        {
+          id: `project-brief`,
+          kind: `document`,
+          title: h({
+            id: `home.artifactTemplates.projectBrief`,
+            defaultMessage: `Project brief`,
+            description: `Title for a document template card`,
+          }),
+          filename: `project-brief.docx`,
+          assetUrl: J,
+          previewUrl: H,
+        },
+        {
+          id: `meeting-notes`,
+          kind: `document`,
+          title: h({
+            id: `home.artifactTemplates.meetingNotes`,
+            defaultMessage: `Meeting notes`,
+            description: `Title for a document template card`,
+          }),
+          filename: `meeting-notes.docx`,
+          assetUrl: vt,
+          previewUrl: Et,
+        },
+        {
+          id: `report-outline`,
+          kind: `document`,
+          title: h({
+            id: `home.artifactTemplates.reportOutline`,
+            defaultMessage: `Report outline`,
+            description: `Title for a document template card`,
+          }),
+          filename: `report-outline.docx`,
+          assetUrl: jt,
+          previewUrl: K,
+        },
+        {
+          id: `monthly-business-review`,
+          kind: `presentation`,
+          title: h({
+            id: `home.artifactTemplates.monthlyBusinessReview`,
+            defaultMessage: `Monthly Business Review`,
+            description: `Title for a presentation template card`,
+          }),
+          filename: `monthly-business-review.pptx`,
+          assetUrl: bt,
+          previewUrl: B,
+        },
+        {
+          id: `sales-discovery`,
+          kind: `presentation`,
+          title: h({
+            id: `home.artifactTemplates.salesDiscovery`,
+            defaultMessage: `Sales discovery`,
+            description: `Title for a presentation template card`,
+          }),
+          filename: `sales-discovery.pptx`,
+          assetUrl: Nt,
+          previewUrl: q,
+        },
+        {
+          id: `design-review`,
+          kind: `presentation`,
+          title: h({
+            id: `home.artifactTemplates.designReview`,
+            defaultMessage: `Design review`,
+            description: `Title for a presentation template card`,
+          }),
+          filename: `design-review.pptx`,
+          assetUrl: I,
+          previewUrl: Tt,
+        },
+        {
+          id: `project-tracker`,
+          kind: `spreadsheet`,
+          title: h({
+            id: `home.artifactTemplates.projectTracker`,
+            defaultMessage: `Project tracker`,
+            description: `Title for a spreadsheet template card`,
+          }),
+          filename: `project-tracker.xlsx`,
+          assetUrl: X,
+          previewUrl: W,
+        },
+        {
+          id: `budget-planner`,
+          kind: `spreadsheet`,
+          title: h({
+            id: `home.artifactTemplates.budgetPlanner`,
+            defaultMessage: `Budget planner`,
+            description: `Title for a spreadsheet template card`,
+          }),
+          filename: `budget-planner.xlsx`,
+          assetUrl: N,
+          previewUrl: St,
+        },
+        {
+          id: `content-calendar`,
+          kind: `spreadsheet`,
+          title: h({
+            id: `home.artifactTemplates.contentCalendar`,
+            defaultMessage: `Content calendar`,
+            description: `Title for a spreadsheet template card`,
+          }),
+          filename: `content-calendar.xlsx`,
+          assetUrl: _t,
+          previewUrl: wt,
+        },
+      ]));
+  }))();
+}
+function Rt(e) {
+  let t = (0, zt.c)(36),
+    { createTemplateCard: n, kind: r, onAttachTemplate: i } = e,
+    a = d(y),
+    o = ve(),
+    s = ce(),
+    [c, l] = (0, Bt.useState)(null),
+    u = r === `document` || r === `google-docs`,
+    f,
+    p,
+    h,
+    g,
+    _;
+  if (
+    t[0] !== o ||
+    t[1] !== n ||
+    t[2] !== s ||
+    t[3] !== u ||
+    t[4] !== r ||
+    t[5] !== i ||
+    t[6] !== c ||
+    t[7] !== a
+  ) {
+    _ = Ft(r).slice(0, !u && n != null ? 2 : void 0);
+    let e;
+    t[13] !== o || t[14] !== s || t[15] !== i || t[16] !== a
+      ? ((e = async (e) => {
+          (l(e.id),
+            await (async () => {
+              try {
+                if ((await i(e)) == null) return;
+                o.focus();
+              } catch {
+                a.get(S).danger(
+                  s.formatMessage({
+                    id: `home.artifactTemplates.attachError`,
+                    defaultMessage: `Unable to attach template`,
+                    description: `Toast shown when attaching a document, presentation, or spreadsheet template fails`,
                   }),
+                  { errorAnalytics: { toastId: `home.artifactTemplates.attachError` } },
+                );
+              }
+            })().finally(() => {
+              l(null);
+            }));
+        }),
+        (t[13] = o),
+        (t[14] = s),
+        (t[15] = i),
+        (t[16] = a),
+        (t[17] = e))
+      : (e = t[17]);
+    let d = e,
+      v = u
+        ? `auto-cols-[min(14rem,80vw)] sm:grid-cols-4`
+        : `auto-cols-[min(18rem,85vw)] sm:grid-cols-3`;
+    (t[18] === v
+      ? (f = t[19])
+      : ((f = x(
+          `hide-scrollbar grid snap-x snap-mandatory grid-flow-col gap-4 overflow-x-auto scroll-pe-4 scroll-ps-3 pe-4 ps-3 py-1 sm:snap-none sm:grid-flow-row sm:auto-cols-auto sm:overflow-visible`,
+          v,
+        )),
+        (t[18] = v),
+        (t[19] = f)),
+      (p = `group`),
+      t[20] === s
+        ? (h = t[21])
+        : ((h = s.formatMessage({
+            id: `home.artifactTemplates.gallery`,
+            defaultMessage: `Templates`,
+            description: `Accessible label for the document, presentation, or spreadsheet template gallery`,
+          })),
+          (t[20] = s),
+          (t[21] = h)));
+    let y;
+    (t[22] !== d || t[23] !== s || t[24] !== u || t[25] !== c
+      ? ((y = (e, t) => {
+          let n = c === e.id;
+          return (0, Z.jsx)(
+            dt,
+            {
+              className: `-m-1 min-w-0 snap-start p-1 sm:snap-none`,
+              index: t,
+              variant: `card`,
+              children: (0, Z.jsxs)(`button`, {
+                type: `button`,
+                className: `group relative flex w-full cursor-interaction flex-col gap-2 rounded-2xl text-start outline-none focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring disabled:cursor-default disabled:opacity-70`,
+                "aria-label": s.formatMessage(
+                  {
+                    id: `home.artifactTemplates.attach`,
+                    defaultMessage: `Attach {title}`,
+                    description: `Accessible label for selecting a document, presentation, or spreadsheet template`,
+                  },
+                  { title: s.formatMessage(e.title) },
+                ),
+                disabled: c != null,
+                onClick: () => void d(e),
+                children: [
+                  (0, Z.jsxs)(`div`, {
+                    className: x(
+                      `relative overflow-hidden rounded-xl border border-default bg-surface shadow-sm ring-4 ring-transparent group-hover:border-strong group-focus-visible:ring-ring`,
+                      u ? `aspect-[4/5]` : `aspect-video`,
+                    ),
+                    children: [
+                      (0, Z.jsx)(`img`, {
+                        src: e.previewUrl,
+                        alt: ``,
+                        className: x(
+                          `h-full w-full object-top`,
+                          u ? `object-contain` : `object-cover`,
+                          n && `motion-safe:animate-pulse`,
+                        ),
+                        draggable: !1,
+                      }),
+                      (0, Z.jsx)(`div`, {
+                        "aria-hidden": !0,
+                        className: `pointer-events-none absolute inset-0 flex items-center justify-center bg-text/0 text-text-primary-solid/0 group-hover:bg-text/25 group-hover:text-primary-solid group-focus-visible:bg-text/25 group-focus-visible:text-primary-solid`,
+                        children: (0, Z.jsx)(m, { "aria-hidden": !1, asset: C }),
+                      }),
+                    ],
+                  }),
+                  (0, Z.jsx)(`div`, {
+                    className: `min-w-0 -translate-y-0.5 truncate ps-0.5 pe-2 pb-1 text-sm leading-5 font-normal tracking-normal text-secondary group-hover:text-default group-focus-visible:text-default`,
+                    children: (0, Z.jsx)(ee, { ...e.title }),
+                  }),
+                ],
+              }),
+            },
+            e.id,
+          );
+        }),
+        (t[22] = d),
+        (t[23] = s),
+        (t[24] = u),
+        (t[25] = c),
+        (t[26] = y))
+      : (y = t[26]),
+      (g = _.map(y)),
+      (t[0] = o),
+      (t[1] = n),
+      (t[2] = s),
+      (t[3] = u),
+      (t[4] = r),
+      (t[5] = i),
+      (t[6] = c),
+      (t[7] = a),
+      (t[8] = f),
+      (t[9] = p),
+      (t[10] = h),
+      (t[11] = g),
+      (t[12] = _));
+  } else ((f = t[8]), (p = t[9]), (h = t[10]), (g = t[11]), (_ = t[12]));
+  let v;
+  t[27] !== n || t[28] !== _
+    ? ((v =
+        n == null
+          ? null
+          : (0, Z.jsx)(dt, {
+              className: `-m-1 min-w-0 snap-start p-1 sm:snap-none`,
+              index: _.length,
+              variant: `card`,
+              children: n,
+            })),
+      (t[27] = n),
+      (t[28] = _),
+      (t[29] = v))
+    : (v = t[29]);
+  let te;
+  return (
+    t[30] !== f || t[31] !== p || t[32] !== h || t[33] !== g || t[34] !== v
+      ? ((te = (0, Z.jsxs)(`div`, { className: f, role: p, "aria-label": h, children: [g, v] })),
+        (t[30] = f),
+        (t[31] = p),
+        (t[32] = h),
+        (t[33] = g),
+        (t[34] = v),
+        (t[35] = te))
+      : (te = t[35]),
+    te
+  );
+}
+var zt, Bt, Z;
+function Vt() {
+  return (Vt = e(() => {
+    ((zt = t()), i(), oe(), a(), (Bt = ie()), u(), j(), Lt(), Ae(), r(), se(), f(), (Z = c()));
+  }))();
+}
+function Ht(e) {
+  let t = (0, Ut.c)(11),
+    { isDocumentTemplates: n, label: r, onClick: i } = e,
+    a = n ? `aspect-[4/5]` : `aspect-video`,
+    o;
+  t[0] === a
+    ? (o = t[1])
+    : ((o = x(
+        `relative flex items-center justify-center overflow-hidden rounded-xl border border-default bg-surface-secondary/85 shadow-sm ring-4 ring-transparent group-hover:border-strong group-hover:bg-text/5 group-focus-visible:ring-ring`,
+        a,
+      )),
+      (t[0] = a),
+      (t[1] = o));
+  let s;
+  t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = (0, Wt.jsx)(m, {
+        className: `text-text-tertiary/60 group-hover:text-codex-icon`,
+        "aria-hidden": !1,
+        asset: C,
+      })),
+      (t[2] = s))
+    : (s = t[2]);
+  let c;
+  t[3] === o
+    ? (c = t[4])
+    : ((c = (0, Wt.jsx)(`div`, { className: o, children: s })), (t[3] = o), (t[4] = c));
+  let l;
+  t[5] === r
+    ? (l = t[6])
+    : ((l = (0, Wt.jsx)(`div`, {
+        className: `min-w-0 -translate-y-0.5 truncate ps-0.5 pe-2 pb-1 text-sm leading-5 font-normal tracking-normal text-secondary group-hover:text-default group-focus-visible:text-default`,
+        children: r,
+      })),
+      (t[5] = r),
+      (t[6] = l));
+  let u;
+  return (
+    t[7] !== i || t[8] !== c || t[9] !== l
+      ? ((u = (0, Wt.jsxs)(`button`, {
+          type: `button`,
+          className: `group relative flex w-full cursor-interaction flex-col gap-2 rounded-2xl text-start outline-none focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring`,
+          onClick: i,
+          children: [c, l],
+        })),
+        (t[7] = i),
+        (t[8] = c),
+        (t[9] = l),
+        (t[10] = u))
+      : (u = t[10]),
+    u
+  );
+}
+var Ut, Wt;
+function Gt() {
+  return (Gt = e(() => {
+    ((Ut = t()), i(), oe(), r(), (Wt = c()));
+  }))();
+}
+function Kt(e) {
+  let t = (0, Zt.c)(89),
+    { canUseTemplateAttachments: r, onAddFileAssetAttachment: i, placement: a } = e,
+    o = r !== void 0 && r,
+    c = a === void 0 ? `top` : a,
+    l = d(He),
+    u = ve(),
+    f = (0, Q.useRef)(null),
+    p = (0, Q.useRef)(null),
+    h = (0, Q.useRef)(``),
+    g = (0, Q.useRef)(null),
+    [y, te] = (0, Q.useState)(!1),
+    [ie, ae] = (0, Q.useState)(!1),
+    oe = s(Ee),
+    b = s(me),
+    se = Fe(b),
+    S = s(ke),
+    [de] = _e(`skills_refresh_nonce`),
+    C = s(at),
+    ye = s(it),
+    w = ce(),
+    Se = Oe(u, Xt),
+    Ce;
+  t[0] === ye ? (Ce = t[1]) : ((Ce = (e) => st(e.view.state.doc, ye)), (t[0] = ye), (t[1] = Ce));
+  let we = Oe(u, Ce, `document`),
+    T = C && !Se ? we : null,
+    Ae = T != null,
+    je;
+  t[2] === Ae ? (je = t[3]) : ((je = { enabled: Ae }), (t[2] = Ae), (t[3] = je));
+  let { forceReload: Me, isLoading: E, skills: D } = Ue(oe ?? void 0, b, je),
+    { isPending: ze, mutate: Be } = mt(Me),
+    Ve;
+  t[4] !== D || t[5] !== T
+    ? ((Ve = T == null ? [] : D), (t[4] = D), (t[5] = T), (t[6] = Ve))
+    : (Ve = t[6]);
+  let { data: We, isLoading: O } = ge(Ve, b, de),
+    Ke = T == null || We == null ? [] : fe(D, T, We),
+    qe;
+  t[7] === se ? (qe = t[8]) : ((qe = (e) => De(e, se)), (t[7] = se), (t[8] = qe));
+  let Je = new Set(Ke.filter(qe).map(Yt)),
+    { data: Ye } = n(en, { hostId: b, paths: [...Je], skillsRefreshNonce: de }),
+    k = he(Ke, Ye, Je),
+    et = (0, Q.useRef)(!1),
+    tt,
+    rt;
+  (t[9] !== E || t[10] !== O || t[11] !== l || t[12] !== Se || t[13] !== C || t[14] !== k.length
+    ? ((tt = () => {
+        if (!C) {
+          et.current = !1;
+          return;
+        }
+        if (!Se) {
+          if (k.length > 0) {
+            et.current = !0;
+            return;
+          }
+          !E && !O && et.current && ct(l);
+        }
+      }),
+      (rt = [E, O, l, Se, C, k.length]),
+      (t[9] = E),
+      (t[10] = O),
+      (t[11] = l),
+      (t[12] = Se),
+      (t[13] = C),
+      (t[14] = k.length),
+      (t[15] = tt),
+      (t[16] = rt))
+    : ((tt = t[15]), (rt = t[16])),
+    (0, Q.useEffect)(tt, rt));
+  let ot = D.find(Jt),
+    A = ot != null && o,
+    ut = (0, Q.useRef)(null),
+    j,
+    ft;
+  (t[17] !== l || t[18] !== T
+    ? ((j = () => {
+        T != null && ut.current !== T && ((ut.current = T), lt(l, T));
+      }),
+      (ft = [l, T]),
+      (t[17] = l),
+      (t[18] = T),
+      (t[19] = j),
+      (t[20] = ft))
+    : ((j = t[19]), (ft = t[20])),
+    (0, Q.useEffect)(j, ft));
+  let ht;
+  if (t[21] !== A || t[22] !== k) {
+    let e;
+    (t[24] === A ? (e = t[25]) : ((e = A ? [`create-template`] : []), (t[24] = A), (t[25] = e)),
+      (ht = [...k.map(qt), ...e]),
+      (t[21] = A),
+      (t[22] = k),
+      (t[23] = ht));
+  } else ht = t[23];
+  let M = ht.join(`
+`),
+    gt;
+  t[26] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((gt = (e) => {
+        let { maximum: t, minimum: n } = be(e);
+        (te(e.scrollLeft > n + 1), ae(e.scrollLeft < t - 1));
+      }),
+      (t[26] = gt))
+    : (gt = t[26]);
+  let N = ne(gt),
+    P;
+  t[27] !== M || t[28] !== N
+    ? ((P = (e) => {
+        if (
+          (p.current?.disconnect(),
+          (f.current = e),
+          e == null ||
+            M === `` ||
+            (h.current !== M &&
+              ((h.current = M),
+              g.current?.stop(),
+              e.style.removeProperty(`scroll-snap-type`),
+              e.scrollTo({ left: be(e).minimum })),
+            N(e),
+            typeof ResizeObserver > `u`))
+        )
+          return;
+        let t = new ResizeObserver(() => N(e));
+        t.observe(e);
+        for (let n of e.children) t.observe(n);
+        p.current = t;
+      }),
+      (t[27] = M),
+      (t[28] = N),
+      (t[29] = P))
+    : (P = t[29]);
+  let _t = P;
+  if (T == null) return null;
+  let F = T === `google-drive`,
+    I;
+  t[30] !== F || t[31] !== T
+    ? ((I = F ? null : pe(T)), (t[30] = F), (t[31] = T), (t[32] = I))
+    : (I = t[32]);
+  let L = I,
+    vt = T === `document` || T === `google-docs`,
+    yt = vt
+      ? `basis-[min(14rem,80vw)] sm:basis-[calc((100%_+_2rem)/5)]`
+      : `basis-[min(18rem,85vw)] sm:basis-1/3`,
+    bt;
+  t[33] !== u || t[34] !== l || t[35] !== w
+    ? ((bt = (e) => {
+        let { state: t, dispatch: n } = u.view,
+          r = ue.atEnd(t.doc),
+          i = r.$from.nodeBefore;
+        (n(t.tr.setSelection(r)),
+          i != null && (!i.isText || !/\s$/.test(i.text ?? ``)) && u.insertTextAtSelection(` `));
+        let a = w.formatMessage(
+            {
+              id: `home.artifactTemplates.useTemplate.prompt`,
+              defaultMessage: `Use the {templateName} template.`,
+              description: `Composer text added after selecting an artifact template`,
+            },
+            { templateName: `__CODEX_TEMPLATE_NAME_PLACEHOLDER__` },
+          ),
+          o = a.indexOf(`__CODEX_TEMPLATE_NAME_PLACEHOLDER__`);
+        if (o === -1) {
+          (u.insertSkillMentionAtSelection(e), u.insertTextAtSelection(a), Ze(l, e));
+          return;
+        }
+        let s = a.slice(0, o),
+          c = a.slice(o + 35).replaceAll(`__CODEX_TEMPLATE_NAME_PLACEHOLDER__`, () => xe(e));
+        (u.insertTextAtSelection(s), u.insertSkillMentionAtSelection(e));
+        let { state: d, dispatch: f } = u.view,
+          p = d.selection.from - 1,
+          m = d.tr.insertText(c, p, d.selection.from);
+        (m.setSelection(ue.create(m.doc, p + c.length)), f(m), Ze(l, e));
+      }),
+      (t[33] = u),
+      (t[34] = l),
+      (t[35] = w),
+      (t[36] = bt))
+    : (bt = t[36]);
+  let xt = bt,
+    St;
+  t[37] !== u || t[38] !== l || t[39] !== w || t[40] !== T
+    ? ((St = () => {
+        ($e(l, Qt), u.appendPromptText(w.formatMessage(tn[T], { templateCreator: $t })));
+      }),
+      (t[37] = u),
+      (t[38] = l),
+      (t[39] = w),
+      (t[40] = T),
+      (t[41] = St))
+    : (St = t[41]);
+  let Ct = St,
+    wt;
+  t[42] !== A || t[43] !== w || t[44] !== vt || t[45] !== Ct
+    ? ((wt = A
+        ? (0, $.jsx)(Ht, {
+            isDocumentTemplates: vt,
+            label: w.formatMessage({
+              id: `home.artifactTemplates.create`,
+              defaultMessage: `Create a template`,
+              description: `Accessible label for adding the Template Creator skill from the artifact template gallery`,
+            }),
+            onClick: Ct,
+          })
+        : null),
+      (t[42] = A),
+      (t[43] = w),
+      (t[44] = vt),
+      (t[45] = Ct),
+      (t[46] = wt))
+    : (wt = t[46]);
+  let R = wt,
+    Tt;
+  t[47] !== S || t[48] !== N
+    ? ((Tt = (e) => {
+        let t = f.current;
+        if (t == null) return;
+        g.current?.stop();
+        let n = Te(t, e);
+        if (S) {
+          (t.scrollTo({ left: n }), t.style.removeProperty(`scroll-snap-type`), N(t));
+          return;
+        }
+        ((t.style.scrollSnapType = `none`),
+          (g.current = le(t.scrollLeft, n, {
+            duration: 0.2,
+            ease: [0.165, 0.84, 0.44, 1],
+            onUpdate: (e) => t.scrollTo({ left: e }),
+            onComplete: () => {
+              (t.style.removeProperty(`scroll-snap-type`), f.current === t && N(t));
+            },
+          })));
+      }),
+      (t[47] = S),
+      (t[48] = N),
+      (t[49] = Tt))
+    : (Tt = t[49]);
+  let z = Tt,
+    Et = Le,
+    Dt = Pe,
+    B;
+  t[50] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((B = (0, $.jsx)(`div`, {
+        className: `min-w-0 truncate`,
+        children: (0, $.jsx)(ee, {
+          id: `home.artifactTemplates.title`,
+          defaultMessage: `Templates`,
+          description: `Title for the floating artifact template picker`,
+        }),
+      })),
+      (t[50] = B))
+    : (B = t[50]);
+  let V;
+  t[51] !== y || t[52] !== ie || t[53] !== w || t[54] !== z || t[55] !== k.length
+    ? ((V =
+        k.length > 0
+          ? (0, $.jsxs)($.Fragment, {
+              children: [
+                (0, $.jsx)(v, {
+                  "aria-label": w.formatMessage({
+                    id: `home.artifactTemplates.previous`,
+                    defaultMessage: `Show previous templates`,
+                    description: `Accessible label for scrolling the artifact template gallery backward`,
+                  }),
+                  color: `ghost`,
+                  disabled: !y,
+                  onClick: () => z(-1),
+                  size: `toolbar`,
+                  uniform: !0,
+                  children: (0, $.jsx)(m, { className: `rotate-180`, "aria-hidden": !1, asset: _ }),
+                }),
+                (0, $.jsx)(v, {
+                  "aria-label": w.formatMessage({
+                    id: `home.artifactTemplates.next`,
+                    defaultMessage: `Show more templates`,
+                    description: `Accessible label for scrolling the artifact template gallery forward`,
+                  }),
+                  color: `ghost`,
+                  disabled: !ie,
+                  onClick: () => z(1),
+                  size: `toolbar`,
+                  uniform: !0,
+                  children: (0, $.jsx)(m, { "aria-hidden": !1, asset: _ }),
                 }),
               ],
+            })
+          : null),
+      (t[51] = y),
+      (t[52] = ie),
+      (t[53] = w),
+      (t[54] = z),
+      (t[55] = k.length),
+      (t[56] = V))
+    : (V = t[56]);
+  let H;
+  t[57] === w
+    ? (H = t[58])
+    : ((H = w.formatMessage({
+        id: `home.artifactTemplates.close`,
+        defaultMessage: `Close templates`,
+        description: `Accessible label for closing the artifact template picker`,
+      })),
+      (t[57] = w),
+      (t[58] = H));
+  let U;
+  t[59] === l
+    ? (U = t[60])
+    : ((U = () => {
+        (Xe(l, Ge.CODEX_ARTIFACT_TEMPLATE_CAROUSEL_DISMISS_REASON_CLOSE_BUTTON), ct(l));
+      }),
+      (t[59] = l),
+      (t[60] = U));
+  let W;
+  t[61] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((W = (0, $.jsx)(m, { "aria-hidden": !1, asset: re })), (t[61] = W))
+    : (W = t[61]);
+  let G;
+  t[62] !== H || t[63] !== U
+    ? ((G = (0, $.jsx)(v, {
+        "aria-label": H,
+        color: `ghost`,
+        onClick: U,
+        size: `toolbar`,
+        uniform: !0,
+        children: W,
+      })),
+      (t[62] = H),
+      (t[63] = U),
+      (t[64] = G))
+    : (G = t[64]);
+  let K;
+  t[65] !== V || t[66] !== G
+    ? ((K = (0, $.jsxs)(Ie, {
+        background: `transparent`,
+        className: `flex h-9 items-center justify-between gap-3 ps-3 pe-1`,
+        children: [
+          B,
+          (0, $.jsxs)(`div`, { className: `flex shrink-0 items-center gap-1`, children: [V, G] }),
+        ],
+      })),
+      (t[65] = V),
+      (t[66] = G),
+      (t[67] = K))
+    : (K = t[67]);
+  let Ot = Ne,
+    q;
+  t[68] !== E ||
+  t[69] !== O ||
+  t[70] !== L ||
+  t[71] !== o ||
+  t[72] !== l ||
+  t[73] !== R ||
+  t[74] !== i ||
+  t[75] !== k.length
+    ? ((q =
+        k.length === 0 && !E && !O && L != null && o && i != null
+          ? (0, $.jsx)(Rt, {
+              createTemplateCard: R,
+              kind: L,
+              onAttachTemplate: async (e) => {
+                let t = l.get(nt),
+                  n = await i({ assetUrl: e.assetUrl, label: e.filename });
+                return n == null
+                  ? null
+                  : (Qe(l, { attachmentPath: n.path, journey: t, templateId: e.id }), n);
+              },
+            })
+          : null),
+      (t[68] = E),
+      (t[69] = O),
+      (t[70] = L),
+      (t[71] = o),
+      (t[72] = l),
+      (t[73] = R),
+      (t[74] = i),
+      (t[75] = k.length),
+      (t[76] = q))
+    : (q = t[76]);
+  let kt =
+      k.length > 0 || (L == null && R != null)
+        ? (0, $.jsxs)(`div`, {
+            ref: _t,
+            className: `hide-scrollbar flex snap-x snap-mandatory scroll-px-3 gap-3 overflow-x-auto px-3 py-1`,
+            role: `group`,
+            "aria-label": w.formatMessage({
+              id: `home.artifactTemplates.reusableGallery`,
+              defaultMessage: `Templates`,
+              description: `Accessible label for the reusable template gallery`,
             }),
-          ],
-        }),
-        jsx.jsxs(Body, { children: [builtInGallery, reusableGallery] }),
-      ],
-    }),
-  });
+            onScroll: (e) => N(e.currentTarget),
+            children: [
+              k.map((e, t) => {
+                let n = We?.get(e.path);
+                return n == null
+                  ? null
+                  : (0, $.jsx)(
+                      dt,
+                      {
+                        className: x(`-m-1 min-w-0 shrink-0 snap-start p-1`, F ? `w-fit` : yt),
+                        index: t,
+                        variant: `card`,
+                        children: (0, $.jsx)(pt, {
+                          hostId: b,
+                          deleteDisabled: ze,
+                          onDelete: Je.has(e.path)
+                            ? () => Be({ hostId: b, skillPath: e.path })
+                            : void 0,
+                          onEdit: ot == null ? void 0 : () => u.appendPromptText(Re(ot, e)),
+                          onUse: () => xt(e),
+                          skill: e,
+                          sourceUrl: n.sourceUrl,
+                          templateKind: pe(n.galleryKind),
+                          isGoogleDriveGallery: F,
+                        }),
+                      },
+                      e.path,
+                    );
+              }),
+              R == null
+                ? null
+                : (0, $.jsx)(dt, {
+                    className: x(`-m-1 min-w-0 shrink-0 snap-start p-1`, yt),
+                    index: k.length,
+                    variant: `card`,
+                    children: R,
+                  }),
+            ],
+          })
+        : null,
+    J;
+  t[77] !== Ot || t[78] !== q || t[79] !== kt
+    ? ((J = (0, $.jsxs)(Ot, { children: [q, kt] })),
+      (t[77] = Ot),
+      (t[78] = q),
+      (t[79] = kt),
+      (t[80] = J))
+    : (J = t[80]);
+  let Y;
+  t[81] !== Dt || t[82] !== K || t[83] !== J
+    ? ((Y = (0, $.jsxs)(Dt, { className: `max-h-[320px]`, padded: !1, children: [K, J] })),
+      (t[81] = Dt),
+      (t[82] = K),
+      (t[83] = J),
+      (t[84] = Y))
+    : (Y = t[84]);
+  let X;
+  return (
+    t[85] !== Et || t[86] !== c || t[87] !== Y
+      ? ((X = (0, $.jsx)(Et, { isActive: !0, placement: c, spacing: `compact`, children: Y })),
+        (t[85] = Et),
+        (t[86] = c),
+        (t[87] = Y),
+        (t[88] = X))
+      : (X = t[88]),
+    X
+  );
 }
-
-function initializeHomeArtifactTemplates(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeSharedRuntime();
-  React = resolveRuntimeExport<ReactRuntime>(reactRuntimeExport);
-  jsx = resolveRuntimeExport<JsxRuntime>(jsxRuntimeExport);
-  initializeStaggeredItem();
-  initializeTemplateCardChunk();
-  initializeArtifactTemplates();
-  initializeGallery();
-  initializeTemplateCard();
-  artifactTemplateMetadataQuery = createArtifactTemplateMetadataQuery();
+function qt(e) {
+  return e.path;
 }
-
-function resolveRuntimeExport<T>(value: unknown): T {
-  return (typeof value === "function" ? value() : value) as T;
+function Jt(e) {
+  return e.enabled && (e.name === `template-creator` || e.name.endsWith(`:template-creator`));
 }
-
-initializeHomeArtifactTemplates();
-
-export { ArtifactTemplatePicker };
+function Yt(e) {
+  return e.path;
+}
+function Xt(e) {
+  return ot(e.view.state);
+}
+var Zt, Q, $, Qt, $t, en, tn;
+function nn() {
+  return (nn = e(() => {
+    ((Zt = t()),
+      We(),
+      g(),
+      de(),
+      oe(),
+      l(),
+      a(),
+      b(),
+      (Q = ie()),
+      u(),
+      j(),
+      ut(),
+      w(),
+      tt(),
+      A(),
+      et(),
+      Ye(),
+      je(),
+      gt(),
+      Je(),
+      rt(),
+      Ce(),
+      te(),
+      k(),
+      r(),
+      E(),
+      f(),
+      T(),
+      ze(),
+      ye(),
+      Me(),
+      Se(),
+      Be(),
+      ae(),
+      O(),
+      Ae(),
+      Vt(),
+      ft(),
+      Gt(),
+      ($ = c()),
+      (Qt = `plugin://template-creator@openai-primary-runtime`),
+      ($t = `[@Template Creator](${Qt})`),
+      (en = p(y, ({ hostId: e, paths: t, skillsRefreshNonce: n }) => ({
+        queryKey: [`artifact-template-skill-creation-times`, e, n, ...t],
+        queryFn: async ({ signal: n }) => {
+          let r = await Promise.all(
+            t.map(async (t) => {
+              try {
+                let { createdAtMs: r, mtimeMs: i } = await we(`read-file-metadata`, {
+                  params: { hostId: e, path: t },
+                  signal: n,
+                });
+                return [t, r != null && r > 0 ? r : (i ?? null)];
+              } catch (e) {
+                if (n.aborted) throw e;
+                return [t, null];
+              }
+            }),
+          );
+          return new Map(r);
+        },
+        enabled: t.length > 0,
+        staleTime: 0,
+      }))),
+      (tn = o({
+        document: {
+          id: `home.artifactTemplates.createDocument.prompt`,
+          defaultMessage: `Create a new document template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to upload a reference file and if needed interview me on how and when to use the template.`,
+          description: `Composer prefill for creating a document template from a reference file`,
+        },
+        presentation: {
+          id: `home.artifactTemplates.createPresentation.prompt`,
+          defaultMessage: `Create a new presentation template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to upload a reference file and if needed interview me on how and when to use the template.`,
+          description: `Composer prefill for creating a presentation template from a reference file`,
+        },
+        spreadsheet: {
+          id: `home.artifactTemplates.createSpreadsheet.prompt`,
+          defaultMessage: `Create a new spreadsheet template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to upload a reference file and if needed interview me on how and when to use the template.`,
+          description: `Composer prefill for creating a spreadsheet template from a reference file`,
+        },
+        site: {
+          id: `home.artifactTemplates.createSite.prompt`,
+          defaultMessage: `Create a new Site template using {templateCreator}. First, explain how templates work and how to use them. Then ask me which existing Site project to use and if needed interview me on how and when to use the template.`,
+          description: `Composer prefill for creating a Site template from an existing Site project`,
+        },
+        "google-drive": {
+          id: `home.artifactTemplates.createGoogleWorkspace.prompt`,
+          defaultMessage: `Create a new Google Workspace template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to provide a Google Docs, Slides, or Sheets link and if needed interview me on how and when to use the template.`,
+          description: `Composer prefill for creating a Google Workspace template from a Google Drive link`,
+        },
+        "google-docs": {
+          id: `home.artifactTemplates.createGoogleDoc.prompt`,
+          defaultMessage: `Create a new Google Doc template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to provide a Google Doc link and if needed interview me on how and when to use the template.`,
+          description: `Composer prefill for creating a Google Doc template from a Google Doc link`,
+        },
+        "google-slides": {
+          id: `home.artifactTemplates.createGoogleSlides.prompt`,
+          defaultMessage: `Create a new Google Slides template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to provide a Google Slides link and if needed interview me on how and when to use the template.`,
+          description: `Composer prefill for creating a Google Slides template from a Google Slides link`,
+        },
+        "google-sheets": {
+          id: `home.artifactTemplates.createGoogleSheet.prompt`,
+          defaultMessage: `Create a new Google Sheet template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to provide a Google Sheet link and if needed interview me on how and when to use the template.`,
+          description: `Composer prefill for creating a Google Sheet template from a Google Sheet link`,
+        },
+        imagegen: {
+          id: `home.artifactTemplates.createImagegen.prompt`,
+          defaultMessage: `Create a new image template for ImageGen using {templateCreator}. First, explain how templates work and how to use them. Then ask me to upload a PNG reference and if needed interview me on how and when to use the template.`,
+          description: `Composer prefill for creating an ImageGen template from a PNG reference`,
+        },
+        "product-design": {
+          id: `home.artifactTemplates.createProductDesign.prompt`,
+          defaultMessage: `Create a new image template for Product Design using {templateCreator}. First, explain how templates work and how to use them. Then ask me to upload a PNG reference and if needed interview me on how and when to use the template.`,
+          description: `Composer prefill for creating a Product Design template from a PNG reference`,
+        },
+        email: {
+          id: `home.artifactTemplates.createEmail.prompt`,
+          defaultMessage: `Create a new email template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to paste or upload the reference email text and if needed interview me on how and when to use the template.`,
+          description: `Composer prefill for creating an email template from reference text`,
+        },
+        slack: {
+          id: `home.artifactTemplates.createSlack.prompt`,
+          defaultMessage: `Create a new Slack template using {templateCreator}. First, explain how templates work and how to use them. Then ask me to paste or upload the reference Slack message and if needed interview me on how and when to use the template.`,
+          description: `Composer prefill for creating a Slack template from a reference message`,
+        },
+      })));
+  }))();
+}
+nn();
+export { Kt as ArtifactTemplatePicker };

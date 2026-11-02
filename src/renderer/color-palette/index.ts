@@ -1,87 +1,151 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeCompilerRuntime,
-  I3 as getJsxRuntime,
-  K2 as initializeIntlComponents,
-  Yh as IconButton,
-  Zh as initializeIconButton,
-  h4 as initializeClassNames,
-  m4 as classNames,
-  n4 as useIntl,
+  $3 as t,
+  I3 as n,
+  K2 as r,
+  Yh as i,
+  Zh as a,
+  h4 as o,
+  m4 as s,
+  n4 as c,
 } from "@rchunk/app-shared";
-import {
-  TM as initializeProjectColors,
-  xM as projectColors,
-} from "@rchunk/app-initial";
-
-type ProjectColor = "black" | "blue" | "green" | "orange" | "pink" | "purple" | "red" | "yellow";
-const colors: ProjectColor[] = ["black", "red", "orange", "yellow", "green", "blue", "purple", "pink"];
-const jsx = getJsxRuntime();
-
-function colorName(intl: import("@rchunk/app-shared").IntlShape, color: ProjectColor): string {
-  const defaults: Record<ProjectColor, string> = {
-    black: "Default", blue: "Blue", green: "Green", orange: "Orange",
-    pink: "Pink", purple: "Purple", red: "Red", yellow: "Yellow",
-  };
-  return String(intl.formatMessage({
-    id: `codex.projectAppearance.color.option.${color}`,
-    defaultMessage: defaults[color],
-    description: "Color option name in the project marker popover.",
-  }));
+import { TM as l, xM as u } from "@rchunk/app-initial";
+function d(e, t) {
+  switch (t) {
+    case `black`:
+      return e.formatMessage({
+        id: `codex.projectAppearance.color.option.black`,
+        defaultMessage: `Default`,
+        description: `Color option name in the project marker popover.`,
+      });
+    case `blue`:
+      return e.formatMessage({
+        id: `codex.projectAppearance.color.option.blue`,
+        defaultMessage: `Blue`,
+        description: `Color option name in the project marker popover.`,
+      });
+    case `green`:
+      return e.formatMessage({
+        id: `codex.projectAppearance.color.option.green`,
+        defaultMessage: `Green`,
+        description: `Color option name in the project marker popover.`,
+      });
+    case `orange`:
+      return e.formatMessage({
+        id: `codex.projectAppearance.color.option.orange`,
+        defaultMessage: `Orange`,
+        description: `Color option name in the project marker popover.`,
+      });
+    case `pink`:
+      return e.formatMessage({
+        id: `codex.projectAppearance.color.option.pink`,
+        defaultMessage: `Pink`,
+        description: `Color option name in the project marker popover.`,
+      });
+    case `purple`:
+      return e.formatMessage({
+        id: `codex.projectAppearance.color.option.purple`,
+        defaultMessage: `Purple`,
+        description: `Color option name in the project marker popover.`,
+      });
+    case `red`:
+      return e.formatMessage({
+        id: `codex.projectAppearance.color.option.red`,
+        defaultMessage: `Red`,
+        description: `Color option name in the project marker popover.`,
+      });
+    case `yellow`:
+      return e.formatMessage({
+        id: `codex.projectAppearance.color.option.yellow`,
+        defaultMessage: `Yellow`,
+        description: `Color option name in the project marker popover.`,
+      });
+  }
 }
-
-interface ColorPaletteProps {
-  color: ProjectColor;
-  defaultSwatchColor?: string;
-  disabled?: boolean;
-  groupAriaLabel?: string;
-  onColorChange(color: ProjectColor): void;
+var f;
+function p() {
+  return (p = e(() => {
+    f = [`black`, `red`, `orange`, `yellow`, `green`, `blue`, `purple`, `pink`];
+  }))();
 }
-
-function ColorPalette({
-  color, defaultSwatchColor, disabled = false, groupAriaLabel, onColorChange,
-}: ColorPaletteProps): unknown {
-  const intl = useIntl();
-  const label = groupAriaLabel ?? String(intl.formatMessage({
-    id: "symbolPicker.icons.colors", defaultMessage: "Icon colors",
-    description: "Accessible label for the icon picker color presets",
-  }));
-  return jsx.jsx("div", {
-    className: "flex items-center justify-between gap-1 select-none",
-    role: "group",
-    "aria-label": label,
-    children: colors.map((option) => jsx.jsx(IconButton, {
-      color: color === option ? "secondary" : "ghost",
-      size: "iconCircle", radius: "full", disabled,
-      "aria-label": intl.formatMessage({
-        id: "codex.projectAppearance.color.option.aria_label",
-        defaultMessage: "Use {colorName}",
-        description: "Accessible label for a project marker color swatch. Placeholder {colorName} is a color name such as Blue or Green.",
-      }, { colorName: colorName(intl, option) }),
-      "aria-pressed": color === option,
-      onClick: () => onColorChange(option),
-      children: jsx.jsx("span", {
-        className: classNames(
-          "size-6 rounded-full",
-          option === "black" && defaultSwatchColor != null
-            ? undefined
-            : projectColors[option].swatchClassName,
+function m(e) {
+  let t = (0, h.c)(12),
+    { color: n, defaultSwatchColor: r, disabled: a, groupAriaLabel: o, onColorChange: l } = e,
+    p = a !== void 0 && a,
+    m = c(),
+    _;
+  t[0] !== o || t[1] !== m
+    ? ((_ =
+        o ??
+        m.formatMessage({
+          id: `symbolPicker.icons.colors`,
+          defaultMessage: `Icon colors`,
+          description: `Accessible label for the icon picker color presets`,
+        })),
+      (t[0] = o),
+      (t[1] = m),
+      (t[2] = _))
+    : (_ = t[2]);
+  let v;
+  t[3] !== n || t[4] !== r || t[5] !== p || t[6] !== m || t[7] !== l
+    ? ((v = f.map((e) =>
+        (0, g.jsx)(
+          i,
+          {
+            color: n === e ? `secondary` : `ghost`,
+            size: `iconCircle`,
+            radius: `full`,
+            disabled: p,
+            "aria-label": m.formatMessage(
+              {
+                id: `codex.projectAppearance.color.option.aria_label`,
+                defaultMessage: `Use {colorName}`,
+                description: `Accessible label for a project marker color swatch. Placeholder {colorName} is a color name such as Blue or Green.`,
+              },
+              { colorName: d(m, e) },
+            ),
+            "aria-pressed": n === e,
+            onClick: () => l(e),
+            children: (0, g.jsx)(`span`, {
+              className: s(
+                `size-6 rounded-full`,
+                e === `black` && r != null ? void 0 : u[e].swatchClassName,
+              ),
+              style: e === `black` && r != null ? { backgroundColor: r } : void 0,
+              "aria-hidden": !0,
+            }),
+          },
+          e,
         ),
-        style: option === "black" && defaultSwatchColor != null
-          ? { backgroundColor: defaultSwatchColor }
-          : undefined,
-        "aria-hidden": true,
-      }),
-    }, option)),
-  });
+      )),
+      (t[3] = n),
+      (t[4] = r),
+      (t[5] = p),
+      (t[6] = m),
+      (t[7] = l),
+      (t[8] = v))
+    : (v = t[8]);
+  let y;
+  return (
+    t[9] !== _ || t[10] !== v
+      ? ((y = (0, g.jsx)(`div`, {
+          className: `flex items-center justify-between gap-1 select-none`,
+          role: `group`,
+          "aria-label": _,
+          children: v,
+        })),
+        (t[9] = _),
+        (t[10] = v),
+        (t[11] = y))
+      : (y = t[11]),
+    y
+  );
 }
-
-function initializeColorPalette(): void {
-  initializeCompilerRuntime();
-  initializeClassNames();
-  initializeIntlComponents();
-  initializeIconButton();
-  initializeProjectColors();
+var h, g;
+function _() {
+  return (_ = e(() => {
+    ((h = t()), o(), r(), a(), p(), l(), (g = n()));
+  }))();
 }
-
-export { initializeColorPalette as n, ColorPalette as t };
+export { _ as n, m as t };

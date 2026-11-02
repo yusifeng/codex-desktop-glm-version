@@ -1,30 +1,33 @@
-import * as appSharedChunk from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-import type { ReactRuntime } from "@rchunk/app-shared";
-
-const { e6: getReactRuntime } = appSharedChunk;
-let React: ReactRuntime;
-let HotkeyWindowDetailLayoutContext: unknown;
-
-function useHotkeyWindowDetailLayout(layout: unknown): void {
-  initializeHotkeyWindowDetailLayout();
-  const setLayout = React.useContext(HotkeyWindowDetailLayoutContext) as
-    ((value: unknown) => void) | null;
-  React.useLayoutEffect(() => {
-    if (setLayout == null) return undefined;
-    setLayout(layout);
-    return () => setLayout(null);
-  }, [layout, setLayout]);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, e6 as n } from "@rchunk/app-shared";
+function r(e) {
+  let t = (0, i.c)(4),
+    n = (0, a.useContext)(o),
+    r,
+    s;
+  (t[0] !== e || t[1] !== n
+    ? ((r = () => {
+        if (n != null)
+          return (
+            n(e),
+            () => {
+              n(null);
+            }
+          );
+      }),
+      (s = [e, n]),
+      (t[0] = e),
+      (t[1] = n),
+      (t[2] = r),
+      (t[3] = s))
+    : ((r = t[2]), (s = t[3])),
+    (0, a.useLayoutEffect)(r, s));
 }
-
-function initializeHotkeyWindowDetailLayout(): void {
-  if (React != null) return;
-  React = getReactRuntime();
-  HotkeyWindowDetailLayoutContext = React.createContext(null);
+var i, a, o;
+function s() {
+  return (s = e(() => {
+    ((i = t()), (a = n()), (o = (0, a.createContext)(null)));
+  }))();
 }
-initializeHotkeyWindowDetailLayout();
-export {
-  initializeHotkeyWindowDetailLayout as n,
-  useHotkeyWindowDetailLayout as r,
-  HotkeyWindowDetailLayoutContext as t,
-};
+export { s as n, r, o as t };

@@ -1,167 +1,246 @@
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as getCompilerRuntime,
-  I3 as getJsxRuntime,
-  K2 as initializeInternationalization,
-  Y2 as FormattedMessage,
-  e6 as getReactRuntime,
-  h4 as initializeClassNames,
-  m4 as classNames,
-  type JsxRuntime,
+  $3 as t,
+  I3 as n,
+  K2 as r,
+  Y2 as i,
+  e6 as a,
+  h4 as o,
+  m4 as s,
 } from "@rchunk/app-shared";
-import {
-  LY as initializeMarkdown,
-  OLt as ChevronDownIcon,
-  RY as Markdown,
-  ion as parseMarkdownMetadata,
-  kLt as initializeMetadataParser,
-} from "@rchunk/app-initial";
-import "@rchunk/rolldown-runtime";
-
-interface SurfaceProps { background?: "normal" | "subtle"; children?: unknown; className?: string; overflow?: "auto" | "clip" }
-interface MetadataEntry { key: string; value: string | string[] }
-interface MarkdownSurfaceProps { conversationId?: string | null; cwd?: string | null; enableMetadataPreview?: boolean; hideCodeBlocks?: boolean; hostId?: string; isStreaming?: boolean; markdown: string }
-interface CompilerRuntime { c(size: number): unknown[] }
-interface ReactRuntime { useState<T>(value: T): [T, (next: T | ((current: T) => T)) => void] }
-
-let compiler: CompilerRuntime;
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let emptyValue: string;
-let collapsedEntryCount: number;
-
-function Surface({ background = "subtle", className, children, overflow = "clip" }: SurfaceProps): unknown {
-  const cache = compiler.c(7);
-  const backgroundClass = background === "normal" ? "bg-surface" : "bg-text/5";
-  const overflowClass = overflow === "auto" ? "overflow-auto" : "overflow-clip";
-  let resolvedClassName: string;
-  if (cache[0] !== className || cache[1] !== backgroundClass || cache[2] !== overflowClass) {
-    resolvedClassName = classNames("relative rounded-lg", backgroundClass, overflowClass, className);
-    cache[0] = className; cache[1] = backgroundClass; cache[2] = overflowClass; cache[3] = resolvedClassName;
-  } else resolvedClassName = cache[3] as string;
-  let result: unknown;
-  if (cache[4] !== children || cache[5] !== resolvedClassName) {
-    result = jsx.jsx("div", { className: resolvedClassName, children });
-    cache[4] = children; cache[5] = resolvedClassName; cache[6] = result;
-  } else result = cache[6];
-  return result;
+import { LY as c, OLt as l, RY as u, ion as d, kLt as f } from "@rchunk/app-initial";
+function p(e) {
+  let t = (0, x.c)(7),
+    { background: n, className: r, children: i, overflow: a } = e,
+    o = n === void 0 ? `subtle` : n,
+    c = a === void 0 ? `clip` : a,
+    l = o === `normal` ? `bg-surface` : `bg-text/5`,
+    u = c === `auto` ? `overflow-auto` : `overflow-clip`,
+    d;
+  t[0] !== r || t[1] !== l || t[2] !== u
+    ? ((d = s(`relative rounded-lg`, l, u, r)), (t[0] = r), (t[1] = l), (t[2] = u), (t[3] = d))
+    : (d = t[3]);
+  let f;
+  return (
+    t[4] !== i || t[5] !== d
+      ? ((f = (0, C.jsx)(`div`, { className: d, children: i })), (t[4] = i), (t[5] = d), (t[6] = f))
+      : (f = t[6]),
+    f
+  );
 }
-
-function MarkdownSurface({ enableMetadataPreview = false, markdown, conversationId = null, cwd = null, hideCodeBlocks, hostId, isStreaming = false }: MarkdownSurfaceProps): unknown {
-  const cache = compiler.c(15);
-  let parsed: { body: string; entries: MetadataEntry[] } | null;
-  if (cache[0] !== enableMetadataPreview || cache[1] !== markdown) {
-    parsed = enableMetadataPreview ? parseMarkdownMetadata(markdown) : null;
-    cache[0] = enableMetadataPreview; cache[1] = markdown; cache[2] = parsed;
-  } else parsed = cache[2] as typeof parsed;
-  const body = parsed?.body ?? markdown;
-  let metadata: unknown;
-  if (cache[3] === parsed) metadata = cache[4];
-  else {
-    metadata = parsed != null && parsed.entries.length > 0 ? jsx.jsx(MetadataPreview, { entries: parsed.entries }) : null;
-    cache[3] = parsed; cache[4] = metadata;
-  }
-  let renderedMarkdown: unknown;
-  if (cache[5] !== conversationId || cache[6] !== cwd || cache[7] !== hideCodeBlocks || cache[8] !== hostId || cache[9] !== isStreaming || cache[10] !== body) {
-    renderedMarkdown = jsx.jsx(Markdown, { className: "text-size-chat", conversationId, hideCodeBlocks, hostId, isStreaming, cwd, children: body });
-    cache[5] = conversationId; cache[6] = cwd; cache[7] = hideCodeBlocks; cache[8] = hostId; cache[9] = isStreaming; cache[10] = body; cache[11] = renderedMarkdown;
-  } else renderedMarkdown = cache[11];
-  let result: unknown;
-  if (cache[12] !== metadata || cache[13] !== renderedMarkdown) {
-    result = jsx.jsxs("div", { className: "px-4 py-3", children: [metadata, renderedMarkdown] });
-    cache[12] = metadata; cache[13] = renderedMarkdown; cache[14] = result;
-  } else result = cache[14];
-  return result;
+function m(e) {
+  let t = (0, x.c)(15),
+    {
+      enableMetadataPreview: n,
+      markdown: r,
+      conversationId: i,
+      cwd: a,
+      hideCodeBlocks: o,
+      hostId: s,
+      isStreaming: c,
+    } = e,
+    l = n !== void 0 && n,
+    f = i === void 0 ? null : i,
+    p = a === void 0 ? null : a,
+    m = c !== void 0 && c,
+    g;
+  t[0] !== l || t[1] !== r
+    ? ((g = l ? d(r) : null), (t[0] = l), (t[1] = r), (t[2] = g))
+    : (g = t[2]);
+  let _ = g,
+    v = _?.body ?? r,
+    y;
+  t[3] === _
+    ? (y = t[4])
+    : ((y = _ != null && _.entries.length > 0 ? (0, C.jsx)(h, { entries: _.entries }) : null),
+      (t[3] = _),
+      (t[4] = y));
+  let b;
+  t[5] !== f || t[6] !== p || t[7] !== o || t[8] !== s || t[9] !== m || t[10] !== v
+    ? ((b = (0, C.jsx)(u, {
+        className: `text-size-chat`,
+        conversationId: f,
+        hideCodeBlocks: o,
+        hostId: s,
+        isStreaming: m,
+        cwd: p,
+        children: v,
+      })),
+      (t[5] = f),
+      (t[6] = p),
+      (t[7] = o),
+      (t[8] = s),
+      (t[9] = m),
+      (t[10] = v),
+      (t[11] = b))
+    : (b = t[11]);
+  let S;
+  return (
+    t[12] !== y || t[13] !== b
+      ? ((S = (0, C.jsxs)(`div`, { className: `px-4 py-3`, children: [y, b] })),
+        (t[12] = y),
+        (t[13] = b),
+        (t[14] = S))
+      : (S = t[14]),
+    S
+  );
 }
-
-function MetadataPreview({ entries }: { entries: MetadataEntry[] }): unknown {
-  const cache = compiler.c(13);
-  const [expanded, setExpanded] = React.useState(false);
-  const collapsible = entries.length > collapsedEntryCount;
-  let visibleEntries: MetadataEntry[];
-  if (cache[0] !== entries || cache[1] !== expanded || cache[2] !== collapsible) {
-    visibleEntries = collapsible && !expanded ? entries.slice(0, collapsedEntryCount) : entries;
-    cache[0] = entries; cache[1] = expanded; cache[2] = collapsible; cache[3] = visibleEntries;
-  } else visibleEntries = cache[3] as MetadataEntry[];
-  let title: unknown;
-  if (cache[4] === Symbol.for("react.memo_cache_sentinel")) {
-    title = jsx.jsx("div", { className: "mb-2 font-medium text-secondary", children: jsx.jsx(FormattedMessage, { id: "markdown.metadata.title", defaultMessage: "Metadata", description: "Title for rendered Markdown file metadata" }) });
-    cache[4] = title;
-  } else title = cache[4];
-  let list: unknown;
-  if (cache[5] === visibleEntries) list = cache[6];
-  else { list = jsx.jsx(MetadataList, { entries: visibleEntries }); cache[5] = visibleEntries; cache[6] = list; }
-  let disclosure: unknown;
-  if (cache[7] !== expanded || cache[8] !== collapsible) {
-    disclosure = collapsible ? jsx.jsxs("button", {
-      type: "button", "aria-expanded": expanded,
-      className: "mt-1.5 inline-flex cursor-interaction items-center gap-1 text-secondary hover:text-default",
-      onClick: () => setExpanded(toggleBoolean),
+function h(e) {
+  let t = (0, x.c)(13),
+    { entries: n } = e,
+    [r, a] = (0, S.useState)(!1),
+    o = n.length > T,
+    c;
+  t[0] !== n || t[1] !== r || t[2] !== o
+    ? ((c = o && !r ? n.slice(0, T) : n), (t[0] = n), (t[1] = r), (t[2] = o), (t[3] = c))
+    : (c = t[3]);
+  let u = c,
+    d;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = (0, C.jsx)(`div`, {
+        className: `mb-2 font-medium text-secondary`,
+        children: (0, C.jsx)(i, {
+          id: `markdown.metadata.title`,
+          defaultMessage: `Metadata`,
+          description: `Title for rendered Markdown file metadata`,
+        }),
+      })),
+      (t[4] = d))
+    : (d = t[4]);
+  let f;
+  t[5] === u ? (f = t[6]) : ((f = (0, C.jsx)(_, { entries: u })), (t[5] = u), (t[6] = f));
+  let p;
+  t[7] !== r || t[8] !== o
+    ? ((p = o
+        ? (0, C.jsxs)(`button`, {
+            type: `button`,
+            "aria-expanded": r,
+            className: `mt-1.5 inline-flex cursor-interaction items-center gap-1 text-secondary hover:text-default`,
+            onClick: () => {
+              a(g);
+            },
+            children: [
+              (0, C.jsx)(`span`, {
+                children: r
+                  ? (0, C.jsx)(i, {
+                      id: `markdown.metadata.showLess`,
+                      defaultMessage: `Show less`,
+                      description: `Disclosure control shown when a Markdown metadata preview can collapse additional fields`,
+                    })
+                  : (0, C.jsx)(i, {
+                      id: `markdown.metadata.showMore`,
+                      defaultMessage: `Show more`,
+                      description: `Disclosure control shown when a Markdown metadata preview hides additional fields`,
+                    }),
+              }),
+              (0, C.jsx)(l, {
+                className: s(`icon-2xs transition-transform`, r ? `rotate-180` : `rotate-0`),
+              }),
+            ],
+          })
+        : null),
+      (t[7] = r),
+      (t[8] = o),
+      (t[9] = p))
+    : (p = t[9]);
+  let m;
+  return (
+    t[10] !== f || t[11] !== p
+      ? ((m = (0, C.jsxs)(`div`, {
+          className: `mb-3 rounded-md border border-border/60 bg-text/5 px-3 py-2 text-xs`,
+          children: [d, f, p],
+        })),
+        (t[10] = f),
+        (t[11] = p),
+        (t[12] = m))
+      : (m = t[12]),
+    m
+  );
+}
+function g(e) {
+  return !e;
+}
+function _(e) {
+  let t = (0, x.c)(7),
+    { className: n, entries: r } = e,
+    i;
+  t[0] === n
+    ? (i = t[1])
+    : ((i = s(`grid grid-cols-[minmax(0,8rem)_minmax(0,1fr)] gap-x-3 gap-y-1.5`, n)),
+      (t[0] = n),
+      (t[1] = i));
+  let a;
+  t[2] === r ? (a = t[3]) : ((a = r.map(v)), (t[2] = r), (t[3] = a));
+  let o;
+  return (
+    t[4] !== i || t[5] !== a
+      ? ((o = (0, C.jsx)(`dl`, { className: i, children: a })), (t[4] = i), (t[5] = a), (t[6] = o))
+      : (o = t[6]),
+    o
+  );
+}
+function v(e, t) {
+  return (0, C.jsxs)(
+    `div`,
+    {
+      className: `contents`,
       children: [
-        jsx.jsx("span", { children: expanded
-          ? jsx.jsx(FormattedMessage, { id: "markdown.metadata.showLess", defaultMessage: "Show less", description: "Disclosure control shown when a Markdown metadata preview can collapse additional fields" })
-          : jsx.jsx(FormattedMessage, { id: "markdown.metadata.showMore", defaultMessage: "Show more", description: "Disclosure control shown when a Markdown metadata preview hides additional fields" }) }),
-        jsx.jsx(ChevronDownIcon, { className: classNames("icon-2xs transition-transform", expanded ? "rotate-180" : "rotate-0") }),
+        (0, C.jsx)(`dt`, {
+          className: `truncate font-mono text-secondary`,
+          title: e.key,
+          children: e.key,
+        }),
+        (0, C.jsx)(`dd`, {
+          className: `min-w-0 text-default`,
+          children: (0, C.jsx)(y, { value: e.value }),
+        }),
       ],
-    }) : null;
-    cache[7] = expanded; cache[8] = collapsible; cache[9] = disclosure;
-  } else disclosure = cache[9];
-  let result: unknown;
-  if (cache[10] !== list || cache[11] !== disclosure) {
-    result = jsx.jsxs("div", { className: "mb-3 rounded-md border border-border/60 bg-text/5 px-3 py-2 text-xs", children: [title, list, disclosure] });
-    cache[10] = list; cache[11] = disclosure; cache[12] = result;
-  } else result = cache[12];
-  return result;
+    },
+    `${e.key}-${t}`,
+  );
 }
-
-function toggleBoolean(value: boolean): boolean { return !value; }
-
-function MetadataList({ className, entries }: { className?: string; entries: MetadataEntry[] }): unknown {
-  const cache = compiler.c(7);
-  let resolvedClassName: string;
-  if (cache[0] === className) resolvedClassName = cache[1] as string;
-  else { resolvedClassName = classNames("grid grid-cols-[minmax(0,8rem)_minmax(0,1fr)] gap-x-3 gap-y-1.5", className); cache[0] = className; cache[1] = resolvedClassName; }
-  let rows: unknown[];
-  if (cache[2] === entries) rows = cache[3] as unknown[];
-  else { rows = entries.map(renderMetadataRow); cache[2] = entries; cache[3] = rows; }
-  let result: unknown;
-  if (cache[4] !== resolvedClassName || cache[5] !== rows) { result = jsx.jsx("dl", { className: resolvedClassName, children: rows }); cache[4] = resolvedClassName; cache[5] = rows; cache[6] = result; }
-  else result = cache[6];
-  return result;
-}
-
-function renderMetadataRow(entry: MetadataEntry, index: number): unknown {
-  return jsx.jsxs("div", { className: "contents", children: [
-    jsx.jsx("dt", { className: "truncate font-mono text-secondary", title: entry.key, children: entry.key }),
-    jsx.jsx("dd", { className: "min-w-0 text-default", children: jsx.jsx(MetadataValue, { value: entry.value }) }),
-  ] }, `${entry.key}-${index}`);
-}
-
-function MetadataValue({ value }: { value: string | string[] }): unknown {
-  const cache = compiler.c(6);
-  if (Array.isArray(value)) {
-    let values: unknown[];
-    if (cache[0] === value) values = cache[1] as unknown[];
-    else { values = value.map(renderArrayValue); cache[0] = value; cache[1] = values; }
-    let result: unknown;
-    if (cache[2] === values) result = cache[3];
-    else { result = jsx.jsx("span", { className: "flex min-w-0 flex-wrap gap-1", children: values }); cache[2] = values; cache[3] = result; }
-    return result;
+function y(e) {
+  let t = (0, x.c)(6),
+    { value: n } = e;
+  if (Array.isArray(n)) {
+    let e;
+    t[0] === n ? (e = t[1]) : ((e = n.map(b)), (t[0] = n), (t[1] = e));
+    let r;
+    return (
+      t[2] === e
+        ? (r = t[3])
+        : ((r = (0, C.jsx)(`span`, { className: `flex min-w-0 flex-wrap gap-1`, children: e })),
+          (t[2] = e),
+          (t[3] = r)),
+      r
+    );
   }
-  const display = value.length === 0 ? emptyValue : value;
-  let result: unknown;
-  if (cache[4] === display) result = cache[5];
-  else { result = jsx.jsx("span", { className: "font-mono break-words", children: display }); cache[4] = display; cache[5] = result; }
-  return result;
+  let r = n.length === 0 ? w : n,
+    i;
+  return (
+    t[4] === r
+      ? (i = t[5])
+      : ((i = (0, C.jsx)(`span`, { className: `font-mono break-words`, children: r })),
+        (t[4] = r),
+        (t[5] = i)),
+    i
+  );
 }
-
-function renderArrayValue(value: string, index: number): unknown {
-  return jsx.jsx("span", { className: "max-w-full rounded-sm bg-text/10 px-1.5 py-0.5 font-mono break-words", children: value.length === 0 ? emptyValue : value }, `${value}-${index}`);
+function b(e, t) {
+  return (0, C.jsx)(
+    `span`,
+    {
+      className: `max-w-full rounded-sm bg-text/10 px-1.5 py-0.5 font-mono break-words`,
+      children: e.length === 0 ? w : e,
+    },
+    `${e}-${t}`,
+  );
 }
-
-function initializeSurface(): void {
-  compiler = getCompilerRuntime() as CompilerRuntime;
-  initializeClassNames(); React = getReactRuntime() as ReactRuntime; initializeInternationalization();
-  initializeMetadataParser(); initializeMarkdown(); jsx = getJsxRuntime(); emptyValue = '""'; collapsedEntryCount = 8;
+var x, S, C, w, T;
+function E() {
+  return (E = e(() => {
+    ((x = t()), o(), (S = a()), r(), f(), c(), (C = n()), (w = `""`), (T = 8));
+  }))();
 }
-
-export { initializeSurface as i, Surface as n, MarkdownSurface as r, MetadataPreview as t };
+export { E as i, p as n, m as r, h as t };

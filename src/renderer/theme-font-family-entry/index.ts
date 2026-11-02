@@ -1,4 +1,19 @@
-// Theme font-family lazy entry. Release chunk: theme-font-family-b0133dd3566c.js.
-import { a as getThemeFontFaceAlias, i as getFirstCssFontFamilyValue, n as escapeThemeFontCssString, o as getThemeFontFamilyValue, r as getFirstCssFontFamilyName, s as initializeThemeFontFamily, t as doesThemeFontFaceMatchValue } from "@rchunk/theme-font-family";
-initializeThemeFontFamily();
-export { doesThemeFontFaceMatchValue, escapeThemeFontCssString, getFirstCssFontFamilyName, getFirstCssFontFamilyValue, getThemeFontFaceAlias, getThemeFontFamilyValue };
+// @ts-nocheck
+import {
+  a as e,
+  i as t,
+  n,
+  o as r,
+  r as i,
+  s as a,
+  t as o,
+} from "@rchunk/theme-font-family";
+a();
+export {
+  o as doesThemeFontFaceMatchValue,
+  n as escapeThemeFontCssString,
+  i as getFirstCssFontFamilyName,
+  t as getFirstCssFontFamilyValue,
+  e as getThemeFontFaceAlias,
+  r as getThemeFontFamilyValue,
+};

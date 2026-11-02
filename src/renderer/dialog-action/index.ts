@@ -1,136 +1,146 @@
-// dialog-action —— 分享弹窗的保存、邀请与取消操作区。
-// 原版：app/webview/assets/dialog-action-9fe7be84d34e.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import type { ButtonSize } from "@rchunk/app-shared";
-
-void runtimeChunk;
-const {
-  $3: initializeReactRuntime,
-  I3: getJsxRuntime,
-  K2: initializeInternationalization,
-  Y2: FormattedMessage,
-  Yh: Button,
-  Zh: initializeButton,
-} = appSharedChunk;
-const jsx = getJsxRuntime();
-
-type DialogActionKind = "invite" | "share";
-
-interface DialogPrimaryAction {
-  label?: unknown;
-  onClick: () => void;
-  type?: "button" | "reset" | "submit";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i, Yh as a, Zh as o } from "@rchunk/app-shared";
+function s(e) {
+  let t = (0, u.c)(22),
+    {
+      actions: n,
+      cancelAction: r,
+      disabled: o,
+      hasPendingAccessChange: s,
+      hasPendingInvitees: f,
+      idleActions: p,
+      isSaving: m,
+      size: h,
+    } = e,
+    g = h === void 0 ? `medium` : h,
+    _;
+  t[0] !== s || t[1] !== f
+    ? ((_ = l({ hasPendingAccessChange: s, hasPendingInvitees: f })),
+      (t[0] = s),
+      (t[1] = f),
+      (t[2] = _))
+    : (_ = t[2]);
+  let v = _;
+  if (v == null) return p ?? null;
+  let y;
+  t[3] !== r || t[4] !== o || t[5] !== m || t[6] !== g
+    ? ((y =
+        r == null
+          ? null
+          : (0, d.jsx)(a, {
+              color: `secondary`,
+              disabled: (r.disabled ?? o) || m,
+              size: g,
+              onClick: r.onClick,
+              children: (0, d.jsx)(i, {
+                id: `shareDialog.primaryAction.cancel`,
+                defaultMessage: `Cancel`,
+                description: `Button label for cancelling staged changes in a share dialog`,
+              }),
+            })),
+      (t[3] = r),
+      (t[4] = o),
+      (t[5] = m),
+      (t[6] = g),
+      (t[7] = y))
+    : (y = t[7]);
+  let b = n[v],
+    x = n[v],
+    S;
+  t[8] !== v || t[9] !== n || t[10] !== m
+    ? ((S = m
+        ? (0, d.jsx)(i, {
+            id: `shareDialog.primaryAction.saving`,
+            defaultMessage: `Saving`,
+            description: `Button label while a share dialog saves permissions or invites`,
+          })
+        : (n[v].label ?? (0, d.jsx)(c, { action: v }))),
+      (t[8] = v),
+      (t[9] = n),
+      (t[10] = m),
+      (t[11] = S))
+    : (S = t[11]);
+  let C;
+  t[12] !== o ||
+  t[13] !== m ||
+  t[14] !== g ||
+  t[15] !== b.onClick ||
+  t[16] !== x.type ||
+  t[17] !== S
+    ? ((C = (0, d.jsx)(a, {
+        "aria-busy": m,
+        color: `primary`,
+        disabled: o,
+        loading: m,
+        size: g,
+        onClick: b.onClick,
+        type: x.type,
+        children: S,
+      })),
+      (t[12] = o),
+      (t[13] = m),
+      (t[14] = g),
+      (t[15] = b.onClick),
+      (t[16] = x.type),
+      (t[17] = S),
+      (t[18] = C))
+    : (C = t[18]);
+  let w;
+  return (
+    t[19] !== y || t[20] !== C
+      ? ((w = (0, d.jsxs)(`div`, {
+          className: `flex max-w-full shrink-0 flex-wrap items-center justify-end gap-3`,
+          children: [y, C],
+        })),
+        (t[19] = y),
+        (t[20] = C),
+        (t[21] = w))
+      : (w = t[21]),
+    w
+  );
 }
-
-interface DialogCancelAction {
-  disabled?: boolean;
-  onClick: () => void;
-}
-
-interface DialogActionProps {
-  actions: Record<DialogActionKind, DialogPrimaryAction>;
-  cancelAction?: DialogCancelAction;
-  disabled?: boolean;
-  hasPendingAccessChange: boolean;
-  hasPendingInvitees: boolean;
-  idleActions?: unknown;
-  isSaving?: boolean;
-  size?: ButtonSize;
-}
-
-function pendingAction({
-  hasPendingAccessChange,
-  hasPendingInvitees,
-}: {
-  hasPendingAccessChange: boolean;
-  hasPendingInvitees: boolean;
-}) {
-  if (!hasPendingAccessChange && !hasPendingInvitees) return null;
-  return hasPendingAccessChange && !hasPendingInvitees ? "share" : "invite";
-}
-
-function DefaultActionLabel({ action }: { action: DialogActionKind }) {
-  switch (action) {
-    case "invite":
-      return jsx.jsx(FormattedMessage, {
-        id: "shareDialog.primaryAction.invite",
-        defaultMessage: "Invite",
-        description:
-          "Button label for inviting selected people or groups in a share dialog",
-      });
-    case "share":
-      return jsx.jsx(FormattedMessage, {
-        id: "shareDialog.primaryAction.save",
-        defaultMessage: "Save",
-        description: "Button label for saving a share dialog access change",
-      });
+function c(e) {
+  let t = (0, u.c)(2),
+    { action: n } = e;
+  switch (n) {
+    case `invite`: {
+      let e;
+      return (
+        t[0] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, d.jsx)(i, {
+              id: `shareDialog.primaryAction.invite`,
+              defaultMessage: `Invite`,
+              description: `Button label for inviting selected people or groups in a share dialog`,
+            })),
+            (t[0] = e))
+          : (e = t[0]),
+        e
+      );
+    }
+    case `share`: {
+      let e;
+      return (
+        t[1] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, d.jsx)(i, {
+              id: `shareDialog.primaryAction.save`,
+              defaultMessage: `Save`,
+              description: `Button label for saving a share dialog access change`,
+            })),
+            (t[1] = e))
+          : (e = t[1]),
+        e
+      );
+    }
   }
 }
-
-function DialogAction({
-  actions,
-  cancelAction,
-  disabled,
-  hasPendingAccessChange,
-  hasPendingInvitees,
-  idleActions,
-  isSaving,
-  size = "medium",
-}: DialogActionProps) {
-  const action = pendingAction({
-    hasPendingAccessChange,
-    hasPendingInvitees,
-  });
-  if (action == null) return idleActions ?? null;
-
-  const cancelButton =
-    cancelAction == null
-      ? null
-      : jsx.jsx(Button, {
-          color: "secondary",
-          disabled: (cancelAction.disabled ?? disabled) || isSaving,
-          size,
-          onClick: cancelAction.onClick,
-          children: jsx.jsx(FormattedMessage, {
-            id: "shareDialog.primaryAction.cancel",
-            defaultMessage: "Cancel",
-            description:
-              "Button label for cancelling staged changes in a share dialog",
-          }),
-        });
-  const actionConfig = actions[action];
-  const label = isSaving
-    ? jsx.jsx(FormattedMessage, {
-        id: "shareDialog.primaryAction.saving",
-        defaultMessage: "Saving",
-        description:
-          "Button label while a share dialog saves permissions or invites",
-      })
-    : (actionConfig.label ?? jsx.jsx(DefaultActionLabel, { action }));
-  const primaryButton = jsx.jsx(Button, {
-    "aria-busy": isSaving,
-    color: "primary",
-    disabled,
-    loading: isSaving,
-    size,
-    onClick: actionConfig.onClick,
-    type: actionConfig.type,
-    children: label,
-  });
-
-  return jsx.jsxs("div", {
-    className:
-      "flex max-w-full shrink-0 flex-wrap items-center justify-end gap-3",
-    children: [cancelButton, primaryButton],
-  });
+function l({ hasPendingAccessChange: e, hasPendingInvitees: t }) {
+  return !e && !t ? null : e && !t ? `share` : `invite`;
 }
-
-function initializeDialogAction(): void {
-  initializeReactRuntime();
-  initializeInternationalization();
-  initializeButton();
+var u, d;
+function f() {
+  return (f = e(() => {
+    ((u = t()), r(), o(), (d = n()));
+  }))();
 }
-
-export { initializeDialogAction as n, DialogAction as t };
+export { f as n, s as t };

@@ -1,61 +1,100 @@
-// Hormonal, ovarian, and uterine changes across a 28-day menstrual cycle.
-import "@rchunk/rolldown-runtime";
-
-type FertilizationOutcome = "noImplantation" | "successfulImplantation";
-interface MenstrualCycleValues { day?: number | null; outcome?: unknown }
-
-const menstrualCycleSpecification = {
-  type: "MENSTRUAL_CYCLE_FERTILIZATION",
-  version: 1,
-  thumbnailAssetKey: "menstrual-cycle-fertilization-v2",
-  parameters: {
-    day: { kind: "integer" as const, defaultValue: 1, min: 1, max: 28 },
-    outcome: { kind: "enum" as const, defaultValue: "noImplantation" as FertilizationOutcome, allowedValues: ["noImplantation", "successfulImplantation"] as FertilizationOutcome[] },
-  },
-};
-const implantationStart = 21.5;
-const dayParameter = menstrualCycleSpecification.parameters.day;
-const outcomeParameter = menstrualCycleSpecification.parameters.outcome;
-const dayControl = { min: dayParameter.min, max: dayParameter.max, step: 1, defaultValue: dayParameter.defaultValue };
-const defaultMenstrualCycleValues = { day: dayControl.defaultValue, outcome: outcomeParameter.defaultValue };
-const clampFinite = (value: number, minimum: number, maximum: number): number => Number.isFinite(value) ? Math.min(Math.max(value, minimum), maximum) : minimum;
-const gaussian = (value: number, mean: number, standardDeviation: number): number => Math.exp(-0.5 * ((value - mean) / standardDeviation) ** 2);
-const smoothstep = (start: number, end: number, value: number): number => {
-  const progress = clampFinite((value - start) / (end - start), 0, 1);
-  return progress * progress * (3 - 2 * progress);
-};
-const normalizeMenstrualCycleValues = (values: MenstrualCycleValues) => ({
-  day: Math.round(clampFinite(values.day ?? dayControl.defaultValue, dayControl.min, dayControl.max)),
-  outcome: typeof values.outcome === "string" && outcomeParameter.allowedValues.some((outcome) => outcome === values.outcome) ? values.outcome as FertilizationOutcome : defaultMenstrualCycleValues.outcome,
-});
-const phaseForDay = (day: number): "menstrual" | "proliferative" | "ovulation" | "secretory" => day <= 5 ? "menstrual" : day <= 13 ? "proliferative" : day === 14 ? "ovulation" : "secretory";
-const ovarianStateForDay = (day: number, implanted: boolean): string => day <= 5 ? "earlyFollicle" : day <= 10 ? "growingFollicle" : day <= 13 ? "matureFollicle" : day === 14 ? "ovulation" : day <= 23 ? "corpusLuteum" : implanted ? "maintainedCorpusLuteum" : "regressingCorpusLuteum";
-const liningStateForDay = (day: number, implanted: boolean): string => day <= 5 ? "shedding" : day <= 14 ? "rebuilding" : implanted && day > implantationStart ? "maintained" : !implanted && day >= 24 ? "breakingDown" : "secretory";
-const liningThicknessForDay = (day: number, implanted: boolean): number => day <= 5
-  ? 8.2 - (day - 1) / 4 * 5.4
-  : day <= 14
-    ? 2.8 + (day - 5) / 9 * 4.7
-    : day <= 23
-      ? 7.5 + (day - 14) / 9 * 3.5
-      : implanted ? 11 + 0.25 * smoothstep(23, 28, day) : 11 - 5.5 * smoothstep(23, 28, day);
-const hormonesForDay = (day: number, implanted: boolean) => {
-  const implantationRamp = implanted && day > implantationStart ? smoothstep(implantationStart, 28, day) : 0;
-  const regressionFactor = implanted ? 1 : 1 - 0.9 * smoothstep(23, 28, day);
-  const lutealRamp = smoothstep(13, 16, day);
-  return {
-    lh: clampFinite(7 + 86 * gaussian(day, 14, 0.82), 0, 100),
-    estrogen: clampFinite(9 + 63 * gaussian(day, 12.2, 3.1) + 31 * gaussian(day, 20.5, 3.5) * regressionFactor + 23 * implantationRamp, 0, 100),
-    progesterone: clampFinite(4 + 72 * gaussian(day, 21.2, 4.5) * lutealRamp * regressionFactor + 53 * implantationRamp, 0, 100),
-    hcg: implanted && day > implantationStart ? clampFinite(90 * smoothstep(implantationStart, 28, day), 0, 100) : 0,
-  };
-};
-const calculateMenstrualCycle = (values: MenstrualCycleValues) => {
-  const normalized = normalizeMenstrualCycleValues(values);
-  const implantationSucceeded = normalized.outcome === "successfulImplantation";
-  return { ...normalized, implantationSucceeded, phase: phaseForDay(normalized.day), ovarianState: ovarianStateForDay(normalized.day, implantationSucceeded), liningState: liningStateForDay(normalized.day, implantationSucceeded), liningThickness: liningThicknessForDay(normalized.day, implantationSucceeded), hormones: hormonesForDay(normalized.day, implantationSucceeded) };
-};
-
-function initializeMenstrualCycleSpecification(): void {}
-function initializeMenstrualCycleModel(): void {}
-
-export { liningThicknessForDay as a, normalizeMenstrualCycleValues as c, calculateMenstrualCycle as i, initializeMenstrualCycleSpecification as l, defaultMenstrualCycleValues as n, hormonesForDay as o, implantationStart as r, initializeMenstrualCycleModel as s, dayControl as t, menstrualCycleSpecification as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `MENSTRUAL_CYCLE_FERTILIZATION`),
+      (n = `menstrual-cycle-fertilization-v2`),
+      (r = {
+        day: { kind: `integer`, defaultValue: 1, min: 1, max: 28 },
+        outcome: {
+          kind: `enum`,
+          defaultValue: `noImplantation`,
+          allowedValues: [`noImplantation`, `successfulImplantation`],
+        },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x;
+function S() {
+  return (S = e(() => {
+    (a(),
+      (o = 21.5),
+      ({ day: s, outcome: c } = i.parameters),
+      (l = { min: s.min, max: s.max, step: 1, defaultValue: s.defaultValue }),
+      (u = c.allowedValues),
+      (d = { day: l.defaultValue, outcome: c.defaultValue }),
+      (f = (e, t, n) => (Number.isFinite(e) ? Math.min(Math.max(e, t), n) : t)),
+      (p = (e, t, n) => Math.exp(-0.5 * ((e - t) / n) ** 2)),
+      (m = (e, t, n) => {
+        let r = f((n - e) / (t - e), 0, 1);
+        return r * r * (3 - 2 * r);
+      }),
+      (h = (e) => ({
+        day: Math.round(f(e.day ?? l.defaultValue, l.min, l.max)),
+        outcome: u.includes(e.outcome) ? e.outcome : d.outcome,
+      })),
+      (g = (e) =>
+        e <= 5 ? `menstrual` : e <= 13 ? `proliferative` : e === 14 ? `ovulation` : `secretory`),
+      (_ = (e, t) =>
+        e <= 5
+          ? `earlyFollicle`
+          : e <= 10
+            ? `growingFollicle`
+            : e <= 13
+              ? `matureFollicle`
+              : e === 14
+                ? `ovulation`
+                : e <= 23
+                  ? `corpusLuteum`
+                  : t
+                    ? `maintainedCorpusLuteum`
+                    : `regressingCorpusLuteum`),
+      (v = (e, t) =>
+        e <= 5
+          ? `shedding`
+          : e <= 14
+            ? `rebuilding`
+            : t && e > 21.5
+              ? `maintained`
+              : !t && e >= 24
+                ? `breakingDown`
+                : `secretory`),
+      (y = (e, t) =>
+        e <= 5
+          ? 8.2 - ((e - 1) / 4) * 5.4
+          : e <= 14
+            ? 2.8 + ((e - 5) / 9) * 4.7
+            : e <= 23
+              ? 7.5 + ((e - 14) / 9) * 3.5
+              : t
+                ? 11 + 0.25 * m(23, 28, e)
+                : 11 - 5.5 * m(23, 28, e)),
+      (b = (e, t) => {
+        let n = t && e > 21.5 ? m(o, 28, e) : 0,
+          r = t ? 1 : 1 - 0.9 * m(23, 28, e),
+          i = m(13, 16, e);
+        return {
+          lh: f(7 + 86 * p(e, 14, 0.82), 0, 100),
+          estrogen: f(9 + 63 * p(e, 12.2, 3.1) + 31 * p(e, 20.5, 3.5) * r + 23 * n, 0, 100),
+          progesterone: f(4 + 72 * p(e, 21.2, 4.5) * i * r + 53 * n, 0, 100),
+          hcg: t && e > 21.5 ? f(90 * m(o, 28, e), 0, 100) : 0,
+        };
+      }),
+      (x = (e) => {
+        let t = h(e),
+          n = t.outcome === `successfulImplantation`;
+        return {
+          ...t,
+          implantationSucceeded: n,
+          phase: g(t.day),
+          ovarianState: _(t.day, n),
+          liningState: v(t.day, n),
+          liningThickness: y(t.day, n),
+          hormones: b(t.day, n),
+        };
+      }));
+  }))();
+}
+export { y as a, h as c, x as i, a as l, d as n, b as o, o as r, S as s, l as t, i as u };

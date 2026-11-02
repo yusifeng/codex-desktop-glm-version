@@ -1,14 +1,54 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-export interface AvatarOption { id: string; label?: string; source?: string; type?: "builtin" | "cloud" | "custom" }
-export interface AvatarOptionsInput { avatarDirectory?: string | null; cloudAvatars?: readonly AvatarOption[]; includeCloudPets?: boolean; isError?: boolean; isFetching?: boolean; isLoading?: boolean; localAvatars?: readonly AvatarOption[]; selectedAvatarId?: string | null }
-function useAvatarOptions(input: AvatarOptionsInput = {}): { avatarDirectory: string | null; avatarOptions: AvatarOption[]; isError: boolean; isFetching: boolean; isLoading: boolean } {
-  const byId = new Map<string, AvatarOption>();
-  for (const avatar of input.localAvatars ?? []) byId.set(avatar.id, avatar);
-  if (input.includeCloudPets !== false) for (const avatar of input.cloudAvatars ?? []) byId.set(avatar.id, avatar);
-  if (input.selectedAvatarId && !byId.has(input.selectedAvatarId)) byId.set(input.selectedAvatarId, { id: input.selectedAvatarId, type: "custom" });
-  return { avatarDirectory: input.avatarDirectory ?? null, avatarOptions: [...byId.values()], isError: input.isError ?? false, isFetching: input.isFetching ?? false, isLoading: input.isLoading ?? false };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, FX as n, HX as r } from "@rchunk/app-shared";
+import {
+  $c as i,
+  Cc as a,
+  Dc as o,
+  Ic as s,
+  Nc as c,
+  Oc as l,
+  Zc as u,
+  wc as d,
+} from "@rchunk/app-initial";
+function f(e) {
+  let t = (0, p.c)(14),
+    n;
+  t[0] === e ? (n = t[1]) : ((n = e === void 0 ? {} : e), (t[0] = e), (t[1] = n));
+  let { includeCloudPets: i } = n,
+    a = i === void 0 || i,
+    { data: s, isError: l, isFetching: f, isLoading: m } = r(o),
+    h;
+  t[2] === a ? (h = t[3]) : ((h = { enabled: a }), (t[2] = a), (t[3] = h));
+  let g = r(c, h),
+    _ = r(d),
+    v = s?.avatarDirectory ?? null,
+    y = s?.avatars,
+    b = a ? g.data : void 0,
+    x;
+  t[4] !== _ || t[5] !== y || t[6] !== b
+    ? ((x = u(y, b, _)), (t[4] = _), (t[5] = y), (t[6] = b), (t[7] = x))
+    : (x = t[7]);
+  let S = f || (a && g.isFetching),
+    C = m || (a && g.isLoading),
+    w;
+  return (
+    t[8] !== l || t[9] !== v || t[10] !== x || t[11] !== S || t[12] !== C
+      ? ((w = { avatarDirectory: v, avatarOptions: x, isError: l, isFetching: S, isLoading: C }),
+        (t[8] = l),
+        (t[9] = v),
+        (t[10] = x),
+        (t[11] = S),
+        (t[12] = C),
+        (t[13] = w))
+      : (w = t[13]),
+    w
+  );
 }
-function initializeAvatarOptions(): void {}
-export { useAvatarOptions as n, initializeAvatarOptions as t };
+var p;
+function m() {
+  return (m = e(() => {
+    ((p = t()), n(), i(), a(), s(), l());
+  }))();
+}
+export { f as n, m as t };

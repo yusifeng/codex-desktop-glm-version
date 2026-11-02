@@ -1,10 +1,33 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-initial";
-import "@rchunk/chatgpt-subscription-events";
-interface EventScope { logProductEvent?(descriptor: string, payload: Record<string, unknown>): void }
-const announcementActions = { shown: "shown", dismissed: "dismissed", cta_clicked: "cta_clicked" } as const;
-const modalActions = { shown: "shown", dismissed: "dismissed", pay_now_clicked: "pay_now_clicked", requires_action: "requires_action", payment_failed: "payment_failed", payment_error: "payment_error", payment_succeeded: "payment_succeeded" } as const;
-function logAnnouncement(scope: EventScope, action: keyof typeof announcementActions, payload: Record<string, unknown> = {}): void { scope.logProductEvent?.("subscription_payment_recovery_announcement", { ...payload, actionType: announcementActions[action] }); }
-function logModal(scope: EventScope, action: keyof typeof modalActions, payload: Record<string, unknown> = {}): void { scope.logProductEvent?.("subscription_payment_recovery_modal", { ...payload, actionType: modalActions[action] }); }
-function initialize(): void {}
-export { initialize as n, logAnnouncement as r, logModal as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { xpn as t, ypn as n } from "@rchunk/app-initial";
+import { a as r, c as i, d as a, o, s } from "@rchunk/chatgpt-subscription-events";
+function c(e, n) {
+  t(e, r, { actionType: u[n] });
+}
+function l(e, n, r) {
+  t(e, s, { actionType: d[n], entryPoint: `announcement`, ...r });
+}
+var u, d;
+function f() {
+  return (f = e(() => {
+    (a(),
+      n(),
+      (u = {
+        shown: o.CHATGPT_SUBSCRIPTION_PAYMENT_RECOVERY_ANNOUNCEMENT_ACTION_TYPE_SHOWN,
+        dismissed: o.CHATGPT_SUBSCRIPTION_PAYMENT_RECOVERY_ANNOUNCEMENT_ACTION_TYPE_DISMISSED,
+        cta_clicked: o.CHATGPT_SUBSCRIPTION_PAYMENT_RECOVERY_ANNOUNCEMENT_ACTION_TYPE_CTA_CLICKED,
+      }),
+      (d = {
+        shown: i.CHATGPT_SUBSCRIPTION_PAYMENT_RECOVERY_MODAL_ACTION_TYPE_SHOWN,
+        dismissed: i.CHATGPT_SUBSCRIPTION_PAYMENT_RECOVERY_MODAL_ACTION_TYPE_DISMISSED,
+        pay_now_clicked: i.CHATGPT_SUBSCRIPTION_PAYMENT_RECOVERY_MODAL_ACTION_TYPE_PAY_NOW_CLICKED,
+        requires_action: i.CHATGPT_SUBSCRIPTION_PAYMENT_RECOVERY_MODAL_ACTION_TYPE_REQUIRES_ACTION,
+        payment_failed: i.CHATGPT_SUBSCRIPTION_PAYMENT_RECOVERY_MODAL_ACTION_TYPE_PAYMENT_FAILED,
+        payment_error: i.CHATGPT_SUBSCRIPTION_PAYMENT_RECOVERY_MODAL_ACTION_TYPE_PAYMENT_ERROR,
+        payment_succeeded:
+          i.CHATGPT_SUBSCRIPTION_PAYMENT_RECOVERY_MODAL_ACTION_TYPE_PAYMENT_SUCCEEDED,
+      }));
+  }))();
+}
+export { c as n, l as r, f as t };

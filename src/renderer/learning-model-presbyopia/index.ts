@@ -1,41 +1,69 @@
-// Accommodation and retinal blur in typical vision versus presbyopia.
-import "@rchunk/rolldown-runtime";
-
-type VisionCondition = "typical" | "presbyopia";
-interface PresbyopiaValues { condition?: unknown; objectDistanceCentimeters?: number | null }
-
-const presbyopiaType = "PRESBYOPIA";
-const presbyopiaThumbnail = "presbyopia-v3";
-const presbyopiaParameters = {
-  condition: { kind: "enum" as const, defaultValue: "presbyopia" as VisionCondition, allowedValues: ["typical", "presbyopia"] as VisionCondition[] },
-  objectDistanceCentimeters: { kind: "number" as const, defaultValue: 35, min: 25, max: 200 },
-};
-const presbyopiaSpecification = { type: presbyopiaType, version: 2, thumbnailAssetKey: presbyopiaThumbnail, parameters: presbyopiaParameters };
-const conditions = presbyopiaSpecification.parameters.condition.allowedValues;
-const conditionControl = { min: 0, max: conditions.length - 1, step: 1 };
-const objectDistanceControl = { min: presbyopiaSpecification.parameters.objectDistanceCentimeters.min, max: presbyopiaSpecification.parameters.objectDistanceCentimeters.max, step: 5 };
-const defaultPresbyopiaValues = { condition: presbyopiaSpecification.parameters.condition.defaultValue, objectDistanceCentimeters: presbyopiaSpecification.parameters.objectDistanceCentimeters.defaultValue };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const presbyopiaAccommodationLimit = 1.25;
-const focusOffsetScale = 12;
-const isVisionCondition = (value: unknown): value is VisionCondition => conditions.some((condition) => condition === value);
-const normalizePresbyopiaValues = (values: PresbyopiaValues) => ({
-  condition: isVisionCondition(values.condition) ? values.condition : defaultPresbyopiaValues.condition,
-  objectDistanceCentimeters: Number.isFinite(values.objectDistanceCentimeters) ? clamp(values.objectDistanceCentimeters ?? defaultPresbyopiaValues.objectDistanceCentimeters, objectDistanceControl.min, objectDistanceControl.max) : defaultPresbyopiaValues.objectDistanceCentimeters,
-});
-const distanceCategory = (distance: number): string => distance <= 55 ? "near" : distance >= 135 ? "far" : "middle";
-const calculatePresbyopia = (values: PresbyopiaValues) => {
-  const safeValues = normalizePresbyopiaValues(values);
-  const accommodationDemandDiopters = 100 / safeValues.objectDistanceCentimeters;
-  const minimumDemand = 100 / objectDistanceControl.max;
-  const maximumDemand = 100 / objectDistanceControl.min;
-  const availableAccommodationDiopters = safeValues.condition === "typical" ? accommodationDemandDiopters : Math.min(accommodationDemandDiopters, presbyopiaAccommodationLimit);
-  const accommodationFraction = clamp((availableAccommodationDiopters - minimumDemand) / (maximumDemand - minimumDemand), 0, 1);
-  const focusOffset = (accommodationDemandDiopters - availableAccommodationDiopters) * focusOffsetScale;
-  return { safeValues, condition: safeValues.condition, accommodationDemandDiopters, availableAccommodationDiopters, lensBulge: 7 + accommodationFraction * 15, focusOffset, retinalSpread: 1.5 + focusOffset * 0.16, blurAmount: clamp(focusOffset / 8, 0, 2.4), isClear: focusOffset < 2.5, distanceCategory: distanceCategory(safeValues.objectDistanceCentimeters) };
-};
-
-function initializePresbyopiaSpecification(): void {}
-function initializePresbyopiaModel(): void {}
-
-export { calculatePresbyopia as a, initializePresbyopiaSpecification as c, conditions as i, presbyopiaSpecification as l, defaultPresbyopiaValues as n, initializePresbyopiaModel as o, objectDistanceControl as r, normalizePresbyopiaValues as s, conditionControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `PRESBYOPIA`),
+      (n = `presbyopia-v3`),
+      (r = {
+        condition: {
+          kind: `enum`,
+          defaultValue: `presbyopia`,
+          allowedValues: [`typical`, `presbyopia`],
+        },
+        objectDistanceCentimeters: { kind: `number`, defaultValue: 35, min: 25, max: 200 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h;
+function g() {
+  return (g = e(() => {
+    (a(),
+      (o = i.parameters.condition.allowedValues),
+      (s = { min: 0, max: o.length - 1, step: 1 }),
+      (c = {
+        min: i.parameters.objectDistanceCentimeters.min,
+        max: i.parameters.objectDistanceCentimeters.max,
+        step: 5,
+      }),
+      (l = {
+        condition: i.parameters.condition.defaultValue,
+        objectDistanceCentimeters: i.parameters.objectDistanceCentimeters.defaultValue,
+      }),
+      (u = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (d = 1.25),
+      (f = 12),
+      (p = (e) => ({
+        condition: o.includes(e.condition) ? e.condition : l.condition,
+        objectDistanceCentimeters: Number.isFinite(e.objectDistanceCentimeters)
+          ? u(e.objectDistanceCentimeters, c.min, c.max)
+          : l.objectDistanceCentimeters,
+      })),
+      (m = (e) => (e <= 55 ? `near` : e >= 135 ? `far` : `middle`)),
+      (h = (e) => {
+        let t = p(e),
+          n = t.condition,
+          r = 100 / t.objectDistanceCentimeters,
+          i = 100 / c.max,
+          a = 100 / c.min,
+          o = n === `typical` ? r : Math.min(r, d),
+          s = u((o - i) / (a - i), 0, 1),
+          l = (r - o) * f,
+          h = l < 2.5;
+        return {
+          safeValues: t,
+          condition: n,
+          accommodationDemandDiopters: r,
+          availableAccommodationDiopters: o,
+          lensBulge: 7 + s * 15,
+          focusOffset: l,
+          retinalSpread: 1.5 + l * 0.16,
+          blurAmount: u(l / 8, 0, 2.4),
+          isClear: h,
+          distanceCategory: m(t.objectDistanceCentimeters),
+        };
+      }));
+  }))();
+}
+export { h as a, a as c, o as i, i as l, l as n, g as o, c as r, p as s, s as t };

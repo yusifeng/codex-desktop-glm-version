@@ -1,34 +1,35 @@
-import "@rchunk/rolldown-runtime";
-import {
-  H3 as initializePreloadRuntime,
-  V3 as loadWithPreload,
-} from "@rchunk/app-shared";
-import { p4 as initializeAsyncRuntimeImport } from "@rchunk/app-shared";
-
-interface AnalyticsTarget {
-  _plugins?: unknown;
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f || (m.f = ["@rchunk/third-party-umd-runtime", "@rchunk/rolldown-runtime"]),
+) => i.map((i) => d[i]);
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import { H3 as n, V3 as r, c4 as i, p4 as a, u4 as o } from "@rchunk/app-shared";
+function s(e) {
+  return i(this, void 0, void 0, function () {
+    var n;
+    return o(this, function (i) {
+      switch (i.label) {
+        case 0:
+          return [
+            4,
+            r(
+              () => import(`@rchunk/third-party-umd-runtime`).then((e) => t(e.default)),
+              __vite__mapDeps([0, 1]),
+              import.meta.url,
+            ),
+          ];
+        case 1:
+          return ((n = i.sent()), (e._plugins = n), [2]);
+      }
+    });
+  });
 }
-
-const initializeAsyncRuntime = initializeAsyncRuntimeImport as unknown as () => void;
-const preloadDependencies = [
-  "./index.umd-4af9c310b668.js",
-  "./rolldown-runtime-2d059c5e81f4.js",
-] as const;
-
-initializeAsyncRuntime();
-initializePreloadRuntime();
-
-async function loadLegacyVideoPlugins(target: AnalyticsTarget): Promise<void> {
-  const plugins = await loadWithPreload(
-    () =>
-      // @ts-expect-error The semantic alias is registered by the renderer chunk manifest.
-      import("@rchunk/legacy-video-plugins-runtime").then(
-        (module) => module.default,
-      ),
-    preloadDependencies,
-    import.meta.url,
-  );
-  target._plugins = plugins;
+function c() {
+  return (c = e(() => {
+    (a(), n());
+  }))();
 }
-
-export { loadLegacyVideoPlugins };
+c();
+export { s as loadLegacyVideoPlugins };

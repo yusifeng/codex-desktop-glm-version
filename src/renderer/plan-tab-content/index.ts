@@ -1,68 +1,79 @@
-// plan-tab-content —— 计划侧栏 Markdown 内容与每个计划独立的滚动位置。
-
-import "@rchunk/rolldown-runtime";
-import {
-  $3 as initializeSharedRuntime,
-  FX as initializeSharedFeatures,
-  HX as useSignalValue,
-  I3 as getJsxRuntime,
-  __ as useCallbackRefImport,
-  g_ as initializeCallbackRef,
-} from "@rchunk/app-shared";
-import { Dyt as hostIdSignal, byt as initializeHostState } from "@rchunk/app-initial";
-// @ts-expect-error The generated declaration is updated centrally after module registration.
-import { wt as initializeConversationSurfaceImport } from "@rchunk/app-primary";
-import { PLAN_SELECTION_SURFACE_ATTRIBUTE as conversationDataAttribute } from "../app-primary/runtime/plan-selection-surface";
-import { i as initializeMarkdownSurface, r as MarkdownSurface } from "@rchunk/surface";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-interface PlanTabState { planKey?: string | null; scrollTop: number }
-interface PlanSidePanelTabContentProps {
-  content: string;
-  conversationId: string;
-  cwd?: string | null;
-  hideCodeBlocks?: boolean;
-  planKey: string;
-  setTabState(next: PlanTabState | ((current: PlanTabState) => PlanTabState)): void;
-  tabState: PlanTabState;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, FX as n, HX as r, I3 as i, __ as a, g_ as o } from "@rchunk/app-shared";
+import { Dyt as s, byt as c } from "@rchunk/app-initial";
+import { Ct as l, wt as u } from "@rchunk/app-primary";
+import { i as d, r as f } from "@rchunk/surface";
+function p(e) {
+  let t = (0, m.c)(17),
+    {
+      content: n,
+      conversationId: i,
+      cwd: o,
+      hideCodeBlocks: c,
+      planKey: u,
+      setTabState: d,
+      tabState: p,
+    } = e,
+    g = r(s),
+    _;
+  t[0] !== u || t[1] !== d || t[2] !== p
+    ? ((_ = (e) => {
+        if (e != null)
+          return (
+            (e.scrollTop = p.planKey === u ? p.scrollTop : 0),
+            () => {
+              let t = e.scrollTop;
+              d((e) => (e.planKey === u && e.scrollTop === t ? e : { planKey: u, scrollTop: t }));
+            }
+          );
+      }),
+      (t[0] = u),
+      (t[1] = d),
+      (t[2] = p),
+      (t[3] = _))
+    : (_ = t[3]);
+  let v = a(_),
+    y;
+  t[4] === i ? (y = t[5]) : ((y = { [l]: i }), (t[4] = i), (t[5] = y));
+  let b;
+  t[6] !== n || t[7] !== i || t[8] !== o || t[9] !== c || t[10] !== g
+    ? ((b = (0, h.jsx)(f, {
+        markdown: n,
+        conversationId: i,
+        cwd: o,
+        hideCodeBlocks: c,
+        hostId: g,
+      })),
+      (t[6] = n),
+      (t[7] = i),
+      (t[8] = o),
+      (t[9] = c),
+      (t[10] = g),
+      (t[11] = b))
+    : (b = t[11]);
+  let x;
+  return (
+    t[12] !== u || t[13] !== v || t[14] !== y || t[15] !== b
+      ? ((x = (0, h.jsx)(
+          `div`,
+          { ref: v, className: `h-full min-h-0 overflow-y-auto px-1`, ...y, children: b },
+          u,
+        )),
+        (t[12] = u),
+        (t[13] = v),
+        (t[14] = y),
+        (t[15] = b),
+        (t[16] = x))
+      : (x = t[16]),
+    x
+  );
 }
-type CallbackRef<Element> = (element: Element | null) => void | (() => void);
-type UseCallbackRef = <Element>(callback: CallbackRef<Element>) => CallbackRef<Element>;
-
-const useCallbackRef = useCallbackRefImport as unknown as UseCallbackRef;
-const initializeConversationSurface = initializeConversationSurfaceImport as unknown as () => void;
-let jsx: JsxRuntime;
-let initialized = false;
-
-function initializePlanSidePanelTabContent(): void {
-  if (initialized) return;
-  initializeSharedRuntime();
-  initializeSharedFeatures();
-  initializeMarkdownSurface();
-  initializeHostState();
-  initializeCallbackRef();
-  initializeConversationSurface();
-  jsx = getJsxRuntime();
-  initialized = true;
+var m, h;
+function g() {
+  return (g = e(() => {
+    ((m = t()), n(), d(), c(), o(), u(), (h = i()));
+  }))();
 }
-
-function PlanSidePanelTabContent({ content, conversationId, cwd, hideCodeBlocks, planKey, setTabState, tabState }: PlanSidePanelTabContentProps): unknown {
-  const hostId = useSignalValue<string>(hostIdSignal);
-  const ref = useCallbackRef<HTMLDivElement>((element) => {
-    if (element == null) return;
-    element.scrollTop = tabState.planKey === planKey ? tabState.scrollTop : 0;
-    return () => {
-      const scrollTop = element.scrollTop;
-      setTabState((current) => current.planKey === planKey && current.scrollTop === scrollTop ? current : { planKey, scrollTop });
-    };
-  });
-  return jsx.jsx("div", {
-    ref,
-    className: "h-full min-h-0 overflow-y-auto px-1",
-    [conversationDataAttribute]: conversationId,
-    children: jsx.jsx(MarkdownSurface, { markdown: content, conversationId, cwd, hideCodeBlocks, hostId }),
-  }, planKey);
-}
-
-initializePlanSidePanelTabContent();
-export { PlanSidePanelTabContent };
+g();
+export { p as PlanSidePanelTabContent };

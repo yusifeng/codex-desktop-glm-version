@@ -1,5 +1,31 @@
-import"@rchunk/app-shared";import"@rchunk/app-initial";
-export interface PersonalSecretsSelection{accountId:string;userId:string;config:{id:string;name?:string};preflightPersonalSecrets?(input:{accountId:string;userId:string;configId:string}):Promise<{ok:boolean;data?:PersonalSecretsPreflight}>;}
-export interface PersonalSecretsIssue{namespace:"sensitive"|"not_sensitive";env_var:string;code:string;id?:string;error?:string;}
-export interface PersonalSecretsPreflight{issues:PersonalSecretsIssue[];}
-async function preflightPersonalSecrets(selection:PersonalSecretsSelection):Promise<PersonalSecretsPreflight|null>{try{const response=await selection.preflightPersonalSecrets?.({accountId:selection.accountId,userId:selection.userId,configId:selection.config.id});return response?.ok?response.data??null:null;}catch{return null;}}const initializePersonalSecretsService=():void=>{};export{preflightPersonalSecrets as n,initializePersonalSecretsService as t};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { yI as t } from "@rchunk/app-shared";
+import { mnt as n, pnt as r } from "@rchunk/app-initial";
+async function i(e) {
+  try {
+    try {
+      var n = t();
+      let i = n.u(
+        await r.environmentConfigs?.preflightPersonalSecrets({
+          accountId: e.accountId,
+          userId: e.userId,
+          configId: e.config.id,
+        }),
+      );
+      return i?.ok ? i.data : null;
+    } catch (e) {
+      n.e = e;
+    } finally {
+      n.d();
+    }
+  } catch {
+    return null;
+  }
+}
+function a() {
+  return (a = e(() => {
+    n();
+  }))();
+}
+export { i as n, a as t };

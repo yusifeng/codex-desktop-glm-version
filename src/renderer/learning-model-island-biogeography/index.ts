@@ -1,34 +1,41 @@
-// Island-biogeography equilibrium model. Release chunk: model-2553fb5c0f9e.js.
-import "@rchunk/rolldown-runtime";
-
-type IslandArea = "small" | "large";
-type IslandIsolation = "near" | "far";
-interface IslandBiogeographyInput { island_area?: string; isolation?: string }
-
-const islandBiogeographyDefinition = {
-  type: "ISLAND_BIOGEOGRAPHY",
-  version: 3,
-  thumbnailAssetKey: "island-biogeography-v1",
-  parameters: {
-    island_area: { kind: "enum", defaultValue: "large", allowedValues: ["small", "large"] },
-    isolation: { kind: "enum", defaultValue: "near", allowedValues: ["near", "far"] },
-  },
-} as const;
-const immigrationMaximums: Record<IslandIsolation, number> = { near: 90, far: 50 };
-const extinctionMaximums: Record<IslandArea, number> = { small: 90, large: 40 };
-const defaultIslandBiogeographyValues = { island_area: islandBiogeographyDefinition.parameters.island_area.defaultValue, isolation: islandBiogeographyDefinition.parameters.isolation.defaultValue };
-const normalizeIslandBiogeographyInput = (input: IslandBiogeographyInput) => ({
-  island_area: input.island_area === "small" || input.island_area === "large" ? input.island_area : defaultIslandBiogeographyValues.island_area,
-  isolation: input.isolation === "near" || input.isolation === "far" ? input.isolation : defaultIslandBiogeographyValues.isolation,
-});
-const calculateIslandBiogeography = (input: IslandBiogeographyInput) => {
-  const normalized = normalizeIslandBiogeographyInput(input);
-  const immigrationMax = immigrationMaximums[normalized.isolation];
-  const extinctionMax = extinctionMaximums[normalized.island_area];
-  return { ...normalized, immigrationMax, extinctionMax, richness: 100 * immigrationMax / (immigrationMax + extinctionMax), turnover: immigrationMax * extinctionMax / (immigrationMax + extinctionMax) };
-};
-const calculateIslandScenario = (island_area: IslandArea, isolation: IslandIsolation) => calculateIslandBiogeography({ island_area, isolation });
-function initializeIslandBiogeographyDefinition(): void {}
-function initializeIslandBiogeographyModel(): void {}
-
-export { calculateIslandScenario as a, islandBiogeographyDefinition as c, calculateIslandBiogeography as i, extinctionMaximums as n, initializeIslandBiogeographyModel as o, immigrationMaximums as r, initializeIslandBiogeographyDefinition as s, defaultIslandBiogeographyValues as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `ISLAND_BIOGEOGRAPHY`),
+      (n = `island-biogeography-v1`),
+      (r = {
+        island_area: { kind: `enum`, defaultValue: `large`, allowedValues: [`small`, `large`] },
+        isolation: { kind: `enum`, defaultValue: `near`, allowedValues: [`near`, `far`] },
+      }),
+      (i = { type: t, version: 3, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    (a(),
+      (o = { near: 90, far: 50 }),
+      (s = { small: 90, large: 40 }),
+      (c = {
+        island_area: i.parameters.island_area.defaultValue,
+        isolation: i.parameters.isolation.defaultValue,
+      }),
+      (l = (e) => ({
+        island_area:
+          e.island_area === `small` || e.island_area === `large` ? e.island_area : c.island_area,
+        isolation: e.isolation === `near` || e.isolation === `far` ? e.isolation : c.isolation,
+      })),
+      (u = (e) => {
+        let t = l(e),
+          n = o[t.isolation],
+          r = s[t.island_area],
+          i = (100 * n) / (n + r),
+          a = (n * r) / (n + r);
+        return { ...t, immigrationMax: n, extinctionMax: r, richness: i, turnover: a };
+      }),
+      (d = (e, t) => u({ island_area: e, isolation: t })));
+  }))();
+}
+export { d as a, i as c, u as i, s as n, f as o, o as r, a as s, c as t };

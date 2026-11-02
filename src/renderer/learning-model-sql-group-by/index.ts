@@ -1,43 +1,49 @@
-// SQL GROUP BY model using a small customer table.
-import "@rchunk/rolldown-runtime";
-
-type GroupByColumn = "country" | "age";
-interface SqlGroupByValues { groupBy?: unknown }
-interface Customer { customerId: number; name: string; age: number; country: string }
-
-const sqlGroupByType = "SQL_GROUP_BY";
-const sqlGroupByThumbnail = "sql-group-by-v1";
-const sqlGroupByParameters = {
-  groupBy: { kind: "enum" as const, defaultValue: "country" as GroupByColumn, allowedValues: ["country", "age"] as GroupByColumn[] },
-};
-const sqlGroupBySpecification = { type: sqlGroupByType, version: 1, thumbnailAssetKey: sqlGroupByThumbnail, parameters: sqlGroupByParameters };
-const customers: Customer[] = [
-  { customerId: 1, name: "Betty", age: 22, country: "UAE" },
-  { customerId: 2, name: "David", age: 22, country: "UK" },
-  { customerId: 3, name: "Maria", age: 25, country: "UK" },
-  { customerId: 4, name: "Robert", age: 28, country: "USA" },
-  { customerId: 5, name: "John", age: 31, country: "USA" },
-];
-const groupByParameter = sqlGroupBySpecification.parameters.groupBy;
-const groupByColumns = groupByParameter.allowedValues;
-const defaultGroupByColumn = groupByParameter.defaultValue;
-const isGroupByColumn = (value: unknown): value is GroupByColumn => groupByColumns.some((column) => column === value);
-const normalizeSqlGroupByValues = (values: SqlGroupByValues) => ({ groupBy: isGroupByColumn(values.groupBy) ? values.groupBy : defaultGroupByColumn });
-const groupKey = (customer: Customer, column: GroupByColumn): string => String(customer[column]);
-const groupCustomers = (rows: Customer[], column: GroupByColumn) => {
-  const groups = new Map<string, { key: string; count: number; rowIndexes: number[] }>();
-  rows.forEach((customer, rowIndex) => {
-    const key = groupKey(customer, column);
-    const group = groups.get(key);
-    if (group) { group.count += 1; group.rowIndexes.push(rowIndex); return; }
-    groups.set(key, { key, count: 1, rowIndexes: [rowIndex] });
-  });
-  return [...groups.values()];
-};
-const sqlGroupByQuery = (column: GroupByColumn): string =>
-  ["SELECT " + column + ", COUNT(*) AS customer_count", "FROM customers", "GROUP BY " + column + ";"].join(String.fromCharCode(10));
-
-function initializeSqlGroupBySpecification(): void {}
-function initializeSqlGroupByModel(): void {}
-
-export { groupKey as a, normalizeSqlGroupByValues as c, sqlGroupByQuery as i, initializeSqlGroupBySpecification as l, defaultGroupByColumn as n, groupCustomers as o, groupByColumns as r, initializeSqlGroupByModel as s, customers as t, sqlGroupBySpecification as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `SQL_GROUP_BY`),
+      (n = `sql-group-by-v1`),
+      (r = {
+        groupBy: { kind: `enum`, defaultValue: `country`, allowedValues: [`country`, `age`] },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m;
+function h() {
+  return (h = e(() => {
+    (a(),
+      (o = [
+        { customerId: 1, name: `Betty`, age: 22, country: `UAE` },
+        { customerId: 2, name: `David`, age: 22, country: `UK` },
+        { customerId: 3, name: `Maria`, age: 25, country: `UK` },
+        { customerId: 4, name: `Robert`, age: 28, country: `USA` },
+        { customerId: 5, name: `John`, age: 31, country: `USA` },
+      ]),
+      (s = i.parameters.groupBy),
+      (c = s.allowedValues),
+      (l = s.defaultValue),
+      (u = (e) => c.some((t) => t === e)),
+      (d = (e) => ({ groupBy: u(e.groupBy) ? e.groupBy : l })),
+      (f = (e, t) => String(e[t])),
+      (p = (e, t) => {
+        let n = new Map();
+        return (
+          e.forEach((e, r) => {
+            let i = f(e, t),
+              a = n.get(i);
+            if (a) {
+              ((a.count += 1), a.rowIndexes.push(r));
+              return;
+            }
+            n.set(i, { key: i, count: 1, rowIndexes: [r] });
+          }),
+          [...n.values()]
+        );
+      }),
+      (m = (e) => `SELECT ${e}, COUNT(*) AS customer_count\nFROM customers\nGROUP BY ${e};`));
+  }))();
+}
+export { f as a, d as c, m as i, a as l, l as n, p as o, c as r, h as s, o as t, i as u };

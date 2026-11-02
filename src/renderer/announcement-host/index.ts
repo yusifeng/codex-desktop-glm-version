@@ -1,69 +1,140 @@
-// Workspace-discovery announcement host. Release chunk: announcement-host-46a475b49467.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as workspaceDiscoveryChunk from "@rchunk/workspace-discovery";
-
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>, key?: unknown): unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  QI as o,
+  ZI as s,
+  e6 as c,
+  oZ as l,
+} from "@rchunk/app-shared";
+import {
+  Iun as u,
+  M6t as d,
+  N6t as f,
+  Rln as p,
+  Run as m,
+  Sqt as h,
+  Wln as g,
+  bqt as _,
+  gC as v,
+  iht as y,
+  mC as b,
+  rht as x,
+} from "@rchunk/app-initial";
+import {
+  a as S,
+  c as C,
+  l as w,
+  n as T,
+  o as E,
+  t as D,
+  u as O,
+} from "@rchunk/workspace-discovery";
+function k(e) {
+  let t = (0, P.c)(4),
+    { children: n } = e,
+    { authMethod: r, userId: i, accountId: a } = f();
+  if (r !== `chatgpt` || i == null || a == null) return n;
+  let o;
+  return (
+    t[0] !== a || t[1] !== n || t[2] !== i
+      ? ((o = (0, I.jsx)(A, { userId: i, accountId: a, children: n }, i)),
+        (t[0] = a),
+        (t[1] = n),
+        (t[2] = i),
+        (t[3] = o))
+      : (o = t[3]),
+    o
+  );
 }
-interface SharedRuntime {
-  BX(signal: unknown, parameter?: unknown): unknown;
-  HX(signal: unknown): {
-    data?: unknown;
-    isPending?: boolean;
-    isError?: boolean;
-  };
-  I3(): JsxRuntime;
-  [key: string]: unknown;
+function A(e) {
+  let t = (0, P.c)(4),
+    { userId: r, accountId: i, children: a } = e;
+  if (!n(L, r)) return a;
+  let o;
+  return (
+    t[0] !== i || t[1] !== a || t[2] !== r
+      ? ((o = (0, I.jsx)(j, { userId: r, accountId: i, children: a }, i)),
+        (t[0] = i),
+        (t[1] = a),
+        (t[2] = r),
+        (t[3] = o))
+      : (o = t[3]),
+    o
+  );
 }
-const shared = appSharedChunk as unknown as SharedRuntime;
-const initial = appInitialChunk as unknown as Record<string, unknown>;
-const workspace = workspaceDiscoveryChunk as unknown as Record<string, unknown>;
-const jsxRuntime = shared.I3();
-
-function WorkspaceDiscoveryAnnouncementHost({
-  children,
-}: {
-  children: unknown;
-}): unknown {
-  const useAuth = initial.N6t as
-    | (() => {
-        authMethod?: string;
-        userId?: string | null;
-        accountId?: string | null;
-      })
-    | undefined;
-  const auth = useAuth?.() ?? {};
-  if (
-    auth.authMethod !== "chatgpt" ||
-    auth.userId == null ||
-    auth.accountId == null
-  ) {
-    return children;
+function j(e) {
+  let t = (0, P.c)(7),
+    { userId: r, accountId: a, children: o } = e,
+    [s, c] = (0, F.useState)(null),
+    l;
+  t[0] !== a || t[1] !== r
+    ? ((l = { accountId: a, userId: r }), (t[0] = a), (t[1] = r), (t[2] = l))
+    : (l = t[2]);
+  let { data: u, isError: d } = n(b, l),
+    { data: f, isError: p } = i(_),
+    { data: m, isError: h } = y();
+  if (s != null) {
+    let e;
+    return (
+      t[3] !== o || t[4] !== s || t[5] !== r
+        ? ((e = s ? (0, I.jsx)(N, { userId: r, children: o }) : o),
+          (t[3] = o),
+          (t[4] = s),
+          (t[5] = r),
+          (t[6] = e))
+        : (e = t[6]),
+      e
+    );
   }
-  const eligibility = shared.BX(workspace.c, auth.userId) as boolean;
-  if (!eligibility) return children;
-  const workspaceQuery = shared.BX(workspace.a, auth.userId) as {
-    data?: { workspaces?: unknown[] };
-    isPending?: boolean;
-    isError?: boolean;
-  };
-  if (workspaceQuery.isPending) return null;
-  if (workspaceQuery.isError || !workspaceQuery.data?.workspaces?.length)
-    return children;
-  return jsxRuntime.jsx(workspace.t, {}, auth.accountId);
+  return d || p || h
+    ? o
+    : (u == null ||
+        f == null ||
+        m == null ||
+        c(
+          C(u) &&
+            !!f.eligibleAnnouncements?.includes(`oai/apps/hasSeenWorkspaceDiscoveryFirstLogin`) &&
+            !m.accounts?.some(M),
+        ),
+      null);
 }
-
-for (const [runtime, names] of [
-  [shared as unknown as Record<string, unknown>, ["FX", "QI"]],
-  [initial, ["Run", "M6t", "gC", "Sqt", "rht", "Rln"]],
-  [workspace, ["l", "o", "n"]],
-] as Array<[Record<string, unknown>, string[]]>) {
-  for (const name of names) {
-    const value = runtime[name];
-    if (typeof value === "function") (value as () => void)();
-  }
+function M(e) {
+  return g(e.plan_type);
 }
-
-export { WorkspaceDiscoveryAnnouncementHost };
+function N(e) {
+  let t = (0, P.c)(2),
+    { userId: r, children: i } = e,
+    { accountId: a } = f(),
+    { data: o, isPending: s, isError: c } = n(S, r);
+  if (s) return null;
+  if (c || o == null || o.workspaces.length === 0) return i;
+  let l;
+  return (t[0] === a ? (l = t[1]) : ((l = (0, I.jsx)(D, {}, a)), (t[0] = a), (t[1] = l)), l);
+}
+var P, F, I, L;
+function R() {
+  return (R = e(() => {
+    ((P = t()),
+      r(),
+      (F = c()),
+      m(),
+      d(),
+      v(),
+      h(),
+      x(),
+      o(),
+      p(),
+      w(),
+      E(),
+      T(),
+      (I = a()),
+      (L = l(s, (e) => O(u()?.accessToken, Date.now()), { getServerSnapshot: () => !1 })));
+  }))();
+}
+R();
+export { k as WorkspaceDiscoveryAnnouncementHost };

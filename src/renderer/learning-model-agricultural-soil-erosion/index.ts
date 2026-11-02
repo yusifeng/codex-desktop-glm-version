@@ -1,37 +1,46 @@
-// Agricultural-soil-erosion teaching model. Release chunk: model-33ec5072ad67.js.
-import "@rchunk/rolldown-runtime";
-
-type FieldManagement = "exposed" | "cover" | "contour";
-interface SoilErosionInput { stage?: number; management?: FieldManagement | string }
-
-const soilErosionDefaults = { stage: 1, management: "exposed" as FieldManagement };
-const normalizeSoilErosionInput = (input: SoilErosionInput) => ({
-  stage: Number.isFinite(input.stage)
-    ? Math.min(3, Math.max(0, Math.round(input.stage ?? soilErosionDefaults.stage)))
-    : soilErosionDefaults.stage,
-  management: input.management === "exposed" || input.management === "cover" || input.management === "contour"
-    ? input.management
-    : soilErosionDefaults.management,
-});
-const calculateSoilErosion = (input: SoilErosionInput) => {
-  const safe = normalizeSoilErosionInput(input);
-  const runoffFactor = safe.management === "exposed" ? 1 : safe.management === "contour" ? 0.62 : 0.42;
-  const sedimentFactor = safe.management === "exposed" ? 1 : safe.management === "contour" ? 0.58 : 0.34;
-  const channel = safe.stage >= 3 ? "gully" : safe.stage === 2 ? "rill" : "none";
-  const channelWidth = channel === "gully"
-    ? safe.management === "exposed" ? 16 : safe.management === "contour" ? 12 : 9
-    : channel === "rill"
-      ? safe.management === "exposed" ? 4 : safe.management === "contour" ? 3 : 2
-      : 0;
-  return {
-    ...safe,
-    channel,
-    channelWidth,
-    splashCount: safe.management === "cover" ? 3 : 9,
-    runoff: safe.stage === 0 ? 0 : runoffFactor,
-    sediment: Math.round([2, 5, 9, 15][safe.stage] * sedimentFactor),
-  };
-};
-function initializeSoilErosionModel(): void {}
-
-export { normalizeSoilErosionInput as i, calculateSoilErosion as n, initializeSoilErosionModel as r, soilErosionDefaults as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r;
+function i() {
+  return (i = e(() => {
+    ((t = { stage: 1, management: `exposed` }),
+      (n = (e) => ({
+        stage: Number.isFinite(e.stage)
+          ? Math.min(3, Math.max(0, Math.round(e.stage ?? 1)))
+          : t.stage,
+        management:
+          e.management === `exposed` || e.management === `cover` || e.management === `contour`
+            ? e.management
+            : t.management,
+      })),
+      (r = (e) => {
+        let t = n(e),
+          r = t.management === `exposed` ? 1 : t.management === `contour` ? 0.62 : 0.42,
+          i = t.management === `exposed` ? 1 : t.management === `contour` ? 0.58 : 0.34,
+          a = t.stage >= 3 ? `gully` : t.stage === 2 ? `rill` : `none`,
+          o =
+            a === `gully`
+              ? t.management === `exposed`
+                ? 16
+                : t.management === `contour`
+                  ? 12
+                  : 9
+              : a === `rill`
+                ? t.management === `exposed`
+                  ? 4
+                  : t.management === `contour`
+                    ? 3
+                    : 2
+                : 0;
+        return {
+          ...t,
+          channel: a,
+          channelWidth: o,
+          splashCount: t.management === `cover` ? 3 : 9,
+          runoff: t.stage === 0 ? 0 : r,
+          sediment: Math.round([2, 5, 9, 15][t.stage] * i),
+        };
+      }));
+  }))();
+}
+export { n as i, r as n, i as r, t };

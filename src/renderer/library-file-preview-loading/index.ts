@@ -1,7 +1,39 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-let runtime: JsxRuntime | undefined;
-function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function LibraryFilePreviewLoading(): unknown { return jsx().jsxs("div", { className: "library-file-preview-loading", children: [jsx().jsx("span", { "aria-hidden": true, children: "…" }), jsx().jsx("div", { role: "status", children: "Loading" })] }); }
-function initialize(): void {}
-export { initialize as n, LibraryFilePreviewLoading as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, $h as n, I3 as r, K2 as i, Qh as a, Y2 as o } from "@rchunk/app-shared";
+function s() {
+  let e = (0, c.c)(2),
+    t;
+  e[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((t = (0, l.jsx)(a, {})), (e[0] = t))
+    : (t = e[0]);
+  let n;
+  return (
+    e[1] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((n = (0, l.jsxs)(`div`, {
+          className: `flex h-full min-h-0 flex-col items-center justify-center gap-3 text-default select-none`,
+          children: [
+            t,
+            (0, l.jsx)(`div`, {
+              className: `text-sm text-codex-description`,
+              role: `status`,
+              children: (0, l.jsx)(o, {
+                id: `libraryFilePreview.loading`,
+                defaultMessage: `Loading`,
+                description: `Status text while Library file content loads`,
+              }),
+            }),
+          ],
+        })),
+        (e[1] = n))
+      : (n = e[1]),
+    n
+  );
+}
+var c, l;
+function u() {
+  return (u = e(() => {
+    ((c = t()), i(), n(), (l = r()));
+  }))();
+}
+export { u as n, s as t };

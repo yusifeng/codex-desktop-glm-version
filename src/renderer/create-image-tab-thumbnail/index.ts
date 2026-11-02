@@ -1,13 +1,84 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as fileThumbnailChunk from "@rchunk/thumbnail-7c714f359bb7";
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>): unknown } interface ReactRuntime { useState<T>(initial: () => T): [T, (value: T) => void] }
-const { $3: initializeRuntime, FX: initializeSignals, I3: getJsxRuntime, LX: useScope, e6: getReactRuntime } = appSharedChunk as unknown as { $3(): void; FX(): void; I3(): JsxRuntime; LX(signal: unknown): { get(signal: unknown, key: string): unknown; value: { conversationId?: string; hostId?: string; routeKind?: string } }; e6(): ReactRuntime };
-const { $en: routeScope, FZt: resolveConversationHost, HZt: initializeConversationModel, itn: initializeRoute, mQt: conversationImagesSignal, ttn: getRouteConversationId } = appInitialChunk as unknown as { $en: unknown; FZt(get: (signal: unknown, key: string) => unknown, conversationId: string): string | null; HZt(): void; itn(): void; mQt: unknown; ttn(route: Record<string, unknown>): string | null };
-const { n: initializeFileThumbnail, t: ImageThumbnail } = fileThumbnailChunk as unknown as { n(): void; t: unknown };
-interface ImageDescriptor { id: string; previewSrc?: string; src?: string } interface Props { icon?: unknown; props: { attachmentSrc?: string; generatedImages?: ImageDescriptor[]; imageAssetResolver?: unknown; imageSourceContext?: { hostId?: string }; initialImageId?: string; liveTailImagePolicy?: string; src?: string }; readState(): { activeImageId?: string } | null; title: string }
-let jsx: JsxRuntime;
-function CreateImageTabThumbnail({ icon, props, readState, title }: Props): unknown { const scope = useScope(routeScope); const [hostId] = getReactRuntime().useState(() => { if (props.imageSourceContext != null) return props.imageSourceContext.hostId; if (scope.value.routeKind === "local-thread" && scope.value.conversationId != null) return scope.value.hostId ?? resolveConversationHost(scope.get, scope.value.conversationId) ?? undefined; return undefined; }); const [sources] = getReactRuntime().useState(() => { if (props.generatedImages == null) return [props.src, props.attachmentSrc]; const activeId = readState()?.activeImageId ?? props.initialImageId; const generated = props.generatedImages.find((image) => image.id === activeId); if (generated != null) return [generated.previewSrc, generated.src]; const conversationId = getRouteConversationId(scope.value); if (props.liveTailImagePolicy !== "follow" || conversationId == null) return null; const image = (scope.get(conversationImagesSignal, conversationId) as { images?: ImageDescriptor[] } | null)?.images?.find((candidate) => candidate.id === activeId); return image?.src == null ? null : [image.src]; }); return jsx.jsx(ImageThumbnail, { icon, hostId, imageAssetResolver: props.imageAssetResolver, title, sources }); }
-let initialized = false; function initializeCreateImageTabThumbnail(): void { if (initialized) return; initialized = true; initializeRuntime(); initializeSignals(); initializeConversationModel(); initializeRoute(); initializeFileThumbnail(); jsx = getJsxRuntime(); }
-initializeCreateImageTabThumbnail(); export { CreateImageTabThumbnail };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, FX as n, I3 as r, LX as i, e6 as a } from "@rchunk/app-shared";
+import {
+  $en as o,
+  FZt as s,
+  HZt as c,
+  itn as l,
+  mQt as u,
+  ttn as d,
+} from "@rchunk/app-initial";
+import { n as f, t as p } from "@rchunk/file-image-thumbnail";
+function m(e) {
+  let t = (0, h.c)(17),
+    { icon: n, props: r, readState: a, title: c } = e,
+    l = i(o),
+    f;
+  t[0] !== r.imageSourceContext || t[1] !== l
+    ? ((f = () => {
+        if (r.imageSourceContext != null) return r.imageSourceContext.hostId;
+        if (l.value.routeKind === `local-thread`)
+          return l.value.hostId ?? s(l.get, l.value.conversationId) ?? void 0;
+      }),
+      (t[0] = r.imageSourceContext),
+      (t[1] = l),
+      (t[2] = f))
+    : (f = t[2]);
+  let [m] = (0, g.useState)(f),
+    v;
+  t[3] !== r.attachmentSrc ||
+  t[4] !== r.generatedImages ||
+  t[5] !== r.initialImageId ||
+  t[6] !== r.liveTailImagePolicy ||
+  t[7] !== r.src ||
+  t[8] !== a ||
+  t[9] !== l
+    ? ((v = () => {
+        if (r.generatedImages == null) return [r.src, r.attachmentSrc];
+        let e = a()?.activeImageId ?? r.initialImageId,
+          t = r.generatedImages.find((t) => t.id === e);
+        if (t != null) return [t.previewSrc, t.src];
+        let n = d(l.value);
+        if (r.liveTailImagePolicy !== `follow` || n == null) return null;
+        let i = l.get(u, n)?.images.find((t) => t.id === e);
+        return i?.src == null ? null : [i.src];
+      }),
+      (t[3] = r.attachmentSrc),
+      (t[4] = r.generatedImages),
+      (t[5] = r.initialImageId),
+      (t[6] = r.liveTailImagePolicy),
+      (t[7] = r.src),
+      (t[8] = a),
+      (t[9] = l),
+      (t[10] = v))
+    : (v = t[10]);
+  let [y] = (0, g.useState)(v),
+    b;
+  return (
+    t[11] !== m || t[12] !== n || t[13] !== r.imageAssetResolver || t[14] !== y || t[15] !== c
+      ? ((b = (0, _.jsx)(p, {
+          icon: n,
+          hostId: m,
+          imageAssetResolver: r.imageAssetResolver,
+          title: c,
+          sources: y,
+        })),
+        (t[11] = m),
+        (t[12] = n),
+        (t[13] = r.imageAssetResolver),
+        (t[14] = y),
+        (t[15] = c),
+        (t[16] = b))
+      : (b = t[16]),
+    b
+  );
+}
+var h, g, _;
+function v() {
+  return (v = e(() => {
+    ((h = t()), n(), (g = a()), c(), l(), f(), (_ = r()));
+  }))();
+}
+v();
+export { m as CreateImageTabThumbnail };

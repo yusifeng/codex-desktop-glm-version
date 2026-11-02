@@ -1,116 +1,129 @@
-// permission-dropdown —— 分享对象权限选择与移除菜单。
-// 原版：app/webview/assets/permission-dropdown-faa59c51006d.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-
-void runtimeChunk;
-const {
-  $3: initializeReactRuntime,
-  I3: getJsxRuntime,
-  If: initializeMenu,
-  cy: ChevronIcon,
-  iy: CheckIcon,
-  jf: Menu,
-  kf: DropdownMenu,
-  lw: initializePermissionIcons,
-} = appSharedChunk;
-const jsx = getJsxRuntime();
-
-type PermissionValue = string | number;
-
-interface PermissionOption<Value extends PermissionValue> {
-  ariaLabel?: string;
-  description?: string | null;
-  disabled?: boolean;
-  tooltipText?: unknown;
-  value: Value;
-}
-
-interface PermissionDropdownProps<Value extends PermissionValue> {
-  disabled?: boolean;
-  onChange?: (value: Value) => void;
-  onRemoveAccess?: () => void;
-  options: readonly PermissionOption<Value>[];
-  removeLabel?: unknown;
-  renderLabel: (value: Value) => unknown;
-  value: Value;
-  variant?: "default" | "inline";
-}
-
-function PermissionDropdown<Value extends PermissionValue>({
-  options,
-  disabled = false,
-  renderLabel,
-  removeLabel,
-  variant = "default",
-  value,
-  onChange,
-  onRemoveAccess,
-}: PermissionDropdownProps<Value>): unknown {
-  const triggerClassName =
-    variant === "inline"
-      ? "flex shrink-0 cursor-interaction items-center gap-1 text-base text-default"
-      : "flex cursor-interaction items-center gap-1 rounded-md border border-default px-2 py-1 text-sm text-default";
-  const triggerButton = jsx.jsxs("button", {
-    type: "button",
-    disabled,
-    className: triggerClassName,
-    children: [
-      renderLabel(value),
-      jsx.jsx(ChevronIcon, { className: "text-codex-description" }),
-    ],
-  });
-  const optionItems = options.map((option) =>
-    jsx.jsx(
-      Menu.Item,
-      {
-        "aria-description": option.description,
-        "aria-label": option.ariaLabel,
-        disabled: disabled || option.disabled,
-        RightIcon: option.value === value ? CheckIcon : undefined,
-        SubText:
-          option.description == null
-            ? undefined
-            : jsx.jsx(jsx.Fragment, { children: option.description }),
-        subTextAllowWrap: true,
-        tooltipText: option.tooltipText,
-        onSelect: () => onChange?.(option.value),
-        children: renderLabel(option.value),
-      },
-      option.value,
-    ),
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  I3 as n,
+  If as r,
+  cy as i,
+  iy as a,
+  jf as o,
+  kf as s,
+  lw as c,
+} from "@rchunk/app-shared";
+function l(e) {
+  "use forget";
+  let t = (0, u.c)(28),
+    {
+      options: n,
+      disabled: r,
+      renderLabel: c,
+      removeLabel: l,
+      variant: f,
+      value: p,
+      onChange: m,
+      onRemoveAccess: h,
+    } = e,
+    g = r !== void 0 && r,
+    _ =
+      (f === void 0 ? `default` : f) === `inline`
+        ? `flex shrink-0 cursor-interaction items-center gap-1 text-base text-default`
+        : `flex cursor-interaction items-center gap-1 rounded-md border border-default px-2 py-1 text-sm text-default`,
+    v;
+  t[0] !== c || t[1] !== p ? ((v = c(p)), (t[0] = c), (t[1] = p), (t[2] = v)) : (v = t[2]);
+  let y;
+  t[3] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((y = (0, d.jsx)(i, { className: `text-codex-description` })), (t[3] = y))
+    : (y = t[3]);
+  let b;
+  t[4] !== g || t[5] !== _ || t[6] !== v
+    ? ((b = (0, d.jsxs)(`button`, { type: `button`, disabled: g, className: _, children: [v, y] })),
+      (t[4] = g),
+      (t[5] = _),
+      (t[6] = v),
+      (t[7] = b))
+    : (b = t[7]);
+  let x;
+  if (t[8] !== g || t[9] !== m || t[10] !== n || t[11] !== c || t[12] !== p) {
+    let e;
+    (t[14] !== g || t[15] !== m || t[16] !== c || t[17] !== p
+      ? ((e = (e) =>
+          (0, d.jsx)(
+            o.Item,
+            {
+              "aria-description": e.description,
+              "aria-label": e.ariaLabel,
+              disabled: g || e.disabled,
+              RightIcon: e.value === p ? a : void 0,
+              SubText:
+                e.description == null
+                  ? void 0
+                  : (0, d.jsx)(d.Fragment, { children: e.description }),
+              subTextAllowWrap: !0,
+              tooltipText: e.tooltipText,
+              onSelect: () => {
+                m?.(e.value);
+              },
+              children: c(e.value),
+            },
+            e.value,
+          )),
+        (t[14] = g),
+        (t[15] = m),
+        (t[16] = c),
+        (t[17] = p),
+        (t[18] = e))
+      : (e = t[18]),
+      (x = n.map(e)),
+      (t[8] = g),
+      (t[9] = m),
+      (t[10] = n),
+      (t[11] = c),
+      (t[12] = p),
+      (t[13] = x));
+  } else x = t[13];
+  let S;
+  t[19] !== g || t[20] !== h || t[21] !== l
+    ? ((S =
+        h == null
+          ? null
+          : (0, d.jsxs)(d.Fragment, {
+              children: [
+                (0, d.jsx)(o.Separator, {}),
+                (0, d.jsx)(o.Item, {
+                  disabled: g,
+                  onSelect: h,
+                  children: (0, d.jsx)(`span`, { className: `text-danger`, children: l }),
+                }),
+              ],
+            })),
+      (t[19] = g),
+      (t[20] = h),
+      (t[21] = l),
+      (t[22] = S))
+    : (S = t[22]);
+  let C;
+  return (
+    t[23] !== g || t[24] !== b || t[25] !== x || t[26] !== S
+      ? ((C = (0, d.jsxs)(s, {
+          align: `end`,
+          contentWidth: `xs`,
+          disabled: g,
+          triggerButton: b,
+          children: [x, S],
+        })),
+        (t[23] = g),
+        (t[24] = b),
+        (t[25] = x),
+        (t[26] = S),
+        (t[27] = C))
+      : (C = t[27]),
+    C
   );
-  const removeItem =
-    onRemoveAccess == null
-      ? null
-      : jsx.jsxs(jsx.Fragment, {
-          children: [
-            jsx.jsx(Menu.Separator, {}),
-            jsx.jsx(Menu.Item, {
-              disabled,
-              onSelect: onRemoveAccess,
-              children: jsx.jsx("span", {
-                className: "text-danger",
-                children: removeLabel,
-              }),
-            }),
-          ],
-        });
-
-  return jsx.jsxs(DropdownMenu, {
-    align: "end",
-    contentWidth: "xs",
-    disabled,
-    triggerButton,
-    children: [optionItems, removeItem],
-  });
 }
-
-function initializePermissionDropdown(): void {
-  initializeReactRuntime();
-  initializeMenu();
-  initializePermissionIcons();
+var u, d;
+function f() {
+  return (f = e(() => {
+    ((u = t()), r(), c(), (d = n()));
+  }))();
 }
-
-export { initializePermissionDropdown as n, PermissionDropdown as t };
+export { f as n, l as t };

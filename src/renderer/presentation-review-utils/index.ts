@@ -1,108 +1,166 @@
-import "@rchunk/rolldown-runtime";
-
-export interface Point { x: number; y: number }
-export interface Frame { height: number; left: number; rotation?: number | null; top: number; width: number }
-export interface ContainedElement { elementId: string; frame: Frame }
-export interface SlideElementTarget extends Record<string, unknown> { frame: Frame; id: string }
-export interface InspectorSlideElement extends Record<string, unknown> { id: string; kind?: string | null; name?: string | null }
-export interface PresentationSnapshot {
-  inspector: { slideElements: InspectorSlideElement[] };
-  primarySelectedElementId?: string | null;
-  selectedElementIds: string[];
-  selectedSlideElementTargets: SlideElementTarget[];
-  selectedSlideIdx: number;
-  slideIds: string[];
-  slideLabels: string[];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e) {
+  return { left: e.left, top: e.top, width: e.width, height: e.height, rotation: e.rotation };
 }
-export interface PresentationRegionTarget {
-  anchorPoint: Point;
-  containedElements: ContainedElement[];
-  frame: Frame;
-  slideId: string;
-  slideIndex: number;
-  slideLabel: string;
-  type: "presentation-region";
+function n(e) {
+  return { x: e.x, y: e.y };
 }
-export interface PresentationElementSelectionTarget {
-  anchorPoint?: Point;
-  elementIds: string[];
-  frame: Frame;
-  primaryElementId: string | null;
-  primaryElementKind?: string | null;
-  primaryElementName?: string | null;
-  primaryElementOffset?: Point | null;
-  primaryElementOrdinal?: number | null;
-  slideId: string;
-  slideIndex: number;
-  slideLabel: string;
-  type: "presentation-element-selection";
+function r(e) {
+  return { elementId: e.elementId, frame: t(e.frame) };
 }
-export interface PresentationDrawingRegionTarget {
-  containedElements: ContainedElement[];
-  frame: Frame;
-  slideId: string;
-  slideIndex: number;
-  slideLabel: string;
-  type: "presentation-drawing-region";
-  viewportBounds: Omit<Frame, "rotation">;
+function i(e) {
+  let t = e.selectedElementIds
+    .map((t) => e.selectedSlideElementTargets.find((e) => e.id === t))
+    .filter((e) => e != null);
+  if (t.length === 0) return null;
+  let n = t[0];
+  if (!n) return null;
+  let r = n.frame.left,
+    i = n.frame.top,
+    a = n.frame.left + n.frame.width,
+    o = n.frame.top + n.frame.height;
+  for (let e of t.slice(1))
+    ((r = Math.min(r, e.frame.left)),
+      (i = Math.min(i, e.frame.top)),
+      (a = Math.max(a, e.frame.left + e.frame.width)),
+      (o = Math.max(o, e.frame.top + e.frame.height)));
+  return { left: r, top: i, width: a - r, height: o - i };
 }
-export type PresentationReviewTarget = PresentationRegionTarget | PresentationElementSelectionTarget;
-
-const copyFrame = (frame: Frame): Frame => ({ left: frame.left, top: frame.top, width: frame.width, height: frame.height, rotation: frame.rotation });
-const copyPoint = (point: Point): Point => ({ x: point.x, y: point.y });
-const copyContainedElement = (element: ContainedElement): ContainedElement => ({ elementId: element.elementId, frame: copyFrame(element.frame) });
-
-function selectedElementsFrame(input: Pick<PresentationSnapshot, "selectedElementIds" | "selectedSlideElementTargets">): Omit<Frame, "rotation"> | null {
-  const selected = input.selectedElementIds.map(id => input.selectedSlideElementTargets.find(element => element.id === id)).filter((element): element is SlideElementTarget => element != null);
-  const first = selected[0];
-  if (!first) return null;
-  let left = first.frame.left, top = first.frame.top, right = first.frame.left + first.frame.width, bottom = first.frame.top + first.frame.height;
-  for (const element of selected.slice(1)) {
-    left = Math.min(left, element.frame.left); top = Math.min(top, element.frame.top);
-    right = Math.max(right, element.frame.left + element.frame.width); bottom = Math.max(bottom, element.frame.top + element.frame.height);
-  }
-  return { left, top, width: right - left, height: bottom - top };
-}
-
-interface SlideHit { kind: "slide"; slideId: string; slideIndex: number; slideLabel: string }
-interface ElementHit { elementId: string; elementName?: string | null; frame?: Frame | null; kind: string; slideId: string; slideIndex: number; slideLabel: string }
-function targetFromHit(hit: SlideHit | ElementHit, point: Point): PresentationReviewTarget {
-  const pointFrame = { left: point.x, top: point.y, width: 0, height: 0 };
-  if (!("elementId" in hit)) return { type: "presentation-region", slideId: hit.slideId, slideIndex: hit.slideIndex, slideLabel: hit.slideLabel, frame: pointFrame, anchorPoint: point, containedElements: [] };
-  return { type: "presentation-element-selection", slideId: hit.slideId, slideIndex: hit.slideIndex, slideLabel: hit.slideLabel, elementIds: [hit.elementId], primaryElementId: hit.elementId, primaryElementName: hit.elementName, frame: hit.frame ?? pointFrame, anchorPoint: point };
-}
-
-function selectedElementTarget(input: { anchorPoint?: Point | null; elementIds?: string[]; frame?: Frame | null; primaryElementId?: string | null; snapshot: PresentationSnapshot }): PresentationElementSelectionTarget | null {
-  const slideId = input.snapshot.slideIds[input.snapshot.selectedSlideIdx];
-  if (!slideId) return null;
-  const elementIds = [...(input.elementIds ?? input.snapshot.selectedElementIds)];
-  const primaryElementId = input.primaryElementId ?? input.snapshot.primarySelectedElementId ?? null;
-  const frame = input.frame ?? selectedElementsFrame({ selectedElementIds: elementIds, selectedSlideElementTargets: input.snapshot.selectedSlideElementTargets });
-  if (!frame || elementIds.length === 0) return null;
-  const primary = primaryElementId == null ? null : input.snapshot.inspector.slideElements.find(element => element.id === primaryElementId) ?? null;
-  const ordinal = primary == null ? null : input.snapshot.inspector.slideElements.filter(element => element.kind === primary.kind).findIndex(element => element.id === primary.id) + 1;
+function a(e, t) {
+  let n = { left: t.x, top: t.y, width: 0, height: 0 };
+  if (e.kind === `slide`)
+    return {
+      type: `presentation-region`,
+      slideId: e.slideId,
+      slideIndex: e.slideIndex,
+      slideLabel: e.slideLabel,
+      frame: n,
+      anchorPoint: t,
+      containedElements: [],
+    };
+  let r = e.frame == null ? n : e.frame;
   return {
-    type: "presentation-element-selection", slideId, slideIndex: input.snapshot.selectedSlideIdx,
-    slideLabel: input.snapshot.slideLabels[input.snapshot.selectedSlideIdx] ?? `Slide ${input.snapshot.selectedSlideIdx + 1}`,
-    elementIds, primaryElementId, primaryElementKind: primary?.kind ?? null, primaryElementName: primary?.name ?? null,
-    primaryElementOrdinal: ordinal != null && ordinal > 0 ? ordinal : null, frame: copyFrame(frame),
-    ...(input.anchorPoint == null ? {} : { anchorPoint: copyPoint(input.anchorPoint), primaryElementOffset: { x: input.anchorPoint.x - frame.left, y: input.anchorPoint.y - frame.top } }),
+    type: `presentation-element-selection`,
+    slideId: e.slideId,
+    slideIndex: e.slideIndex,
+    slideLabel: e.slideLabel,
+    elementIds: [e.elementId],
+    primaryElementId: e.elementId,
+    primaryElementName: e.elementName,
+    frame: r,
+    anchorPoint: t,
   };
 }
-
-function presentationRegionTarget(input: { anchorPoint: Point; containedElements?: ContainedElement[]; frame: Frame; snapshot: PresentationSnapshot }): PresentationRegionTarget | null {
-  const slideId = input.snapshot.slideIds[input.snapshot.selectedSlideIdx];
-  return slideId ? { type: "presentation-region", slideId, slideIndex: input.snapshot.selectedSlideIdx, slideLabel: input.snapshot.slideLabels[input.snapshot.selectedSlideIdx] ?? `Slide ${input.snapshot.selectedSlideIdx + 1}`, frame: copyFrame(input.frame), anchorPoint: copyPoint(input.anchorPoint), containedElements: (input.containedElements ?? []).map(copyContainedElement) } : null;
+function o(e) {
+  let r = e.snapshot.slideIds[e.snapshot.selectedSlideIdx];
+  if (!r) return null;
+  let a = [...(e.elementIds ?? e.snapshot.selectedElementIds)],
+    o = e.primaryElementId ?? e.snapshot.primarySelectedElementId ?? null,
+    s =
+      e.frame ??
+      i({
+        selectedElementIds: a,
+        selectedSlideElementTargets: e.snapshot.selectedSlideElementTargets,
+      });
+  if (!s || a.length === 0) return null;
+  let c = o == null ? null : (e.snapshot.inspector.slideElements.find((e) => e.id === o) ?? null),
+    l =
+      c == null
+        ? null
+        : e.snapshot.inspector.slideElements
+            .filter((e) => e.kind === c.kind)
+            .findIndex((e) => e.id === c.id) + 1;
+  return {
+    type: `presentation-element-selection`,
+    slideId: r,
+    slideIndex: e.snapshot.selectedSlideIdx,
+    slideLabel:
+      e.snapshot.slideLabels[e.snapshot.selectedSlideIdx] ??
+      `Slide ${e.snapshot.selectedSlideIdx + 1}`,
+    elementIds: a,
+    primaryElementId: o,
+    primaryElementKind: c?.kind ?? null,
+    primaryElementName: c?.name ?? null,
+    primaryElementOrdinal: l != null && l > 0 ? l : null,
+    frame: t(s),
+    ...(e.anchorPoint == null
+      ? {}
+      : {
+          anchorPoint: n(e.anchorPoint),
+          primaryElementOffset:
+            s == null ? null : { x: e.anchorPoint.x - s.left, y: e.anchorPoint.y - s.top },
+        }),
+  };
 }
-
-function presentationDrawingRegionTarget(input: { containedElements?: ContainedElement[]; frame: Frame; snapshot: PresentationSnapshot; viewportBounds: Omit<Frame, "rotation"> }): PresentationDrawingRegionTarget | null {
-  const slideId = input.snapshot.slideIds[input.snapshot.selectedSlideIdx];
-  return slideId ? { type: "presentation-drawing-region", slideId, slideIndex: input.snapshot.selectedSlideIdx, slideLabel: input.snapshot.slideLabels[input.snapshot.selectedSlideIdx] ?? `Slide ${input.snapshot.selectedSlideIdx + 1}`, frame: copyFrame(input.frame), viewportBounds: { left: input.viewportBounds.left, top: input.viewportBounds.top, width: input.viewportBounds.width, height: input.viewportBounds.height }, containedElements: (input.containedElements ?? []).map(copyContainedElement) } : null;
+function s(e) {
+  let i = e.snapshot.slideIds[e.snapshot.selectedSlideIdx];
+  return i
+    ? {
+        type: `presentation-region`,
+        slideId: i,
+        slideIndex: e.snapshot.selectedSlideIdx,
+        slideLabel:
+          e.snapshot.slideLabels[e.snapshot.selectedSlideIdx] ??
+          `Slide ${e.snapshot.selectedSlideIdx + 1}`,
+        frame: t(e.frame),
+        anchorPoint: n(e.anchorPoint),
+        containedElements: (e.containedElements ?? []).map(r),
+      }
+    : null;
 }
-
-const targetLabel = (target: PresentationReviewTarget): string => target.type === "presentation-region" ? target.frame.width === 0 && target.frame.height === 0 ? `${target.slideLabel} · Point` : `${target.slideLabel} · Region` : target.elementIds.length === 1 ? `${target.slideLabel} · ${target.primaryElementId ?? target.elementIds[0]}` : `${target.slideLabel} · ${target.elementIds.length} elements`;
-const drawingTargetLabel = (target: PresentationDrawingRegionTarget): string => `${target.slideLabel} · Drawing`;
-function frameToViewport(target: { frame: Frame }, viewport?: { left: number; scale: number; top: number } | null): Frame { return viewport ? { left: viewport.left + target.frame.left * viewport.scale, top: viewport.top + target.frame.top * viewport.scale, width: target.frame.width * viewport.scale, height: target.frame.height * viewport.scale } : copyFrame(target.frame); }
-function annotationAnchorRect(target: PresentationReviewTarget, viewport?: { left: number; scale: number; top: number } | null): Frame { const point = target.type === "presentation-region" ? target.anchorPoint : target.anchorPoint ?? null; return point ? viewport ? { left: viewport.left + point.x * viewport.scale, top: viewport.top + point.y * viewport.scale, width: 0, height: 0 } : { left: point.x, top: point.y, width: 0, height: 0 } : frameToViewport(target, viewport); }
-function initializePresentationReviewUtils(): void {}
-export { drawingTargetLabel as a, targetLabel as c, presentationRegionTarget as i, selectedElementsFrame as l, presentationDrawingRegionTarget as n, annotationAnchorRect as o, selectedElementTarget as r, frameToViewport as s, targetFromHit as t, initializePresentationReviewUtils as u };
+function c(e) {
+  let n = e.snapshot.slideIds[e.snapshot.selectedSlideIdx];
+  return n
+    ? {
+        type: `presentation-drawing-region`,
+        slideId: n,
+        slideIndex: e.snapshot.selectedSlideIdx,
+        slideLabel:
+          e.snapshot.slideLabels[e.snapshot.selectedSlideIdx] ??
+          `Slide ${e.snapshot.selectedSlideIdx + 1}`,
+        frame: t(e.frame),
+        viewportBounds: {
+          left: e.viewportBounds.left,
+          top: e.viewportBounds.top,
+          width: e.viewportBounds.width,
+          height: e.viewportBounds.height,
+        },
+        containedElements: (e.containedElements ?? []).map(r),
+      }
+    : null;
+}
+function l(e) {
+  return e.type === `presentation-region`
+    ? e.frame.width === 0 && e.frame.height === 0
+      ? `${e.slideLabel} · Point`
+      : `${e.slideLabel} · Region`
+    : e.elementIds.length === 1
+      ? `${e.slideLabel} · ${e.primaryElementId ?? e.elementIds[0]}`
+      : `${e.slideLabel} · ${e.elementIds.length} elements`;
+}
+function u(e) {
+  return `${e.slideLabel} · Drawing`;
+}
+function d(e, n) {
+  return n
+    ? {
+        left: n.left + e.frame.left * n.scale,
+        top: n.top + e.frame.top * n.scale,
+        width: e.frame.width * n.scale,
+        height: e.frame.height * n.scale,
+      }
+    : t(e.frame);
+}
+function f(e, t) {
+  let n = e.type === `presentation-region` ? e.anchorPoint : (e.anchorPoint ?? null);
+  return n
+    ? t
+      ? { left: t.left + n.x * t.scale, top: t.top + n.y * t.scale, width: 0, height: 0 }
+      : { left: n.x, top: n.y, width: 0, height: 0 }
+    : d(e, t);
+}
+function p() {
+  return (p = e(() => {}))();
+}
+export { u as a, l as c, s as i, i as l, c as n, f as o, o as r, d as s, a as t, p as u };

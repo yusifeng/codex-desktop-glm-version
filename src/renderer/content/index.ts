@@ -1,444 +1,466 @@
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as bookOpenChunk from "@rchunk/book-open";
-import * as memoryManagerGateChunk from "@rchunk/memory-manager-gate";
-import "@rchunk/rolldown-runtime";
-import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
-
-export interface ResolvedApp {
-  installUrl?: string | null;
-  logoUrl?: string | null;
-  logoUrlDark?: string | null;
-  name?: string;
-  [key: string]: unknown;
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/chatgpt-about-you-summary-panel",
+      "@rchunk/app-shared",
+      "@rchunk/rolldown-runtime",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/about-you-summary",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/app-primary",
+      "./app-primary-484df789f2f5.css",
+      "@rchunk/animated-icon",
+      "./about-you-summary-3a9ce93984ce.css",
+      "@rchunk/chatgpt-saved-memories-panel",
+      "@rchunk/saved-memories",
+      "@rchunk/chatgpt-saved-memory-state",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $h as n,
+  AT as r,
+  Bm as i,
+  C_ as a,
+  Cf as o,
+  Ef as s,
+  FX as c,
+  Gl as l,
+  Gm as u,
+  H3 as d,
+  HD as f,
+  HX as p,
+  I3 as m,
+  ID as h,
+  Iv as ee,
+  Jm as g,
+  K2 as _,
+  Km as v,
+  LD as y,
+  Qh as b,
+  S_ as x,
+  TE as S,
+  Tf as te,
+  Tw as C,
+  UD as w,
+  V3 as T,
+  Wl as ne,
+  Xa as E,
+  Y2 as D,
+  Ya as re,
+  Yh as O,
+  Zh as ie,
+  _E as ae,
+  dl as oe,
+  e6 as se,
+  fm as ce,
+  gE as k,
+  jT as A,
+  lw as j,
+  my as M,
+  pm as N,
+  qm as P,
+  ul as F,
+  wE as I,
+  ww as L,
+  xf as R,
+  zm as z,
+} from "@rchunk/app-shared";
+import {
+  Dlt as B,
+  Olt as V,
+  Sqt as H,
+  U6t as U,
+  ifn as W,
+  ofn as le,
+  yqt as ue,
+} from "@rchunk/app-initial";
+import { n as de, t as fe } from "@rchunk/book-open";
+import { t as pe } from "@rchunk/memory-manager-gate";
+function me(e) {
+  let t = (0, G.c)(6),
+    { resolvedApps: n, shouldBlockExternalEgress: r, toolIcons: i } = e,
+    a;
+  t[0] !== n || t[1] !== r || t[2] !== i
+    ? ((a = i
+        ?.flatMap((e, t) => {
+          let i = e.trim(),
+            a = he(i, `${i}-${String(t)}`);
+          if (a != null) return [a];
+          let o = n.find((e) =>
+              [e.logoUrl, e.logoUrlDark].some(
+                (e) => e === i || (i.startsWith(`/`) && e?.endsWith(i)),
+              ),
+            ),
+            s = o == null ? ge(i, n) : null;
+          return o == null && s == null
+            ? []
+            : [
+                (0, K.jsx)(
+                  B,
+                  {
+                    alt: ``,
+                    appInfo: o,
+                    className: `icon-xs shrink-0 object-contain`,
+                    fallback: (0, K.jsx)(u, { "aria-hidden": !0 }),
+                    loadRemote: !r,
+                    logoUrl: s,
+                  },
+                  `${i}-${String(t)}`,
+                ),
+              ];
+        })
+        .slice(0, 2)),
+      (t[0] = n),
+      (t[1] = r),
+      (t[2] = i),
+      (t[3] = a))
+    : (a = t[3]);
+  let o = a;
+  if (o == null || o.length === 0) return null;
+  let s;
+  return (
+    t[4] === o
+      ? (s = t[5])
+      : ((s = (0, K.jsx)(`span`, {
+          className: `flex shrink-0 items-center -space-x-1`,
+          children: o,
+        })),
+        (t[4] = o),
+        (t[5] = s)),
+    s
+  );
 }
-export interface ToolIconContentProps {
-  resolvedApps: readonly ResolvedApp[];
-  shouldBlockExternalEgress?: boolean;
-  toolIcons?: readonly string[] | null;
-}
-export interface MemoryWriteItem {
-  isUpdating?: boolean;
-  writes: readonly string[];
-}
-export interface MemoryWriteContentProps {
-  isParagen?: boolean;
-  item: MemoryWriteItem;
-}
-
-type Component = (props: Record<string, unknown>) => unknown;
-interface MemoryConfiguration {
-  m3mEnabled?: boolean;
-  m3mOptedOut?: boolean;
-}
-interface SharedDependencies {
-  Cf: Component;
-  Gm: Component;
-  HX<Value>(signal: unknown): Value;
-  I3(): JsxRuntime;
-  Iv: Component;
-  Qh: Component;
-  S_: Component;
-  Tf: Component;
-  Y2: Component;
-  Yh: Component;
-  e6(): ReactRuntime;
-  my: Component;
-  xf: Component;
-  [key: string]: unknown;
-}
-interface InitialDependencies {
-  Dlt: Component;
-  U6t: unknown;
-  ofn(mode: string): boolean;
-  yqt: unknown;
-  [key: string]: unknown;
-}
-
-const shared = appSharedChunk as unknown as SharedDependencies;
-const initial = appInitialChunk as unknown as InitialDependencies;
-const BookOpenIcon = (bookOpenChunk as unknown as { t: Component }).t;
-const memoryManagerMode = (memoryManagerGateChunk as unknown as { t(): string })
-  .t;
-let jsx: JsxRuntime;
-let react: ReactRuntime;
-let MemorySummaryDialog: Component;
-let SavedMemoriesDialog: Component;
-
-function ToolIconContent({
-  resolvedApps,
-  shouldBlockExternalEgress,
-  toolIcons,
-}: ToolIconContentProps): unknown {
-  initializeToolIconContent();
-  const icons = toolIcons
-    ?.flatMap((rawIcon, index) => {
-      const icon = rawIcon.trim();
-      const key = `${icon}-${String(index)}`;
-      const builtIn = renderBuiltInToolIcon(icon, key);
-      if (builtIn != null) return [builtIn];
-      const appInfo = resolvedApps.find((app) =>
-        [app.logoUrl, app.logoUrlDark].some(
-          (candidate) =>
-            candidate === icon ||
-            (icon.startsWith("/") && candidate?.endsWith(icon)),
-        ),
-      );
-      const logoUrl =
-        appInfo == null ? resolveRemoteToolIcon(icon, resolvedApps) : null;
-      if (appInfo == null && logoUrl == null) return [];
-      return [
-        jsx.jsx(
-          initial.Dlt,
-          {
-            alt: "",
-            appInfo,
-            className: "icon-xs shrink-0 object-contain",
-            fallback: jsx.jsx(shared.Gm, { "aria-hidden": true }),
-            loadRemote: !shouldBlockExternalEgress,
-            logoUrl,
-          },
-          key,
-        ),
-      ];
-    })
-    .slice(0, 2);
-  if (icons == null || icons.length === 0) return null;
-  return jsx.jsx("span", {
-    className: "flex shrink-0 items-center -space-x-1",
-    children: icons,
-  });
-}
-
-function renderBuiltInToolIcon(icon: string, key: string): unknown | null {
-  const IconAsset = shared.S_;
-  const asset = (name: string) => shared[name];
-  switch (icon) {
-    case "api_tool":
-      return jsx.jsx(
-        shared.Gm,
-        { "aria-hidden": true, className: "icon-xs shrink-0" },
-        key,
-      );
-    case "approved":
-      return jsx.jsx(
-        IconAsset,
-        { className: "shrink-0", asset: asset("fm") },
-        key,
-      );
-    case "book-open":
-      return jsx.jsx(
-        BookOpenIcon,
-        { "aria-hidden": true, className: "icon-xs shrink-0" },
-        key,
-      );
-    case "brush-stroke":
-      return jsx.jsx(
-        IconAsset,
-        { className: "shrink-0", asset: asset("Gl") },
-        key,
-      );
-    case "code":
-    case "run-command":
-      return jsx.jsx(
-        IconAsset,
-        { className: "shrink-0", asset: asset("Tw") },
-        key,
-      );
-    case "code-searching":
-      return jsx.jsx(
-        IconAsset,
-        { className: "shrink-0", asset: asset("Bm") },
-        key,
-      );
-    case "denied":
-      return jsx.jsx(
-        IconAsset,
-        { className: "shrink-0", asset: asset("ul") },
-        key,
-      );
-    case "edit-files":
-      return jsx.jsx(
-        IconAsset,
-        { className: "shrink-0", asset: asset("jT") },
-        key,
-      );
-    case "globe":
-      return jsx.jsx(
-        IconAsset,
-        { className: "shrink-0", asset: asset("gE") },
-        key,
-      );
-    case "library":
-    case "/images/ecosystem/apps/library/icon.png":
-      return jsx.jsx(
-        IconAsset,
-        { className: "shrink-0", asset: asset("HD") },
-        key,
-      );
-    case "list-files":
-      return jsx.jsx(
-        IconAsset,
-        { className: "shrink-0", asset: asset("wE") },
-        key,
-      );
-    case "stop":
-      return jsx.jsx(
-        IconAsset,
-        { className: "shrink-0", asset: asset("Xa") },
-        key,
-      );
-    case "thoughts":
-      return jsx.jsx(
-        IconAsset,
-        { className: "shrink-0", asset: asset("ID") },
-        key,
-      );
+function he(e, t) {
+  switch (e) {
+    case `api_tool`:
+      return (0, K.jsx)(u, { "aria-hidden": !0, className: `icon-xs shrink-0` }, t);
+    case `approved`:
+      return (0, K.jsx)(x, { className: `shrink-0`, asset: ce }, t);
+    case `book-open`:
+      return (0, K.jsx)(fe, { "aria-hidden": !0, className: `icon-xs shrink-0` }, t);
+    case `brush-stroke`:
+      return (0, K.jsx)(x, { className: `shrink-0`, asset: l }, t);
+    case `code`:
+    case `run-command`:
+      return (0, K.jsx)(x, { className: `shrink-0`, asset: C }, t);
+    case `code-searching`:
+      return (0, K.jsx)(x, { className: `shrink-0`, asset: i }, t);
+    case `denied`:
+      return (0, K.jsx)(x, { className: `shrink-0`, asset: F }, t);
+    case `edit-files`:
+      return (0, K.jsx)(x, { className: `shrink-0`, asset: A }, t);
+    case `globe`:
+      return (0, K.jsx)(x, { className: `shrink-0`, asset: k }, t);
+    case `library`:
+    case `/images/ecosystem/apps/library/icon.png`:
+      return (0, K.jsx)(x, { className: `shrink-0`, asset: f }, t);
+    case `list-files`:
+      return (0, K.jsx)(x, { className: `shrink-0`, asset: I }, t);
+    case `stop`:
+      return (0, K.jsx)(x, { className: `shrink-0`, asset: E }, t);
+    case `thoughts`:
+      return (0, K.jsx)(x, { className: `shrink-0`, asset: h }, t);
     default:
       return null;
   }
 }
-
-function resolveRemoteToolIcon(
-  icon: string,
-  apps: readonly ResolvedApp[],
-): string | null {
-  if (icon.startsWith("/") && !icon.startsWith("//")) {
-    const installUrl = apps
-      .find((app) => app.installUrl?.trim())
-      ?.installUrl?.trim();
-    if (installUrl == null) return null;
+function ge(e, t) {
+  if (e.startsWith(`/`) && !e.startsWith(`//`)) {
+    let n = t.find((e) => e.installUrl?.trim())?.installUrl?.trim();
+    if (n == null) return null;
     try {
-      const resolved = new URL(icon, installUrl);
-      return resolved.protocol === "http:" || resolved.protocol === "https:"
-        ? resolved.toString()
-        : null;
+      let t = new URL(e, n);
+      return t.protocol === `http:` || t.protocol === `https:` ? t.toString() : null;
     } catch {
       return null;
     }
   }
-  return icon.startsWith("data:") ||
-    icon.startsWith("https://") ||
-    icon.startsWith("connectors://")
-    ? icon
+  return e.startsWith(`data:`) || e.startsWith(`https://`) || e.startsWith(`connectors://`)
+    ? e
     : null;
 }
-
-function MemoryWriteContent({
-  isParagen,
-  item,
-}: MemoryWriteContentProps): unknown {
-  initializeContent();
-  const accountId = shared.HX<string | null>(initial.U6t);
-  if (item.isUpdating) {
-    return jsx.jsxs("div", {
-      className:
-        "flex items-center gap-1 py-1 text-sm text-secondary select-none",
-      role: "status",
-      children: [
-        jsx.jsx(shared.Qh, { as: "span", className: "icon-2xs" }),
-        jsx.jsx(shared.Y2, {
-          id: "chatgptConversations.memoryWrite.updating",
-          defaultMessage: "Updating memory",
-          description:
-            "Status below a ChatGPT response while a memory write is in progress or awaiting its result.",
-        }),
-      ],
-    });
+var G, K;
+function q() {
+  return (q = e(() => {
+    ((G = t()),
+      w(),
+      y(),
+      N(),
+      oe(),
+      S(),
+      ae(),
+      z(),
+      ne(),
+      r(),
+      re(),
+      L(),
+      V(),
+      a(),
+      v(),
+      de(),
+      (K = m()));
+  }))();
+}
+function _e(e) {
+  let t = (0, J.c)(5),
+    { isParagen: n, item: r } = e,
+    i = p(U);
+  if (r.isUpdating) {
+    let e;
+    return (
+      t[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, X.jsxs)(`div`, {
+            className: `flex items-center gap-1 py-1 text-sm text-secondary select-none`,
+            role: `status`,
+            children: [
+              (0, X.jsx)(b, { as: `span`, className: `icon-2xs` }),
+              (0, X.jsx)(D, {
+                id: `chatgptConversations.memoryWrite.updating`,
+                defaultMessage: `Updating memory`,
+                description: `Status below a ChatGPT response while a memory write is in progress or awaiting its result.`,
+              }),
+            ],
+          })),
+          (t[0] = e))
+        : (e = t[0]),
+      e
+    );
   }
-  return jsx.jsx(
-    MemoryWritePopover,
-    { accountId, isParagen, writes: item.writes },
-    accountId ?? undefined,
+  let a;
+  return (
+    t[1] !== i || t[2] !== n || t[3] !== r.writes
+      ? ((a = (0, X.jsx)(ve, { accountId: i, isParagen: n, writes: r.writes }, i)),
+        (t[1] = i),
+        (t[2] = n),
+        (t[3] = r.writes),
+        (t[4] = a))
+      : (a = t[4]),
+    a
   );
 }
-
-function MemoryWritePopover({
-  accountId,
-  isParagen,
-  writes,
-}: {
-  accountId: string | null;
-  isParagen?: boolean;
-  writes: readonly string[];
-}): unknown {
-  const memoryConfiguration = shared.HX<MemoryConfiguration | null>(
-    initial.yqt,
-  );
-  const canUseMemoryManager =
-    initial.ofn(memoryManagerMode()) &&
-    accountId != null &&
-    memoryConfiguration != null;
-  const [open, setOpen] = react.useState(false);
-  const [dialog, setDialog] = react.useState<"saved" | "summary" | null>(null);
-  const manage = () => {
-    if (!canUseMemoryManager || memoryConfiguration == null) return;
-    setOpen(false);
-    setDialog(
-      memoryConfiguration.m3mEnabled != null && !memoryConfiguration.m3mOptedOut
-        ? "summary"
-        : "saved",
-    );
-  };
-  const trigger = jsx.jsx(shared.Tf, {
-    asChild: true,
-    children: jsx.jsxs(shared.Yh, {
-      className: "text-sm",
-      color: "ghostTertiary",
-      size: "inline",
-      children: [
-        jsx.jsx(shared.Iv, {}),
-        jsx.jsx(shared.Y2, {
-          id: "chatgptConversations.memoryUpdate.label",
-          defaultMessage:
-            "{count, plural, one {Memory updated} other {Memories updated}}",
-          description:
-            "Clickable status in a ChatGPT conversation after memory writes succeed. Opens a popover listing the changes. Count is the number of confirmed writes.",
-          values: { count: writes.length },
-        }),
-      ],
-    }),
-  });
-  const preventFocusRestore = (event: { preventDefault(): void }) => {
-    if (dialog != null) event.preventDefault();
-  };
-  const popover = jsx.jsxs(shared.xf, {
-    open,
-    onOpenChange: setOpen,
-    children: [
-      trigger,
-      jsx.jsx(shared.Cf, {
-        size: "menuWide",
-        variant: "menu",
-        onCloseAutoFocus: preventFocusRestore,
-        children: jsx.jsxs(jsx.Fragment, {
+function ve(e) {
+  let t = (0, J.c)(34),
+    { accountId: n, isParagen: r, writes: i } = e,
+    a = p(ue),
+    s;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`) ? ((s = pe()), (t[0] = s)) : (s = t[0]);
+  let c = le(s),
+    [l, u] = (0, Y.useState)(!1),
+    [d, f] = (0, Y.useState)(null),
+    m = c && n != null && a != null,
+    h;
+  t[1] !== m || t[2] !== a
+    ? ((h = () => {
+        m && (u(!1), f(a.m3mEnabled != null && !a.m3mOptedOut ? `summary` : `saved`));
+      }),
+      (t[1] = m),
+      (t[2] = a),
+      (t[3] = h))
+    : (h = t[3]);
+  let g = h,
+    _;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((_ = (0, X.jsx)(ee, {})), (t[4] = _))
+    : (_ = t[4]);
+  let v;
+  t[5] === i.length
+    ? (v = t[6])
+    : ((v = (0, X.jsx)(te, {
+        asChild: !0,
+        children: (0, X.jsxs)(O, {
+          className: `text-sm`,
+          color: `ghostTertiary`,
+          size: `inline`,
           children: [
-            jsx.jsx("ul", {
-              className: "flex flex-col gap-1",
-              children: writes.map(renderMemoryWrite),
-            }),
-            jsx.jsxs(shared.Yh, {
-              className: "w-full justify-between",
-              color: "ghostSecondary",
-              disabled: !canUseMemoryManager,
-              size: "default",
-              onClick: manage,
-              children: [
-                jsx.jsx(shared.Y2, {
-                  id: "chatgptConversations.memoryWrite.manage",
-                  defaultMessage: "Manage",
-                  description:
-                    "Button below the changed memories in a ChatGPT response popover. Opens Memory summary or legacy Saved memories for the current account.",
-                }),
-                jsx.jsx(shared.my, {}),
-              ],
+            _,
+            (0, X.jsx)(D, {
+              id: `chatgptConversations.memoryUpdate.label`,
+              defaultMessage: `{count, plural, one {Memory updated} other {Memories updated}}`,
+              description: `Clickable status in a ChatGPT conversation after memory writes succeed. Opens a popover listing the changes. Count is the number of confirmed writes.`,
+              values: { count: i.length },
             }),
           ],
         }),
+      })),
+      (t[5] = i.length),
+      (t[6] = v));
+  let y;
+  t[7] === d
+    ? (y = t[8])
+    : ((y = (e) => {
+        d != null && e.preventDefault();
       }),
-    ],
-  });
-  const savedDialog =
-    canUseMemoryManager && dialog === "saved"
-      ? jsx.jsx(SavedMemoriesDialog, {
-          accountId,
-          onClose: () => setDialog(null),
-          onOptBackIn: () => setDialog("summary"),
-        })
-      : null;
-  const summaryDialog =
-    canUseMemoryManager && dialog === "summary"
-      ? jsx.jsx(MemorySummaryDialog, {
-          accountId,
-          contextualHint: isParagen
-            ? undefined
-            : { source: "bio_tool_write", hints: writes },
-          forceRefresh: true,
-          source: "MemoryActionResult",
-          onClose: () => setDialog(null),
-        })
-      : null;
-  return jsx.jsxs(jsx.Fragment, {
-    children: [popover, savedDialog, summaryDialog],
-  });
-}
-
-function renderMemoryWrite(write: string, index: number): unknown {
-  return jsx.jsx(
-    "li",
-    {
-      className:
-        "px-2 py-1.5 text-sm break-words whitespace-pre-wrap select-text first-letter:uppercase",
-      children: write.trim().replace(/^(?:The user|User)(?:'s)? /, ""),
-    },
-    index,
+      (t[7] = d),
+      (t[8] = y));
+  let b;
+  t[9] !== m || t[10] !== g || t[11] !== i
+    ? ((b = (0, X.jsx)(ye, { canManage: m, writes: i, onManage: g })),
+      (t[9] = m),
+      (t[10] = g),
+      (t[11] = i),
+      (t[12] = b))
+    : (b = t[12]);
+  let x;
+  t[13] !== y || t[14] !== b
+    ? ((x = (0, X.jsx)(o, { size: `menuWide`, variant: `menu`, onCloseAutoFocus: y, children: b })),
+      (t[13] = y),
+      (t[14] = b),
+      (t[15] = x))
+    : (x = t[15]);
+  let S;
+  t[16] !== l || t[17] !== v || t[18] !== x
+    ? ((S = (0, X.jsxs)(R, { open: l, onOpenChange: u, children: [v, x] })),
+      (t[16] = l),
+      (t[17] = v),
+      (t[18] = x),
+      (t[19] = S))
+    : (S = t[19]);
+  let C;
+  t[20] !== n || t[21] !== m || t[22] !== d
+    ? ((C =
+        m && d === `saved`
+          ? (0, X.jsx)(Q, { accountId: n, onClose: () => f(null), onOptBackIn: () => f(`summary`) })
+          : null),
+      (t[20] = n),
+      (t[21] = m),
+      (t[22] = d),
+      (t[23] = C))
+    : (C = t[23]);
+  let w;
+  t[24] !== n || t[25] !== m || t[26] !== d || t[27] !== r || t[28] !== i
+    ? ((w =
+        m && d === `summary`
+          ? (0, X.jsx)(Z, {
+              accountId: n,
+              contextualHint: r ? void 0 : { source: `bio_tool_write`, hints: i },
+              forceRefresh: !0,
+              source: `MemoryActionResult`,
+              onClose: () => f(null),
+            })
+          : null),
+      (t[24] = n),
+      (t[25] = m),
+      (t[26] = d),
+      (t[27] = r),
+      (t[28] = i),
+      (t[29] = w))
+    : (w = t[29]);
+  let T;
+  return (
+    t[30] !== w || t[31] !== S || t[32] !== C
+      ? ((T = (0, X.jsxs)(X.Fragment, { children: [S, C, w] })),
+        (t[30] = w),
+        (t[31] = S),
+        (t[32] = C),
+        (t[33] = T))
+      : (T = t[33]),
+    T
   );
 }
-
-let toolIconsInitialized = false;
-function initializeToolIconContent(): void {
-  if (toolIconsInitialized) return;
-  toolIconsInitialized = true;
-  callInitializers([
-    "wE",
-    "LD",
-    "pm",
-    "dl",
-    "TE",
-    "_E",
-    "zm",
-    "Wl",
-    "AT",
-    "Ya",
-    "ww",
-    "Olt",
-    "C_",
-    "Km",
-  ]);
-  (bookOpenChunk as unknown as { n(): void }).n();
-  jsx = shared.I3();
+function ye(e) {
+  let t = (0, J.c)(12),
+    { canManage: n, writes: r, onManage: i } = e,
+    a;
+  t[0] === r ? (a = t[1]) : ((a = r.map(be)), (t[0] = r), (t[1] = a));
+  let o;
+  t[2] === a
+    ? (o = t[3])
+    : ((o = (0, X.jsx)(`ul`, { className: `flex flex-col gap-1`, children: a })),
+      (t[2] = a),
+      (t[3] = o));
+  let s = !n,
+    c,
+    l;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((c = (0, X.jsx)(D, {
+        id: `chatgptConversations.memoryWrite.manage`,
+        defaultMessage: `Manage`,
+        description: `Button below the changed memories in a ChatGPT response popover. Opens Memory summary or legacy Saved memories for the current account.`,
+      })),
+      (l = (0, X.jsx)(M, {})),
+      (t[4] = c),
+      (t[5] = l))
+    : ((c = t[4]), (l = t[5]));
+  let u;
+  t[6] !== i || t[7] !== s
+    ? ((u = (0, X.jsxs)(O, {
+        className: `w-full justify-between`,
+        color: `ghostSecondary`,
+        disabled: s,
+        size: `default`,
+        onClick: i,
+        children: [c, l],
+      })),
+      (t[6] = i),
+      (t[7] = s),
+      (t[8] = u))
+    : (u = t[8]);
+  let d;
+  return (
+    t[9] !== o || t[10] !== u
+      ? ((d = (0, X.jsxs)(X.Fragment, { children: [o, u] })), (t[9] = o), (t[10] = u), (t[11] = d))
+      : (d = t[11]),
+    d
+  );
 }
-
-let contentInitialized = false;
-function initializeContent(): void {
-  initializeToolIconContent();
-  if (contentInitialized) return;
-  contentInitialized = true;
-  callInitializers([
-    "FX",
-    "K2",
-    "Zh",
-    "lw",
-    "qm",
-    "Ef",
-    "$h",
-    "ifn",
-    "Sqt",
-    "H3",
-  ]);
-  react = shared.e6();
-  jsx = shared.I3();
-  MemorySummaryDialog = react.lazy(async () => {
-    const module = await import("@rchunk/chatgpt-about-you-summary-panel");
-    return { default: module.MemorySummaryDialog as Component };
-  }) as Component;
-  SavedMemoriesDialog = react.lazy(async () => {
-    const module = await import("@rchunk/chatgpt-saved-memories-panel");
-    return { default: module.SavedMemoriesDialog as Component };
-  }) as Component;
+function be(e, t) {
+  return (0, X.jsx)(
+    `li`,
+    {
+      className: `px-2 py-1.5 text-sm break-words whitespace-pre-wrap select-text first-letter:uppercase`,
+      children: e.trim().replace(/^(?:The user|User)(?:'s)? /, ``),
+    },
+    t,
+  );
 }
-
-function callInitializers(names: readonly string[]): void {
-  for (const name of names) {
-    const candidate = name in shared ? shared[name] : initial[name];
-    if (typeof candidate === "function") (candidate as () => unknown)();
-  }
+var J, Y, X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((J = t()),
+      c(),
+      (Y = se()),
+      _(),
+      ie(),
+      j(),
+      P(),
+      s(),
+      n(),
+      W(),
+      H(),
+      (X = m()),
+      d(),
+      (Z = g(
+        async () =>
+          (
+            await T(
+              async () => {
+                let { MemorySummaryDialog: e } = await import(
+                  `@rchunk/chatgpt-about-you-summary-panel`
+                );
+                return { MemorySummaryDialog: e };
+              },
+              __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+              import.meta.url,
+            )
+          ).MemorySummaryDialog,
+        { propagateLoadError: !0 },
+      )),
+      (Q = g(async () =>
+        T(
+          async () => {
+            let { SavedMemoriesDialog: e } = await import(`@rchunk/chatgpt-saved-memories-panel`);
+            return { SavedMemoriesDialog: e };
+          },
+          __vite__mapDeps([11, 1, 2, 3, 12, 5, 6, 7, 8, 13]),
+          import.meta.url,
+        ).then(({ SavedMemoriesDialog: e }) => e),
+      )));
+  }))();
 }
-
-initializeToolIconContent();
-export {
-  initializeToolIconContent as i,
-  initializeContent as n,
-  ToolIconContent as r,
-  MemoryWriteContent as t,
-};
+export { q as i, $ as n, me as r, _e as t };

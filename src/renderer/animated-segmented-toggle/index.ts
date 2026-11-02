@@ -1,39 +1,115 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, m4 as joinClasses, type JsxRuntime } from "@rchunk/app-shared";
-
-interface SegmentOption { ariaLabel?: string; id: string; label: unknown }
-interface AnimatedSegmentedToggleProps {
-  animateSelection?: boolean;
-  ariaLabel: string;
-  className?: string;
-  onSelect(id: string): void;
-  options: SegmentOption[];
-  selectedId: string;
-  size?: "compact" | "default";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  I3 as n,
+  a$ as r,
+  e6 as i,
+  h4 as a,
+  m4 as o,
+  o$ as s,
+} from "@rchunk/app-shared";
+function c(e) {
+  let t = (0, l.c)(23),
+    {
+      ariaLabel: n,
+      className: r,
+      options: i,
+      selectedId: a,
+      animateSelection: c,
+      size: f,
+      onSelect: p,
+    } = e,
+    m = c === void 0 || c,
+    h = f === void 0 ? `default` : f,
+    g = (0, u.useId)(),
+    _ =
+      h === `compact`
+        ? `inline-grid gap-0.5 rounded-[10px] bg-surface-secondary/92 p-0.5`
+        : `bg-text/10 inline-grid gap-1 rounded-2xl p-1`,
+    v;
+  t[0] !== r || t[1] !== _ ? ((v = o(_, r)), (t[0] = r), (t[1] = _), (t[2] = v)) : (v = t[2]);
+  let y = `repeat(${i.length}, minmax(0, 1fr))`,
+    b;
+  t[3] === y ? (b = t[4]) : ((b = { gridTemplateColumns: y }), (t[3] = y), (t[4] = b));
+  let x;
+  if (t[5] !== m || t[6] !== g || t[7] !== p || t[8] !== i || t[9] !== a || t[10] !== h) {
+    let e;
+    (t[12] !== m || t[13] !== g || t[14] !== p || t[15] !== a || t[16] !== h
+      ? ((e = (e) => {
+          let t = e.id === a;
+          return (0, d.jsxs)(
+            `button`,
+            {
+              className: o(
+                `cursor-interaction relative isolate min-w-0 transition-transform duration-basic active:scale-[0.98]`,
+                h === `compact`
+                  ? `flex h-6 items-center justify-center rounded-lg px-2 py-0 text-xs leading-4 font-medium focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0`
+                  : `rounded-xl px-3 py-1.5 text-sm font-medium`,
+                t ? (h === `compact` && `text-default`) || `text-black` : `text-secondary`,
+              ),
+              type: `button`,
+              "aria-label": e.ariaLabel,
+              "aria-pressed": t,
+              onClick: () => {
+                p(e.id);
+              },
+              children: [
+                t
+                  ? (0, d.jsx)(s.span, {
+                      layoutId: m ? g : void 0,
+                      className:
+                        h === `compact`
+                          ? `absolute inset-0 -z-10 rounded-lg bg-surface shadow-sm`
+                          : `absolute inset-0 -z-10 rounded-xl bg-white shadow-sm`,
+                      transition: { type: `spring`, duration: 0.28, bounce: 0 },
+                    })
+                  : null,
+                e.label,
+              ],
+            },
+            e.id,
+          );
+        }),
+        (t[12] = m),
+        (t[13] = g),
+        (t[14] = p),
+        (t[15] = a),
+        (t[16] = h),
+        (t[17] = e))
+      : (e = t[17]),
+      (x = i.map(e)),
+      (t[5] = m),
+      (t[6] = g),
+      (t[7] = p),
+      (t[8] = i),
+      (t[9] = a),
+      (t[10] = h),
+      (t[11] = x));
+  } else x = t[11];
+  let S;
+  return (
+    t[18] !== n || t[19] !== v || t[20] !== b || t[21] !== x
+      ? ((S = (0, d.jsx)(`div`, {
+          className: v,
+          role: `group`,
+          "aria-label": n,
+          style: b,
+          children: x,
+        })),
+        (t[18] = n),
+        (t[19] = v),
+        (t[20] = b),
+        (t[21] = x),
+        (t[22] = S))
+      : (S = t[22]),
+    S
+  );
 }
-let runtime: JsxRuntime | undefined;
-function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-
-function t({ animateSelection = true, ariaLabel, className, onSelect, options, selectedId, size = "default" }: AnimatedSegmentedToggleProps): unknown {
-  const compact = size === "compact";
-  return jsx().jsx("div", {
-    "aria-label": ariaLabel,
-    className: joinClasses(compact ? "inline-grid gap-0.5 rounded-[10px] bg-surface-secondary/92 p-0.5" : "bg-text/10 inline-grid gap-1 rounded-2xl p-1", className),
-    role: "group",
-    style: { gridTemplateColumns: `repeat(${options.length}, minmax(0, 1fr))` },
-    children: options.map((option) => {
-      const selected = option.id === selectedId;
-      return jsx().jsxs("button", {
-        "aria-label": option.ariaLabel,
-        "aria-pressed": selected,
-        className: joinClasses("relative isolate min-w-0", compact ? "h-6 rounded-lg px-2 text-xs" : "rounded-xl px-3 py-1.5 text-sm", selected ? "text-default" : "text-secondary"),
-        onClick: () => onSelect(option.id),
-        type: "button",
-        children: [selected ? jsx().jsx("span", { "data-animate-selection": animateSelection ? "" : undefined, className: "absolute inset-0 -z-10 rounded-lg bg-surface shadow-sm" }) : null, option.label],
-      }, option.id);
-    }),
-  });
+var l, u, d;
+function f() {
+  return (f = e(() => {
+    ((l = t()), a(), r(), (u = i()), (d = n()));
+  }))();
 }
-
-function n(): void {}
-export { n, t };
+export { f as n, c as t };

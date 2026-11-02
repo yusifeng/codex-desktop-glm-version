@@ -1,49 +1,132 @@
-// suggestion-card —— 首页 suggestion 的可访问卡片按钮。
-// 原版：app/webview/assets/suggestion-card-f3fce61476bd.js。
-
-import "@rchunk/app-shared";
-
-export interface SuggestionCardProps<TIcon = unknown, TTooltip = unknown> {
-  description?: string | null;
-  disabled?: boolean;
-  icon: TIcon;
-  keyboardShortcut?: string | null;
-  label: string;
-  tooltipContent?: TTooltip;
-  onClick?(): void;
-  /** React useId 的确定性替代，便于 SSR/测试层保持 aria 关联。 */
-  id?: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  I3 as n,
+  c_ as r,
+  e6 as i,
+  h_ as a,
+  m_ as o,
+  o_ as s,
+} from "@rchunk/app-shared";
+function c(e) {
+  let t = (0, l.c)(26),
+    {
+      description: n,
+      disabled: r,
+      icon: i,
+      keyboardShortcut: a,
+      label: c,
+      tooltipContent: f,
+      onClick: p,
+    } = e,
+    m = (0, u.useId)(),
+    h = `${m}-description`,
+    g = `${m}-label`,
+    _ = n == null ? void 0 : h,
+    v;
+  t[0] === i
+    ? (v = t[1])
+    : ((v = (0, d.jsx)(`span`, {
+        className: `[&>svg]:icon-sm flex size-6 shrink-0 items-center justify-start text-info`,
+        children: i,
+      })),
+      (t[0] = i),
+      (t[1] = v));
+  let y;
+  t[2] === a
+    ? (y = t[3])
+    : ((y = a
+        ? (0, d.jsx)(`span`, {
+            className: `shrink-0 text-secondary`,
+            children: (0, d.jsx)(o, { keysLabel: a }),
+          })
+        : null),
+      (t[2] = a),
+      (t[3] = y));
+  let b;
+  t[4] !== v || t[5] !== y
+    ? ((b = (0, d.jsxs)(`span`, {
+        className: `flex w-full items-center justify-between gap-2`,
+        children: [v, y],
+      })),
+      (t[4] = v),
+      (t[5] = y),
+      (t[6] = b))
+    : (b = t[6]);
+  let x;
+  t[7] !== c || t[8] !== g
+    ? ((x = (0, d.jsx)(`span`, {
+        id: g,
+        className: `text-sm leading-5 font-medium text-default`,
+        children: c,
+      })),
+      (t[7] = c),
+      (t[8] = g),
+      (t[9] = x))
+    : (x = t[9]);
+  let S;
+  t[10] !== n || t[11] !== h
+    ? ((S =
+        n == null
+          ? null
+          : (0, d.jsx)(`span`, {
+              id: h,
+              className: `mt-1 line-clamp-2 text-xs leading-4 text-secondary`,
+              children: n,
+            })),
+      (t[10] = n),
+      (t[11] = h),
+      (t[12] = S))
+    : (S = t[12]);
+  let C;
+  t[13] !== x || t[14] !== S
+    ? ((C = (0, d.jsxs)(`span`, {
+        className: `mt-auto flex min-h-10 w-full flex-col justify-end`,
+        children: [x, S],
+      })),
+      (t[13] = x),
+      (t[14] = S),
+      (t[15] = C))
+    : (C = t[15]);
+  let w;
+  t[16] !== r || t[17] !== g || t[18] !== p || t[19] !== _ || t[20] !== b || t[21] !== C
+    ? ((w = (0, d.jsxs)(`button`, {
+        type: `button`,
+        "aria-describedby": _,
+        "aria-labelledby": g,
+        className: `flex h-full min-h-26 w-full min-w-0 cursor-interaction flex-col rounded-2xl border border-primary-outline bg-surface px-4 py-3 text-start shadow-md-strong outline-none hover:bg-primary-ghost-hover focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default disabled:opacity-50 electron:border-0 electron:ring-[0.5px] electron:ring-border-strong`,
+        disabled: r,
+        onClick: p,
+        children: [b, C],
+      })),
+      (t[16] = r),
+      (t[17] = g),
+      (t[18] = p),
+      (t[19] = _),
+      (t[20] = b),
+      (t[21] = C),
+      (t[22] = w))
+    : (w = t[22]);
+  let T;
+  return (
+    t[23] !== w || t[24] !== f
+      ? ((T = (0, d.jsx)(s, {
+          tooltipContent: f,
+          tooltipMaxWidth: `min(24rem, var(--radix-tooltip-content-available-width), calc(100vw - 16px))`,
+          children: w,
+        })),
+        (t[23] = w),
+        (t[24] = f),
+        (t[25] = T))
+      : (T = t[25]),
+    T
+  );
 }
-
-let nextSuggestionCardId = 0;
-
-function SuggestionCard<TIcon, TTooltip>(props: SuggestionCardProps<TIcon, TTooltip>) {
-  const id = props.id ?? `suggestion-card-${++nextSuggestionCardId}`;
-  const descriptionId = `${id}-description`;
-  const labelId = `${id}-label`;
-  return {
-    kind: "suggestion-card" as const,
-    role: "button" as const,
-    type: "button" as const,
-    disabled: props.disabled === true,
-    ariaLabelledBy: labelId,
-    ariaDescribedBy: props.description == null ? undefined : descriptionId,
-    icon: props.icon,
-    keyboardShortcut: props.keyboardShortcut ?? null,
-    label: { id: labelId, text: props.label },
-    description: props.description == null
-      ? null
-      : { id: descriptionId, text: props.description, lineClamp: 2 },
-    tooltip: {
-      content: props.tooltipContent,
-      maxWidth: "min(24rem, var(--radix-tooltip-content-available-width), calc(100vw - 16px))",
-    },
-    activate: () => {
-      if (props.disabled !== true) props.onClick?.();
-    },
-  };
+var l, u, d;
+function f() {
+  return (f = e(() => {
+    ((l = t()), (u = i()), a(), r(), (d = n()));
+  }))();
 }
-
-function initializeSuggestionCard(): void {}
-
-export { initializeSuggestionCard as n, SuggestionCard as t };
+export { f as n, c as t };

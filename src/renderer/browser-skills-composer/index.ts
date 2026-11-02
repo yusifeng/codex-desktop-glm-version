@@ -1,116 +1,220 @@
-// browser-skills-composer —— 浏览器技能的 composer 命令、mention 同步与提交错误提示。
-// 原版：app/webview/assets/composer-ab5081483162.js。
-
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/browser-skills-state";
-import "@rchunk/composer-browser-skills-state";
-import "@rchunk/skill-icon-source";
-
-export interface BrowserSkill {
-  id: string;
-  name: string;
-  displayName?: string;
-  description: string;
-  short_description?: string | null;
-  iconSmall?: unknown;
-  [key: string]: unknown;
-}
-
-export interface BrowserSkillAccount {
-  accountId: string;
-  userId?: string | null;
-}
-
-export interface BrowserSkillMention {
-  kind: "browser-skill";
-  name: string;
-  displayName: string;
-  path: string;
-  description: string;
-  iconSmall?: unknown;
-}
-
-export interface BrowserSkillsComposerProps {
-  surface: string;
-  installedSkills?: BrowserSkill[] | null;
-  account?: BrowserSkillAccount | null;
-  commandsEnabled?: boolean;
-  submissionFailed?: boolean;
-  isSkillEligible?(skill: BrowserSkill, surface: string): boolean;
-  isSkillHidden?(skill: BrowserSkill): boolean;
-  resolveTitle?(skill: BrowserSkill): string;
-  resolveIcon?(skill: BrowserSkill): unknown;
-  insertMention?(mention: BrowserSkillMention): void;
-  focusComposer?(): void;
-  closeCommandMenu?(): void;
-}
-
-function browserSkillPath(skillId: string, account: BrowserSkillAccount): string {
-  return JSON.stringify({ id: skillId, accountId: account.accountId, userId: account.userId ?? null });
-}
-
-function parseBrowserSkillPath(path: string): ({ id: string } & BrowserSkillAccount) | null {
-  try {
-    const value = JSON.parse(path);
-    return typeof value?.id === "string" && typeof value?.accountId === "string" ? value : null;
-  } catch {
-    return null;
-  }
-}
-
-function BrowserSkillsComposer(props: BrowserSkillsComposerProps) {
-  const eligible = (props.installedSkills ?? []).filter((skill) =>
-    (props.isSkillEligible?.(skill, props.surface) ?? true) && !(props.isSkillHidden?.(skill) ?? false),
-  );
-  const commands = props.commandsEnabled === true
-    ? eligible.map((skill) => {
-        const title = props.resolveTitle?.(skill) ?? skill.displayName ?? skill.name;
-        return {
-          id: `browser-skill-${skill.id}`,
-          title,
-          description: skill.short_description?.trim() || skill.description,
-          searchAliases: [skill.name],
-          triggers: ["@", "/"] as const,
-          requiresEmptyComposer: false,
-          group: "Skills",
-          select: async () => {
-            if (props.account == null) return;
-            props.closeCommandMenu?.();
-            props.insertMention?.({
-              kind: "browser-skill",
-              name: title,
-              displayName: title,
-              path: browserSkillPath(skill.id, props.account),
-              description: skill.description,
-              iconSmall: props.resolveIcon?.(skill) ?? skill.iconSmall,
-            });
-            props.focusComposer?.();
-          },
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  K2 as o,
+  LX as s,
+  Y2 as c,
+  dg as l,
+  e6 as u,
+  fg as d,
+  lw as f,
+  n4 as p,
+  nC as m,
+  rC as h,
+} from "@rchunk/app-shared";
+import {
+  BPt as g,
+  Gi as _,
+  HZ as v,
+  KZ as y,
+  RPt as b,
+  Rht as x,
+  UZ as S,
+  VPt as C,
+  VZ as w,
+  WZ as T,
+  a8 as E,
+  i8 as D,
+  kht as O,
+  qi as k,
+  zPt as A,
+} from "@rchunk/app-initial";
+import {
+  _ as j,
+  a as M,
+  b as N,
+  c as P,
+  d as F,
+  g as I,
+  n as L,
+  s as R,
+  u as z,
+  v as B,
+  y as V,
+} from "@rchunk/browser-skills-state";
+import { n as H, t as U } from "@rchunk/composer-browser-skills-state";
+import { n as W, r as G } from "@rchunk/skill-icon-source";
+function K(e) {
+  let t = (0, Y.c)(27),
+    { surface: r } = e,
+    a = s(O),
+    o = p(),
+    l = v(),
+    u = S(l, q, `document`),
+    f = d(),
+    g = i(R),
+    _ = i(P),
+    y = i(H),
+    x = i(F),
+    w = i(M),
+    { data: E } = n(z, `installed`),
+    A;
+  t[0] !== _ || t[1] !== w || t[2] !== r
+    ? ((A = (e) => N(e, r) && I(e, _) && B(e, w) == null),
+      (t[0] = _),
+      (t[1] = w),
+      (t[2] = r),
+      (t[3] = A))
+    : (A = t[3]);
+  let L = (E ?? []).filter(A),
+    V;
+  t[4] !== l.view || t[5] !== x
+    ? ((V = () => {
+        if (x == null || l.view.isDestroyed) return;
+        let e = l.view.state.tr;
+        (e.doc.descendants((t, n) => {
+          if (t.type.name !== `browserSkillMention`) return;
+          let r = typeof t.attrs.path == `string` ? C(t.attrs.path) : null;
+          (r?.accountId !== x.accountId || r?.userId !== (x.userId ?? null)) &&
+            e.delete(e.mapping.map(n), e.mapping.map(n + t.nodeSize));
+        }),
+          e.docChanged && l.view.dispatch(e));
+      }),
+      (t[4] = l.view),
+      (t[5] = x),
+      (t[6] = V))
+    : (V = t[6]);
+  let U;
+  (t[7] !== l || t[8] !== x || t[9] !== u
+    ? ((U = [l, x, u]), (t[7] = l), (t[8] = x), (t[9] = u), (t[10] = U))
+    : (U = t[10]),
+    (0, X.useLayoutEffect)(V, U));
+  let G;
+  t[11] !== l.view || t[12] !== x || t[13] !== E || t[14] !== f
+    ? ((G = () => {
+        let e = () => {
+          if (x == null || l.view.isDestroyed) return;
+          let e = l.view.state.tr;
+          (e.doc.descendants((t, n) => {
+            if (t.type.name !== `browserSkillMention`) return;
+            let r = typeof t.attrs.path == `string` ? C(t.attrs.path) : null;
+            if (r?.accountId !== x.accountId || r?.userId !== (x.userId ?? null)) return;
+            let i = E?.find((e) => e.id === r.id);
+            if (i == null) return;
+            let a = W(i, f);
+            t.attrs.iconSmall !== a && e.setNodeMarkup(n, void 0, { ...t.attrs, iconSmall: a });
+          }),
+            e.docChanged && l.view.dispatch(e.setMeta(`addToHistory`, !1)));
         };
-      })
-    : [];
-
-  return {
-    kind: "browser-skills-composer" as const,
-    eligibleSkills: eligible,
-    commands,
-    submissionError: props.submissionFailed === true
-      ? "Selected skills couldn't be checked. Please try again."
-      : null,
-    reconcileMentions(mentions: BrowserSkillMention[]) {
-      if (props.account == null) return [];
-      return mentions.flatMap((mention) => {
-        const parsed = parseBrowserSkillPath(mention.path);
-        if (parsed?.accountId !== props.account!.accountId || parsed.userId !== (props.account!.userId ?? null)) {
-          return [];
-        }
-        const skill = props.installedSkills?.find((candidate) => candidate.id === parsed.id);
-        if (skill == null) return [mention];
-        return [{ ...mention, iconSmall: props.resolveIcon?.(skill) ?? skill.iconSmall }];
-      });
-    },
-  };
+        return (
+          e(),
+          D(l.view, (t) => {
+            t && e();
+          })
+        );
+      }),
+      (t[11] = l.view),
+      (t[12] = x),
+      (t[13] = E),
+      (t[14] = f),
+      (t[15] = G))
+    : (G = t[15]);
+  let K;
+  (t[16] !== l || t[17] !== x || t[18] !== E || t[19] !== f
+    ? ((K = [l, x, E, f]), (t[16] = l), (t[17] = x), (t[18] = E), (t[19] = f), (t[20] = K))
+    : (K = t[20]),
+    (0, X.useLayoutEffect)(G, K));
+  let J;
+  if (
+    (t[21] !== l || t[22] !== x || t[23] !== f || t[24] !== L
+      ? ((J = [x, L, l, f]), (t[21] = l), (t[22] = x), (t[23] = f), (t[24] = L), (t[25] = J))
+      : (J = t[25]),
+    k(
+      g === !0
+        ? L.map((e) => ({
+            id: `browser-skill-${e.id}`,
+            title: j(e),
+            description: e.short_description?.trim() || e.description,
+            searchAliases: [e.name],
+            triggers: [`@`, `/`],
+            requiresEmptyComposer: !1,
+            group: o.formatMessage({
+              id: `browserSkills.commandGroup`,
+              defaultMessage: `Skills`,
+              description: `Skills group in composer command suggestions`,
+            }),
+            Icon: { 16: m, 20: h },
+            onSelect: async () => {
+              x != null &&
+                (a.set(H, !1),
+                l.insertMentionAtSelection({
+                  kind: `browser-skill`,
+                  name: j(e),
+                  displayName: j(e),
+                  path: b(e.id, x),
+                  description: e.description,
+                  iconSmall: W(e, f),
+                }),
+                l.focus());
+            },
+          }))
+        : [],
+      J,
+    ),
+    !y)
+  )
+    return null;
+  let Q;
+  return (
+    t[26] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((Q = (0, Z.jsx)(T.Attachments, {
+          hasVisibleAttachments: !0,
+          children: (0, Z.jsx)(`span`, {
+            role: `alert`,
+            children: (0, Z.jsx)(c, {
+              id: `browserSkills.submissionFailed`,
+              defaultMessage: `Selected skills couldn't be checked. Please try again.`,
+              description: `The message was not sent because selected skills could not be loaded`,
+            }),
+          }),
+        })),
+        (t[26] = Q))
+      : (Q = t[26]),
+    Q
+  );
 }
-
-export { BrowserSkillsComposer };
+function q(e) {
+  return A(e.getPlainText()).map(J).join(`\0`);
+}
+function J(e) {
+  return e.path;
+}
+var Y, X, Z;
+function Q() {
+  return (Q = e(() => {
+    ((Y = t()),
+      r(),
+      (X = u()),
+      o(),
+      g(),
+      y(),
+      E(),
+      w(),
+      _(),
+      f(),
+      x(),
+      l(),
+      U(),
+      V(),
+      G(),
+      L(),
+      (Z = a()));
+  }))();
+}
+Q();
+export { K as BrowserSkillsComposer };

@@ -1,10 +1,111 @@
-import "@rchunk/rolldown-runtime";
-import * as Adaptive from "@rchunk/adaptive-slider-field";
-type Bounds = { min: number; max: number; step: number }; type Allowed = { kind: "number"; defaultValue: number; min: number; max: number };
-const adaptive = Adaptive as unknown as { i(v: unknown, a: Allowed): number; n(): void; r(i: { allowed: Allowed; bounds?: Bounds; control: { baseMin: number; baseMax: number; step: number }; value: number }): Bounds; t(v: number, c: { baseMin: number; baseMax: number; step: number }, a: Allowed): Bounds };
-let spec: Record<string, unknown>, lengthAllowed: Allowed, widthAllowed: Allowed, heightAllowed: Allowed, lengthControl: Record<string, number | string>, widthControl: Record<string, number | string>, heightControl: Record<string, number | string>, lengthBounds: { baseMin: number; baseMax: number; step: number }, widthBounds: typeof lengthBounds, heightBounds: typeof lengthBounds, template: Record<string, unknown>;
-const controlBounds = (control: Record<string, number | string>) => ({ baseMin: Number(control.min), baseMax: Number(control.max), step: Number(control.step) });
-function initializeSpec(): void { spec = { type: "RECTANGULAR_PRISM_VOLUME", version: 2, thumbnailAssetKey: "rectangular-prism-volume-v1", canonicalFormula: "V = lwh", canonicalFormulaAliases: ["V = l \\times w \\times h", "V = \\ell wh"], parameters: { length: { kind: "number", defaultValue: 4, min: 1, max: 10 }, width: { kind: "number", defaultValue: 3, min: 1, max: 10 }, height: { kind: "number", defaultValue: 2, min: 1, max: 10 } } }; }
-function normalize(v: Record<string, unknown>): Record<string, unknown> { const l = adaptive.i(v.length, lengthAllowed), w = adaptive.i(v.width, widthAllowed), h = adaptive.i(v.height, heightAllowed); return { length: l, lengthBounds: adaptive.r({ allowed: lengthAllowed, bounds: v.lengthBounds as Bounds, control: lengthBounds, value: l }), width: w, widthBounds: adaptive.r({ allowed: widthAllowed, bounds: v.widthBounds as Bounds, control: widthBounds, value: w }), height: h, heightBounds: adaptive.r({ allowed: heightAllowed, bounds: v.heightBounds as Bounds, control: heightBounds, value: h }) }; }
-function initializeTemplate(): void { adaptive.n(); initializeSpec(); const parameters = (spec.parameters as Record<string, Allowed>); lengthAllowed = parameters.length; widthAllowed = parameters.width; heightAllowed = parameters.height; lengthControl = { label: "l", min: 1, max: 10, step: 1, defaultValue: 4, thumbnailDefaultValue: 6 }; widthControl = { label: "w", min: 1, max: 10, step: 1, defaultValue: 3, thumbnailDefaultValue: 4 }; heightControl = { label: "h", min: 1, max: 10, step: 1, defaultValue: 2, thumbnailDefaultValue: 3 }; lengthBounds = controlBounds(lengthControl); widthBounds = controlBounds(widthControl); heightBounds = controlBounds(heightControl); const prop = (c: Record<string, number | string>, b: typeof lengthBounds, a: Allowed) => ({ defaultValue: adaptive.t(Number(c.defaultValue), b, a), thumbnailDefaultValue: adaptive.t(Number(c.thumbnailDefaultValue), b, a) }); template = { properties: { length: lengthControl, lengthBounds: prop(lengthControl, lengthBounds, lengthAllowed), width: widthControl, widthBounds: prop(widthControl, widthBounds, widthAllowed), height: heightControl, heightBounds: prop(heightControl, heightBounds, heightAllowed) } }; }
-export { lengthBounds as a, widthAllowed as c, initializeTemplate as d, normalize as f, lengthAllowed as i, widthBounds as l, spec as m, heightBounds as n, lengthControl as o, initializeSpec as p, heightControl as r, template as s, heightAllowed as t, widthControl as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { i as t, n, r, t as i } from "@rchunk/adaptive-slider-field";
+var a, o, s, c, l, u;
+function d() {
+  return (d = e(() => {
+    ((a = `RECTANGULAR_PRISM_VOLUME`),
+      (o = `rectangular-prism-volume-v1`),
+      (s = `V = lwh`),
+      (c = [`V = l \\times w \\times h`, `V = \\ell wh`]),
+      (l = {
+        length: { kind: `number`, defaultValue: 4, min: 1, max: 10 },
+        width: { kind: `number`, defaultValue: 3, min: 1, max: 10 },
+        height: { kind: `number`, defaultValue: 2, min: 1, max: 10 },
+      }),
+      (u = {
+        type: a,
+        version: 2,
+        thumbnailAssetKey: o,
+        canonicalFormula: s,
+        canonicalFormulaAliases: c,
+        parameters: l,
+      }));
+  }))();
+}
+var f, p, m, h, g, _, v, y, b, x, S, C;
+function w() {
+  return (w = e(() => {
+    (n(),
+      d(),
+      (f = {
+        label: `l`,
+        min: 1,
+        max: 10,
+        step: 1,
+        defaultValue: u.parameters.length.defaultValue,
+        thumbnailDefaultValue: 6,
+      }),
+      (p = {
+        label: `w`,
+        min: 1,
+        max: 10,
+        step: 1,
+        defaultValue: u.parameters.width.defaultValue,
+        thumbnailDefaultValue: 4,
+      }),
+      (m = {
+        label: `h`,
+        min: 1,
+        max: 10,
+        step: 1,
+        defaultValue: u.parameters.height.defaultValue,
+        thumbnailDefaultValue: 3,
+      }),
+      (h = u.parameters.length),
+      (g = u.parameters.width),
+      (_ = u.parameters.height),
+      (v = { baseMin: f.min, baseMax: f.max, step: f.step }),
+      (y = { baseMin: p.min, baseMax: p.max, step: p.step }),
+      (b = { baseMin: m.min, baseMax: m.max, step: m.step }),
+      (x = (e, t, n) => i(e, t, n)),
+      (S = (e) => {
+        let n = t(e.length, h),
+          i = t(e.width, g),
+          a = t(e.height, _);
+        return {
+          length: n,
+          lengthBounds: r({ allowed: h, bounds: e.lengthBounds, control: v, value: n }),
+          width: i,
+          widthBounds: r({ allowed: g, bounds: e.widthBounds, control: y, value: i }),
+          height: a,
+          heightBounds: r({ allowed: _, bounds: e.heightBounds, control: b, value: a }),
+        };
+      }),
+      (C = {
+        properties: {
+          length: f,
+          lengthBounds: {
+            defaultValue: x(f.defaultValue, v, h),
+            thumbnailDefaultValue: x(f.thumbnailDefaultValue, v, h),
+          },
+          width: p,
+          widthBounds: {
+            defaultValue: x(p.defaultValue, y, g),
+            thumbnailDefaultValue: x(p.thumbnailDefaultValue, y, g),
+          },
+          height: m,
+          heightBounds: {
+            defaultValue: x(m.defaultValue, b, _),
+            thumbnailDefaultValue: x(m.thumbnailDefaultValue, b, _),
+          },
+        },
+      }));
+  }))();
+}
+export {
+  v as a,
+  g as c,
+  w as d,
+  S as f,
+  h as i,
+  y as l,
+  u as m,
+  b as n,
+  f as o,
+  d as p,
+  m as r,
+  C as s,
+  _ as t,
+  p as u,
+};

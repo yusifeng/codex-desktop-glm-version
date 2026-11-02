@@ -1,47 +1,80 @@
-// home-suggestion-staggered-item —— Home suggestion 进入/退出时的错峰动效。
-// 原版：app/webview/assets/home-suggestion-staggered-item-832765849b4a.js。
-
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-
-export type HomeSuggestionStaggerVariant = "card" | "feed" | string;
-
-export interface HomeSuggestionStaggeredItemProps<T = unknown> {
-  className?: string;
-  children: T;
-  index: number;
-  variant: HomeSuggestionStaggerVariant;
-  /** 原组件分别从 reduce-motion 与 presence hooks 获取。 */
-  reduceMotion?: boolean;
-  present?: boolean;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, a$ as r, m$ as i, o$ as a, p$ as o } from "@rchunk/app-shared";
+import { Slt as s, xlt as c } from "@rchunk/app-initial";
+function l(e) {
+  let t = (0, u.c)(19),
+    { className: n, children: r, index: o, variant: c } = e,
+    l = s(),
+    f = i(),
+    p = c !== `card`,
+    m = c === `feed` ? Math.min(o, 5) * 0.09 : o * 0.025,
+    h = c === `feed` ? 0.34 : 0.15,
+    g = !f,
+    _ = !f || void 0,
+    v;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((v = { opacity: 1, transform: `translateY(0)` }), (t[0] = v))
+    : (v = t[0]);
+  let y;
+  t[1] !== p || t[2] !== l
+    ? ((y = !l && { opacity: 0, transform: `translateY(${p ? 4 : 8}px)` }),
+      (t[1] = p),
+      (t[2] = l),
+      (t[3] = y))
+    : (y = t[3]);
+  let b;
+  t[4] !== l || t[5] !== c
+    ? ((b = c === `feed` ? { opacity: 0, transition: { duration: l ? 0 : 0.12 } } : void 0),
+      (t[4] = l),
+      (t[5] = c),
+      (t[6] = b))
+    : (b = t[6]);
+  let x = l ? 0 : m,
+    S = l ? 0 : h,
+    C;
+  t[7] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((C = [0.23, 1, 0.32, 1]), (t[7] = C))
+    : (C = t[7]);
+  let w;
+  t[8] !== x || t[9] !== S
+    ? ((w = { delay: x, duration: S, ease: C }), (t[8] = x), (t[9] = S), (t[10] = w))
+    : (w = t[10]);
+  let T;
+  return (
+    t[11] !== r ||
+    t[12] !== n ||
+    t[13] !== g ||
+    t[14] !== _ ||
+    t[15] !== y ||
+    t[16] !== b ||
+    t[17] !== w
+      ? ((T = (0, d.jsx)(a.div, {
+          className: n,
+          inert: g,
+          "aria-hidden": _,
+          animate: v,
+          initial: y,
+          exit: b,
+          transition: w,
+          children: r,
+        })),
+        (t[11] = r),
+        (t[12] = n),
+        (t[13] = g),
+        (t[14] = _),
+        (t[15] = y),
+        (t[16] = b),
+        (t[17] = w),
+        (t[18] = T))
+      : (T = t[18]),
+    T
+  );
 }
-
-function HomeSuggestionStaggeredItem<T>(props: HomeSuggestionStaggeredItemProps<T>) {
-  const reduceMotion = props.reduceMotion === true;
-  const present = props.present ?? true;
-  const feed = props.variant === "feed";
-  const card = props.variant === "card";
-  const delay = reduceMotion ? 0 : feed ? Math.min(props.index, 5) * 0.09 : props.index * 0.025;
-  const duration = reduceMotion ? 0 : feed ? 0.34 : 0.15;
-
-  return {
-    kind: "home-suggestion-staggered-item" as const,
-    className: props.className,
-    inert: !present,
-    ariaHidden: !present || undefined,
-    animate: { opacity: 1, transform: "translateY(0)" },
-    initial: reduceMotion
-      ? false
-      : { opacity: 0, transform: `translateY(${card ? 8 : 4}px)` },
-    exit: feed ? { opacity: 0, transition: { duration: reduceMotion ? 0 : 0.12 } } : undefined,
-    transition: { delay, duration, ease: [0.23, 1, 0.32, 1] as const },
-    children: props.children,
-  };
+var u, d;
+function f() {
+  return (f = e(() => {
+    ((u = t()), r(), o(), c(), (d = n()));
+  }))();
 }
-
-function initializeHomeSuggestionStaggeredItem(): void {}
-
-export {
-  initializeHomeSuggestionStaggeredItem as n,
-  HomeSuggestionStaggeredItem as t,
-};
+export { f as n, l as t };

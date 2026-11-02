@@ -1,69 +1,111 @@
-// Lotka-Volterra predator-prey trajectories integrated with RK4.
-import "@rchunk/rolldown-runtime";
-
-type StartingBalance = "balanced" | "prey-surge" | "predator-surge";
-interface PredatorPreyValues { initial_prey_abundance?: number | null; initial_predator_abundance?: number | null; startingBalance?: unknown; selectedTime?: number | null }
-
-const predatorPreySpecification = { type: "PREDATOR_PREY_DYNAMICS", version: 3, thumbnailAssetKey: "predator-prey-dynamics-v1", parameters: { initial_prey_abundance: { kind: "number" as const, defaultValue: 1.4, min: 0.65, max: 1.4 }, initial_predator_abundance: { kind: "number" as const, defaultValue: 0.65, min: 0.65, max: 1.4 } } };
-const preyParameter = predatorPreySpecification.parameters.initial_prey_abundance;
-const predatorParameter = predatorPreySpecification.parameters.initial_predator_abundance;
-const simulationDuration = 20;
-const simulationSteps = 500;
-const surgeMultiplier = 2;
-const steadyTolerance = 1e-6;
-const maximumCachedTrajectories = 24;
-const trajectoryCache = new Map<string, { preyPoints: Array<{ x: number; y: number }>; predatorPoints: Array<{ x: number; y: number }> }>();
-const selectedTimeControl = { min: 0, max: simulationDuration, step: 0.25, defaultValue: 4 };
-const defaultPredatorPreyValues = { initial_prey_abundance: preyParameter.defaultValue, initial_predator_abundance: predatorParameter.defaultValue, startingBalance: "balanced" as StartingBalance, selectedTime: selectedTimeControl.defaultValue };
-const finiteOrDefault = (value: unknown, defaultValue: number): number => typeof value === "number" && Number.isFinite(value) ? value : defaultValue;
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const isStartingBalance = (value: unknown): value is StartingBalance => value === "balanced" || value === "prey-surge" || value === "predator-surge";
-const normalizePredatorPreyValues = (values: PredatorPreyValues) => ({
-  initial_prey_abundance: clamp(finiteOrDefault(values.initial_prey_abundance, defaultPredatorPreyValues.initial_prey_abundance), preyParameter.min, preyParameter.max),
-  initial_predator_abundance: clamp(finiteOrDefault(values.initial_predator_abundance, defaultPredatorPreyValues.initial_predator_abundance), predatorParameter.min, predatorParameter.max),
-  startingBalance: isStartingBalance(values.startingBalance) ? values.startingBalance : defaultPredatorPreyValues.startingBalance,
-  selectedTime: clamp(finiteOrDefault(values.selectedTime, defaultPredatorPreyValues.selectedTime), selectedTimeControl.min, selectedTimeControl.max),
-});
-const predatorPreyDerivative = (prey: number, predator: number) => ({ prey: prey * (1 - predator), predator: predator * (prey - 1) });
-const rk4Step = (prey: number, predator: number, stepSize: number) => {
-  const first = predatorPreyDerivative(prey, predator);
-  const second = predatorPreyDerivative(prey + first.prey * stepSize / 2, predator + first.predator * stepSize / 2);
-  const third = predatorPreyDerivative(prey + second.prey * stepSize / 2, predator + second.predator * stepSize / 2);
-  const fourth = predatorPreyDerivative(prey + third.prey * stepSize, predator + third.predator * stepSize);
-  return { prey: prey + stepSize * (first.prey + 2 * second.prey + 2 * third.prey + fourth.prey) / 6, predator: predator + stepSize * (first.predator + 2 * second.predator + 2 * third.predator + fourth.predator) / 6 };
-};
-const directionForDerivative = (value: number): "steady" | "rising" | "falling" => Math.abs(value) <= steadyTolerance ? "steady" : value > 0 ? "rising" : "falling";
-const trajectoryForValues = (values: ReturnType<typeof normalizePredatorPreyValues>) => {
-  const key = [values.initial_prey_abundance, values.initial_predator_abundance, values.startingBalance].join(":");
-  const cached = trajectoryCache.get(key);
-  if (cached) return cached;
-  let prey = values.initial_prey_abundance * (values.startingBalance === "prey-surge" ? surgeMultiplier : 1);
-  let predator = values.initial_predator_abundance * (values.startingBalance === "predator-surge" ? surgeMultiplier : 1);
-  const stepSize = simulationDuration / simulationSteps;
-  const preyPoints: Array<{ x: number; y: number }> = [];
-  const predatorPoints: Array<{ x: number; y: number }> = [];
-  for (let step = 0; step <= simulationSteps; step += 1) { const x = step * stepSize; preyPoints.push({ x, y: prey }); predatorPoints.push({ x, y: predator }); if (step < simulationSteps) ({ prey, predator } = rk4Step(prey, predator, stepSize)); }
-  const trajectory = { preyPoints, predatorPoints };
-  trajectoryCache.set(key, trajectory);
-  if (trajectoryCache.size > maximumCachedTrajectories) { const oldestKey = trajectoryCache.keys().next().value; if (oldestKey !== undefined) trajectoryCache.delete(oldestKey); }
-  return trajectory;
-};
-const calculatePredatorPrey = (values: PredatorPreyValues) => {
-  const normalized = normalizePredatorPreyValues(values);
-  const trajectory = trajectoryForValues(normalized);
-  const continuousIndex = normalized.selectedTime / simulationDuration * simulationSteps;
-  const lowerIndex = Math.floor(continuousIndex);
-  const upperIndex = Math.min(simulationSteps, lowerIndex + 1);
-  const fraction = continuousIndex - lowerIndex;
-  const prey = trajectory.preyPoints[lowerIndex].y * (1 - fraction) + trajectory.preyPoints[upperIndex].y * fraction;
-  const predator = trajectory.predatorPoints[lowerIndex].y * (1 - fraction) + trajectory.predatorPoints[upperIndex].y * fraction;
-  const derivative = predatorPreyDerivative(prey, predator);
-  const preyDirection = directionForDerivative(derivative.prey);
-  const predatorDirection = directionForDerivative(derivative.predator);
-  return { values: normalized, ...trajectory, prey, predator, preyDirection, predatorDirection, isEquilibrium: preyDirection === "steady" && predatorDirection === "steady" };
-};
-
-function initializePredatorPreySpecification(): void {}
-function initializePredatorPreyModel(): void {}
-
-export { initializePredatorPreySpecification as a, initializePredatorPreyModel as i, selectedTimeControl as n, predatorPreySpecification as o, calculatePredatorPrey as r, defaultPredatorPreyValues as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `PREDATOR_PREY_DYNAMICS`),
+      (n = `predator-prey-dynamics-v1`),
+      (r = {
+        initial_prey_abundance: { kind: `number`, defaultValue: 1.4, min: 0.65, max: 1.4 },
+        initial_predator_abundance: { kind: `number`, defaultValue: 0.65, min: 0.65, max: 1.4 },
+      }),
+      (i = { type: t, version: 3, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w;
+function T() {
+  return (T = e(() => {
+    (a(),
+      (o = i.parameters.initial_prey_abundance),
+      (s = i.parameters.initial_predator_abundance),
+      (c = 20),
+      (l = 500),
+      (u = 2),
+      (d = 1e-6),
+      (f = 24),
+      (p = new Map()),
+      (m = { min: 0, max: c, step: 0.25, defaultValue: 4 }),
+      (h = {
+        initial_prey_abundance: o.defaultValue,
+        initial_predator_abundance: s.defaultValue,
+        startingBalance: `balanced`,
+        selectedTime: m.defaultValue,
+      }),
+      (g = (e, t) => (typeof e == `number` && Number.isFinite(e) ? e : t)),
+      (_ = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (v = (e) => e === `balanced` || e === `prey-surge` || e === `predator-surge`),
+      (y = (e) => ({
+        initial_prey_abundance: _(
+          g(e.initial_prey_abundance, h.initial_prey_abundance),
+          o.min,
+          o.max,
+        ),
+        initial_predator_abundance: _(
+          g(e.initial_predator_abundance, h.initial_predator_abundance),
+          s.min,
+          s.max,
+        ),
+        startingBalance: v(e.startingBalance) ? e.startingBalance : h.startingBalance,
+        selectedTime: _(g(e.selectedTime, h.selectedTime), m.min, m.max),
+      })),
+      (b = (e, t) => ({ prey: e * (1 - t), predator: t * (e - 1) })),
+      (x = (e, t, n) => {
+        let r = b(e, t),
+          i = b(e + (r.prey * n) / 2, t + (r.predator * n) / 2),
+          a = b(e + (i.prey * n) / 2, t + (i.predator * n) / 2),
+          o = b(e + a.prey * n, t + a.predator * n);
+        return {
+          prey: e + (n * (r.prey + 2 * i.prey + 2 * a.prey + o.prey)) / 6,
+          predator: t + (n * (r.predator + 2 * i.predator + 2 * a.predator + o.predator)) / 6,
+        };
+      }),
+      (S = (e) => (Math.abs(e) <= d ? `steady` : e > 0 ? `rising` : `falling`)),
+      (C = (e) => {
+        let t = [e.initial_prey_abundance, e.initial_predator_abundance, e.startingBalance].join(
+            `:`,
+          ),
+          n = p.get(t);
+        if (n) return n;
+        let r = e.initial_prey_abundance * (e.startingBalance === `prey-surge` ? u : 1),
+          i = e.initial_predator_abundance * (e.startingBalance === `predator-surge` ? u : 1),
+          a = c / l,
+          o = [],
+          s = [];
+        for (let e = 0; e <= l; e += 1) {
+          let t = e * a;
+          (o.push({ x: t, y: r }),
+            s.push({ x: t, y: i }),
+            e < l && ({ prey: r, predator: i } = x(r, i, a)));
+        }
+        let d = { preyPoints: o, predatorPoints: s };
+        if ((p.set(t, d), p.size > f)) {
+          let e = p.keys().next().value;
+          e !== void 0 && p.delete(e);
+        }
+        return d;
+      }),
+      (w = (e) => {
+        let t = y(e),
+          n = C(t),
+          r = (t.selectedTime / c) * l,
+          i = Math.floor(r),
+          a = Math.min(l, i + 1),
+          o = r - i,
+          s = n.preyPoints[i].y * (1 - o) + n.preyPoints[a].y * o,
+          u = n.predatorPoints[i].y * (1 - o) + n.predatorPoints[a].y * o,
+          d = b(s, u),
+          f = S(d.prey),
+          p = S(d.predator);
+        return {
+          values: t,
+          ...n,
+          prey: s,
+          predator: u,
+          preyDirection: f,
+          predatorDirection: p,
+          isEquilibrium: f === `steady` && p === `steady`,
+        };
+      }));
+  }))();
+}
+export { a, T as i, m as n, i as o, w as r, h as t };

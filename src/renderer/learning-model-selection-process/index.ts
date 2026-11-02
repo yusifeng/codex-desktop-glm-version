@@ -1,74 +1,92 @@
-// Deterministic token draws for permutation and combination selection processes.
-import "@rchunk/rolldown-runtime";
-
-type SelectionMode = "ordered-with-replacement" | "ordered-without-replacement" | "unordered-without-replacement";
-interface SelectionProcessOptions { mode: SelectionMode; optionCount: number; selectionCount: number }
-interface SelectionDraw { availableTokenIds: number[]; drawIndex: number; selectedTokenId: number; resultIndex: number }
-interface SelectionProcess { draws: SelectionDraw[]; durationSeconds: number; mode: SelectionMode; optionCount: number; resultTokenIds: number[]; selectionCount: number; selectionOrderTokenIds: number[]; signature: string }
-
-const drawDurationSeconds = 1.25;
-const selectedPhaseStart = 0.24;
-const movingPhaseStart = 0.34;
-const placedPhaseStart = 0.84;
-const hashString = (value: string): number => {
-  let hash = 2166136261;
-  for (let index = 0; index < value.length; index += 1) { hash ^= value.charCodeAt(index); hash = Math.imul(hash, 16777619); }
-  return hash >>> 0;
-};
-const seededRandom = (seed: number): (() => number) => {
-  let state = seed;
-  return () => {
-    state += 1831565813;
-    let value = state;
-    value = Math.imul(value ^ value >>> 15, value | 1);
-    value ^= value + Math.imul(value ^ value >>> 7, value | 61);
-    return ((value ^ value >>> 14) >>> 0) / 4294967296;
-  };
-};
-const uniformIndex = (randomValue: number, possibilityCount: number): number => {
-  if (!Number.isInteger(possibilityCount) || possibilityCount < 1) throw new Error("A uniform selection needs at least one possibility");
-  return Math.floor(Math.min(Math.max(randomValue, 0), 1 - 2 ** -52) * possibilityCount);
-};
-const smoothstep = (value: number): number => value * value * (3 - 2 * value);
-const buildSelectionProcess = ({ mode, optionCount, selectionCount }: SelectionProcessOptions): SelectionProcess => {
-  if (!Number.isInteger(optionCount) || optionCount < 1) throw new Error("optionCount must be a positive integer");
-  if (!Number.isInteger(selectionCount) || selectionCount < 1) throw new Error("selectionCount must be a positive integer");
-  if (mode !== "ordered-with-replacement" && selectionCount > optionCount) throw new Error("Selections without replacement cannot exceed the options");
-  const tokenIds = Array.from({ length: optionCount }, (_, index) => index + 1);
-  const random = seededRandom(hashString(`selection-process:${optionCount}:${selectionCount}`));
-  let availableTokenIds = tokenIds;
-  const rawDraws: Array<Omit<SelectionDraw, "resultIndex">> = [];
-  for (let drawIndex = 0; drawIndex < selectionCount; drawIndex += 1) {
-    const availableAtDraw = [...availableTokenIds];
-    const selectedTokenId = availableAtDraw[uniformIndex(random(), availableAtDraw.length)];
-    rawDraws.push({ availableTokenIds: availableAtDraw, drawIndex, selectedTokenId });
-    if (mode !== "ordered-with-replacement") availableTokenIds = availableTokenIds.filter((tokenId) => tokenId !== selectedTokenId);
-  }
-  const selectionOrderTokenIds = rawDraws.map(({ selectedTokenId }) => selectedTokenId);
-  const resultTokenIds = mode === "unordered-without-replacement" ? [...selectionOrderTokenIds].sort((left, right) => left - right) : selectionOrderTokenIds;
-  return {
-    draws: rawDraws.map((draw) => ({ ...draw, resultIndex: mode === "unordered-without-replacement" ? resultTokenIds.indexOf(draw.selectedTokenId) : draw.drawIndex })),
-    durationSeconds: selectionCount * drawDurationSeconds, mode, optionCount, resultTokenIds, selectionCount, selectionOrderTokenIds,
-    signature: `${mode}:${optionCount}:${selectionCount}:${selectionOrderTokenIds.join("-")}`,
-  };
-};
-const selectionFrameAtTime = (process: SelectionProcess, timeSeconds: number) => {
-  const elapsed = Math.min(Math.max(Number.isFinite(timeSeconds) ? timeSeconds : 0, 0), process.durationSeconds);
-  const complete = elapsed === process.durationSeconds;
-  const activeDrawIndex = complete ? process.draws.length - 1 : Math.min(Math.floor(elapsed / drawDurationSeconds), process.draws.length - 1);
-  const drawProgress = complete ? 1 : (elapsed - activeDrawIndex * drawDurationSeconds) / drawDurationSeconds;
-  const movementProgress = smoothstep(Math.min(Math.max((drawProgress - movingPhaseStart) / (placedPhaseStart - movingPhaseStart), 0), 1));
-  const phase = drawProgress < selectedPhaseStart ? "available" : drawProgress < movingPhaseStart ? "selected" : drawProgress < placedPhaseStart ? "moving" : "placed";
-  return { activeDraw: process.draws[activeDrawIndex], activeDrawIndex, movementProgress, phase, settledDrawCount: activeDrawIndex + Number(phase === "placed") };
-};
-const countOrderedSelections = (optionCount: number, selectionCount: number, withReplacement: boolean): number => withReplacement ? optionCount ** selectionCount : Array.from({ length: selectionCount }, (_, index) => optionCount - index).reduce((product, value) => product * value, 1);
-const countCombinations = (optionCount: number, selectionCount: number): number => {
-  const smallerSelection = Math.min(selectionCount, optionCount - selectionCount);
-  let result = 1;
-  for (let index = 1; index <= smallerSelection; index += 1) result = result * (optionCount - smallerSelection + index) / index;
-  return Math.round(result);
-};
-
-function initializeSelectionProcessModel(): void {}
-
-export { initializeSelectionProcessModel as a, selectionFrameAtTime as i, countOrderedSelections as n, countCombinations as r, buildSelectionProcess as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    ((t = 1.25),
+      (n = 0.24),
+      (r = 0.34),
+      (i = 0.84),
+      (a = (e) => {
+        let t = 2166136261;
+        for (let n = 0; n < e.length; n += 1)
+          ((t ^= e.charCodeAt(n)), (t = Math.imul(t, 16777619)));
+        return t >>> 0;
+      }),
+      (o = (e) => {
+        let t = e;
+        return () => {
+          t += 1831565813;
+          let e = t;
+          return (
+            (e = Math.imul(e ^ (e >>> 15), e | 1)),
+            (e ^= e + Math.imul(e ^ (e >>> 7), e | 61)),
+            ((e ^ (e >>> 14)) >>> 0) / 4294967296
+          );
+        };
+      }),
+      (s = (e, t) => {
+        if (!Number.isInteger(t) || t < 1)
+          throw Error(`A uniform selection needs at least one possibility`);
+        return Math.floor(Math.min(Math.max(e, 0), 1 - 2 ** -52) * t);
+      }),
+      (c = (e) => e * e * (3 - 2 * e)),
+      (l = ({ mode: e, optionCount: n, selectionCount: r }) => {
+        if (!Number.isInteger(n) || n < 1) throw Error(`optionCount must be a positive integer`);
+        if (!Number.isInteger(r) || r < 1) throw Error(`selectionCount must be a positive integer`);
+        if (e !== `ordered-with-replacement` && r > n)
+          throw Error(`Selections without replacement cannot exceed the options`);
+        let i = Array.from({ length: n }, (e, t) => t + 1),
+          c = o(a(`selection-process:${n}:${r}`)),
+          l = i,
+          u = [];
+        for (let t = 0; t < r; t += 1) {
+          let n = [...l],
+            r = n[s(c(), n.length)];
+          (u.push({ availableTokenIds: n, drawIndex: t, selectedTokenId: r }),
+            e !== `ordered-with-replacement` && (l = l.filter((e) => e !== r)));
+        }
+        let d = u.map((e) => e.selectedTokenId),
+          f = e === `unordered-without-replacement` ? [...d].sort((e, t) => e - t) : d;
+        return {
+          draws: u.map((t) => ({
+            ...t,
+            resultIndex:
+              e === `unordered-without-replacement` ? f.indexOf(t.selectedTokenId) : t.drawIndex,
+          })),
+          durationSeconds: r * t,
+          mode: e,
+          optionCount: n,
+          resultTokenIds: f,
+          selectionCount: r,
+          selectionOrderTokenIds: d,
+          signature: `${e}:${n}:${r}:${d.join(`-`)}`,
+        };
+      }),
+      (u = (e, a) => {
+        let o = Math.min(Math.max(Number.isFinite(a) ? a : 0, 0), e.durationSeconds),
+          s = o === e.durationSeconds,
+          l = s ? e.draws.length - 1 : Math.min(Math.floor(o / t), e.draws.length - 1),
+          u = s ? 1 : (o - l * t) / t,
+          d = (u - r) / 0.49999999999999994,
+          f = c(Math.min(Math.max(d, 0), 1)),
+          p = u < n ? `available` : u < r ? `selected` : u < i ? `moving` : `placed`;
+        return {
+          activeDraw: e.draws[l],
+          activeDrawIndex: l,
+          movementProgress: f,
+          phase: p,
+          settledDrawCount: l + +(p === `placed`),
+        };
+      }),
+      (d = (e, t, n) =>
+        n ? e ** t : Array.from({ length: t }, (t, n) => e - n).reduce((e, t) => e * t, 1)),
+      (f = (e, t) => {
+        let n = Math.min(t, e - t),
+          r = 1;
+        for (let t = 1; t <= n; t += 1) r = (r * (e - n + t)) / t;
+        return Math.round(r);
+      }));
+  }))();
+}
+export { p as a, u as i, d as n, f as r, l as t };

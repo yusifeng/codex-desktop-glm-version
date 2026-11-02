@@ -1,68 +1,75 @@
-// Money-market supply-and-demand learning model. Release chunk: model-6bc352ee4868.js.
-import "@rchunk/rolldown-runtime";
-
-type MarketChange = "baseline" | "money supply increases" | "money supply decreases" | "money demand increases" | "money demand decreases";
-interface MoneyMarketValues { initial_market_change?: string | null; interestRate?: number | null }
-interface MoneyMarketManifest {
-  type: string; version: number; thumbnailAssetKey: string;
-  parameters: { initial_market_change: { kind: "enum"; defaultValue: MarketChange; allowedValues: MarketChange[] } };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `MONEY_MARKET`),
+      (n = `money-market-v1`),
+      (r = {
+        initial_market_change: {
+          kind: `enum`,
+          defaultValue: `baseline`,
+          allowedValues: [
+            `baseline`,
+            `money supply increases`,
+            `money supply decreases`,
+            `money demand increases`,
+            `money demand decreases`,
+          ],
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-let moneyMarketManifest: MoneyMarketManifest;
-let marketChanges: MarketChange[];
-let interestRateControl: { min: number; max: number; step: number };
-let calculateMoneyMarket: (values: MoneyMarketValues) => {
-  initial_market_change: MarketChange; interestRate: number; suppliedQuantity: number; desiredQuantity: number; equilibriumRate: number;
-  demandShift: number; supplyShift: number; demandLine: { from: { x: number; y: number }; to: { x: number; y: number } };
-  imbalance: number; status: "equilibrium" | "excess demand" | "excess supply";
-};
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeMoneyMarketManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  moneyMarketManifest = {
-    type: "MONEY_MARKET", version: 2, thumbnailAssetKey: "money-market-v1",
-    parameters: {
-      initial_market_change: {
-        kind: "enum", defaultValue: "baseline",
-        allowedValues: ["baseline", "money supply increases", "money supply decreases", "money demand increases", "money demand decreases"],
-      },
-    },
-  };
+var o, s, c, l, u;
+function d() {
+  return (d = e(() => {
+    (a(),
+      (o = i.parameters.initial_market_change.allowedValues),
+      (s = { min: 2, max: 10, step: 0.5 }),
+      (c = (e) => typeof e == `string` && o.some((t) => t === e)),
+      (l = (e) => ({
+        initial_market_change: c(e.initial_market_change)
+          ? e.initial_market_change
+          : i.parameters.initial_market_change.defaultValue,
+        interestRate: Number.isFinite(e.interestRate)
+          ? Math.min(s.max, Math.max(s.min, e.interestRate))
+          : 6,
+      })),
+      (u = (e) => {
+        let t = l(e),
+          n =
+            t.initial_market_change === `money supply increases`
+              ? 20
+              : t.initial_market_change === `money supply decreases`
+                ? -20
+                : 0,
+          r =
+            t.initial_market_change === `money demand increases`
+              ? 20
+              : t.initial_market_change === `money demand decreases`
+                ? -20
+                : 0,
+          i = 60 + n,
+          a = 120 + r - 10 * t.interestRate,
+          o = (120 + r - i) / 10,
+          s = a - i,
+          c = {
+            from: { x: Math.max(0, r), y: 12 + Math.min(0, r) / 10 },
+            to: { x: 120 + r, y: 0 },
+          };
+        return {
+          ...t,
+          suppliedQuantity: i,
+          desiredQuantity: a,
+          equilibriumRate: o,
+          demandShift: r,
+          supplyShift: n,
+          demandLine: c,
+          imbalance: s,
+          status: Math.abs(s) < 0.01 ? `equilibrium` : s > 0 ? `excess demand` : `excess supply`,
+        };
+      }));
+  }))();
 }
-
-function initializeMoneyMarketModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeMoneyMarketManifest();
-  marketChanges = moneyMarketManifest.parameters.initial_market_change.allowedValues;
-  interestRateControl = { min: 2, max: 10, step: 0.5 };
-  const isMarketChange = (value: unknown): value is MarketChange =>
-    typeof value === "string" && marketChanges.some(change => change === value);
-  calculateMoneyMarket = values => {
-    const initialMarketChange = isMarketChange(values.initial_market_change)
-      ? values.initial_market_change
-      : moneyMarketManifest.parameters.initial_market_change.defaultValue;
-    const interestRate = typeof values.interestRate === "number" && Number.isFinite(values.interestRate)
-      ? Math.min(interestRateControl.max, Math.max(interestRateControl.min, values.interestRate))
-      : 6;
-    const supplyShift = initialMarketChange === "money supply increases" ? 20 : initialMarketChange === "money supply decreases" ? -20 : 0;
-    const demandShift = initialMarketChange === "money demand increases" ? 20 : initialMarketChange === "money demand decreases" ? -20 : 0;
-    const suppliedQuantity = 60 + supplyShift;
-    const desiredQuantity = 120 + demandShift - 10 * interestRate;
-    const equilibriumRate = (120 + demandShift - suppliedQuantity) / 10;
-    const imbalance = desiredQuantity - suppliedQuantity;
-    return {
-      initial_market_change: initialMarketChange, interestRate, suppliedQuantity, desiredQuantity, equilibriumRate, demandShift, supplyShift,
-      demandLine: { from: { x: Math.max(0, demandShift), y: 12 + Math.min(0, demandShift) / 10 }, to: { x: 120 + demandShift, y: 0 } },
-      imbalance, status: Math.abs(imbalance) < 0.01 ? "equilibrium" : imbalance > 0 ? "excess demand" : "excess supply",
-    };
-  };
-}
-
-export {
-  initializeMoneyMarketManifest as a, initializeMoneyMarketModel as i, interestRateControl as n,
-  moneyMarketManifest as o, calculateMoneyMarket as r, marketChanges as t,
-};
+export { a, d as i, s as n, i as o, u as r, o as t };

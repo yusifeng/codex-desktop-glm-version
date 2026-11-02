@@ -1,17 +1,55 @@
-// Finite partial sums and convergence behavior for a geometric series.
-import "@rchunk/rolldown-runtime";
-import "@rchunk/adaptive-slider-field";
-
-interface GeometricValues { a?: number | null; r?: number | null }
-interface NumberParameter { defaultValue: number; min: number; max: number }
-const geometricType = "GEOMETRIC_SERIES"; const geometricThumbnail = "geometric-series-v1"; const geometricFormula = "\\sum_{k=0}^{\\infty} ar^k = \\frac{a}{1-r},\\quad |r|<1";
-const geometricParameters = { r: { kind: "number", defaultValue: 0.5, min: -10, max: 10 } }; const geometricDefinition = { type: geometricType, version: 1, thumbnailAssetKey: geometricThumbnail, canonicalFormula: geometricFormula, parameters: geometricParameters };
-const initialTermParameter = { defaultValue: 1, min: -1000, max: 1000 }; const ratioParameter = geometricDefinition.parameters.r; const equalityTolerance = 1e-10;
-const normalizeParameter = (value: number | null | undefined, parameter: NumberParameter): number => Number.isFinite(value) ? Math.min(parameter.max, Math.max(parameter.min, value as number)) : parameter.defaultValue;
-const approximatelyEqual = (first: number, second: number): boolean => Math.abs(first - second) <= equalityTolerance;
-const normalizeGeometricValues = (values: GeometricValues) => ({ a: normalizeParameter(values.a, initialTermParameter), r: normalizeParameter(values.r, ratioParameter) });
-const geometricStatus = ({ a, r }: ReturnType<typeof normalizeGeometricValues>) => approximatelyEqual(a, 0) ? "zero" : Math.abs(r) < 1 ? "convergent" : approximatelyEqual(r, 1) ? "linear-divergence" : approximatelyEqual(r, -1) ? "two-cycle" : r < -1 ? "alternating-divergence" : "unbounded";
-const deriveGeometricSeries = (values: GeometricValues, termCount = 12) => { const safe = normalizeGeometricValues(values); const count = Math.max(1, Math.round(termCount)); const terms: number[] = []; const partialSums = [0]; let term = safe.a; let sum = 0; for (let index = 0; index < count; index += 1) { terms.push(term); sum += term; partialSums.push(sum); term *= safe.r; } const status = geometricStatus(safe); return { values: safe, terms, partialSums, status, limit: status === "zero" ? 0 : status === "convergent" ? safe.a / (1 - safe.r) : null }; };
-function initializeGeometricSchema(): void {}
-function initializeGeometricModel(): void {}
-export { geometricDefinition as a, initializeGeometricSchema as i, deriveGeometricSeries as n, initializeGeometricModel as r, initialTermParameter as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { i as t, n } from "@rchunk/adaptive-slider-field";
+var r, i, a, o, s;
+function c() {
+  return (c = e(() => {
+    ((r = `GEOMETRIC_SERIES`),
+      (i = `geometric-series-v1`),
+      (a = `\\sum_{k=0}^{\\infty} ar^k = \\frac{a}{1-r},\\quad |r|<1`),
+      (o = { r: { kind: `number`, defaultValue: 0.5, min: -10, max: 10 } }),
+      (s = { type: r, version: 1, thumbnailAssetKey: i, canonicalFormula: a, parameters: o }));
+  }))();
+}
+var l, u, d, f, p, m, h;
+function g() {
+  return (g = e(() => {
+    (n(),
+      c(),
+      (l = { defaultValue: 1, min: -1e3, max: 1e3 }),
+      (u = s.parameters.r),
+      (d = 1e-10),
+      (f = (e, t) => Math.abs(e - t) <= d),
+      (p = (e) => ({ a: t(e.a, l), r: t(e.r, u) })),
+      (m = ({ a: e, r: t }) =>
+        f(e, 0)
+          ? `zero`
+          : Math.abs(t) < 1
+            ? `convergent`
+            : f(t, 1)
+              ? `linear-divergence`
+              : f(t, -1)
+                ? `two-cycle`
+                : t < -1
+                  ? `alternating-divergence`
+                  : `unbounded`),
+      (h = (e, t = 12) => {
+        let n = p(e),
+          r = Math.max(1, Math.round(t)),
+          i = [],
+          a = [0],
+          o = n.a,
+          s = 0;
+        for (let e = 0; e < r; e += 1) (i.push(o), (s += o), a.push(s), (o *= n.r));
+        let c = m(n);
+        return {
+          values: n,
+          terms: i,
+          partialSums: a,
+          status: c,
+          limit: c === `zero` ? 0 : c === `convergent` ? n.a / (1 - n.r) : null,
+        };
+      }));
+  }))();
+}
+export { s as a, c as i, h as n, g as r, l as t };

@@ -1,60 +1,76 @@
-// Buffer-pH learning model comparing a buffer with unbuffered water.
-import "@rchunk/rolldown-runtime";
-
-interface BufferDoseValues { netStrongAcidMinusBaseMoles?: number | null }
-
-const bufferPhType = "BUFFER_PH_STRONG_ACID_BASE";
-const bufferPhThumbnail = "buffer-ph-strong-acid-base-v2";
-const bufferPhParameters = { netStrongAcidMinusBaseMoles: { kind: "number", defaultValue: 0, min: -0.02, max: 0.02, multipleOf: 0.005 } };
-const bufferPhDefinition = { type: bufferPhType, version: 2, thumbnailAssetKey: bufferPhThumbnail, parameters: bufferPhParameters };
-const initialAcidMoles = 0.05;
-const initialBaseMoles = 0.05;
-const bufferPka = 4.76;
-const particleMoles = 0.005;
-const doseControl = { variable: "Strong acid − base dose", unit: "mol", min: bufferPhDefinition.parameters.netStrongAcidMinusBaseMoles.min, max: bufferPhDefinition.parameters.netStrongAcidMinusBaseMoles.max, step: bufferPhDefinition.parameters.netStrongAcidMinusBaseMoles.multipleOf, defaultValue: bufferPhDefinition.parameters.netStrongAcidMinusBaseMoles.defaultValue };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const quantizeDose = (value: number | null | undefined, parameter: { defaultValue: number; min: number; max: number; multipleOf: number }): number => {
-  const dose = typeof value === "number" && Number.isFinite(value) ? value : parameter.defaultValue;
-  const clamped = clamp(dose, parameter.min, parameter.max);
-  const quantized = Number((Math.round(clamped / parameter.multipleOf) * parameter.multipleOf).toFixed(6));
-  return Object.is(quantized, -0) ? 0 : quantized;
-};
-const normalizeBufferDose = (values: BufferDoseValues) => ({ netStrongAcidMinusBaseMoles: quantizeDose(values.netStrongAcidMinusBaseMoles, bufferPhDefinition.parameters.netStrongAcidMinusBaseMoles) });
-
-function deriveBufferPhState(values: BufferDoseValues) {
-  const safeValues = normalizeBufferDose(values);
-  const dose = safeValues.netStrongAcidMinusBaseMoles;
-  const direction = dose > 0 ? "acid" : dose < 0 ? "base" : "none";
-  const doseMagnitudeMoles = Math.abs(dose);
-  const bufferHaMoles = initialAcidMoles + dose;
-  const bufferAMinusMoles = initialBaseMoles - dose;
-  const bufferPh = bufferPka + Math.log10(bufferAMinusMoles / bufferHaMoles);
-  const waterPh = direction === "acid" ? -Math.log10(doseMagnitudeMoles) : direction === "base" ? 14 + Math.log10(doseMagnitudeMoles) : 7;
-  return {
-    safeValues,
-    direction,
-    doseMagnitudeMoles,
-    bufferHaMoles,
-    bufferAMinusMoles,
-    bufferPh,
-    bufferDeltaPh: bufferPh - bufferPka,
-    waterPh,
-    waterDeltaPh: waterPh - 7,
-    bufferHaParticleCount: Math.round(bufferHaMoles / particleMoles),
-    bufferAMinusParticleCount: Math.round(bufferAMinusMoles / particleMoles),
-    waterDoseParticleCount: Math.round(doseMagnitudeMoles / particleMoles),
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `BUFFER_PH_STRONG_ACID_BASE`),
+      (n = `buffer-ph-strong-acid-base-v2`),
+      (r = {
+        netStrongAcidMinusBaseMoles: {
+          kind: `number`,
+          defaultValue: 0,
+          min: -0.02,
+          max: 0.02,
+          multipleOf: 0.005,
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-function initializeBufferPhSchema(): void {}
-function initializeBufferPhModel(): void {}
-
-export {
-  normalizeBufferDose as a,
-  initializeBufferPhModel as i,
-  doseControl as n,
-  initializeBufferPhSchema as o,
-  deriveBufferPhState as r,
-  bufferPhDefinition as s,
-  bufferPka as t,
-};
+var o, s, c, l, u, d, f, p, m;
+function h() {
+  return (h = e(() => {
+    (a(),
+      (o = 0.05),
+      (s = 0.05),
+      (c = 4.76),
+      (l = 0.005),
+      (u = {
+        variable: `Strong acid − base dose`,
+        unit: `mol`,
+        min: i.parameters.netStrongAcidMinusBaseMoles.min,
+        max: i.parameters.netStrongAcidMinusBaseMoles.max,
+        step: i.parameters.netStrongAcidMinusBaseMoles.multipleOf,
+        defaultValue: i.parameters.netStrongAcidMinusBaseMoles.defaultValue,
+      }),
+      (d = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (f = (e, t) => {
+        let n = typeof e == `number` && Number.isFinite(e) ? e : t.defaultValue,
+          r = d(n, t.min, t.max),
+          i = Math.round(r / t.multipleOf) * t.multipleOf,
+          a = Number(i.toFixed(6));
+        return Object.is(a, -0) ? 0 : a;
+      }),
+      (p = (e) => ({
+        netStrongAcidMinusBaseMoles: f(
+          e.netStrongAcidMinusBaseMoles,
+          i.parameters.netStrongAcidMinusBaseMoles,
+        ),
+      })),
+      (m = (e) => {
+        let t = p(e),
+          n = t.netStrongAcidMinusBaseMoles,
+          r = n > 0 ? `acid` : n < 0 ? `base` : `none`,
+          i = Math.abs(n),
+          a = o + n,
+          u = s - n,
+          d = c + Math.log10(u / a),
+          f = r === `acid` ? -Math.log10(i) : r === `base` ? 14 + Math.log10(i) : 7;
+        return {
+          safeValues: t,
+          direction: r,
+          doseMagnitudeMoles: i,
+          bufferHaMoles: a,
+          bufferAMinusMoles: u,
+          bufferPh: d,
+          bufferDeltaPh: d - c,
+          waterPh: f,
+          waterDeltaPh: f - 7,
+          bufferHaParticleCount: Math.round(a / l),
+          bufferAMinusParticleCount: Math.round(u / l),
+          waterDoseParticleCount: Math.round(i / l),
+        };
+      }));
+  }))();
+}
+export { p as a, h as i, u as n, a as o, m as r, i as s, c as t };

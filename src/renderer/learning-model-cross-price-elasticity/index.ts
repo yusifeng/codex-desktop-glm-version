@@ -1,49 +1,91 @@
-// Cross-price elasticity for substitute and complementary goods.
-import "@rchunk/rolldown-runtime";
-
-type Relationship = "substitutes" | "complements";
-type PriceChangeDirection = "increase" | "decrease";
-interface CrossPriceValues { relationship?: unknown; priceChangeDirection?: unknown; priceChangeMagnitudePercent?: unknown }
-
-const crossPriceElasticityType = "CROSS_PRICE_ELASTICITY";
-const crossPriceElasticityThumbnail = "cross-price-elasticity-v2";
-const crossPriceElasticityFormula = "E_{xy} = \\frac{\\%\\Delta Q_x}{\\%\\Delta P_y}";
-const crossPriceElasticityParameters = {
-  relationship: { kind: "enum" as const, defaultValue: "substitutes" as Relationship, allowedValues: ["substitutes", "complements"] as Relationship[] },
-  priceChangeDirection: { kind: "enum" as const, defaultValue: "increase" as PriceChangeDirection, allowedValues: ["increase", "decrease"] as PriceChangeDirection[] },
-  priceChangeMagnitudePercent: { kind: "number" as const, defaultValue: 20, min: 1, max: 30 },
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `CROSS_PRICE_ELASTICITY`),
+      (n = `cross-price-elasticity-v2`),
+      (r = `E_{xy} = \\frac{\\%\\Delta Q_x}{\\%\\Delta P_y}`),
+      (i = {
+        relationship: {
+          kind: `enum`,
+          defaultValue: `substitutes`,
+          allowedValues: [`substitutes`, `complements`],
+        },
+        priceChangeDirection: {
+          kind: `enum`,
+          defaultValue: `increase`,
+          allowedValues: [`increase`, `decrease`],
+        },
+        priceChangeMagnitudePercent: { kind: `number`, defaultValue: 20, min: 1, max: 30 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+var s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w, T, E;
+function D() {
+  return (D = e(() => {
+    (o(),
+      (s = { complements: `complements`, substitutes: `substitutes` }),
+      (c = a.parameters.relationship),
+      (l = a.parameters.priceChangeDirection),
+      (u = a.parameters.priceChangeMagnitudePercent),
+      (d = c.allowedValues),
+      (f = l.allowedValues),
+      (p = { min: 0, max: d.length - 1, step: 1 }),
+      (m = (e) => Math.max(0, d.indexOf(e))),
+      (h = (e) => d[Math.min(Math.max(Math.round(e), p.min), p.max)] ?? _.relationship),
+      (g = { min: u.min, max: u.max, step: 5, defaultValue: u.defaultValue }),
+      (_ = {
+        relationship: c.defaultValue,
+        priceChangeDirection: l.defaultValue,
+        priceChangeMagnitudePercent: g.defaultValue,
+      }),
+      (v = { quantityMin: 0, quantityMax: 100, priceMin: 0, priceMax: 100 }),
+      (y = 0.8),
+      (b = 0.7),
+      (x = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (S = (e) => (typeof e == `string` && d.includes(e) ? e : _.relationship)),
+      (C = (e) => (typeof e == `string` && f.includes(e) ? e : _.priceChangeDirection)),
+      (w = (e) =>
+        typeof e == `number` && Number.isFinite(e) ? x(e, g.min, g.max) : g.defaultValue),
+      (T = (e) => ({
+        relationship: S(e.relationship),
+        priceChangeDirection: C(e.priceChangeDirection),
+        priceChangeMagnitudePercent: w(e.priceChangeMagnitudePercent),
+      })),
+      (E = (e) => {
+        let t = T(e),
+          n = (t.relationship === s.substitutes ? 1 : -1) * y,
+          r = t.priceChangeMagnitudePercent * (t.priceChangeDirection === `increase` ? 1 : -1),
+          i = n * r,
+          a = 30 / b,
+          o = (i / 100) * a,
+          c = a + o;
+        return {
+          relationship: t.relationship,
+          elasticity: n,
+          priceChangePercent: r,
+          quantityChangePercent: i,
+          baselineQuantity: a,
+          shiftedQuantity: c,
+          curveShift: o,
+          shiftDirection: o > 0 ? `right` : `left`,
+        };
+      }));
+  }))();
+}
+export {
+  p as a,
+  m as c,
+  o as d,
+  a as f,
+  s as i,
+  D as l,
+  f as n,
+  E as o,
+  g as r,
+  h as s,
+  v as t,
+  T as u,
 };
-const crossPriceElasticitySpecification = { type: crossPriceElasticityType, version: 1, thumbnailAssetKey: crossPriceElasticityThumbnail, canonicalFormula: crossPriceElasticityFormula, parameters: crossPriceElasticityParameters };
-const relationshipNames = { complements: "complements" as Relationship, substitutes: "substitutes" as Relationship };
-const relationshipParameter = crossPriceElasticitySpecification.parameters.relationship;
-const directionParameter = crossPriceElasticitySpecification.parameters.priceChangeDirection;
-const magnitudeParameter = crossPriceElasticitySpecification.parameters.priceChangeMagnitudePercent;
-const relationships = relationshipParameter.allowedValues;
-const priceChangeDirections = directionParameter.allowedValues;
-const relationshipIndexControl = { min: 0, max: relationships.length - 1, step: 1 };
-const relationshipIndex = (relationship: Relationship): number => Math.max(0, relationships.indexOf(relationship));
-const magnitudeControl = { min: magnitudeParameter.min, max: magnitudeParameter.max, step: 5, defaultValue: magnitudeParameter.defaultValue };
-const defaultCrossPriceValues = { relationship: relationshipParameter.defaultValue, priceChangeDirection: directionParameter.defaultValue, priceChangeMagnitudePercent: magnitudeControl.defaultValue };
-const relationshipForIndex = (index: number): Relationship => relationships[Math.min(Math.max(Math.round(index), relationshipIndexControl.min), relationshipIndexControl.max)] ?? defaultCrossPriceValues.relationship;
-const crossPriceChartBounds = { quantityMin: 0, quantityMax: 100, priceMin: 0, priceMax: 100 };
-const elasticityMagnitude = 0.8;
-const baselineDemandSlope = 0.7;
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeRelationship = (value: unknown): Relationship => typeof value === "string" && relationships.some((relationship) => relationship === value) ? value as Relationship : defaultCrossPriceValues.relationship;
-const normalizeDirection = (value: unknown): PriceChangeDirection => typeof value === "string" && priceChangeDirections.some((direction) => direction === value) ? value as PriceChangeDirection : defaultCrossPriceValues.priceChangeDirection;
-const normalizeMagnitude = (value: unknown): number => typeof value === "number" && Number.isFinite(value) ? clamp(value, magnitudeControl.min, magnitudeControl.max) : magnitudeControl.defaultValue;
-const normalizeCrossPriceValues = (values: CrossPriceValues) => ({ relationship: normalizeRelationship(values.relationship), priceChangeDirection: normalizeDirection(values.priceChangeDirection), priceChangeMagnitudePercent: normalizeMagnitude(values.priceChangeMagnitudePercent) });
-const calculateCrossPriceElasticity = (values: CrossPriceValues) => {
-  const normalized = normalizeCrossPriceValues(values);
-  const elasticity = (normalized.relationship === relationshipNames.substitutes ? 1 : -1) * elasticityMagnitude;
-  const priceChangePercent = normalized.priceChangeMagnitudePercent * (normalized.priceChangeDirection === "increase" ? 1 : -1);
-  const quantityChangePercent = elasticity * priceChangePercent;
-  const baselineQuantity = 30 / baselineDemandSlope;
-  const curveShift = quantityChangePercent / 100 * baselineQuantity;
-  return { relationship: normalized.relationship, elasticity, priceChangePercent, quantityChangePercent, baselineQuantity, shiftedQuantity: baselineQuantity + curveShift, curveShift, shiftDirection: curveShift > 0 ? "right" : "left" };
-};
-
-function initializeCrossPriceElasticitySpecification(): void {}
-function initializeCrossPriceElasticityModel(): void {}
-
-export { relationshipIndexControl as a, relationshipIndex as c, initializeCrossPriceElasticitySpecification as d, crossPriceElasticitySpecification as f, relationshipNames as i, initializeCrossPriceElasticityModel as l, priceChangeDirections as n, calculateCrossPriceElasticity as o, magnitudeControl as r, relationshipForIndex as s, crossPriceChartBounds as t, normalizeCrossPriceValues as u };

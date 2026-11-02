@@ -1,86 +1,106 @@
-import {
-  I3 as getJsxRuntime,
-  Y2 as FormattedMessage,
-  n4 as useIntl,
-} from "@rchunk/app-shared";
-import {
-  d2 as initializeAnnouncementModal,
-  h2 as useStartImageGeneration,
-  l2 as AnnouncementModal,
-  u2 as initializeImageGeneration,
-} from "@rchunk/app-initial";
-
-export interface ImageGenAnnouncementModalProps {
-  dismissAnnouncement(): void;
-  imageUrl: string;
-  onShown(): void;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i, n4 as a } from "@rchunk/app-shared";
+import { d2 as o, h2 as s, l2 as c, u2 as l } from "@rchunk/app-initial";
+function u(e) {
+  let t = (0, d.c)(18),
+    { dismissAnnouncement: n, imageUrl: r, onShown: o } = e,
+    l = a(),
+    u = s(),
+    p;
+  t[0] === o
+    ? (p = t[1])
+    : ((p = (e) => {
+        e != null && o();
+      }),
+      (t[0] = o),
+      (t[1] = p));
+  let m;
+  t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((m = (0, f.jsx)(i, {
+        id: `codex.imageGen25Announcement.body`,
+        defaultMessage: `Higher-quality results, faster generation, and smarter creative tools`,
+        description: `Description of the improved image creation capabilities announced in Codex`,
+      })),
+      (t[2] = m))
+    : (m = t[2]);
+  let h;
+  t[3] === p
+    ? (h = t[4])
+    : ((h = (0, f.jsx)(`p`, {
+        ref: p,
+        className: `max-w-xs text-base leading-normal tracking-normal text-codex-description`,
+        children: m,
+      })),
+      (t[3] = p),
+      (t[4] = h));
+  let g;
+  t[5] === r
+    ? (g = t[6])
+    : ((g = (0, f.jsx)(`img`, { className: `h-auto w-full object-contain`, src: r, alt: `` })),
+      (t[5] = r),
+      (t[6] = g));
+  let _;
+  t[7] !== n || t[8] !== l || t[9] !== u
+    ? ((_ = () => {
+        (n(),
+          u({
+            prefillPrompt: l.formatMessage({
+              id: `codex.imageGen25Announcement.promptPrefix`,
+              defaultMessage: `Create an image of `,
+              description: `Image creation prompt prefix inserted into the composer when the user clicks Try it. The user continues typing what to create.`,
+            }),
+          }));
+      }),
+      (t[7] = n),
+      (t[8] = l),
+      (t[9] = u),
+      (t[10] = _))
+    : (_ = t[10]);
+  let v, y;
+  t[11] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((v = (0, f.jsx)(i, {
+        id: `codex.imageGen25Announcement.primaryAction`,
+        defaultMessage: `Try it`,
+        description: `Primary action to start creating an image from the Codex ImageGen 2.5 announcement`,
+      })),
+      (y = (0, f.jsx)(i, {
+        id: `codex.imageGen25Announcement.title`,
+        defaultMessage: `Image creation got a major upgrade`,
+        description: `Title announcing improved image creation capabilities in Codex`,
+      })),
+      (t[11] = v),
+      (t[12] = y))
+    : ((v = t[11]), (y = t[12]));
+  let b;
+  return (
+    t[13] !== n || t[14] !== h || t[15] !== g || t[16] !== _
+      ? ((b = (0, f.jsx)(c, {
+          body: h,
+          closeButtonClassName: `dark:text-default`,
+          closeButtonTone: `dark`,
+          initialFocus: `primary`,
+          media: g,
+          mediaClassName: `h-auto shrink-0 px-2 pt-14`,
+          onDismiss: n,
+          onPrimaryAction: _,
+          primaryActionLabel: v,
+          title: y,
+        })),
+        (t[13] = n),
+        (t[14] = h),
+        (t[15] = g),
+        (t[16] = _),
+        (t[17] = b))
+      : (b = t[17]),
+    b
+  );
 }
-
-function ImageGen25AnnouncementModal({
-  dismissAnnouncement,
-  imageUrl,
-  onShown,
-}: ImageGenAnnouncementModalProps): unknown {
-  const intl = useIntl();
-  const startImageGeneration = useStartImageGeneration();
-  const jsx = getJsxRuntime();
-  const body = jsx.jsx("p", {
-    ref: (element: unknown) => {
-      if (element != null) onShown();
-    },
-    className:
-      "max-w-xs text-base leading-normal tracking-normal text-codex-description",
-    children: jsx.jsx(FormattedMessage, {
-      id: "codex.imageGen25Announcement.body",
-      defaultMessage:
-        "Higher-quality results, faster generation, and smarter creative tools",
-      description:
-        "Description of the improved image creation capabilities announced in Codex",
-    }),
-  });
-  return jsx.jsx(AnnouncementModal, {
-    body,
-    closeButtonClassName: "dark:text-default",
-    closeButtonTone: "dark",
-    initialFocus: "primary",
-    media: jsx.jsx("img", {
-      className: "h-auto w-full object-contain",
-      src: imageUrl,
-      alt: "",
-    }),
-    mediaClassName: "h-auto shrink-0 px-2 pt-14",
-    onDismiss: dismissAnnouncement,
-    onPrimaryAction: () => {
-      dismissAnnouncement();
-      startImageGeneration({
-        prefillPrompt: intl.formatMessage({
-          id: "codex.imageGen25Announcement.promptPrefix",
-          defaultMessage: "Create an image of ",
-          description:
-            "Image creation prompt prefix inserted into the composer when the user clicks Try it. The user continues typing what to create.",
-        }) as string,
-      });
-    },
-    primaryActionLabel: jsx.jsx(FormattedMessage, {
-      id: "codex.imageGen25Announcement.primaryAction",
-      defaultMessage: "Try it",
-      description:
-        "Primary action to start creating an image from the Codex ImageGen 2.5 announcement",
-    }),
-    title: jsx.jsx(FormattedMessage, {
-      id: "codex.imageGen25Announcement.title",
-      defaultMessage: "Image creation got a major upgrade",
-      description:
-        "Title announcing improved image creation capabilities in Codex",
-    }),
-  });
+var d, f;
+function p() {
+  return (p = e(() => {
+    ((d = t()), r(), o(), l(), (f = n()));
+  }))();
 }
-
-function initializeImageGenAnnouncementModal(): void {
-  initializeAnnouncementModal();
-  initializeImageGeneration();
-}
-
-initializeImageGenAnnouncementModal();
-
-export { ImageGen25AnnouncementModal };
+p();
+export { u as ImageGen25AnnouncementModal };

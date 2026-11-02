@@ -1,275 +1,370 @@
-import "@rchunk/rolldown-runtime";
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import * as primaryChunk from "@rchunk/app-primary";
-import * as pluginPickerChunk from "@rchunk/plugin-picker-menu-content";
-
-interface WorkPlugin {
-  displayName?: string;
-  plugin: { id: string };
-  [key: string]: unknown;
-}
-
-interface ComposerController {
-  getMentionedPluginIdsKey(): string;
-  insertMentionAtSelection(value: unknown): void;
-  removePluginMentions(id: string): void;
-}
-
-interface ComposerWorkHomePluginsControlProps {
-  composerController: ComposerController;
-  cwd?: string;
-  hostId: string;
-  menuOpen: boolean;
-  onOpenChange(open: boolean): void;
-  onRequestComposerFocus(): void;
-  pluginHostId?: string | null;
-}
-
-interface PluginPickerState {
-  connectedPlugins: WorkPlugin[];
-  defaultConnectedPluginLimit?: number;
-  featuredPlugins: WorkPlugin[];
-  hasLoadError: boolean;
-  isLoading: boolean;
-  openPluginInstall(plugin: WorkPlugin): void;
-  pluginInstallationStatus?: {
-    phase: "installing" | "loading";
-    pluginDisplayName: string;
-  } | null;
-  pluginsFeatureEnabled: boolean;
-}
-
-const shared = sharedChunk as unknown as Record<string, unknown>;
-const initial = initialChunk as unknown as Record<string, unknown>;
-const primary = primaryChunk as unknown as Record<string, unknown>;
-const pluginPicker = pluginPickerChunk as unknown as Record<string, unknown>;
-
-function callInitializer(value: unknown): void {
-  if (typeof value === "function") value();
-}
-
-for (const value of [
-  shared.fI,
-  shared.FX,
-  shared.K2,
-  initial.Qgn,
-  pluginPicker.n,
-  pluginPicker.a,
-  pluginPicker.r,
-  initial.Rht,
-  initial.Q_,
-  primary.dn,
-  primary.ma,
-  initial.GWt,
-  initial.VZ,
-  primary.Ml,
-]) callInitializer(value);
-
-const jsx = (shared.I3 as () => {
-  jsx(component: unknown, props: unknown): unknown;
-})();
-const React = shared.e6 as () => {
-  useRef<T>(value: T): { current: T };
-};
-const useScope = shared.LX as (scope: unknown) => {
-  get(signal: unknown, parameter?: unknown): unknown;
-};
-const useIntl = shared.n4 as () => {
-  formatMessage(message: Record<string, string>, values?: Record<string, unknown>): string;
-};
-const subscribeComposerValue = initial.UZ as (
-  controller: ComposerController,
-  selector: (controller: ComposerController) => string,
-  channel: string,
-) => string;
-const usePluginPickerState = pluginPicker.i as (
-  options: Record<string, unknown>,
-) => PluginPickerState;
-const recordPluginSelected = pluginPicker.o as (
-  scope: unknown,
-  plugin: WorkPlugin,
-) => void;
-const PluginPickerMenuContent = pluginPicker.t;
-const ComposerPluginControl = primary.pa;
-const ComposerPluginControlSkeleton = primary.un;
-
-const messages = {
-  pluginsTooltip: {
-    id: "composer.workMode.plugins.tooltip",
-    defaultMessage: "Work with ChatGPT across your favorite tools",
-    description: "Tooltip for the Plugins picker in the Chat home composer utility bar",
-  },
-  installingPlugin: {
-    id: "composer.workMode.plugins.installing",
-    defaultMessage: "Installing {pluginName}",
-    description: "Label for the Plugins picker while installing a named plugin",
-  },
-  loadingPlugin: {
-    id: "composer.workMode.plugins.loading",
-    defaultMessage: "Loading {pluginName}",
-    description: "Label for the Plugins picker while loading a named plugin installation",
-  },
-};
-
-function PluginControl({
-  connectedPlugins,
-  defaultConnectedPluginLimit,
-  featuredPlugins,
-  hasLoadError,
-  isLoading,
-  menuOpen,
-  onConnectPlugin,
-  onOpenPluginDirectory,
-  onOpenChange,
-  onPluginSelectionChange,
-  onRequestComposerFocus,
-  pluginInstallationStatus,
-  selectedPluginIds,
-  workRecommendationsHostId,
-}: PluginPickerState & {
-  menuOpen: boolean;
-  onConnectPlugin(plugin: WorkPlugin): void;
-  onOpenPluginDirectory(): void;
-  onOpenChange(open: boolean): void;
-  onPluginSelectionChange(plugin: WorkPlugin, selected: boolean): void;
-  onRequestComposerFocus(): void;
-  selectedPluginIds: string[];
-  workRecommendationsHostId: string;
-}): unknown {
-  const intl = useIntl();
-  const shouldRestoreFocus = React().useRef(false);
-  if (isLoading) {
-    return jsx.jsx(ComposerPluginControlSkeleton, { menuOpen, onOpenChange });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  G2 as r,
+  I3 as i,
+  K2 as a,
+  LX as o,
+  e6 as s,
+  fI as c,
+  iN as l,
+  lw as u,
+  mS as d,
+  n4 as f,
+  pS as p,
+} from "@rchunk/app-shared";
+import {
+  $_ as m,
+  GWt as h,
+  PWt as g,
+  Q_ as _,
+  Qgn as v,
+  Rht as y,
+  UZ as b,
+  VZ as x,
+  kht as S,
+  o_n as C,
+  zWt as w,
+} from "@rchunk/app-initial";
+import {
+  Ml as T,
+  Nl as E,
+  dn as D,
+  ma as O,
+  pa as k,
+  un as A,
+} from "@rchunk/app-primary";
+import {
+  a as j,
+  i as M,
+  n as N,
+  o as P,
+  r as F,
+  t as I,
+} from "@rchunk/plugin-picker-menu-content";
+function L(e) {
+  "use forget";
+  let t = (0, R.c)(37),
+    {
+      connectedPlugins: n,
+      defaultConnectedPluginLimit: r,
+      featuredPlugins: i,
+      hasLoadError: a,
+      isLoading: o,
+      menuOpen: s,
+      onConnectPlugin: c,
+      onOpenPluginDirectory: l,
+      onOpenChange: u,
+      onPluginSelectionChange: m,
+      onRequestComposerFocus: h,
+      pluginInstallationStatus: g,
+      selectedPluginIds: _,
+      workRecommendationsHostId: v,
+    } = e,
+    y = f(),
+    b = (0, z.useRef)(!1),
+    x;
+  t[0] === y
+    ? (x = t[1])
+    : ((x = y.formatMessage({
+        id: `composer.workMode.plugins.label`,
+        defaultMessage: `Plugins`,
+        description: `Label for the Plugins picker in the Chat home composer utility bar`,
+      })),
+      (t[0] = y),
+      (t[1] = x));
+  let S = x,
+    C;
+  t[2] === y ? (C = t[3]) : ((C = y.formatMessage(V.pluginsTooltip)), (t[2] = y), (t[3] = C));
+  let w = C,
+    T;
+  t[4] !== y || t[5] !== g
+    ? ((T =
+        g == null
+          ? null
+          : g.phase === `loading`
+            ? y.formatMessage(V.loadingPlugin, { pluginName: g.pluginDisplayName })
+            : y.formatMessage(V.installingPlugin, { pluginName: g.pluginDisplayName })),
+      (t[4] = y),
+      (t[5] = g),
+      (t[6] = T))
+    : (T = t[6]);
+  let E = T,
+    D = E ?? S,
+    O;
+  t[7] !== E || t[8] !== D
+    ? ((O =
+        E == null
+          ? D
+          : (0, B.jsx)(`span`, {
+              className: `loading-shimmer-pure-text [--text-primary:var(--color-text)]`,
+              children: D,
+            })),
+      (t[7] = E),
+      (t[8] = D),
+      (t[9] = O))
+    : (O = t[9]);
+  let j = O;
+  if (o) {
+    let e;
+    return (
+      t[10] !== s || t[11] !== u
+        ? ((e = (0, B.jsx)(A, { menuOpen: s, onOpenChange: u })),
+          (t[10] = s),
+          (t[11] = u),
+          (t[12] = e))
+        : (e = t[12]),
+      e
+    );
   }
-
-  const label = intl.formatMessage({
-    id: "composer.workMode.plugins.label",
-    defaultMessage: "Plugins",
-    description: "Label for the Plugins picker in the Chat home composer utility bar",
-  });
-  const tooltip = intl.formatMessage(messages.pluginsTooltip);
-  const installationLabel = pluginInstallationStatus == null
-    ? null
-    : pluginInstallationStatus.phase === "loading"
-      ? intl.formatMessage(messages.loadingPlugin, {
-          pluginName: pluginInstallationStatus.pluginDisplayName,
-        })
-      : intl.formatMessage(messages.installingPlugin, {
-          pluginName: pluginInstallationStatus.pluginDisplayName,
-        });
-  const value = installationLabel ?? label;
-  const visibleValue = installationLabel == null
-    ? value
-    : jsx.jsx("span", {
-        className: "loading-shimmer-pure-text [--text-primary:var(--color-text)]",
-        children: value,
-      });
-  const selectPlugin = (plugin: WorkPlugin, selected: boolean) => {
-    shouldRestoreFocus.current = true;
-    onPluginSelectionChange(plugin, selected);
-    onOpenChange(false);
-  };
-  const content = jsx.jsx(PluginPickerMenuContent, {
-    connectedPlugins,
-    defaultConnectedPluginLimit,
-    featuredPlugins,
-    hasLoadError,
-    onConnectPlugin,
-    onOpenPluginDirectory,
-    onPluginSelectionChange: selectPlugin,
-    selectedPluginIds,
-    workRecommendationsHostId,
-  });
-  return jsx.jsx(ComposerPluginControl, {
-    "aria-label": value,
-    "data-composer-navigation-target": "plugins",
-    contentClassName: "overflow-hidden!",
-    contentMaxHeight: "composerPlugins",
-    contentSurface: "opaque",
-    contentWidth: "menuWide",
-    foreground: "primary",
-    iconSource: { 16: shared.pS, 20: shared.mS },
-    menuOpen,
-    tooltipContent: tooltip,
-    value: visibleValue,
-    onOpenChange,
-    onCloseAutoFocus: (event: { preventDefault(): void }) => {
-      if (!shouldRestoreFocus.current) return;
-      shouldRestoreFocus.current = false;
-      event.preventDefault();
-      onRequestComposerFocus();
-    },
-    children: content,
-  });
-}
-
-function ComposerWorkHomePluginsControl({
-  composerController,
-  cwd,
-  hostId,
-  menuOpen,
-  onOpenChange,
-  onRequestComposerFocus,
-  pluginHostId,
-}: ComposerWorkHomePluginsControlProps): unknown {
-  const scope = useScope(initial.kht);
-  const intl = useIntl();
-  const directoryContext = (initial.o_n as () => unknown)();
-  const trackSelection = (primary.Nl as (
-    options: { hostId: string },
-  ) => (plugin: WorkPlugin) => void)({ hostId });
-  const mentionedPluginIds = subscribeComposerValue(
-    composerController,
-    (controller) => controller.getMentionedPluginIdsKey(),
-    "document",
+  let M;
+  t[13] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((M = { 16: p, 20: d }), (t[13] = M))
+    : (M = t[13]);
+  let N;
+  t[14] === h
+    ? (N = t[15])
+    : ((N = (e) => {
+        b.current && ((b.current = !1), e.preventDefault(), h());
+      }),
+      (t[14] = h),
+      (t[15] = N));
+  let P;
+  t[16] !== u || t[17] !== m
+    ? ((P = (e, t) => {
+        ((b.current = !0), m(e, t), u(!1));
+      }),
+      (t[16] = u),
+      (t[17] = m),
+      (t[18] = P))
+    : (P = t[18]);
+  let F;
+  t[19] !== n ||
+  t[20] !== r ||
+  t[21] !== i ||
+  t[22] !== a ||
+  t[23] !== c ||
+  t[24] !== l ||
+  t[25] !== _ ||
+  t[26] !== P ||
+  t[27] !== v
+    ? ((F = (0, B.jsx)(I, {
+        connectedPlugins: n,
+        defaultConnectedPluginLimit: r,
+        featuredPlugins: i,
+        hasLoadError: a,
+        onConnectPlugin: c,
+        onOpenPluginDirectory: l,
+        onPluginSelectionChange: P,
+        selectedPluginIds: _,
+        workRecommendationsHostId: v,
+      })),
+      (t[19] = n),
+      (t[20] = r),
+      (t[21] = i),
+      (t[22] = a),
+      (t[23] = c),
+      (t[24] = l),
+      (t[25] = _),
+      (t[26] = P),
+      (t[27] = v),
+      (t[28] = F))
+    : (F = t[28]);
+  let L;
+  return (
+    t[29] !== s ||
+    t[30] !== u ||
+    t[31] !== w ||
+    t[32] !== N ||
+    t[33] !== F ||
+    t[34] !== j ||
+    t[35] !== D
+      ? ((L = (0, B.jsx)(k, {
+          "aria-label": D,
+          "data-composer-navigation-target": `plugins`,
+          contentClassName: `overflow-hidden!`,
+          contentMaxHeight: `composerPlugins`,
+          contentSurface: `opaque`,
+          contentWidth: `menuWide`,
+          foreground: `primary`,
+          iconSource: M,
+          menuOpen: s,
+          tooltipContent: w,
+          value: j,
+          onOpenChange: u,
+          onCloseAutoFocus: N,
+          children: F,
+        })),
+        (t[29] = s),
+        (t[30] = u),
+        (t[31] = w),
+        (t[32] = N),
+        (t[33] = F),
+        (t[34] = j),
+        (t[35] = D),
+        (t[36] = L))
+      : (L = t[36]),
+    L
   );
-  const pickerState = usePluginPickerState({
-    cwd,
-    hostId,
-    pluginHostId,
-    workComposer: true,
-  });
-  if (!pickerState.pluginsFeatureEnabled) return null;
-
-  const selectPlugin = (plugin: WorkPlugin, selected: boolean) => {
-    if (selected) {
-      recordPluginSelected(scope, plugin);
-      const createMention = initial.PWt as (plugin: WorkPlugin, locale: unknown) => unknown;
-      const getLocale = initial.zWt as (intl: unknown) => unknown;
-      composerController.insertMentionAtSelection(createMention(plugin, getLocale(intl)));
-      trackSelection(plugin);
-      return;
-    }
-    composerController.removePluginMentions(plugin.plugin.id);
-  };
-  const selectedPluginIds = mentionedPluginIds === ""
-    ? []
-    : mentionedPluginIds.split("\0");
-  const openPluginDirectory = () => {
-    const openDirectory = initial.$_ as (
-      scope: unknown,
-      context: unknown,
-      enabled: boolean,
-      entrypoint: unknown,
-      hostId: string,
-    ) => void;
-    const entrypoint = (shared.iN as Record<string, unknown>)
-      .CODEX_PLUGIN_DIRECTORY_ENTRYPOINT_OTHER;
-    openDirectory(scope, directoryContext, pickerState.pluginsFeatureEnabled, entrypoint, hostId);
-  };
-
-  return jsx.jsx(PluginControl, {
-    ...pickerState,
-    menuOpen,
-    onConnectPlugin: pickerState.openPluginInstall,
-    onOpenPluginDirectory: openPluginDirectory,
-    onOpenChange,
-    onPluginSelectionChange: selectPlugin,
-    onRequestComposerFocus,
-    selectedPluginIds,
-    workRecommendationsHostId: pluginHostId ?? hostId,
-  });
 }
-
-export { ComposerWorkHomePluginsControl };
+var R, z, B, V;
+function H() {
+  return (H = e(() => {
+    ((R = t()),
+      (z = s()),
+      a(),
+      u(),
+      N(),
+      D(),
+      O(),
+      (B = i()),
+      (V = r({
+        pluginsTooltip: {
+          id: `composer.workMode.plugins.tooltip`,
+          defaultMessage: `Work with ChatGPT across your favorite tools`,
+          description: `Tooltip for the Plugins picker in the Chat home composer utility bar`,
+        },
+        installingPlugin: {
+          id: `composer.workMode.plugins.installing`,
+          defaultMessage: `Installing {pluginName}`,
+          description: `Label for the Plugins picker while installing a named plugin`,
+        },
+        loadingPlugin: {
+          id: `composer.workMode.plugins.loading`,
+          defaultMessage: `Loading {pluginName}`,
+          description: `Label for the Plugins picker while loading a named plugin installation`,
+        },
+      })));
+  }))();
+}
+function U(e) {
+  "use forget";
+  let t = (0, G.c)(33),
+    {
+      composerController: n,
+      cwd: r,
+      hostId: i,
+      menuOpen: a,
+      onOpenChange: s,
+      pluginHostId: c,
+      onRequestComposerFocus: u,
+    } = e,
+    d = o(S),
+    p = f(),
+    h = C(),
+    _;
+  t[0] === i ? (_ = t[1]) : ((_ = { hostId: i }), (t[0] = i), (t[1] = _));
+  let v = E(_),
+    y = b(n, W, `document`),
+    x;
+  t[2] !== r || t[3] !== i || t[4] !== c
+    ? ((x = { cwd: r, hostId: i, pluginHostId: c, workComposer: !0 }),
+      (t[2] = r),
+      (t[3] = i),
+      (t[4] = c),
+      (t[5] = x))
+    : (x = t[5]);
+  let {
+    connectedPlugins: T,
+    defaultConnectedPluginLimit: D,
+    featuredPlugins: O,
+    hasLoadError: k,
+    isLoading: A,
+    openPluginInstall: j,
+    pluginsFeatureEnabled: N,
+    pluginInstallationStatus: F,
+  } = M(x);
+  if (!N) return null;
+  let I;
+  t[6] !== i || t[7] !== h || t[8] !== N || t[9] !== d
+    ? ((I = () => {
+        m(d, h, N, l.CODEX_PLUGIN_DIRECTORY_ENTRYPOINT_OTHER, i);
+      }),
+      (t[6] = i),
+      (t[7] = h),
+      (t[8] = N),
+      (t[9] = d),
+      (t[10] = I))
+    : (I = t[10]);
+  let R;
+  t[11] !== n || t[12] !== p || t[13] !== v || t[14] !== d
+    ? ((R = (e, t) => {
+        if (t) {
+          (P(d, e), n.insertMentionAtSelection(g(e, w(p))), v(e));
+          return;
+        }
+        n.removePluginMentions(e.plugin.id);
+      }),
+      (t[11] = n),
+      (t[12] = p),
+      (t[13] = v),
+      (t[14] = d),
+      (t[15] = R))
+    : (R = t[15]);
+  let z;
+  t[16] === y ? (z = t[17]) : ((z = y === `` ? [] : y.split(`\0`)), (t[16] = y), (t[17] = z));
+  let B = c ?? i,
+    V;
+  return (
+    t[18] !== T ||
+    t[19] !== D ||
+    t[20] !== O ||
+    t[21] !== k ||
+    t[22] !== A ||
+    t[23] !== a ||
+    t[24] !== s ||
+    t[25] !== u ||
+    t[26] !== j ||
+    t[27] !== F ||
+    t[28] !== I ||
+    t[29] !== R ||
+    t[30] !== z ||
+    t[31] !== B
+      ? ((V = (0, K.jsx)(L, {
+          connectedPlugins: T,
+          defaultConnectedPluginLimit: D,
+          featuredPlugins: O,
+          hasLoadError: k,
+          isLoading: A,
+          menuOpen: a,
+          onOpenChange: s,
+          onConnectPlugin: j,
+          onOpenPluginDirectory: I,
+          onPluginSelectionChange: R,
+          onRequestComposerFocus: u,
+          pluginInstallationStatus: F,
+          selectedPluginIds: z,
+          workRecommendationsHostId: B,
+        })),
+        (t[18] = T),
+        (t[19] = D),
+        (t[20] = O),
+        (t[21] = k),
+        (t[22] = A),
+        (t[23] = a),
+        (t[24] = s),
+        (t[25] = u),
+        (t[26] = j),
+        (t[27] = F),
+        (t[28] = I),
+        (t[29] = R),
+        (t[30] = z),
+        (t[31] = B),
+        (t[32] = V))
+      : (V = t[32]),
+    V
+  );
+}
+function W(e) {
+  return e.getMentionedPluginIdsKey();
+}
+var G, K;
+function q() {
+  return (q = e(() => {
+    ((G = t()), c(), n(), a(), v(), j(), F(), y(), _(), H(), h(), x(), T(), (K = i()));
+  }))();
+}
+q();
+export { U as ComposerWorkHomePluginsControl };

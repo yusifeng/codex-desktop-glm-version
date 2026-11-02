@@ -1,83 +1,84 @@
-// Prime-factor-tree learning model with deterministic tree layout.
-import "@rchunk/rolldown-runtime";
-
-interface PrimeValues { number?: number | null }
-interface FactorNode { id: string; value: number; prime: boolean; depth: number; leafStart: number; leafEnd: number; left?: FactorNode; right?: FactorNode }
-interface PositionedFactorNode extends FactorNode { x: number; y: number }
-
-const primesType = "PRIMES";
-const primesThumbnail = "primes-v1";
-const primesParameters = { number: { kind: "integer", defaultValue: 100, min: 2, max: 1000 } };
-const primesDefinition = { type: primesType, version: 1, thumbnailAssetKey: primesThumbnail, parameters: primesParameters };
-const numberParameter = primesDefinition.parameters.number;
-const numberControl = { defaultValue: numberParameter.defaultValue, min: numberParameter.min, max: numberParameter.max };
-const factorTreeLayout = { baseMin: 2, baseMax: 200, step: 1 };
-const horizontalPadding = 32;
-const verticalPadding = 24;
-const leafSpacing = 48;
-const levelSpacing = 56;
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizePrimeNumber = (value: number | null | undefined): number => {
-  const number = typeof value === "number" && Number.isFinite(value) ? value : numberControl.defaultValue;
-  return clamp(Math.round(number), numberControl.min, numberControl.max);
-};
-const normalizePrimeValues = (values: PrimeValues) => ({ number: normalizePrimeNumber(values.number) });
-const primeFactors = (value: number): number[] => {
-  const factors: number[] = [];
-  let remainder = normalizePrimeNumber(value);
-  for (let divisor = 2; divisor * divisor <= remainder; divisor += 1) {
-    while (remainder % divisor === 0) { factors.push(divisor); remainder /= divisor; }
-  }
-  if (remainder > 1) factors.push(remainder);
-  return factors;
-};
-const product = (values: number[]): number => values.reduce((result, value) => result * value, 1);
-const buildFactorTree = (factors: number[], depth: number, leafStart: number, id: string): FactorNode => {
-  const value = product(factors);
-  if (factors.length === 1) return { id, value, prime: true, depth, leafStart, leafEnd: leafStart };
-  const midpoint = Math.floor(factors.length / 2);
-  const leftFactors = factors.slice(0, midpoint);
-  const rightFactors = factors.slice(midpoint);
-  return {
-    id, value, prime: false, depth, leafStart, leafEnd: leafStart + factors.length - 1,
-    left: buildFactorTree(leftFactors, depth + 1, leafStart, `${id}-l`),
-    right: buildFactorTree(rightFactors, depth + 1, leafStart + leftFactors.length, `${id}-r`),
-  };
-};
-const createPrimeFactorTree = (values: PrimeValues): FactorNode => buildFactorTree(primeFactors(normalizePrimeValues(values).number), 0, 0, "root");
-const maximumDepth = (node: FactorNode): number => node.prime ? node.depth : Math.max(maximumDepth(node.left as FactorNode), maximumDepth(node.right as FactorNode));
-
-function layoutPrimeFactorTree(values: PrimeValues) {
-  const root = createPrimeFactorTree(values);
-  const leafCount = root.leafEnd - root.leafStart + 1;
-  const maxDepth = maximumDepth(root);
-  const width = 64 + (leafCount - 1) * leafSpacing;
-  const height = 56 + maxDepth * levelSpacing;
-  const nodes: PositionedFactorNode[] = [];
-  const edges: Array<{ from: PositionedFactorNode; to: PositionedFactorNode }> = [];
-  const leafX = (index: number): number => leafCount === 1 ? width / 2 : horizontalPadding + index * leafSpacing;
-  const positionNode = (node: FactorNode): PositionedFactorNode => {
-    const positioned = { ...node, x: (leafX(node.leafStart) + leafX(node.leafEnd)) / 2, y: verticalPadding + node.depth * levelSpacing };
-    nodes.push(positioned);
-    for (const child of [node.left, node.right]) {
-      if (child) { const positionedChild = positionNode(child); edges.push({ from: positioned, to: positionedChild }); }
-    }
-    return positioned;
-  };
-  positionNode(root);
-  return { edges, height, maxDepth, nodes, width };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `PRIMES`),
+      (n = `primes-v1`),
+      (r = { number: { kind: `integer`, defaultValue: 100, min: 2, max: 1e3 } }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-function initializePrimesSchema(): void {}
-function initializePrimesModel(): void {}
-
-export {
-  layoutPrimeFactorTree as a,
-  primesDefinition as c,
-  initializePrimesModel as i,
-  factorTreeLayout as n,
-  normalizePrimeValues as o,
-  primeFactors as r,
-  initializePrimesSchema as s,
-  numberControl as t,
-};
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x;
+function S() {
+  return (S = e(() => {
+    (a(),
+      (o = i.parameters.number),
+      (s = { defaultValue: o.defaultValue, min: o.min, max: o.max }),
+      (c = { baseMin: 2, baseMax: 200, step: 1 }),
+      (l = 32),
+      (u = 24),
+      (d = 48),
+      (f = 56),
+      (p = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (m = (e) => {
+        let t = typeof e == `number` && Number.isFinite(e) ? e : s.defaultValue;
+        return p(Math.round(t), s.min, s.max);
+      }),
+      (h = (e) => ({ number: m(e.number) })),
+      (g = (e) => {
+        let t = [],
+          n = m(e);
+        for (let e = 2; e * e <= n; e += 1) for (; n % e === 0;) (t.push(e), (n /= e));
+        return (n > 1 && t.push(n), t);
+      }),
+      (_ = (e) => e.reduce((e, t) => e * t, 1)),
+      (v = (e, t, n, r) => {
+        let i = _(e);
+        if (e.length === 1)
+          return { id: r, value: i, prime: !0, depth: t, leafStart: n, leafEnd: n };
+        let a = Math.floor(e.length / 2),
+          o = e.slice(0, a),
+          s = e.slice(a),
+          c = v(o, t + 1, n, `${r}-l`),
+          l = v(s, t + 1, n + o.length, `${r}-r`);
+        return {
+          id: r,
+          value: i,
+          prime: !1,
+          depth: t,
+          leafStart: n,
+          leafEnd: n + e.length - 1,
+          left: c,
+          right: l,
+        };
+      }),
+      (y = (e) => {
+        let { number: t } = h(e);
+        return v(g(t), 0, 0, `root`);
+      }),
+      (b = (e) => (e.prime ? e.depth : Math.max(b(e.left), b(e.right)))),
+      (x = (e) => {
+        let t = y(e),
+          n = t.leafEnd - t.leafStart + 1,
+          r = b(t),
+          i = 64 + (n - 1) * d,
+          a = 56 + r * f,
+          o = [],
+          s = [],
+          c = (e) => (n === 1 ? i / 2 : l + e * d),
+          p = (e) => {
+            let t = { ...e, x: (c(e.leafStart) + c(e.leafEnd)) / 2, y: u + e.depth * f };
+            o.push(t);
+            for (let n of [e.left, e.right])
+              if (n) {
+                let e = p(n);
+                s.push({ from: t, to: e });
+              }
+            return t;
+          };
+        return (p(t), { edges: s, height: a, maxDepth: r, nodes: o, width: i });
+      }));
+  }))();
+}
+export { x as a, i as c, S as i, c as n, h as o, g as r, a as s, s as t };

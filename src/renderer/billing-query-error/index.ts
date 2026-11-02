@@ -1,6 +1,48 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime } from "@rchunk/app-shared";
-const jsx = getJsxRuntime();
-function BillingQueryError({ onRetry }: { onRetry(): void }): unknown { return jsx.jsxs("div", { className: "flex items-center gap-2 text-sm text-warning", role: "alert", children: [jsx.jsx("span", { children: "Unable to load billing information. Please try again." }), jsx.jsx("button", { type: "button", onClick: onRetry, children: "Retry" })] }); }
-function initializeBillingQueryError(): void {}
-export { initializeBillingQueryError as n, BillingQueryError as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i, Yh as a, Zh as o } from "@rchunk/app-shared";
+function s(e) {
+  let t = (0, c.c)(4),
+    { onRetry: n } = e,
+    r;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((r = (0, l.jsx)(i, {
+        id: `settings.consumerBilling.loadError`,
+        defaultMessage: `Unable to load billing information. Please try again.`,
+        description: `Error shown in a consumer Billing settings section when its data request fails. The adjacent Retry button retries that section.`,
+      })),
+      (t[0] = r))
+    : (r = t[0]);
+  let o;
+  t[1] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((o = (0, l.jsx)(i, {
+        id: `settings.consumerBilling.retry`,
+        defaultMessage: `Retry`,
+        description: `Button that retries a failed request in consumer Billing settings`,
+      })),
+      (t[1] = o))
+    : (o = t[1]);
+  let s;
+  return (
+    t[2] === n
+      ? (s = t[3])
+      : ((s = (0, l.jsxs)(`div`, {
+          className: `flex items-center gap-2 text-sm text-warning`,
+          role: `alert`,
+          children: [
+            r,
+            (0, l.jsx)(a, { color: `secondary`, size: `toolbar`, onClick: n, children: o }),
+          ],
+        })),
+        (t[2] = n),
+        (t[3] = s)),
+    s
+  );
+}
+var c, l;
+function u() {
+  return (u = e(() => {
+    ((c = t()), r(), o(), (l = n()));
+  }))();
+}
+export { u as n, s as t };

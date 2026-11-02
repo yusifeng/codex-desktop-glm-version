@@ -1,16 +1,93 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import { rJt as apiClient } from "@rchunk/app-initial";
-import { n as initializeBillingPricing, t as resolvePricingConfig } from "@rchunk/billing-pricing";
-interface SubscriptionApi { safeGet<Response>(path: string, options: Record<string, unknown>): Promise<Response> }
-interface Subscription { account: { plan_type?: string }; entitlement: { billing_period?: string; discount?: { discount_expires_at?: string }; renews_at?: string } }
-interface PricingScope { billing_currency?: string; billing_period?: string; price_country?: string | null; pricing_scope?: "country" | "default"; scheduled_billing_period?: string }
-interface Pricing { country_code: string; currency_config: Record<string, { month?: { amount: number }; year?: { amount: number } } | string | null | undefined> & { symbol_code?: string } }
-const client = apiClient as unknown as SubscriptionApi;
-function subscriptionQuery(accountId: string) { return { queryKey: ["consumer-billing", accountId, "subscription"], queryFn: ({ signal }: { signal?: AbortSignal }) => client.safeGet("/subscriptions", { parameters: { query: { account_id: accountId } }, signal }), staleTime: 0, retry: false }; }
-function pricingScopeKey(scope?: PricingScope): string | null { return scope?.pricing_scope === "country" && scope.price_country != null ? scope.price_country : scope?.pricing_scope === "default" && scope.price_country === null ? scope.billing_currency ?? null : null; }
-function subscriptionPricingQuery(accountId: string, scope: PricingScope | undefined, isPricingEnabled: (gate: string) => boolean) { const key = pricingScopeKey(scope); return { queryKey: ["consumer-billing", accountId, "subscription-pricing", key, scope?.billing_currency], enabled: key != null, queryFn: ({ signal }: { signal?: AbortSignal }) => key == null ? null : resolvePricingConfig({ country: scope?.pricing_scope === "country" ? scope.price_country ?? undefined : undefined, currency: scope?.billing_currency, isPricingEnabled, signal }), staleTime: 0, retry: false }; }
-function renewalPrice(subscription: Subscription, scope: PricingScope | null, pricing: Pricing | null, now = Date.now()): { amount: number; currency?: string; period: string } | undefined { const expires = subscription.entitlement.discount?.discount_expires_at; const renews = subscription.entitlement.renews_at; if (!expires || !renews || !scope || !pricing) return undefined; const days = (value: string) => Math.ceil((Date.parse(value) - now) / 864e5); if (Math.abs(days(expires) - days(renews)) > 1) return undefined; const plan = subscription.account.plan_type; if (!plan || !["plus", "prolite", "pro", "go"].includes(plan)) return undefined; const period = scope.scheduled_billing_period ?? scope.billing_period ?? subscription.entitlement.billing_period; const planPricing = pricing.currency_config[plan]; if (!period || typeof planPricing !== "object" || planPricing == null) return undefined; const price = period === "yearly" ? planPricing.year : planPricing.month; return price ? { amount: period === "yearly" ? Math.round(price.amount * 12) : price.amount, currency: scope.billing_currency, period } : undefined; }
-function initializeSubscriptionQueries(): void { initializeBillingPricing(); }
-const pricingSchema = { safeParse: (value: unknown) => ({ success: value != null, data: value }) };
-export { subscriptionPricingQuery as a, initializeSubscriptionQueries as i, renewalPrice as n, subscriptionQuery as o, pricingScopeKey as r, pricingSchema as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { H4 as t, V4 as n, g4 as r, pL as i, q4 as a, x4 as o } from "@rchunk/app-shared";
+import { pdn as s, udn as c } from "@rchunk/app-initial";
+import { n as l, t as u } from "@rchunk/billing-pricing";
+function d(e) {
+  return i({
+    queryKey: [`consumer-billing`, e, `subscription`],
+    queryFn: ({ signal: t }) =>
+      c.safeGet(`/subscriptions`, { parameters: { query: { account_id: e } }, signal: t }),
+    staleTime: 0,
+    retry: !1,
+  });
+}
+function f(e, t, n) {
+  let r = p(t);
+  return i({
+    queryKey: [`consumer-billing`, e, `subscription-pricing`, r, t?.billing_currency],
+    queryFn: async ({ signal: e }) => {
+      if (r == null) return null;
+      let i = await u({
+          country: t?.pricing_scope === `country` ? (t.price_country ?? void 0) : void 0,
+          currency: t?.billing_currency,
+          isPricingEnabled: n,
+          signal: e,
+        }),
+        a = v.safeParse(i);
+      if (!a.success) return null;
+      let o = a.data;
+      return o.currency_config.symbol_code === t?.billing_currency ? o : null;
+    },
+    enabled: r != null,
+    staleTime: 0,
+    retry: !1,
+  });
+}
+function p(e) {
+  return e?.pricing_scope === `country` && e.price_country != null
+    ? e.price_country
+    : e?.pricing_scope === "default" && e.price_country === null
+      ? e.billing_currency
+      : null;
+}
+function m(e, t) {
+  return (
+    e != null &&
+    p(e) != null &&
+    t.currency_config.symbol_code === e.billing_currency &&
+    (e.pricing_scope !== `country` || t.country_code === e.price_country)
+  );
+}
+function h(e, t, n, r = Date.now()) {
+  let i = e.entitlement.discount?.discount_expires_at,
+    a = e.entitlement.renews_at;
+  if (i == null || a == null || t == null || n == null) return;
+  let o = Math.ceil((Date.parse(i) - r) / 864e5),
+    s = Math.ceil((Date.parse(a) - r) / 864e5);
+  if (!Number.isFinite(o) || !Number.isFinite(s) || Math.abs(o - s) > 1) return;
+  let c = e.account.plan_type;
+  if (c !== `plus` && c !== `prolite` && c !== `pro` && c !== `go`) return;
+  let l = t.scheduled_billing_period ?? t.billing_period ?? e.entitlement.billing_period;
+  if (l == null || !m(t, n)) return;
+  let u = l === `yearly` ? n.currency_config[c]?.year : n.currency_config[c]?.month;
+  if (u != null)
+    return {
+      amount: l === `yearly` ? Math.round(u.amount * 12) : u.amount,
+      currency: t.billing_currency,
+      period: l,
+    };
+}
+var g, _, v;
+function y() {
+  return (y = e(() => {
+    (r(),
+      s(),
+      l(),
+      (g = t({ amount: n().nonnegative(), tax: o([`inclusive`, `exclusive`]).optional() })),
+      (_ = t({ month: g.optional(), year: g.optional() })),
+      (v = t({
+        country_code: a(),
+        currency_config: t({
+          symbol_code: a().min(1),
+          minor_unit_exponent: n().int().nonnegative().nullish(),
+          pricing_rollout_gate: a().nullish(),
+          go: _.optional(),
+          plus: _.optional(),
+          prolite: _.optional(),
+          pro: _.optional(),
+        }),
+      })));
+  }))();
+}
+export { f as a, y as i, h as n, d as o, p as r, v as t };

@@ -1,120 +1,195 @@
-import "@rchunk/rolldown-runtime";
-import {
-  $3 as initializeSharedRuntime,
-  I3 as getJsxRuntime,
-  K2 as initializeUiRuntime,
-  e6 as getReactRuntime,
-  n4 as useIntl,
-  type JsxRuntime,
-} from "@rchunk/app-shared";
-import { Trt as initializeLightbox, wrt as Lightbox } from "@rchunk/app-initial";
-
-interface VideoRequest {
-  selectedIndex: number;
-  videos: readonly { title?: string | null; videoId: string }[];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, e6 as i, n4 as a } from "@rchunk/app-shared";
+import { Trt as o, wrt as s } from "@rchunk/app-initial";
+function c(e) {
+  let t = (0, l.c)(40),
+    { request: n, onClose: r, onCloseAutoFocus: i } = e,
+    o = a(),
+    [c, f] = (0, u.useState)(n.selectedIndex),
+    p = n.videos[c];
+  if (p == null) return null;
+  let m;
+  t[0] !== o || t[1] !== p.title
+    ? ((m =
+        p.title ??
+        o.formatMessage({
+          id: `chatgpt.videoLightbox.playerTitle`,
+          defaultMessage: `YouTube video player`,
+          description: `Accessible title of the embedded YouTube player in the video lightbox when the video has no title`,
+        })),
+      (t[0] = o),
+      (t[1] = p.title),
+      (t[2] = m))
+    : (m = t[2]);
+  let h = m,
+    g = `https://www.youtube.com/embed/${p.videoId}?autoplay=1&playsinline=1&rel=0&fs=0`,
+    _ = h;
+  if (n.videos.length > 1) {
+    let e;
+    (t[3] !== o || t[4] !== n.videos.length || t[5] !== c || t[6] !== p.title
+      ? ((e =
+          p.title == null
+            ? o.formatMessage(
+                {
+                  id: `chatgpt.videoLightbox.position`,
+                  defaultMessage: `Video {current, number} of {total, number}`,
+                  description: `Caption in the video lightbox when the selected video has no title; current is its one-based position and total is the number of videos`,
+                },
+                { current: c + 1, total: n.videos.length },
+              )
+            : o.formatMessage(
+                {
+                  id: `chatgpt.videoLightbox.titleAndPosition`,
+                  defaultMessage: `{title} ({current, number} of {total, number})`,
+                  description: `Caption in the video lightbox; title is the selected video's title, current is its one-based position, and total is the number of videos`,
+                },
+                { title: p.title, current: c + 1, total: n.videos.length },
+              )),
+        (t[3] = o),
+        (t[4] = n.videos.length),
+        (t[5] = c),
+        (t[6] = p.title),
+        (t[7] = e))
+      : (e = t[7]),
+      (_ = e));
+  }
+  let v = _,
+    y;
+  t[8] === o
+    ? (y = t[9])
+    : ((y = o.formatMessage({
+        id: `chatgpt.videoLightbox.close`,
+        defaultMessage: `Close video player`,
+        description: `Accessible label of the button closing the video lightbox`,
+      })),
+      (t[8] = o),
+      (t[9] = y));
+  let b;
+  t[10] === o
+    ? (b = t[11])
+    : ((b = o.formatMessage({
+        id: `chatgpt.videoLightbox.dialogLabel`,
+        defaultMessage: `Video player`,
+        description: `Accessible label of the video lightbox dialog`,
+      })),
+      (t[10] = o),
+      (t[11] = b));
+  let x;
+  t[12] === o
+    ? (x = t[13])
+    : ((x = o.formatMessage({
+        id: `chatgpt.videoLightbox.nextVideo`,
+        defaultMessage: `Next video`,
+        description: `Accessible label of the next-video button in the video lightbox`,
+      })),
+      (t[12] = o),
+      (t[13] = x));
+  let S;
+  t[14] !== n.videos.length || t[15] !== c
+    ? ((S = c >= n.videos.length - 1 ? void 0 : () => f(c + 1)),
+      (t[14] = n.videos.length),
+      (t[15] = c),
+      (t[16] = S))
+    : (S = t[16]);
+  let C;
+  t[17] === r
+    ? (C = t[18])
+    : ((C = (e) => {
+        e || r();
+      }),
+      (t[17] = r),
+      (t[18] = C));
+  let w;
+  t[19] === c ? (w = t[20]) : ((w = c === 0 ? void 0 : () => f(c - 1)), (t[19] = c), (t[20] = w));
+  let T;
+  t[21] !== g || t[22] !== h || t[23] !== p.videoId
+    ? ((T = (0, d.jsx)(`div`, {
+        className: `[container-type:size] pointer-events-none flex size-full items-center justify-center`,
+        children: (0, d.jsx)(`div`, {
+          className: `pointer-events-auto aspect-[9/16] w-[min(100cqw,56.25cqh)] overflow-hidden rounded-lg bg-surface`,
+          children: (0, d.jsx)(
+            `iframe`,
+            {
+              className: `size-full border-0`,
+              allow: `accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share`,
+              allowFullScreen: !0,
+              referrerPolicy: `strict-origin-when-cross-origin`,
+              src: g,
+              title: h,
+            },
+            p.videoId,
+          ),
+        }),
+      })),
+      (t[21] = g),
+      (t[22] = h),
+      (t[23] = p.videoId),
+      (t[24] = T))
+    : (T = t[24]);
+  let E;
+  t[25] === o
+    ? (E = t[26])
+    : ((E = o.formatMessage({
+        id: `chatgpt.videoLightbox.previousVideo`,
+        defaultMessage: `Previous video`,
+        description: `Accessible label of the previous-video button in the video lightbox`,
+      })),
+      (t[25] = o),
+      (t[26] = E));
+  let D;
+  return (
+    t[27] !== _ ||
+    t[28] !== i ||
+    t[29] !== g ||
+    t[30] !== E ||
+    t[31] !== y ||
+    t[32] !== b ||
+    t[33] !== x ||
+    t[34] !== S ||
+    t[35] !== C ||
+    t[36] !== w ||
+    t[37] !== T ||
+    t[38] !== h
+      ? ((D = (0, d.jsx)(s, {
+          alt: h,
+          caption: v,
+          closeAriaLabel: y,
+          dialogAriaLabel: b,
+          nextAriaLabel: x,
+          onCloseAutoFocus: i,
+          onNextImage: S,
+          onOpenChange: C,
+          onPreviousImage: w,
+          open: !0,
+          previewContent: T,
+          previousAriaLabel: E,
+          showDownload: !1,
+          showZoomControls: !1,
+          src: g,
+        })),
+        (t[27] = _),
+        (t[28] = i),
+        (t[29] = g),
+        (t[30] = E),
+        (t[31] = y),
+        (t[32] = b),
+        (t[33] = x),
+        (t[34] = S),
+        (t[35] = C),
+        (t[36] = w),
+        (t[37] = T),
+        (t[38] = h),
+        (t[39] = D))
+      : (D = t[39]),
+    D
+  );
 }
-interface VideoLightboxProps {
-  onClose(): void;
-  onCloseAutoFocus?: () => void;
-  request: VideoRequest;
+var l, u, d;
+function f() {
+  return (f = e(() => {
+    ((l = t()), (u = i()), r(), o(), (d = n()));
+  }))();
 }
-interface IntlRuntime {
-  formatMessage(
-    descriptor: { defaultMessage: string; description?: string; id: string },
-    values?: Record<string, string | number>,
-  ): string;
-}
-interface ReactHooks {
-  useCallback<Callback>(callback: Callback, dependencies: readonly unknown[]): Callback;
-  useState<Value>(initialValue: Value): [Value, (value: Value | ((current: Value) => Value)) => void];
-}
-
-let React: ReactHooks;
-let jsx: JsxRuntime;
-let initialized = false;
-
-function ChatGptVideoLightbox({ request, onClose, onCloseAutoFocus }: VideoLightboxProps): unknown {
-  const intl = useIntl() as IntlRuntime;
-  const [selectedIndex, setSelectedIndex] = React.useState(request.selectedIndex);
-  const video = request.videos[selectedIndex];
-  const close = React.useCallback((open: boolean): void => {
-    if (!open) onClose();
-  }, [onClose]);
-  const previous = React.useCallback((): void => {
-    setSelectedIndex((current) => Math.max(0, current - 1));
-  }, []);
-  const next = React.useCallback((): void => {
-    setSelectedIndex((current) => Math.min(request.videos.length - 1, current + 1));
-  }, [request.videos.length]);
-  if (video == null) return null;
-
-  const title = video.title ?? intl.formatMessage({
-    id: "chatgpt.videoLightbox.playerTitle",
-    defaultMessage: "YouTube video player",
-    description: "Accessible title of the embedded YouTube player in the video lightbox when the video has no title",
-  });
-  const source = "https://www.youtube.com/embed/" + video.videoId + "?autoplay=1&playsinline=1&rel=0&fs=0";
-  const caption = request.videos.length === 1
-    ? title
-    : video.title == null
-      ? intl.formatMessage({
-          id: "chatgpt.videoLightbox.position",
-          defaultMessage: "Video {current, number} of {total, number}",
-          description: "Caption in the video lightbox when the selected video has no title",
-        }, { current: selectedIndex + 1, total: request.videos.length })
-      : intl.formatMessage({
-          id: "chatgpt.videoLightbox.titleAndPosition",
-          defaultMessage: "{title} ({current, number} of {total, number})",
-          description: "Caption in the video lightbox with its position",
-        }, { title: video.title, current: selectedIndex + 1, total: request.videos.length });
-  const closeLabel = intl.formatMessage({ id: "chatgpt.videoLightbox.close", defaultMessage: "Close video player" });
-  const dialogLabel = intl.formatMessage({ id: "chatgpt.videoLightbox.dialogLabel", defaultMessage: "Video player" });
-  const nextLabel = intl.formatMessage({ id: "chatgpt.videoLightbox.nextVideo", defaultMessage: "Next video" });
-  const previousLabel = intl.formatMessage({ id: "chatgpt.videoLightbox.previousVideo", defaultMessage: "Previous video" });
-  const previewContent = jsx.jsx("div", {
-    className: "[container-type:size] pointer-events-none flex size-full items-center justify-center",
-    children: jsx.jsx("div", {
-      className: "pointer-events-auto aspect-[9/16] w-[min(100cqw,56.25cqh)] overflow-hidden rounded-lg bg-surface",
-      children: jsx.jsx("iframe", {
-        className: "size-full border-0",
-        allow: "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share",
-        allowFullScreen: true,
-        referrerPolicy: "strict-origin-when-cross-origin",
-        src: source,
-        title,
-      }, video.videoId),
-    }),
-  });
-
-  return jsx.jsx(Lightbox, {
-    alt: title,
-    caption,
-    closeAriaLabel: closeLabel,
-    dialogAriaLabel: dialogLabel,
-    nextAriaLabel: nextLabel,
-    onCloseAutoFocus,
-    onNextImage: selectedIndex >= request.videos.length - 1 ? undefined : next,
-    onOpenChange: close,
-    onPreviousImage: selectedIndex === 0 ? undefined : previous,
-    open: true,
-    previewContent,
-    previousAriaLabel: previousLabel,
-    showDownload: false,
-    showZoomControls: false,
-    src: source,
-  });
-}
-
-function initializeChatGptVideoLightbox(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeSharedRuntime();
-  React = getReactRuntime() as unknown as ReactHooks;
-  initializeUiRuntime();
-  initializeLightbox();
-  jsx = getJsxRuntime();
-}
-
-initializeChatGptVideoLightbox();
-
-export { ChatGptVideoLightbox };
+f();
+export { c as ChatGptVideoLightbox };

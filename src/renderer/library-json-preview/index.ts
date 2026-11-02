@@ -1,18 +1,75 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/codemirror-view-runtime";
-import "@rchunk/codemirror-json-runtime";
-import "@rchunk/chatgpt-code-block-highlighting";
-
-export interface LibraryJsonPreviewProps { content: string; fileName: string }
-let runtime: JsxRuntime | undefined;
-function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function LibraryJsonPreview({ content, fileName }: LibraryJsonPreviewProps): unknown {
-  let valid = true;
-  try { JSON.parse(content); } catch { valid = false; }
-  return jsx().jsxs("section", { "aria-label": `${fileName} JSON preview`, "data-json-valid": valid, onKeyDown: (event: { stopPropagation(): void }) => event.stopPropagation(), children: [
-    jsx().jsxs("header", { children: [jsx().jsx("span", { children: fileName }), jsx().jsx("span", { role: "status", children: valid ? "Valid JSON" : "Invalid JSON" })] }),
-    jsx().jsx("pre", { tabIndex: 0, children: jsx().jsx("code", { "data-language": "json", children: content }) }),
-  ] });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, e6 as r } from "@rchunk/app-shared";
+import { B as i, M as a, R as o, _t as s, tt as c } from "@rchunk/codemirror-view-runtime";
+import { n as l, t as u } from "@rchunk/codemirror-json-runtime";
+import { n as d, r as f } from "@rchunk/chatgpt-code-block-highlighting";
+function p(e) {
+  let t = (0, h.c)(6),
+    { content: n, fileName: r } = e,
+    [i, o] = (0, g.useState)(null),
+    s,
+    c;
+  (t[0] !== i || t[1] !== n || t[2] !== r
+    ? ((s = () => {
+        if (i == null) return;
+        let e = new a({
+          parent: i,
+          doc: n,
+          extensions: [v, a.contentAttributes.of({ "aria-label": r, tabindex: `0` })],
+        });
+        return () => e.destroy();
+      }),
+      (c = [i, n, r]),
+      (t[0] = i),
+      (t[1] = n),
+      (t[2] = r),
+      (t[3] = s),
+      (t[4] = c))
+    : ((s = t[3]), (c = t[4])),
+    (0, g.useLayoutEffect)(s, c));
+  let l;
+  return (
+    t[5] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((l = (0, _.jsx)(`div`, {
+          ref: o,
+          className: `h-full min-h-0 w-full overflow-auto bg-surface text-start text-sm`,
+          dir: `ltr`,
+          onPointerDown: m,
+        })),
+        (t[5] = l))
+      : (l = t[5]),
+    l
+  );
 }
-export { LibraryJsonPreview };
+function m(e) {
+  return e.stopPropagation();
+}
+var h, g, _, v;
+function y() {
+  return (y = e(() => {
+    ((h = t()),
+      u(),
+      s(),
+      o(),
+      (g = r()),
+      f(),
+      (_ = n()),
+      (v = [
+        a.theme({
+          ".cm-content": { lineHeight: `var(--text-sm--line-height)` },
+          ".text-codex-syntax-string": {
+            color: `light-dark(#2c6732, var(--color-codex-syntax-string))`,
+          },
+        }),
+        d,
+        l(),
+        i(),
+        c.readOnly.of(!0),
+        a.editable.of(!1),
+        a.lineWrapping,
+      ]));
+  }))();
+}
+y();
+export { p as LibraryJsonPreview };

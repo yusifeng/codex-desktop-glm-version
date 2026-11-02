@@ -1,15 +1,36 @@
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-
-function parseSkillMarkdownOverrides(value: unknown): Record<string, string> {
-  if (!isRecord(value)) return {};
-  const source = isRecord(value.skill_markdown_by_id) ? value.skill_markdown_by_id : {};
-  const result: Record<string, string> = {};
-  for (const [skillId, markdown] of Object.entries(source)) if (typeof markdown === "string" && markdown.trim()) result[skillId] = markdown;
-  return result;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, G4 as n, H4 as r, Z4 as i, g4 as a, q4 as o } from "@rchunk/app-shared";
+import { afn as s, ifn as c } from "@rchunk/app-initial";
+function l() {
+  let e = (0, f.c)(2),
+    { value: t } = s(p),
+    n;
+  return (e[0] === t ? (n = e[1]) : ((n = u(t)), (e[0] = t), (e[1] = n)), n);
 }
-const recommendedSkillMarkdown = (overrides: Record<string, string>, skillId: string): string | undefined => overrides[skillId];
-const readRecommendedSkillOverrides = (value: unknown = {}): Record<string, string> => parseSkillMarkdownOverrides(value);
-const initialize = (): void => {};
-const isRecord = (value: unknown): value is Record<string, unknown> => typeof value === "object" && value != null && !Array.isArray(value);
-export { initialize as n, readRecommendedSkillOverrides as r, recommendedSkillMarkdown as t };
+function u(e) {
+  let t = {},
+    n = h.parse(e);
+  for (let [e, r] of Object.entries(n.skill_markdown_by_id ?? {})) {
+    let n = m.safeParse(r);
+    n.success && (t[e] = n.data);
+  }
+  return t;
+}
+function d(e, t) {
+  return e[t];
+}
+var f, p, m, h;
+function g() {
+  return (g = e(() => {
+    ((f = t()),
+      a(),
+      c(),
+      (p = `1852350085`),
+      (m = o().refine((e) => e.trim().length > 0)),
+      (h = r({ skill_markdown_by_id: n(o(), i()).optional() }).catch({
+        skill_markdown_by_id: {},
+      })));
+  }))();
+}
+export { g as n, l as r, d as t };

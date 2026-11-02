@@ -1,25 +1,44 @@
-import "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-
-function randomIndex(minimum: number, maximum: number): number {
-  return minimum + Math.floor(Math.random() * (maximum - minimum + 1));
-}
-
-function shuffleSelf<T>(array: T[], size = array.length): T[] {
-  const lastIndex = array.length - 1;
-  for (let index = 0; index < size; index += 1) {
-    const selectedIndex = randomIndex(index, lastIndex);
-    const value = array[selectedIndex];
-    array[selectedIndex] = array[index];
-    array[index] = value;
-  }
-  array.length = size;
-  return array;
-}
-
-function objectValues<T>(value: Record<string, T> | null | undefined): T[] {
-  if (value == null) return [];
-  return Object.keys(value).map((key) => value[key]);
-}
-
-export { shuffleSelf as n, objectValues as t };
+// @ts-nocheck
+import { t as e } from "@rchunk/rolldown-runtime";
+import { bY as t, m3 as n } from "@rchunk/app-shared";
+var r = e((e, t) => {
+    var n = Math.floor,
+      r = Math.random;
+    function i(e, t) {
+      return e + n(r() * (t - e + 1));
+    }
+    t.exports = i;
+  }),
+  i = e((e, t) => {
+    var n = r();
+    function i(e, t) {
+      var r = -1,
+        i = e.length,
+        a = i - 1;
+      for (t = t === void 0 ? i : t; ++r < t;) {
+        var o = n(r, a),
+          s = e[o];
+        ((e[o] = e[r]), (e[r] = s));
+      }
+      return ((e.length = t), e);
+    }
+    t.exports = i;
+  }),
+  a = e((e, n) => {
+    var r = t();
+    function i(e, t) {
+      return r(t, function (t) {
+        return e[t];
+      });
+    }
+    n.exports = i;
+  }),
+  o = e((e, t) => {
+    var r = a(),
+      i = n();
+    function o(e) {
+      return e == null ? [] : r(e, i(e));
+    }
+    t.exports = o;
+  });
+export { i as n, o as t };

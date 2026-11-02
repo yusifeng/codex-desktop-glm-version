@@ -1,655 +1,731 @@
-// appgen-site-detail-layout —— Site 详情页的共享标题栏、标签导航与内容容器。
-// 原版：app/webview/assets/appgen-site-detail-layout-26be1094f84a.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as tabsChunk from "@rchunk/security-tabs";
-import * as breadcrumbChunk from "@rchunk/toolbar-breadcrumb";
-import * as appgenAccessChunk from "@rchunk/appgen-access";
-import * as disabledTooltipChunk from "@rchunk/appgen-disabled-tooltip";
-import * as startConversationChunk from "@rchunk/start-appgen-conversation";
-import { formatBrowserUrl as formatSiteHost } from "../app-primary/runtime/format-browser-url";
-import type {
-  IntlShape,
-  JsxRuntime,
-  MaitaiScopeApi,
-  ReadableSignal,
-  ScopedQueryFamily,
-  ScopedQueryResult,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $h as n,
+  AT as r,
+  BX as i,
+  Bk as a,
+  C_ as o,
+  FX as s,
+  HX as c,
+  Hk as l,
+  I3 as u,
+  K2 as d,
+  LX as f,
+  QI as p,
+  Qh as m,
+  S_ as h,
+  Vk as g,
+  Y2 as _,
+  Yh as v,
+  ZI as ee,
+  Zh as y,
+  c_ as b,
+  e6 as te,
+  if as ne,
+  jT as re,
+  n4 as ie,
+  o_ as x,
+  rf as S,
 } from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-type SiteDetailTab = "analytics" | "automations" | "database" | "settings";
-
-interface AppgenSite {
-  current_user_role?: string;
-  current_live_url?: string | null;
-  disabled_by?: string | null;
-  id: string;
-  latest_edit_context?: unknown;
-  screenshot_url?: string | null;
-  slug: string;
-  status?: string;
-  title: string;
-}
-
-interface AppgenSiteDetailLayoutProps {
-  children(site: AppgenSite): unknown;
-  prefetchTab?(tab: SiteDetailTab): Promise<unknown>;
-  projectId: string;
-  selectedTab: SiteDetailTab;
-}
-
-interface ReactContext<T> {
-  Provider: unknown;
-  value?: T;
-}
-
-interface ReactRuntime {
-  createContext<T>(value: T): ReactContext<T>;
-  useContext<T>(context: ReactContext<T>): T;
-  useEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void;
-  useEffectEvent<Callback extends (...args: never[]) => unknown>(callback: Callback): Callback;
-  useRef<T>(value: T): { current: T };
-}
-
-interface AppInitialBindings {
-  Aet(): void;
-  B9: unknown;
-  Nan(): void;
-  Pan(
-    scope: MaitaiScopeApi<Record<string, unknown>>,
-    event: {
-      action: string;
-      page?: string;
-      projectId: string;
-      source: string;
-    },
-  ): void;
-  Qgn(): void;
-  V9(): void;
-  Ygn: unknown;
-  _an(): void;
-  a3t(): void;
-  aan: ScopedQueryFamily<Record<string, unknown>, string, AppgenSite>;
-  ann(projectId: string): string;
-  can: ReadableSignal<ScopedQueryResult<{ database?: boolean }>>;
-  cnn(projectId: string): string;
-  d2(): void;
-  enn: string;
-  h2(): (options: Record<string, unknown>) => void;
-  h7(): void;
-  i3t: unknown;
-  ifn(): void;
-  inn(projectId: string): string;
-  ket: unknown;
-  lnn(): void;
-  m7: unknown;
-  o_n(): (destination: string) => void;
-  ofn(flagId: string): boolean;
-  onn(projectId: string): string;
-  pfn(): void;
-  sfn(flagId: string): boolean;
-  vfn: ReadableSignal<boolean>;
-  wan(url: string | null): { data?: string | null };
-}
-
-interface AppPrimaryBindings {
-  Sf(): void;
-}
-
-const {
-  $3: initializeRuntimeLazy,
-  $h: initializeResourceButton,
-  AT: initializeMountedState,
-  Bk: interactionActions,
-  BX: useSignalFamilyValue,
-  C_: initializeIconAsset,
-  FX: initializeSignalRuntime,
-  Hk: interactionSources,
-  HX: useSignalValue,
-  I3: getJsxRuntime,
-  K2: initializeSharedComponents,
-  LX: useSignalScope,
-  QI: initializeSharedRuntime,
-  Qh: LoadingSpinner,
-  S_: IconAsset,
-  Vk: interactionPages,
-  Y2: FormattedMessage,
-  Yh: Button,
-  ZI: applicationScope,
-  Zh: initializeButton,
-  c_: initializeTooltip,
-  e6: reactRuntimeExport,
-  if: useIsMounted,
-  jT: editIconAsset,
-  n4: useIntl,
-  o_: Tooltip,
-  rf: initializeIntl,
-} = appSharedChunk;
-const {
-  Aet: initializeAppgenHeader,
-  B9: Header,
-  Nan: initializeScreenshotQuery,
-  Pan: trackAppgenInteraction,
-  Qgn: initializeGptResources,
-  V9: initializeNavigationComponents,
-  Ygn: Navigate,
-  _an: initializeAppgenRouting,
-  a3t: initializeAppgenFeatureFlags,
-  aan: appgenSiteQuery,
-  ann: appgenAutomationsRoute,
-  can: databaseAvailabilityQuery,
-  cnn: appgenSettingsRoute,
-  d2: initializeSiteComponents,
-  enn: sitesDefaultRoute,
-  h2: useStartConversationFromHome,
-  h7: initializeHeaderLayout,
-  i3t: SiteIcon,
-  ifn: initializeExperiments,
-  inn: appgenAnalyticsRoute,
-  ket: ErrorStateView,
-  lnn: initializeAppgenConversation,
-  m7: HeaderBoundary,
-  o_n: useNavigate,
-  ofn: useFeatureGate,
-  onn: appgenDatabaseRoute,
-  pfn: initializeMigrationExperiment,
-  sfn: useFeatureGateLoading,
-  vfn: automationsAvailabilityLoadingSignal,
-  wan: useScreenshot,
-} = appInitialChunk as unknown as AppInitialBindings;
-const { Sf: initializeAppgenFormatting } = appPrimaryChunk as unknown as AppPrimaryBindings;
-const { n: initializeTabs, t: Tabs } = tabsChunk;
-const { n: initializeBreadcrumb, t: ToolbarBreadcrumb } = breadcrumbChunk;
-const {
-  s: initializeAppgenAccess,
-  t: canManageAppgenSite,
-} = appgenAccessChunk;
-const {
-  n: initializeDisabledTooltip,
-  t: AppgenDisabledTooltip,
-} = disabledTooltipChunk;
-const {
-  n: startAppgenConversation,
-  t: initializeStartAppgenConversation,
-} = startConversationChunk;
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let SiteContext: ReactContext<AppgenSite | null>;
-let ANALYTICS_PANEL_ID: string;
-let DATABASE_PANEL_ID: string;
-let AUTOMATIONS_PANEL_ID: string;
-let SETTINGS_PANEL_ID: string;
-
-function AppgenSiteDetailLayout(props: AppgenSiteDetailLayoutProps): unknown {
-  const existingSite = React.useContext(SiteContext);
-  if (existingSite != null) {
-    return jsx.jsx(jsx.Fragment, { children: props.children(existingSite) });
+import {
+  Aet as C,
+  B9 as w,
+  Nan as ae,
+  Pan as oe,
+  Qgn as T,
+  V9 as E,
+  Ygn as se,
+  _an as D,
+  a3t as O,
+  aan as ce,
+  ann as le,
+  can as ue,
+  cnn as de,
+  d2 as k,
+  enn as fe,
+  h2 as pe,
+  h7 as A,
+  i3t as j,
+  ifn as M,
+  inn as me,
+  ket as N,
+  lnn as P,
+  m7 as he,
+  o_n as ge,
+  ofn as F,
+  onn as _e,
+  pfn as I,
+  sfn as ve,
+  vfn as ye,
+  wan as be,
+} from "@rchunk/app-initial";
+import { Sf as L, xf as R } from "@rchunk/app-primary";
+import { n as z, t as xe } from "@rchunk/security-tabs";
+import { n as B, t as V } from "@rchunk/toolbar-breadcrumb";
+import { s as H, t as Se } from "@rchunk/appgen-access";
+import { n as U, t as W } from "@rchunk/appgen-disabled-tooltip";
+import { n as Ce, t as G } from "@rchunk/start-appgen-conversation";
+function K(e) {
+  let t = (0, Y.c)(7),
+    n = (0, X.useContext)(Me);
+  if (n != null) {
+    let r;
+    t[0] !== n || t[1] !== e.children
+      ? ((r = e.children(n)), (t[0] = n), (t[1] = e.children), (t[2] = r))
+      : (r = t[2]);
+    let i;
+    return (
+      t[3] === r
+        ? (i = t[4])
+        : ((i = (0, Z.jsx)(Z.Fragment, { children: r })), (t[3] = r), (t[4] = i)),
+      i
+    );
   }
-  return jsx.jsx(AppgenSiteDetailLayoutRoot, { ...props });
+  let r;
+  return (t[5] === e ? (r = t[6]) : ((r = (0, Z.jsx)(q, { ...e })), (t[5] = e), (t[6] = r)), r);
 }
-
-function AppgenSiteDetailLayoutRoot({
-  children,
-  prefetchTab,
-  projectId,
-  selectedTab,
-}: AppgenSiteDetailLayoutProps): unknown {
-  const scope = useSignalScope(applicationScope);
-  const navigate = useNavigate();
-  const intl = useIntl();
-  const isMounted = useIsMounted();
-  const navigationSequence = React.useRef(0);
-  const startConversationFromHome = useStartConversationFromHome();
-  const automationsEnabled = useFeatureGate("282477705");
-  const automationsFlagLoading = useFeatureGateLoading("282477705");
-  const automationsAvailabilityLoading = useSignalValue(
-    automationsAvailabilityLoadingSignal,
-  );
-  const analyticsEnabled = useFeatureGate("262557526");
-  const databaseEnabled = useFeatureGate("1912312436");
-  const { data: databaseAvailability, isError: databaseAvailabilityError } =
-    useSignalValue(databaseAvailabilityQuery, { enabled: databaseEnabled });
-  const {
-    data: site,
-    isError: siteError,
-    isLoading: siteLoading,
-  } = useSignalFamilyValue(appgenSiteQuery, projectId);
-  const canManageSite = canManageAppgenSite(site);
-
-  const trackPageView = React.useEffectEvent(() => {
-    let page;
-    switch (selectedTab) {
-      case "automations":
-        return;
-      case "analytics":
-        page = interactionPages.CODEX_APPGEN_INTERACTION_PAGE_ANALYTICS;
-        break;
-      case "database":
-        page = interactionPages.CODEX_APPGEN_INTERACTION_PAGE_DATABASE;
-        break;
-      case "settings":
-        page = interactionPages.CODEX_APPGEN_INTERACTION_PAGE_SETTINGS;
-    }
-    trackAppgenInteraction(scope, {
-      action: interactionActions.CODEX_APPGEN_INTERACTION_ACTION_PAGE_VIEWED,
-      page,
-      projectId,
-      source: interactionSources.CODEX_APPGEN_INTERACTION_SOURCE_SITE_DETAILS,
-    });
-  });
-  const pageViewKey =
-    site == null ||
-    siteLoading ||
-    siteError ||
-    (selectedTab === "settings" && !canManageSite) ||
-    selectedTab === "automations" ||
-    (selectedTab === "analytics" && !analyticsEnabled) ||
-    (selectedTab === "database" &&
-      (!databaseEnabled ||
-        databaseAvailabilityError ||
-        databaseAvailability?.database !== true))
-      ? null
-      : `${site.id}:${selectedTab}`;
-  React.useEffect(() => {
-    if (pageViewKey != null) trackPageView();
-  }, [pageViewKey]);
-
-  const { data: screenshotSrc } = useScreenshot(site?.screenshot_url ?? null);
-  const liveUrl = site?.status === "suspended" ? null : site?.current_live_url;
-
-  if (site != null && selectedTab === "settings" && !canManageSite) {
-    return jsx.jsx(Navigate, { replace: true, to: sitesDefaultRoute });
-  }
-  if (
-    selectedTab === "automations" &&
-    (automationsAvailabilityLoading || automationsFlagLoading)
-  ) {
-    return jsx.jsx(LoadingSpinner, {});
-  }
-  if (
-    selectedTab === "automations" &&
-    (!automationsEnabled || (site != null && !canManageSite))
-  ) {
-    return jsx.jsx(Navigate, {
-      replace: true,
-      to: appgenSettingsRoute(projectId),
-    });
-  }
-
-  const tabItems = [
-    {
-      key: "settings",
-      name: jsx.jsx(FormattedMessage, {
-        id: "appgenSiteDetail.navigation.settings",
-        defaultMessage: "Settings",
-        description: "Tab label for Site settings",
-      }),
-      panelId: SETTINGS_PANEL_ID,
-    },
-  ];
-  if (analyticsEnabled || selectedTab === "analytics") {
-    tabItems.push({
-      key: "analytics",
-      name: jsx.jsx(FormattedMessage, {
-        id: "appgenSiteDetail.navigation.analytics",
-        defaultMessage: "Analytics",
-        description: "Tab label for Site analytics",
-      }),
-      panelId: ANALYTICS_PANEL_ID,
-    });
-  }
-  if (
-    (databaseEnabled && databaseAvailability?.database === true) ||
-    selectedTab === "database"
-  ) {
-    tabItems.push({
-      key: "database",
-      name: jsx.jsx(FormattedMessage, {
-        id: "appgenSiteDetail.navigation.database",
-        defaultMessage: "Database",
-        description: "Tab label for the Site database viewer",
-      }),
-      panelId: DATABASE_PANEL_ID,
-    });
-  }
-  if (automationsEnabled && canManageSite) {
-    tabItems.push({
-      key: "automations",
-      name: jsx.jsx(FormattedMessage, {
-        id: "appgenSiteDetail.navigation.automations",
-        defaultMessage: "Automations",
-        description: "Tab label for a Site's cloud scheduled tasks",
-      }),
-      panelId: AUTOMATIONS_PANEL_ID,
-    });
-  }
-
-  const selectedPanel = getSelectedPanel(selectedTab, intl);
-  const onBack = () => navigate("/sites");
-  const onEdit =
-    site == null
-      ? undefined
-      : () => {
-          trackAppgenInteraction(scope, {
-            action:
-              interactionActions
-                .CODEX_APPGEN_INTERACTION_ACTION_EDIT_WITH_CHAT_CLICKED,
-            projectId: site.id,
-            source:
-              interactionSources.CODEX_APPGEN_INTERACTION_SOURCE_SITE_DETAILS,
-          });
-          startAppgenConversation(scope, startConversationFromHome, {
-            type: "edit",
-            liveUrl,
-            projectId: site.id,
-            projectTitle: site.title,
-            latestEditContext: site.latest_edit_context,
-          }, {});
-        };
-  const header = jsx.jsx(SiteDetailHeader, { site, onBack, onEdit });
-
-  let pageContent;
-  if (siteLoading) {
-    pageContent = jsx.jsx(LoadingState, {});
-  } else if (siteError || site == null) {
-    pageContent = jsx.jsx(ErrorState, {});
-  } else {
-    const siteSummary = jsx.jsx(SiteSummary, { screenshotSrc, site });
-    const ariaLabel = intl.formatMessage({
-      id: "appgenSiteDetail.navigation.label",
-      defaultMessage: "Site details",
-      description:
-        "Accessible label for navigation between Site settings, analytics, and database",
-    });
-    const selectTab = (tab: SiteDetailTab) => {
-      let destination: string;
-      switch (tab) {
-        case "automations":
-          destination = appgenAutomationsRoute(projectId);
-          break;
-        case "settings":
-          destination = appgenSettingsRoute(projectId);
-          break;
-        case "analytics":
-          destination = appgenAnalyticsRoute(projectId);
-          break;
-        case "database":
-          destination = appgenDatabaseRoute(projectId);
-      }
-      const sequence = (navigationSequence.current += 1);
-      (prefetchTab?.(tab) ?? Promise.resolve()).catch(ignoreError).then(() => {
-        if (isMounted() && sequence === navigationSequence.current)
-          navigate(destination);
-      });
-    };
-    const tabNavigation = jsx.jsx("div", {
-      className: "border-b border-subtle pb-6",
-      children: jsx.jsx(Tabs, {
-        ariaLabel,
-        selectedKey: selectedTab,
-        tabs: tabItems,
-        variant: "toolbar",
-        onSelect: selectTab,
-      }),
-    });
-    const siteContent = jsx.jsx(SiteContext.Provider, {
-      value: site,
-      children: children(site),
-    });
-    const panel = jsx.jsx("div", {
-      id: selectedPanel.id,
-      "aria-label": selectedPanel.label,
-      role: "tabpanel",
-      children: siteContent,
-    });
-    pageContent = jsx.jsxs(jsx.Fragment, {
-      children: [siteSummary, tabNavigation, panel],
-    });
-  }
-
-  return jsx.jsxs("div", {
-    className: "flex h-full min-h-0 flex-col bg-surface",
-    children: [
-      null,
-      jsx.jsx(jsx.Fragment, {
-        children: jsx.jsx(HeaderBoundary, { children: header }),
-      }),
-      jsx.jsx("div", {
-        className:
-          "flex min-h-0 flex-1 scrollbar-stable overflow-y-auto p-panel",
-        children: jsx.jsx("div", {
-          className: "mx-auto flex w-full max-w-3xl flex-col gap-6 pb-8",
-          children: pageContent,
-        }),
-      }),
-    ],
-  });
-}
-
-function getSelectedPanel(
-  selectedTab: SiteDetailTab,
-  intl: IntlShape,
-): { id: string; label: string } {
-  const descriptors: Record<SiteDetailTab, { id: string; label: string }> = {
-    automations: {
-      id: AUTOMATIONS_PANEL_ID,
-      label: formatMessageText(intl, {
-        id: "appgenSiteDetail.navigation.automations",
-        defaultMessage: "Automations",
-        description: "Tab label for a Site's cloud scheduled tasks",
-      }),
-    },
-    settings: {
-      id: SETTINGS_PANEL_ID,
-      label: formatMessageText(intl, {
-        id: "appgenSiteDetail.navigation.settings",
-        defaultMessage: "Settings",
-        description: "Tab label for Site settings",
-      }),
-    },
-    analytics: {
-      id: ANALYTICS_PANEL_ID,
-      label: formatMessageText(intl, {
-        id: "appgenSiteDetail.navigation.analytics",
-        defaultMessage: "Analytics",
-        description: "Tab label for Site analytics",
-      }),
-    },
-    database: {
-      id: DATABASE_PANEL_ID,
-      label: formatMessageText(intl, {
-        id: "appgenSiteDetail.navigation.database",
-        defaultMessage: "Database",
-        description: "Tab label for the Site database viewer",
-      }),
-    },
-  };
-  return descriptors[selectedTab];
-}
-
-function formatMessageText(
-  intl: IntlShape,
-  descriptor: Parameters<IntlShape["formatMessage"]>[0],
-): string {
-  const value = intl.formatMessage(descriptor);
-  return typeof value === "string" ? value : descriptor.defaultMessage ?? "";
-}
-
-function ignoreError() {}
-
-function SiteDetailHeader({
-  onBack,
-  onEdit,
-  site,
-}: {
-  onBack(): void;
-  onEdit?: () => void;
-  site?: AppgenSite;
-}): unknown {
-  const ancestors = [
-    {
-      id: "sites",
-      label: jsx.jsx(FormattedMessage, {
-        id: "appgenSiteDetail.header.sites",
-        defaultMessage: "Sites",
-        description: "Breadcrumb link from Site details back to Sites",
-      }),
-      onClick: onBack,
-    },
-  ];
-  const breadcrumbs = jsx.jsx(ToolbarBreadcrumb, {
-    ancestors,
-    current: site?.title,
-  });
-  const editAction =
-    site == null || onEdit == null
-      ? null
-      : jsx.jsx(EditSiteButton, { site, onEdit });
-  return jsx.jsxs(Header, { children: [breadcrumbs, editAction] });
-}
-
-function SiteSummary({
-  screenshotSrc,
-  site,
-}: {
-  screenshotSrc?: string | null;
-  site: AppgenSite;
-}): unknown {
-  const titleAndUrl = jsx.jsxs("div", {
-    className: "flex min-w-0 flex-col gap-0.5",
-    children: [
-      jsx.jsx("h1", {
-        className: "truncate text-xl leading-7 font-medium text-default",
-        children: site.title,
-      }),
-      jsx.jsx("div", {
-        className: "truncate text-xs text-tertiary",
-        children: formatSiteHost(site.current_live_url) ?? site.slug,
-      }),
-    ],
-  });
-  const thumbnail =
-    screenshotSrc == null
-      ? jsx.jsx(SiteIcon, { "aria-hidden": true, className: "icon-md" })
-      : jsx.jsx("img", {
-          alt: "",
-          className: "size-full object-cover",
-          src: screenshotSrc,
+function q(e) {
+  let t = (0, Y.c)(87),
+    { children: n, prefetchTab: r, projectId: o, selectedTab: s } = e,
+    u = f(ee),
+    d = ge(),
+    p = ie(),
+    h = ne(),
+    v = (0, X.useRef)(0),
+    y = pe(),
+    b = F(`282477705`),
+    te = ve(`282477705`),
+    re = c(ye),
+    x = F(`262557526`),
+    S = F(`1912312436`),
+    C;
+  t[0] === S ? (C = t[1]) : ((C = { enabled: S }), (t[0] = S), (t[1] = C));
+  let { data: w, isError: ae } = c(ue, C),
+    { data: T, isError: E, isLoading: D } = i(ce, o),
+    O;
+  t[2] === T ? (O = t[3]) : ((O = Se(T)), (t[2] = T), (t[3] = O));
+  let k = O,
+    A;
+  t[4] !== o || t[5] !== u || t[6] !== s
+    ? ((A = () => {
+        let e;
+        bb2: switch (s) {
+          case `automations`:
+            return;
+          case `analytics`:
+            e = g.CODEX_APPGEN_INTERACTION_PAGE_ANALYTICS;
+            break bb2;
+          case `database`:
+            e = g.CODEX_APPGEN_INTERACTION_PAGE_DATABASE;
+            break bb2;
+          case `settings`:
+            e = g.CODEX_APPGEN_INTERACTION_PAGE_SETTINGS;
+        }
+        oe(u, {
+          action: a.CODEX_APPGEN_INTERACTION_ACTION_PAGE_VIEWED,
+          page: e,
+          projectId: o,
+          source: l.CODEX_APPGEN_INTERACTION_SOURCE_SITE_DETAILS,
         });
-  const thumbnailFrame = jsx.jsxs("div", {
-    className:
-      "relative flex h-12 w-20 shrink-0 items-center justify-center overflow-hidden rounded-md bg-surface-secondary/92",
-    children: [
-      thumbnail,
-      jsx.jsx("span", {
-        "aria-hidden": true,
-        className:
-          "pointer-events-none absolute inset-0 rounded-md ring-1 ring-border ring-inset",
       }),
-    ],
-  });
-  return jsx.jsxs("div", {
-    className: "grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3",
-    children: [titleAndUrl, thumbnailFrame],
-  });
-}
-
-function EditSiteButton({
-  onEdit,
-  site,
-}: {
-  onEdit(): void;
-  site: AppgenSite;
-}): unknown {
-  const suspended = site.status === "suspended";
-  const button = jsx.jsxs(Button, {
-    color: "outline",
-    disabled: suspended,
-    size: "toolbar",
-    onClick: onEdit,
-    children: [
-      jsx.jsx(IconAsset, { asset: editIconAsset }),
-      jsx.jsx(FormattedMessage, {
-        id: "appgenSiteDetail.edit",
-        defaultMessage: "Edit",
-        description: "Button label for editing a Site from its details page",
+      (t[4] = o),
+      (t[5] = u),
+      (t[6] = s),
+      (t[7] = A))
+    : (A = t[7]);
+  let j = (0, X.useEffectEvent)(A),
+    M =
+      T == null ||
+      D ||
+      E ||
+      (s === `settings` && !k) ||
+      s === `automations` ||
+      (s === `analytics` && !x) ||
+      (s === `database` && (!S || ae || w?.database !== !0))
+        ? null
+        : `${T.id}:${s}`,
+    N;
+  t[8] !== j || t[9] !== M
+    ? ((N = () => {
+        M != null && j();
       }),
-    ],
-  });
-  return suspended
-    ? jsx.jsx(Tooltip, {
-        interactive: site.disabled_by === "openai",
-        tooltipContent: jsx.jsx(AppgenDisabledTooltip, {
-          disabledBy: site.disabled_by,
+      (t[8] = j),
+      (t[9] = M),
+      (t[10] = N))
+    : (N = t[10]);
+  let P;
+  (t[11] === M ? (P = t[12]) : ((P = [M]), (t[11] = M), (t[12] = P)), (0, X.useEffect)(N, P));
+  let { data: I } = be(T?.screenshot_url ?? null),
+    L = T?.status === `suspended` ? null : T?.current_live_url;
+  if (T != null && s === `settings` && !k) {
+    let e;
+    return (
+      t[13] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Z.jsx)(se, { replace: !0, to: fe })), (t[13] = e))
+        : (e = t[13]),
+      e
+    );
+  }
+  if (s === `automations` && (re || te)) {
+    let e;
+    return (
+      t[14] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Z.jsx)(m, {})), (t[14] = e))
+        : (e = t[14]),
+      e
+    );
+  }
+  if (s === `automations` && (!b || (T != null && !k))) {
+    let e;
+    t[15] === o ? (e = t[16]) : ((e = de(o)), (t[15] = o), (t[16] = e));
+    let n;
+    return (
+      t[17] === e
+        ? (n = t[18])
+        : ((n = (0, Z.jsx)(se, { replace: !0, to: e })), (t[17] = e), (t[18] = n)),
+      n
+    );
+  }
+  let R;
+  t[19] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((R = {
+        key: `settings`,
+        name: (0, Z.jsx)(_, {
+          id: `appgenSiteDetail.navigation.settings`,
+          defaultMessage: `Settings`,
+          description: `Tab label for Site settings`,
         }),
-        children: button,
-      })
-    : button;
+        panelId: je,
+      }),
+      (t[19] = R))
+    : (R = t[19]);
+  let z;
+  if (
+    t[20] !== x ||
+    t[21] !== b ||
+    t[22] !== k ||
+    t[23] !== S ||
+    t[24] !== s ||
+    t[25] !== w?.database
+  ) {
+    if (((z = [R]), x || s === `analytics`)) {
+      let e;
+      (t[27] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = {
+            key: `analytics`,
+            name: (0, Z.jsx)(_, {
+              id: `appgenSiteDetail.navigation.analytics`,
+              defaultMessage: `Analytics`,
+              description: `Tab label for Site analytics`,
+            }),
+            panelId: Q,
+          }),
+          (t[27] = e))
+        : (e = t[27]),
+        z.push(e));
+    }
+    if ((S && w?.database === !0) || s === `database`) {
+      let e;
+      (t[28] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = {
+            key: `database`,
+            name: (0, Z.jsx)(_, {
+              id: `appgenSiteDetail.navigation.database`,
+              defaultMessage: `Database`,
+              description: `Tab label for the Site database viewer`,
+            }),
+            panelId: ke,
+          }),
+          (t[28] = e))
+        : (e = t[28]),
+        z.push(e));
+    }
+    if (b && k) {
+      let e;
+      (t[29] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = {
+            key: `automations`,
+            name: (0, Z.jsx)(_, {
+              id: `appgenSiteDetail.navigation.automations`,
+              defaultMessage: `Automations`,
+              description: `Tab label for a Site's cloud scheduled tasks`,
+            }),
+            panelId: Ae,
+          }),
+          (t[29] = e))
+        : (e = t[29]),
+        z.push(e));
+    }
+    ((t[20] = x),
+      (t[21] = b),
+      (t[22] = k),
+      (t[23] = S),
+      (t[24] = s),
+      (t[25] = w?.database),
+      (t[26] = z));
+  } else z = t[26];
+  let B, V;
+  bb0: switch (s) {
+    case `automations`: {
+      B = Ae;
+      let e;
+      (t[30] === p
+        ? (e = t[31])
+        : ((e = p.formatMessage({
+            id: `appgenSiteDetail.navigation.automations`,
+            defaultMessage: `Automations`,
+            description: `Tab label for a Site's cloud scheduled tasks`,
+          })),
+          (t[30] = p),
+          (t[31] = e)),
+        (V = e));
+      break bb0;
+    }
+    case `settings`: {
+      B = je;
+      let e;
+      (t[32] === p
+        ? (e = t[33])
+        : ((e = p.formatMessage({
+            id: `appgenSiteDetail.navigation.settings`,
+            defaultMessage: `Settings`,
+            description: `Tab label for Site settings`,
+          })),
+          (t[32] = p),
+          (t[33] = e)),
+        (V = e));
+      break bb0;
+    }
+    case `analytics`: {
+      B = Q;
+      let e;
+      (t[34] === p
+        ? (e = t[35])
+        : ((e = p.formatMessage({
+            id: `appgenSiteDetail.navigation.analytics`,
+            defaultMessage: `Analytics`,
+            description: `Tab label for Site analytics`,
+          })),
+          (t[34] = p),
+          (t[35] = e)),
+        (V = e));
+      break bb0;
+    }
+    case `database`: {
+      B = ke;
+      let e;
+      (t[36] === p
+        ? (e = t[37])
+        : ((e = p.formatMessage({
+            id: `appgenSiteDetail.navigation.database`,
+            defaultMessage: `Database`,
+            description: `Tab label for the Site database viewer`,
+          })),
+          (t[36] = p),
+          (t[37] = e)),
+        (V = e));
+    }
+  }
+  let H;
+  t[38] === d
+    ? (H = t[39])
+    : ((H = () => {
+        d(`/sites`);
+      }),
+      (t[38] = d),
+      (t[39] = H));
+  let U;
+  t[40] !== L || t[41] !== u || t[42] !== T || t[43] !== y
+    ? ((U =
+        T == null
+          ? void 0
+          : () => {
+              (oe(u, {
+                action: a.CODEX_APPGEN_INTERACTION_ACTION_EDIT_WITH_CHAT_CLICKED,
+                projectId: T.id,
+                source: l.CODEX_APPGEN_INTERACTION_SOURCE_SITE_DETAILS,
+              }),
+                Ce(u, y, {
+                  type: `edit`,
+                  liveUrl: L,
+                  projectId: T.id,
+                  projectTitle: T.title,
+                  latestEditContext: T.latest_edit_context,
+                }));
+            }),
+      (t[40] = L),
+      (t[41] = u),
+      (t[42] = T),
+      (t[43] = y),
+      (t[44] = U))
+    : (U = t[44]);
+  let W;
+  t[45] !== T || t[46] !== H || t[47] !== U
+    ? ((W = (0, Z.jsx)(Te, { site: T, onBack: H, onEdit: U })),
+      (t[45] = T),
+      (t[46] = H),
+      (t[47] = U),
+      (t[48] = W))
+    : (W = t[48]);
+  let G = W,
+    K;
+  if (D) {
+    let e;
+    (t[49] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, Z.jsx)(De, {})), (t[49] = e))
+      : (e = t[49]),
+      (K = e));
+  } else if (E || T == null) {
+    let e;
+    (t[50] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, Z.jsx)(Oe, {})), (t[50] = e))
+      : (e = t[50]),
+      (K = e));
+  } else {
+    let e;
+    t[51] !== I || t[52] !== T
+      ? ((e = (0, Z.jsx)(Ee, { screenshotSrc: I, site: T })), (t[51] = I), (t[52] = T), (t[53] = e))
+      : (e = t[53]);
+    let i;
+    t[54] === p
+      ? (i = t[55])
+      : ((i = p.formatMessage({
+          id: `appgenSiteDetail.navigation.label`,
+          defaultMessage: `Site details`,
+          description: `Accessible label for navigation between Site settings, analytics, and database`,
+        })),
+        (t[54] = p),
+        (t[55] = i));
+    let a;
+    t[56] !== h || t[57] !== d || t[58] !== r || t[59] !== o
+      ? ((a = (e) => {
+          let t;
+          bb171: switch (e) {
+            case `automations`:
+              t = le(o);
+              break bb171;
+            case `settings`:
+              t = de(o);
+              break bb171;
+            case `analytics`:
+              t = me(o);
+              break bb171;
+            case `database`:
+              t = _e(o);
+          }
+          let n = (v.current += 1);
+          (r?.(e) ?? Promise.resolve()).catch(we).then(() => {
+            h() && n === v.current && d(t);
+          });
+        }),
+        (t[56] = h),
+        (t[57] = d),
+        (t[58] = r),
+        (t[59] = o),
+        (t[60] = a))
+      : (a = t[60]);
+    let c;
+    t[61] !== s || t[62] !== i || t[63] !== a || t[64] !== z
+      ? ((c = (0, Z.jsx)(`div`, {
+          className: `border-b border-subtle pb-6`,
+          children: (0, Z.jsx)(xe, {
+            ariaLabel: i,
+            selectedKey: s,
+            tabs: z,
+            variant: `toolbar`,
+            onSelect: a,
+          }),
+        })),
+        (t[61] = s),
+        (t[62] = i),
+        (t[63] = a),
+        (t[64] = z),
+        (t[65] = c))
+      : (c = t[65]);
+    let l = B,
+      u = V,
+      f;
+    t[66] !== n || t[67] !== T ? ((f = n(T)), (t[66] = n), (t[67] = T), (t[68] = f)) : (f = t[68]);
+    let m;
+    t[69] !== T || t[70] !== f
+      ? ((m = (0, Z.jsx)(Me, { value: T, children: f })), (t[69] = T), (t[70] = f), (t[71] = m))
+      : (m = t[71]);
+    let g;
+    t[72] !== B || t[73] !== V || t[74] !== m
+      ? ((g = (0, Z.jsx)(`div`, { id: l, "aria-label": u, role: `tabpanel`, children: m })),
+        (t[72] = B),
+        (t[73] = V),
+        (t[74] = m),
+        (t[75] = g))
+      : (g = t[75]);
+    let _;
+    (t[76] !== e || t[77] !== c || t[78] !== g
+      ? ((_ = (0, Z.jsxs)(Z.Fragment, { children: [e, c, g] })),
+        (t[76] = e),
+        (t[77] = c),
+        (t[78] = g),
+        (t[79] = _))
+      : (_ = t[79]),
+      (K = _));
+  }
+  let q;
+  t[80] === G
+    ? (q = t[81])
+    : ((q = (0, Z.jsx)(Z.Fragment, { children: (0, Z.jsx)(he, { children: G }) })),
+      (t[80] = G),
+      (t[81] = q));
+  let J;
+  t[82] === K
+    ? (J = t[83])
+    : ((J = (0, Z.jsx)(`div`, {
+        className: `flex min-h-0 flex-1 scrollbar-stable overflow-y-auto p-panel`,
+        children: (0, Z.jsx)(`div`, {
+          className: `mx-auto flex w-full max-w-3xl flex-col gap-6 pb-8`,
+          children: K,
+        }),
+      })),
+      (t[82] = K),
+      (t[83] = J));
+  let $;
+  return (
+    t[84] !== q || t[85] !== J
+      ? (($ = (0, Z.jsxs)(`div`, {
+          className: `flex h-full min-h-0 flex-col bg-surface`,
+          children: [null, q, J],
+        })),
+        (t[84] = q),
+        (t[85] = J),
+        (t[86] = $))
+      : ($ = t[86]),
+    $
+  );
 }
-
-function LoadingState() {
-  return jsx.jsx("div", {
-    className: "flex min-h-96 flex-1 items-center justify-center",
-    children: jsx.jsx(LoadingSpinner, {}),
-  });
+function we() {}
+function Te(e) {
+  let t = (0, Y.c)(12),
+    { onBack: n, onEdit: r, site: i } = e,
+    a;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((a = (0, Z.jsx)(_, {
+        id: `appgenSiteDetail.header.sites`,
+        defaultMessage: `Sites`,
+        description: `Breadcrumb link from Site details back to Sites`,
+      })),
+      (t[0] = a))
+    : (a = t[0]);
+  let o;
+  t[1] === n ? (o = t[2]) : ((o = [{ id: `sites`, label: a, onClick: n }]), (t[1] = n), (t[2] = o));
+  let s = i?.title,
+    c;
+  t[3] !== o || t[4] !== s
+    ? ((c = (0, Z.jsx)(V, { ancestors: o, current: s })), (t[3] = o), (t[4] = s), (t[5] = c))
+    : (c = t[5]);
+  let l;
+  t[6] !== r || t[7] !== i
+    ? ((l = i == null || r == null ? null : (0, Z.jsx)(J, { site: i, onEdit: r })),
+      (t[6] = r),
+      (t[7] = i),
+      (t[8] = l))
+    : (l = t[8]);
+  let u;
+  return (
+    t[9] !== c || t[10] !== l
+      ? ((u = (0, Z.jsxs)(w, { children: [c, l] })), (t[9] = c), (t[10] = l), (t[11] = u))
+      : (u = t[11]),
+    u
+  );
 }
-
-function ErrorState() {
-  return jsx.jsx(ErrorStateView, {
-    className: "min-h-96 flex-1",
-    title: jsx.jsx(FormattedMessage, {
-      id: "appgenSiteDetail.error.title",
-      defaultMessage: "Unable to load site",
-      description: "Error state shown when Site details cannot load",
-    }),
-  });
+function Ee(e) {
+  let t = (0, Y.c)(18),
+    { screenshotSrc: n, site: r } = e,
+    i;
+  t[0] === r.title
+    ? (i = t[1])
+    : ((i = (0, Z.jsx)(`h1`, {
+        className: `truncate text-xl leading-7 font-medium text-default`,
+        children: r.title,
+      })),
+      (t[0] = r.title),
+      (t[1] = i));
+  let a;
+  t[2] !== r.current_live_url || t[3] !== r.slug
+    ? ((a = R(r.current_live_url) ?? r.slug),
+      (t[2] = r.current_live_url),
+      (t[3] = r.slug),
+      (t[4] = a))
+    : (a = t[4]);
+  let o;
+  t[5] === a
+    ? (o = t[6])
+    : ((o = (0, Z.jsx)(`div`, { className: `truncate text-xs text-tertiary`, children: a })),
+      (t[5] = a),
+      (t[6] = o));
+  let s;
+  t[7] !== i || t[8] !== o
+    ? ((s = (0, Z.jsxs)(`div`, { className: `flex min-w-0 flex-col gap-0.5`, children: [i, o] })),
+      (t[7] = i),
+      (t[8] = o),
+      (t[9] = s))
+    : (s = t[9]);
+  let c;
+  t[10] === n
+    ? (c = t[11])
+    : ((c =
+        n == null
+          ? (0, Z.jsx)(j, { "aria-hidden": !0, className: `icon-md` })
+          : (0, Z.jsx)(`img`, { alt: ``, className: `size-full object-cover`, src: n })),
+      (t[10] = n),
+      (t[11] = c));
+  let l;
+  t[12] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((l = (0, Z.jsx)(`span`, {
+        "aria-hidden": !0,
+        className: `pointer-events-none absolute inset-0 rounded-md ring-1 ring-border ring-inset`,
+      })),
+      (t[12] = l))
+    : (l = t[12]);
+  let u;
+  t[13] === c
+    ? (u = t[14])
+    : ((u = (0, Z.jsxs)(`div`, {
+        className: `relative flex h-12 w-20 shrink-0 items-center justify-center overflow-hidden rounded-md bg-surface-secondary/92`,
+        children: [c, l],
+      })),
+      (t[13] = c),
+      (t[14] = u));
+  let d;
+  return (
+    t[15] !== s || t[16] !== u
+      ? ((d = (0, Z.jsxs)(`div`, {
+          className: `grid min-w-0 grid-cols-[minmax(0,1fr)_auto] items-center gap-3`,
+          children: [s, u],
+        })),
+        (t[15] = s),
+        (t[16] = u),
+        (t[17] = d))
+      : (d = t[17]),
+    d
+  );
 }
-
-function initializeAppgenSiteDetailLayout(): void {
-  initializeRuntimeLazy();
-  initializeMountedState();
-  initializeSignalRuntime();
-  React = resolveRuntime<ReactRuntime>(reactRuntimeExport);
-  initializeSharedComponents();
-  initializeGptResources();
-  initializeHeaderLayout();
-  initializeNavigationComponents();
-  initializeButton();
-  initializeIconAsset();
-  initializeAppgenHeader();
-  initializeResourceButton();
-  initializeTabs();
-  initializeBreadcrumb();
-  initializeTooltip();
-  initializeSiteComponents();
-  initializeAppgenFeatureFlags();
-  initializeSharedRuntime();
-  initializeExperiments();
-  initializeMigrationExperiment();
-  initializeIntl();
-  initializeAppgenAccess();
-  initializeScreenshotQuery();
-  initializeDisabledTooltip();
-  initializeAppgenRouting();
-  initializeAppgenConversation();
-  initializeAppgenFormatting();
-  initializeStartAppgenConversation();
-  jsx = getJsxRuntime();
-  ANALYTICS_PANEL_ID = "appgen-site-detail-analytics";
-  DATABASE_PANEL_ID = "appgen-site-detail-database";
-  AUTOMATIONS_PANEL_ID = "appgen-site-detail-automations";
-  SETTINGS_PANEL_ID = "appgen-site-detail-settings";
-  SiteContext = React.createContext(null);
+function J(e) {
+  let t = (0, Y.c)(9),
+    { onEdit: n, site: r } = e,
+    i = r.status === `suspended`,
+    a,
+    o;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((a = (0, Z.jsx)(h, { asset: re })),
+      (o = (0, Z.jsx)(_, {
+        id: `appgenSiteDetail.edit`,
+        defaultMessage: `Edit`,
+        description: `Button label for editing a Site from its details page`,
+      })),
+      (t[0] = a),
+      (t[1] = o))
+    : ((a = t[0]), (o = t[1]));
+  let s;
+  t[2] !== i || t[3] !== n
+    ? ((s = (0, Z.jsxs)(v, {
+        color: `outline`,
+        disabled: i,
+        size: `toolbar`,
+        onClick: n,
+        children: [a, o],
+      })),
+      (t[2] = i),
+      (t[3] = n),
+      (t[4] = s))
+    : (s = t[4]);
+  let c = s,
+    l;
+  return (
+    t[5] !== c || t[6] !== i || t[7] !== r.disabled_by
+      ? ((l = i
+          ? (0, Z.jsx)(x, {
+              interactive: r.disabled_by === `openai`,
+              tooltipContent: (0, Z.jsx)(W, { disabledBy: r.disabled_by }),
+              children: c,
+            })
+          : c),
+        (t[5] = c),
+        (t[6] = i),
+        (t[7] = r.disabled_by),
+        (t[8] = l))
+      : (l = t[8]),
+    l
+  );
 }
-
-function resolveRuntime<T>(value: unknown): T {
-  return (typeof value === "function" ? value() : value) as T;
+function De() {
+  let e = (0, Y.c)(1),
+    t;
+  return (
+    e[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, Z.jsx)(`div`, {
+          className: `flex min-h-96 flex-1 items-center justify-center`,
+          children: (0, Z.jsx)(m, {}),
+        })),
+        (e[0] = t))
+      : (t = e[0]),
+    t
+  );
 }
-
-export { initializeAppgenSiteDetailLayout as n, AppgenSiteDetailLayout as t };
+function Oe() {
+  let e = (0, Y.c)(1),
+    t;
+  return (
+    e[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, Z.jsx)(N, {
+          className: `min-h-96 flex-1`,
+          title: (0, Z.jsx)(_, {
+            id: `appgenSiteDetail.error.title`,
+            defaultMessage: `Unable to load site`,
+            description: `Error state shown when Site details cannot load`,
+          }),
+        })),
+        (e[0] = t))
+      : (t = e[0]),
+    t
+  );
+}
+var Y, X, Z, Q, ke, Ae, je, Me;
+function $() {
+  return ($ = e(() => {
+    ((Y = t()),
+      r(),
+      s(),
+      (X = te()),
+      d(),
+      T(),
+      A(),
+      E(),
+      y(),
+      o(),
+      C(),
+      n(),
+      z(),
+      B(),
+      b(),
+      k(),
+      O(),
+      p(),
+      M(),
+      I(),
+      S(),
+      H(),
+      ae(),
+      U(),
+      D(),
+      P(),
+      L(),
+      G(),
+      (Z = u()),
+      (Q = `appgen-site-detail-analytics`),
+      (ke = `appgen-site-detail-database`),
+      (Ae = `appgen-site-detail-automations`),
+      (je = `appgen-site-detail-settings`),
+      (Me = (0, X.createContext)(null)));
+  }))();
+}
+export { $ as n, K as t };

@@ -1,5 +1,22 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Positive-gap owner closure：不再拆分剩余小批次，将全部 408 个仍有
+发布源码正向行数缺口的 renderer owner 一次性恢复为发布一致 TypeScript。范围覆盖
+settings、composer/home、plugin、conversation/thread、artifact/preview、billing、
+Browser、terminal、thumbnail、Git/review、voice、analytics、library、learning-model
+以及剩余 entry/runtime leaves；renderer 共新增 41,049 行、删除 28,429 行，净恢复
+12,620 行。408/408 owner 均通过标准化后的发布全文一致性复验。`banner` 恢复发布
+`app-primary` 依赖后，同步移除 verifier 中已经失效的“预期移除 import”例外。
+整批通过 12,448/12,448 transform check、1,888/1,888 renderer build/verify、
+2,247/2,247 app-code coverage、0 semantic tail、typecheck 与 1,912-script
+test-index。严格 hub 消费推进到 app-shared 1,843/3,185、app-initial 6,000/8,204、
+app-primary 793/917，仍为 0 unreviewed、0 invalid consumers。按发布源码正向
+行数缺口口径，剩余由 12,620 行降至 0，覆盖率达到 100%；可比对 owner 中已有
+1,025 个与发布证据一致，仍有 837 个不完全一致，另有 454 个缺少双方可比资产。
+这里的 100% 仅表示“当前可比 owner 不再短于发布源码”，不是全文一致率，也不等于
+完整项目已经反编译完成；425 个 preserved 边界、三个聚合 hub 的剩余耦合导出、
+837 个非 exact owner 的语义/证据复核以及最终完整登录态 E2E 仍需继续。
+
 2026-11-02 Owner-family large convergence：从剩余正向行数缺口最高的 preview、plugin、
 learning-model、Chronicle、conversation resume、artifact navigation 与 workspace owner
 出发，将受旧缩减 ABI/mock 牵连的完整测试家族一并扩展恢复，共收口 84 个发布 owner。

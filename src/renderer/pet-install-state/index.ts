@@ -1,79 +1,100 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import { pnt as desktopBridge } from "@rchunk/app-initial";
-
-interface PetPreview { spriteVersionNumber: number; [key: string]: unknown }
-interface PetRequest extends Record<string, unknown> { description?: string; imageUrl: string; name: string; spriteVersionNumber?: number }
-type PetInstallState = null | (PetRequest & {
-  installedAvatarId?: string;
-  preview?: PetPreview;
-  status: "installError" | "installed" | "installing" | "loading" | "previewError" | "ready";
-});
-interface PetStateKey { value: PetInstallState }
-interface PetScope {
-  get<Value>(key: PetStateKey): Value;
-  set(key: PetStateKey, value: PetInstallState): void;
-}
-interface InstalledPet { id: string }
-
-const i: PetStateKey = { value: null };
-
-async function defaultPreview(request: PetRequest): Promise<PetPreview> {
-  const previewPetInstall = desktopBridge.customAvatars.previewPetInstall;
-  if (previewPetInstall == null) throw new Error("Pet installation is unavailable on this host");
-  return previewPetInstall(request) as Promise<PetPreview>;
-}
-
-async function defaultInstall(request: PetRequest): Promise<InstalledPet> {
-  const installPet = desktopBridge.customAvatars.installPet;
-  if (installPet == null) throw new Error("Pet installation is unavailable on this host");
-  return installPet(request) as Promise<InstalledPet>;
-}
-
-async function a(
-  scope: PetScope,
-  request: PetRequest,
-  preview: (request: PetRequest) => Promise<PetPreview> = defaultPreview,
-): Promise<void> {
-  if (scope.get<PetInstallState>(i)?.status === "installing") return;
-  const loading: PetInstallState = { ...request, status: "loading" };
-  scope.set(i, loading);
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, QI as n, ZI as r, pZ as i } from "@rchunk/app-shared";
+import {
+  Ac as a,
+  Fc as o,
+  Ic as s,
+  Pc as c,
+  Sun as l,
+  _un as u,
+  mfn as d,
+  mnt as f,
+  pfn as p,
+  pnt as m,
+  vun as h,
+} from "@rchunk/app-initial";
+async function g(
+  e,
+  t,
+  n = async (e) => {
+    if (m.customAvatars.previewPetInstall == null)
+      throw Error(`Pet installation is unavailable on this host`);
+    return m.customAvatars.previewPetInstall(e);
+  },
+) {
+  if (e.get(b)?.status === `installing`) return;
+  let r = { ...t, status: `loading` };
+  e.set(b, r);
   try {
-    const result = await preview(request);
-    if (scope.get<PetInstallState>(i) !== loading) return;
-    scope.set(i, { ...request, preview: result, status: "ready" });
+    let i = await n(t);
+    if (e.get(b) !== r) return;
+    e.set(b, { ...t, status: `ready`, preview: i });
   } catch {
-    if (scope.get<PetInstallState>(i) !== loading) return;
-    scope.set(i, { ...request, status: "previewError" });
+    if (e.get(b) !== r) return;
+    e.set(b, { ...t, status: `previewError` });
   }
 }
-
-async function r(
-  scope: PetScope,
-  refresh: () => Promise<unknown>,
-  install: (request: PetRequest) => Promise<InstalledPet> = defaultInstall,
-): Promise<void> {
-  const current = scope.get<PetInstallState>(i);
-  if (current?.status !== "ready" && current?.status !== "installError") return;
-  const installing: PetInstallState = { ...current, status: "installing" };
-  scope.set(i, installing);
+async function _(
+  e,
+  t,
+  n = async (e) => {
+    if (m.customAvatars.installPet == null)
+      throw Error(`Pet installation is unavailable on this host`);
+    return m.customAvatars.installPet(e);
+  },
+) {
+  let r = e.get(b);
+  if (r?.status !== `ready` && r?.status !== `installError`) return;
+  let i = { ...r, status: `installing` };
+  e.set(b, i);
+  let s;
   try {
-    const result = await install({
-      description: current.description,
-      imageUrl: current.imageUrl,
-      name: current.name,
-      spriteVersionNumber: current.preview?.spriteVersionNumber,
-    });
-    if (scope.get<PetInstallState>(i) !== installing) return;
-    scope.set(i, { ...current, installedAvatarId: result.id, status: "installed" });
-    await refresh().catch(() => undefined);
+    if (e.get(d, `1655510532`)) {
+      let t = e.get(h),
+        n = e.get(u);
+      if (t.status !== `allowed` || !(`accountId` in t) || n == null)
+        throw Error(`Cloud pet installation requires a ChatGPT account`);
+      let i = o(t.accountId, n),
+        l = y(r.imageUrl),
+        d =
+          l == null
+            ? await c(t.accountId, r.preview)
+            : (e.queryClient.getQueryData(i)?.find((e) => e.sharedPetId === l) ??
+              (await a(t.accountId, l, r.preview.spriteVersionNumber)));
+      (e.queryClient.setQueryData(i, (e) =>
+        e?.some((e) => e.id === d.id) ? e : [...(e ?? []), d],
+      ),
+        (s = { id: d.id }));
+    } else
+      s = await n({
+        name: r.name,
+        description: r.description,
+        imageUrl: r.imageUrl,
+        spriteVersionNumber: r.preview.spriteVersionNumber,
+      });
   } catch {
-    if (scope.get<PetInstallState>(i) === installing) {
-      scope.set(i, { ...current, status: "installError" });
-    }
+    if (e.get(b) !== i) return;
+    e.set(b, { ...r, status: `installError` });
+    return;
   }
+  e.get(b) === i &&
+    (e.set(b, { ...r, status: `installed`, installedAvatarId: s.id }),
+    await t().catch(() => void 0));
 }
-
-function t(scope: PetScope): void { scope.set(i, null); }
-function n(): void {}
-export { a, i, n, r, t };
+function v(e) {
+  e.set(b, null);
+}
+function y(e) {
+  let t = new URL(e);
+  return t.origin !== `https://chatgpt.com` && t.origin !== `https://chatgpt-staging.com`
+    ? null
+    : (/^\/pets\/share\/(sharepet_[A-Za-z0-9_-]+)\/sprite$/.exec(t.pathname)?.[1] ?? null);
+}
+var b;
+function x() {
+  return (x = e(() => {
+    (t(), l(), s(), f(), n(), p(), (b = i(r, null)));
+  }))();
+}
+export { g as a, b as i, x as n, _ as r, v as t };

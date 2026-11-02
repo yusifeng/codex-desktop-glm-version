@@ -1,31 +1,38 @@
-// Integer-addition number-line model. Release chunk: model-1ff2e69cbdc9.js.
-import "@rchunk/rolldown-runtime";
-
-interface AddingIntegersInput { firstAddend?: number; secondAddend?: number }
-
-const addingIntegersDefinition = {
-  type: "ADDING_INTEGERS",
-  version: 1,
-  thumbnailAssetKey: "adding-integers-v1",
-  parameters: {
-    firstAddend: { kind: "integer", defaultValue: 3, min: 1, max: 12 },
-    secondAddend: { kind: "integer", defaultValue: 6, min: 1, max: 12 },
-  },
-} as const;
-const firstAddendControl = { defaultValue: addingIntegersDefinition.parameters.firstAddend.defaultValue, min: addingIntegersDefinition.parameters.firstAddend.min, max: addingIntegersDefinition.parameters.firstAddend.max, step: 1 };
-const secondAddendControl = { defaultValue: addingIntegersDefinition.parameters.secondAddend.defaultValue, min: addingIntegersDefinition.parameters.secondAddend.min, max: addingIntegersDefinition.parameters.secondAddend.max, step: 1 };
-const numberLineLength = firstAddendControl.max + secondAddendControl.max + 1;
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeInteger = (value: number | undefined, fallback: number, minimum: number, maximum: number): number => typeof value === "number" && Number.isFinite(value) ? clamp(Math.round(value), minimum, maximum) : fallback;
-const normalizeAddingIntegersInput = (input: AddingIntegersInput) => ({
-  firstAddend: normalizeInteger(input.firstAddend, firstAddendControl.defaultValue, firstAddendControl.min, firstAddendControl.max),
-  secondAddend: normalizeInteger(input.secondAddend, secondAddendControl.defaultValue, secondAddendControl.min, secondAddendControl.max),
-});
-const calculateIntegerAddition = (input: AddingIntegersInput) => {
-  const normalized = normalizeAddingIntegersInput(input);
-  return { ...normalized, sum: normalized.firstAddend + normalized.secondAddend, positions: Array.from({ length: normalized.secondAddend + 1 }, (_unused, index) => normalized.firstAddend + index) };
-};
-function initializeAddingIntegersDefinition(): void {}
-function initializeAddingIntegersModel(): void {}
-
-export { initializeAddingIntegersModel as a, addingIntegersDefinition as c, calculateIntegerAddition as i, numberLineLength as n, normalizeAddingIntegersInput as o, secondAddendControl as r, initializeAddingIntegersDefinition as s, firstAddendControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `ADDING_INTEGERS`),
+      (n = `adding-integers-v1`),
+      (r = {
+        firstAddend: { kind: `integer`, defaultValue: 3, min: 1, max: 12 },
+        secondAddend: { kind: `integer`, defaultValue: 6, min: 1, max: 12 },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m;
+function h() {
+  return (h = e(() => {
+    (a(),
+      (o = i.parameters.firstAddend),
+      (s = i.parameters.secondAddend),
+      (c = { defaultValue: o.defaultValue, min: o.min, max: o.max, step: 1 }),
+      (l = { defaultValue: s.defaultValue, min: s.min, max: s.max, step: 1 }),
+      (u = c.max + l.max + 1),
+      (d = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (f = (e, t, n, r) => (Number.isFinite(e) ? d(Math.round(e ?? t), n, r) : t)),
+      (p = (e) => ({
+        firstAddend: f(e.firstAddend, c.defaultValue, c.min, c.max),
+        secondAddend: f(e.secondAddend, l.defaultValue, l.min, l.max),
+      })),
+      (m = (e) => {
+        let t = p(e),
+          n = t.firstAddend + t.secondAddend,
+          r = Array.from({ length: t.secondAddend + 1 }, (e, n) => t.firstAddend + n);
+        return { ...t, sum: n, positions: r };
+      }));
+  }))();
+}
+export { h as a, i as c, m as i, u as n, p as o, l as r, a as s, c as t };

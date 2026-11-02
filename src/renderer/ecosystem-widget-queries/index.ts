@@ -1,14 +1,57 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-
-function ecosystemWidgetQuery(input: { accountId?: string | null; appUri: string; connectorId?: string | null; hostId: string; targetId?: string | null; template?: string | null }) {
-  return {
-    queryKey: ["ecosystem-widget-resource", input.hostId, input.accountId ?? null, input.appUri, input.template ?? null],
-    enabled: input.appUri.length > 0,
-    retry: false,
-    staleTime: Infinity,
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, QI as n, QX as r, ZI as i } from "@rchunk/app-shared";
+import {
+  Llt as a,
+  Rlt as o,
+  Sun as s,
+  Vlt as c,
+  cJt as l,
+  mun as u,
+  rJt as d,
+} from "@rchunk/app-initial";
+var f;
+function p() {
+  return (p = e(() => {
+    (t(),
+      a(),
+      s(),
+      n(),
+      l(),
+      (f = r(
+        i,
+        (
+          { hostId: e, accountId: t, connectorId: n, targetId: r = null, appUri: i, template: a },
+          { scope: s, get: l },
+        ) => {
+          let f = l(u),
+            p = {
+              hostId: e,
+              server: `codex_apps`,
+              threadId: null,
+              connectorTarget: n == null ? null : { connectorId: n, targetId: r },
+            },
+            m = l(o, p),
+            h = m != null && (t == null || t === f);
+          return {
+            queryKey: [`ecosystem-widget-resource`, m, t ?? f, i, a],
+            queryFn: async ({ signal: e }) => {
+              if (!h) throw Error(`MCP app account changed before reading`);
+              let { resource: t, identitySnapshot: n } = await c(s, p, m, () =>
+                d.safeGet(`/ecosystem/widget`, {
+                  additionalHeaders: f == null ? void 0 : { "ChatGPT-Account-ID": f },
+                  parameters: { query: { launcher_host: `chatgpt`, uri: i, template_pointer: a } },
+                  signal: e,
+                }),
+              );
+              return { widget: t, resourceIdentity: n };
+            },
+            enabled: h,
+            staleTime: 1 / 0,
+            retry: !1,
+          };
+        },
+      )));
+  }))();
 }
-function initializeEcosystemWidgetQueries(): void {}
-export { initializeEcosystemWidgetQueries as n, ecosystemWidgetQuery as t };
+export { p as n, f as t };

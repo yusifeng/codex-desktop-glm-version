@@ -1,64 +1,147 @@
-import "@rchunk/rolldown-runtime";
-import { LX as useScope, e6 as ReactRuntime } from "@rchunk/app-shared";
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/appgen-query",
+      "@rchunk/app-shared",
+      "@rchunk/rolldown-runtime",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, FX as n, H3 as r, LX as i, V3 as a, e6 as o } from "@rchunk/app-shared";
 import {
-  $en as routeScope,
-  Hl as pendingSiteProjectIdSignal,
-  Lbt as sitePreviewEnabledSignal,
-  Rl as openSitePreviewTab,
-  Vl as persistSitePreviewSelection,
-  _Bt as conversationHasSitePreview,
-  qvt as rightPanelTabs,
-  vbt as sitePreviewRevisionSignal,
-  zl as readSitePreviewState,
+  $en as s,
+  Bl as c,
+  Ebt as l,
+  Hl as u,
+  Lbt as d,
+  Ll as f,
+  Rl as p,
+  Vl as m,
+  Wvt as h,
+  _Bt as g,
+  _bt as _,
+  itn as v,
+  nqt as y,
+  qbt as b,
+  qvt as x,
+  tqt as S,
+  vBt as C,
+  vbt as w,
+  zl as T,
 } from "@rchunk/app-initial";
-import { pf as currentConversationSignal } from "@rchunk/app-primary";
-
-interface SiteProject { current_live_url?: string | null; id: string; status: string; title: string; }
-interface ScopeSnapshot {
-  get(signal: unknown, parameter?: unknown): unknown;
-  query?: { fetch(query: unknown, parameter: string): Promise<SiteProject | null> };
-  value: { conversationId?: string; routeKind?: string };
+import { df as E, ff as D, pf as O } from "@rchunk/app-primary";
+function k() {
+  let e = (0, j.c)(6),
+    t = i(s),
+    n,
+    r;
+  (e[0] === t
+    ? ((n = e[1]), (r = e[2]))
+    : ((n = () => {
+        let e = null;
+        return t.watch((t) => {
+          let n = t.get(u),
+            r = t.get(d),
+            i = t.get(O),
+            a = t.get(S, i?.hostId == null ? (i?.conversationId ?? null) : null),
+            o = t.get(_),
+            s = t.get(x.tabs$),
+            c = t.value.routeKind === `chatgpt-thread` && t.get(g, t.value.conversationId);
+          if (n == null || !r || c || e === n || ((e = n), D(i, t.value, a) || o || s.length > 0))
+            return;
+          let l = T(n);
+          if (!l?.isOpen) return;
+          let f = !1;
+          return (
+            N()
+              .then((e) => {
+                let { appgenProjectQuery$: n } = e;
+                return f ? null : t.query.fetch(n, l.projectId);
+              })
+              .then((e) => {
+                let r = T(n);
+                f ||
+                  e == null ||
+                  !r?.isOpen ||
+                  r.projectId !== l.projectId ||
+                  e.status !== `active` ||
+                  e.current_live_url == null ||
+                  (t.value.routeKind === `chatgpt-thread` && t.get(g, t.value.conversationId)) ||
+                  p(t, {
+                    type: `appgen-app`,
+                    projectId: e.id,
+                    title: e.title,
+                    url: e.current_live_url,
+                  });
+              }, A),
+            () => {
+              f = !0;
+            }
+          );
+        });
+      }),
+      (r = [t]),
+      (e[0] = t),
+      (e[1] = n),
+      (e[2] = r)),
+    (0, M.useEffect)(n, r));
+  let a, o;
+  return (
+    e[3] === t
+      ? ((a = e[4]), (o = e[5]))
+      : ((a = () => {
+          let e = t.get(w),
+            n = t.get(u);
+          return t.watch((t) => {
+            let r = t.get(w),
+              i = t.get(x.activeTab$),
+              a = t.get(u);
+            ((r !== e || (n == null && a != null)) &&
+              a != null &&
+              i?.tabId.startsWith(`site-preview:`) &&
+              m(a, i.tabId.slice(13), r),
+              (e = r),
+              (n = a));
+          });
+        }),
+        (o = [t]),
+        (e[3] = t),
+        (e[4] = a),
+        (e[5] = o)),
+    (0, M.useEffect)(a, o),
+    null
+  );
 }
-interface WatchableScope extends ScopeSnapshot {
-  watch(effect: (scope: ScopeSnapshot) => void | (() => void)): () => void;
+function A() {}
+var j, M, N;
+function P() {
+  return (P = e(() => {
+    ((j = t()),
+      n(),
+      (M = o()),
+      b(),
+      h(),
+      l(),
+      C(),
+      y(),
+      v(),
+      f(),
+      c(),
+      E(),
+      r(),
+      (N = () =>
+        a(
+          () => import(`@rchunk/appgen-query`),
+          __vite__mapDeps([0, 1, 2, 3, 4, 5]),
+          import.meta.url,
+        )));
+  }))();
 }
-
-function SitePreviewPersistenceBridge(): null {
-  const scope = useScope(routeScope) as unknown as WatchableScope;
-  ReactRuntime.useEffect(() => {
-    let lastProjectId: string | null = null;
-    return scope.watch((snapshot) => {
-      const projectId = snapshot.get(pendingSiteProjectIdSignal) as string | null;
-      const enabled = snapshot.get(sitePreviewEnabledSignal) as boolean;
-      const conversation = snapshot.get(currentConversationSignal) as { conversationId?: string } | null;
-      const preview = readSitePreviewState(projectId);
-      const alreadyOpen = snapshot.value.routeKind === "chatgpt-thread" && snapshot.value.conversationId != null && conversationHasSitePreview(snapshot, snapshot.value.conversationId);
-      if (projectId == null || !enabled || alreadyOpen || projectId === lastProjectId || preview?.isOpen !== true) return;
-      lastProjectId = projectId;
-      let cancelled = false;
-      void import("@rchunk/appgen-query").then(({ appgenProjectQuery$ }) => snapshot.query?.fetch(appgenProjectQuery$, preview.projectId)).then((project) => {
-        if (cancelled || project == null || project.status !== "active" || project.current_live_url == null) return;
-        if (conversation?.conversationId != null && conversationHasSitePreview(snapshot, conversation.conversationId)) return;
-        openSitePreviewTab(snapshot, { type: "appgen-app", projectId: project.id, title: project.title, url: project.current_live_url });
-      });
-      return () => { cancelled = true; };
-    });
-  }, [scope]);
-  ReactRuntime.useEffect(() => {
-    let previousRevision = scope.get(sitePreviewRevisionSignal);
-    let previousProject = scope.get(pendingSiteProjectIdSignal);
-    return scope.watch((snapshot) => {
-      const revision = snapshot.get(sitePreviewRevisionSignal);
-      const projectId = snapshot.get(pendingSiteProjectIdSignal) as string | null;
-      const activeTab = snapshot.get(rightPanelTabs.activeTab$) as { tabId?: string } | null;
-      if ((revision !== previousRevision || (previousProject == null && projectId != null)) && projectId != null && activeTab?.tabId?.startsWith("site-preview:")) {
-        persistSitePreviewSelection(projectId, activeTab.tabId.slice(13), revision);
-      }
-      previousRevision = revision;
-      previousProject = projectId;
-    });
-  }, [scope]);
-  return null;
-}
-
-export { SitePreviewPersistenceBridge };
+P();
+export { k as SitePreviewPersistenceBridge };

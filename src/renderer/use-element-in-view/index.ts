@@ -1,47 +1,50 @@
-import * as appSharedChunk from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-
-const { e6: React } = appSharedChunk;
-
-export interface UseElementInViewInput {
-  container: Element | null;
-  target: Element | null;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, e6 as n } from "@rchunk/app-shared";
+function r(e) {
+  let t = (0, a.c)(6),
+    { container: n, target: r } = e,
+    s;
+  t[0] !== n || t[1] !== r
+    ? ((s = (e) => {
+        if (!n || !r) return i;
+        let t = () => {
+          e();
+        };
+        n.addEventListener(`scroll`, t, { passive: !0 });
+        let a = typeof ResizeObserver > `u` ? null : new ResizeObserver(t);
+        return (
+          a && (a.observe(n), a.observe(r)),
+          () => {
+            (n.removeEventListener(`scroll`, t), a && a.disconnect());
+          }
+        );
+      }),
+      (t[0] = n),
+      (t[1] = r),
+      (t[2] = s))
+    : (s = t[2]);
+  let c = s,
+    l;
+  t[3] !== n || t[4] !== r
+    ? ((l = () => {
+        if (!n || !r) return !0;
+        let e = n.getBoundingClientRect(),
+          t = r.getBoundingClientRect();
+        return t.bottom > e.top && t.top < e.bottom;
+      }),
+      (t[3] = n),
+      (t[4] = r),
+      (t[5] = l))
+    : (l = t[5]);
+  let u = l;
+  return (0, o.useSyncExternalStore)(c, u, u);
 }
-
-const emptySubscribe = (): void => {};
-
-function useElementInView({
-  container,
-  target,
-}: UseElementInViewInput): boolean {
-  const subscribe = (listener: () => void): (() => void) => {
-    if (container == null || target == null) return emptySubscribe;
-    container.addEventListener("scroll", listener, { passive: true });
-    const observer =
-      typeof ResizeObserver === "undefined"
-        ? null
-        : new ResizeObserver(listener);
-    observer?.observe(container);
-    observer?.observe(target);
-    return () => {
-      container.removeEventListener("scroll", listener);
-      observer?.disconnect();
-    };
-  };
-  const getSnapshot = (): boolean => {
-    if (container == null || target == null) return true;
-    const containerBounds = container.getBoundingClientRect();
-    const targetBounds = target.getBoundingClientRect();
-    return (
-      targetBounds.bottom > containerBounds.top &&
-      targetBounds.top < containerBounds.bottom
-    );
-  };
-  return React.useSyncExternalStore(subscribe, getSnapshot, getSnapshot);
+function i() {}
+var a, o;
+function s() {
+  return (s = e(() => {
+    ((a = t()), (o = n()));
+  }))();
 }
-
-function initializeUseElementInView(): void {
-  React();
-}
-
-export { useElementInView as n, initializeUseElementInView as t };
+export { r as n, s as t };

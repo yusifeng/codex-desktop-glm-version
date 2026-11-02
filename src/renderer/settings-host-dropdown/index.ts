@@ -1,168 +1,204 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  I3 as getJsxRuntime,
-  K2 as initializeInternationalization,
-  Y2 as FormattedMessage,
-  Yh as Button,
-  bD as selectedIconAsset,
-  db as FilterIcon,
-  jf as Menu,
-  kf as Dropdown,
-  lw as initializeIcons,
-  n4 as useCurrentAccount,
+  $3 as t,
+  I3 as n,
+  If as r,
+  K2 as i,
+  Y2 as a,
+  Yh as o,
+  Zh as s,
+  bD as c,
+  db as l,
+  jf as u,
+  kf as d,
+  lw as f,
+  n4 as p,
+  xD as m,
 } from "@rchunk/app-shared";
 import {
-  Bfn as initializeHostRuntime,
-  Yg as DefaultLocalIcon,
-  gb as HostIcon,
-  ql as SelectedHostTrigger,
-  ugn as localHostId,
+  Bfn as h,
+  Xg as g,
+  Xl as _,
+  Yg as v,
+  _b as y,
+  gb as b,
+  ql as x,
+  ugn as S,
 } from "@rchunk/app-initial";
-
-interface HostOption {
-  displayName: string;
-  hostId: string;
-}
-
-interface SettingsHostDropdownProps {
-  align?: "center" | "end" | "start";
-  connectedRemoteConnections: HostOption[];
-  contentWidth?: string;
-  disabled?: boolean;
-  includeLocalHost?: boolean;
-  localIcon?: unknown;
-  localLabel?: string;
-  onSelectHost(hostId: string): void;
-  selectedHostId: string;
-  showConnectedIndicator?: boolean;
-  triggerVariant?: "filter" | "selected-host";
-}
-
-interface IntlAccount {
-  formatMessage(message: { defaultMessage: string; id: string }): string;
-}
-
-const jsx = getJsxRuntime();
-
-function ConnectedIndicator(): unknown {
-  return jsx.jsx("span", {
-    "aria-hidden": true,
-    className: "block size-2 shrink-0 rounded-full bg-green-500",
-  });
-}
-
-function SettingsHostDropdown({
-  connectedRemoteConnections,
-  disabled = false,
-  includeLocalHost = true,
-  onSelectHost,
-  selectedHostId,
-  align = "end",
-  contentWidth = "menuWide",
-  localIcon = DefaultLocalIcon,
-  localLabel,
-  showConnectedIndicator = false,
-  triggerVariant = "selected-host",
-}: SettingsHostDropdownProps): unknown {
-  const intl = useCurrentAccount() as IntlAccount;
-  const selectedRemote = connectedRemoteConnections.find(
-    (connection) => connection.hostId === selectedHostId,
-  ) ?? null;
-  const resolvedLocalLabel = localLabel ?? intl.formatMessage({
-    id: "settings.hostDropdown.local",
-    defaultMessage: "Local",
-  });
-  const options = [
-    ...(includeLocalHost
-      ? [{ hostId: localHostId, displayName: resolvedLocalLabel }]
-      : []),
-    ...connectedRemoteConnections,
-  ];
-  const selectedLabel = selectedRemote?.displayName ?? resolvedLocalLabel;
-  const trigger = triggerVariant === "filter"
-    ? jsx.jsx(Button, {
-        className: "sidebar-icon-button sidebar-hover-icon-button-tint",
-        "aria-label": intl.formatMessage({
-          id: "settings.hostDropdown.filter",
-          defaultMessage: "Filter settings by host",
-        }),
-        color: "ghostMuted",
-        disabled,
-        size: "compact",
-        uniform: true,
-        children: jsx.jsx(FilterIcon as (props: Record<string, unknown>) => unknown, {}),
-      })
-    : jsx.jsxs(SelectedHostTrigger as (props: Record<string, unknown>) => unknown, {
-        disabled,
-        chevronClassName: disabled ? "hidden" : undefined,
-        children: [
-          selectedRemote == null
-            ? jsx.jsx(localIcon as (props: Record<string, unknown>) => unknown, {
-                className: "icon-xs shrink-0 text-default",
-              })
-            : jsx.jsx(HostIcon as (props: Record<string, unknown>) => unknown, {
-                className: "icon-xs shrink-0",
-                hostId: selectedRemote.hostId,
+function C(e) {
+  let t = (0, T.c)(32),
+    {
+      connectedRemoteConnections: n,
+      disabled: r,
+      includeLocalHost: i,
+      onSelectHost: s,
+      selectedHostId: f,
+      align: m,
+      contentWidth: h,
+      localIcon: g,
+      localLabel: _,
+      showConnectedIndicator: y,
+      triggerVariant: C,
+    } = e,
+    D = r !== void 0 && r,
+    O = i === void 0 || i,
+    k = g === void 0 ? v : g,
+    A = y !== void 0 && y,
+    j = C === void 0 ? `selected-host` : C,
+    M = p(),
+    N;
+  t[0] !== n || t[1] !== f
+    ? ((N = n.find((e) => e.hostId === f) ?? null), (t[0] = n), (t[1] = f), (t[2] = N))
+    : (N = t[2]);
+  let P = N,
+    F;
+  t[3] !== M || t[4] !== _
+    ? ((F =
+        _ ??
+        M.formatMessage({
+          id: `settings.hostDropdown.local`,
+          defaultMessage: `Local`,
+          description: `Label for the local host in settings connection dropdowns`,
+        })),
+      (t[3] = M),
+      (t[4] = _),
+      (t[5] = F))
+    : (F = t[5]);
+  let I = F,
+    L = P?.displayName ?? I,
+    R;
+  t[6] !== O || t[7] !== I
+    ? ((R = O ? [{ hostId: S, displayName: I }] : []), (t[6] = O), (t[7] = I), (t[8] = R))
+    : (R = t[8]);
+  let z;
+  t[9] !== n || t[10] !== R
+    ? ((z = [...R, ...n]), (t[9] = n), (t[10] = R), (t[11] = z))
+    : (z = t[11]);
+  let B = z,
+    V;
+  t[12] !== k ||
+  t[13] !== D ||
+  t[14] !== M ||
+  t[15] !== L ||
+  t[16] !== P ||
+  t[17] !== A ||
+  t[18] !== j
+    ? ((V =
+        j === `filter`
+          ? (0, E.jsx)(o, {
+              className: `sidebar-icon-button sidebar-hover-icon-button-tint`,
+              "aria-label": M.formatMessage({
+                id: `settings.hostDropdown.filter`,
+                defaultMessage: `Filter settings by host`,
+                description: `Accessible label for the settings host filter dropdown button`,
               }),
-          jsx.jsx("span", {
-            className: "truncate text-start text-default",
-            children: selectedLabel,
-          }),
-          selectedRemote != null && showConnectedIndicator
-            ? jsx.jsx(ConnectedIndicator, {})
-            : null,
-        ],
-      });
-  if (disabled) return trigger;
-  const MenuTitle = (Menu as { Title: unknown }).Title;
-  const MenuSection = (Menu as { Section: unknown }).Section;
-  const MenuItem = (Menu as { Item: unknown }).Item;
-  return jsx.jsxs(Dropdown as (props: Record<string, unknown>) => unknown, {
-    align,
-    contentWidth,
-    triggerButton: trigger,
-    children: [
-      jsx.jsx(MenuTitle, {
-        children: jsx.jsx(FormattedMessage, {
-          id: "settings.hostDropdown.title",
-          defaultMessage: "Host",
-        }),
-      }),
-      jsx.jsx(MenuSection, {
-        className: "max-h-40 overflow-y-auto",
-        children: options.map((option) =>
-          jsx.jsx(MenuItem, {
-            rightIconAsset:
-              option.hostId === selectedHostId ? selectedIconAsset : undefined,
-            onSelect: () => onSelectHost(option.hostId),
-            children: jsx.jsxs("span", {
-              className: "flex min-w-0 items-center gap-2",
+              color: `ghostMuted`,
+              disabled: D,
+              size: `compact`,
+              uniform: !0,
+              children: (0, E.jsx)(l, {}),
+            })
+          : (0, E.jsxs)(x, {
+              disabled: D,
+              chevronClassName: D ? `hidden` : void 0,
               children: [
-                option.hostId === localHostId
-                  ? jsx.jsx(localIcon as (props: Record<string, unknown>) => unknown, {
-                      className: "icon-xs shrink-0",
-                    })
-                  : jsx.jsx(HostIcon as (props: Record<string, unknown>) => unknown, {
-                      className: "icon-xs shrink-0",
-                      hostId: option.hostId,
-                    }),
-                jsx.jsx("span", { className: "truncate", children: option.displayName }),
-                option.hostId !== localHostId && showConnectedIndicator
-                  ? jsx.jsx(ConnectedIndicator, {})
-                  : null,
+                P == null
+                  ? (0, E.jsx)(k, { className: `icon-xs shrink-0 text-default` })
+                  : (0, E.jsx)(b, { className: `icon-xs shrink-0`, hostId: P.hostId }),
+                (0, E.jsx)(`span`, { className: `truncate text-start text-default`, children: L }),
+                P != null && A ? (0, E.jsx)(w, {}) : null,
               ],
-            }),
-          }, option.hostId),
+            })),
+      (t[12] = k),
+      (t[13] = D),
+      (t[14] = M),
+      (t[15] = L),
+      (t[16] = P),
+      (t[17] = A),
+      (t[18] = j),
+      (t[19] = V))
+    : (V = t[19]);
+  let H = V;
+  if (D) return H;
+  let U = m ?? `end`,
+    W = h ?? `menuWide`,
+    G;
+  t[20] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((G = (0, E.jsx)(u.Title, {
+        children: (0, E.jsx)(a, {
+          id: `settings.hostDropdown.title`,
+          defaultMessage: `Host`,
+          description: `Title for the Host dropdown shown in settings pages`,
+        }),
+      })),
+      (t[20] = G))
+    : (G = t[20]);
+  let K;
+  t[21] !== k || t[22] !== B || t[23] !== s || t[24] !== f || t[25] !== A
+    ? ((K = (0, E.jsx)(u.Section, {
+        className: `max-h-40 overflow-y-auto`,
+        children: B.map((e) =>
+          (0, E.jsx)(
+            u.Item,
+            {
+              rightIconAsset: e.hostId === f ? c : void 0,
+              onSelect: () => {
+                s(e.hostId);
+              },
+              children: (0, E.jsxs)(`span`, {
+                className: `flex min-w-0 items-center gap-2`,
+                children: [
+                  e.hostId === `local`
+                    ? (0, E.jsx)(k, { className: `icon-xs shrink-0` })
+                    : (0, E.jsx)(b, { className: `icon-xs shrink-0`, hostId: e.hostId }),
+                  (0, E.jsx)(`span`, { className: `truncate`, children: e.displayName }),
+                  e.hostId !== `local` && A ? (0, E.jsx)(w, {}) : null,
+                ],
+              }),
+            },
+            e.hostId,
+          ),
         ),
-      }),
-    ],
-  });
+      })),
+      (t[21] = k),
+      (t[22] = B),
+      (t[23] = s),
+      (t[24] = f),
+      (t[25] = A),
+      (t[26] = K))
+    : (K = t[26]);
+  let q;
+  return (
+    t[27] !== U || t[28] !== W || t[29] !== K || t[30] !== H
+      ? ((q = (0, E.jsxs)(d, { align: U, contentWidth: W, triggerButton: H, children: [G, K] })),
+        (t[27] = U),
+        (t[28] = W),
+        (t[29] = K),
+        (t[30] = H),
+        (t[31] = q))
+      : (q = t[31]),
+    q
+  );
 }
-
-function initializeSettingsHostDropdown(): void {
-  initializeInternationalization();
-  initializeIcons();
-  initializeHostRuntime();
+function w() {
+  let e = (0, T.c)(1),
+    t;
+  return (
+    e[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, E.jsx)(`span`, {
+          "aria-hidden": !0,
+          className: `block size-2 shrink-0 rounded-full bg-green-500`,
+        })),
+        (e[0] = t))
+      : (t = e[0]),
+    t
+  );
 }
-
-export { initializeSettingsHostDropdown as n, SettingsHostDropdown as t };
+var T, E;
+function D() {
+  return (D = e(() => {
+    ((T = t()), m(), i(), s(), r(), f(), g(), y(), h(), _(), (E = n()));
+  }))();
+}
+export { D as n, C as t };

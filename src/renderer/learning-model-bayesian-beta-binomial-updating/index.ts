@@ -1,61 +1,76 @@
-// Conjugate Beta prior updating for Bernoulli observations.
-import "@rchunk/rolldown-runtime";
-
-interface BayesianValues { prior_alpha?: number | null; prior_beta?: number | null; observed_successes?: number | null; observed_failures?: number | null }
-interface NumericControl { defaultValue: number; min: number; max: number }
-
-const bayesianSpecification = {
-  type: "BAYESIAN_BETA_BINOMIAL_UPDATING",
-  version: 1,
-  thumbnailAssetKey: "bayesian-beta-binomial-updating-v1",
-  parameters: {
-    prior_alpha: { kind: "number" as const, defaultValue: 5, min: 1.5, max: 6 },
-    prior_beta: { kind: "number" as const, defaultValue: 5, min: 1.5, max: 6 },
-    observed_successes: { kind: "integer" as const, defaultValue: 6, min: 0, max: 12 },
-    observed_failures: { kind: "integer" as const, defaultValue: 2, min: 0, max: 12 },
-  },
-};
-const bayesianParameters = bayesianSpecification.parameters;
-const priorAlphaControl = { ...bayesianParameters.prior_alpha, step: 0.1 };
-const priorBetaControl = { ...bayesianParameters.prior_beta, step: 0.1 };
-const observedSuccessesControl = { ...bayesianParameters.observed_successes, step: 1 };
-const observedFailuresControl = { ...bayesianParameters.observed_failures, step: 1 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const normalizeNumber = (value: number | null | undefined, control: NumericControl, integer = false): number => {
-  const finiteValue = typeof value === "number" && Number.isFinite(value) ? value : control.defaultValue;
-  return clamp(integer ? Math.round(finiteValue) : finiteValue, control.min, control.max);
-};
-const normalizeBayesianValues = (values: BayesianValues) => ({
-  prior_alpha: normalizeNumber(values.prior_alpha, priorAlphaControl),
-  prior_beta: normalizeNumber(values.prior_beta, priorBetaControl),
-  observed_successes: normalizeNumber(values.observed_successes, observedSuccessesControl, true),
-  observed_failures: normalizeNumber(values.observed_failures, observedFailuresControl, true),
-});
-const lanczosCoefficients = [0.9999999999998099, 676.5203681218851, -1259.1392167224028, 771.3234287776531, -176.6150291621406, 12.507343278686905, -0.13857109526572012, 9984369578019572e-21, 15056327351493116e-23];
-const logGamma = (value: number): number => {
-  let sum = lanczosCoefficients[0];
-  const shifted = value - 1;
-  for (let index = 1; index < lanczosCoefficients.length; index += 1) sum += lanczosCoefficients[index] / (shifted + index);
-  const scale = shifted + 7.5;
-  return 0.5 * Math.log(2 * Math.PI) + (shifted + 0.5) * Math.log(scale) - scale + Math.log(sum);
-};
-const calculateBayesianUpdate = (values: BayesianValues) => {
-  const normalized = normalizeBayesianValues(values);
-  const posteriorAlpha = normalized.prior_alpha + normalized.observed_successes;
-  const posteriorBeta = normalized.prior_beta + normalized.observed_failures;
-  const trials = normalized.observed_successes + normalized.observed_failures;
-  return { ...normalized, posteriorAlpha, posteriorBeta, priorMean: normalized.prior_alpha / (normalized.prior_alpha + normalized.prior_beta), posteriorMean: posteriorAlpha / (posteriorAlpha + posteriorBeta), observedRate: trials === 0 ? null : normalized.observed_successes / trials, trials };
-};
-const betaDensityCurve = (alpha: number, beta: number, samples = 240) => {
-  const logBeta = logGamma(alpha) + logGamma(beta) - logGamma(alpha + beta);
-  return Array.from({ length: samples + 1 }, (_, index) => {
-    const x = index / samples;
-    return x === 0 || x === 1 ? { x, y: 0 } : { x, y: Math.exp((alpha - 1) * Math.log(x) + (beta - 1) * Math.log1p(-x) - logBeta) };
-  });
-};
-const formatBayesianNumber = (value: number): string => value.toFixed(2).replace(/\.?0+$/, "");
-
-function initializeBayesianSpecification(): void {}
-function initializeBayesianModel(): void {}
-
-export { calculateBayesianUpdate as a, betaDensityCurve as c, bayesianSpecification as d, priorBetaControl as i, normalizeBayesianValues as l, observedSuccessesControl as n, formatBayesianNumber as o, priorAlphaControl as r, initializeBayesianModel as s, observedFailuresControl as t, initializeBayesianSpecification as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `BAYESIAN_BETA_BINOMIAL_UPDATING`),
+      (n = `bayesian-beta-binomial-updating-v1`),
+      (r = {
+        prior_alpha: { kind: `number`, defaultValue: 5, min: 1.5, max: 6 },
+        prior_beta: { kind: `number`, defaultValue: 5, min: 1.5, max: 6 },
+        observed_successes: { kind: `integer`, defaultValue: 6, min: 0, max: 12 },
+        observed_failures: { kind: `integer`, defaultValue: 2, min: 0, max: 12 },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v;
+function y() {
+  return (y = e(() => {
+    (a(),
+      (o = i.parameters),
+      (s = { ...o.prior_alpha, step: 0.1 }),
+      (c = { ...o.prior_beta, step: 0.1 }),
+      (l = { ...o.observed_successes, step: 1 }),
+      (u = { ...o.observed_failures, step: 1 }),
+      (d = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (f = (e, t, n = !1) => {
+        let r = Number.isFinite(e) ? (e ?? t.defaultValue) : t.defaultValue;
+        return d(n ? Math.round(r) : r, t.min, t.max);
+      }),
+      (p = (e) => ({
+        prior_alpha: f(e.prior_alpha, s),
+        prior_beta: f(e.prior_beta, c),
+        observed_successes: f(e.observed_successes, l, !0),
+        observed_failures: f(e.observed_failures, u, !0),
+      })),
+      (m = [
+        0.9999999999998099, 676.5203681218851, -1259.1392167224028, 771.3234287776531,
+        -176.6150291621406, 12.507343278686905, -0.13857109526572012, 9984369578019572e-21,
+        1.5056327351493116e-7,
+      ]),
+      (h = (e) => {
+        let t = m[0],
+          n = e - 1;
+        for (let e = 1; e < m.length; e += 1) t += m[e] / (n + e);
+        let r = n + 7.5;
+        return 0.5 * Math.log(2 * Math.PI) + (n + 0.5) * Math.log(r) - r + Math.log(t);
+      }),
+      (g = (e) => {
+        let t = p(e),
+          n = t.prior_alpha + t.observed_successes,
+          r = t.prior_beta + t.observed_failures,
+          i = t.observed_successes + t.observed_failures;
+        return {
+          ...t,
+          posteriorAlpha: n,
+          posteriorBeta: r,
+          priorMean: t.prior_alpha / (t.prior_alpha + t.prior_beta),
+          posteriorMean: n / (n + r),
+          observedRate: i === 0 ? null : t.observed_successes / i,
+          trials: i,
+        };
+      }),
+      (_ = (e, t, n = 240) => {
+        let r = h(e) + h(t) - h(e + t);
+        return Array.from({ length: n + 1 }, (i, a) => {
+          let o = a / n;
+          return o === 0 || o === 1
+            ? { x: o, y: 0 }
+            : { x: o, y: Math.exp((e - 1) * Math.log(o) + (t - 1) * Math.log1p(-o) - r) };
+        });
+      }),
+      (v = (e) => e.toFixed(2).replace(/\.?0+$/, ``)));
+  }))();
+}
+export { g as a, _ as c, i as d, c as i, p as l, l as n, v as o, s as r, y as s, u as t, a as u };

@@ -1,5 +1,21 @@
-import "@rchunk/rolldown-runtime";
-interface NumberFormatter { formatNumber(value: number, options: Intl.NumberFormatOptions): string }
-function t(bytes: number, intl: NumberFormatter): string { if (!Number.isFinite(bytes) || bytes <= 0) return intl.formatNumber(0, { style: "unit", unit: "byte", unitDisplay: "long" }); if (bytes < 1024) return intl.formatNumber(bytes, { style: "unit", unit: "byte", unitDisplay: "long" }); const units: Intl.NumberFormatOptions["unit"][] = ["kilobyte", "megabyte", "gigabyte", "terabyte"]; let value = bytes / 1024, index = 0; while (value >= 1024 && index < units.length - 1) { value /= 1024; index++; } return intl.formatNumber(value, { maximumFractionDigits: 1, style: "unit", unit: units[index], unitDisplay: "short" }); }
-function n(): void {}
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e, t) {
+  if (!Number.isFinite(e) || e <= 0)
+    return t.formatNumber(0, { style: `unit`, unit: `byte`, unitDisplay: `long` });
+  if (e < 1024) return t.formatNumber(e, { style: `unit`, unit: `byte`, unitDisplay: `long` });
+  let n = [`kilobyte`, `megabyte`, `gigabyte`, `terabyte`],
+    r = e / 1024,
+    i = 0;
+  for (; r >= 1024 && i < n.length - 1;) ((r /= 1024), (i += 1));
+  return t.formatNumber(r, {
+    maximumFractionDigits: 1,
+    style: `unit`,
+    unit: n[i],
+    unitDisplay: `short`,
+  });
+}
+function n() {
+  return (n = e(() => {}))();
+}
 export { n, t };

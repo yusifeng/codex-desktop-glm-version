@@ -1,209 +1,303 @@
-import "@rchunk/rolldown-runtime";
-
-type Alignment = "top-left" | "top-right" | "bottom-left" | "bottom-right";
-interface Rect { height: number; width: number; x: number; y: number }
-interface EdgeRect { bottom: number; height: number; left: number; right: number; top: number; width: number }
-interface Anchor { alignment: Alignment; point: { x: number; y: number } }
-interface PipLayout {
-  anchorRect: Rect | null;
-  anchors: Anchor[] | null;
-  animated: boolean;
-  hostId: string;
-  homeSurfaceWidth: number | null;
-  isCodexHomeAvailable: boolean;
-  interactionPassthroughRect: null;
-  presentationScope: "thread";
-}
-
-let hostId: string;
-let hostAttribute: string;
-let homeSurfaceAttribute: string;
-let obstacleAttribute: string;
-let margin: number;
-let obstaclePadding: number;
-let pipSize: { height: number; width: number };
-let collisionPasses: number;
-let overlapPenalty: number;
-let overlapAreaWeight: number;
-let priorityWeight: number;
-let alignments: Alignment[];
-let hostSelector: string;
-let homeSurfaceSelector: string;
-let obstacleSelector: string;
-let observedSelector: string;
-
-function rectAt(left: number, top: number, size: { height: number; width: number }): EdgeRect {
-  return { bottom: top + size.height, height: size.height, left, right: left + size.width, top, width: size.width };
-}
-function edgeRect({ bottom, left, right, top }: { bottom: number; left: number; right: number; top: number }): EdgeRect {
-  return { bottom, height: bottom - top, left, right, top, width: right - left };
-}
-function overlapArea(first: EdgeRect, second: EdgeRect): number {
-  const width = Math.min(first.right, second.right) - Math.max(first.left, second.left);
-  const height = Math.min(first.bottom, second.bottom) - Math.max(first.top, second.top);
-  return width <= 0 || height <= 0 ? 0 : width * height;
-}
-function clamp(value: number, minimum: number, maximum: number): number {
-  return Math.min(Math.max(value, minimum), maximum);
-}
-function clampToHost(rect: EdgeRect, host: Rect): EdgeRect {
-  return rectAt(clamp(rect.left, margin, Math.max(margin, host.width - rect.width - margin)), clamp(rect.top, margin, Math.max(margin, host.height - rect.height - margin)), rect);
-}
-function initialRect(alignment: Alignment, host: Rect): EdgeRect {
-  switch (alignment) {
-    case "top-left": return rectAt(margin, margin, pipSize);
-    case "top-right": return rectAt(host.width - pipSize.width - margin, margin, pipSize);
-    case "bottom-left": return rectAt(margin, host.height - pipSize.height - margin, pipSize);
-    case "bottom-right": return rectAt(host.width - pipSize.width - margin, host.height - pipSize.height - margin, pipSize);
-  }
-}
-function candidateRects(alignment: Alignment, rect: EdgeRect, obstacle: EdgeRect): Array<{ priority: number; rect: EdgeRect }> {
-  const below = rectAt(rect.left, obstacle.bottom, rect);
-  const above = rectAt(rect.left, obstacle.top - rect.height, rect);
-  const right = rectAt(obstacle.right, rect.top, rect);
-  const left = rectAt(obstacle.left - rect.width, rect.top, rect);
-  switch (alignment) {
-    case "top-left": return [{ priority: 0, rect: below }, { priority: 1, rect: right }, { priority: 2, rect: left }, { priority: 3, rect: above }];
-    case "top-right": return [{ priority: 0, rect: below }, { priority: 1, rect: left }, { priority: 2, rect: right }, { priority: 3, rect: above }];
-    case "bottom-left": return [{ priority: 0, rect: above }, { priority: 1, rect: right }, { priority: 2, rect: left }, { priority: 3, rect: below }];
-    case "bottom-right": return [{ priority: 0, rect: above }, { priority: 1, rect: left }, { priority: 2, rect: right }, { priority: 3, rect: below }];
-  }
-}
-function candidateScore(candidate: { priority: number; rect: EdgeRect }, obstacles: EdgeRect[], source: EdgeRect): number {
-  const overlap = obstacles.reduce((total, obstacle) => total + overlapArea(candidate.rect, obstacle), 0);
-  return (overlap > 0 ? overlapPenalty : 0) + overlap * overlapAreaWeight + candidate.priority * priorityWeight
-    + (candidate.rect.left - source.left) ** 2 + (candidate.rect.top - source.top) ** 2;
-}
-function firstCollision(rect: EdgeRect, obstacles: EdgeRect[]): EdgeRect | null {
-  for (const obstacle of obstacles) if (overlapArea(rect, obstacle) > 0) return obstacle;
-  return null;
-}
-function resolveCollision(alignment: Alignment, host: Rect, obstacle: EdgeRect, obstacles: EdgeRect[], rect: EdgeRect, source: EdgeRect): EdgeRect {
-  const candidates = candidateRects(alignment, rect, obstacle).map((candidate) => ({ priority: candidate.priority, rect: clampToHost(candidate.rect, host) }));
-  let best = candidates[0];
-  let bestScore = best == null ? Number.POSITIVE_INFINITY : candidateScore(best, obstacles, source);
-  for (const candidate of candidates.slice(1)) {
-    const score = candidateScore(candidate, obstacles, source);
-    if (score < bestScore) { best = candidate; bestScore = score; }
-  }
-  return best?.rect ?? rect;
-}
-function anchorPoint(alignment: Alignment, host: Rect, rect: EdgeRect): { x: number; y: number } {
-  switch (alignment) {
-    case "top-left": return { x: host.x + rect.left, y: host.y + rect.top };
-    case "top-right": return { x: host.x + rect.right, y: host.y + rect.top };
-    case "bottom-left": return { x: host.x + rect.left, y: host.y + rect.bottom };
-    case "bottom-right": return { x: host.x + rect.right, y: host.y + rect.bottom };
-  }
-}
-function preferredHomeRect(host: Rect, surface: Rect): EdgeRect {
-  return rectAt(surface.x - host.x + surface.width - pipSize.width, surface.y - host.y, pipSize);
-}
-function inflatedObstacle(host: Rect, obstacle: Rect): EdgeRect {
-  return edgeRect({ bottom: obstacle.y - host.y + obstacle.height + obstaclePadding, left: obstacle.x - host.x - obstaclePadding, right: obstacle.x - host.x + obstacle.width + obstaclePadding, top: obstacle.y - host.y - obstaclePadding });
-}
-function createAnchor(alignment: Alignment, host: Rect, obstacles: EdgeRect[], preferred: EdgeRect | null): Anchor {
-  if (preferred != null) return { alignment, point: anchorPoint(alignment, host, preferred) };
-  const source = clampToHost(initialRect(alignment, host), host);
-  let current = source;
-  for (let pass = 0; pass < collisionPasses; pass += 1) {
-    const obstacle = firstCollision(current, obstacles);
-    if (obstacle == null) break;
-    current = resolveCollision(alignment, host, obstacle, obstacles, current, source);
-  }
-  return { alignment, point: anchorPoint(alignment, host, current) };
-}
-function computePipLayout({ homeSurfaceRect, hostId: requestedHostId, hostRect, isCodexHomeAvailable, obstacleRects }: { homeSurfaceRect: Rect | null; hostId: string; hostRect: Rect; isCodexHomeAvailable: boolean; obstacleRects: Rect[] }): PipLayout {
-  const obstacles = obstacleRects.map((rect) => inflatedObstacle(hostRect, rect));
-  const preferred = isCodexHomeAvailable && homeSurfaceRect != null ? preferredHomeRect(hostRect, homeSurfaceRect) : null;
-  return { anchorRect: hostRect, anchors: alignments.map((alignment) => createAnchor(alignment, hostRect, obstacles, alignment === "top-right" ? preferred : null)), animated: false, hostId: requestedHostId, homeSurfaceWidth: homeSurfaceRect?.width ?? null, isCodexHomeAvailable, interactionPassthroughRect: null, presentationScope: "thread" };
-}
-
-function visibleRect(element: HTMLElement, allowZeroHeight = false): Rect | null {
-  if (element.hidden || window.getComputedStyle(element).visibility === "hidden") return null;
-  const rect = element.getBoundingClientRect();
-  return rect.width <= 0 || (!allowZeroHeight && rect.height <= 0) ? null : { height: rect.height, width: rect.width, x: rect.left, y: rect.top };
-}
-function layoutKey(layout: PipLayout): string {
-  return JSON.stringify({ anchors: layout.anchors, anchorRect: layout.anchorRect, hostId: layout.hostId, homeSurfaceWidth: layout.homeSurfaceWidth, isCodexHomeAvailable: layout.isCodexHomeAvailable, presentationScope: layout.presentationScope });
-}
-function isObservedElement(node: Node): boolean {
-  return node instanceof HTMLElement && (node.matches(observedSelector) || node.querySelector(observedSelector) != null);
-}
-function containsObservedElement(record: MutationRecord): boolean {
-  if (record.type === "attributes") return true;
-  for (const node of record.addedNodes) if (isObservedElement(node)) return true;
-  for (const node of record.removedNodes) if (isObservedElement(node)) return true;
-  return false;
-}
-function startRemoteHostedPipAnchorBridge(scale = 1): { setCodexHomeAvailable(available: boolean): void; stop(): void } {
-  const send = (window as Window & { electronBridge?: { sendMessageFromView?(message: unknown): unknown } }).electronBridge?.sendMessageFromView;
-  if (send == null || document.body == null) return { setCodexHomeAvailable() {}, stop() {} };
-  const safeScale = Number.isFinite(scale) && scale > 0 ? scale : 1;
-  let frame: number | null = null;
-  let available = false;
-  let previous: PipLayout | null = null;
-  let previousKey: string | null = null;
-  const resizeObserver = new ResizeObserver(schedule);
-  const treeObserver = new MutationObserver((records) => { if (records.some(containsObservedElement)) { observeElements(); schedule(); } });
-  const attributeObserver = new MutationObserver(schedule);
-  function publish(layout: PipLayout): void {
-    const key = layoutKey(layout);
-    if (key === previousKey) return;
-    const next = { ...layout, animated: previous?.anchorRect != null && layout.anchorRect != null };
-    previous = next;
-    previousKey = key;
-    send({ layout: next, type: "remote-hosted-pip-host-layout-changed" });
-  }
-  function publishEmpty(): void {
-    publish({ anchors: null, anchorRect: null, animated: false, hostId, homeSurfaceWidth: null, isCodexHomeAvailable: false, interactionPassthroughRect: null, presentationScope: "thread" });
-  }
-  function schedule(): void { frame ??= window.requestAnimationFrame(() => { frame = null; measure(); }); }
-  function measure(): void {
-    const hostElement = document.querySelector<HTMLElement>(hostSelector);
-    if (hostElement == null) { publishEmpty(); return; }
-    const measuredHost = visibleRect(hostElement);
-    if (measuredHost == null) { publishEmpty(); return; }
-    const obstacles: Rect[] = [];
-    for (const element of document.querySelectorAll<HTMLElement>(obstacleSelector)) { const rect = visibleRect(element); if (rect != null) obstacles.push(rect); }
-    let surface: Rect | null = null;
-    for (const element of document.querySelectorAll<HTMLElement>(homeSurfaceSelector)) {
-      surface = visibleRect(element, true);
-      if (surface != null) { surface.width = element.offsetWidth * safeScale; break; }
-    }
-    publish(computePipLayout({ homeSurfaceRect: surface, hostId, hostRect: measuredHost, isCodexHomeAvailable: available, obstacleRects: obstacles }));
-  }
-  function observeElements(): void {
-    resizeObserver.disconnect();
-    attributeObserver.disconnect();
-    for (const element of document.querySelectorAll<HTMLElement>(observedSelector)) {
-      resizeObserver.observe(element);
-      attributeObserver.observe(element, { attributeFilter: ["class", "hidden", "style"], attributes: true });
-    }
-  }
-  treeObserver.observe(document.body, { attributeFilter: [hostAttribute, homeSurfaceAttribute, obstacleAttribute], attributes: true, childList: true, subtree: true });
-  window.addEventListener("resize", schedule);
-  document.addEventListener("scroll", schedule, true);
-  observeElements();
-  schedule();
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t({
+  homeSurfaceRect: e,
+  hostId: t,
+  hostRect: i,
+  isCodexHomeAvailable: a,
+  obstacleRects: o,
+}) {
+  let s = o.map((e) => l(i, e)),
+    c = a && e != null ? r(i, e) : null;
   return {
-    setCodexHomeAvailable(next) { if (available !== next) { available = next; schedule(); } },
-    stop() {
-      if (frame != null) window.cancelAnimationFrame(frame);
-      resizeObserver.disconnect(); treeObserver.disconnect(); attributeObserver.disconnect();
-      window.removeEventListener("resize", schedule); document.removeEventListener("scroll", schedule, true); publishEmpty();
-    },
+    anchorRect: i,
+    anchors: D.map((e) => n(e, i, s, e === `top-right` ? c : null)),
+    animated: !1,
+    hostId: t,
+    homeSurfaceWidth: e?.width ?? null,
+    isCodexHomeAvailable: a,
+    interactionPassthroughRect: null,
+    presentationScope: `thread`,
   };
 }
-
-function initializePipGeometry(): void {
-  hostId = "codex-main-thread"; hostAttribute = "data-pip-anchor-host"; homeSurfaceAttribute = "data-pip-home-surface"; obstacleAttribute = "data-pip-obstacle";
-  margin = 24; obstaclePadding = 12; pipSize = { height: 250, width: 250 }; collisionPasses = 6; overlapPenalty = 1e9; overlapAreaWeight = 1e4; priorityWeight = 1e6;
-  alignments = ["top-left", "top-right", "bottom-left", "bottom-right"];
+function n(e, t, n, r) {
+  if (r != null) return { alignment: e, point: u(e, t, r) };
+  let o = d(i(e, t), t),
+    s = o;
+  for (let r = 0; r < C; r += 1) {
+    let r = c(s, n);
+    if (r == null) break;
+    s = a({ alignment: e, hostRect: t, obstacle: r, obstacles: n, rect: s, sourceRect: o });
+  }
+  return { alignment: e, point: u(e, t, s) };
 }
-function initializeRemoteHostedPipBridge(): void {
-  initializePipGeometry();
-  hostSelector = `[${hostAttribute}="${hostId}"]`; homeSurfaceSelector = `[${homeSurfaceAttribute}]`; obstacleSelector = `[${obstacleAttribute}]`; observedSelector = `${hostSelector},${homeSurfaceSelector},${obstacleSelector}`;
+function r(e, t) {
+  let n = t.x - e.x + t.width,
+    r = t.y - e.y;
+  return f(n - S.width, r, S);
 }
-
-export { initializePipGeometry as i, startRemoteHostedPipAnchorBridge as n, hostId as r, initializeRemoteHostedPipBridge as t };
+function i(e, t) {
+  switch (e) {
+    case `top-left`:
+      return f(b, b, S);
+    case `top-right`:
+      return f(t.width - S.width - b, b, S);
+    case `bottom-left`:
+      return f(b, t.height - S.height - b, S);
+    case `bottom-right`:
+      return f(t.width - S.width - b, t.height - S.height - b, S);
+  }
+}
+function a({ alignment: e, hostRect: t, obstacle: n, obstacles: r, rect: i, sourceRect: a }) {
+  let c = o(e, i, n).map((e) => ({ priority: e.priority, rect: d(e.rect, t) })),
+    l = c[0],
+    u = l == null ? 1 / 0 : s(l, r, a);
+  for (let e of c.slice(1)) {
+    let t = s(e, r, a);
+    t < u && ((l = e), (u = t));
+  }
+  return l?.rect ?? i;
+}
+function o(e, t, n) {
+  let r = f(t.left, n.bottom, t),
+    i = f(t.left, n.top - t.height, t),
+    a = f(n.right, t.top, t),
+    o = f(n.left - t.width, t.top, t);
+  switch (e) {
+    case `top-left`:
+      return [
+        { priority: 0, rect: r },
+        { priority: 1, rect: a },
+        { priority: 2, rect: o },
+        { priority: 3, rect: i },
+      ];
+    case `top-right`:
+      return [
+        { priority: 0, rect: r },
+        { priority: 1, rect: o },
+        { priority: 2, rect: a },
+        { priority: 3, rect: i },
+      ];
+    case `bottom-left`:
+      return [
+        { priority: 0, rect: i },
+        { priority: 1, rect: a },
+        { priority: 2, rect: o },
+        { priority: 3, rect: r },
+      ];
+    case `bottom-right`:
+      return [
+        { priority: 0, rect: i },
+        { priority: 1, rect: o },
+        { priority: 2, rect: a },
+        { priority: 3, rect: r },
+      ];
+  }
+}
+function s(e, t, n) {
+  let r = t.reduce((t, n) => t + m(e.rect, n), 0);
+  return (
+    (r > 0 ? w : 0) +
+    r * T +
+    e.priority * E +
+    (e.rect.left - n.left) ** 2 +
+    (e.rect.top - n.top) ** 2
+  );
+}
+function c(e, t) {
+  for (let n of t) if (m(e, n) > 0) return n;
+  return null;
+}
+function l(e, t) {
+  return p({
+    bottom: t.y - e.y + t.height + x,
+    left: t.x - e.x - x,
+    right: t.x - e.x + t.width + x,
+    top: t.y - e.y - x,
+  });
+}
+function u(e, t, n) {
+  switch (e) {
+    case `top-left`:
+      return { x: t.x + n.left, y: t.y + n.top };
+    case `top-right`:
+      return { x: t.x + n.right, y: t.y + n.top };
+    case `bottom-left`:
+      return { x: t.x + n.left, y: t.y + n.bottom };
+    case `bottom-right`:
+      return { x: t.x + n.right, y: t.y + n.bottom };
+  }
+}
+function d(e, t) {
+  return f(
+    h(e.left, b, Math.max(b, t.width - e.width - b)),
+    h(e.top, b, Math.max(b, t.height - e.height - b)),
+    e,
+  );
+}
+function f(e, t, n) {
+  return {
+    bottom: t + n.height,
+    height: n.height,
+    left: e,
+    right: e + n.width,
+    top: t,
+    width: n.width,
+  };
+}
+function p({ bottom: e, left: t, right: n, top: r }) {
+  return { bottom: e, height: e - r, left: t, right: n, top: r, width: n - t };
+}
+function m(e, t) {
+  let n = Math.min(e.right, t.right) - Math.max(e.left, t.left),
+    r = Math.min(e.bottom, t.bottom) - Math.max(e.top, t.top);
+  return n <= 0 || r <= 0 ? 0 : n * r;
+}
+function h(e, t, n) {
+  return Math.min(Math.max(e, t), n);
+}
+var g, _, v, y, b, x, S, C, w, T, E, D;
+function O() {
+  return (O = e(() => {
+    ((g = `codex-main-thread`),
+      (_ = `data-pip-anchor-host`),
+      (v = `data-pip-home-surface`),
+      (y = `data-pip-obstacle`),
+      (b = 24),
+      (x = 12),
+      (S = { height: 250, width: 250 }),
+      (C = 6),
+      (w = 1e9),
+      (T = 1e4),
+      (E = 1e6),
+      (D = [`top-left`, `top-right`, `bottom-left`, `bottom-right`]));
+  }))();
+}
+function k(e) {
+  let n = window.electronBridge?.sendMessageFromView;
+  if (n == null || document.body == null) return { setCodexHomeAvailable() {}, stop() {} };
+  let r = n,
+    i = Number.isFinite(e) && e > 0 ? e : 1,
+    a = null,
+    o = !1,
+    s = null,
+    c = null,
+    l = new ResizeObserver(m),
+    u = new MutationObserver((e) => {
+      e.some(M) && (b(), m());
+    }),
+    d = new MutationObserver(m);
+  function f(e) {
+    let t = j(e);
+    if (t === c) return;
+    let n = s?.anchorRect != null && e.anchorRect != null,
+      i = { ...e, animated: n };
+    ((s = i), (c = t), r({ layout: i, type: `remote-hosted-pip-host-layout-changed` }));
+  }
+  function p() {
+    f({
+      anchors: null,
+      anchorRect: null,
+      animated: !1,
+      hostId: g,
+      homeSurfaceWidth: null,
+      isCodexHomeAvailable: !1,
+      interactionPassthroughRect: null,
+      presentationScope: `thread`,
+    });
+  }
+  function m() {
+    a ??= window.requestAnimationFrame(() => {
+      ((a = null), h());
+    });
+  }
+  function h() {
+    let e = document.querySelector(P);
+    if (e == null) {
+      p();
+      return;
+    }
+    let n = A(e);
+    if (n == null) {
+      p();
+      return;
+    }
+    let r = [];
+    for (let e of document.querySelectorAll(I)) {
+      let t = A(e);
+      t != null && r.push(t);
+    }
+    let a = null;
+    for (let e of document.querySelectorAll(F))
+      if (((a = A(e, !0)), a != null)) {
+        a.width = e.offsetWidth * i;
+        break;
+      }
+    f(t({ homeSurfaceRect: a, hostId: g, hostRect: n, isCodexHomeAvailable: o, obstacleRects: r }));
+  }
+  function b() {
+    (l.disconnect(), d.disconnect());
+    for (let e of document.querySelectorAll(L))
+      (l.observe(e),
+        d.observe(e, { attributeFilter: [`class`, `hidden`, `style`], attributes: !0 }));
+  }
+  return (
+    u.observe(document.body, {
+      attributeFilter: [_, v, y],
+      attributes: !0,
+      childList: !0,
+      subtree: !0,
+    }),
+    window.addEventListener(`resize`, m),
+    document.addEventListener(`scroll`, m, !0),
+    b(),
+    m(),
+    {
+      setCodexHomeAvailable(e) {
+        o !== e && ((o = e), m());
+      },
+      stop() {
+        (a != null && window.cancelAnimationFrame(a),
+          l.disconnect(),
+          u.disconnect(),
+          d.disconnect(),
+          window.removeEventListener(`resize`, m),
+          document.removeEventListener(`scroll`, m, !0),
+          p());
+      },
+    }
+  );
+}
+function A(e, t = !1) {
+  if (e.hidden || window.getComputedStyle(e).visibility === `hidden`) return null;
+  let n = e.getBoundingClientRect();
+  return n.width <= 0 || (!t && n.height <= 0)
+    ? null
+    : { height: n.height, width: n.width, x: n.left, y: n.top };
+}
+function j(e) {
+  return JSON.stringify({
+    anchors: e.anchors,
+    anchorRect: e.anchorRect,
+    hostId: e.hostId,
+    homeSurfaceWidth: e.homeSurfaceWidth,
+    isCodexHomeAvailable: e.isCodexHomeAvailable,
+    presentationScope: e.presentationScope,
+  });
+}
+function M(e) {
+  if (e.type === `attributes`) return !0;
+  for (let t of e.addedNodes) if (N(t)) return !0;
+  for (let t of e.removedNodes) if (N(t)) return !0;
+  return !1;
+}
+function N(e) {
+  return e instanceof HTMLElement && (e.matches(L) || e.querySelector(L) != null);
+}
+var P, F, I, L;
+function R() {
+  return (R = e(() => {
+    (O(), (P = `[${_}="${g}"]`), (F = `[${v}]`), (I = `[${y}]`), (L = `${P},${F},${I}`));
+  }))();
+}
+export { O as i, k as n, g as r, R as t };

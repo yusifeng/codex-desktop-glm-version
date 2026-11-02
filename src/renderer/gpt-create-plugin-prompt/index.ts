@@ -1,297 +1,371 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeSharedRuntime,
-  BX as useSignalFamilyImport,
-  FX as initializeMaitaiRuntime,
-  HX as useSignalValue,
-  I3 as getJsxRuntime,
-  Ih as Dialog,
-  K2 as initializeUiRuntime,
-  LX as useScope,
-  Lh as DialogText,
-  Oh as DialogBody,
-  Ph as initializeDialogTitle,
-  QI as initializeExternalSignals,
-  Rh as DialogTitle,
-  Y2 as FormattedMessage,
-  Yh as Button,
-  ZI as appScope,
-  Zh as initializeButtons,
-  c_ as initializeDialogRuntime,
-  e6 as getReactRuntime,
-  kh as DialogActions,
-  o_ as Tooltip,
-  zh as initializeTooltipRuntime,
-  type JsxRuntime,
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  Ih as o,
+  K2 as s,
+  LX as c,
+  Lh as l,
+  Oh as u,
+  Ph as d,
+  QI as f,
+  Rh as p,
+  Y2 as m,
+  Yh as h,
+  ZI as g,
+  Zh as _,
+  c_ as v,
+  e6 as y,
+  kh as b,
+  o_ as x,
+  zh as S,
 } from "@rchunk/app-shared";
 import {
-  G6t as initializeAccountRuntime,
-  K6t as currentAccountIdSignal,
-  Qgn as initializeIdentityRuntime,
-  ifn as initializeFeatureFlags,
-  lfn as getDynamicConfigService,
-  m0t as dynamicConfigFamily,
-  o_n as useNavigate,
-  ofn as useFeatureFlag,
-  p0t as initializeDynamicConfig,
+  G6t as C,
+  K6t as w,
+  Qgn as T,
+  iE as E,
+  ifn as D,
+  lfn as O,
+  m0t as k,
+  o_n as A,
+  ofn as j,
+  p0t as M,
+  rE as N,
 } from "@rchunk/app-initial";
-// @ts-expect-error The navigation initializer is absent from the shared declaration baseline.
-import { iE as initializeNavigationRuntime } from "@rchunk/app-initial";
-// @ts-expect-error The GPT editor route is absent from the shared declaration baseline.
-import { rE as gptEditorRoute } from "@rchunk/app-initial";
-import {
-  n as initializeHostedPluginCreationActions,
-  t as HostedPluginCreationActions,
-} from "@rchunk/hosted-plugin-creation-actions";
-
-interface PromptProps {
-  accountId: string;
-  onClose(): void;
+import { n as P, t as F } from "@rchunk/hosted-plugin-creation-actions";
+function I(e) {
+  let t = (0, R.c)(17),
+    { accountId: r, onClose: a } = e,
+    o = c(g),
+    s = A(),
+    l = i(w),
+    u = j(`2160578039`),
+    d = j(`1663164947`),
+    f = n(k, `2513446768`),
+    p = O(),
+    m = (0, z.useEffectEvent)(a),
+    h;
+  t[0] !== r || t[1] !== m || t[2] !== o
+    ? ((h = () =>
+        o.watch((e) => {
+          let { get: t } = e;
+          t(w) !== r && m();
+        })),
+      (t[0] = r),
+      (t[1] = m),
+      (t[2] = o),
+      (t[3] = h))
+    : (h = t[3]);
+  let _;
+  if (
+    (t[4] !== r || t[5] !== o ? ((_ = [r, o]), (t[4] = r), (t[5] = o), (t[6] = _)) : (_ = t[6]),
+    (0, z.useEffect)(h, _),
+    l !== r)
+  )
+    return null;
+  let v;
+  t[7] !== d || t[8] !== s || t[9] !== a || t[10] !== f || t[11] !== p
+    ? ((v = (e) =>
+        (0, B.jsx)(L, {
+          canCreatePlugin: e.canCreatePlugin,
+          isCreatingPlugin: e.isCreatingPlugin,
+          isPluginCreatorEnabled: d,
+          isPluginCreatorDisabledByAdmin: e.isPluginCreatorDisabledByAdmin,
+          isWorkspacePluginUseDenied: e.isWorkspacePluginUseDenied,
+          gptCreationDisabled: f?.get(`disable_gpt_creation`, !1) === !0,
+          onClose: a,
+          onCreatePlugin: e.onCreatePlugin,
+          onCreateGpt: () => {
+            p.getDynamicConfig(`2513446768`).get(`disable_gpt_creation`, !1) || (a(), s(N));
+          },
+        })),
+      (t[7] = d),
+      (t[8] = s),
+      (t[9] = a),
+      (t[10] = f),
+      (t[11] = p),
+      (t[12] = v))
+    : (v = t[12]);
+  let y;
+  return (
+    t[13] !== u || t[14] !== a || t[15] !== v
+      ? ((y = (0, B.jsx)(F, {
+          enabled: u,
+          logSkillCreationEvent: !1,
+          mode: `browse`,
+          onNavigate: a,
+          children: v,
+        })),
+        (t[13] = u),
+        (t[14] = a),
+        (t[15] = v),
+        (t[16] = y))
+      : (y = t[16]),
+    y
+  );
 }
-
-interface CreationState {
-  canCreatePlugin: boolean;
-  isCreatingPlugin?: boolean;
-  isPluginCreatorDisabledByAdmin?: boolean;
-  isWorkspacePluginUseDenied?: boolean;
-  onCreatePlugin(): void;
-}
-
-interface DynamicConfig {
-  get(key: string, fallback: boolean): boolean;
-}
-
-interface ScopeApi {
-  watch(listener: (context: { get<T>(signal: unknown): T }) => void): void | (() => void);
-}
-
-interface ReactHooks {
-  useEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void;
-  useEffectEvent(callback: () => void): () => void;
-}
-
-const useSignalFamily = useSignalFamilyImport as unknown as (
-  family: unknown,
-  key: string,
-) => DynamicConfig | undefined;
-
-let initialized = false;
-let jsx: JsxRuntime;
-let react: ReactHooks;
-
-function message(id: string, defaultMessage: string): unknown {
-  return jsx.jsx(FormattedMessage, { id, defaultMessage });
-}
-
-function CreationPrompt({
-  canCreatePlugin,
-  gptCreationDisabled,
-  isCreatingPlugin = false,
-  isPluginCreatorEnabled = true,
-  isPluginCreatorDisabledByAdmin = false,
-  isWorkspacePluginUseDenied = false,
-  onClose,
-  onCreatePlugin,
-  onCreateGpt,
-}: CreationState & {
-  gptCreationDisabled: boolean;
-  isPluginCreatorEnabled?: boolean;
-  onClose(): void;
-  onCreateGpt(): void;
-}): unknown {
-  let disabledTooltip: unknown;
-  if (!isPluginCreatorEnabled) {
-    disabledTooltip = message(
-      "chatgptConversations.gpts.create.creatorUnavailableTooltip",
-      "Plugin Creator is not available for your account yet",
-    );
-  } else if (isWorkspacePluginUseDenied) {
-    disabledTooltip = message(
-      "chatgptConversations.gpts.create.workspacePluginUseDeniedTooltip",
-      "Your workspace must allow you to use plugins to create a plugin. Contact your admin for access.",
-    );
-  } else if (isPluginCreatorDisabledByAdmin) {
-    disabledTooltip = message(
-      "chatgptConversations.gpts.create.creatorDisabledByAdminTooltip",
-      "You do not have permission to create a plugin via conversation. Contact your admin to enable Plugin Creator",
-    );
+function L(e) {
+  let t = (0, R.c)(45),
+    {
+      canCreatePlugin: n,
+      gptCreationDisabled: r,
+      isCreatingPlugin: i,
+      isPluginCreatorEnabled: a,
+      isPluginCreatorDisabledByAdmin: s,
+      isWorkspacePluginUseDenied: c,
+      onClose: d,
+      onCreatePlugin: f,
+      onCreateGpt: g,
+    } = e,
+    _ = i !== void 0 && i,
+    v = a === void 0 || a,
+    y = s !== void 0 && s,
+    S = c !== void 0 && c,
+    C;
+  if (!v) {
+    let e;
+    (t[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, B.jsx)(m, {
+          id: `chatgptConversations.gpts.create.creatorUnavailableTooltip`,
+          defaultMessage: `Plugin Creator is not available for your account yet`,
+          description: `Tooltip for the disabled Create plugin button in the GPT transition dialog when Plugin Creator has not been enabled for the account's feature rollout. Applies to personal and workspace accounts; this is not an administrator permission restriction. Complete explanation with no placeholders.`,
+        })),
+        (t[0] = e))
+      : (e = t[0]),
+      (C = e));
+  } else if (S) {
+    let e;
+    (t[1] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, B.jsx)(m, {
+          id: `chatgptConversations.gpts.create.workspacePluginUseDeniedTooltip`,
+          defaultMessage: `Your workspace must allow you to use plugins to create a plugin. Contact your admin for access.`,
+          description: `Tooltip for a disabled Create plugin action when the user lacks the workspace Use plugins permission. Explains the required permission and who can grant access. No placeholders.`,
+        })),
+        (t[1] = e))
+      : (e = t[1]),
+      (C = e));
+  } else if (y) {
+    let e;
+    (t[2] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, B.jsx)(m, {
+          id: `chatgptConversations.gpts.create.creatorDisabledByAdminTooltip`,
+          defaultMessage: `You do not have permission to create a plugin via conversation. Contact your admin to enable Plugin Creator`,
+          description: `Tooltip for a disabled Create plugin action when the workspace administrator has disabled Plugin Creator. Explains why conversation-based plugin creation is unavailable and who can enable it. No placeholders.`,
+        })),
+        (t[2] = e))
+      : (e = t[2]),
+      (C = e));
   }
-
-  const onOpenChange = (open: boolean): void => {
-    if (!open) onClose();
-  };
-  const onSubmit = (event: { preventDefault(): void }): void => {
-    event.preventDefault();
-    if (canCreatePlugin) onCreatePlugin();
-  };
-
-  const unavailable =
-    gptCreationDisabled && !canCreatePlugin && !isCreatingPlugin
-      ? message(
-          "chatgptConversations.gpts.create.unavailableDescription",
-          "GPT creation is no longer available, and you don’t have access to create plugins",
-        )
-      : null;
-  const pluginOnly =
-    gptCreationDisabled && (canCreatePlugin || isCreatingPlugin)
-      ? message(
-          "chatgptConversations.gpts.create.pluginOnlyDescription",
-          "You can no longer create GPTs. Plugins are the new home for custom tools.",
-        )
-      : null;
-  const transition = !gptCreationDisabled
-    ? message(
-        "chatgptConversations.gpts.create.pluginDescription",
-        "Plugins are replacing GPTs as the home for custom tools. You can still create a GPT for now, but this option is going away.",
-      )
-    : null;
-
-  const primaryButton = jsx.jsx(Button, {
-    className: "w-full",
-    "aria-disabled": !canCreatePlugin || undefined,
-    "aria-busy": isCreatingPlugin,
-    color: "primary",
-    loading: isCreatingPlugin,
-    size: "promotionalAction",
-    type: "submit",
-    children: message(
-      "chatgptConversations.gpts.create.plugin",
-      "Create plugin",
-    ),
-  });
-  const primaryAction = jsx.jsx(Tooltip, {
-    cloneCustomTrigger: true,
-    tooltipContent: disabledTooltip,
-    children: primaryButton,
-  });
-  const gptAction = gptCreationDisabled
-    ? null
-    : jsx.jsx(Button, {
-        className: "w-full",
-        color: "ghostSecondary",
-        size: "promotionalLink",
-        type: "button",
-        onClick: onCreateGpt,
-        children: message(
-          "chatgptConversations.gpts.create.gpt",
-          "Create GPT",
-        ),
-      });
-
-  return jsx.jsx(Dialog, {
-    open: true,
-    variant: "centeredText",
-    size: "feature",
-    onOpenChange,
-    children: jsx.jsx(DialogBody, {
-      as: "form",
-      variant: "chatgpt",
-      onSubmit,
-      children: jsx.jsxs("div", {
-        className: "flex flex-col gap-8 p-6 pt-14 text-center sm:p-10",
+  let w;
+  t[3] === d
+    ? (w = t[4])
+    : ((w = (e) => {
+        e || d();
+      }),
+      (t[3] = d),
+      (t[4] = w));
+  let T;
+  t[5] !== n || t[6] !== f
+    ? ((T = (e) => {
+        (e.preventDefault(), n && f());
+      }),
+      (t[5] = n),
+      (t[6] = f),
+      (t[7] = T))
+    : (T = t[7]);
+  let E;
+  t[8] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((E = (0, B.jsx)(p, {
+        className: `text-heading-lg leading-7 font-semibold select-none`,
+        variant: `promotional`,
+        children: (0, B.jsx)(m, {
+          id: `chatgptConversations.gpts.create.pluginTitle`,
+          defaultMessage: `Create a plugin instead`,
+          description: `Heading directing users to create plugins during GPT retirement, including after GPT creation has been disabled`,
+        }),
+      })),
+      (t[8] = E))
+    : (E = t[8]);
+  let D;
+  t[9] !== n || t[10] !== r || t[11] !== _
+    ? ((D =
+        r &&
+        !n &&
+        !_ &&
+        (0, B.jsx)(m, {
+          id: `chatgptConversations.gpts.create.unavailableDescription`,
+          defaultMessage: `GPT creation is no longer available, and you don’t have access to create plugins`,
+          description: `Visible explanation in an open GPT creation dialog when GPT creation has been retired and plugin creation is unavailable, including when access changes while the dialog is open. The Create plugin action is disabled, and the user can close the dialog.`,
+        })),
+      (t[9] = n),
+      (t[10] = r),
+      (t[11] = _),
+      (t[12] = D))
+    : (D = t[12]);
+  let O;
+  t[13] !== n || t[14] !== r || t[15] !== _
+    ? ((O =
+        r &&
+        (n || _) &&
+        (0, B.jsx)(m, {
+          id: `chatgptConversations.gpts.create.pluginOnlyDescription`,
+          defaultMessage: `You can no longer create GPTs. Plugins are the new home for custom tools.`,
+          description: `Body of the plugin creation prompt after GPT creation is disabled. Only plugin creation is offered.`,
+        })),
+      (t[13] = n),
+      (t[14] = r),
+      (t[15] = _),
+      (t[16] = O))
+    : (O = t[16]);
+  let k;
+  t[17] === r
+    ? (k = t[18])
+    : ((k =
+        !r &&
+        (0, B.jsx)(m, {
+          id: `chatgptConversations.gpts.create.pluginDescription`,
+          defaultMessage: `Plugins are replacing GPTs as the home for custom tools. You can still create a GPT for now, but this option is going away.`,
+          description: `Body of the dialog shown when a user starts creating a GPT. Explains that plugins are replacing GPTs, while GPT creation remains temporarily available without specifying a duration. The primary action creates a plugin and the secondary action continues to the GPT editor.`,
+        })),
+      (t[17] = r),
+      (t[18] = k));
+  let A;
+  t[19] !== k || t[20] !== D || t[21] !== O
+    ? ((A = (0, B.jsxs)(`div`, {
+        className: `flex flex-col gap-4`,
         children: [
-          jsx.jsxs("div", {
-            className: "flex flex-col gap-4",
-            children: [
-              jsx.jsx(DialogTitle, {
-                className: "text-heading-lg leading-7 font-semibold select-none",
-                variant: "promotional",
-                children: message(
-                  "chatgptConversations.gpts.create.pluginTitle",
-                  "Create a plugin instead",
-                ),
-              }),
-              jsx.jsxs(DialogText, {
-                className: "text-onboarding-body text-secondary select-none",
-                "aria-live": "polite",
-                children: [unavailable, pluginOnly, transition],
-              }),
-            ],
-          }),
-          jsx.jsxs(DialogActions, {
-            className: "flex-col",
-            children: [primaryAction, gptAction],
+          E,
+          (0, B.jsxs)(l, {
+            className: `text-onboarding-body text-secondary select-none`,
+            "aria-live": `polite`,
+            children: [D, O, k],
           }),
         ],
-      }),
-    }),
-  });
-}
-
-function GptCreatePluginPrompt({ accountId, onClose }: PromptProps): unknown {
-  const scope = useScope(appScope) as unknown as ScopeApi;
-  const navigate = useNavigate();
-  const currentAccountId = useSignalValue<string | null>(
-    currentAccountIdSignal as unknown as Parameters<typeof useSignalValue<string | null>>[0],
+      })),
+      (t[19] = k),
+      (t[20] = D),
+      (t[21] = O),
+      (t[22] = A))
+    : (A = t[22]);
+  let j = !n || void 0,
+    M;
+  t[23] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((M = (0, B.jsx)(m, {
+        id: `chatgptConversations.gpts.create.plugin`,
+        defaultMessage: `Create plugin`,
+        description: `Primary choice in the GPT transition prompt; sets up Plugin Creator and opens an editable, unsent conversation draft for creating a plugin`,
+      })),
+      (t[23] = M))
+    : (M = t[23]);
+  let N;
+  t[24] !== _ || t[25] !== j
+    ? ((N = (0, B.jsx)(h, {
+        className: `w-full`,
+        "aria-disabled": j,
+        "aria-busy": _,
+        color: `primary`,
+        loading: _,
+        size: `promotionalAction`,
+        type: `submit`,
+        children: M,
+      })),
+      (t[24] = _),
+      (t[25] = j),
+      (t[26] = N))
+    : (N = t[26]);
+  let P;
+  t[27] !== C || t[28] !== N
+    ? ((P = (0, B.jsx)(x, { cloneCustomTrigger: !0, tooltipContent: C, children: N })),
+      (t[27] = C),
+      (t[28] = N),
+      (t[29] = P))
+    : (P = t[29]);
+  let F;
+  t[30] !== r || t[31] !== g
+    ? ((F = r
+        ? null
+        : (0, B.jsx)(h, {
+            className: `w-full`,
+            color: `ghostSecondary`,
+            size: `promotionalLink`,
+            type: `button`,
+            onClick: g,
+            children: (0, B.jsx)(m, {
+              id: `chatgptConversations.gpts.create.gpt`,
+              defaultMessage: `Create GPT`,
+              description: `Secondary choice in the GPT transition prompt; closes the prompt and opens the existing GPT editor`,
+            }),
+          })),
+      (t[30] = r),
+      (t[31] = g),
+      (t[32] = F))
+    : (F = t[32]);
+  let I;
+  t[33] !== P || t[34] !== F
+    ? ((I = (0, B.jsxs)(b, { className: `flex-col`, children: [P, F] })),
+      (t[33] = P),
+      (t[34] = F),
+      (t[35] = I))
+    : (I = t[35]);
+  let L;
+  t[36] !== A || t[37] !== I
+    ? ((L = (0, B.jsxs)(`div`, {
+        className: `flex flex-col gap-8 p-6 pt-14 text-center sm:p-10`,
+        children: [A, I],
+      })),
+      (t[36] = A),
+      (t[37] = I),
+      (t[38] = L))
+    : (L = t[38]);
+  let z;
+  t[39] !== L || t[40] !== T
+    ? ((z = (0, B.jsx)(u, { as: `form`, variant: `chatgpt`, onSubmit: T, children: L })),
+      (t[39] = L),
+      (t[40] = T),
+      (t[41] = z))
+    : (z = t[41]);
+  let V;
+  return (
+    t[42] !== z || t[43] !== w
+      ? ((V = (0, B.jsx)(o, {
+          open: !0,
+          variant: `centeredText`,
+          size: `feature`,
+          onOpenChange: w,
+          children: z,
+        })),
+        (t[42] = z),
+        (t[43] = w),
+        (t[44] = V))
+      : (V = t[44]),
+    V
   );
-  const creationEnabled = useFeatureFlag("2160578039");
-  const pluginCreatorEnabled = useFeatureFlag("1663164947");
-  const config = useSignalFamily(dynamicConfigFamily, "2513446768");
-  const configService = getDynamicConfigService() as unknown as {
-    getDynamicConfig(key: string): DynamicConfig;
-  };
-  const closeFromEffect = react.useEffectEvent(onClose);
-
-  react.useEffect(
-    () =>
-      scope.watch(({ get }) => {
-        if (get<string | null>(currentAccountIdSignal) !== accountId) {
-          closeFromEffect();
-        }
-      }),
-    [accountId, scope],
-  );
-
-  if (currentAccountId !== accountId) return null;
-
-  return jsx.jsx(HostedPluginCreationActions, {
-    enabled: creationEnabled,
-    logSkillCreationEvent: false,
-    mode: "browse",
-    onNavigate: onClose,
-    children: (state: CreationState) =>
-      jsx.jsx(CreationPrompt, {
-        ...state,
-        isPluginCreatorEnabled: pluginCreatorEnabled,
-        gptCreationDisabled:
-          config?.get("disable_gpt_creation", false) === true,
-        onClose,
-        onCreateGpt: () => {
-          if (
-            configService
-              .getDynamicConfig("2513446768")
-              .get("disable_gpt_creation", false)
-          ) {
-            return;
-          }
-          onClose();
-          navigate(gptEditorRoute);
-        },
-      }),
-  });
 }
-
-function initializeGptCreatePluginPrompt(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeSharedRuntime();
-  initializeNavigationRuntime();
-  initializeMaitaiRuntime();
-  react = getReactRuntime() as unknown as ReactHooks;
-  initializeUiRuntime();
-  initializeIdentityRuntime();
-  initializeAccountRuntime();
-  initializeButtons();
-  initializeTooltipRuntime();
-  initializeDialogTitle();
-  initializeDialogRuntime();
-  initializeHostedPluginCreationActions();
-  initializeExternalSignals();
-  initializeFeatureFlags();
-  initializeDynamicConfig();
-  jsx = getJsxRuntime();
+var R, z, B;
+function V() {
+  return (V = e(() => {
+    ((R = t()),
+      E(),
+      r(),
+      (z = y()),
+      s(),
+      T(),
+      C(),
+      _(),
+      S(),
+      d(),
+      v(),
+      P(),
+      f(),
+      D(),
+      M(),
+      (B = a()));
+  }))();
 }
-
-initializeGptCreatePluginPrompt();
-
-export { GptCreatePluginPrompt };
+V();
+export { I as GptCreatePluginPrompt };

@@ -1,51 +1,76 @@
-// Hash chaining and tamper propagation through a four-block blockchain.
-import "@rchunk/rolldown-runtime";
-
-type ChainState = "original" | "tamper_block_1" | "tamper_block_2" | "tamper_block_3";
-interface BlockchainValues { chainState?: unknown }
-
-const blockchainHashChainType = "BLOCKCHAIN_HASH_CHAIN";
-const blockchainHashChainThumbnail = "blockchain-hash-chain-v1";
-const blockchainHashChainParameters = { chainState: { kind: "enum" as const, defaultValue: "original" as ChainState, allowedValues: ["original", "tamper_block_1", "tamper_block_2", "tamper_block_3"] as ChainState[] } };
-const blockchainHashChainSpecification = { type: blockchainHashChainType, version: 2, thumbnailAssetKey: blockchainHashChainThumbnail, parameters: blockchainHashChainParameters };
-const defaultChainState = blockchainHashChainSpecification.parameters.chainState.defaultValue;
-const chainStates = blockchainHashChainSpecification.parameters.chainState.allowedValues;
-const genesisPreviousHash = "00000000";
-const originalPayloads = ["GENESIS", "ALICE>BOB:4", "BOB>CHEN:2", "CHEN>DANA:1"];
-const tamperedPayloads = ["GENESIS", "ALICE>BOB:8", "BOB>CHEN:9", "CHEN>DANA:6"];
-const tamperedIndexes: Record<ChainState, number> = { original: -1, tamper_block_1: 1, tamper_block_2: 2, tamper_block_3: 3 };
-const isChainState = (value: unknown): value is ChainState => chainStates.some((state) => state === value);
-const normalizeBlockchainValues = (values: BlockchainValues) => ({ chainState: isChainState(values.chainState) ? values.chainState : defaultChainState });
-const tamperedIndexForState = (state: ChainState): number => tamperedIndexes[state];
-const chainStateForTamperedIndex = (index: number): ChainState => chainStates.find((state) => tamperedIndexForState(state) === index) ?? defaultChainState;
-const fnv1aHash = (value: string): string => {
-  let hash = 2166136261;
-  for (let index = 0; index < value.length; index += 1) { hash ^= value.charCodeAt(index); hash = Math.imul(hash, 16777619); }
-  return (hash >>> 0).toString(16).padStart(8, "0");
-};
-const blockHash = (index: number, payload: string, previousHash: string): string => fnv1aHash(`${index}|${payload}|${previousHash}`);
-const canonicalChain = (() => {
-  let previousHash = genesisPreviousHash;
-  return originalPayloads.map((payload, index) => { const hash = blockHash(index, payload, previousHash); const block = { index, payload, previousHash, hash }; previousHash = hash; return block; });
-})();
-const calculateBlockchain = (values: BlockchainValues) => {
-  const { chainState } = normalizeBlockchainValues(values);
-  const tamperedIndex = tamperedIndexForState(chainState);
-  let calculatedPreviousHash = genesisPreviousHash;
-  return canonicalChain.map((block) => {
-    const isTampered = block.index === tamperedIndex;
-    const payload = isTampered ? tamperedPayloads[block.index] : block.payload;
-    const calculatedHash = blockHash(block.index, payload, calculatedPreviousHash);
-    const previousHashMatches = block.previousHash === calculatedPreviousHash;
-    const blockHashMatches = block.hash === calculatedHash;
-    const result = { index: block.index, originalPayload: block.payload, payload, storedPreviousHash: block.previousHash, originalHash: block.hash, calculatedPreviousHash, calculatedHash, isTampered, previousHashMatches, blockHashMatches, isValid: previousHashMatches && blockHashMatches };
-    calculatedPreviousHash = calculatedHash;
-    return result;
-  });
-};
-const firstInvalidBlockIndex = (blocks: ReturnType<typeof calculateBlockchain>): number => blocks.find((block) => !block.isValid)?.index ?? -1;
-
-function initializeBlockchainHashChainSpecification(): void {}
-function initializeBlockchainHashChainModel(): void {}
-
-export { firstInvalidBlockIndex as a, normalizeBlockchainValues as c, chainStateForTamperedIndex as i, initializeBlockchainHashChainSpecification as l, defaultChainState as n, tamperedIndexForState as o, calculateBlockchain as r, initializeBlockchainHashChainModel as s, chainStates as t, blockchainHashChainSpecification as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `BLOCKCHAIN_HASH_CHAIN`),
+      (n = `blockchain-hash-chain-v1`),
+      (r = {
+        chainState: {
+          kind: `enum`,
+          defaultValue: `original`,
+          allowedValues: [`original`, `tamper_block_1`, `tamper_block_2`, `tamper_block_3`],
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b;
+function x() {
+  return (x = e(() => {
+    (a(),
+      (o = i.parameters.chainState.defaultValue),
+      (s = i.parameters.chainState.allowedValues),
+      (c = `00000000`),
+      (l = [`GENESIS`, `ALICE>BOB:4`, `BOB>CHEN:2`, `CHEN>DANA:1`]),
+      (u = [`GENESIS`, `ALICE>BOB:8`, `BOB>CHEN:9`, `CHEN>DANA:6`]),
+      (d = { original: -1, tamper_block_1: 1, tamper_block_2: 2, tamper_block_3: 3 }),
+      (f = (e) => ({ chainState: s.includes(e.chainState) ? e.chainState : o })),
+      (p = (e) => d[e]),
+      (m = (e) => s.find((t) => p(t) === e) ?? o),
+      (h = (e) => {
+        let t = 2166136261;
+        for (let n = 0; n < e.length; n += 1)
+          ((t ^= e.charCodeAt(n)), (t = Math.imul(t, 16777619)));
+        return (t >>> 0).toString(16).padStart(8, `0`);
+      }),
+      (g = (e, t, n) => h(`${e}|${t}|${n}`)),
+      (_ = () => {
+        let e = c;
+        return l.map((t, n) => {
+          let r = g(n, t, e),
+            i = { index: n, payload: t, previousHash: e, hash: r };
+          return ((e = r), i);
+        });
+      }),
+      (v = _()),
+      (y = (e) => {
+        let { chainState: t } = f(e),
+          n = p(t),
+          r = c;
+        return v.map((e) => {
+          let t = e.index === n,
+            i = t ? u[e.index] : e.payload,
+            a = g(e.index, i, r),
+            o = e.previousHash === r,
+            s = e.hash === a,
+            c = {
+              index: e.index,
+              originalPayload: e.payload,
+              payload: i,
+              storedPreviousHash: e.previousHash,
+              originalHash: e.hash,
+              calculatedPreviousHash: r,
+              calculatedHash: a,
+              isTampered: t,
+              previousHashMatches: o,
+              blockHashMatches: s,
+              isValid: o && s,
+            };
+          return ((r = a), c);
+        });
+      }),
+      (b = (e) => e.find((e) => !e.isValid)?.index ?? -1));
+  }))();
+}
+export { b as a, f as c, m as i, a as l, o as n, p as o, y as r, x as s, s as t, i as u };

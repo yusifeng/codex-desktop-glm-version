@@ -1,70 +1,73 @@
-// Enzyme-inhibition rate-effects learning model.
-import "@rchunk/rolldown-runtime";
-
-type InhibitorLevel = "none" | "low" | "high";
-type InhibitionCurve = "uninhibited" | "competitive" | "noncompetitive";
-interface EnzymeInhibitionValues { relativeSubstrateConcentration?: number | null; inhibitorLevel?: string | null }
-
-const enzymeInhibitionType = "ENZYME_INHIBITION_RATE_EFFECTS";
-const enzymeInhibitionThumbnail = "enzyme-inhibition-rate-effects-v2";
-const enzymeInhibitionParameters = {
-  relativeSubstrateConcentration: { kind: "number", defaultValue: 2, min: 0, max: 10 },
-  inhibitorLevel: { kind: "enum", defaultValue: "low" as InhibitorLevel, allowedValues: ["none", "low", "high"] as InhibitorLevel[] },
-};
-const enzymeInhibitionDefinition = { type: enzymeInhibitionType, version: 1, thumbnailAssetKey: enzymeInhibitionThumbnail, parameters: enzymeInhibitionParameters };
-const substrateControl = { ...enzymeInhibitionDefinition.parameters.relativeSubstrateConcentration, step: 0.1 };
-const inhibitorLevels = enzymeInhibitionDefinition.parameters.inhibitorLevel.allowedValues;
-const defaultInhibitorLevel = enzymeInhibitionDefinition.parameters.inhibitorLevel.defaultValue;
-const inhibitionScale = 1.5;
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const finiteOr = (value: number | null | undefined, fallback: number): number => Number.isFinite(value) ? value as number : fallback;
-const inhibitorLevelToIndex = (level: string): number => Math.max(0, inhibitorLevels.indexOf(level as InhibitorLevel));
-const normalizeInhibitorLevel = (level: string | null | undefined): InhibitorLevel => inhibitorLevels.includes(level as InhibitorLevel) ? level as InhibitorLevel : defaultInhibitorLevel;
-const normalizeEnzymeInhibitionValues = (values: EnzymeInhibitionValues) => ({
-  relativeSubstrateConcentration: clamp(finiteOr(values.relativeSubstrateConcentration, substrateControl.defaultValue), substrateControl.min, substrateControl.max),
-  inhibitorLevel: normalizeInhibitorLevel(values.inhibitorLevel),
-});
-const alphaForInhibitor = (level: InhibitorLevel): number => 1 + inhibitorLevelToIndex(level) / inhibitionScale;
-const calculateEnzymeRate = (substrate: number, inhibitorLevel: InhibitorLevel, curve: InhibitionCurve): number => {
-  const safeSubstrate = Math.max(0, finiteOr(substrate, 0));
-  const alpha = alphaForInhibitor(inhibitorLevel);
-  switch (curve) {
-    case "uninhibited": return safeSubstrate / (2 + safeSubstrate);
-    case "competitive": return safeSubstrate / (alpha * 2 + safeSubstrate);
-    case "noncompetitive": return 1 / alpha * safeSubstrate / (2 + safeSubstrate);
-  }
-};
-
-function deriveEnzymeInhibitionState(values: EnzymeInhibitionValues) {
-  const safeValues = normalizeEnzymeInhibitionValues(values);
-  const substrate = safeValues.relativeSubstrateConcentration;
-  const level = safeValues.inhibitorLevel;
-  const alpha = alphaForInhibitor(level);
-  return {
-    safeValues,
-    alpha,
-    uninhibitedRate: calculateEnzymeRate(substrate, level, "uninhibited"),
-    competitiveRate: calculateEnzymeRate(substrate, level, "competitive"),
-    noncompetitiveRate: calculateEnzymeRate(substrate, level, "noncompetitive"),
-    competitiveVmax: 1,
-    noncompetitiveVmax: 1 / alpha,
-    competitiveApparentKm: alpha * 2,
-    noncompetitiveApparentKm: 2,
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `ENZYME_INHIBITION_RATE_EFFECTS`),
+      (n = `enzyme-inhibition-rate-effects-v2`),
+      (r = {
+        relativeSubstrateConcentration: { kind: `number`, defaultValue: 2, min: 0, max: 10 },
+        inhibitorLevel: {
+          kind: `enum`,
+          defaultValue: `low`,
+          allowedValues: [`none`, `low`, `high`],
+        },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-function initializeEnzymeInhibitionSchema(): void {}
-function initializeEnzymeInhibitionModel(): void {}
-
-export {
-  calculateEnzymeRate as a,
-  normalizeEnzymeInhibitionValues as c,
-  deriveEnzymeInhibitionState as i,
-  initializeEnzymeInhibitionSchema as l,
-  inhibitorLevels as n,
-  inhibitorLevelToIndex as o,
-  substrateControl as r,
-  initializeEnzymeInhibitionModel as s,
-  defaultInhibitorLevel as t,
-  enzymeInhibitionDefinition as u,
-};
+var o, s, c, l, u, d, f, p, m, h, g, _;
+function v() {
+  return (v = e(() => {
+    (a(),
+      (o = { ...i.parameters.relativeSubstrateConcentration, step: 0.1 }),
+      (s = i.parameters.inhibitorLevel.allowedValues),
+      (c = i.parameters.inhibitorLevel.defaultValue),
+      (l = 1.5),
+      (u = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (d = (e, t) => (Number.isFinite(e) ? e : t)),
+      (f = (e) => Math.max(0, s.indexOf(e))),
+      (p = (e) => (s.includes(e) ? e : c)),
+      (m = (e) => ({
+        relativeSubstrateConcentration: u(
+          d(e.relativeSubstrateConcentration, o.defaultValue),
+          o.min,
+          o.max,
+        ),
+        inhibitorLevel: p(e.inhibitorLevel),
+      })),
+      (h = (e) => 1 + f(e) / l),
+      (g = (e, t, n) => {
+        let r = Math.max(0, d(e, 0)),
+          i = h(t);
+        switch (n) {
+          case `uninhibited`:
+            return (1 * r) / (2 + r);
+          case `competitive`:
+            return (1 * r) / (i * 2 + r);
+          case `noncompetitive`:
+            return ((1 / i) * r) / (2 + r);
+        }
+      }),
+      (_ = (e) => {
+        let t = m(e),
+          { inhibitorLevel: n, relativeSubstrateConcentration: r } = t,
+          i = g(r, n, `uninhibited`),
+          a = g(r, n, `competitive`),
+          o = g(r, n, `noncompetitive`),
+          s = h(n);
+        return {
+          safeValues: t,
+          alpha: s,
+          uninhibitedRate: i,
+          competitiveRate: a,
+          noncompetitiveRate: o,
+          competitiveVmax: 1,
+          noncompetitiveVmax: 1 / s,
+          competitiveApparentKm: s * 2,
+          noncompetitiveApparentKm: 2,
+        };
+      }));
+  }))();
+}
+export { g as a, m as c, _ as i, a as l, s as n, f as o, o as r, v as s, c as t, i as u };

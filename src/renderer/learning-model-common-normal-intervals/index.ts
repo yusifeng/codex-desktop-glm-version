@@ -1,43 +1,45 @@
-// Common-normal-interval learning model using the standard normal CDF.
-import "@rchunk/rolldown-runtime";
-
-interface NumberParameter { kind: "number"; defaultValue: number; min: number; max: number }
-
-let commonNormalIntervalsManifest: { type: string; version: number; thumbnailAssetKey: string; parameters: { z: NumberParameter } };
-let zParameter: NumberParameter;
-let zControl: { baseMin: number; baseMax: number; step: number };
-let centralNormalProbability: (z: number | null | undefined) => number;
-let probabilityPrecision: (probability: number) => number;
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializeCommonNormalIntervalsManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  commonNormalIntervalsManifest = { type: "COMMON_NORMAL_INTERVALS", version: 2, thumbnailAssetKey: "common-normal-intervals-v1", parameters: { z: { kind: "number", defaultValue: 1, min: 0, max: 4 } } };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `COMMON_NORMAL_INTERVALS`),
+      (n = `common-normal-intervals-v1`),
+      (r = { z: { kind: `number`, defaultValue: 1, min: 0, max: 4 } }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-function initializeCommonNormalIntervalsModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializeCommonNormalIntervalsManifest();
-  zParameter = commonNormalIntervalsManifest.parameters.z;
-  zControl = { baseMin: zParameter.min, baseMax: zParameter.max, step: 0.1 };
-  const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-  const normalizeZ = (value: number | null | undefined): number => clamp(Number.isFinite(value) ? value ?? zParameter.defaultValue : zParameter.defaultValue, zParameter.min, zParameter.max);
-  const errorFunction = (value: number): number => {
-    if (value === 0) return 0;
-    const sign = value < 0 ? -1 : 1;
-    const magnitude = Math.abs(value);
-    const factor = 1 / (1 + 0.3275911 * magnitude);
-    return sign * (1 - ((((1.061405429 * factor - 1.453152027) * factor + 1.421413741) * factor - 0.284496736) * factor + 0.254829592) * factor * Math.exp(-magnitude * magnitude));
-  };
-  const normalCdf = (value: number): number => 0.5 * (1 + errorFunction(value / Math.sqrt(2)));
-  centralNormalProbability = value => clamp(2 * normalCdf(normalizeZ(value)) - 1, 0, 1);
-  probabilityPrecision = probability => {
-    const percent = clamp(probability, 0, 1) * 100;
-    return percent === 0 ? 0 : percent >= 99.95 && percent < 100 ? 2 : 1;
-  };
+var o, s, c, l, u, d, f, p;
+function m() {
+  return (m = e(() => {
+    (a(),
+      (o = i.parameters.z),
+      (s = { baseMin: o.min, baseMax: o.max, step: 0.1 }),
+      (c = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (l = (e) => c(Number.isFinite(e) ? (e ?? o.defaultValue) : o.defaultValue, o.min, o.max)),
+      (u = (e) => {
+        if (e === 0) return 0;
+        let t = e < 0 ? -1 : 1,
+          n = Math.abs(e),
+          r = 1 / (1 + 0.3275911 * n);
+        return (
+          t *
+          (1 -
+            ((((1.061405429 * r - 1.453152027) * r + 1.421413741) * r - 0.284496736) * r +
+              0.254829592) *
+              r *
+              Math.exp(-n * n))
+        );
+      }),
+      (d = (e) => 0.5 * (1 + u(e / Math.sqrt(2)))),
+      (f = (e) => {
+        let t = l(e);
+        return c(2 * d(t) - 1, 0, 1);
+      }),
+      (p = (e) => {
+        let t = c(e, 0, 1) * 100;
+        return t === 0 ? 0 : t >= 99.95 && t < 100 ? 2 : 1;
+      }));
+  }))();
 }
-
-export { initializeCommonNormalIntervalsModel as a, probabilityPrecision as i, zControl as n, initializeCommonNormalIntervalsManifest as o, centralNormalProbability as r, commonNormalIntervalsManifest as s, zParameter as t };
+export { m as a, p as i, s as n, a as o, f as r, i as s, o as t };

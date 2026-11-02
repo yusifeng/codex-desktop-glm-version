@@ -1,72 +1,96 @@
-// Temperature-tolerance growth-curve learning model for microbial groups.
-import "@rchunk/rolldown-runtime";
-
-type MicrobialGroup = "psychrophile" | "mesophile" | "thermophile" | "hyperthermophile";
-interface MicrobialToleranceValues { microbial_group?: unknown; temperature_c?: number | null }
-
-const microbialToleranceType = "MICROBIAL_TOLERANCE_CURVE";
-const microbialToleranceThumbnail = "microbial-tolerance-curve-v1";
-const microbialGroups: MicrobialGroup[] = ["psychrophile", "mesophile", "thermophile", "hyperthermophile"];
-const microbialToleranceParameters = {
-  microbial_group: { kind: "enum", defaultValue: "mesophile" as MicrobialGroup, allowedValues: microbialGroups },
-  temperature_c: { kind: "number", defaultValue: 37, min: -10, max: 110 },
-};
-const microbialToleranceDefinition = { type: microbialToleranceType, version: 2, thumbnailAssetKey: microbialToleranceThumbnail, parameters: microbialToleranceParameters };
-const cardinalTemperatures: Record<MicrobialGroup, { minimum: number; optimum: number; maximum: number }> = {
-  psychrophile: { minimum: -5, optimum: 10, maximum: 20 }, mesophile: { minimum: 15, optimum: 35, maximum: 45 }, thermophile: { minimum: 45, optimum: 65, maximum: 80 }, hyperthermophile: { minimum: 65, optimum: 90, maximum: 105 },
-};
-const temperatureControl = microbialToleranceDefinition.parameters.temperature_c;
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const isMicrobialGroup = (value: unknown): value is MicrobialGroup => typeof value === "string" && microbialGroups.some((group) => group === value);
-const normalizeMicrobialToleranceValues = (values: MicrobialToleranceValues) => {
-  const defaultGroup = microbialToleranceDefinition.parameters.microbial_group.defaultValue;
-  return {
-    microbial_group: isMicrobialGroup(values.microbial_group) ? values.microbial_group : isMicrobialGroup(defaultGroup) ? defaultGroup : microbialGroups[0],
-    temperature_c: Number.isFinite(values.temperature_c) ? clamp(values.temperature_c ?? temperatureControl.defaultValue, temperatureControl.min, temperatureControl.max) : temperatureControl.defaultValue,
-  };
-};
-const relativeGrowthAt = (group: MicrobialGroup, temperature: number): number => {
-  const { minimum, optimum, maximum } = cardinalTemperatures[group];
-  if (temperature < minimum || temperature > maximum) return 0;
-  const baseline = 0.02;
-  if (temperature <= optimum) {
-    const progress = (temperature - minimum) / (optimum - minimum);
-    return baseline + 0.98 * Math.sin(Math.PI / 2 * progress) ** 1.15;
-  }
-  const progress = (temperature - optimum) / (maximum - optimum);
-  return baseline + 0.98 * Math.cos(Math.PI / 2 * progress) ** 1.2;
-};
-const buildToleranceCurve = (group: MicrobialGroup, segments = 96) => {
-  const { minimum, maximum } = cardinalTemperatures[group];
-  return Array.from({ length: segments + 1 }, (_unused, index) => {
-    const temperature = minimum + (maximum - minimum) * index / segments;
-    return { x: temperature, y: relativeGrowthAt(group, temperature) };
-  });
-};
-
-function deriveMicrobialToleranceState(values: MicrobialToleranceValues) {
-  const normalized = normalizeMicrobialToleranceValues(values);
-  const cardinal = cardinalTemperatures[normalized.microbial_group];
-  const growthByGroup: Record<MicrobialGroup, number> = {
-    psychrophile: relativeGrowthAt("psychrophile", normalized.temperature_c), mesophile: relativeGrowthAt("mesophile", normalized.temperature_c), thermophile: relativeGrowthAt("thermophile", normalized.temperature_c), hyperthermophile: relativeGrowthAt("hyperthermophile", normalized.temperature_c),
-  };
-  const bestAdaptedGroup = microbialGroups.reduce<MicrobialGroup | undefined>((best, group) => growthByGroup[group] > (best ? growthByGroup[best] : 0) ? group : best, undefined);
-  const temperature = normalized.temperature_c;
-  const position = temperature < cardinal.minimum ? "below-minimum" : temperature === cardinal.minimum ? "minimum" : temperature > cardinal.maximum ? "above-maximum" : temperature === cardinal.maximum ? "maximum" : Math.abs(temperature - cardinal.optimum) < 0.5 ? "optimum" : temperature < cardinal.optimum ? "rising" : "falling";
-  return { ...normalized, cardinal, position, relativeGrowth: growthByGroup[normalized.microbial_group], growthByGroup, bestAdaptedGroup };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `MICROBIAL_TOLERANCE_CURVE`),
+      (n = `microbial-tolerance-curve-v1`),
+      (r = {
+        microbial_group: {
+          kind: `enum`,
+          defaultValue: `mesophile`,
+          allowedValues: [`psychrophile`, `mesophile`, `thermophile`, `hyperthermophile`],
+        },
+        temperature_c: { kind: `number`, defaultValue: 37, min: -10, max: 110 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-function initializeMicrobialToleranceSchema(): void {}
-function initializeMicrobialToleranceModel(): void {}
-
-export {
-  buildToleranceCurve as a,
-  initializeMicrobialToleranceSchema as c,
-  deriveMicrobialToleranceState as i,
-  microbialToleranceDefinition as l,
-  microbialGroups as n,
-  initializeMicrobialToleranceModel as o,
-  temperatureControl as r,
-  normalizeMicrobialToleranceValues as s,
-  cardinalTemperatures as t,
-};
+var o, s, c, l, u, d, f, p, m;
+function h() {
+  return (h = e(() => {
+    (a(),
+      (o = [`psychrophile`, `mesophile`, `thermophile`, `hyperthermophile`]),
+      (s = {
+        psychrophile: { minimum: -5, optimum: 10, maximum: 20 },
+        mesophile: { minimum: 15, optimum: 35, maximum: 45 },
+        thermophile: { minimum: 45, optimum: 65, maximum: 80 },
+        hyperthermophile: { minimum: 65, optimum: 90, maximum: 105 },
+      }),
+      (c = i.parameters.temperature_c),
+      (l = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (u = (e) => typeof e == `string` && o.some((t) => t === e)),
+      (d = (e) => {
+        let t = i.parameters.microbial_group.defaultValue;
+        return {
+          microbial_group: u(e.microbial_group) ? e.microbial_group : u(t) ? t : o[0],
+          temperature_c: Number.isFinite(e.temperature_c)
+            ? l(e.temperature_c ?? c.defaultValue, c.min, c.max)
+            : c.defaultValue,
+        };
+      }),
+      (f = (e, t) => {
+        let { minimum: n, optimum: r, maximum: i } = s[e];
+        if (t < n || t > i) return 0;
+        let a = 0.02;
+        if (t <= r) {
+          let e = (t - n) / (r - n);
+          return a + 0.98 * Math.sin((Math.PI / 2) * e) ** 1.15;
+        }
+        let o = (t - r) / (i - r);
+        return a + 0.98 * Math.cos((Math.PI / 2) * o) ** 1.2;
+      }),
+      (p = (e, t = 96) => {
+        let { minimum: n, maximum: r } = s[e];
+        return Array.from({ length: t + 1 }, (i, a) => {
+          let o = n + ((r - n) * a) / t;
+          return { x: o, y: f(e, o) };
+        });
+      }),
+      (m = (e) => {
+        let t = d(e),
+          n = s[t.microbial_group],
+          r = {
+            psychrophile: f(`psychrophile`, t.temperature_c),
+            mesophile: f(`mesophile`, t.temperature_c),
+            thermophile: f(`thermophile`, t.temperature_c),
+            hyperthermophile: f(`hyperthermophile`, t.temperature_c),
+          },
+          i = o.reduce((e, t) => (r[t] > (e ? r[e] : 0) ? t : e), void 0),
+          a = t.temperature_c,
+          c =
+            a < n.minimum
+              ? `below-minimum`
+              : a === n.minimum
+                ? `minimum`
+                : a > n.maximum
+                  ? `above-maximum`
+                  : a === n.maximum
+                    ? `maximum`
+                    : Math.abs(a - n.optimum) < 0.5
+                      ? `optimum`
+                      : a < n.optimum
+                        ? `rising`
+                        : `falling`;
+        return {
+          ...t,
+          cardinal: n,
+          position: c,
+          relativeGrowth: r[t.microbial_group],
+          growthByGroup: r,
+          bestAdaptedGroup: i,
+        };
+      }));
+  }))();
+}
+export { p as a, a as c, m as i, i as l, o as n, h as o, c as r, d as s, s as t };

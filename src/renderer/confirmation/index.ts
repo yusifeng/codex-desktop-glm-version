@@ -1,119 +1,157 @@
-import "@rchunk/rolldown-runtime";
-import {
-  I3 as getJsxRuntime,
-  K2 as initializeInternationalization,
-  Y2 as FormattedMessage,
-} from "@rchunk/app-shared";
-import {
-  Jot as ExternalLink,
-  Xot as initializeExternalLink,
-} from "@rchunk/app-initial";
-import {
-  i as initializeSecurityShared,
-  t as SecurityConfirmationDialog,
-} from "@rchunk/security-shared";
-
-interface LockdownConfirmationProps {
-  disablesDeveloperMode: boolean;
-  isPending: boolean;
-  onClose(): void;
-  onConfirm(): void;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i } from "@rchunk/app-shared";
+import { Jot as a, Xot as o } from "@rchunk/app-initial";
+import { i as s, t as c } from "@rchunk/security-shared";
+function l(e) {
+  let t = (0, d.c)(18),
+    { disablesDeveloperMode: n, isPending: r, onConfirm: a, onClose: o } = e,
+    s,
+    l;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = (0, f.jsx)(i, {
+        id: `settingsModal.lockdownModeEnableModalTitle`,
+        defaultMessage: `Turn on Lockdown mode?`,
+        description: `Title of the confirmation shown before enabling the account's Lockdown mode security feature.`,
+      })),
+      (l = (0, f.jsx)(i, {
+        id: `settingsModal.lockdownModeEnableModalConfirm`,
+        defaultMessage: `Turn on`,
+        description: `Primary confirmation button that enables the Lockdown mode account security setting.`,
+      })),
+      (t[0] = s),
+      (t[1] = l))
+    : ((s = t[0]), (l = t[1]));
+  let p, m;
+  t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((p = (0, f.jsx)(`p`, {
+        children: (0, f.jsx)(i, {
+          id: `settingsModal.lockdownModeEnableModalDescription`,
+          defaultMessage: `Lockdown mode helps protect sensitive data by limiting connections to websites, external services, and tools outside ChatGPT. <link>Learn more</link>`,
+          description: `Introduction in the Lockdown mode confirmation. The link wraps Learn more and opens the official explanation in the system browser while the confirmation remains open.`,
+          values: { link: u },
+        }),
+      })),
+      (m = (0, f.jsx)(`p`, {
+        children: (0, f.jsx)(i, {
+          id: `settingsModal.lockdownModeEnableModalWhileOn`,
+          defaultMessage: `While it’s on:`,
+          description: `Introduction to the list of restrictions while Lockdown mode is enabled, shown in the enable confirmation.`,
+        }),
+      })),
+      (t[2] = p),
+      (t[3] = m))
+    : ((p = t[2]), (m = t[3]));
+  let h, g, _, v;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((h = (0, f.jsx)(`li`, {
+        children: (0, f.jsx)(i, {
+          id: `settingsModal.lockdownModeEnableModalWebAccess`,
+          defaultMessage: `ChatGPT won’t browse live web pages. It may use offline or cached results when available.`,
+          description: `Restriction in the Lockdown mode confirmation: browsing live pages is unavailable, but offline or cached results may still be used.`,
+        }),
+      })),
+      (g = (0, f.jsx)(`li`, {
+        children: (0, f.jsx)(i, {
+          id: `settingsModal.lockdownModeEnableModalDisabledCapabilities`,
+          defaultMessage: `Connectors, Agent mode, Deep Research, and shopping research are turned off`,
+          description: `Restriction in the Lockdown mode confirmation listing named ChatGPT features that become unavailable. Shopping research is the shopping-focused research feature.`,
+        }),
+      })),
+      (_ = (0, f.jsx)(`li`, {
+        children: (0, f.jsx)(i, {
+          id: `settingsModal.lockdownModeEnableModalUnavailableFeatures`,
+          defaultMessage: `File downloads and some code and canvas features won’t be available`,
+          description: `Restriction in the Lockdown mode confirmation describing unavailable downloads, code and canvas features.`,
+        }),
+      })),
+      (v = (0, f.jsx)(`li`, {
+        children: (0, f.jsx)(i, {
+          id: `settingsModal.lockdownModeEnableModalExternalLinks`,
+          defaultMessage: `External links show the full URL and ask for confirmation before opening`,
+          description: `Restriction in the Lockdown mode confirmation explaining that external links require confirmation of their full destination URL.`,
+        }),
+      })),
+      (t[4] = h),
+      (t[5] = g),
+      (t[6] = _),
+      (t[7] = v))
+    : ((h = t[4]), (g = t[5]), (_ = t[6]), (v = t[7]));
+  let y;
+  t[8] === n
+    ? (y = t[9])
+    : ((y = n
+        ? (0, f.jsx)(`li`, {
+            children: (0, f.jsx)(i, {
+              id: `settingsModal.lockdownModeEnableModalDisablesDeveloperMode`,
+              defaultMessage: `Developer mode will be turned off while lockdown mode is on`,
+              description: `Additional warning in the Lockdown mode confirmation when Developer mode is currently enabled. The server disables Developer mode as part of this single setting change. Use consistent translations for both feature names.`,
+            }),
+          })
+        : null),
+      (t[8] = n),
+      (t[9] = y));
+  let b;
+  t[10] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((b = (0, f.jsx)(`li`, {
+        children: (0, f.jsx)(i, {
+          id: `settingsModal.lockdownModeEnableModalTurnOff`,
+          defaultMessage: `You can turn Lockdown mode off anytime, or turn it off for one chat`,
+          description: `Final statement in the Lockdown mode confirmation, explaining that the account-wide restriction can be disabled globally or separately for a single chat.`,
+        }),
+      })),
+      (t[10] = b))
+    : (b = t[10]);
+  let x;
+  t[11] === y
+    ? (x = t[12])
+    : ((x = (0, f.jsxs)(`div`, {
+        className: `flex flex-col gap-3 select-none`,
+        children: [
+          p,
+          m,
+          (0, f.jsxs)(`ul`, {
+            className: `flex list-disc flex-col gap-1 ps-5`,
+            children: [h, g, _, v, y, b],
+          }),
+        ],
+      })),
+      (t[11] = y),
+      (t[12] = x));
+  let S;
+  return (
+    t[13] !== r || t[14] !== o || t[15] !== a || t[16] !== x
+      ? ((S = (0, f.jsx)(c, {
+          title: s,
+          confirmLabel: l,
+          isPending: r,
+          onConfirm: a,
+          onClose: o,
+          children: x,
+        })),
+        (t[13] = r),
+        (t[14] = o),
+        (t[15] = a),
+        (t[16] = x),
+        (t[17] = S))
+      : (S = t[17]),
+    S
+  );
 }
-
-const jsx = getJsxRuntime();
-
-function LearnMoreLink(chunks: unknown): unknown {
-  return jsx.jsx(ExternalLink as (props: Record<string, unknown>) => unknown, {
-    appearance: "secondary",
-    initiator: "open_in_browser_bridge",
-    href: "https://help.openai.com/en/articles/20001061-lockdown-mode",
-    openTarget: "external-browser",
-    children: chunks,
+function u(e) {
+  return (0, f.jsx)(a, {
+    appearance: `secondary`,
+    initiator: `open_in_browser_bridge`,
+    href: `https://help.openai.com/en/articles/20001061-lockdown-mode`,
+    openTarget: `external-browser`,
+    children: e,
   });
 }
-
-function LockdownConfirmation({
-  disablesDeveloperMode,
-  isPending,
-  onConfirm,
-  onClose,
-}: LockdownConfirmationProps): unknown {
-  const restrictions = [
-    [
-      "settingsModal.lockdownModeEnableModalWebAccess",
-      "ChatGPT won’t browse live web pages. It may use offline or cached results when available.",
-    ],
-    [
-      "settingsModal.lockdownModeEnableModalDisabledCapabilities",
-      "Connectors, Agent mode, Deep Research, and shopping research are turned off",
-    ],
-    [
-      "settingsModal.lockdownModeEnableModalUnavailableFeatures",
-      "File downloads and some code and canvas features won’t be available",
-    ],
-    [
-      "settingsModal.lockdownModeEnableModalExternalLinks",
-      "External links show the full URL and ask for confirmation before opening",
-    ],
-  ];
-  if (disablesDeveloperMode) {
-    restrictions.push([
-      "settingsModal.lockdownModeEnableModalDisablesDeveloperMode",
-      "Developer mode will be turned off while lockdown mode is on",
-    ]);
-  }
-  restrictions.push([
-    "settingsModal.lockdownModeEnableModalTurnOff",
-    "You can turn Lockdown mode off anytime, or turn it off for one chat",
-  ]);
-  return jsx.jsx(SecurityConfirmationDialog, {
-    title: jsx.jsx(FormattedMessage, {
-      id: "settingsModal.lockdownModeEnableModalTitle",
-      defaultMessage: "Turn on Lockdown mode?",
-    }),
-    confirmLabel: jsx.jsx(FormattedMessage, {
-      id: "settingsModal.lockdownModeEnableModalConfirm",
-      defaultMessage: "Turn on",
-    }),
-    isPending,
-    onConfirm,
-    onClose,
-    children: jsx.jsxs("div", {
-      className: "flex flex-col gap-3 select-none",
-      children: [
-        jsx.jsx("p", {
-          children: jsx.jsx(FormattedMessage, {
-            id: "settingsModal.lockdownModeEnableModalDescription",
-            defaultMessage:
-              "Lockdown mode helps protect sensitive data by limiting connections to websites, external services, and tools outside ChatGPT. <link>Learn more</link>",
-            values: { link: LearnMoreLink },
-          }),
-        }),
-        jsx.jsx("p", {
-          children: jsx.jsx(FormattedMessage, {
-            id: "settingsModal.lockdownModeEnableModalWhileOn",
-            defaultMessage: "While it’s on:",
-          }),
-        }),
-        jsx.jsx("ul", {
-          className: "flex list-disc flex-col gap-1 ps-5",
-          children: restrictions.map(([id, defaultMessage]) =>
-            jsx.jsx("li", {
-              children: jsx.jsx(FormattedMessage, { id, defaultMessage }),
-            }, id),
-          ),
-        }),
-      ],
-    }),
-  });
+var d, f;
+function p() {
+  return (p = e(() => {
+    ((d = t()), r(), o(), s(), (f = n()));
+  }))();
 }
-
-function initializeLockdownConfirmation(): void {
-  initializeInternationalization();
-  initializeExternalLink();
-  initializeSecurityShared();
-}
-
-initializeLockdownConfirmation();
-
-export { LockdownConfirmation };
+p();
+export { l as LockdownConfirmation };

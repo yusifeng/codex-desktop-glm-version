@@ -1,8 +1,50 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime } from "@rchunk/app-shared";
-import { Bl as Avatar } from "@rchunk/app-primary";
-const jsxRuntime = getJsxRuntime();
-export interface SubagentRowProps { avatarSeed: string; name: string; status: string }
-function SubagentRow({ avatarSeed, name, status }: SubagentRowProps): unknown { return jsxRuntime.jsxs("div", { className: "flex min-w-0 items-center gap-1.5 text-sm leading-5", children: [jsxRuntime.jsx(Avatar, { className: "size-6", seed: avatarSeed, "aria-hidden": true }), jsxRuntime.jsx("span", { className: "min-w-0 flex-1 truncate", children: name }), jsxRuntime.jsx("span", { className: "shrink-0 text-xs text-codex-description", children: status })] }); }
-function initializeSubagentRow(): void {}
-export { initializeSubagentRow as n, SubagentRow as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n } from "@rchunk/app-shared";
+import { Bl as r, Vl as i } from "@rchunk/app-primary";
+function a(e) {
+  let t = (0, o.c)(10),
+    { avatarSeed: n, name: i, status: a } = e,
+    c;
+  t[0] === n
+    ? (c = t[1])
+    : ((c = (0, s.jsx)(r, { className: `size-6`, seed: n, "aria-hidden": !0 })),
+      (t[0] = n),
+      (t[1] = c));
+  let l;
+  t[2] === i
+    ? (l = t[3])
+    : ((l = (0, s.jsx)(`span`, { className: `min-w-0 flex-1 truncate`, children: i })),
+      (t[2] = i),
+      (t[3] = l));
+  let u;
+  t[4] === a
+    ? (u = t[5])
+    : ((u = (0, s.jsx)(`span`, {
+        className: `shrink-0 text-xs text-codex-description`,
+        children: a,
+      })),
+      (t[4] = a),
+      (t[5] = u));
+  let d;
+  return (
+    t[6] !== c || t[7] !== l || t[8] !== u
+      ? ((d = (0, s.jsxs)(`div`, {
+          className: `flex min-w-0 items-center gap-1.5 text-sm leading-5`,
+          children: [c, l, u],
+        })),
+        (t[6] = c),
+        (t[7] = l),
+        (t[8] = u),
+        (t[9] = d))
+      : (d = t[9]),
+    d
+  );
+}
+var o, s;
+function c() {
+  return (c = e(() => {
+    ((o = t()), i(), (s = n()));
+  }))();
+}
+export { c as n, a as t };

@@ -1,56 +1,58 @@
-// Rates-and-bonds learning model: discount fixed cash flows at a changing yield.
-import "@rchunk/rolldown-runtime";
-
-interface BondYieldValues { yieldChangePercentagePoints?: number | null }
-
-const ratesAndBondsType = "RATES_AND_BONDS";
-const ratesAndBondsThumbnail = "rates-and-bonds-v1";
-const ratesAndBondsParameters = { yieldChangePercentagePoints: { kind: "number", defaultValue: 0, min: -3, max: 3 } };
-const ratesAndBondsDefinition = { type: ratesAndBondsType, version: 1, thumbnailAssetKey: ratesAndBondsThumbnail, parameters: ratesAndBondsParameters };
-const yieldChangeParameter = ratesAndBondsDefinition.parameters.yieldChangePercentagePoints;
-const yieldChangeControl = { min: yieldChangeParameter.min, max: yieldChangeParameter.max, step: 0.25, defaultValue: yieldChangeParameter.defaultValue };
-const exampleBond = { faceValue: 1000, annualCouponRate: 0.04, yearsRemaining: 7, baselineYield: 0.04 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeBondYieldValues = (values: BondYieldValues) => ({
-  yieldChangePercentagePoints: clamp(
-    Number.isFinite(values.yieldChangePercentagePoints) ? values.yieldChangePercentagePoints ?? yieldChangeControl.defaultValue : yieldChangeControl.defaultValue,
-    yieldChangeControl.min,
-    yieldChangeControl.max,
-  ),
-});
-
-function priceExampleBond(yieldRate: number): number {
-  const annualCoupon = exampleBond.faceValue * exampleBond.annualCouponRate;
-  let presentValue = 0;
-  for (let year = 1; year <= exampleBond.yearsRemaining; year += 1) presentValue += annualCoupon / (1 + yieldRate) ** year;
-  return presentValue + exampleBond.faceValue / (1 + yieldRate) ** exampleBond.yearsRemaining;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `RATES_AND_BONDS`),
+      (n = `rates-and-bonds-v1`),
+      (r = { yieldChangePercentagePoints: { kind: `number`, defaultValue: 0, min: -3, max: 3 } }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-function calculateRateAndBondState(values: BondYieldValues) {
-  const safeValues = normalizeBondYieldValues(values);
-  const marketYield = exampleBond.baselineYield + safeValues.yieldChangePercentagePoints / 100;
-  const baselinePrice = priceExampleBond(exampleBond.baselineYield);
-  const bondPrice = priceExampleBond(marketYield);
-  const priceChange = bondPrice - baselinePrice;
-  return {
-    safeValues,
-    marketYield,
-    baselinePrice,
-    bondPrice,
-    priceChange,
-    priceChangePercent: priceChange / baselinePrice * 100,
-    direction: safeValues.yieldChangePercentagePoints > 0 ? "yieldUp" : safeValues.yieldChangePercentagePoints < 0 ? "yieldDown" : "unchanged",
-  };
+var o, s, c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    (a(),
+      (o = i.parameters.yieldChangePercentagePoints),
+      (s = { min: o.min, max: o.max, step: 0.25, defaultValue: o.defaultValue }),
+      (c = { faceValue: 1e3, annualCouponRate: 0.04, yearsRemaining: 7, baselineYield: 0.04 }),
+      (l = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (u = (e) => ({
+        yieldChangePercentagePoints: l(
+          Number.isFinite(e.yieldChangePercentagePoints)
+            ? (e.yieldChangePercentagePoints ?? s.defaultValue)
+            : s.defaultValue,
+          s.min,
+          s.max,
+        ),
+      })),
+      (d = (e) => {
+        let t = c.faceValue * c.annualCouponRate,
+          n = 0;
+        for (let r = 1; r <= c.yearsRemaining; r += 1) n += t / (1 + e) ** r;
+        return n + c.faceValue / (1 + e) ** c.yearsRemaining;
+      }),
+      (f = (e) => {
+        let t = u(e),
+          n = c.baselineYield + t.yieldChangePercentagePoints / 100,
+          r = d(c.baselineYield),
+          i = d(n),
+          a = i - r;
+        return {
+          safeValues: t,
+          marketYield: n,
+          baselinePrice: r,
+          bondPrice: i,
+          priceChange: a,
+          priceChangePercent: (a / r) * 100,
+          direction:
+            t.yieldChangePercentagePoints > 0
+              ? `yieldUp`
+              : t.yieldChangePercentagePoints < 0
+                ? `yieldDown`
+                : `unchanged`,
+        };
+      }));
+  }))();
 }
-
-function initializeRatesAndBondsSchema(): void {}
-function initializeRatesAndBondsModel(): void {}
-
-export {
-  initializeRatesAndBondsSchema as a,
-  normalizeBondYieldValues as i,
-  calculateRateAndBondState as n,
-  ratesAndBondsDefinition as o,
-  initializeRatesAndBondsModel as r,
-  yieldChangeControl as t,
-};
+export { a, u as i, f as n, i as o, p as r, s as t };

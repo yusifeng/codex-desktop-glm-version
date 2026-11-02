@@ -1,13 +1,117 @@
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>): unknown }
-const { n: initializeRuntimeLazy, o: interopDefault } = runtimeChunk as unknown as { n(): void; o(value: unknown, count: number): { default: (items: unknown[], predicate: (item: unknown) => boolean) => unknown } };
-const { $3: initializeRuntime, BX: useSignalFamilyValue, FX: initializeSignals, I3: getJsxRuntime, K2: initializeCompiler, Y2: FormattedMessage, oZ: createSignalFamily, vV: loadFindLast } = appSharedChunk as unknown as { $3(): void; BX(signal: unknown, key: unknown): unknown; FX(): void; I3(): JsxRuntime; K2(): void; Y2: unknown; oZ(scope: unknown, factory: (key: [string, string | null], context: { scope: { get(signal: unknown, key: string): unknown } }) => unknown): unknown; vV(): unknown };
-const { BL: cloudScreenshotsSignal, HL: initializeCloudBrowser, VL: selectScreenshotIndex, Xd: TabThumbnail, Zd: initializeTabThumbnail, cet: appScope, dWt: getScreenshotSubtitle, hWt: isSitesScreenshot, let: initializeAppScope, mWt: initializeScreenshotHelpers, zL: cloudBrowserModeSignal } = appInitialChunk as unknown as { BL: unknown; HL(): void; VL(mode: unknown, items: unknown[]): number; Xd: unknown; Zd(): void; cet: unknown; dWt(value: unknown): unknown; hWt(value: unknown): boolean; let(): void; mWt(): void; zL: unknown };
-interface Screenshot { tab_id?: string; tool_summary?: string } interface Props { conversationId: string; targetTabId: string | null; tab: { icon?: unknown; title?: string } }
-let jsx: JsxRuntime; let screenshotSignal: unknown;
-function CloudBrowserThumbnailView({ icon, screenshot, title }: { icon?: unknown; screenshot?: Screenshot | null; title?: string }): unknown { const subtitle = getScreenshotSubtitle(screenshot); const sites = isSitesScreenshot(screenshot); const summary = screenshot?.tool_summary?.slice(0, 600).trim(); if (!subtitle && !sites && !summary) return null; return jsx.jsx(TabThumbnail, { icon, subtitle: sites ? jsx.jsx(FormattedMessage, { id: "chatgptConversations.cloudBrowser.preview.sites", defaultMessage: "Sites" }) : subtitle, title, sections: [summary ? { kind: "text", content: summary, lines: 3 } : null] }); }
-function RegisteredCloudBrowserThumbnail({ conversationId, targetTabId, tab }: Props): unknown { const screenshot = useSignalFamilyValue(screenshotSignal, [conversationId, targetTabId]) as Screenshot | null; return jsx.jsx(CloudBrowserThumbnailView, { icon: tab.icon, screenshot, title: tab.title }); }
-let initialized = false; function initializeRegisteredCloudBrowserThumbnail(): void { if (initialized) return; initialized = true; initializeRuntime(); initializeRuntimeLazy(); const findLast = interopDefault(loadFindLast(), 1).default; initializeSignals(); initializeAppScope(); initializeTabThumbnail(); initializeScreenshotHelpers(); initializeCloudBrowser(); jsx = getJsxRuntime(); screenshotSignal = createSignalFamily(appScope, ([conversationId, targetTabId], { scope }) => { const screenshots = (scope.get(cloudScreenshotsSignal, conversationId) as Screenshot[] | null) ?? []; const mode = scope.get(cloudBrowserModeSignal, conversationId) as { mode?: string }; if (mode?.mode === "live" && targetTabId != null) return findLast(screenshots, (item) => (item as Screenshot).tab_id === targetTabId) as Screenshot | undefined; return screenshots[selectScreenshotIndex(mode, screenshots)] as Screenshot | undefined; }); }
-initializeRegisteredCloudBrowserThumbnail(); export { RegisteredCloudBrowserThumbnail };
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  $3 as n,
+  BX as r,
+  FX as i,
+  I3 as a,
+  K2 as o,
+  Y2 as s,
+  oZ as c,
+  vV as l,
+} from "@rchunk/app-shared";
+import {
+  BL as u,
+  HL as d,
+  VL as f,
+  Xd as p,
+  Zd as m,
+  cet as h,
+  dWt as g,
+  hWt as _,
+  let as v,
+  mWt as y,
+  zL as b,
+} from "@rchunk/app-initial";
+function x(e) {
+  let t = (0, S.c)(18),
+    { icon: n, screenshot: r, title: i } = e,
+    a;
+  t[0] === r ? (a = t[1]) : ((a = g(r)), (t[0] = r), (t[1] = a));
+  let o = a,
+    c;
+  t[2] === r ? (c = t[3]) : ((c = _(r)), (t[2] = r), (t[3] = c));
+  let l = c,
+    u;
+  t[4] === r?.tool_summary
+    ? (u = t[5])
+    : ((u = r?.tool_summary?.slice(0, 600).trim()), (t[4] = r?.tool_summary), (t[5] = u));
+  let d = u;
+  if (!o && !l && !d) return null;
+  let f;
+  t[6] !== o || t[7] !== l
+    ? ((f = l
+        ? (0, C.jsx)(s, {
+            id: `chatgptConversations.cloudBrowser.preview.sites`,
+            defaultMessage: `Sites`,
+            description: `Product name shown below a cloud-browser preview of an unpublished ChatGPT Sites website`,
+          })
+        : o),
+      (t[6] = o),
+      (t[7] = l),
+      (t[8] = f))
+    : (f = t[8]);
+  let m;
+  t[9] === d
+    ? (m = t[10])
+    : ((m = d ? { kind: `text`, content: d, lines: 3 } : null), (t[9] = d), (t[10] = m));
+  let h;
+  t[11] === m ? (h = t[12]) : ((h = [m]), (t[11] = m), (t[12] = h));
+  let v;
+  return (
+    t[13] !== n || t[14] !== f || t[15] !== h || t[16] !== i
+      ? ((v = (0, C.jsx)(p, { icon: n, subtitle: f, title: i, sections: h })),
+        (t[13] = n),
+        (t[14] = f),
+        (t[15] = h),
+        (t[16] = i),
+        (t[17] = v))
+      : (v = t[17]),
+    v
+  );
+}
+var S, C;
+function w() {
+  return (w = e(() => {
+    ((S = n()), o(), m(), y(), (C = a()));
+  }))();
+}
+function T(e) {
+  let t = (0, E.c)(7),
+    { conversationId: n, targetTabId: i, tab: a } = e,
+    o;
+  t[0] !== n || t[1] !== i ? ((o = [n, i]), (t[0] = n), (t[1] = i), (t[2] = o)) : (o = t[2]);
+  let s = r(k, o),
+    c;
+  return (
+    t[3] !== s || t[4] !== a.icon || t[5] !== a.title
+      ? ((c = (0, O.jsx)(x, { icon: a.icon, screenshot: s, title: a.title })),
+        (t[3] = s),
+        (t[4] = a.icon),
+        (t[5] = a.title),
+        (t[6] = c))
+      : (c = t[6]),
+    c
+  );
+}
+var E, D, O, k;
+function A() {
+  return (A = e(() => {
+    ((E = n()),
+      (D = t(l(), 1)),
+      i(),
+      v(),
+      w(),
+      d(),
+      (O = a()),
+      (k = c(h, ([e, t], { scope: n }) => {
+        let r = n.get(u, e),
+          i = n.get(b, e);
+        return i.mode === `live` && t != null
+          ? (0, D.default)(r, (e) => e.tab_id === t)
+          : r[f(i, r)];
+      })));
+  }))();
+}
+A();
+export { T as RegisteredCloudBrowserThumbnail };

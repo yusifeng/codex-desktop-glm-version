@@ -1,36 +1,44 @@
-import { pL as queryOptions, vW as accountHeaderName, wL as initializeQueryOptions } from "@rchunk/app-shared";
-import { aI as initializeOffers, cJt as initializeApi, eI as promotionPlanName, rJt as apiClient } from "@rchunk/app-initial";
-import "@rchunk/rolldown-runtime";
-
-export interface Promotion { is_eligible?: boolean; metadata?: unknown; }
-
-function promotionSelectionState(input: { accountId?: string | null; promoCode?: string | null; planName: string; promotion?: Promotion | null; isLoading: boolean; error?: unknown }): { lockedProPlanName: unknown; proPromotionPending: boolean; proSelectionBlocked: boolean } {
-  const applies = !!input.promoCode && (input.planName === "chatgptpro" || input.planName === "chatgptprolite");
-  const lockedProPlanName = promotionPlanName(applies && input.promotion?.is_eligible ? input.promotion.metadata : null);
-  const pending = applies && (input.accountId == null || input.isLoading);
-  return { lockedProPlanName, proPromotionPending: pending, proSelectionBlocked: applies && (pending || input.error != null || (lockedProPlanName != null && lockedProPlanName !== input.planName)) };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { pL as t, vW as n, wL as r } from "@rchunk/app-shared";
+import { aI as i, cJt as a, eI as o, rJt as s } from "@rchunk/app-initial";
+function c({ accountId: e, promoCode: t, planName: n, promotion: r, isLoading: i, error: a }) {
+  let s = !!t && (n === `chatgptpro` || n === `chatgptprolite`),
+    c = o(s && r?.is_eligible ? r.metadata : null),
+    l = s && (e == null || i);
+  return {
+    lockedProPlanName: c,
+    proPromotionPending: l,
+    proSelectionBlocked: s && (l || a != null || (c != null && c !== n)),
+  };
 }
-
-async function fetchPromotionEligibility(input: { accountId: string; code: string; kind: string; signal: AbortSignal }): Promise<Promotion> {
-  const options = { additionalHeaders: { "ChatGPT-Account-ID": input.accountId, [accountHeaderName]: input.accountId }, parameters: { path: { code: input.code }, query: { type: input.kind } }, signal: input.signal };
-  const api = apiClient as { safeGet(path: string, options: unknown): Promise<Promotion> };
-  const eligibility = await api.safeGet("/promotions/eligibility/{code}", options);
-  input.signal.throwIfAborted();
-  return eligibility.is_eligible ? api.safeGet("/promotions/metadata/{code}", options) : { ...eligibility, metadata: null };
+function l({ accountId: e, promoCode: n, planName: r }) {
+  return t({
+    queryKey: [`pro-checkout-promotion`, e, n],
+    enabled: e != null && !!n && (r === `chatgptpro` || r === `chatgptprolite`),
+    queryFn: ({ signal: t }) => {
+      if (e == null || !n) throw Error(`Promotion requires an account and code`);
+      return u({ accountId: e, code: n, kind: `promo`, signal: t });
+    },
+    staleTime: 0,
+    retry: !1,
+  });
 }
-
-function promotionQuery(input: { accountId?: string | null; promoCode?: string | null; planName: string }): unknown {
-  return queryOptions({ queryKey: ["pro-checkout-promotion", input.accountId, input.promoCode], enabled: input.accountId != null && !!input.promoCode && (input.planName === "chatgptpro" || input.planName === "chatgptprolite"), queryFn: ({ signal }: { signal: AbortSignal }) => {
-    if (input.accountId == null || !input.promoCode) throw new Error("Promotion requires an account and code");
-    return fetchPromotionEligibility({ accountId: input.accountId, code: input.promoCode, kind: "promo", signal });
-  }, staleTime: 0, retry: false });
+async function u({ accountId: e, code: t, kind: r, signal: i }) {
+  let a = {
+      additionalHeaders: { "ChatGPT-Account-ID": e, [n]: e },
+      parameters: { path: { code: t }, query: { type: r } },
+      signal: i,
+    },
+    o = await s.safeGet(`/promotions/eligibility/{code}`, a);
+  return (
+    i.throwIfAborted(),
+    o.is_eligible ? s.safeGet(`/promotions/metadata/{code}`, a) : { ...o, metadata: null }
+  );
 }
-let initialized = false;
-function initializeOfferQueries(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeOffers();
-  initializeQueryOptions();
-  initializeApi();
+function d() {
+  return (d = e(() => {
+    (i(), r(), a());
+  }))();
 }
-export { promotionQuery as i, fetchPromotionEligibility as n, initializeOfferQueries as r, promotionSelectionState as t };
+export { l as i, u as n, d as r, c as t };

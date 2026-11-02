@@ -1,72 +1,97 @@
-// Split-normal distributions for visualizing left and right skew.
-import "@rchunk/rolldown-runtime";
-
-type SkewDirection = "left" | "right";
-interface SkewnessValues { direction?: unknown; skewStrength?: number | null }
-
-const skewnessSpecification = {
-  type: "SKEWNESS_DIRECTION",
-  version: 1,
-  thumbnailAssetKey: "skewness-direction-v1",
-  parameters: {
-    direction: { kind: "enum" as const, defaultValue: "right" as SkewDirection, allowedValues: ["left", "right"] as SkewDirection[] },
-    skewStrength: { kind: "number" as const, defaultValue: 0.6, min: 0, max: 1 },
-  },
-};
-const leftDirection = "left";
-const rightDirection = "right";
-const strengthParameter = skewnessSpecification.parameters.skewStrength;
-const defaultDirection = skewnessSpecification.parameters.direction.defaultValue;
-const skewStrengthControl = { min: strengthParameter.min, max: strengthParameter.max, step: 0.01, defaultValue: strengthParameter.defaultValue };
-const skewnessDomain = { min: -7.5, max: 7.5 };
-const curveSegments = 160;
-const squareRootTwo = Math.sqrt(2);
-const normalScale = Math.sqrt(2 / Math.PI);
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeSkewnessValues = (values: SkewnessValues) => ({
-  direction: values.direction === leftDirection || values.direction === rightDirection ? values.direction : defaultDirection,
-  skewStrength: typeof values.skewStrength === "number" && Number.isFinite(values.skewStrength) ? clamp(values.skewStrength, skewStrengthControl.min, skewStrengthControl.max) : skewStrengthControl.defaultValue,
-});
-const errorFunction = (value: number): number => {
-  const sign = value < 0 ? -1 : 1;
-  const magnitude = Math.abs(value);
-  const scale = 1 / (1 + 0.3275911 * magnitude);
-  return sign * (1 - ((((1.061405429 * scale - 1.453152027) * scale + 1.421413741) * scale - 0.284496736) * scale + 0.254829592) * scale * Math.exp(-magnitude * magnitude));
-};
-const normalCdf = (value: number): number => 0.5 * (1 + errorFunction(value / squareRootTwo));
-const splitNormalDensity = (value: number, sigmaLeft: number, sigmaRight: number): number => {
-  const sigma = value < 0 ? sigmaLeft : sigmaRight;
-  return normalScale / (sigmaLeft + sigmaRight) * Math.exp(-(value * value) / (2 * sigma * sigma));
-};
-const splitNormalCdf = (value: number, sigmaLeft: number, sigmaRight: number): number => {
-  const sigmaTotal = sigmaLeft + sigmaRight;
-  return value <= 0 ? 2 * sigmaLeft * normalCdf(value / sigmaLeft) / sigmaTotal : sigmaLeft / sigmaTotal + 2 * sigmaRight * (normalCdf(value / sigmaRight) - 0.5) / sigmaTotal;
-};
-const splitNormalMedian = (sigmaLeft: number, sigmaRight: number): number => {
-  let lower = skewnessDomain.min;
-  let upper = skewnessDomain.max;
-  for (let iteration = 0; iteration < 64; iteration += 1) {
-    const midpoint = (lower + upper) / 2;
-    if (splitNormalCdf(midpoint, sigmaLeft, sigmaRight) < 0.5) lower = midpoint; else upper = midpoint;
-  }
-  return (lower + upper) / 2;
-};
-const sigmasForSkew = (direction: SkewDirection, strength: number) => {
-  const narrowSigma = 1 - 0.25 * strength;
-  const broadSigma = 1 + 1.6 * strength;
-  return direction === rightDirection ? { sigmaLeft: narrowSigma, sigmaRight: broadSigma } : { sigmaLeft: broadSigma, sigmaRight: narrowSigma };
-};
-const densityPoints = (sigmaLeft: number, sigmaRight: number) => Array.from({ length: curveSegments + 1 }, (_, index) => {
-  const x = skewnessDomain.min + index / curveSegments * (skewnessDomain.max - skewnessDomain.min);
-  return { x, density: splitNormalDensity(x, sigmaLeft, sigmaRight) };
-});
-const calculateSkewness = (values: SkewnessValues) => {
-  const normalized = normalizeSkewnessValues(values);
-  const { sigmaLeft, sigmaRight } = sigmasForSkew(normalized.direction, normalized.skewStrength);
-  return { ...normalized, isSymmetric: normalized.skewStrength === 0, sigmaLeft, sigmaRight, mean: normalScale * (sigmaRight - sigmaLeft), median: splitNormalMedian(sigmaLeft, sigmaRight), mode: 0, points: densityPoints(sigmaLeft, sigmaRight) };
-};
-
-function initializeSkewnessSpecification(): void {}
-function initializeSkewnessModel(): void {}
-
-export { skewStrengthControl as a, normalizeSkewnessValues as c, skewnessSpecification as d, rightDirection as i, splitNormalDensity as l, skewnessDomain as n, calculateSkewness as o, leftDirection as r, initializeSkewnessModel as s, defaultDirection as t, initializeSkewnessSpecification as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `SKEWNESS_DIRECTION`),
+      (n = `skewness-direction-v1`),
+      (r = {
+        direction: { kind: `enum`, defaultValue: `right`, allowedValues: [`left`, `right`] },
+        skewStrength: { kind: `number`, defaultValue: 0.6, min: 0, max: 1 },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w, T, E;
+function D() {
+  return (D = e(() => {
+    (a(),
+      (o = `left`),
+      (s = `right`),
+      (c = i.parameters.skewStrength),
+      (l = i.parameters.direction),
+      (u = (e) => e === `left` || e === `right`),
+      (d = u(l.defaultValue) ? l.defaultValue : s),
+      (f = { min: c.min, max: c.max, step: 0.01, defaultValue: c.defaultValue }),
+      (p = { min: -7.5, max: 7.5 }),
+      (m = 160),
+      (h = Math.sqrt(2)),
+      (g = Math.sqrt(2 / Math.PI)),
+      (_ = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (v = (e) => {
+        let t = e.skewStrength;
+        return {
+          direction: e.direction === `left` || e.direction === `right` ? e.direction : d,
+          skewStrength:
+            typeof t == `number` && Number.isFinite(t) ? _(t, f.min, f.max) : f.defaultValue,
+        };
+      }),
+      (y = (e) => {
+        let t = e < 0 ? -1 : 1,
+          n = Math.abs(e),
+          r = 1 / (1 + 0.3275911 * n);
+        return (
+          t *
+          (1 -
+            ((((1.061405429 * r - 1.453152027) * r + 1.421413741) * r - 0.284496736) * r +
+              0.254829592) *
+              r *
+              Math.exp(-n * n))
+        );
+      }),
+      (b = (e) => 0.5 * (1 + y(e / h))),
+      (x = (e, t, n) => {
+        let r = e < 0 ? t : n;
+        return (g / (t + n)) * Math.exp(-(e * e) / (2 * r * r));
+      }),
+      (S = (e, t, n) => {
+        let r = t + n;
+        return e <= 0 ? (2 * t * b(e / t)) / r : t / r + (2 * n * (b(e / n) - 0.5)) / r;
+      }),
+      (C = (e, t) => {
+        let n = p.min,
+          r = p.max;
+        for (let i = 0; i < 64; i += 1) {
+          let i = (n + r) / 2;
+          S(i, e, t) < 0.5 ? (n = i) : (r = i);
+        }
+        return (n + r) / 2;
+      }),
+      (w = (e, t) => {
+        let n = 1 - 0.25 * t,
+          r = 1 + 1.6 * t;
+        return e === `right` ? { sigmaLeft: n, sigmaRight: r } : { sigmaLeft: r, sigmaRight: n };
+      }),
+      (T = (e, t) =>
+        Array.from({ length: 161 }, (n, r) => {
+          let i = p.min + (r / m) * (p.max - p.min);
+          return { x: i, density: x(i, e, t) };
+        })),
+      (E = (e) => {
+        let { direction: t, skewStrength: n } = v(e),
+          { sigmaLeft: r, sigmaRight: i } = w(t, n);
+        return {
+          direction: t,
+          skewStrength: n,
+          isSymmetric: n === 0,
+          sigmaLeft: r,
+          sigmaRight: i,
+          mean: g * (i - r),
+          median: C(r, i),
+          mode: 0,
+          points: T(r, i),
+        };
+      }));
+  }))();
+}
+export { f as a, v as c, i as d, s as i, x as l, p as n, E as o, o as r, D as s, d as t, a as u };

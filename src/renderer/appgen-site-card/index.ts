@@ -1,114 +1,127 @@
-// appgen-site-card —— Site 分享弹窗中的站点摘要与设置入口。
-// 原版：app/webview/assets/appgen-site-card-230b77db57a9.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import { formatBrowserUrl as formatSiteLiveUrl } from "../app-primary/runtime/format-browser-url";
-
-void runtimeChunk;
-const {
-  $3: initializeReactRuntime,
-  C_: initializeCardActions,
-  I3: getJsxRuntime,
-  K2: initializeInternationalization,
-  S_: IconAsset,
-  Xh: LinkButton,
-  Y2: FormattedMessage,
-  Zh: initializeButton,
-  bE: settingsIcon,
-  c_: initializeTooltip,
-  n4: useIntl,
-  o_: Tooltip,
-  xE: initializeNavigationTooltip,
-} = appSharedChunk;
-const {
-  a3t: initializeSiteIcon,
-  i3t: SiteIcon,
-} = appInitialChunk;
-const { Sf: initializeSiteUrlFormatter } = appPrimaryChunk;
-const jsx = getJsxRuntime();
-
-interface AppgenSiteCardProps {
-  liveUrl?: string | null;
-  onOpenSettings?: () => void;
-  settingsHref?: string | null;
-  title: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  C_ as n,
+  I3 as r,
+  K2 as i,
+  S_ as a,
+  Xh as o,
+  Y2 as s,
+  Zh as c,
+  bE as l,
+  c_ as u,
+  n4 as d,
+  o_ as f,
+  xE as p,
+} from "@rchunk/app-shared";
+import { a3t as m, i3t as h } from "@rchunk/app-initial";
+import { Sf as g, xf as _ } from "@rchunk/app-primary";
+function v(e) {
+  let t = (0, y.c)(21),
+    { liveUrl: n, title: r, onOpenSettings: i, settingsHref: c } = e,
+    u = d(),
+    p;
+  t[0] === n ? (p = t[1]) : ((p = _(n)), (t[0] = n), (t[1] = p));
+  let m = p,
+    g;
+  t[2] === u
+    ? (g = t[3])
+    : ((g = u.formatMessage({
+        id: `appgenShareDialog.site.settings.label`,
+        defaultMessage: `Open site settings`,
+        description: `Tooltip and accessible label for the gear button on the website card in the Sites share dialog. Site owners can select it to open the website's settings page. Keep this action label short. No placeholders.`,
+      })),
+      (t[2] = u),
+      (t[3] = g));
+  let v = g,
+    x;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((x = (0, b.jsx)(`span`, {
+        className: `flex size-10 shrink-0 items-center justify-center`,
+        children: (0, b.jsx)(h, { className: `icon-md` }),
+      })),
+      (t[4] = x))
+    : (x = t[4]);
+  let S;
+  t[5] === r
+    ? (S = t[6])
+    : ((S = (0, b.jsx)(`div`, {
+        className: `truncate text-sm font-medium text-default`,
+        children: r,
+      })),
+      (t[5] = r),
+      (t[6] = S));
+  let C;
+  t[7] === m
+    ? (C = t[8])
+    : ((C =
+        m ??
+        (0, b.jsx)(s, {
+          id: `appgenShareDialog.site.notPublished`,
+          defaultMessage: `Not published yet`,
+          description: `Label in a Site card for a site without a published URL`,
+        })),
+      (t[7] = m),
+      (t[8] = C));
+  let w;
+  t[9] === C
+    ? (w = t[10])
+    : ((w = (0, b.jsx)(`div`, { className: `truncate text-xs text-tertiary`, children: C })),
+      (t[9] = C),
+      (t[10] = w));
+  let T;
+  t[11] !== S || t[12] !== w
+    ? ((T = (0, b.jsxs)(`div`, {
+        className: `flex min-w-0 flex-1 flex-col gap-0.5`,
+        children: [S, w],
+      })),
+      (t[11] = S),
+      (t[12] = w),
+      (t[13] = T))
+    : (T = t[13]);
+  let E;
+  t[14] !== i || t[15] !== c || t[16] !== v
+    ? ((E =
+        c == null
+          ? null
+          : (0, b.jsx)(f, {
+              tooltipContent: v,
+              children: (0, b.jsx)(o, {
+                "aria-label": v,
+                color: `ghost`,
+                size: `toolbar`,
+                uniform: !0,
+                href: c,
+                target: void 0,
+                rel: `noopener noreferrer`,
+                onClick: i,
+                children: (0, b.jsx)(a, { asset: l }),
+              }),
+            })),
+      (t[14] = i),
+      (t[15] = c),
+      (t[16] = v),
+      (t[17] = E))
+    : (E = t[17]);
+  let D;
+  return (
+    t[18] !== T || t[19] !== E
+      ? ((D = (0, b.jsxs)(`div`, {
+          className: `flex items-center gap-3 rounded-lg bg-secondary-soft p-3`,
+          children: [x, T, E],
+        })),
+        (t[18] = T),
+        (t[19] = E),
+        (t[20] = D))
+      : (D = t[20]),
+    D
+  );
 }
-
-function AppgenSiteCard({
-  liveUrl,
-  title,
-  onOpenSettings,
-  settingsHref,
-}: AppgenSiteCardProps): unknown {
-  const intl = useIntl();
-  const formattedLiveUrl = formatSiteLiveUrl(liveUrl);
-  const settingsLabel = intl.formatMessage({
-    id: "appgenShareDialog.site.settings.label",
-    defaultMessage: "Open site settings",
-    description:
-      "Tooltip and accessible label for the gear button on the website card in the Sites share dialog. Site owners can select it to open the website's settings page. Keep this action label short. No placeholders.",
-  });
-  const siteIcon = jsx.jsx("span", {
-    className: "flex size-10 shrink-0 items-center justify-center",
-    children: jsx.jsx(SiteIcon, { className: "icon-md" }),
-  });
-  const titleNode = jsx.jsx("div", {
-    className: "truncate text-sm font-medium text-default",
-    children: title,
-  });
-  const urlLabel =
-    formattedLiveUrl ??
-    jsx.jsx(FormattedMessage, {
-      id: "appgenShareDialog.site.notPublished",
-      defaultMessage: "Not published yet",
-      description: "Label in a Site card for a site without a published URL",
-    });
-  const details = jsx.jsxs("div", {
-    className: "flex min-w-0 flex-1 flex-col gap-0.5",
-    children: [
-      titleNode,
-      jsx.jsx("div", {
-        className: "truncate text-xs text-tertiary",
-        children: urlLabel,
-      }),
-    ],
-  });
-  const settingsAction =
-    settingsHref == null
-      ? null
-      : jsx.jsx(Tooltip, {
-          tooltipContent: settingsLabel,
-          children: jsx.jsx(LinkButton, {
-            "aria-label": settingsLabel,
-            color: "ghost",
-            size: "toolbar",
-            uniform: true,
-            href: settingsHref,
-            target: undefined,
-            rel: "noopener noreferrer",
-            onClick: onOpenSettings,
-            children: jsx.jsx(IconAsset, { asset: settingsIcon }),
-          }),
-        });
-
-  return jsx.jsxs("div", {
-    className: "flex items-center gap-3 rounded-lg bg-secondary-soft p-3",
-    children: [siteIcon, details, settingsAction],
-  });
+var y, b;
+function x() {
+  return (x = e(() => {
+    ((y = t()), p(), i(), c(), n(), u(), m(), g(), (b = r()));
+  }))();
 }
-
-function initializeAppgenSiteCard(): void {
-  initializeReactRuntime();
-  initializeNavigationTooltip();
-  initializeInternationalization();
-  initializeButton();
-  initializeCardActions();
-  initializeTooltip();
-  initializeSiteIcon();
-  initializeSiteUrlFormatter();
-}
-
-export { initializeAppgenSiteCard as n, AppgenSiteCard as t };
+export { x as n, v as t };

@@ -1,106 +1,144 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeCompilerRuntime,
-  CL as useQueryClient,
-  FX as initializeSignalRuntime,
-  K2 as initializeIntlComponents,
-  LX as useScope,
-  QI as initializeQueryRuntime,
-  SL as initializeQueryClient,
-  ZI as appScope,
-  iL as useMutation,
-  iW as normalizePath,
-  lk as initializeToastRuntime,
-  n4 as useIntl,
-  pk as toastManagerSignal,
-  rL as initializeMutationRuntime,
-  wL as initializeWindowRuntime,
+  $3 as t,
+  CL as n,
+  FX as r,
+  K2 as i,
+  LX as a,
+  QI as o,
+  SL as s,
+  ZI as c,
+  iL as l,
+  iW as u,
+  lk as d,
+  n4 as f,
+  pk as p,
+  rL as m,
+  wL as h,
 } from "@rchunk/app-shared";
-import {
-  $ln as queryKey,
-  Con as initializeHostConfig,
-  _on as getHostConfigId,
-  nun as initializeHostCommands,
-  won as getHostCommandClient,
-} from "@rchunk/app-initial";
-
-interface CreateGitRepositoryOptions {
-  cwd?: string | null;
-  hostConfig: unknown;
-  onErrorMessage?(message: string): void;
-  showErrorToast?: boolean;
-}
-
-function useCreateGitRepository({
-  cwd,
-  hostConfig,
-  onErrorMessage,
-  showErrorToast = false,
-}: CreateGitRepositoryOptions) {
-  const scope = useScope(appScope);
-  const queryClient = useQueryClient();
-  const intl = useIntl();
-  const hostConfigId = getHostConfigId(hostConfig);
-  const mutation = useMutation({
-    mutationKey: ["git", "init-repo", hostConfigId, cwd ?? ""],
-    mutationFn: async () => {
-      if (cwd == null) throw new Error("Missing git context");
-      await getHostCommandClient("git").request({
-        method: "git-init-repo",
-        params: {
-          cwd: normalizePath(cwd),
-          hostConfig,
-          operationSource: "review_model",
-        },
-      });
-    },
-    onSuccess: async () => {
-      scope.get(toastManagerSignal).success(String(intl.formatMessage({
-        id: "codex.review.noDiff.gitInit.success",
-        defaultMessage: "Git repository created",
-        description: "Toast shown after creating a git repository from the diff empty state",
-      })));
-      const invalidations = [queryClient.invalidateQueries({ queryKey: queryKey("git-origins") })];
-      if (cwd != null) invalidations.push(queryClient.invalidateQueries({
-        queryKey: ["git", "metadata", hostConfigId, cwd],
-      }));
-      await Promise.all(invalidations);
-    },
-    onError: (error: unknown) => {
-      const message = error instanceof Error ? error.message : String(error);
-      if (showErrorToast) {
-        scope.get(toastManagerSignal).danger(String(intl.formatMessage({
-          id: "codex.review.noDiff.gitInit.error",
-          defaultMessage: "Git init failed: {message}",
-          description: "Error text shown when git initialization fails from the diff empty state",
-        }, { message })), {
-          errorAnalytics: { toastId: "codex.review.noDiff.gitInit.error" },
+import { $ln as g, Con as _, _on as v, nun as y, won as b } from "@rchunk/app-initial";
+function x(e) {
+  let t = (0, S.c)(31),
+    { cwd: r, hostConfig: i, onErrorMessage: o, showErrorToast: s } = e,
+    d = s !== void 0 && s,
+    m = a(c),
+    h = n(),
+    _ = f(),
+    y;
+  t[0] === i ? (y = t[1]) : ((y = v(i)), (t[0] = i), (t[1] = y));
+  let x = y,
+    C = r ?? ``,
+    w;
+  t[2] !== x || t[3] !== C
+    ? ((w = [`git`, `init-repo`, x, C]), (t[2] = x), (t[3] = C), (t[4] = w))
+    : (w = t[4]);
+  let T;
+  t[5] !== r || t[6] !== i
+    ? ((T = async () => {
+        if (r == null) throw Error(`Missing git context`);
+        await b(`git`).request({
+          method: `git-init-repo`,
+          params: { cwd: u(r), hostConfig: i, operationSource: `review_model` },
         });
-      }
-      onErrorMessage?.(message);
-    },
-  });
-  return {
-    canCreateGitRepository: cwd != null,
-    createGitRepository: async () => {
-      if (cwd == null || mutation.isPending) return;
-      try { await mutation.mutateAsync(); } catch { return; }
-    },
-    isCreatingGitRepository: mutation.isPending,
-  };
+      }),
+      (t[5] = r),
+      (t[6] = i),
+      (t[7] = T))
+    : (T = t[7]);
+  let E;
+  t[8] !== r || t[9] !== x || t[10] !== _ || t[11] !== h || t[12] !== m
+    ? ((E = async () => {
+        m.get(p).success(
+          _.formatMessage({
+            id: `codex.review.noDiff.gitInit.success`,
+            defaultMessage: `Git repository created`,
+            description: `Toast shown after creating a git repository from the diff empty state`,
+          }),
+        );
+        let e = [h.invalidateQueries({ queryKey: g(`git-origins`) })];
+        (r != null && e.push(h.invalidateQueries({ queryKey: [`git`, `metadata`, x, r] })),
+          await Promise.all(e));
+      }),
+      (t[8] = r),
+      (t[9] = x),
+      (t[10] = _),
+      (t[11] = h),
+      (t[12] = m),
+      (t[13] = E))
+    : (E = t[13]);
+  let D;
+  t[14] !== _ || t[15] !== o || t[16] !== m || t[17] !== d
+    ? ((D = (e) => {
+        let t = e instanceof Error ? e.message : String(e);
+        (d &&
+          m
+            .get(p)
+            .danger(
+              _.formatMessage(
+                {
+                  id: `codex.review.noDiff.gitInit.error`,
+                  defaultMessage: `Git init failed: {message}`,
+                  description: `Error text shown when git initialization fails from the diff empty state`,
+                },
+                { message: t },
+              ),
+              { errorAnalytics: { toastId: `codex.review.noDiff.gitInit.error` } },
+            ),
+          o?.(t));
+      }),
+      (t[14] = _),
+      (t[15] = o),
+      (t[16] = m),
+      (t[17] = d),
+      (t[18] = D))
+    : (D = t[18]);
+  let O;
+  t[19] !== w || t[20] !== T || t[21] !== E || t[22] !== D
+    ? ((O = { mutationKey: w, mutationFn: T, onSuccess: E, onError: D }),
+      (t[19] = w),
+      (t[20] = T),
+      (t[21] = E),
+      (t[22] = D),
+      (t[23] = O))
+    : (O = t[23]);
+  let k = l(O),
+    A;
+  t[24] !== r || t[25] !== k
+    ? ((A = async () => {
+        if (!(r == null || k.isPending))
+          try {
+            await k.mutateAsync();
+          } catch {
+            return;
+          }
+      }),
+      (t[24] = r),
+      (t[25] = k),
+      (t[26] = A))
+    : (A = t[26]);
+  let j = A,
+    M = r != null,
+    N;
+  return (
+    t[27] !== j || t[28] !== k.isPending || t[29] !== M
+      ? ((N = {
+          canCreateGitRepository: M,
+          createGitRepository: j,
+          isCreatingGitRepository: k.isPending,
+        }),
+        (t[27] = j),
+        (t[28] = k.isPending),
+        (t[29] = M),
+        (t[30] = N))
+      : (N = t[30]),
+    N
+  );
 }
-
-function initializeUseCreateGitRepository(): void {
-  initializeCompilerRuntime();
-  initializeMutationRuntime();
-  initializeQueryClient();
-  initializeSignalRuntime();
-  initializeWindowRuntime();
-  initializeIntlComponents();
-  initializeToastRuntime();
-  initializeQueryRuntime();
-  initializeHostCommands();
-  initializeHostConfig();
+var S;
+function C() {
+  return (C = e(() => {
+    ((S = t()), m(), s(), r(), h(), i(), d(), o(), y(), _());
+  }))();
 }
-
-export { useCreateGitRepository as n, initializeUseCreateGitRepository as t };
+export { x as n, C as t };

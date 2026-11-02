@@ -1,531 +1,587 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/open-pending-site-preview",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/app-primary",
+      "./app-primary-484df789f2f5.css",
+      "@rchunk/site-preview-persistence-bridge",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  BX as useParameterizedSignal,
-  HX as useSignalValue,
-  I3 as getJsxRuntime,
-  Jm as createLazyComponent,
-  LX as useScope,
-  Tf as PopoverTrigger,
-  Y2 as FormattedMessage,
-  Yh as Button,
-  ZI as appScope,
-  Cf as PopoverContent,
-  FX as initializeSignalRuntime,
-  Ih as Dialog,
-  m4 as classNames,
-  xf as Popover,
+  $3 as t,
+  Ah as n,
+  BX as r,
+  Cf as i,
+  Ef as a,
+  FX as o,
+  H3 as s,
+  HX as c,
+  I3 as l,
+  Ih as u,
+  Jm as d,
+  K2 as f,
+  LX as p,
+  Lh as m,
+  Oh as h,
+  Ph as g,
+  QI as _,
+  Rh as v,
+  Tf as y,
+  V3 as b,
+  Y2 as x,
+  Yh as S,
+  ZI as C,
+  Zh as w,
+  dg as T,
+  fg as E,
+  h4 as D,
+  jh as O,
+  kh as ee,
+  m4 as k,
+  qm as A,
+  xf as te,
+  zh as ne,
 } from "@rchunk/app-shared";
-import * as sharedChunk from "@rchunk/app-shared";
 import {
-  Dbt as previewExpandedByKeySignal,
-  Ebt as initializeLatestTurnPreviewState,
-  Fbt as defaultPreviewExpandedSignal,
-  bbt as updatePreviewExpandedMap,
-  wbt as readPreviewExpanded,
+  $en as re,
+  Dbt as j,
+  Ebt as ie,
+  Fbt as M,
+  JN as ae,
+  LN as oe,
+  RN as se,
+  Uzt as ce,
+  Vzt as le,
+  X8 as N,
+  XN as P,
+  Y8 as ue,
+  YN as de,
+  Z8 as F,
+  ZN as I,
+  bbt as L,
+  d0t as fe,
+  eP as R,
+  f0t as pe,
+  fit as me,
+  itn as he,
+  nqt as ge,
+  pit as _e,
+  tP as z,
+  tqt as ve,
+  wbt as ye,
 } from "@rchunk/app-initial";
-import * as initialChunk from "@rchunk/app-initial";
-import { Io as Disclosure } from "@rchunk/app-primary";
-import * as primaryChunk from "@rchunk/app-primary";
-import {
-  c as initializePanelSurfaceState,
-  u as panelDisplayModeSignal,
-} from "@rchunk/virtualized-turn-list";
-import { v as ConversationBlocks } from "@rchunk/conversation-blocks";
-import * as conversationBlocksChunk from "@rchunk/conversation-blocks";
-
-const once = onceExport as (initializer: () => void) => () => void;
-
-interface ScopeLike {
-  get(signal: unknown, parameter?: unknown): unknown;
-  set(signal: unknown, valueOrParameter: unknown, value?: unknown): void;
-}
-
-interface PanelDisplayMode {
-  displayMode: "gutter" | "overlay" | "shift";
-  isPopoverOpen: boolean;
-}
-
-interface PreviewExpandedMap extends Record<string, boolean> {}
-
-interface LatestTurnPreviewProps {
-  expanded: boolean;
-  headerLabel?: unknown;
-  isTurnInProgress: boolean;
-  latestTurnContentRef?: unknown;
-  onExpandedChange(expanded: boolean): void;
-  presentation?: "floating-hidden" | "floating-visible" | "inline";
-  threadPreview: unknown;
-}
-
-interface PreviewPopoverProps {
-  children?: unknown;
-  isOpen: boolean;
-  onOpenChange(open: boolean): void;
-  shouldPreventAutoFocus?: boolean;
-  trigger: unknown;
-}
-
-interface WheelEventLike {
-  deltaX: number;
-  deltaY: number;
-  stopPropagation(): void;
-}
-
-interface FocusEventLike {
-  preventDefault(): void;
-  target: unknown;
-}
-
-interface LunaReserveButtonProps {
-  hostId: string;
-}
-
-const MAX_PREVIEW_HEIGHT = "22.5rem";
-function callInitializer(value: unknown): void {
-  if (typeof value === "function") value();
-}
-
-function stopPanelPointerDismiss(event: FocusEventLike): void {
-  if (!(event.target instanceof Element)) return;
-  if (
-    event.target.closest('[data-app-shell-tab-strip-controller="right"]') !=
-    null
-  )
-    event.preventDefault();
-}
-
-function stopPanelFocusDismiss(event: FocusEventLike): void {
-  if (!(event.target instanceof Element)) return;
-  if (
-    event.target.matches(
-      '[role="tabpanel"][data-app-shell-tab-panel-controller="right"]',
-    )
-  )
-    event.preventDefault();
-}
-
-function LatestTurnPreviewPopover(props: PreviewPopoverProps): unknown {
-  const runtime = getJsxRuntime();
-  const preventAutoFocus = (event: { preventDefault(): void }): void => {
-    if (props.shouldPreventAutoFocus === true) event.preventDefault();
-  };
-  return runtime.jsxs(Popover, {
-    open: props.isOpen,
-    onOpenChange: props.onOpenChange,
-    children: [
-      runtime.jsx(PopoverTrigger, { asChild: true, children: props.trigger }),
-      runtime.jsx(PopoverContent, {
-        align: "end",
-        side: "bottom",
-        sideOffset: 16,
-        className:
-          "!w-auto !overflow-visible !rounded-3xl !bg-transparent !p-0 !shadow-none !ring-0 !backdrop-blur-none",
-        onCloseAutoFocus: preventAutoFocus,
-        onFocusOutside: stopPanelFocusDismiss,
-        onOpenAutoFocus: preventAutoFocus,
-        onPointerDownOutside: stopPanelPointerDismiss,
-        style: { maxHeight: "none", maxWidth: "none" },
-        children: props.isOpen ? props.children : null,
-      }),
-    ],
-  });
-}
-
-const initializeLatestTurnPreviewPopover = once((): void => {
-  callInitializer((sharedChunk as any).$3);
-  callInitializer((sharedChunk as any).Ef);
-  getJsxRuntime();
-});
-
-const initializeLatestTurnPreviewLazyComponents = once((): void => {
-  for (const candidate of [
-    (sharedChunk as any).$3,
-    initializeSignalRuntime,
-    (initialChunk as any).nqt,
-    (sharedChunk as any).qm,
-    (initialChunk as any).itn,
-    (primaryChunk as any).df,
-  ])
-    callInitializer(candidate);
-  getJsxRuntime();
-  callInitializer((sharedChunk as any).H3);
-  createLazyComponent(async () => {
-    const module = await import("@rchunk/open-pending-site-preview");
-    return module.OpenPendingSitePreview;
-  });
-  createLazyComponent(async () => {
-    const module = await import("@rchunk/site-preview-persistence-bridge");
-    return module.SitePreviewPersistenceBridge;
-  });
-});
-
-function LatestTurnPreviewSideEffects(): unknown {
-  useScope((initialChunk as any).$en ?? appScope);
-  const session = (useSignalValue as unknown as (signal: unknown) => any)(
-    (primaryChunk as any).pf,
-  );
-  (
-    useParameterizedSignal as unknown as (
-      signal: unknown,
-      key: unknown,
-    ) => unknown
-  )(
-    (initialChunk as any).tqt,
-    session?.hostId == null ? (session?.conversationId ?? null) : null,
-  );
-  return null;
-}
-
-function toggleLatestTurnPreview(
-  scope: ScopeLike,
-  key: true | string = true,
-): void {
-  const panel = scope.get(panelDisplayModeSignal) as PanelDisplayMode;
-  const expanded = readPreviewExpanded(
-    key === true
-      ? scope.get(defaultPreviewExpandedSignal)
-      : scope.get(previewExpandedByKeySignal, key),
-    key,
-  );
-  if (panel.displayMode !== "overlay") {
-    if (key === true) scope.set(defaultPreviewExpandedSignal, !expanded);
-    else
-      scope.set(
-        previewExpandedByKeySignal,
-        key,
-        updatePreviewExpandedMap(key, !expanded),
-      );
-    return;
-  }
-  const currentlyOpen =
-    panel.isPopoverOpen || (typeof key !== "boolean" && expanded);
-  if (typeof key !== "boolean") {
-    scope.set(
-      previewExpandedByKeySignal,
-      key,
-      updatePreviewExpandedMap(key, !currentlyOpen),
-    );
-  }
-  scope.set(panelDisplayModeSignal, {
-    ...panel,
-    isPopoverOpen: !currentlyOpen,
-  });
-}
-
-const initializeLatestTurnPreviewToggle = once((): void => {
-  initializeLatestTurnPreviewState();
-  initializePanelSurfaceState();
-});
-
-function LatestTurnPreview(props: LatestTurnPreviewProps): unknown {
-  const runtime = getJsxRuntime();
-  const presentation = props.presentation ?? "inline";
-  const isInline = presentation === "inline";
-  const handleWheel = (event: WheelEventLike): void => {
-    if (
-      presentation !== "floating-visible" ||
-      Math.abs(event.deltaY) <= Math.abs(event.deltaX)
-    )
-      return;
-    event.stopPropagation();
-    const nextExpanded = event.deltaY > 0;
-    if (props.expanded !== nextExpanded) props.onExpandedChange(nextExpanded);
-  };
-  const title =
-    props.headerLabel ??
-    runtime.jsx(FormattedMessage, {
-      id: props.isTurnInProgress
-        ? "composer.latestTurn.working"
-        : "composer.latestTurn",
-      defaultMessage: props.isTurnInProgress ? "Working" : "Latest turn",
-    });
-  const item = runtime.jsxs(Disclosure.Item, {
-    overlap: isInline,
-    children: [
-      runtime.jsx(Disclosure.DisclosureRow, {
-        "data-right-panel-composer-overlay-safe-area-header": "true",
-        expanded: props.expanded,
-        onExpandedChange: props.onExpandedChange,
-        onWheel: handleWheel,
-        titleClassName: "truncate",
-        title,
-      }),
-      runtime.jsx(Disclosure.DisclosureBody, {
-        ref: props.latestTurnContentRef,
-        expanded: props.expanded,
-        maxHeight: MAX_PREVIEW_HEIGHT,
-        tabIndex: -1,
-        children: runtime.jsx(Disclosure.Body, {
-          children: runtime.jsx(ConversationBlocks, {
-            items: [{ key: "latest-turn-preview", node: props.threadPreview }],
-            allowHorizontalScroll: true,
-            className:
-              "@container/latest-turn-preview [--edge-fade-distance:1rem] [animation-direction:reverse]",
-            contentClassName:
-              "gap-0 [&_[data-virtualized-turn-content]]:-ms-2.5 [&_[data-virtualized-turn-content]]:pb-1.5 [&_[data-virtualized-turn-content]]:ps-2.5",
-            maxHeightByState: {
-              collapsed: "0px",
-              expanded: MAX_PREVIEW_HEIGHT,
-              preview: MAX_PREVIEW_HEIGHT,
-            },
-            viewState: "expanded",
+import { Io as B, Lo as be, df as xe, pf as Se } from "@rchunk/app-primary";
+import { c as Ce, u as V } from "@rchunk/virtualized-turn-list";
+import { v as we, y as Te } from "@rchunk/conversation-blocks";
+function Ee(e) {
+  let t = (0, H.c)(19),
+    { hostId: i, onClose: a, rateLimitStatus: o } = e,
+    s = p(C),
+    c = E(),
+    l = r(F, i),
+    d = o.rate_limit_upsell;
+  if (!l || d == null) return null;
+  let f = !c && `-mb-6`,
+    g;
+  t[0] === f
+    ? (g = t[1])
+    : ((g = k(`block w-full scale-105 object-cover`, f)), (t[0] = f), (t[1] = g));
+  let _ = c ? G : W,
+    y;
+  t[2] !== g || t[3] !== _
+    ? ((y = (0, U.jsx)(`div`, {
+        className: `overflow-hidden`,
+        children: (0, U.jsx)(`img`, { alt: ``, "aria-hidden": `true`, className: g, src: _ }),
+      })),
+      (t[2] = g),
+      (t[3] = _),
+      (t[4] = y))
+    : (y = t[4]);
+  let b;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((b = (0, U.jsx)(v, {
+        className: `contents`,
+        children: (0, U.jsx)(x, {
+          id: `codex.lunaReserve.dialog.title`,
+          defaultMessage: `Regain access to our most powerful models`,
+          description: `Heading in the Codex Luna Reserve modal on desktop and web, opened by clicking the thread-header badge after included usage is exhausted. Invites the user to regain access to higher-capability OpenAI models through the available upgrade or credit actions. Reassuring, concise heading; no placeholders.`,
+        }),
+      })),
+      (t[5] = b))
+    : (b = t[5]);
+  let w;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((w = (0, U.jsx)(O, {
+        className: `items-center pb-2`,
+        children: (0, U.jsx)(n, {
+          className: `items-center`,
+          titleClassName: `text-center`,
+          subtitleTone: `secondary`,
+          subtitleClassName: `text-center`,
+          title: b,
+          subtitle: (0, U.jsx)(m, {
+            className: `contents`,
+            children: (0, U.jsx)(x, {
+              id: `codex.lunaReserve.dialog.description`,
+              defaultMessage: `You are now chatting with Luna. Continue to access our most capable models.`,
+              description: `Body in the Codex Luna Reserve modal on desktop and web, opened from the Codex or Work thread-header badge after included usage is exhausted. Reassures the user that they are chatting with Luna and invites them to use the available actions below to access higher-capability models. Luna is a model name. No placeholders.`,
+            }),
           }),
         }),
-      }),
-    ],
-  });
-  if (isInline) return item;
-  const visible = presentation === "floating-visible";
-  return runtime.jsx("div", {
-    "aria-hidden": !visible,
-    className: classNames(
-      "absolute inset-x-10 bottom-0 z-0 transition-[opacity,translate] duration-basic ease-enter-snappy motion-reduce:transition-none",
-      visible
-        ? "translate-y-0 opacity-100"
-        : "pointer-events-none translate-y-full opacity-0 delay-75",
-    ),
-    inert: !visible,
-    children: item,
-  });
-}
-
-function LunaReserveDialog(props: {
-  hostId: string;
-  onClose(): void;
-  rateLimitStatus: any;
-}): unknown {
-  const runtime = getJsxRuntime();
-  const scope = useScope(appScope) as any;
-  const darkMode = Boolean((sharedChunk as any).fg?.());
-  const banner = props.rateLimitStatus?.rate_limit_upsell;
-  const eligible = (
-    useParameterizedSignal as unknown as (
-      signal: unknown,
-      key: unknown,
-    ) => unknown
-  )((initialChunk as any).Z8, props.hostId);
-  if (!eligible || banner == null) return null;
-  const actions = (initialChunk as any).eP;
-  const track = (initialChunk as any).ZN as (
-    scope: unknown,
-    event: unknown,
-  ) => void;
-  const renderContent = (resolved: any) =>
-    runtime.jsx("div", {
-      className: "self-center",
-      children: runtime.jsx((sharedChunk as any).kh ?? "div", {
-        expandSingleButton: false,
-        children: (banner.ctas ?? [])
-          .map((cta: any, index: number) => {
-            if (!(initialChunk as any).YN?.(cta.action)) return null;
-            const action = resolved.actions[cta.action];
-            return runtime.jsx(
-              Button,
-              {
-                color: index === 0 ? "primary" : "secondary",
-                disabled: action.disabled,
-                size: "large",
-                onClick: (event: unknown) => {
-                  track(scope, {
-                    action:
-                      actions.CODEX_LUNA_RESERVE_LIFECYCLE_ACTION_MODAL_CTA_CLICKED,
-                    ctaAction: cta.action,
-                    source: "details_modal",
-                  });
-                  action.log();
-                  props.onClose();
-                  action.onClick(event);
-                },
-                children: cta.label,
-              },
-              `${cta.action}:${index}`,
-            );
-          })
-          .reverse(),
-      }),
-    });
-  const BannerActions = (initialChunk as any).LN;
-  const title = runtime.jsx((sharedChunk as any).Rh, {
-    className: "contents",
-    children: runtime.jsx(FormattedMessage, {
-      id: "codex.lunaReserve.dialog.title",
-      defaultMessage: "Regain access to our most powerful models",
-    }),
-  });
-  const heading = runtime.jsx((sharedChunk as any).jh, {
-    className: "items-center pb-2",
-    children: runtime.jsx((sharedChunk as any).Ah, {
-      className: "items-center",
-      titleClassName: "text-center",
-      subtitleTone: "secondary",
-      subtitleClassName: "text-center",
-      title,
-      subtitle: runtime.jsx((sharedChunk as any).Lh, {
-        className: "contents",
-        children: runtime.jsx(FormattedMessage, {
-          id: "codex.lunaReserve.dialog.description",
-          defaultMessage:
-            "You are now chatting with Luna. Continue to access our most capable models.",
-        }),
-      }),
-    }),
-  });
-  return runtime.jsxs(Dialog, {
-    open: true,
-    size: "default",
-    onOpenChange: props.onClose,
-    children: [
-      runtime.jsx("div", {
-        className: "overflow-hidden",
-        children: runtime.jsx("img", {
-          alt: "",
-          "aria-hidden": "true",
-          className: classNames(
-            "block w-full scale-105 object-cover",
-            !darkMode && "-mb-6",
-          ),
-          src: darkMode
-            ? "https://persistent.oaistatic.com/chatgpt/tpp/luna-reserve-modal-hero-dark.png"
-            : "https://persistent.oaistatic.com/chatgpt/tpp/luna-reserve-modal-hero-light.png",
-        }),
-      }),
-      runtime.jsxs((sharedChunk as any).Oh, {
+      })),
+      (t[6] = w))
+    : (w = t[6]);
+  let T;
+  t[7] !== d.ctas || t[8] !== a || t[9] !== s
+    ? ((T = (e) =>
+        (0, U.jsx)(`div`, {
+          className: `self-center`,
+          children: (0, U.jsx)(ee, {
+            expandSingleButton: !1,
+            children: d.ctas
+              .map((t, n) => {
+                if (!de(t.action)) return null;
+                let r = e.actions[t.action];
+                return (0, U.jsx)(
+                  S,
+                  {
+                    color: n === 0 ? `primary` : `secondary`,
+                    disabled: r.disabled,
+                    size: `large`,
+                    onClick: (e) => {
+                      (I(s, {
+                        action: R.CODEX_LUNA_RESERVE_LIFECYCLE_ACTION_MODAL_CTA_CLICKED,
+                        ctaAction: t.action,
+                        source: `details_modal`,
+                      }),
+                        r.log(),
+                        a(),
+                        r.onClick(e));
+                    },
+                    children: t.label,
+                  },
+                  `${t.action}:${n}`,
+                );
+              })
+              .reverse(),
+          }),
+        })),
+      (t[7] = d.ctas),
+      (t[8] = a),
+      (t[9] = s),
+      (t[10] = T))
+    : (T = t[10]);
+  let D;
+  t[11] !== d || t[12] !== o || t[13] !== T
+    ? ((D = (0, U.jsxs)(h, {
         children: [
-          heading,
-          runtime.jsx((sharedChunk as any).jh, {
-            className: "items-center",
-            children: runtime.jsx(BannerActions, {
-              banner,
-              rateLimitStatus: props.rateLimitStatus,
-              renderContent,
+          w,
+          (0, U.jsx)(O, {
+            className: `items-center`,
+            children: (0, U.jsx)(oe, { banner: d, rateLimitStatus: o, renderContent: T }),
+          }),
+        ],
+      })),
+      (t[11] = d),
+      (t[12] = o),
+      (t[13] = T),
+      (t[14] = D))
+    : (D = t[14]);
+  let A;
+  return (
+    t[15] !== a || t[16] !== y || t[17] !== D
+      ? ((A = (0, U.jsxs)(u, { open: !0, size: `default`, onOpenChange: a, children: [y, D] })),
+        (t[15] = a),
+        (t[16] = y),
+        (t[17] = D),
+        (t[18] = A))
+      : (A = t[18]),
+    A
+  );
+}
+var H, U, W, G;
+function K() {
+  return (K = e(() => {
+    ((H = t()),
+      z(),
+      D(),
+      o(),
+      f(),
+      w(),
+      ne(),
+      g(),
+      ae(),
+      se(),
+      _(),
+      T(),
+      P(),
+      N(),
+      (U = l()),
+      (W = `https://persistent.oaistatic.com/chatgpt/tpp/luna-reserve-modal-hero-light.png`),
+      (G = `https://persistent.oaistatic.com/chatgpt/tpp/luna-reserve-modal-hero-dark.png`));
+  }))();
+}
+function De(e) {
+  let t = (0, q.c)(7),
+    { hostId: n } = e,
+    i = p(C);
+  if (!r(F, n)) return null;
+  let a;
+  t[0] !== n || t[1] !== i
+    ? ((a = () => {
+        I(i, {
+          action: R.CODEX_LUNA_RESERVE_LIFECYCLE_ACTION_HEADER_BUTTON_CLICKED,
+          source: `thread_header`,
+        });
+        let e = i.query.getData(pe);
+        if (e != null) {
+          (ce(i, Ee, { hostId: n, rateLimitStatus: e }),
+            I(i, {
+              action: R.CODEX_LUNA_RESERVE_LIFECYCLE_ACTION_MODAL_OPENED,
+              source: `details_modal`,
+            }));
+          return;
+        }
+        I(i, {
+          action: R.CODEX_LUNA_RESERVE_LIFECYCLE_ACTION_ERROR,
+          errorCode: `missing_usage_status`,
+          source: `thread_header`,
+        });
+      }),
+      (t[0] = n),
+      (t[1] = i),
+      (t[2] = a))
+    : (a = t[2]);
+  let o;
+  t[3] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((o = (0, J.jsx)(`span`, {
+        "aria-hidden": `true`,
+        className: `text-chart-yellow`,
+        children: ue,
+      })),
+      (t[3] = o))
+    : (o = t[3]);
+  let s;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = (0, J.jsxs)(me, {
+        variant: `reserve`,
+        children: [
+          o,
+          (0, J.jsx)(`span`, {
+            className: `brightness-75 dark:brightness-100`,
+            children: (0, J.jsx)(x, {
+              id: `codex.lunaReserve.header.label`,
+              defaultMessage: `Luna reserve`,
+              description: `Short label on the Codex or Work thread-header badge on desktop and web while the user is using their separate Luna Reserve allowance. Clicking the badge opens the backend-provided Luna Reserve explanation and available account actions.`,
             }),
           }),
         ],
+      })),
+      (t[4] = s))
+    : (s = t[4]);
+  let c;
+  return (
+    t[5] === a
+      ? (c = t[6])
+      : ((c = (0, J.jsx)(S, { color: `ghostMuted`, size: `inline`, onClick: a, children: s })),
+        (t[5] = a),
+        (t[6] = c)),
+    c
+  );
+}
+var q, J;
+function Y() {
+  return (Y = e(() => {
+    ((q = t()), z(), o(), f(), _e(), w(), le(), fe(), _(), P(), K(), N(), (J = l()));
+  }))();
+}
+function Oe() {
+  ((0, ke.c)(10), p(re));
+  let e = c(Se);
+  return (r(ve, e?.hostId == null ? (e?.conversationId ?? null) : null), null);
+}
+var ke;
+function Ae() {
+  return (Ae = e(() => {
+    ((ke = t()),
+      o(),
+      ge(),
+      A(),
+      he(),
+      xe(),
+      l(),
+      s(),
+      d(
+        async () =>
+          (
+            await b(
+              async () => {
+                let { OpenPendingSitePreview: e } = await import(
+                  `@rchunk/open-pending-site-preview`
+                );
+                return { OpenPendingSitePreview: e };
+              },
+              __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7]),
+              import.meta.url,
+            )
+          ).OpenPendingSitePreview,
+      ),
+      d(
+        async () =>
+          (
+            await b(
+              async () => {
+                let { SitePreviewPersistenceBridge: e } = await import(
+                  `@rchunk/site-preview-persistence-bridge`
+                );
+                return { SitePreviewPersistenceBridge: e };
+              },
+              __vite__mapDeps([8, 1, 2, 3, 4, 5, 6, 7]),
+              import.meta.url,
+            )
+          ).SitePreviewPersistenceBridge,
+      ));
+  }))();
+}
+function je(e) {
+  let t = (0, Pe.c)(15),
+    { children: n, isOpen: r, onOpenChange: a, shouldPreventAutoFocus: o, trigger: s } = e,
+    c = o !== void 0 && o,
+    l;
+  t[0] === s
+    ? (l = t[1])
+    : ((l = (0, X.jsx)(y, { asChild: !0, children: s })), (t[0] = s), (t[1] = l));
+  let u, d;
+  t[2] === c
+    ? ((u = t[3]), (d = t[4]))
+    : ((u = (e) => {
+        c && e.preventDefault();
       }),
-    ],
-  });
+      (d = (e) => {
+        c && e.preventDefault();
+      }),
+      (t[2] = c),
+      (t[3] = u),
+      (t[4] = d));
+  let f;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((f = { maxHeight: `none`, maxWidth: `none` }), (t[5] = f))
+    : (f = t[5]);
+  let p = r ? n : null,
+    m;
+  t[6] !== u || t[7] !== d || t[8] !== p
+    ? ((m = (0, X.jsx)(i, {
+        align: `end`,
+        side: `bottom`,
+        sideOffset: 16,
+        className: `!w-auto !overflow-visible !rounded-3xl !bg-transparent !p-0 !shadow-none !ring-0 !backdrop-blur-none`,
+        onOpenAutoFocus: u,
+        onCloseAutoFocus: d,
+        onFocusOutside: Ne,
+        onPointerDownOutside: Me,
+        style: f,
+        children: p,
+      })),
+      (t[6] = u),
+      (t[7] = d),
+      (t[8] = p),
+      (t[9] = m))
+    : (m = t[9]);
+  let h;
+  return (
+    t[10] !== r || t[11] !== a || t[12] !== l || t[13] !== m
+      ? ((h = (0, X.jsxs)(te, { open: r, onOpenChange: a, children: [l, m] })),
+        (t[10] = r),
+        (t[11] = a),
+        (t[12] = l),
+        (t[13] = m),
+        (t[14] = h))
+      : (h = t[14]),
+    h
+  );
 }
-
-function LunaReserveButton(props: LunaReserveButtonProps): unknown {
-  const runtime = getJsxRuntime();
-  const scope = useScope(appScope) as any;
-  const eligible = (
-    useParameterizedSignal as unknown as (
-      signal: unknown,
-      key: unknown,
-    ) => unknown
-  )((initialChunk as any).Z8, props.hostId);
-  if (!eligible) return null;
-  const onClick = (): void => {
-    const actions = (initialChunk as any).eP;
-    const track = (initialChunk as any).ZN as (
-      scope: unknown,
-      event: unknown,
-    ) => void;
-    track(scope, {
-      action: actions.CODEX_LUNA_RESERVE_LIFECYCLE_ACTION_HEADER_BUTTON_CLICKED,
-      source: "thread_header",
-    });
-    const rateLimitStatus = scope.query.getData((initialChunk as any).f0t);
-    if (rateLimitStatus != null) {
-      (initialChunk as any).Uzt(scope, LunaReserveDialog, {
-        hostId: props.hostId,
-        rateLimitStatus,
-      });
-      track(scope, {
-        action: actions.CODEX_LUNA_RESERVE_LIFECYCLE_ACTION_MODAL_OPENED,
-        source: "details_modal",
-      });
-      return;
-    }
-    track(scope, {
-      action: actions.CODEX_LUNA_RESERVE_LIFECYCLE_ACTION_ERROR,
-      errorCode: "missing_usage_status",
-      source: "thread_header",
-    });
-  };
-  return runtime.jsx(Button, {
-    color: "ghostMuted",
-    size: "inline",
-    onClick,
-    children: runtime.jsxs((initialChunk as any).fit ?? "span", {
-      variant: "reserve",
-      children: [
-        runtime.jsx("span", {
-          "aria-hidden": true,
-          className: "text-chart-yellow",
-          children: (initialChunk as any).Y8 ?? "✦",
-        }),
-        runtime.jsx("span", {
-          className: "brightness-75 dark:brightness-100",
-          children: runtime.jsx(FormattedMessage, {
-            id: "codex.lunaReserve.header.label",
-            defaultMessage: "Luna reserve",
-          }),
-        }),
-      ],
-    }),
-  });
+function Me(e) {
+  e.target instanceof Element &&
+    e.target.closest(`[data-app-shell-tab-strip-controller="right"]`) != null &&
+    e.preventDefault();
 }
-
-const initializeLunaReserveButton = once((): void => {
-  for (const candidate of [
-    (sharedChunk as any).$3,
-    (initialChunk as any).tP,
-    initializeSignalRuntime,
-    (sharedChunk as any).K2,
-    (initialChunk as any).pit,
-    (sharedChunk as any).h4,
-    (initialChunk as any).Vzt,
-    (initialChunk as any).d0t,
-    (sharedChunk as any).QI,
-    (initialChunk as any).XN,
-  ])
-    callInitializer(candidate);
-  initializeLunaReserveDialog();
-  callInitializer((initialChunk as any).X8);
-  getJsxRuntime();
-});
-
-const initializeLunaReserveDialog = once((): void => {
-  for (const candidate of [
-    (sharedChunk as any).$3,
-    (initialChunk as any).tP,
-    (sharedChunk as any).h4,
-    initializeSignalRuntime,
-    (sharedChunk as any).K2,
-    (sharedChunk as any).Zh,
-    (sharedChunk as any).zh,
-    (sharedChunk as any).Ph,
-    (initialChunk as any).JN,
-    (initialChunk as any).RN,
-    (sharedChunk as any).QI,
-    (sharedChunk as any).dg,
-    (initialChunk as any).XN,
-    (initialChunk as any).X8,
-  ])
-    callInitializer(candidate);
-  getJsxRuntime();
-});
-
-const initializeLatestTurnPreview = once((): void => {
-  callInitializer((sharedChunk as any).$3);
-  callInitializer((sharedChunk as any).h4);
-  callInitializer((sharedChunk as any).K2);
-  callInitializer((conversationBlocksChunk as any).y);
-  callInitializer((primaryChunk as any).Lo);
-  getJsxRuntime();
-});
-
-export {
-  LatestTurnPreviewPopover as a,
-  initializeLatestTurnPreviewLazyComponents as c,
-  toggleLatestTurnPreview as i,
-  LunaReserveButton as l,
-  initializeLatestTurnPreview as n,
-  initializeLatestTurnPreviewPopover as o,
-  initializeLatestTurnPreviewToggle as r,
-  LatestTurnPreviewSideEffects as s,
-  LatestTurnPreview as t,
-  initializeLunaReserveButton as u,
-};
+function Ne(e) {
+  e.target instanceof Element &&
+    e.target.matches(`[role="tabpanel"][data-app-shell-tab-panel-controller="right"]`) &&
+    e.preventDefault();
+}
+var Pe, X;
+function Fe() {
+  return (Fe = e(() => {
+    ((Pe = t()), a(), (X = l()));
+  }))();
+}
+function Ie(e, t = !0) {
+  let n = e.get(V),
+    r = ye(t === !0 ? e.get(M) : e.get(j, t), t);
+  if (n.displayMode !== `overlay`) {
+    t === !0 ? e.set(M, !r) : e.set(j, t, L(t, !r));
+    return;
+  }
+  let i = n.isPopoverOpen || (typeof t != `boolean` && r);
+  (typeof t != `boolean` && e.set(j, t, L(t, !i)), e.set(V, { ...n, isPopoverOpen: !i }));
+}
+function Le() {
+  return (Le = e(() => {
+    (ie(), Ce());
+  }))();
+}
+function Re(e) {
+  let t = (0, ze.c)(33),
+    {
+      expanded: n,
+      headerLabel: r,
+      isTurnInProgress: i,
+      latestTurnContentRef: a,
+      onExpandedChange: o,
+      presentation: s,
+      threadPreview: c,
+    } = e,
+    l = s === void 0 ? `inline` : s,
+    u = l === `inline`,
+    d;
+  t[0] !== n || t[1] !== o || t[2] !== l
+    ? ((d = (e) => {
+        if (l === `floating-visible` && Math.abs(e.deltaY) > Math.abs(e.deltaX)) {
+          e.stopPropagation();
+          let t = e.deltaY > 0;
+          n !== t && o(t);
+        }
+      }),
+      (t[0] = n),
+      (t[1] = o),
+      (t[2] = l),
+      (t[3] = d))
+    : (d = t[3]);
+  let f;
+  t[4] !== r || t[5] !== i
+    ? ((f =
+        r ??
+        (i
+          ? (0, Z.jsx)(x, {
+              id: `composer.latestTurn.working`,
+              defaultMessage: `Working`,
+              description: `Heading shown above the composer when the latest thread turn is still in progress`,
+            })
+          : (0, Z.jsx)(x, {
+              id: `composer.latestTurn`,
+              defaultMessage: `Latest turn`,
+              description: `Heading shown above the latest thread turn preview above the composer`,
+            }))),
+      (t[4] = r),
+      (t[5] = i),
+      (t[6] = f))
+    : (f = t[6]);
+  let p;
+  t[7] !== n || t[8] !== o || t[9] !== d || t[10] !== f
+    ? ((p = (0, Z.jsx)(B.DisclosureRow, {
+        "data-right-panel-composer-overlay-safe-area-header": `true`,
+        expanded: n,
+        onExpandedChange: o,
+        onWheel: d,
+        titleClassName: `truncate`,
+        title: f,
+      })),
+      (t[7] = n),
+      (t[8] = o),
+      (t[9] = d),
+      (t[10] = f),
+      (t[11] = p))
+    : (p = t[11]);
+  let m;
+  t[12] === c
+    ? (m = t[13])
+    : ((m = [{ key: `latest-turn-preview`, node: c }]), (t[12] = c), (t[13] = m));
+  let h;
+  t[14] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((h = { preview: Q, expanded: Q, collapsed: `0px` }), (t[14] = h))
+    : (h = t[14]);
+  let g;
+  t[15] === m
+    ? (g = t[16])
+    : ((g = (0, Z.jsx)(B.Body, {
+        children: (0, Z.jsx)(we, {
+          items: m,
+          allowHorizontalScroll: !0,
+          className: `@container/latest-turn-preview [--edge-fade-distance:1rem] [animation-direction:reverse]`,
+          contentClassName: `gap-0 [&_[data-virtualized-turn-content]]:-ms-2.5 [&_[data-virtualized-turn-content]]:pb-1.5 [&_[data-virtualized-turn-content]]:ps-2.5`,
+          maxHeightByState: h,
+          viewState: `expanded`,
+        }),
+      })),
+      (t[15] = m),
+      (t[16] = g));
+  let _;
+  t[17] !== n || t[18] !== a || t[19] !== g
+    ? ((_ = (0, Z.jsx)(B.DisclosureBody, {
+        ref: a,
+        expanded: n,
+        maxHeight: Q,
+        tabIndex: -1,
+        children: g,
+      })),
+      (t[17] = n),
+      (t[18] = a),
+      (t[19] = g),
+      (t[20] = _))
+    : (_ = t[20]);
+  let v;
+  t[21] !== u || t[22] !== p || t[23] !== _
+    ? ((v = (0, Z.jsxs)(B.Item, { overlap: u, children: [p, _] })),
+      (t[21] = u),
+      (t[22] = p),
+      (t[23] = _),
+      (t[24] = v))
+    : (v = t[24]);
+  let y = v;
+  if (l === `inline`) return y;
+  let b = l !== `floating-hidden`,
+    S = !b,
+    C = l === `floating-hidden` && `delay-75`,
+    w = b ? `translate-y-0 opacity-100` : `pointer-events-none translate-y-full opacity-0`,
+    T;
+  t[25] !== C || t[26] !== w
+    ? ((T = k(
+        `absolute inset-x-10 bottom-0 z-0 transition-[opacity,translate] duration-basic ease-enter-snappy motion-reduce:transition-none`,
+        C,
+        w,
+      )),
+      (t[25] = C),
+      (t[26] = w),
+      (t[27] = T))
+    : (T = t[27]);
+  let E = !b,
+    D;
+  return (
+    t[28] !== y || t[29] !== S || t[30] !== T || t[31] !== E
+      ? ((D = (0, Z.jsx)(`div`, { "aria-hidden": S, className: T, inert: E, children: y })),
+        (t[28] = y),
+        (t[29] = S),
+        (t[30] = T),
+        (t[31] = E),
+        (t[32] = D))
+      : (D = t[32]),
+    D
+  );
+}
+var ze, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((ze = t()), D(), f(), Te(), be(), (Z = l()), (Q = `22.5rem`));
+  }))();
+}
+export { je as a, Ae as c, Ie as i, De as l, $ as n, Fe as o, Le as r, Oe as s, Re as t, Y as u };

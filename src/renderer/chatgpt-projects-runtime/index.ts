@@ -1,8 +1,13 @@
-import "@rchunk/rolldown-runtime";
-const t = { $type: "protobuf_analytics_events.v1.ChatgptProjectFileLimitUpgradeClicked" } as const;
-const n = { $type: "protobuf_analytics_events.v1.ChatgptProjectSettingsOpened" } as const;
-const a = { $type: "protobuf_analytics_events.v1.ChatgptProjectSettingsSaveInitiated" } as const;
-const r = { $type: "protobuf_analytics_events.v1.ChatgptProjectSettingsSaveCompleted" } as const;
-const i = { $type: "protobuf_analytics_events.v1.ChatgptProjectSettingsSaveFailed" } as const;
-function o(): void {}
-export { a, i, n, o, r, t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = { $type: `protobuf_analytics_events.v1.ChatgptProjectFileLimitUpgradeClicked` }),
+      (n = { $type: `protobuf_analytics_events.v1.ChatgptProjectSettingsOpened` }),
+      (r = { $type: `protobuf_analytics_events.v1.ChatgptProjectSettingsSaveInitiated` }),
+      (i = { $type: `protobuf_analytics_events.v1.ChatgptProjectSettingsSaveCompleted` }),
+      (a = { $type: `protobuf_analytics_events.v1.ChatgptProjectSettingsSaveFailed` }));
+  }))();
+}
+export { r as a, a as i, n, o, i as r, t };

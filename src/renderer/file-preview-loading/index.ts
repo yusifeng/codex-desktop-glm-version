@@ -1,119 +1,162 @@
-// Loading surface for file previews. Release chunk: loading-cba17c98d28e.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as editorHeaderChunk from "@rchunk/editor-header";
-import * as headerFadeChunk from "@rchunk/header-content-fade";
-import * as headerControlsChunk from "@rchunk/editor-header-controls";
-import * as loadingControlsChunk from "@rchunk/loading-controls";
-
-interface Props {
-  downloadOptions?: unknown;
-  fileName: string;
-  libraryFileId?: string | null;
-  onClose?: () => void;
-  onDownload?: () => unknown;
-  previewTabId?: string;
-  textDocumentPreviewKind?: unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  HX as r,
+  I3 as i,
+  LX as a,
+  h4 as o,
+  iL as s,
+  m4 as c,
+  rL as l,
+} from "@rchunk/app-shared";
+import {
+  $en as u,
+  DR as d,
+  Let as f,
+  QUt as p,
+  Ret as m,
+  Rrt as h,
+  Sun as g,
+  XUt as _,
+  Xrt as v,
+  YUt as y,
+  itn as b,
+  kR as x,
+  mun as S,
+} from "@rchunk/app-initial";
+import { r as C, t as w } from "@rchunk/editor-header";
+import { i as T, n as E, r as D, t as O } from "@rchunk/header-content-fade";
+import { n as k, t as A } from "@rchunk/editor-header-controls";
+import { n as j, t as M } from "@rchunk/loading-controls";
+function N(e) {
+  let t = (0, P.c)(43),
+    {
+      downloadOptions: n,
+      fileName: i,
+      libraryFileId: o,
+      onClose: l,
+      onDownload: d,
+      previewTabId: m,
+      textDocumentPreviewKind: h,
+    } = e,
+    g = a(u),
+    _ = r(S),
+    b = r(!1),
+    C;
+  t[0] !== n || t[1] !== d || t[2] !== g
+    ? ((C = { mutationFn: () => d?.() ?? x(g, n) }), (t[0] = n), (t[1] = d), (t[2] = g), (t[3] = C))
+    : (C = t[3]);
+  let { isPending: T, mutate: E } = s(C),
+    k,
+    j,
+    N,
+    I;
+  if (t[4] !== i || t[5] !== h) {
+    N = Symbol.for(`react.early_return_sentinel`);
+    bb0: {
+      ((k = y(i)), (I = h != null));
+      let e = I ? `text-document` : k?.importKind;
+      if (e == null || (e !== `text-document` && !p(e))) {
+        let e;
+        (t[10] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, F.jsx)(f, { debugName: `ChatGptFilePreview`, fillParent: !0 })), (t[10] = e))
+          : (e = t[10]),
+          (N = e));
+        break bb0;
+      }
+      j = O(e);
+    }
+    ((t[4] = i), (t[5] = h), (t[6] = k), (t[7] = j), (t[8] = N), (t[9] = I));
+  } else ((k = t[6]), (j = t[7]), (N = t[8]), (I = t[9]));
+  if (N !== Symbol.for(`react.early_return_sentinel`)) return N;
+  let L = j,
+    R = I || k?.artifactType === `spreadsheet` ? `bg-surface` : `bg-background-artifact-preview`,
+    z;
+  t[11] === R
+    ? (z = t[12])
+    : ((z = c(`relative flex h-full min-h-0 flex-col`, R)), (t[11] = R), (t[12] = z));
+  let B;
+  t[13] === o
+    ? (B = t[14])
+    : ((B = o == null ? null : (0, F.jsx)(D, { libraryFileId: o })), (t[13] = o), (t[14] = B));
+  let V;
+  t[15] !== i || t[16] !== B
+    ? ((V = (0, F.jsx)(v, { libraryBreadcrumb: B, title: i })),
+      (t[15] = i),
+      (t[16] = B),
+      (t[17] = V))
+    : (V = t[17]);
+  let H;
+  t[18] !== k?.importKind || t[19] !== I
+    ? ((H = I ? A : M({ paginated: k?.importKind === `docx` || k?.importKind === `pdf` })),
+      (t[18] = k?.importKind),
+      (t[19] = I),
+      (t[20] = H))
+    : (H = t[20]);
+  let U;
+  t[21] === E ? (U = t[22]) : ((U = () => E()), (t[21] = E), (t[22] = U));
+  let W;
+  t[23] !== _ || t[24] !== i || t[25] !== o || t[26] !== g || t[27] !== b
+    ? ((W = void 0), (t[23] = _), (t[24] = i), (t[25] = o), (t[26] = g), (t[27] = b), (t[28] = W))
+    : (W = t[28]);
+  let G;
+  t[29] !== L ||
+  t[30] !== T ||
+  t[31] !== i ||
+  t[32] !== l ||
+  t[33] !== m ||
+  t[34] !== W ||
+  t[35] !== V ||
+  t[36] !== H ||
+  t[37] !== U
+    ? ((G = (0, F.jsx)(w, {
+        actions: V,
+        contentFade: L,
+        controls: H,
+        downloadPending: T,
+        onClose: l,
+        onDownload: U,
+        onShare: W,
+        tabId: m,
+        title: i,
+      })),
+      (t[29] = L),
+      (t[30] = T),
+      (t[31] = i),
+      (t[32] = l),
+      (t[33] = m),
+      (t[34] = W),
+      (t[35] = V),
+      (t[36] = H),
+      (t[37] = U),
+      (t[38] = G))
+    : (G = t[38]);
+  let K;
+  t[39] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((K = (0, F.jsx)(`div`, {
+        className: `relative min-h-0 flex-1`,
+        children: (0, F.jsx)(f, { debugName: `ChatGptFilePreview`, fillParent: !0 }),
+      })),
+      (t[39] = K))
+    : (K = t[39]);
+  let q;
+  return (
+    t[40] !== G || t[41] !== z
+      ? ((q = (0, F.jsxs)(`section`, { className: z, children: [G, K] })),
+        (t[40] = G),
+        (t[41] = z),
+        (t[42] = q))
+      : (q = t[42]),
+    q
+  );
 }
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>): unknown;
+var P, F;
+function I() {
+  return (I = e(() => {
+    ((P = t()), l(), o(), n(), _(), C(), k(), E(), j(), g(), T(), m(), b(), h(), d(), (F = i()));
+  }))();
 }
-interface SharedRuntime {
-  I3(): JsxRuntime;
-  m4(...classNames: Array<string | false | null | undefined>): string;
-  [key: string]: unknown;
-}
-
-const shared = appSharedChunk as unknown as SharedRuntime;
-const initial = appInitialChunk as unknown as Record<string, unknown>;
-const editorHeader = editorHeaderChunk as unknown as Record<string, unknown>;
-const headerFade = headerFadeChunk as unknown as Record<string, unknown>;
-const headerControls = headerControlsChunk as unknown as Record<
-  string,
-  unknown
->;
-const loadingControls = loadingControlsChunk as unknown as Record<
-  string,
-  unknown
->;
-const jsxRuntime = shared.I3();
-
-function callInitializer(runtime: Record<string, unknown>, name: string): void {
-  const value = runtime[name];
-  if (typeof value === "function") (value as () => void)();
-}
-
-function ChatGptFilePreviewLoading(props: Props): unknown {
-  const classify = initial.YUt as
-    | ((
-        fileName: string,
-      ) => { importKind?: string; artifactType?: string } | undefined)
-    | undefined;
-  const fileType = classify?.(props.fileName);
-  const isTextDocument = props.textDocumentPreviewKind != null;
-  const importKind = isTextDocument ? "text-document" : fileType?.importKind;
-  const isSupported = initial.QUt as ((kind: string) => boolean) | undefined;
-  const Spinner = initial.Let;
-  if (
-    importKind == null ||
-    (importKind !== "text-document" && !isSupported?.(importKind))
-  ) {
-    return jsxRuntime.jsx(Spinner, {
-      debugName: "ChatGptFilePreview",
-      fillParent: true,
-    });
-  }
-  const contentFade = (
-    headerFade.t as ((kind: string) => unknown) | undefined
-  )?.(importKind);
-  const background =
-    isTextDocument || fileType?.artifactType === "spreadsheet"
-      ? "bg-surface"
-      : "bg-background-artifact-preview";
-  const controls = isTextDocument
-    ? headerControls.t
-    : (
-        loadingControls.t as
-          ((options: { paginated: boolean }) => unknown) | undefined
-      )?.({
-        paginated: importKind === "docx" || importKind === "pdf",
-      });
-  const Header = editorHeader.t;
-  return jsxRuntime.jsxs("section", {
-    className: shared.m4("relative flex h-full min-h-0 flex-col", background),
-    children: [
-      jsxRuntime.jsx(Header, {
-        actions: null,
-        contentFade,
-        controls,
-        downloadPending: false,
-        onClose: props.onClose,
-        onDownload: props.onDownload,
-        tabId: props.previewTabId,
-        title: props.fileName,
-      }),
-      jsxRuntime.jsx("div", {
-        className: "relative min-h-0 flex-1",
-        children: jsxRuntime.jsx(Spinner, {
-          debugName: "ChatGptFilePreview",
-          fillParent: true,
-        }),
-      }),
-    ],
-  });
-}
-
-for (const [runtime, names] of [
-  [shared as unknown as Record<string, unknown>, ["rL", "h4", "FX"]],
-  [initial, ["XUt", "Sun", "Ret", "itn", "Rrt", "DR"]],
-  [editorHeader, ["r"]],
-  [headerFade, ["n", "r", "i"]],
-  [headerControls, ["n"]],
-  [loadingControls, ["n"]],
-] as Array<[Record<string, unknown>, string[]]>) {
-  for (const name of names) callInitializer(runtime, name);
-}
-
-export { ChatGptFilePreviewLoading };
+I();
+export { N as ChatGptFilePreviewLoading };

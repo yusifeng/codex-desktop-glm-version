@@ -1,10 +1,45 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import { rJt as apiClient } from "@rchunk/app-initial";
-import "@rchunk/stripe-pure";
-interface StripeApi { safeGet<Response>(path: string, options: Record<string, unknown>): Promise<Response> }
-const client = apiClient as unknown as StripeApi;
-function stripeAppearance(dark: boolean): Record<string, unknown> { const style = typeof document === "undefined" ? null : getComputedStyle(document.body); const value = (name: string) => style?.getPropertyValue(name).trim() || undefined; return { theme: dark ? "night" : "stripe", labels: "floating", variables: { colorPrimary: value("--color-text"), colorText: style?.color || undefined, colorTextPlaceholder: value("--color-text-tertiary"), colorBackground: value("--color-background-primary-soft"), colorDanger: value("--color-text-danger"), fontFamily: style?.fontFamily || undefined, fontSizeBase: value("--text-sm"), borderRadius: value("--radius-md"), spacingUnit: value("--spacing") } }; }
-function stripeClientQuery(accountId: string) { return { queryKey: ["consumer-billing-setup", accountId, "stripe-client"], queryFn: async ({ signal }: { signal?: AbortSignal }) => { const response = await client.safeGet<{ publishable_key: string; currency: string }>("/payments/stripe_client_bootstrap", { parameters: { query: { account_id: accountId } }, signal }); return { stripe: response.publishable_key, currency: response.currency }; }, staleTime: Infinity, retry: false }; }
-function initializeStripeClient(): void {}
-export { initializeStripeClient as n, stripeClientQuery as r, stripeAppearance as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { pL as t } from "@rchunk/app-shared";
+import { pdn as n, udn as r } from "@rchunk/app-initial";
+import { r as i, t as a } from "@rchunk/stripe-pure";
+function o(e) {
+  let t = getComputedStyle(document.body);
+  return {
+    theme: e ? `night` : `stripe`,
+    labels: `floating`,
+    variables: {
+      colorPrimary: t.getPropertyValue(`--color-text`).trim() || void 0,
+      colorText: t.color || void 0,
+      colorTextPlaceholder: t.getPropertyValue(`--color-text-tertiary`).trim() || void 0,
+      colorBackground: t.getPropertyValue(`--color-background-primary-soft`).trim() || void 0,
+      colorDanger: t.getPropertyValue(`--color-text-danger`).trim() || void 0,
+      fontFamily: t.fontFamily || void 0,
+      fontSizeBase: t.getPropertyValue(`--text-sm`).trim() || void 0,
+      borderRadius: t.getPropertyValue(`--radius-md`).trim() || void 0,
+      spacingUnit: t.getPropertyValue(`--spacing`).trim() || void 0,
+    },
+  };
+}
+function s(e) {
+  return t({
+    queryKey: [`consumer-billing-setup`, e, `stripe-client`],
+    queryFn: async ({ signal: t }) => {
+      let n = await r.safeGet(`/payments/stripe_client_bootstrap`, {
+          parameters: { query: { account_id: e } },
+          signal: t,
+        }),
+        a = await i(n.publishable_key);
+      if (a == null) throw Error(`Could not load payment form`);
+      return { stripe: a, currency: n.currency };
+    },
+    staleTime: 1 / 0,
+    retry: !1,
+  });
+}
+function c() {
+  return (c = e(() => {
+    (a(), n());
+  }))();
+}
+export { c as n, s as r, o as t };

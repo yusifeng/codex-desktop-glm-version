@@ -1,50 +1,59 @@
-import "@rchunk/rolldown-runtime";
-
-export type PermissionPath =
-  | { type: "path"; path: string }
-  | { type: "glob_pattern"; pattern: string }
-  | { type: "special"; value: { kind: "root" | "minimal" | "tmpdir" | "slash_tmp" } | { kind: "project_roots"; subpath?: string | null } | { kind: "unknown"; path: string; subpath?: string | null } };
-export interface PermissionRequest {
-  network?: unknown;
-  fileSystem?: { entries?: Array<{ access: "read" | "write"; path: PermissionPath }> } | null;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e) {
+  let t = [];
+  if ((e.network != null && t.push({ kind: `network` }), e.fileSystem == null)) return t;
+  let r = new Set(),
+    i = new Set();
+  for (let t of e.fileSystem.entries ?? []) {
+    let e = n(t.path);
+    switch (t.access) {
+      case `read`:
+        r.add(e);
+        break;
+      case `write`:
+        i.add(e);
+    }
+  }
+  let a = Array.from(r),
+    o = Array.from(i),
+    s = a.filter((e) => i.has(e)),
+    c = a.filter((e) => !i.has(e)),
+    l = o.filter((e) => !r.has(e));
+  return (
+    s.length > 0 && t.push({ kind: `fileSystem`, access: `readWrite`, paths: s }),
+    c.length > 0 && t.push({ kind: `fileSystem`, access: `read`, paths: c }),
+    l.length > 0 && t.push({ kind: `fileSystem`, access: `write`, paths: l }),
+    t
+  );
 }
-export type PermissionGroup =
-  | { kind: "network" }
-  | { kind: "fileSystem"; access: "read" | "write" | "readWrite"; paths: string[] };
-
-function permissionPathLabel(path: PermissionPath): string {
-  if (path.type === "path") return path.path;
-  if (path.type === "glob_pattern") return path.pattern;
-  const value = path.value;
-  switch (value.kind) {
-    case "root": return "/";
-    case "minimal": return ":minimal";
-    case "project_roots": return value.subpath == null ? ":project_roots" : `:project_roots/${value.subpath}`;
-    case "tmpdir": return ":tmpdir";
-    case "slash_tmp": return "/tmp";
-    case "unknown": return value.subpath == null ? value.path : `${value.path}/${value.subpath}`;
+function n(e) {
+  switch (e.type) {
+    case `path`:
+      return e.path;
+    case `glob_pattern`:
+      return e.pattern;
+    case `special`:
+      return r(e.value);
   }
 }
-
-function groupPermissionRequest(request: PermissionRequest): PermissionGroup[] {
-  const groups: PermissionGroup[] = [];
-  if (request.network != null) groups.push({ kind: "network" });
-  if (request.fileSystem == null) return groups;
-  const read = new Set<string>();
-  const write = new Set<string>();
-  for (const entry of request.fileSystem.entries ?? []) {
-    const label = permissionPathLabel(entry.path);
-    if (entry.access === "read") read.add(label);
-    else write.add(label);
+function r(e) {
+  switch (e.kind) {
+    case `root`:
+      return `/`;
+    case `minimal`:
+      return `:minimal`;
+    case `project_roots`:
+      return e.subpath == null ? `:project_roots` : `:project_roots/${e.subpath}`;
+    case `tmpdir`:
+      return `:tmpdir`;
+    case `slash_tmp`:
+      return `/tmp`;
+    case `unknown`:
+      return e.subpath == null ? e.path : `${e.path}/${e.subpath}`;
   }
-  const readWrite = [...read].filter((path) => write.has(path));
-  const readOnly = [...read].filter((path) => !write.has(path));
-  const writeOnly = [...write].filter((path) => !read.has(path));
-  if (readWrite.length) groups.push({ kind: "fileSystem", access: "readWrite", paths: readWrite });
-  if (readOnly.length) groups.push({ kind: "fileSystem", access: "read", paths: readOnly });
-  if (writeOnly.length) groups.push({ kind: "fileSystem", access: "write", paths: writeOnly });
-  return groups;
 }
-
-function initializePermissionRequestModel(): void {}
-export { initializePermissionRequestModel as n, groupPermissionRequest as t };
+function i() {
+  return (i = e(() => {}))();
+}
+export { i as n, t };

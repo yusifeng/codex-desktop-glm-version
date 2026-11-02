@@ -1,89 +1,102 @@
-// appgen-settings-dialog —— Site 项目设置页的宽屏弹窗宿主。
-// 原版：app/webview/assets/appgen-settings-dialog-22832d8eda26.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appgenSettingsPageChunk from "@rchunk/appgen-settings-page";
-
-void runtimeChunk;
-const {
-  $3: initializeRuntimeLazy,
-  Ah: DialogHeader,
-  I3: getJsxRuntime,
-  Ih: Dialog,
-  K2: initializeSharedComponents,
-  Oh: DialogBody,
-  Ph: initializeDialogLayout,
-  Rh: DialogTitle,
-  Y2: FormattedMessage,
-  n4: useIntl,
-  zh: initializeDialog,
-} = appSharedChunk;
-const { r: initializeAppgenSettingsPage, t: AppgenSettingsPage } =
-  appgenSettingsPageChunk;
-const jsx = getJsxRuntime();
-
-interface AppgenSettingsDialogProps {
-  onClose(): void;
-  projectId: string;
-}
-
-function AppgenSettingsDialog({
-  onClose,
-  projectId,
-}: AppgenSettingsDialogProps): unknown {
-  const intl = useIntl();
-  const title = jsx.jsx(FormattedMessage, {
-    id: "appgenSettings.dialog.title",
-    defaultMessage: "Site settings",
-    description: "Title for the Site settings dialog",
-  });
-  const dialogCloseLabel = intl.formatMessage({
-    id: "appgenSettings.dialog.close",
-    defaultMessage: "Close Site settings",
-    description: "Accessible label for closing the Site settings dialog",
-  });
-  const handleOpenChange = (open: boolean) => {
-    if (!open) onClose();
-  };
-  const heading = jsx.jsxs("div", {
-    className: "flex w-full flex-col px-4 pt-3",
-    children: [
-      jsx.jsx(DialogTitle, { className: "sr-only", children: title }),
-      jsx.jsx(DialogHeader, {
-        title,
-        titleClassName: "truncate pe-8",
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Ah as n,
+  I3 as r,
+  Ih as i,
+  K2 as a,
+  Oh as o,
+  Ph as s,
+  Rh as c,
+  Y2 as l,
+  n4 as u,
+  zh as d,
+} from "@rchunk/app-shared";
+import { r as f, t as p } from "@rchunk/appgen-settings-page";
+function m(e) {
+  let t = (0, h.c)(14),
+    { onClose: r, projectId: a } = e,
+    s = u(),
+    d;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = (0, g.jsx)(l, {
+        id: `appgenSettings.dialog.title`,
+        defaultMessage: `Site settings`,
+        description: `Title for the Site settings dialog`,
+      })),
+      (t[0] = d))
+    : (d = t[0]);
+  let f = d,
+    m;
+  t[1] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((m = { "aria-describedby": void 0 }), (t[1] = m))
+    : (m = t[1]);
+  let _;
+  t[2] === s
+    ? (_ = t[3])
+    : ((_ = s.formatMessage({
+        id: `appgenSettings.dialog.close`,
+        defaultMessage: `Close Site settings`,
+        description: `Accessible label for closing the Site settings dialog`,
+      })),
+      (t[2] = s),
+      (t[3] = _));
+  let v;
+  t[4] === r
+    ? (v = t[5])
+    : ((v = (e) => {
+        e || r();
       }),
-    ],
-  });
-  const content = jsx.jsxs(DialogBody, {
-    className: "!px-1 !py-1",
-    size: "full",
-    children: [
-      heading,
-      jsx.jsx(AppgenSettingsPage, { projectId, onDeleted: onClose }),
-    ],
-  });
-
-  return jsx.jsx(Dialog, {
-    open: true,
-    contentClassName: "h-[720px] max-h-[92vh]",
-    contentProps: { "aria-describedby": undefined },
-    dialogCloseLabel,
-    size: "xwide",
-    onOpenChange: handleOpenChange,
-    children: content,
-  });
+      (t[4] = r),
+      (t[5] = v));
+  let y;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((y = (0, g.jsxs)(`div`, {
+        className: `flex w-full flex-col px-4 pt-3`,
+        children: [
+          (0, g.jsx)(c, { className: `sr-only`, children: f }),
+          (0, g.jsx)(n, { title: f, titleClassName: `truncate pe-8` }),
+        ],
+      })),
+      (t[6] = y))
+    : (y = t[6]);
+  let b;
+  t[7] !== r || t[8] !== a
+    ? ((b = (0, g.jsxs)(o, {
+        className: `!px-1 !py-1`,
+        size: `full`,
+        children: [y, (0, g.jsx)(p, { projectId: a, onDeleted: r })],
+      })),
+      (t[7] = r),
+      (t[8] = a),
+      (t[9] = b))
+    : (b = t[9]);
+  let x;
+  return (
+    t[10] !== _ || t[11] !== v || t[12] !== b
+      ? ((x = (0, g.jsx)(i, {
+          open: !0,
+          contentClassName: `h-[720px] max-h-[92vh]`,
+          contentProps: m,
+          dialogCloseLabel: _,
+          size: `xwide`,
+          onOpenChange: v,
+          children: b,
+        })),
+        (t[10] = _),
+        (t[11] = v),
+        (t[12] = b),
+        (t[13] = x))
+      : (x = t[13]),
+    x
+  );
 }
-
-function initializeAppgenSettingsDialog(): void {
-  initializeRuntimeLazy();
-  initializeSharedComponents();
-  initializeDialog();
-  initializeDialogLayout();
-  initializeAppgenSettingsPage();
+var h, g;
+function _() {
+  return (_ = e(() => {
+    ((h = t()), a(), d(), s(), f(), (g = r()));
+  }))();
 }
-
-initializeAppgenSettingsDialog();
-
-export { AppgenSettingsDialog };
+_();
+export { m as AppgenSettingsDialog };

@@ -1,35 +1,81 @@
-// Sequential physical stages that create a mountain rain shadow.
-import "@rchunk/rolldown-runtime";
-
-type RainShadowStage = "moist-air-rises" | "clouds-form" | "rain-falls" | "dry-air-descends";
-interface RainShadowValues { stageIndex?: number | null }
-interface OptionalMessageFormatter { formatMessage(descriptor: { id: string; defaultMessage: string }): string }
-
-const rainShadowStages: RainShadowStage[] = ["moist-air-rises", "clouds-form", "rain-falls", "dry-air-descends"];
-const stageIndexControl = { min: 0, max: 3, step: 1, defaultValue: 0 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeRainShadowValues = (values: RainShadowValues) => ({
-  stageIndex: clamp(typeof values.stageIndex === "number" && Number.isFinite(values.stageIndex) ? Math.round(values.stageIndex) : stageIndexControl.defaultValue, stageIndexControl.min, stageIndexControl.max),
-});
-const currentRainShadowStage = (values: RainShadowValues): RainShadowStage => rainShadowStages[normalizeRainShadowValues(values).stageIndex] ?? rainShadowStages[0];
-const formatOptional = (formatter: OptionalMessageFormatter | undefined, id: string, defaultMessage: string): string => formatter ? formatter.formatMessage({ id, defaultMessage }) : defaultMessage;
-const rainShadowStageTitle = (stage: RainShadowStage, formatter?: OptionalMessageFormatter): string => {
-  switch (stage) {
-    case "moist-air-rises": return formatOptional(formatter, "learningBlock.rainShadow.stage.moistAirRises.title", "Moist air rises");
-    case "clouds-form": return formatOptional(formatter, "learningBlock.rainShadow.stage.cloudsForm.title", "Clouds form");
-    case "rain-falls": return formatOptional(formatter, "learningBlock.rainShadow.stage.rainFalls.title", "Rain falls");
-    case "dry-air-descends": return formatOptional(formatter, "learningBlock.rainShadow.stage.dryAirDescends.title", "Dry air descends");
-  }
-};
-const rainShadowCaption = (values: RainShadowValues, formatter?: OptionalMessageFormatter): string => {
-  switch (currentRainShadowStage(values)) {
-    case "moist-air-rises": return formatOptional(formatter, "learningBlock.rainShadow.stage.moistAirRises.caption", "Moist ocean air rises up the windward slope.");
-    case "clouds-form": return formatOptional(formatter, "learningBlock.rainShadow.stage.cloudsForm.caption", "Rising air cools and condenses into clouds.");
-    case "rain-falls": return formatOptional(formatter, "learningBlock.rainShadow.stage.rainFalls.caption", "Rain falls on the windward slope, drying the air.");
-    case "dry-air-descends": return formatOptional(formatter, "learningBlock.rainShadow.stage.dryAirDescends.caption", "Descending dry air warms, creating a rain shadow.");
-  }
-};
-
-function initializeRainShadowModel(): void {}
-
-export { rainShadowStageTitle as a, rainShadowCaption as i, stageIndexControl as n, initializeRainShadowModel as o, currentRainShadowStage as r, normalizeRainShadowValues as s, rainShadowStages as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c;
+function l() {
+  return (l = e(() => {
+    ((t = [`moist-air-rises`, `clouds-form`, `rain-falls`, `dry-air-descends`]),
+      (n = { min: 0, max: 3, defaultValue: 0 }),
+      (r = { min: n.min, max: n.max, step: 1, defaultValue: n.defaultValue }),
+      (i = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (a = (e) => {
+        let t = Number.isFinite(e.stageIndex) ? Math.round(e.stageIndex) : r.defaultValue;
+        return { stageIndex: i(t, r.min, r.max) };
+      }),
+      (o = (e) => t[a(e).stageIndex]),
+      (s = (e, t) => {
+        switch (e) {
+          case `moist-air-rises`:
+            return t
+              ? t.formatMessage({
+                  id: `learningBlock.rainShadow.stage.moistAirRises.title`,
+                  defaultMessage: `Moist air rises`,
+                })
+              : `Moist air rises`;
+          case `clouds-form`:
+            return t
+              ? t.formatMessage({
+                  id: `learningBlock.rainShadow.stage.cloudsForm.title`,
+                  defaultMessage: `Clouds form`,
+                })
+              : `Clouds form`;
+          case `rain-falls`:
+            return t
+              ? t.formatMessage({
+                  id: `learningBlock.rainShadow.stage.rainFalls.title`,
+                  defaultMessage: `Rain falls`,
+                })
+              : `Rain falls`;
+          case `dry-air-descends`:
+            return t
+              ? t.formatMessage({
+                  id: `learningBlock.rainShadow.stage.dryAirDescends.title`,
+                  defaultMessage: `Dry air descends`,
+                })
+              : `Dry air descends`;
+        }
+      }),
+      (c = (e, t) => {
+        switch (o(e)) {
+          case `moist-air-rises`:
+            return t
+              ? t.formatMessage({
+                  id: `learningBlock.rainShadow.stage.moistAirRises.caption`,
+                  defaultMessage: `Moist ocean air rises up the windward slope.`,
+                })
+              : `Moist ocean air rises up the windward slope.`;
+          case `clouds-form`:
+            return t
+              ? t.formatMessage({
+                  id: `learningBlock.rainShadow.stage.cloudsForm.caption`,
+                  defaultMessage: `Rising air cools and condenses into clouds.`,
+                })
+              : `Rising air cools and condenses into clouds.`;
+          case `rain-falls`:
+            return t
+              ? t.formatMessage({
+                  id: `learningBlock.rainShadow.stage.rainFalls.caption`,
+                  defaultMessage: `Rain falls on the windward slope, drying the air.`,
+                })
+              : `Rain falls on the windward slope, drying the air.`;
+          case `dry-air-descends`:
+            return t
+              ? t.formatMessage({
+                  id: `learningBlock.rainShadow.stage.dryAirDescends.caption`,
+                  defaultMessage: `Descending dry air warms, creating a rain shadow.`,
+                })
+              : `Descending dry air warms, creating a rain shadow.`;
+        }
+      }));
+  }))();
+}
+export { s as a, c as i, r as n, l as o, o as r, a as s, t };

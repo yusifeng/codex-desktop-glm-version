@@ -1,64 +1,82 @@
-// Rolle's theorem learning model with equal endpoints and a stationary vertex.
-import "@rchunk/rolldown-runtime";
-
-interface RolleValues { leftX?: number | null; rightX?: number | null; endpointY?: number | null; vertexOffset?: number | null }
-
-const rollesTheoremType = "ROLLES_THEOREM";
-const rollesTheoremThumbnail = "rolles-theorem-v1";
-const rollesTheoremFormula = "f(a)=f(b)\\implies\\exists\\,c\\in(a,b):f'(c)=0";
-const rollesTheoremParameters = { endpointY: { kind: "number", defaultValue: -2, min: -10, max: 10 }, vertexOffset: { kind: "number", defaultValue: 6, min: -10, max: 10 } };
-const rollesTheoremDefinition = { type: rollesTheoremType, version: 1, thumbnailAssetKey: rollesTheoremThumbnail, canonicalFormula: rollesTheoremFormula, parameters: rollesTheoremParameters };
-const minimumEndpointSeparation = 2;
-const xBounds = { min: -10, max: 10 };
-const minimumViewportSpan = 8;
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(maximum, Math.max(minimum, value));
-const finiteOr = (value: number | null | undefined, fallback: number): number => Number.isFinite(value) ? Number(value) : fallback;
-const expandRange = (minimum: number, maximum: number, span: number): [number, number] => {
-  if (maximum - minimum >= span) return [minimum, maximum];
-  const center = (minimum + maximum) / 2;
-  return [center - span / 2, center + span / 2];
-};
-const defaultRolleValues = { leftX: -4, rightX: 4, endpointY: rollesTheoremDefinition.parameters.endpointY.defaultValue, vertexOffset: rollesTheoremDefinition.parameters.vertexOffset.defaultValue };
-
-function normalizeRolleValues(values: RolleValues) {
-  const firstX = clamp(finiteOr(values.leftX, defaultRolleValues.leftX), xBounds.min, xBounds.max);
-  const secondX = clamp(finiteOr(values.rightX, defaultRolleValues.rightX), xBounds.min, xBounds.max);
-  let leftX = Math.min(firstX, secondX);
-  let rightX = Math.max(firstX, secondX);
-  if (rightX - leftX < minimumEndpointSeparation) {
-    const center = (leftX + rightX) / 2;
-    leftX = clamp(center - minimumEndpointSeparation / 2, xBounds.min, xBounds.max - minimumEndpointSeparation);
-    rightX = leftX + minimumEndpointSeparation;
-  }
-  return {
-    leftX, rightX,
-    endpointY: clamp(finiteOr(values.endpointY, defaultRolleValues.endpointY), rollesTheoremDefinition.parameters.endpointY.min, rollesTheoremDefinition.parameters.endpointY.max),
-    vertexOffset: clamp(finiteOr(values.vertexOffset, defaultRolleValues.vertexOffset), rollesTheoremDefinition.parameters.vertexOffset.min, rollesTheoremDefinition.parameters.vertexOffset.max),
-  };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `ROLLES_THEOREM`),
+      (n = `rolles-theorem-v1`),
+      (r = `f(a)=f(b)\\implies\\exists\\,c\\in(a,b):f'(c)=0`),
+      (i = {
+        endpointY: { kind: `number`, defaultValue: -2, min: -10, max: 10 },
+        vertexOffset: { kind: `number`, defaultValue: 6, min: -10, max: 10 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-
-function deriveRolleTheoremState(values: RolleValues) {
-  const normalized = normalizeRolleValues(values);
-  const centerX = (normalized.leftX + normalized.rightX) / 2;
-  const halfWidth = (normalized.rightX - normalized.leftX) / 2;
-  const vertexY = normalized.endpointY + normalized.vertexOffset;
-  const xPadding = Math.max(1.5, halfWidth * 0.35);
-  const yPadding = Math.max(1.5, Math.abs(normalized.vertexOffset) * 0.28);
-  const [xMin, xMax] = expandRange(normalized.leftX - xPadding, normalized.rightX + xPadding, minimumViewportSpan);
-  const [yMin, yMax] = expandRange(Math.min(normalized.endpointY, vertexY) - yPadding, Math.max(normalized.endpointY, vertexY) + yPadding, minimumViewportSpan);
-  return { values: normalized, centerX, halfWidth, vertexY, pointA: { x: normalized.leftX, y: normalized.endpointY }, pointB: { x: normalized.rightX, y: normalized.endpointY }, stationaryPoint: { x: centerX, y: vertexY }, viewport: { xMin, xMax, yMin, yMax } };
+var s, c, l, u, d, f, p, m, h, g;
+function _() {
+  return (_ = e(() => {
+    (o(),
+      (s = 2),
+      (c = { min: -10, max: 10 }),
+      (l = 8),
+      (u = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (d = (e, t) => (Number.isFinite(e) ? Number(e) : t)),
+      (f = (e, t, n) => {
+        if (t - e >= n) return [e, t];
+        let r = (e + t) / 2;
+        return [r - n / 2, r + n / 2];
+      }),
+      (p = {
+        leftX: -4,
+        rightX: 4,
+        endpointY: a.parameters.endpointY.defaultValue,
+        vertexOffset: a.parameters.vertexOffset.defaultValue,
+      }),
+      (m = (e) => {
+        let t = u(d(e.leftX, p.leftX), c.min, c.max),
+          n = u(d(e.rightX, p.rightX), c.min, c.max),
+          r = Math.min(t, n),
+          i = Math.max(t, n);
+        if (i - r < s) {
+          let e = (r + i) / 2;
+          ((r = u(e - s / 2, c.min, c.max - s)), (i = r + s));
+        }
+        let o = u(
+            d(e.endpointY, p.endpointY),
+            a.parameters.endpointY.min,
+            a.parameters.endpointY.max,
+          ),
+          l = u(
+            d(e.vertexOffset, p.vertexOffset),
+            a.parameters.vertexOffset.min,
+            a.parameters.vertexOffset.max,
+          );
+        return { leftX: r, rightX: i, endpointY: o, vertexOffset: l };
+      }),
+      (h = (e) => {
+        let t = m(e),
+          n = (t.leftX + t.rightX) / 2,
+          r = (t.rightX - t.leftX) / 2,
+          i = t.endpointY + t.vertexOffset,
+          a = { x: t.leftX, y: t.endpointY },
+          o = { x: t.rightX, y: t.endpointY },
+          s = Math.max(1.5, r * 0.35),
+          c = Math.max(1.5, Math.abs(t.vertexOffset) * 0.28),
+          [u, d] = f(t.leftX - s, t.rightX + s, l),
+          [p, h] = f(Math.min(t.endpointY, i) - c, Math.max(t.endpointY, i) + c, l);
+        return {
+          values: t,
+          centerX: n,
+          halfWidth: r,
+          vertexY: i,
+          pointA: a,
+          pointB: o,
+          stationaryPoint: { x: n, y: i },
+          viewport: { xMin: u, xMax: d, yMin: p, yMax: h },
+        };
+      }),
+      (g = (e) => Number(e.toFixed(2)).toString()));
+  }))();
 }
-const formatRolleValue = (value: number): string => Number(value.toFixed(2)).toString();
-
-function initializeRolleTheoremSchema(): void {}
-function initializeRolleTheoremModel(): void {}
-
-export {
-  normalizeRolleValues as a,
-  initializeRolleTheoremModel as i,
-  deriveRolleTheoremState as n,
-  initializeRolleTheoremSchema as o,
-  formatRolleValue as r,
-  rollesTheoremDefinition as s,
-  defaultRolleValues as t,
-};
+export { m as a, _ as i, h as n, o, g as r, a as s, p as t };

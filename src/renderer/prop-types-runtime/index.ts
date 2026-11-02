@@ -1,6 +1,53 @@
-import "@rchunk/rolldown-runtime";
-type Validator = ((...arguments_: unknown[]) => void) & { isRequired: Validator };
-export interface PropTypesRuntime { PropTypes: PropTypesRuntime; any: Validator; array: Validator; arrayOf(): Validator; bigint: Validator; bool: Validator; checkPropTypes(): void; element: Validator; elementType: Validator; exact(): Validator; func: Validator; instanceOf(): Validator; node: Validator; number: Validator; object: Validator; objectOf(): Validator; oneOf(): Validator; oneOfType(): Validator; resetWarningCache(): void; shape(): Validator; string: Validator; symbol: Validator }
-let cached: PropTypesRuntime | undefined;
-function getPropTypes(): PropTypesRuntime { if (cached) return cached; const validator = ((...arguments_: unknown[]) => { if (arguments_.at(-1) !== "SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED") { const error = new Error("Calling PropTypes validators directly is not supported by the `prop-types` package. Use PropTypes.checkPropTypes() to call them."); error.name = "Invariant Violation"; throw error; } }) as Validator; validator.isRequired = validator; const factory = () => validator; const result = { any: validator, array: validator, arrayOf: factory, bigint: validator, bool: validator, checkPropTypes() {}, element: validator, elementType: validator, exact: factory, func: validator, instanceOf: factory, node: validator, number: validator, object: validator, objectOf: factory, oneOf: factory, oneOfType: factory, resetWarningCache() {}, shape: factory, string: validator, symbol: validator } as PropTypesRuntime; result.PropTypes = result; cached = result; return result; }
-export { getPropTypes as t };
+// @ts-nocheck
+import { t as e } from "@rchunk/rolldown-runtime";
+var t = e((e, t) => {
+    t.exports = `SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED`;
+  }),
+  n = e((e, n) => {
+    var r = t();
+    function i() {}
+    function a() {}
+    ((a.resetWarningCache = i),
+      (n.exports = function () {
+        function e(e, t, n, i, a, o) {
+          if (o !== r) {
+            var s = Error(
+              "Calling PropTypes validators directly is not supported by the `prop-types` package. Use PropTypes.checkPropTypes() to call them. Read more at http://fb.me/use-check-prop-types",
+            );
+            throw ((s.name = `Invariant Violation`), s);
+          }
+        }
+        e.isRequired = e;
+        function t() {
+          return e;
+        }
+        var n = {
+          array: e,
+          bigint: e,
+          bool: e,
+          func: e,
+          number: e,
+          object: e,
+          string: e,
+          symbol: e,
+          any: e,
+          arrayOf: t,
+          element: e,
+          elementType: e,
+          instanceOf: t,
+          node: e,
+          objectOf: t,
+          oneOf: t,
+          oneOfType: t,
+          shape: t,
+          exact: t,
+          checkPropTypes: a,
+          resetWarningCache: i,
+        };
+        return ((n.PropTypes = n), n);
+      }));
+  }),
+  r = e((e, t) => {
+    t.exports = n()();
+  });
+export { r as t };

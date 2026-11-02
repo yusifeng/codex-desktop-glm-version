@@ -1,25 +1,27 @@
-// Stereo-panning teaching model. Release chunk: model-ac19e1b3688e.js.
-import "@rchunk/rolldown-runtime";
-
-interface StereoPanningInput { pan?: number }
-
-const stereoPanningDefaults = { pan: 0 };
-const clampPan = (value: number): number => Math.max(-100, Math.min(100, value));
-const calculateStereoPanning = (input: StereoPanningInput) => {
-  const pan = Number.isFinite(input.pan) ? clampPan(input.pan ?? stereoPanningDefaults.pan) : stereoPanningDefaults.pan;
-  const left = (100 - pan) / 200;
-  const right = (100 + pan) / 200;
-  return {
-    pan, left, right,
-    leftPercent: left * 100,
-    rightPercent: right * 100,
-    markerPercent: (pan + 100) / 2,
-    isCenter: pan === 0,
-    isFullLeft: pan === -100,
-    isFullRight: pan === 100,
-    strongerSide: pan === 0 ? "center" as const : pan < 0 ? "left" as const : "right" as const,
-  };
-};
-function initializeStereoPanningModel(): void {}
-
-export { calculateStereoPanning as n, initializeStereoPanningModel as r, stereoPanningDefaults as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r;
+function i() {
+  return (i = e(() => {
+    ((t = { pan: 0 }),
+      (n = (e) => Math.max(-100, Math.min(100, e))),
+      (r = (e) => {
+        let r = Number.isFinite(e.pan) ? n(e.pan ?? t.pan) : t.pan,
+          i = (100 - r) / 200,
+          a = (100 + r) / 200;
+        return {
+          pan: r,
+          left: i,
+          right: a,
+          leftPercent: i * 100,
+          rightPercent: a * 100,
+          markerPercent: (r + 100) / 2,
+          isCenter: r === 0,
+          isFullLeft: r === -100,
+          isFullRight: r === 100,
+          strongerSide: r === 0 ? `center` : r < 0 ? `left` : `right`,
+        };
+      }));
+  }))();
+}
+export { r as n, i as r, t };

@@ -1,115 +1,181 @@
-// Insulin deficiency versus resistance teaching model. Release chunk: model-fe380b24f817.js.
-import "@rchunk/rolldown-runtime";
-type Condition = "normal" | "deficiency" | "resistance";
-type Checkpoint = 0 | 1 | 2 | 3 | 4;
-interface Formatter {
-  formatMessage(message: { id: string; defaultMessage: string }): string;
-}
-const conditions: Condition[] = ["normal", "deficiency", "resistance"];
-const checkpoints: Checkpoint[] = [0, 1, 2, 3, 4];
-const defaults: { condition: Condition; checkpoint: Checkpoint } = {
-  condition: "normal",
-  checkpoint: 0,
-};
-const normalize = (input: { condition?: unknown; checkpoint?: unknown }) => ({
-  condition: conditions.some((value) => value === input.condition)
-    ? (input.condition as Condition)
-    : defaults.condition,
-  checkpoint: checkpoints.some((value) => value === input.checkpoint)
-    ? (input.checkpoint as Checkpoint)
-    : defaults.checkpoint,
-});
-const state = (condition: Condition) =>
-  condition === "normal"
-    ? {
-        insulinCount: 3,
-        signalStrength: 1,
-        membraneGlut4Count: 4,
-        uptakeCount: 4,
-        bloodGlucoseCount: 2,
-        firstDivergence: null,
-      }
-    : condition === "deficiency"
-      ? {
-          insulinCount: 1,
-          signalStrength: 0.35,
-          membraneGlut4Count: 1,
-          uptakeCount: 1,
-          bloodGlucoseCount: 5,
-          firstDivergence: 0,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u;
+function d() {
+  return (d = e(() => {
+    ((t = [`normal`, `deficiency`, `resistance`]),
+      (n = [0, 1, 2, 3, 4]),
+      (r = { condition: `normal`, checkpoint: 0 }),
+      (i = (e) => typeof e == `string` && t.some((t) => t === e)),
+      (a = (e) => typeof e == `number` && Number.isInteger(e) && n.some((t) => t === e)),
+      (o = (e) => ({
+        condition: i(e.condition) ? e.condition : r.condition,
+        checkpoint: a(e.checkpoint) ? e.checkpoint : r.checkpoint,
+      })),
+      (s = (e) => {
+        switch (e) {
+          case `normal`:
+            return {
+              insulinCount: 3,
+              signalStrength: 1,
+              membraneGlut4Count: 4,
+              uptakeCount: 4,
+              bloodGlucoseCount: 2,
+              firstDivergence: null,
+            };
+          case `deficiency`:
+            return {
+              insulinCount: 1,
+              signalStrength: 0.35,
+              membraneGlut4Count: 1,
+              uptakeCount: 1,
+              bloodGlucoseCount: 5,
+              firstDivergence: 0,
+            };
+          case `resistance`:
+            return {
+              insulinCount: 4,
+              signalStrength: 0.42,
+              membraneGlut4Count: 2,
+              uptakeCount: 2,
+              bloodGlucoseCount: 4,
+              firstDivergence: 2,
+            };
         }
-      : {
-          insulinCount: 4,
-          signalStrength: 0.42,
-          membraneGlut4Count: 2,
-          uptakeCount: 2,
-          bloodGlucoseCount: 4,
-          firstDivergence: 2,
-        };
-const conditionLabel = (formatter: Formatter, condition: Condition) =>
-  formatter.formatMessage({
-    id: `learningBlock.insulinDeficiencyVsResistanceV2.condition.${condition}`,
-    defaultMessage:
-      condition === "normal"
-        ? "Normal insulin response"
-        : condition === "deficiency"
-          ? "Insulin deficiency"
-          : "Insulin resistance",
-  });
-const checkpointDefaults = [
-  "Pancreas responds",
-  "Insulin reaches receptor",
-  "Cell responds",
-  "GLUT4 moves",
-  "Glucose uptake",
-];
-const checkpointKeys = ["pancreas", "receptor", "response", "glut4", "uptake"];
-const checkpointLabel = (formatter: Formatter, checkpoint: Checkpoint) =>
-  formatter.formatMessage({
-    id: `learningBlock.insulinDeficiencyVsResistanceV2.checkpoint.${checkpointKeys[checkpoint]}`,
-    defaultMessage: checkpointDefaults[checkpoint]!,
-  });
-const captions: Record<Condition, string[]> = {
-  normal: [
-    "The pancreas releases insulin when blood glucose rises",
-    "Insulin binds to a receptor on the muscle cell",
-    "The muscle cell responds to the insulin signal",
-    "The signal moves GLUT4 transporters to the cell membrane",
-    "Glucose enters the muscle cell, lowering blood glucose",
-  ],
-  deficiency: [
-    "The pancreas releases too little insulin",
-    "Less insulin reaches the muscle cell",
-    "The muscle cell receives a weaker overall insulin signal",
-    "Fewer GLUT4 transporters move to the cell membrane",
-    "Less glucose enters the muscle cell, so more stays in the blood",
-  ],
-  resistance: [
-    "The pancreas releases insulin",
-    "Insulin reaches the muscle cell receptor",
-    "The muscle cell responds weakly to insulin",
-    "Fewer GLUT4 transporters move to the cell membrane",
-    "Less glucose enters the muscle cell, so more stays in the blood",
-  ],
-};
-const caption = (
-  formatter: Formatter,
-  condition: Condition,
-  checkpoint: Checkpoint,
-) =>
-  formatter.formatMessage({
-    id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.${condition}${checkpointKeys[checkpoint]![0]!.toUpperCase()}${checkpointKeys[checkpoint]!.slice(1)}`,
-    defaultMessage: captions[condition][checkpoint]!,
-  });
-function initializeModel(): void {}
-export {
-  checkpointLabel as a,
-  state as c,
-  caption as i,
-  normalize as l,
-  conditions as n,
-  conditionLabel as o,
-  defaults as r,
-  initializeModel as s,
-  checkpoints as t,
-};
+      }),
+      (c = (e, t) => {
+        switch (t) {
+          case `normal`:
+            return e.formatMessage({
+              id: `learningBlock.insulinDeficiencyVsResistanceV2.condition.normal`,
+              defaultMessage: `Normal insulin response`,
+            });
+          case `deficiency`:
+            return e.formatMessage({
+              id: `learningBlock.insulinDeficiencyVsResistanceV2.condition.deficiency`,
+              defaultMessage: `Insulin deficiency`,
+            });
+          case `resistance`:
+            return e.formatMessage({
+              id: `learningBlock.insulinDeficiencyVsResistanceV2.condition.resistance`,
+              defaultMessage: `Insulin resistance`,
+            });
+        }
+      }),
+      (l = (e, t) => {
+        switch (t) {
+          case 0:
+            return e.formatMessage({
+              id: `learningBlock.insulinDeficiencyVsResistanceV2.checkpoint.pancreas`,
+              defaultMessage: `Pancreas responds`,
+            });
+          case 1:
+            return e.formatMessage({
+              id: `learningBlock.insulinDeficiencyVsResistanceV2.checkpoint.receptor`,
+              defaultMessage: `Insulin reaches receptor`,
+            });
+          case 2:
+            return e.formatMessage({
+              id: `learningBlock.insulinDeficiencyVsResistanceV2.checkpoint.response`,
+              defaultMessage: `Cell responds`,
+            });
+          case 3:
+            return e.formatMessage({
+              id: `learningBlock.insulinDeficiencyVsResistanceV2.checkpoint.glut4`,
+              defaultMessage: `GLUT4 moves`,
+            });
+          case 4:
+            return e.formatMessage({
+              id: `learningBlock.insulinDeficiencyVsResistanceV2.checkpoint.uptake`,
+              defaultMessage: `Glucose uptake`,
+            });
+        }
+      }),
+      (u = (e, t, n) => {
+        if (t === `normal`)
+          switch (n) {
+            case 0:
+              return e.formatMessage({
+                id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.normalPancreas`,
+                defaultMessage: `The pancreas releases insulin when blood glucose rises`,
+              });
+            case 1:
+              return e.formatMessage({
+                id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.normalReceptor`,
+                defaultMessage: `Insulin binds to a receptor on the muscle cell`,
+              });
+            case 2:
+              return e.formatMessage({
+                id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.normalResponse`,
+                defaultMessage: `The muscle cell responds to the insulin signal`,
+              });
+            case 3:
+              return e.formatMessage({
+                id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.normalGlut4`,
+                defaultMessage: `The signal moves GLUT4 transporters to the cell membrane`,
+              });
+            case 4:
+              return e.formatMessage({
+                id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.normalUptake`,
+                defaultMessage: `Glucose enters the muscle cell, lowering blood glucose`,
+              });
+          }
+        if (t === `deficiency`)
+          switch (n) {
+            case 0:
+              return e.formatMessage({
+                id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.deficiencyPancreas`,
+                defaultMessage: `The pancreas releases too little insulin`,
+              });
+            case 1:
+              return e.formatMessage({
+                id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.deficiencyReceptor`,
+                defaultMessage: `Less insulin reaches the muscle cell`,
+              });
+            case 2:
+              return e.formatMessage({
+                id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.deficiencyResponse`,
+                defaultMessage: `The muscle cell receives a weaker overall insulin signal`,
+              });
+            case 3:
+              return e.formatMessage({
+                id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.deficiencyGlut4`,
+                defaultMessage: `Fewer GLUT4 transporters move to the cell membrane`,
+              });
+            case 4:
+              return e.formatMessage({
+                id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.deficiencyUptake`,
+                defaultMessage: `Less glucose enters the muscle cell, so more stays in the blood`,
+              });
+          }
+        switch (n) {
+          case 0:
+            return e.formatMessage({
+              id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.resistancePancreas`,
+              defaultMessage: `The pancreas releases insulin`,
+            });
+          case 1:
+            return e.formatMessage({
+              id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.resistanceReceptor`,
+              defaultMessage: `Insulin reaches the muscle cell receptor`,
+            });
+          case 2:
+            return e.formatMessage({
+              id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.resistanceResponse`,
+              defaultMessage: `The muscle cell responds weakly to insulin`,
+            });
+          case 3:
+            return e.formatMessage({
+              id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.resistanceGlut4`,
+              defaultMessage: `Fewer GLUT4 transporters move to the cell membrane`,
+            });
+          case 4:
+            return e.formatMessage({
+              id: `learningBlock.insulinDeficiencyVsResistanceV2.caption.resistanceUptake`,
+              defaultMessage: `Less glucose enters the muscle cell, so more stays in the blood`,
+            });
+        }
+      }));
+  }))();
+}
+export { l as a, s as c, u as i, o as l, t as n, c as o, r, d as s, n as t };

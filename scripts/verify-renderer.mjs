@@ -44,10 +44,6 @@ const EXPECTED_IMPORT_CHANGES = new Map([
     },
   ],
   [
-    CHUNKS.banner,
-    { missing: new Set([`./${CHUNKS["app-primary"]}`]), extra: new Set() },
-  ],
-  [
     CHUNKS["gpt-plugin-migration-banner-content"],
     { missing: new Set([`./${CHUNKS["app-primary"]}`]), extra: new Set() },
   ],

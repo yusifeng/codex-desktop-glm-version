@@ -1,50 +1,54 @@
-import { $O as queryConstants, FX as initializeSignals, QI as initializeQueries, QX as createQueryFamily, ZI as appScope, ek as initializeMutations } from "@rchunk/app-shared";
-import { cJt as initializeApi, rJt as apiClient } from "@rchunk/app-initial";
-import "@rchunk/rolldown-runtime";
-
-interface AgentMessage { phase?: string; text: string; type: "agentMessage"; }
-interface TurnResponse { data: Array<{ items: unknown[] }>; }
-
-function finalResponseFromTurns(response: TurnResponse): string | null {
-  const turn = response.data[0];
-  if (turn == null) return null;
-  let fallback: AgentMessage | null = null;
-  for (let index = turn.items.length - 1; index >= 0; index--) {
-    const item = turn.items[index];
-    if (item != null && typeof item === "object" && "type" in item && (item as { type?: unknown }).type === "agentMessage") {
-      const message = item as AgentMessage;
-      if (message.text.trim() === "") continue;
-      fallback ??= message;
-      if (message.phase === "final_answer") return message.text;
-    }
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $O as t, FX as n, QI as r, QX as i, ZI as a, ek as o } from "@rchunk/app-shared";
+import { cJt as s, rJt as c } from "@rchunk/app-initial";
+function l(e) {
+  let t = e.data[0];
+  if (t == null) return null;
+  let n = null;
+  for (let e = t.items.length - 1; e >= 0; e--) {
+    let r = t.items[e];
+    if (
+      r != null &&
+      `type` in r &&
+      r.type === `agentMessage` &&
+      r.text.trim().length !== 0 &&
+      ((n ??= r), r.phase === `final_answer`)
+    )
+      return r.text;
   }
-  return fallback?.text ?? null;
+  return n?.text ?? null;
 }
-
-class FinalResponseUnavailableError extends Error {}
-let finalResponseQuery: unknown;
-let initialized = false;
-
-function initializeSubagentFinalResponseQuery(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeSignals(); initializeApi(); initializeQueries(); initializeMutations();
-  finalResponseQuery = createQueryFamily(appScope, (input: { activationId: string | null; conversationId: string | null; isTurnLive: boolean; threadId: string | null }) => ({
-    enabled: input.activationId != null && input.conversationId != null && input.threadId != null,
-    queryKey: ["chatgpt-subagent-final-response", input.conversationId, input.threadId, input.activationId],
-    queryFn: async () => {
-      if (input.conversationId == null || input.threadId == null) return null;
-      const response = await (apiClient as { safeGet(path: string, options: unknown): Promise<TurnResponse> }).safeGet("/flora/subagent/thread/turns", { parameters: { query: { conversationId: input.conversationId, threadId: input.threadId, limit: 1 } } });
-      const result = finalResponseFromTurns(response);
-      if (result == null) throw new FinalResponseUnavailableError("Subagent final response is not available yet");
-      return result;
-    },
-    refetchOnWindowFocus: false,
-    retryOnMount: !input.isTurnLive,
-    retry: (count: number, error: unknown) => error instanceof FinalResponseUnavailableError && count < 2,
-    retryDelay: (attempt: number) => Math.min(250 * 2 ** attempt + Math.random() * 100, 1_000),
-    staleTime: queryConstants.INFINITE,
-  }));
+var u, d, f, p, m;
+function h() {
+  return (h = e(() => {
+    (n(),
+      s(),
+      r(),
+      o(),
+      (u = 2),
+      (d = 250),
+      (f = 100),
+      (p = class extends Error {}),
+      (m = i(a, ({ activationId: e, conversationId: n, isTurnLive: r, threadId: i }) => ({
+        enabled: e != null && n != null && i != null,
+        queryFn: async () => {
+          if (n == null || i == null) return null;
+          let e = l(
+            await c.safeGet(`/flora/subagent/thread/turns`, {
+              parameters: { query: { conversationId: n, threadId: i, limit: 1 } },
+            }),
+          );
+          if (e == null) throw new p(`Subagent final response is not available yet`);
+          return e;
+        },
+        queryKey: [`chatgpt-subagent-final-response`, n, i, e],
+        refetchOnWindowFocus: !1,
+        retryOnMount: !r,
+        retry: (e, t) => t instanceof p && e < u,
+        retryDelay: (e) => Math.min(d * 2 ** e + Math.random() * f, 1e3),
+        staleTime: t.INFINITE,
+      }))));
+  }))();
 }
-
-export { initializeSubagentFinalResponseQuery as n, finalResponseQuery as t };
+export { h as n, m as t };

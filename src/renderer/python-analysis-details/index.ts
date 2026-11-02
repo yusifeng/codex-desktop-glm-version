@@ -1,92 +1,161 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeCompilerRuntime,
-  $d as CodeBlock,
-  I3 as getJsxRuntime,
-  K2 as initializeIntlComponents,
-  Y2 as FormattedMessage,
-  ef as initializeCodeBlock,
-  h4 as initializeClassNames,
-  m4 as classNames,
+  $3 as t,
+  $d as n,
+  I3 as r,
+  K2 as i,
+  Y2 as a,
+  ef as o,
+  h4 as s,
+  m4 as c,
 } from "@rchunk/app-shared";
-
-interface PythonOutput { kind: "error" | "result" | "stderr" | "stdout"; text: string; }
-interface PythonAnalysisItem { code: string; output: PythonOutput[]; }
-const jsx = getJsxRuntime();
-
-function PythonOutputDetails({ output }: { output: PythonOutput[] }): unknown {
-  if (output.length === 0) return null;
-  const streams = output.filter((item) => item.kind === "stdout" || item.kind === "stderr");
-  const results = output.filter((item) => item.kind === "result" || item.kind === "error");
-  const streamBlock = streams.length === 0 ? null : jsx.jsxs("div", {
-    className: "rounded-3xl bg-execution-output p-4 text-xs",
-    children: [
-      jsx.jsx("div", {
-        className: "mb-1 text-execution-output-label select-none",
-        children: jsx.jsx(FormattedMessage, {
-          id: "chatgpt.pythonExecution.streamsLabel", defaultMessage: "STDOUT/STDERR",
-          description: "Short label above printed output and warnings in expanded Python analysis in a ChatGPT conversation. STDOUT and STDERR are the technical names for standard output and standard error.",
-        }),
-      }),
-      jsx.jsx("pre", {
-        className: "overflow-auto font-mono text-sm/6 text-execution-output outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
-        dir: "ltr", tabIndex: 0,
-        children: streams.map((item, index) => jsx.jsx("span", {
-          className: item.kind === "stderr" ? "text-execution-output-error" : undefined,
-          children: item.text,
-        }, index)),
-      }),
-    ],
-  });
-  return jsx.jsxs("div", {
-    className: "font-normal",
-    children: [streamBlock, results.map((item, index) => jsx.jsxs("div", {
-      className: item.kind === "error"
-        ? "border-t border-default bg-execution-traceback"
-        : "rounded-3xl bg-execution-output p-4 text-xs",
+function l(e) {
+  let t = (0, m.c)(8),
+    { output: n } = e;
+  if (n.length === 0) return null;
+  let r, i, o;
+  if (t[0] !== n) {
+    let e = n.filter(p),
+      s = n.filter(f);
+    ((r = `font-normal`),
+      (i =
+        e.length > 0
+          ? (0, h.jsxs)(`div`, {
+              className: `rounded-3xl bg-execution-output p-4 text-xs`,
+              children: [
+                (0, h.jsx)(`div`, {
+                  className: `mb-1 text-execution-output-label select-none`,
+                  children: (0, h.jsx)(a, {
+                    id: `chatgpt.pythonExecution.streamsLabel`,
+                    defaultMessage: `STDOUT/STDERR`,
+                    description: `Short label above printed output and warnings in expanded Python analysis in a ChatGPT conversation. STDOUT and STDERR are the technical names for standard output and standard error.`,
+                  }),
+                }),
+                (0, h.jsx)(`pre`, {
+                  className: `overflow-auto font-mono text-sm/6 text-execution-output outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset`,
+                  dir: `ltr`,
+                  tabIndex: 0,
+                  children: e.map(d),
+                }),
+              ],
+            })
+          : null),
+      (o = s.map(u)),
+      (t[0] = n),
+      (t[1] = r),
+      (t[2] = i),
+      (t[3] = o));
+  } else ((r = t[1]), (i = t[2]), (o = t[3]));
+  let s;
+  return (
+    t[4] !== r || t[5] !== i || t[6] !== o
+      ? ((s = (0, h.jsxs)(`div`, { className: r, children: [i, o] })),
+        (t[4] = r),
+        (t[5] = i),
+        (t[6] = o),
+        (t[7] = s))
+      : (s = t[7]),
+    s
+  );
+}
+function u(e, t) {
+  let { kind: n, text: r } = e;
+  return (0, h.jsxs)(
+    `div`,
+    {
+      className:
+        n === `error`
+          ? `border-t border-default bg-execution-traceback`
+          : `rounded-3xl bg-execution-output p-4 text-xs`,
       children: [
-        item.kind === "result" ? jsx.jsx("div", {
-          className: "mb-1 text-execution-output-label select-none",
-          children: jsx.jsx(FormattedMessage, {
-            id: "chatgpt.pythonExecution.resultLabel", defaultMessage: "Result",
-            description: "Short label above the final value returned by expanded Python analysis in a ChatGPT conversation",
-          }),
-        }) : null,
-        jsx.jsx("pre", {
-          className: classNames(
-            "overflow-auto font-mono outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset",
-            item.kind === "error"
-              ? "max-h-64 border-s-4 border-text-danger p-2 text-xs/4 text-execution-traceback"
-              : "text-sm/6 text-execution-output",
+        n === `result`
+          ? (0, h.jsx)(`div`, {
+              className: `mb-1 text-execution-output-label select-none`,
+              children: (0, h.jsx)(a, {
+                id: `chatgpt.pythonExecution.resultLabel`,
+                defaultMessage: `Result`,
+                description: `Short label above the final value returned by expanded Python analysis in a ChatGPT conversation`,
+              }),
+            })
+          : null,
+        (0, h.jsx)(`pre`, {
+          className: c(
+            `overflow-auto font-mono outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset`,
+            n === `error`
+              ? `max-h-64 border-s-4 border-text-danger p-2 text-xs/4 text-execution-traceback`
+              : `text-sm/6 text-execution-output`,
           ),
-          dir: "ltr", tabIndex: 0, children: item.text,
+          dir: `ltr`,
+          tabIndex: 0,
+          children: r,
         }),
       ],
-    }, index))],
-  });
+    },
+    t,
+  );
 }
-
-function PythonAnalysisDetails({ item }: { item: PythonAnalysisItem }): unknown {
-  return jsx.jsxs("div", {
-    className: "flex min-w-0 flex-col gap-2",
-    children: [
-      item.code.length > 0 ? jsx.jsx(CodeBlock, {
-        content: item.code, language: "python",
-        title: jsx.jsx(FormattedMessage, {
-          id: "chatgpt.pythonExecution.language", defaultMessage: "Python",
-          description: "Programming language heading above the read-only source of a Python analysis",
-        }),
-      }) : null,
-      jsx.jsx(PythonOutputDetails, { output: item.output }),
-    ],
-  });
+function d(e, t) {
+  let { kind: n, text: r } = e;
+  return (0, h.jsx)(
+    `span`,
+    { className: n === `stderr` ? `text-execution-output-error` : void 0, children: r },
+    t,
+  );
 }
-
-function initializePythonOutputDetails(): void {
-  initializeCompilerRuntime(); initializeClassNames(); initializeIntlComponents();
+function f(e) {
+  let { kind: t } = e;
+  return t === `result` || t === `error`;
 }
-function initializePythonAnalysisDetails(): void {
-  initializeCompilerRuntime(); initializeIntlComponents(); initializeCodeBlock(); initializePythonOutputDetails();
+function p(e) {
+  let { kind: t } = e;
+  return t === `stdout` || t === `stderr`;
 }
-
-export { initializePythonAnalysisDetails as n, PythonAnalysisDetails as t };
+var m, h;
+function g() {
+  return (g = e(() => {
+    ((m = t()), s(), i(), (h = r()));
+  }))();
+}
+function _(e) {
+  let t = (0, v.c)(7),
+    { item: r } = e,
+    i;
+  t[0] === r.code
+    ? (i = t[1])
+    : ((i =
+        r.code.length > 0
+          ? (0, y.jsx)(n, {
+              content: r.code,
+              language: `python`,
+              title: (0, y.jsx)(a, {
+                id: `chatgpt.pythonExecution.language`,
+                defaultMessage: `Python`,
+                description: `Programming language heading above the read-only source of a Python analysis`,
+              }),
+            })
+          : null),
+      (t[0] = r.code),
+      (t[1] = i));
+  let o;
+  t[2] === r.output
+    ? (o = t[3])
+    : ((o = (0, y.jsx)(l, { output: r.output })), (t[2] = r.output), (t[3] = o));
+  let s;
+  return (
+    t[4] !== i || t[5] !== o
+      ? ((s = (0, y.jsxs)(`div`, { className: `flex min-w-0 flex-col gap-2`, children: [i, o] })),
+        (t[4] = i),
+        (t[5] = o),
+        (t[6] = s))
+      : (s = t[6]),
+    s
+  );
+}
+var v, y;
+function b() {
+  return (b = e(() => {
+    ((v = t()), i(), o(), g(), (y = r()));
+  }))();
+}
+export { b as n, _ as t };

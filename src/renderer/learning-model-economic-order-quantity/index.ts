@@ -1,28 +1,31 @@
-// Economic-order-quantity teaching model. Release chunk: model-838233d701ed.js.
-import "@rchunk/rolldown-runtime";
-
-interface EconomicOrderInput { annualDemand?: number; orderCost?: number; holdingCost?: number }
-interface NumericControl { min: number; max: number; step: number; defaultValue: number }
-
-const annualDemandControl = { label: "D\;\text{annual demand}", min: 1_000, max: 6_000, step: 250, defaultValue: 3_500 };
-const orderCostControl = { label: "S\;\text{order cost}", min: 25, max: 225, step: 5, defaultValue: 120 };
-const holdingCostControl = { label: "H\;\text{holding cost}", min: 4, max: 30, step: 1, defaultValue: 12 };
-const clamp = (value: number, minimum: number, maximum: number): number =>
-  Math.min(Math.max(value, minimum), maximum);
-const normalizeValue = (value: number | undefined, control: NumericControl): number =>
-  Number.isFinite(value) ? clamp(value ?? control.defaultValue, control.min, control.max) : control.defaultValue;
-const normalizeEconomicOrderInput = (input: EconomicOrderInput) => ({
-  annualDemand: normalizeValue(input.annualDemand, annualDemandControl),
-  orderCost: normalizeValue(input.orderCost, orderCostControl),
-  holdingCost: normalizeValue(input.holdingCost, holdingCostControl),
-});
-const calculateEconomicOrderQuantity = (input: EconomicOrderInput) => {
-  const safe = normalizeEconomicOrderInput(input);
-  const eoq = Math.sqrt(2 * safe.annualDemand * safe.orderCost / safe.holdingCost);
-  const orderingCostAtEoq = safe.annualDemand * safe.orderCost / eoq;
-  const holdingCostAtEoq = safe.holdingCost * eoq / 2;
-  return { ...safe, eoq, orderingCostAtEoq, holdingCostAtEoq, totalCostAtEoq: orderingCostAtEoq + holdingCostAtEoq };
-};
-function initializeEconomicOrderQuantityModel(): void {}
-
-export { initializeEconomicOrderQuantityModel as a, calculateEconomicOrderQuantity as i, holdingCostControl as n, normalizeEconomicOrderInput as o, orderCostControl as r, annualDemandControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s;
+function c() {
+  return (c = e(() => {
+    ((t = {
+      label: `D\\;\\text{annual demand}`,
+      min: 1e3,
+      max: 6e3,
+      step: 250,
+      defaultValue: 3500,
+    }),
+      (n = { label: `S\\;\\text{order cost}`, min: 25, max: 225, step: 5, defaultValue: 120 }),
+      (r = { label: `H\\;\\text{holding cost}`, min: 4, max: 30, step: 1, defaultValue: 12 }),
+      (i = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (a = (e, t, n, r) => (Number.isFinite(e) ? i(e ?? t, n, r) : t)),
+      (o = (e) => ({
+        annualDemand: a(e.annualDemand, t.defaultValue, t.min, t.max),
+        orderCost: a(e.orderCost, n.defaultValue, n.min, n.max),
+        holdingCost: a(e.holdingCost, r.defaultValue, r.min, r.max),
+      })),
+      (s = (e) => {
+        let t = o(e),
+          n = Math.sqrt((2 * t.annualDemand * t.orderCost) / t.holdingCost),
+          r = (t.annualDemand * t.orderCost) / n,
+          i = (t.holdingCost * n) / 2;
+        return { ...t, eoq: n, orderingCostAtEoq: r, holdingCostAtEoq: i, totalCostAtEoq: r + i };
+      }));
+  }))();
+}
+export { c as a, s as i, r as n, o, n as r, t };

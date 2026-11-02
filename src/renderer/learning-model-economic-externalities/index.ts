@@ -1,17 +1,113 @@
-// Supply/demand externality and deadweight-loss learning model.
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-
-type CurveSide = "supply" | "demand"; type SocialPosition = "above_private" | "below_private";
-interface ExternalityValues { curveSide?: unknown; socialCurvePosition?: unknown; externalitySize?: number | null }
-const externalitiesType = "ECONOMIC_EXTERNALITIES"; const externalitiesThumbnail = "economic-externalities-v1"; const externalitiesParameters = { curveSide: { kind: "enum", defaultValue: "demand" as CurveSide, allowedValues: ["supply", "demand"] as CurveSide[] }, socialCurvePosition: { kind: "enum", defaultValue: "below_private" as SocialPosition, allowedValues: ["above_private", "below_private"] as SocialPosition[] }, externalitySize: { kind: "number", defaultValue: 18, min: 1, max: 30 } }; const externalitiesDefinition = { type: externalitiesType, version: 1, thumbnailAssetKey: externalitiesThumbnail, parameters: externalitiesParameters };
-const externalitiesViewport = { quantityMin: 0, quantityMax: 100, priceMin: 0, priceMax: 100 }; const externalitySizeControl = { min: 1, max: 30, step: 1 }; const defaultExternalityValues = { curveSide: externalitiesParameters.curveSide.defaultValue, socialCurvePosition: externalitiesParameters.socialCurvePosition.defaultValue, externalitySize: externalitiesParameters.externalitySize.defaultValue };
-const demandIntercept = 84; const demandSlope = 0.7; const supplyIntercept = 16; const supplySlope = 0.6; const combinedSlope = 1.3; const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeExternalityValues = (values: ExternalityValues) => ({ curveSide: externalitiesParameters.curveSide.allowedValues.includes(values.curveSide as CurveSide) ? values.curveSide as CurveSide : externalitiesParameters.curveSide.defaultValue, socialCurvePosition: externalitiesParameters.socialCurvePosition.allowedValues.includes(values.socialCurvePosition as SocialPosition) ? values.socialCurvePosition as SocialPosition : externalitiesParameters.socialCurvePosition.defaultValue, externalitySize: typeof values.externalitySize === "number" && Number.isFinite(values.externalitySize) ? clamp(values.externalitySize, 1, 30) : externalitiesParameters.externalitySize.defaultValue });
-const demandPrice = (quantity: number, offset = 0): number => demandIntercept + offset - demandSlope * quantity; const supplyPrice = (quantity: number, offset = 0): number => supplyIntercept + offset + supplySlope * quantity;
-const equilibrium = ({ demandOffset = 0, supplyOffset = 0 }: { demandOffset?: number; supplyOffset?: number }) => { const quantity = (demandIntercept + demandOffset - supplyIntercept - supplyOffset) / combinedSlope; return { quantity, price: demandPrice(quantity, demandOffset) }; };
-const deriveExternalityState = (values: ExternalityValues) => { const safe = normalizeExternalityValues(values); const socialOffset = safe.socialCurvePosition === "above_private" ? safe.externalitySize : -safe.externalitySize; const marketEquilibrium = equilibrium({}); const socialEquilibrium = safe.curveSide === "supply" ? equilibrium({ supplyOffset: socialOffset }) : equilibrium({ demandOffset: socialOffset }); const externalityType = (safe.curveSide === "supply" ? socialOffset < 0 : socialOffset > 0) ? "positive" : "negative"; const quantityGap = marketEquilibrium.quantity - socialEquilibrium.quantity; const marketOutcome = quantityGap > 0 ? "overproduction" : "underproduction"; const marketQuantity = marketEquilibrium.quantity; const privatePrice = safe.curveSide === "supply" ? demandPrice(marketQuantity) : supplyPrice(marketQuantity); const socialPrice = safe.curveSide === "supply" ? supplyPrice(marketQuantity, socialOffset) : demandPrice(marketQuantity, socialOffset); return { values: safe, socialOffset, externalityType, marketOutcome, marketEquilibrium, socialEquilibrium, welfareLossTriangle: [{ x: socialEquilibrium.quantity, y: socialEquilibrium.price }, { x: marketQuantity, y: privatePrice }, { x: marketQuantity, y: socialPrice }], welfareArea: 0.5 * Math.abs(quantityGap) * Math.abs(socialPrice - privatePrice) }; };
-const externalitySummary = (state: ReturnType<typeof deriveExternalityState>) => state.values.curveSide === "supply" ? state.externalityType === "negative" ? { id: "learningBlock.economicExternalities.negativeProductionSummary", defaultMessage: "Social cost is higher than private cost, so the unregulated market overproduces. At the market quantity, the shaded triangle is deadweight loss from overproduction." } : { id: "learningBlock.economicExternalities.positiveProductionSummary", defaultMessage: "Social cost is lower than private cost, so the unregulated market underproduces. At the market quantity, the shaded triangle is deadweight loss from underproduction." } : state.externalityType === "positive" ? { id: "learningBlock.economicExternalities.positiveConsumptionSummary", defaultMessage: "Social benefit is higher than private benefit, so the unregulated market underproduces. At the market quantity, the shaded triangle is deadweight loss from underproduction." } : { id: "learningBlock.economicExternalities.negativeConsumptionSummary", defaultMessage: "Social benefit is lower than private benefit, so the unregulated market overproduces. At the market quantity, the shaded triangle is deadweight loss from overproduction." };
-function initializeExternalitiesSchema(): void {}
-function initializeExternalitiesModel(): void {}
-export { demandPrice as a, initializeExternalitiesModel as c, externalitiesDefinition as d, deriveExternalityState as i, normalizeExternalityValues as l, defaultExternalityValues as n, externalitySummary as o, externalitySizeControl as r, supplyPrice as s, externalitiesViewport as t, initializeExternalitiesSchema as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { K2 as t, W2 as n } from "@rchunk/app-shared";
+var r, i, a, o;
+function s() {
+  return (s = e(() => {
+    ((r = `ECONOMIC_EXTERNALITIES`),
+      (i = `economic-externalities-v1`),
+      (a = {
+        curveSide: { kind: `enum`, defaultValue: `demand`, allowedValues: [`supply`, `demand`] },
+        socialCurvePosition: {
+          kind: `enum`,
+          defaultValue: `below_private`,
+          allowedValues: [`above_private`, `below_private`],
+        },
+        externalitySize: { kind: `number`, defaultValue: 18, min: 1, max: 30 },
+      }),
+      (o = { type: r, version: 1, thumbnailAssetKey: i, parameters: a }));
+  }))();
+}
+var c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w;
+function T() {
+  return (T = e(() => {
+    (t(),
+      s(),
+      (c = { quantityMin: 0, quantityMax: 100, priceMin: 0, priceMax: 100 }),
+      (l = {
+        min: o.parameters.externalitySize.min,
+        max: o.parameters.externalitySize.max,
+        step: 1,
+      }),
+      (u = {
+        curveSide: o.parameters.curveSide.defaultValue,
+        socialCurvePosition: o.parameters.socialCurvePosition.defaultValue,
+        externalitySize: o.parameters.externalitySize.defaultValue,
+      }),
+      (d = 84),
+      (f = 0.7),
+      (p = 16),
+      (m = 0.6),
+      (h = 1.2999999999999998),
+      (g = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (_ = o.parameters.curveSide.allowedValues),
+      (v = o.parameters.socialCurvePosition.allowedValues),
+      (y = (e) => ({
+        curveSide: _.includes(e.curveSide) ? e.curveSide : o.parameters.curveSide.defaultValue,
+        socialCurvePosition: v.includes(e.socialCurvePosition)
+          ? e.socialCurvePosition
+          : o.parameters.socialCurvePosition.defaultValue,
+        externalitySize:
+          typeof e.externalitySize == `number` && Number.isFinite(e.externalitySize)
+            ? g(
+                e.externalitySize,
+                o.parameters.externalitySize.min,
+                o.parameters.externalitySize.max,
+              )
+            : o.parameters.externalitySize.defaultValue,
+      })),
+      (b = (e, t = 0) => d + t - f * e),
+      (x = (e, t = 0) => p + t + m * e),
+      (S = ({ demandOffset: e = 0, supplyOffset: t = 0 }) => {
+        let n = (d + e - p - t) / h;
+        return { quantity: n, price: b(n, e) };
+      }),
+      (C = (e) => {
+        let t = y(e),
+          n = t.socialCurvePosition === `above_private` ? t.externalitySize : -t.externalitySize,
+          r = S({}),
+          i = t.curveSide === `supply` ? S({ supplyOffset: n }) : S({ demandOffset: n }),
+          a = (t.curveSide === `supply` ? n < 0 : n > 0) ? `positive` : `negative`,
+          o = r.quantity - i.quantity,
+          s = o > 0 ? `overproduction` : `underproduction`,
+          c = r.quantity,
+          l = t.curveSide === `supply` ? b(c) : x(c),
+          u = t.curveSide === `supply` ? x(c, n) : b(c, n);
+        return {
+          values: t,
+          socialOffset: n,
+          externalityType: a,
+          marketOutcome: s,
+          marketEquilibrium: r,
+          socialEquilibrium: i,
+          welfareLossTriangle: [
+            { x: i.quantity, y: i.price },
+            { x: c, y: l },
+            { x: c, y: u },
+          ],
+          welfareArea: 0.5 * Math.abs(o) * Math.abs(u - l),
+        };
+      }),
+      (w = (e) =>
+        e.values.curveSide === `supply`
+          ? e.externalityType === `negative`
+            ? n({
+                id: `learningBlock.economicExternalities.negativeProductionSummary`,
+                defaultMessage: `Social cost is higher than private cost, so the unregulated market overproduces. At the market quantity, the shaded triangle is deadweight loss from overproduction.`,
+              })
+            : n({
+                id: `learningBlock.economicExternalities.positiveProductionSummary`,
+                defaultMessage: `Social cost is lower than private cost, so the unregulated market underproduces. At the market quantity, the shaded triangle is deadweight loss from underproduction.`,
+              })
+          : e.externalityType === `positive`
+            ? n({
+                id: `learningBlock.economicExternalities.positiveConsumptionSummary`,
+                defaultMessage: `Social benefit is higher than private benefit, so the unregulated market underproduces. At the market quantity, the shaded triangle is deadweight loss from underproduction.`,
+              })
+            : n({
+                id: `learningBlock.economicExternalities.negativeConsumptionSummary`,
+                defaultMessage: `Social benefit is lower than private benefit, so the unregulated market overproduces. At the market quantity, the shaded triangle is deadweight loss from overproduction.`,
+              })));
+  }))();
+}
+export { b as a, T as c, o as d, C as i, y as l, u as n, w as o, l as r, x as s, c as t, s as u };

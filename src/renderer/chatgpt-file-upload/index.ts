@@ -1,13 +1,23 @@
+// @ts-nocheck
 import {
-  GRt as createChatGptFile,
-  HRt as ChatGptFileUploadIncompleteError,
-  JRt as uploadChatGptConversationFile,
-  KRt as initializeChatGptFileUpload,
-  URt as MAX_CHATGPT_UPLOAD_SIZE_BYTES,
-  WRt as MAX_CONCURRENT_CHATGPT_FILE_UPLOADS,
-  XRt as uploadChatGptProjectFiles,
-  YRt as uploadChatGptFileBytes,
-  qRt as processChatGptFileUploadStream,
+  GRt as e,
+  HRt as t,
+  JRt as n,
+  KRt as r,
+  URt as i,
+  WRt as a,
+  XRt as o,
+  YRt as s,
+  qRt as c,
 } from "@rchunk/app-initial";
-initializeChatGptFileUpload();
-export { ChatGptFileUploadIncompleteError, MAX_CHATGPT_UPLOAD_SIZE_BYTES, MAX_CONCURRENT_CHATGPT_FILE_UPLOADS, createChatGptFile, processChatGptFileUploadStream, uploadChatGptConversationFile, uploadChatGptFileBytes, uploadChatGptProjectFiles };
+r();
+export {
+  t as ChatGptFileUploadIncompleteError,
+  i as MAX_CHATGPT_UPLOAD_SIZE_BYTES,
+  a as MAX_CONCURRENT_CHATGPT_FILE_UPLOADS,
+  e as createChatGptFile,
+  c as processChatGptFileUploadStream,
+  n as uploadChatGptConversationFile,
+  s as uploadChatGptFileBytes,
+  o as uploadChatGptProjectFiles,
+};

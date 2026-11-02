@@ -1,16 +1,82 @@
-// Arithmetic-versus-geometric sequences learning model. Release chunk: model-d049b0702e2b.js.
-import "@rchunk/rolldown-runtime";
-
-interface SequenceValues { initialTerm?: number | null; commonDifference?: number | null; commonRatio?: number | null }
-interface SequenceManifest { type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string; parameters: { commonDifference: { kind: "number"; defaultValue: number; min: number; max: number }; commonRatio: { kind: "number"; defaultValue: number; min: number; max: number } } }
-interface SequenceTerm { termNumber: number; value: number }
-let sequenceManifest: SequenceManifest; let initialTermControl: { defaultValue: number; min: number; max: number }; let differenceAxisControl: { baseMin: number; baseMax: number; step: number }; let termAxisControl: { baseMin: number; baseMax: number; step: number }; let ratioAxisControl: { baseMin: number; baseMax: number; step: number }; let calculateSequences: (values: SequenceValues) => { initialTerm: number; commonDifference: number; commonRatio: number; arithmeticTerms: SequenceTerm[]; geometricTerms: SequenceTerm[]; arithmeticFinal: number; geometricFinal: number; yMin: number; yMax: number }; let formatSequenceValue: (value: number) => string; let manifestInitialized = false; let modelInitialized = false;
-function initializeSequencesManifest(): void { if (manifestInitialized) return; manifestInitialized = true; sequenceManifest = { type: "ARITHMETIC_VS_GEOMETRIC", version: 1, thumbnailAssetKey: "arithmetic-vs-geometric-v1", canonicalFormula: "\\begin{aligned} a_n &= a_1 + (n - 1)d \\\\ g_n &= a_1 r^{n - 1} \\end{aligned}", parameters: { commonDifference: { kind: "number", defaultValue: 2, min: -20, max: 20 }, commonRatio: { kind: "number", defaultValue: 2, min: -3, max: 3 } } }; }
-function initializeSequencesModel(): void {
-  if (modelInitialized) return; modelInitialized = true; initializeSequencesManifest(); initialTermControl = { defaultValue: 2, min: -20, max: 20 }; differenceAxisControl = { baseMin: -10, baseMax: 10, step: 0.5 }; termAxisControl = { baseMin: -5, baseMax: 8, step: 0.5 }; ratioAxisControl = { baseMin: -2, baseMax: 3, step: 0.25 };
-  const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value)); const rounded = (value: number) => Number(value.toFixed(Math.abs(value) >= 1e6 ? 0 : 6)); const normalizeParameter = (value: number | null | undefined, parameter: { defaultValue: number; min: number; max: number }) => clamp(typeof value === "number" && Number.isFinite(value) ? value : parameter.defaultValue, parameter.min, parameter.max); const normalize = (values: SequenceValues) => ({ initialTerm: normalizeParameter(values.initialTerm, initialTermControl), commonDifference: normalizeParameter(values.commonDifference, sequenceManifest.parameters.commonDifference), commonRatio: normalizeParameter(values.commonRatio, sequenceManifest.parameters.commonRatio) });
-  const axisBounds = (values: number[]) => { const finite = values.filter(Number.isFinite); const minimum = Math.min(0, ...finite); const maximum = Math.max(0, ...finite); if (minimum === maximum) return { yMin: -1, yMax: 1 }; const range = maximum - minimum; const padding = Math.max(range * 0.12, 2 ** -52); const paddedMinimum = minimum < 0 ? minimum - padding : 0; const paddedMaximum = maximum > 0 ? maximum + padding : 0; const target = (paddedMaximum - paddedMinimum) / 4; const magnitude = 10 ** Math.floor(Math.log10(Math.max(target, 1e-9))); const normalizedTarget = target / magnitude; const step = (normalizedTarget <= 1.5 ? 1 : normalizedTarget <= 3 ? 2 : normalizedTarget <= 7 ? 5 : 10) * magnitude; return { yMin: Math.floor(paddedMinimum / step) * step, yMax: Math.ceil(paddedMaximum / step) * step }; };
-  calculateSequences = values => { const normalized = normalize(values); const arithmeticTerms = Array.from({ length: 8 }, (_, index) => ({ termNumber: index + 1, value: rounded(normalized.initialTerm + index * normalized.commonDifference) })); const geometricTerms = Array.from({ length: 8 }, (_, index) => ({ termNumber: index + 1, value: rounded(normalized.initialTerm * normalized.commonRatio ** index) })); const bounds = axisBounds([...arithmeticTerms.map(term => term.value), ...geometricTerms.map(term => term.value)]); return { ...normalized, arithmeticTerms, geometricTerms, arithmeticFinal: arithmeticTerms[7]?.value ?? 0, geometricFinal: geometricTerms[7]?.value ?? 0, ...bounds }; };
-  formatSequenceValue = value => { const absolute = Math.abs(value); return absolute >= 1e5 || absolute > 0 && absolute < 0.01 ? value.toExponential(2).replace(/\.?0+e/, "e").replace("e+", "e") : value.toFixed(2).replace(/\.?0+$/, ""); };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `ARITHMETIC_VS_GEOMETRIC`),
+      (n = `arithmetic-vs-geometric-v1`),
+      (r = `\\begin{aligned} a_n &= a_1 + (n - 1)d \\\\ g_n &= a_1 r^{n - 1} \\end{aligned}`),
+      (i = {
+        commonDifference: { kind: `number`, defaultValue: 2, min: -20, max: 20 },
+        commonRatio: { kind: `number`, defaultValue: 2, min: -3, max: 3 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-export { calculateSequences as a, initializeSequencesManifest as c, differenceAxisControl as i, sequenceManifest as l, ratioAxisControl as n, formatSequenceValue as o, initialTermControl as r, initializeSequencesModel as s, termAxisControl as t };
+var s, c, l, u, d, f, p, m, h, g, _;
+function v() {
+  return (v = e(() => {
+    (o(),
+      (s = { defaultValue: 2, min: -20, max: 20 }),
+      (c = { baseMin: -10, baseMax: 10, step: 0.5 }),
+      (l = { baseMin: -5, baseMax: 8, step: 0.5 }),
+      (u = { baseMin: -2, baseMax: 3, step: 0.25 }),
+      (d = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (f = (e) => Number(e.toFixed(Math.abs(e) >= 1e6 ? 0 : 6))),
+      (p = (e, t) => {
+        let n = typeof e == `number` && Number.isFinite(e) ? e : t.defaultValue;
+        return d(n, t.min, t.max);
+      }),
+      (m = (e) => ({
+        initialTerm: p(e.initialTerm, s),
+        commonDifference: p(e.commonDifference, a.parameters.commonDifference),
+        commonRatio: p(e.commonRatio, a.parameters.commonRatio),
+      })),
+      (h = (e) => {
+        let t = e.filter(Number.isFinite),
+          n = Math.min(0, ...t),
+          r = Math.max(0, ...t);
+        if (n === r) return { yMin: -1, yMax: 1 };
+        let i = r - n,
+          a = Math.max(i * 0.12, 2 ** -52),
+          o = n < 0 ? n - a : 0,
+          s = r > 0 ? r + a : 0,
+          c = (s - o) / 4,
+          l = 10 ** Math.floor(Math.log10(Math.max(c, 1e-9))),
+          u = c / l,
+          d = (u <= 1.5 ? 1 : u <= 3 ? 2 : u <= 7 ? 5 : 10) * l;
+        return { yMin: Math.floor(o / d) * d, yMax: Math.ceil(s / d) * d };
+      }),
+      (g = (e) => {
+        let t = m(e),
+          n = Array.from({ length: 8 }, (e, n) => ({
+            termNumber: n + 1,
+            value: f(t.initialTerm + n * t.commonDifference),
+          })),
+          r = Array.from({ length: 8 }, (e, n) => ({
+            termNumber: n + 1,
+            value: f(t.initialTerm * t.commonRatio ** n),
+          })),
+          { yMin: i, yMax: a } = h([...n.map((e) => e.value), ...r.map((e) => e.value)]);
+        return {
+          ...t,
+          arithmeticTerms: n,
+          geometricTerms: r,
+          arithmeticFinal: n[7]?.value ?? 0,
+          geometricFinal: r[7]?.value ?? 0,
+          yMin: i,
+          yMax: a,
+        };
+      }),
+      (_ = (e) => {
+        let t = Math.abs(e);
+        return t >= 1e5 || (t > 0 && t < 0.01)
+          ? e
+              .toExponential(2)
+              .replace(/\.?0+e/, `e`)
+              .replace(`e+`, `e`)
+          : e.toFixed(2).replace(/\.?0+$/, ``);
+      }));
+  }))();
+}
+export { g as a, o as c, c as i, a as l, u as n, _ as o, s as r, v as s, l as t };

@@ -1,15 +1,53 @@
-// Counting ordered sequences with and without replacement.
-import "@rchunk/rolldown-runtime";
-import { a as initializeSelectionProcess, n as countOrderedSelections, t as buildSelectionProcess } from "@rchunk/learning-model-selection-process";
-
-type ReplacementMode = "with" | "without"; interface CountingValues { optionCount?: number | null; sequenceLength?: number | null; replacementMode?: unknown }
-const countingType = "COUNTING_SEQUENCES"; const countingThumbnail = "counting-sequences-v2"; const countingParameters = { optionCount: { kind: "integer", defaultValue: 6, min: 4, max: 8 }, sequenceLength: { kind: "integer", defaultValue: 3, min: 2, max: 4 }, replacementMode: { kind: "enum", defaultValue: "with" as ReplacementMode, allowedValues: ["with", "without"] as ReplacementMode[] } }; const countingDefinition = { type: countingType, version: 2, thumbnailAssetKey: countingThumbnail, parameters: countingParameters };
-const optionCountControl = { ...countingParameters.optionCount, step: 1 }; const sequenceLengthControl = { ...countingParameters.sequenceLength, step: 1 }; const replacementParameter = countingParameters.replacementMode; const isReplacementMode = (value: unknown): value is ReplacementMode => typeof value === "string" && replacementParameter.allowedValues.includes(value as ReplacementMode); const defaultReplacementMode = isReplacementMode(replacementParameter.defaultValue) ? replacementParameter.defaultValue : "with"; const defaultCountingValues = { optionCount: optionCountControl.defaultValue, replacementMode: defaultReplacementMode, sequenceLength: sequenceLengthControl.defaultValue };
-const normalizeInteger = (value: number | null | undefined, fallback: number, maximum: number): number => Math.min(Math.max(Math.round(typeof value === "number" && Number.isFinite(value) ? value : fallback), fallback), maximum);
-const normalizeCountingValues = (values: CountingValues) => ({ optionCount: normalizeInteger(values.optionCount, optionCountControl.min, optionCountControl.max), replacementMode: isReplacementMode(values.replacementMode) ? values.replacementMode : defaultReplacementMode, sequenceLength: normalizeInteger(values.sequenceLength, sequenceLengthControl.min, sequenceLengthControl.max) });
-const countSequences = (values: ReturnType<typeof normalizeCountingValues>): number => countOrderedSelections(values.optionCount, values.sequenceLength, values.replacementMode === "with");
-const createSequenceSelectionProcess = (values: ReturnType<typeof normalizeCountingValues>) => { initializeSelectionProcess(); return buildSelectionProcess({ mode: values.replacementMode === "with" ? "ordered-with-replacement" : "ordered-without-replacement", optionCount: values.optionCount, selectionCount: values.sequenceLength }); };
-const formatSequenceCount = (values: ReturnType<typeof normalizeCountingValues>): string => { const count = countSequences(values); return values.replacementMode === "with" ? values.optionCount + "^{" + values.sequenceLength + "}=" + count : "{}^{" + values.optionCount + "}P_" + values.sequenceLength + "=\\frac{" + values.optionCount + "!}{(" + values.optionCount + "-" + values.sequenceLength + ")!}=" + count; };
-function initializeCountingSchema(): void {}
-function initializeCountingModel(): void {}
-export { createSequenceSelectionProcess as a, initializeCountingSchema as c, formatSequenceCount as i, countingDefinition as l, optionCountControl as n, initializeCountingModel as o, sequenceLengthControl as r, normalizeCountingValues as s, defaultCountingValues as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { a as t, n, t as r } from "@rchunk/learning-model-selection-process";
+var i, a, o, s;
+function c() {
+  return (c = e(() => {
+    ((i = `COUNTING_SEQUENCES`),
+      (a = `counting-sequences-v2`),
+      (o = {
+        optionCount: { kind: `integer`, defaultValue: 6, min: 4, max: 8 },
+        sequenceLength: { kind: `integer`, defaultValue: 3, min: 2, max: 4 },
+        replacementMode: { kind: `enum`, defaultValue: `with`, allowedValues: [`with`, `without`] },
+      }),
+      (s = { type: i, version: 2, thumbnailAssetKey: a, parameters: o }));
+  }))();
+}
+var l, u, d, f, p, m, h, g, _, v, y;
+function b() {
+  return (b = e(() => {
+    (t(),
+      c(),
+      (l = { ...s.parameters.optionCount, step: 1 }),
+      (u = { ...s.parameters.sequenceLength, step: 1 }),
+      (d = s.parameters.replacementMode),
+      (f = (e) => typeof e == `string` && d.allowedValues.includes(e)),
+      (p = f(d.defaultValue) ? d.defaultValue : `with`),
+      (m = { optionCount: l.defaultValue, replacementMode: p, sequenceLength: u.defaultValue }),
+      (h = (e, t, n) =>
+        Math.min(Math.max(Math.round(typeof e == `number` && Number.isFinite(e) ? e : t), t), n)),
+      (g = (e) => ({
+        optionCount: h(e.optionCount ?? l.defaultValue, l.min, l.max),
+        replacementMode: f(e.replacementMode) ? e.replacementMode : p,
+        sequenceLength: h(e.sequenceLength ?? u.defaultValue, u.min, u.max),
+      })),
+      (_ = (e) => n(e.optionCount, e.sequenceLength, e.replacementMode === `with`)),
+      (v = (e) =>
+        r({
+          mode:
+            e.replacementMode === `with`
+              ? `ordered-with-replacement`
+              : `ordered-without-replacement`,
+          optionCount: e.optionCount,
+          selectionCount: e.sequenceLength,
+        })),
+      (y = (e) => {
+        let t = _(e);
+        return e.replacementMode === `with`
+          ? `${e.optionCount}^{${e.sequenceLength}}=${t}`
+          : `{}^{${e.optionCount}}P_${e.sequenceLength}=\\frac{${e.optionCount}!}{(${e.optionCount}-${e.sequenceLength})!}=${t}`;
+      }));
+  }))();
+}
+export { v as a, c, y as i, s as l, l as n, b as o, u as r, g as s, m as t };

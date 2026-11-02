@@ -1,462 +1,475 @@
-// Interactive poll widget renderer and action controller. Release chunk: renderer-60f4bb7aa0fd.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as pollWidgetChunk from "@rchunk/index-ymUnTRBB";
-import * as pollRuntimeChunk from "@rchunk/dist-e0bb3d63cc62";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as persistenceChunk from "@rchunk/view-state-persistence";
-
-interface PollState extends Record<string, unknown> {
-  lifecycle?: string;
-  is_creator?: boolean;
-  is_unfurl_preview?: boolean;
-  action_pending?: boolean;
-  role_loading?: boolean;
-  can_vote?: boolean;
-  question?: unknown;
-}
-interface PollStore {
-  getState(): PollState;
-  setState(state: PollState): void;
-  subscribe(listener: (state: PollState) => void): () => void;
-}
-interface PollAction {
-  type: string;
-  payload?: unknown;
-}
-interface Persistence {
-  markInteraction(): void;
-  setItem(key: unknown, value: string): void;
-  flush(force?: boolean): Promise<void>;
-  hydrate(input: Record<string, unknown>): void;
-  getSnapshot(): string | null;
-  dispose(): void;
-}
-interface JsxRuntime {
-  jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown;
-  jsxs(type: unknown, props: Record<string, unknown>): unknown;
-}
-interface ReactRuntime {
-  useState<Value>(factory: () => Value): [Value];
-  useLayoutEffect(effect: () => void, dependencies: unknown[]): void;
-  useEffect(effect: () => void | (() => void), dependencies: unknown[]): void;
-  useEffectEvent(callback: () => void): () => void;
-}
-interface Scope {
-  value: { pathname: string };
-  get(signal: unknown): {
-    danger(message: string, options: Record<string, unknown>): void;
-  };
-  query: {
-    cancel(key: unknown, input: unknown): Promise<void>;
-    invalidate(key: unknown, input: unknown): Promise<void>;
-  };
-}
-interface SharedRuntime {
-  $3(): unknown;
-  BX(signal: unknown, parameter: string): string | null;
-  FX(): void;
-  G4(...schemas: unknown[]): { parse(value: unknown): PollState };
-  I3(): JsxRuntime;
-  I4(): unknown;
-  K2(): void;
-  LX(context: unknown): Scope;
-  Q3: { warning(message: string, detail: unknown): void };
-  Y2: unknown;
-  Yh: unknown;
-  Z3(): void;
-  Zh(): void;
-  e6(): ReactRuntime;
-  g4(): void;
-  lk(): void;
-  n4(): { formatMessage(descriptor: Record<string, string>): string };
-  pk: unknown;
-  q4(): unknown;
-}
-interface InitialRuntime {
-  $en: unknown;
-  $gn(
-    pattern: string,
-    pathname: string,
-  ): { params: { postId?: string } } | null;
-  B0(): void;
-  F0: Record<string, string>;
-  Gkt(
-    scope: Scope,
-    conversationId: string,
-    flush: (force?: boolean) => Promise<void>,
-  ): (() => void) | undefined;
-  I0: Record<string, string>;
-  Kun(): void;
-  L0: unknown;
-  M6t(): void;
-  N0: Record<string, string>;
-  N6t(): {
-    isLoading: boolean;
-    userId?: string;
-    accountId?: string;
-    authMethod?: string;
-  };
-  P0: Record<string, string>;
-  Qgn(): void;
-  Run(): void;
-  Uzt(scope: Scope, signal: unknown, input: Record<string, unknown>): void;
-  Vzt(): void;
-  Wkt(): void;
-  _R(): void;
-  aL(): void;
-  cJt(): void;
-  hH(): void;
-  iL: unknown;
-  itn(): void;
-  mH: unknown;
-  rJt: {
-    safePost(
-      path: string,
-      options: Record<string, unknown>,
-    ): Promise<{ status: string; status_message?: string; data?: PollState }>;
-  };
-  uHt(): void;
-  wVt: unknown;
-  xR: unknown;
-  xpn(...args: unknown[]): void;
-  ypn(): void;
-  z0: Record<string, string>;
-}
-interface PersistenceRuntime {
-  d: unknown;
-  n(): void;
-  r(): void;
-  t(input: {
-    messageId: string;
-    widgetRefId: string;
-    initial: Record<string, unknown>;
-    onError(error: unknown): void;
-  }): Persistence;
-}
-interface WidgetRuntime {
-  r: unknown;
-}
-interface DistRuntime {
-  t(): void;
-}
-
-const shared = appSharedChunk as unknown as SharedRuntime;
-const initial = appInitialChunk as unknown as InitialRuntime;
-const persistenceRuntime = persistenceChunk as unknown as PersistenceRuntime;
-const widgetRuntime = pollWidgetChunk as unknown as WidgetRuntime;
-const distRuntime = pollRuntimeChunk as unknown as DistRuntime;
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let stateSchema: { parse(value: unknown): PollState };
-const actionTypes = new Set([
-  "interactive_poll_initialize",
-  "interactive_poll_publish",
-  "interactive_poll_vote",
-  "interactive_poll_refresh",
-]);
-
-function createPollController(input: {
-  conversationId: string | null;
-  messageId: string;
-  widgetRefId: string;
-  sharedPostId: string | null;
-  initialState: PollState;
-  sync: unknown;
-  onShare(state: PollState): void;
-  onError(error: unknown): void;
-  beforeVote(): Promise<void>;
-  afterVote(): Promise<void>;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  G4 as i,
+  I3 as a,
+  I4 as o,
+  K2 as s,
+  LX as c,
+  Q3 as l,
+  Y2 as u,
+  Yh as d,
+  Z3 as f,
+  Zh as p,
+  e6 as m,
+  g4 as h,
+  lk as g,
+  n4 as _,
+  pk as v,
+  q4 as y,
+} from "@rchunk/app-shared";
+import { r as b } from "@rchunk/dil-react-renderer-bridge";
+import { t as x } from "@rchunk/dist-e0bb3d63cc62";
+import {
+  $en as S,
+  $gn as C,
+  B0 as w,
+  F0 as T,
+  Gkt as E,
+  I0 as ee,
+  Kun as te,
+  L0 as ne,
+  M6t as D,
+  N0 as O,
+  N6t as k,
+  P0 as A,
+  Qgn as j,
+  Run as M,
+  Uzt as re,
+  Vzt as N,
+  Wkt as P,
+  _R as F,
+  aL as I,
+  cJt as L,
+  hH as R,
+  iL as z,
+  itn as B,
+  mH as V,
+  rJt as H,
+  uHt as U,
+  wVt as W,
+  xR as G,
+  xpn as K,
+  ypn as ie,
+  z0 as ae,
+} from "@rchunk/app-initial";
+import { d as oe, n as se, r as ce, t as le } from "@rchunk/view-state-persistence-runtime";
+function ue({
+  conversationId: e,
+  messageId: t,
+  widgetRefId: n,
+  sharedPostId: r,
+  initialState: i,
+  sync: a,
+  onShare: o,
+  onError: s,
+  beforeVote: c,
+  afterVote: l,
 }) {
-  let store: PollStore | undefined;
-  let unsubscribe: (() => void) | undefined;
-  let state = input.initialState;
-  let applying = false;
-  let acting = false;
-  let hydrationKey = JSON.stringify({
-    state: input.initialState,
-    sync: input.sync,
-  });
-  let abortController = new AbortController();
-  const persistence = persistenceRuntime.t({
-    messageId: input.messageId,
-    widgetRefId: input.widgetRefId,
-    initial: persisted(input.initialState, input.sync),
-    onError: input.onError,
-  });
-  function persisted(root: PollState, sync: unknown) {
+  let u,
+    d,
+    f = i,
+    p = !1,
+    m = !1,
+    h = JSON.stringify({ state: i, sync: a }),
+    g = new AbortController(),
+    _ = le({ messageId: t, widgetRefId: n, initial: v(i, a), onError: s });
+  function v(t, n) {
     return {
-      conversationId: input.conversationId,
-      root,
-      sync,
-      readOnly:
-        input.sharedPostId != null ||
-        root.lifecycle !== "draft" ||
-        root.is_creator !== true,
+      conversationId: e,
+      root: t,
+      sync: n,
+      readOnly: r != null || t.lifecycle !== `draft` || t.is_creator !== !0,
     };
   }
-  function update(next: PollState) {
-    applying = true;
-    store?.setState(next);
-    applying = false;
-    state = store?.getState() ?? next;
+  function y(e) {
+    ((p = !0), u?.setState(e), (p = !1), (f = u?.getState() ?? e));
   }
-  function connect(nextStore: PollStore) {
-    unsubscribe?.();
-    store = nextStore;
-    if (abortController.signal.aborted) abortController = new AbortController();
-    update(state);
-    unsubscribe = store.subscribe((next) => {
-      if (!applying && !acting && next.action_pending !== true) {
-        state = next;
-        if (next.lifecycle === "draft" && next.is_creator === true) {
-          persistence.markInteraction();
-          persistence.setItem(persistenceRuntime.d, JSON.stringify(next));
-        }
-      }
-    });
+  function b(e) {
+    (d?.(),
+      (u = e),
+      g.signal.aborted && (g = new AbortController()),
+      y(f),
+      (d = u.subscribe((e) => {
+        p ||
+          m ||
+          e.action_pending === !0 ||
+          ((f = e),
+          e.lifecycle === `draft` &&
+            e.is_creator === !0 &&
+            (_.markInteraction(), _.setItem(oe, JSON.stringify(e))));
+      })));
   }
   return {
-    connect,
+    connect: b,
     activate() {
-      if (store && abortController.signal.aborted) connect(store);
+      u && g.signal.aborted && b(u);
     },
-    flush: persistence.flush,
-    hydrate(nextState: PollState, sync: unknown) {
-      if (acting) return;
-      const key = JSON.stringify({ state: nextState, sync });
-      if (
-        key === hydrationKey ||
-        (state.lifecycle === "published" && nextState.lifecycle === "draft")
-      )
-        return;
-      hydrationKey = key;
-      persistence.hydrate(persisted(nextState, sync));
-      const snapshot = persistence.getSnapshot();
-      update(
-        snapshot == null ? nextState : stateSchema.parse(JSON.parse(snapshot)),
-      );
+    flush: _.flush,
+    hydrate(e, t) {
+      if (m) return;
+      let n = JSON.stringify({ state: e, sync: t });
+      if (n === h || (f.lifecycle === `published` && e.lifecycle === `draft`)) return;
+      ((h = n), _.hydrate(v(e, t)));
+      let r = _.getSnapshot();
+      y(r == null ? e : q.parse(JSON.parse(r)));
     },
-    async onAction(action: PollAction) {
-      if (
-        abortController.signal.aborted ||
-        !store ||
-        acting ||
-        state.is_unfurl_preview === true
-      )
-        return;
-      if (action.type === "share") {
-        input.onShare(state);
+    async onAction(i) {
+      if (g.signal.aborted || !u || m || f.is_unfurl_preview === !0) return;
+      if (i.type === `share`) {
+        o(f);
         return;
       }
-      if (!actionTypes.has(action.type)) return;
-      const signal = abortController.signal;
-      const previous = state;
-      acting = true;
-      store.setState({ action_pending: true });
+      if (!J.has(i.type)) return;
+      let a = g.signal,
+        d = f;
+      ((m = !0), u.setState({ action_pending: !0 }));
       try {
-        if (
-          input.sharedPostId != null &&
-          action.type !== "interactive_poll_vote"
-        )
-          throw new Error("Only voting is available on shared polls");
-        await persistence.flush();
-        if (action.type === "interactive_poll_vote") await input.beforeVote();
-        signal.throwIfAborted();
-        const payload = stateSchema.parse(action.payload ?? {});
-        const response =
-          input.sharedPostId == null
-            ? await initial.rJt.safePost("/widget_server_action", {
-                signal,
-                requestBody: {
-                  action_type: action.type,
-                  payload,
-                  conversation_id: input.conversationId,
-                  message_id: input.messageId,
-                  ref_id: input.widgetRefId,
-                },
-              })
-            : await initial.rJt.safePost("/widget_server_action/public", {
-                signal,
-                requestBody: {
-                  action_type: action.type,
-                  payload,
-                  ref_id: input.widgetRefId,
-                  public_action_context: {
-                    surface_type: "shared_post",
-                    surface_id: input.sharedPostId,
+        if (r != null && i.type !== `interactive_poll_vote`)
+          throw Error(`Only voting is available on shared polls`);
+        (await _.flush(), i.type === `interactive_poll_vote` && (await c()), a.throwIfAborted());
+        let o = q.parse(i.payload ?? {}),
+          s =
+            r == null
+              ? await H.safePost(`/widget_server_action`, {
+                  signal: a,
+                  requestBody: {
+                    action_type: i.type,
+                    payload: o,
+                    conversation_id: e,
+                    message_id: t,
+                    ref_id: n,
                   },
-                },
-              });
-        signal.throwIfAborted();
-        if (response.status !== "success")
-          throw new Error(response.status_message ?? "Poll action failed");
-        const data = response.data;
-        update({
-          ...(previous.lifecycle === "draft" &&
-          data?.lifecycle !== "published" &&
-          action.type !== "interactive_poll_publish"
-            ? {
-                is_creator: data?.is_creator ?? previous.is_creator,
-                role_loading: false,
-              }
-            : data),
-          action_pending: false,
-        });
-        persistence.hydrate(persisted(state, undefined));
-      } catch (error) {
-        if (!signal.aborted) {
-          update({ ...previous, action_pending: false, role_loading: false });
-          input.onError(error);
-        }
+                })
+              : await H.safePost(`/widget_server_action/public`, {
+                  signal: a,
+                  requestBody: {
+                    action_type: i.type,
+                    payload: o,
+                    ref_id: n,
+                    public_action_context: { surface_type: `shared_post`, surface_id: r },
+                  },
+                });
+        if ((a.throwIfAborted(), s.status !== `success`))
+          throw Error(s.status_message ?? `Poll action failed`);
+        let l = s.data;
+        (y({
+          ...(d.lifecycle === `draft` &&
+          l?.lifecycle !== `published` &&
+          i.type !== `interactive_poll_publish`
+            ? { is_creator: l?.is_creator ?? d.is_creator, role_loading: !1 }
+            : l),
+          action_pending: !1,
+        }),
+          _.hydrate(v(f, void 0)));
+      } catch (e) {
+        a.aborted || (y({ ...d, action_pending: !1, role_loading: !1 }), s(e));
       } finally {
-        acting = false;
-        if (!signal.aborted && action.type === "interactive_poll_vote")
-          await input.afterVote();
+        ((m = !1), !a.aborted && i.type === `interactive_poll_vote` && (await l()));
       }
     },
     dispose() {
-      abortController.abort();
-      unsubscribe?.();
-      persistence.dispose();
+      (g.abort(), d?.(), _.dispose());
     },
   };
 }
-
-interface Props {
-  widget: unknown;
-  state: PollState;
-  widgetRefId: string;
-  messageId: string;
-  turn: {
-    conversationId: string;
-    isStreaming?: boolean;
-    dilViewState?: { widgetSync?: Record<string, unknown> };
-  };
-  theme?: unknown;
-  customCss?: string;
+var q, J;
+function Y() {
+  return (Y = e(() => {
+    (ce(),
+      h(),
+      L(),
+      se(),
+      (q = i(y(), o())),
+      (J = new Set([
+        `interactive_poll_initialize`,
+        `interactive_poll_publish`,
+        `interactive_poll_vote`,
+        `interactive_poll_refresh`,
+      ])));
+  }))();
 }
-function InteractivePoll(props: Props): unknown {
-  const scope = shared.LX(initial.$en);
-  const session = initial.N6t();
-  const serverId = shared.BX(initial.wVt, props.turn.conversationId);
-  const sharedPostId =
-    initial.$gn("/s/:postId", scope.value.pathname)?.params.postId ?? null;
-  if (session.isLoading || (serverId == null && sharedPostId == null))
-    return jsx.jsx(initial.mH, { state: props.state });
-  const sync = props.turn.dilViewState?.widgetSync?.[props.widgetRefId];
-  const onError = (error: unknown) => {
-    shared.Q3.warning("Interactive poll action failed", {
-      safe: {},
-      sensitive: { error },
-    });
-    scope.get(shared.pk).danger(
-      shared.n4().formatMessage({
-        id: "chatgptConversations.interactivePoll.actionFailed",
-        defaultMessage: "Your poll change couldn’t be saved. Please try again",
-        description:
-          "Error after publishing, saving, or voting on an interactive poll fails",
-      }),
-      {
-        errorAnalytics: {
-          toastId: "chatgptConversations.interactivePoll.actionFailed",
-        },
-      },
+function de(e) {
+  let t = (0, X.c)(9),
+    r = c(S),
+    i = k(),
+    a = n(W, e.turn.conversationId),
+    o;
+  t[0] === r.value.pathname
+    ? (o = t[1])
+    : ((o = C(`/s/:postId`, r.value.pathname)?.params.postId),
+      (t[0] = r.value.pathname),
+      (t[1] = o));
+  let s = o;
+  if (i.isLoading || (a == null && s == null)) {
+    let n;
+    return (
+      t[2] === e.state
+        ? (n = t[3])
+        : ((n = (0, Q.jsx)(V, { state: e.state })), (t[2] = e.state), (t[3] = n)),
+      n
     );
-  };
-  const [controller] = React.useState(() =>
-    createPollController({
-      conversationId: serverId,
-      messageId: props.messageId,
-      widgetRefId: props.widgetRefId,
-      sharedPostId,
-      initialState: props.state,
-      sync,
-      onError,
-      onShare: () => undefined,
-      beforeVote: async () => {
-        if (sharedPostId != null) await scope.query.cancel(initial.xR, session);
-      },
-      afterVote: async () => {
-        if (sharedPostId != null)
-          await scope.query.invalidate(initial.xR, session);
-      },
-    }),
+  }
+  let l = `${i.userId}:${i.accountId}:${a}:${s}`,
+    u;
+  return (
+    t[4] !== e || t[5] !== a || t[6] !== s || t[7] !== l
+      ? ((u = (0, Q.jsx)(fe, { ...e, serverId: a, sharedPostId: s }, l)),
+        (t[4] = e),
+        (t[5] = a),
+        (t[6] = s),
+        (t[7] = l),
+        (t[8] = u))
+      : (u = t[8]),
+    u
   );
-  React.useLayoutEffect(
-    () => controller.hydrate(props.state, sync),
-    [controller, props.state, sync],
+}
+function fe(e) {
+  let t = (0, X.c)(48),
+    {
+      widget: n,
+      state: r,
+      widgetRefId: i,
+      messageId: a,
+      turn: o,
+      theme: s,
+      customCss: f,
+      serverId: p,
+      sharedPostId: m,
+    } = e,
+    h = c(S),
+    g = k(),
+    y = _(),
+    x = o.dilViewState?.widgetSync?.[i],
+    C;
+  t[0] !== y || t[1] !== h
+    ? ((C = function (e) {
+        (l.warning(`Interactive poll action failed`, { safe: {}, sensitive: { error: e } }),
+          h
+            .get(v)
+            .danger(
+              y.formatMessage({
+                id: `chatgptConversations.interactivePoll.actionFailed`,
+                defaultMessage: `Your poll change couldn’t be saved. Please try again`,
+                description: `Error after publishing, saving, or voting on an interactive poll fails`,
+              }),
+              { errorAnalytics: { toastId: `chatgptConversations.interactivePoll.actionFailed` } },
+            ));
+      }),
+      (t[0] = y),
+      (t[1] = h),
+      (t[2] = C))
+    : (C = t[2]);
+  let w = C,
+    D;
+  t[3] !== g ||
+  t[4] !== a ||
+  t[5] !== w ||
+  t[6] !== h ||
+  t[7] !== p ||
+  t[8] !== m ||
+  t[9] !== r ||
+  t[10] !== x ||
+  t[11] !== i
+    ? ((D = () =>
+        ue({
+          conversationId: p,
+          messageId: a,
+          widgetRefId: i,
+          sharedPostId: m,
+          initialState: r,
+          sync: x,
+          onError: w,
+          onShare: (e) => {
+            let t = i.match(/:(\d+)$/)?.[1];
+            if (p == null || t == null || e.lifecycle !== `published`) return;
+            let n = crypto.randomUUID(),
+              r = { widgetType: `dil`, widgetName: `create_interactive_poll` };
+            (K(h, ne, {
+              action: O.CHATGPT_SHARE_FLOW_ACTION_ENTRY_POINT_SELECTED,
+              actor: A.CHATGPT_SHARE_FLOW_ACTOR_SHARER,
+              attachmentType: T.CHATGPT_SHARE_FLOW_ATTACHMENT_TYPE_WIDGET,
+              contentType: ee.CHATGPT_SHARE_FLOW_CONTENT_TYPE_POST_SLICE,
+              source: ae.CHATGPT_SHARE_FLOW_SOURCE_WIDGET_INLINE_ACTION,
+              widgetMetadata: r,
+              shareSessionId: n,
+            }),
+              re(h, z, {
+                shareSessionId: n,
+                currentNodeId: a,
+                serverConversationId: p,
+                title: typeof e.question == `string` ? e.question : null,
+                widget: {
+                  metadata: r,
+                  attachment: {
+                    kind: `widget`,
+                    conversation_id: p,
+                    message_id: a,
+                    content_reference_index: Number(t),
+                  },
+                  preview: (0, Q.jsx)(V, { state: e }),
+                },
+              }));
+          },
+          beforeVote: async () => {
+            m != null && (await h.query.cancel(G, g));
+          },
+          afterVote: async () => {
+            m != null && (await h.query.invalidate(G, g));
+          },
+        })),
+      (t[3] = g),
+      (t[4] = a),
+      (t[5] = w),
+      (t[6] = h),
+      (t[7] = p),
+      (t[8] = m),
+      (t[9] = r),
+      (t[10] = x),
+      (t[11] = i),
+      (t[12] = D))
+    : (D = t[12]);
+  let [j] = (0, Z.useState)(D),
+    M,
+    N;
+  (t[13] !== j || t[14] !== r || t[15] !== x
+    ? ((M = () => {
+        j.hydrate(r, x);
+      }),
+      (N = [j, r, x]),
+      (t[13] = j),
+      (t[14] = r),
+      (t[15] = x),
+      (t[16] = M),
+      (t[17] = N))
+    : ((M = t[16]), (N = t[17])),
+    (0, Z.useLayoutEffect)(M, N));
+  let P;
+  t[18] !== j || t[19] !== w
+    ? ((P = () => {
+        j.flush(!0).catch(w);
+      }),
+      (t[18] = j),
+      (t[19] = w),
+      (t[20] = P))
+    : (P = t[20]);
+  let F = (0, Z.useEffectEvent)(P),
+    I;
+  t[21] !== j || t[22] !== F || t[23] !== h || t[24] !== p || t[25] !== m
+    ? ((I = () => {
+        j.activate();
+        let e = p != null && m == null ? E(h, p, j.flush) : void 0;
+        return (
+          window.addEventListener(`pagehide`, F),
+          () => {
+            (window.removeEventListener(`pagehide`, F), j.dispose(), e?.());
+          }
+        );
+      }),
+      (t[21] = j),
+      (t[22] = F),
+      (t[23] = h),
+      (t[24] = p),
+      (t[25] = m),
+      (t[26] = I))
+    : (I = t[26]);
+  let L;
+  (t[27] !== j || t[28] !== h || t[29] !== p || t[30] !== m
+    ? ((L = [j, h, p, m]), (t[27] = j), (t[28] = h), (t[29] = p), (t[30] = m), (t[31] = L))
+    : (L = t[31]),
+    (0, Z.useEffect)(I, L));
+  let R = n,
+    B;
+  t[32] !== j.connect ||
+  t[33] !== j.onAction ||
+  t[34] !== f ||
+  t[35] !== w ||
+  t[36] !== r ||
+  t[37] !== R ||
+  t[38] !== s ||
+  t[39] !== o.isStreaming
+    ? ((B = (0, Q.jsx)(b, {
+        theme: s,
+        customCss: f,
+        initialState: r,
+        streaming: o.isStreaming,
+        widget: R,
+        onLoad: j.connect,
+        onAction: j.onAction,
+        onError: w,
+      })),
+      (t[32] = j.connect),
+      (t[33] = j.onAction),
+      (t[34] = f),
+      (t[35] = w),
+      (t[36] = r),
+      (t[37] = R),
+      (t[38] = s),
+      (t[39] = o.isStreaming),
+      (t[40] = B))
+    : (B = t[40]);
+  let H;
+  t[41] !== g || t[42] !== m || t[43] !== r
+    ? ((H =
+        m != null && g.authMethod !== `chatgpt` && r.can_vote !== !0
+          ? (0, Q.jsx)(d, {
+              onClick: te,
+              children: (0, Q.jsx)(u, {
+                id: `chatgptConversations.interactivePoll.login`,
+                defaultMessage: `Log in to vote`,
+                description: `Button to log in before voting in a shared poll when anonymous voting is unavailable`,
+              }),
+            })
+          : null),
+      (t[41] = g),
+      (t[42] = m),
+      (t[43] = r),
+      (t[44] = H))
+    : (H = t[44]);
+  let U;
+  return (
+    t[45] !== H || t[46] !== B
+      ? ((U = (0, Q.jsxs)(`div`, {
+          className: `my-3 flex w-full flex-col gap-3`,
+          "data-testid": `interactive-poll`,
+          children: [B, H],
+        })),
+        (t[45] = H),
+        (t[46] = B),
+        (t[47] = U))
+      : (U = t[47]),
+    U
   );
-  const flushOnPageHide = React.useEffectEvent(() => {
-    void controller.flush(true).catch(onError);
-  });
-  React.useEffect(() => {
-    controller.activate();
-    window.addEventListener("pagehide", flushOnPageHide);
-    return () => {
-      window.removeEventListener("pagehide", flushOnPageHide);
-      controller.dispose();
-    };
-  }, [controller, flushOnPageHide]);
-  const widget = jsx.jsx(widgetRuntime.r, {
-    theme: props.theme,
-    customCss: props.customCss,
-    initialState: props.state,
-    streaming: props.turn.isStreaming,
-    widget: props.widget,
-    onLoad: controller.connect,
-    onAction: controller.onAction,
-    onError,
-  });
-  const login =
-    sharedPostId != null &&
-    session.authMethod !== "chatgpt" &&
-    props.state.can_vote !== true
-      ? jsx.jsx(shared.Yh, {
-          onClick: initial.Kun,
-          children: jsx.jsx(shared.Y2, {
-            id: "chatgptConversations.interactivePoll.login",
-            defaultMessage: "Log in to vote",
-            description:
-              "Button to log in before voting in a shared poll when anonymous voting is unavailable",
-          }),
-        })
-      : null;
-  return jsx.jsxs("div", {
-    className: "my-3 flex w-full flex-col gap-3",
-    "data-testid": "interactive-poll",
-    children: [widget, login],
-  });
 }
-
-function initialize(): void {
-  shared.$3();
-  initial.B0();
-  distRuntime.t();
-  shared.FX();
-  React = shared.e6();
-  shared.K2();
-  initial.Qgn();
-  initial.Run();
-  initial.M6t();
-  shared.Zh();
-  initial.Vzt();
-  shared.lk();
-  initial.ypn();
-  initial.itn();
-  shared.Z3();
-  initial.aL();
-  initial.uHt();
-  initial.Wkt();
-  initial._R();
-  persistenceRuntime.r();
-  shared.g4();
-  initial.cJt();
-  persistenceRuntime.n();
-  stateSchema = shared.G4(shared.q4(), shared.I4());
-  initial.hH();
-  jsx = shared.I3();
+var X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((X = t()),
+      w(),
+      x(),
+      r(),
+      (Z = m()),
+      s(),
+      j(),
+      M(),
+      D(),
+      p(),
+      N(),
+      g(),
+      ie(),
+      B(),
+      f(),
+      I(),
+      U(),
+      P(),
+      F(),
+      Y(),
+      R(),
+      (Q = a()));
+  }))();
 }
-initialize();
-
-export { InteractivePoll };
+$();
+export { de as InteractivePoll };

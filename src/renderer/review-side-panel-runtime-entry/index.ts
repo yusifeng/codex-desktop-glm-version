@@ -1,7 +1,18 @@
-// Review-side-panel lazy runtime entry. Release chunk: runtime-337e1f2ac0bd.js.
+// @ts-nocheck
 import "@rchunk/app-shared";
-import * as appInitial from "@rchunk/app-initial";
-type Runtime = typeof appInitial & { Fi: unknown; Ii: (...arguments_: unknown[]) => unknown; Mi: (...arguments_: unknown[]) => unknown; Ni: (...arguments_: unknown[]) => unknown; Pi: (...arguments_: unknown[]) => unknown; ji: () => void };
-const runtime = appInitial as Runtime; runtime.ji();
-const reviewTabType = runtime.Fi; const toggleThreadReviewSidePanelTab = runtime.Ii; const openThreadBranchReviewSidePanelTab = runtime.Mi; const openThreadLastTurnReviewSidePanelTab = runtime.Ni; const openThreadReviewSidePanelTab = runtime.Pi;
-export { openThreadBranchReviewSidePanelTab, openThreadLastTurnReviewSidePanelTab, openThreadReviewSidePanelTab, reviewTabType, toggleThreadReviewSidePanelTab };
+import {
+  Fi as e,
+  Ii as t,
+  Mi as n,
+  Ni as r,
+  Pi as i,
+  ji as a,
+} from "@rchunk/app-initial";
+a();
+export {
+  n as openThreadBranchReviewSidePanelTab,
+  r as openThreadLastTurnReviewSidePanelTab,
+  i as openThreadReviewSidePanelTab,
+  e as reviewTabType,
+  t as toggleThreadReviewSidePanelTab,
+};

@@ -1,27 +1,34 @@
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-
-export type SecretNamespace = "not_sensitive" | "sensitive";
-let jsx: JsxRuntime;
-
-function SecretEntryTypeLabel({
-  namespace,
-}: {
-  namespace: SecretNamespace;
-}): unknown {
-  return ensureJsx().jsx("span", {
-    children:
-      namespace === "not_sensitive" ? "Environment variable" : "Network secret",
-  });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i } from "@rchunk/app-shared";
+function a(e) {
+  let t = (0, o.c)(2),
+    { namespace: n } = e,
+    r;
+  return (
+    t[0] === n
+      ? (r = t[1])
+      : ((r =
+          n === `not_sensitive`
+            ? (0, s.jsx)(i, {
+                id: `personalVault.variableType`,
+                defaultMessage: `Environment variable`,
+                description: `Type label for a personal variable whose value is visible to the task`,
+              })
+            : (0, s.jsx)(i, {
+                id: `personalVault.networkSecretType`,
+                defaultMessage: `Network secret`,
+                description: `Type label for a personal secret delivered by the network proxy`,
+              })),
+        (t[0] = n),
+        (t[1] = r)),
+    r
+  );
 }
-
-function initializeSecretEntryType(): void {
-  jsx = getJsxRuntime();
+var o, s;
+function c() {
+  return (c = e(() => {
+    ((o = t()), r(), (s = n()));
+  }))();
 }
-
-function ensureJsx(): JsxRuntime {
-  if (jsx == null) jsx = getJsxRuntime();
-  return jsx;
-}
-
-export { initializeSecretEntryType as n, SecretEntryTypeLabel as t };
+export { c as n, a as t };

@@ -1,12 +1,30 @@
-import "@rchunk/browser-skills-state";
-import "@rchunk/browser-skill-files";
-
-export interface SkillDataRecord { description?: string; enabled?: boolean; id: string; name?: string; safety_scan?: { status?: string }; [key: string]: unknown }
-export const getSkillName = (skill: SkillDataRecord): string => skill.name?.trim() || skill.id;
-export const getSkillSafetyStatus = (skill: SkillDataRecord, config?: { blockUnsafe?: boolean }): "blocked" | "needs-review" | null => skill.safety_scan?.status === "blocked" && config?.blockUnsafe !== false ? "blocked" : skill.safety_scan?.status === "needs_review" ? "needs-review" : null;
-export const setSkillInstalled = async (_scope: unknown, skill: SkillDataRecord, installed: boolean): Promise<SkillDataRecord> => ({ ...skill, enabled: installed });
-export const skillDetail$ = { key: "skill-detail" };
-export const skillFile$ = { key: "skill-file" };
-export const skillSafetyConfig$ = { key: "skill-safety-config" };
-export const skillsAccess$ = { key: "skills-access" };
-export const skillsCollection$ = { key: "skills-collection" };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  _ as t,
+  a as n,
+  i as r,
+  n as i,
+  r as a,
+  s as o,
+  u as s,
+  v as c,
+  y as l,
+} from "@rchunk/browser-skills-state";
+import { n as u, r as d } from "@rchunk/browser-skill-files";
+function f() {
+  return (f = e(() => {
+    (u(), l(), i());
+  }))();
+}
+f();
+export {
+  t as getSkillName,
+  c as getSkillSafetyStatus,
+  a as setSkillInstalled,
+  r as skillDetail$,
+  d as skillFile$,
+  n as skillSafetyConfig$,
+  o as skillsAccess$,
+  s as skillsCollection$,
+};

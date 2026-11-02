@@ -1,10 +1,12 @@
-// Non-null assertion utility. Release chunk: null-throws-c7a886463bcb.js.
-import "@rchunk/rolldown-runtime";
-
-function nullThrows<T>(value: T | null | undefined): T {
-  if (value == null) throw new Error("Unexpected null or undefined value");
-  return value;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t;
+function n() {
+  return (n = e(() => {
+    t = (e) => {
+      if (e == null) throw Error(`Unexpected null or undefined value`);
+      return e;
+    };
+  }))();
 }
-function initializeNullThrows(): void {}
-
-export { nullThrows as n, initializeNullThrows as t };
+export { t as n, n as t };

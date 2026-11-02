@@ -1,8 +1,40 @@
-import "@rchunk/rolldown-runtime";
-interface SubscriptionState { entitlement: { has_active_subscription?: boolean }; last_active_subscription?: { purchase_origin_platform?: string } }
-interface PaymentMethod { id: string; type?: string; card?: { exp_month?: number; exp_year?: number } }
-function subscriptionManagementSource(state: SubscriptionState): "app_store" | "google_play_store" | "partner_managed" | null { if (!state.entitlement.has_active_subscription) return null; switch (state.last_active_subscription?.purchase_origin_platform) { case "chatgpt_mobile_ios": case "sora_mobile_ios": return "app_store"; case "chatgpt_mobile_android": return "google_play_store"; case "partner_managed": return "partner_managed"; default: return null; } }
-function isExpiredPaymentMethod(method: PaymentMethod, now = new Date()): boolean { const card = method.card; return method.type === "card" && card?.exp_month != null && card.exp_year != null && (card.exp_year < now.getFullYear() || (card.exp_year === now.getFullYear() && card.exp_month < now.getMonth() + 1)); }
-function canDeletePaymentMethod({ paymentMethod, defaultPaymentMethodId, autoReloadPaymentMethodId, autoReloadResolved }: { paymentMethod: PaymentMethod; defaultPaymentMethodId?: string; autoReloadPaymentMethodId?: string; autoReloadResolved: boolean }): boolean { return autoReloadResolved && paymentMethod.id !== defaultPaymentMethodId && paymentMethod.id !== autoReloadPaymentMethodId; }
-function initializeBillingState(): void {}
-export { isExpiredPaymentMethod as i, subscriptionManagementSource as n, initializeBillingState as r, canDeletePaymentMethod as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e) {
+  if (!e.entitlement.has_active_subscription) return null;
+  switch (e.last_active_subscription.purchase_origin_platform) {
+    case `chatgpt_mobile_ios`:
+    case `sora_mobile_ios`:
+      return `app_store`;
+    case `chatgpt_mobile_android`:
+      return `google_play_store`;
+    case `partner_managed`:
+      return `partner_managed`;
+    case void 0:
+      return null;
+    default:
+      return null;
+  }
+}
+function n(e, t = new Date()) {
+  let n = e.card;
+  return (
+    e.type === `card` &&
+    n?.exp_month != null &&
+    n.exp_year != null &&
+    (n.exp_year < t.getFullYear() ||
+      (n.exp_year === t.getFullYear() && n.exp_month < t.getMonth() + 1))
+  );
+}
+function r({
+  paymentMethod: e,
+  defaultPaymentMethodId: t,
+  autoReloadPaymentMethodId: n,
+  autoReloadResolved: r,
+}) {
+  return r && e.id !== t && e.id !== n;
+}
+function i() {
+  return (i = e(() => {}))();
+}
+export { n as i, t as n, i as r, r as t };

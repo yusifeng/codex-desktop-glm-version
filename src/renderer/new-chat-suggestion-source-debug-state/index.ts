@@ -1,136 +1,142 @@
-// new-chat-suggestion-source-debug-state —— Ambient suggestions 的持久化覆盖、查询和派生状态。
-// 原版：app/webview/assets/new-chat-suggestion-source-debug-state-855bc2eaa826.js。
-
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
-  FX as initializeSignalRuntime, QI as initializeScopedSignals, ZI as appScope,
-  eZ as createQuerySignal, oZ as createSignalFamily, rZ as createDerivedFamily,
+  FX as n,
+  QI as r,
+  ZI as i,
+  eZ as a,
+  oZ as o,
+  rZ as s,
+  vV as c,
 } from "@rchunk/app-shared";
 import {
-  dun as createPersistedSignal, eun as createAppServerQueryFamily,
-  ign as clearPersistedValues, mnt as initializeDesktopBridge,
-  ngn as readPersistedValue, nun as initializeAppServerQueries,
-  pnt as desktopBridge, rgn as initializePreferenceRuntime,
-  uun as initializePreferenceStorage,
+  dun as l,
+  eun as u,
+  ign as d,
+  mnt as f,
+  ngn as p,
+  nun as m,
+  pnt as h,
+  rgn as g,
+  uun as _,
 } from "@rchunk/app-initial";
-
-export type AmbientSuggestionStatus = "pending" | "accepted" | "dismissed" | string;
-export interface AmbientSuggestion { id: string; status: AmbientSuggestionStatus; [key: string]: unknown }
-export interface AmbientSuggestionsFile { currentSuggestionIds: string[]; suggestions: AmbientSuggestion[]; [key: string]: unknown }
-export interface AmbientSuggestionsResponse { file: AmbientSuggestionsFile; [key: string]: unknown }
-export interface AmbientSuggestionScope { domain?: string | null; hostId: string; projectRoot?: string | null }
-interface SignalScope {
-  set(signal: unknown, update: unknown): void;
-  query: { snapshot(signal: unknown, parameter: unknown): { setData(update: (value: AmbientSuggestionsResponse | null | undefined) => AmbientSuggestionsResponse | null | undefined): void } };
-}
-type SignalReader = (signal: unknown, parameter?: unknown) => any;
-
-const MAX_PENDING_SUGGESTIONS = 3;
-const GENERATION_STATUS_POLL_MS = 1_000;
-const DEFAULT_STATUS_PREFIX = "ambient-suggestions:default-statuses";
-let defaultSuggestionStatusesState: unknown;
-let ambientSuggestionsQuery: unknown;
-let ambientSuggestionGenerationStatusesQuery: unknown;
-let ambientSuggestionsRefreshQuery: unknown;
-let selectedAmbientSuggestionDomain: unknown;
-let ambientSuggestionDomains: unknown;
-let ambientSuggestionsLoaded: unknown;
-let pendingAmbientSuggestions: unknown;
-let newChatSuggestionSourceDebugOverride: unknown;
-let initialized = false;
-let overrideInitialized = false;
-
-function projectRootKey(projectRoot?: string | null): string { return projectRoot ?? ""; }
-function baseDefaultStatusesKey({ hostId, projectRoot }: AmbientSuggestionScope): string {
-  return `${DEFAULT_STATUS_PREFIX}:${hostId}:${projectRootKey(projectRoot)}`;
-}
-function defaultStatusesKey(scope: AmbientSuggestionScope): string {
-  const base = baseDefaultStatusesKey(scope);
-  return scope.domain == null ? base : `${base}:${scope.domain}`;
-}
-function persistedDefaultStatuses(scope: AmbientSuggestionScope): Record<string, AmbientSuggestionStatus> | undefined {
-  return readPersistedValue<Record<string, AmbientSuggestionStatus> | undefined>(baseDefaultStatusesKey(scope), undefined);
-}
-function readDefaultStatuses(get: SignalReader, scope: AmbientSuggestionScope): Record<string, AmbientSuggestionStatus> | undefined {
-  const current = get(defaultSuggestionStatusesState)?.[defaultStatusesKey(scope)];
-  if (current != null) return current;
-  if (scope.domain == null) return persistedDefaultStatuses(scope);
-}
-function setDefaultSuggestionStatus(scopeApi: SignalScope, scope: AmbientSuggestionScope, suggestionId: string, status: AmbientSuggestionStatus): void {
-  const key = defaultStatusesKey(scope);
-  scopeApi.set(defaultSuggestionStatusesState, (value: Record<string, Record<string, AmbientSuggestionStatus>> | null | undefined) => {
-    const current = value ?? {};
-    const statuses = current[key] ?? persistedDefaultStatuses(scope);
-    return statuses?.[suggestionId] === status ? current : { ...current, [key]: { ...statuses, [suggestionId]: status } };
+function v(e, t, n, r) {
+  let i = S(t);
+  e.set(M, (e) => {
+    let a = e ?? {},
+      o = a[i] ?? T(t);
+    return o?.[n] === r ? a : { ...a, [i]: { ...o, [n]: r } };
   });
 }
-function clearDefaultSuggestionStatuses(scopeApi: SignalScope): void {
-  clearPersistedValues(`${DEFAULT_STATUS_PREFIX}:`);
-  scopeApi.set(defaultSuggestionStatusesState, {});
+function y(e) {
+  (d(`${j}:`), e.set(M, {}));
 }
-function updateCachedSuggestionStatus(scopeApi: SignalScope, params: AmbientSuggestionScope, suggestionId: string, status: AmbientSuggestionStatus): void {
-  scopeApi.query.snapshot(ambientSuggestionsQuery, params).setData((response) => response == null ? response : ({
-    file: { ...response.file, suggestions: response.file.suggestions.map((suggestion) => suggestion.id === suggestionId ? { ...suggestion, status } : suggestion) },
-  }));
+function b(e, t, n, r) {
+  e.query
+    .snapshot(N, t)
+    .setData((e) =>
+      e == null
+        ? e
+        : {
+            file: {
+              ...e.file,
+              suggestions: e.file.suggestions.map((e) => (e.id === n ? { ...e, status: r } : e)),
+            },
+          },
+    );
 }
-function listDefaultStatusDomains(statuses: Record<string, AmbientSuggestionStatus> | null | undefined): string[] | null {
-  return statuses == null ? null : Object.keys(statuses);
+function x(e) {
+  return e == null ? null : Object.keys(e);
 }
-function selectPendingCurrentSuggestions(currentIds: readonly string[], suggestions: readonly AmbientSuggestion[]): AmbientSuggestion[] {
-  const pending: AmbientSuggestion[] = [];
-  for (const id of currentIds) {
-    const suggestion = suggestions.find((candidate) => candidate.id === id);
-    if (suggestion?.status === "pending") pending.push(suggestion);
-    if (pending.length === MAX_PENDING_SUGGESTIONS) break;
+function S({ domain: e, hostId: t, projectRoot: n }) {
+  return e == null ? `${j}:${t}:${w(n)}` : `${j}:${t}:${w(n)}:${e}`;
+}
+function C(e, t) {
+  let n = S(t),
+    r = e(M)?.[n];
+  if (r != null) return r;
+  if (t.domain == null) return T(t);
+}
+function w(e) {
+  return e ?? ``;
+}
+function T(e) {
+  return p(E(e), void 0);
+}
+function E({ hostId: e, projectRoot: t }) {
+  return `${j}:${e}:${w(t)}`;
+}
+function D(e, t) {
+  let n = [];
+  for (let r of e) {
+    let e = (0, O.default)(t, ({ id: e }) => e === r);
+    if ((e?.status === `pending` && n.push(e), n.length === k)) break;
   }
-  return pending;
+  return n;
 }
-
-function initializeNewChatSuggestionSourceDebugState(): void {
-  if (initialized) return;
-  initializeSignalRuntime(); initializeDesktopBridge(); initializeScopedSignals();
-  initializePreferenceRuntime(); initializePreferenceStorage(); initializeAppServerQueries();
-  defaultSuggestionStatusesState = createPersistedSignal(DEFAULT_STATUS_PREFIX, {});
-  const createServerQuery = createAppServerQueryFamily as unknown as (scope: unknown, name: string, options: (parameter: any) => Record<string, unknown>) => unknown;
-  ambientSuggestionsQuery = createServerQuery(appScope, "ambient-suggestions", ({ projectRoot }: AmbientSuggestionScope) => ({ enabled: projectRoot != null }));
-  const ambientSuggestionsBridge = desktopBridge.ambientSuggestions as unknown as { getGenerationStatuses?(): Promise<unknown> } | undefined;
-  ambientSuggestionGenerationStatusesQuery = createQuerySignal(appScope, () => ({
-    enabled: ambientSuggestionsBridge != null,
-    queryFn: () => ambientSuggestionsBridge?.getGenerationStatuses?.(),
-    queryKey: ["ambient-suggestions-generation-statuses"],
-    refetchInterval: GENERATION_STATUS_POLL_MS,
-    staleTime: GENERATION_STATUS_POLL_MS,
-  }));
-  ambientSuggestionsRefreshQuery = createServerQuery(appScope, "ambient-suggestions-refresh", ({ domain, hostId, projectRoot, staleTimeMs, surface }: AmbientSuggestionScope & { staleTimeMs: number; surface: unknown }) => ({
-    enabled: projectRoot != null, gcTime: staleTimeMs,
-    params: { domain, hostId, projectRoot, surface }, select: () => true, staleTime: staleTimeMs,
-  }));
-  selectedAmbientSuggestionDomain = createSignalFamily(appScope, () => null);
-  ambientSuggestionDomains = createDerivedFamily(appScope, (scope: AmbientSuggestionScope, { get }) => listDefaultStatusDomains(readDefaultStatuses(get, scope)));
-  ambientSuggestionsLoaded = createDerivedFamily(appScope, (scope: AmbientSuggestionScope, { get }) => {
-    const query = get(ambientSuggestionsQuery as never, scope) as { data?: unknown; isError?: boolean };
-    return query.data != null || query.isError === true;
-  });
-  pendingAmbientSuggestions = createDerivedFamily(appScope, ({ domain, hostId, projectRoot }: AmbientSuggestionScope, { get }) => {
-    const file = (get(ambientSuggestionsQuery as never, { domain, hostId, projectRoot }) as { data?: AmbientSuggestionsResponse }).data?.file;
-    return selectPendingCurrentSuggestions(file?.currentSuggestionIds ?? [], file?.suggestions ?? []);
-  });
-  initialized = true;
+var O, k, A, j, M, N, P, F, I, L, R, z;
+function B() {
+  return (B = e(() => {
+    ((O = t(c(), 1)),
+      n(),
+      f(),
+      r(),
+      g(),
+      _(),
+      m(),
+      (k = 3),
+      (A = 1e3),
+      (j = `ambient-suggestions:default-statuses`),
+      (M = l(j, {})),
+      (N = u(i, `ambient-suggestions`, ({ projectRoot: e }) => ({ enabled: e != null }))),
+      (P = a(i, () => ({
+        enabled: h.ambientSuggestions != null,
+        queryFn: () => h.ambientSuggestions?.getGenerationStatuses(),
+        queryKey: [`ambient-suggestions-generation-statuses`],
+        refetchInterval: A,
+        staleTime: A,
+      }))),
+      (F = u(
+        i,
+        `ambient-suggestions-refresh`,
+        ({ domain: e, hostId: t, projectRoot: n, staleTimeMs: r, surface: i }) => ({
+          enabled: n != null,
+          gcTime: r,
+          params: { domain: e, hostId: t, projectRoot: n, surface: i },
+          select: () => !0,
+          staleTime: r,
+        }),
+      )),
+      (I = o(i, (e) => null)),
+      (L = s(i, (e, { get: t }) => x(C(t, e)))),
+      (R = s(i, (e, { get: t }) => {
+        let n = t(N, e);
+        return n.data != null || n.isError;
+      })),
+      (z = s(i, ({ domain: e, hostId: t, projectRoot: n }, { get: r }) => {
+        let i = r(N, { domain: e, hostId: t, projectRoot: n }).data?.file;
+        return D(i?.currentSuggestionIds ?? [], i?.suggestions ?? []);
+      })));
+  }))();
 }
-
-function initializeNewChatSuggestionSourceDebugOverride(): void {
-  if (overrideInitialized) return;
-  initializePreferenceStorage();
-  newChatSuggestionSourceDebugOverride = createPersistedSignal("electron:new-chat-suggestion-source-debug-override", null);
-  overrideInitialized = true;
+var V;
+function H() {
+  return (H = e(() => {
+    (_(), (V = l(`electron:new-chat-suggestion-source-debug-override`, null)));
+  }))();
 }
-
 export {
-  ambientSuggestionsQuery as a, initializeNewChatSuggestionSourceDebugState as c,
-  updateCachedSuggestionStatus as d, setDefaultSuggestionStatus as f,
-  ambientSuggestionGenerationStatusesQuery as i, ambientSuggestionDomains as l,
-  newChatSuggestionSourceDebugOverride as n, ambientSuggestionsLoaded as o,
-  pendingAmbientSuggestions as p, selectedAmbientSuggestionDomain as r,
-  ambientSuggestionsRefreshQuery as s, initializeNewChatSuggestionSourceDebugOverride as t,
-  clearDefaultSuggestionStatuses as u,
+  N as a,
+  B as c,
+  b as d,
+  v as f,
+  P as i,
+  L as l,
+  V as n,
+  R as o,
+  z as p,
+  I as r,
+  F as s,
+  H as t,
+  y as u,
 };

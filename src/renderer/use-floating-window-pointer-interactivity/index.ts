@@ -1,96 +1,191 @@
-// use-floating-window-pointer-interactivity — publish whether a floating surface is pointer-interactive.
-
-import "@rchunk/rolldown-runtime";
-import { e6 as getReactRuntime } from "@rchunk/app-shared";
-
-interface PointerPosition { x: number; y: number }
-interface FloatingReactRuntime {
-  useEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void;
-  useEffectEvent<Arguments extends unknown[], Result>(callback: (...arguments_: Arguments) => Result): (...arguments_: Arguments) => Result;
-  useState<Value>(value: Value): [Value, (value: Value) => void];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, e6 as n } from "@rchunk/app-shared";
+function r(e) {
+  let t = (0, c.c)(26),
+    {
+      activationNonce: n,
+      floatingElementSelectors: r,
+      includeInteractiveRegion: s,
+      interactiveRegionRef: u,
+      isPaused: d,
+      onInteractiveChange: f,
+      publishInitialNonInteractive: p,
+      regionElementSelectors: m,
+    } = e,
+    h;
+  t[0] === r ? (h = t[1]) : ((h = r === void 0 ? [] : r), (t[0] = r), (t[1] = h));
+  let g = h,
+    _ = s !== void 0 && s,
+    v = p === void 0 || p,
+    y;
+  t[2] === m ? (y = t[3]) : ((y = m === void 0 ? [] : m), (t[2] = m), (t[3] = y));
+  let b = y,
+    [x, S] = (0, l.useState)(!1),
+    C;
+  t[4] === d ? (C = t[5]) : ((C = () => d?.() ?? !1), (t[4] = d), (t[5] = C));
+  let w = (0, l.useEffectEvent)(C),
+    T;
+  t[6] === f
+    ? (T = t[7])
+    : ((T = (e) => {
+        (S(!e), f(e));
+      }),
+      (t[6] = f),
+      (t[7] = T));
+  let E = (0, l.useEffectEvent)(T),
+    D;
+  t[8] === f
+    ? (D = t[9])
+    : ((D = () => {
+        f(!0);
+      }),
+      (t[8] = f),
+      (t[9] = D));
+  let O = (0, l.useEffectEvent)(D),
+    k;
+  t[10] !== g ||
+  t[11] !== _ ||
+  t[12] !== u ||
+  t[13] !== w ||
+  t[14] !== v ||
+  t[15] !== E ||
+  t[16] !== b ||
+  t[17] !== O
+    ? ((k = () => {
+        let e = null,
+          t = null,
+          n = null,
+          r = null,
+          s = (t) => {
+            e !== t && ((e = t), E(t));
+          },
+          c = (e) => {
+            let t = u.current;
+            if (t == null || (_ && a(e, t))) return !0;
+            for (let n of b) {
+              let r = t.querySelectorAll(n);
+              for (let t of r) if (a(e, t) && o(t)) return !0;
+            }
+            for (let t of g) {
+              let n = document.querySelectorAll(t);
+              for (let t of n) if (a(e, t) && o(t)) return !0;
+            }
+            return !1;
+          },
+          l = () => {
+            ((r = null), !(n == null || w()) && ((t = n), s(c(n))));
+          },
+          d = () => {
+            r ??= requestAnimationFrame(l);
+          },
+          f = (e) => {
+            ((n = { x: e.clientX, y: e.clientY }), (t = n), d());
+          },
+          p = () => {
+            t != null && ((n = t), d());
+          },
+          m = () => {
+            w() || s(!1);
+          },
+          h = () => {
+            if (w()) return;
+            let e = i({
+              floatingElementSelectors: g,
+              includeInteractiveRegion: _,
+              interactiveRegion: u.current,
+              regionElementSelectors: b,
+            });
+            e != null && (e || v) && s(e);
+          },
+          y = new MutationObserver(p);
+        (window.addEventListener(`mousemove`, f),
+          window.addEventListener(`resize`, p),
+          window.addEventListener(`scroll`, p, !0),
+          window.addEventListener(`mouseleave`, m),
+          y.observe(document.body, {
+            attributeFilter: [`aria-hidden`, `class`, `hidden`, `style`],
+            attributes: !0,
+            childList: !0,
+            subtree: !0,
+          }),
+          h());
+        let x = requestAnimationFrame(h);
+        return () => {
+          (window.removeEventListener(`mousemove`, f),
+            window.removeEventListener(`resize`, p),
+            window.removeEventListener(`scroll`, p, !0),
+            window.removeEventListener(`mouseleave`, m),
+            y.disconnect(),
+            cancelAnimationFrame(x),
+            r != null && cancelAnimationFrame(r),
+            (e = null),
+            O());
+        };
+      }),
+      (t[10] = g),
+      (t[11] = _),
+      (t[12] = u),
+      (t[13] = w),
+      (t[14] = v),
+      (t[15] = E),
+      (t[16] = b),
+      (t[17] = O),
+      (t[18] = k))
+    : (k = t[18]);
+  let A;
+  return (
+    t[19] !== n || t[20] !== g || t[21] !== _ || t[22] !== u || t[23] !== v || t[24] !== b
+      ? ((A = [n, g, _, u, v, b]),
+        (t[19] = n),
+        (t[20] = g),
+        (t[21] = _),
+        (t[22] = u),
+        (t[23] = v),
+        (t[24] = b),
+        (t[25] = A))
+      : (A = t[25]),
+    (0, l.useEffect)(k, A),
+    x
+  );
 }
-interface FloatingWindowPointerOptions {
-  activationNonce?: unknown;
-  floatingElementSelectors?: readonly string[];
-  includeInteractiveRegion?: boolean;
-  interactiveRegionRef: { current: HTMLElement | null };
-  isPaused?(): boolean;
-  onInteractiveChange(interactive: boolean): void;
-  publishInitialNonInteractive?: boolean;
-  regionElementSelectors?: readonly string[];
-}
-
-let React: FloatingReactRuntime;
-function initializeFloatingWindowPointerInteractivity(): void { React ??= getReactRuntime() as unknown as FloatingReactRuntime; }
-function containsPoint(position: PointerPosition, rectangle: DOMRect): boolean { return position.x >= rectangle.left && position.x <= rectangle.right && position.y >= rectangle.top && position.y <= rectangle.bottom; }
-function isVisible(element: Element): boolean {
-  const style = window.getComputedStyle(element);
-  if (style.display === "none" || style.visibility === "hidden" || style.pointerEvents === "none") return false;
-  const rectangle = element.getBoundingClientRect();
-  return rectangle.width > 0 && rectangle.height > 0;
-}
-function isPointInside(position: PointerPosition, element: Element): boolean {
-  if (!containsPoint(position, element.getBoundingClientRect())) return false;
-  return document.elementsFromPoint(position.x, position.y).some((candidate) => candidate === element || element.contains(candidate));
-}
-function hoveredInteractiveState({ floatingElementSelectors, includeInteractiveRegion, interactiveRegion, regionElementSelectors }: { floatingElementSelectors: readonly string[]; includeInteractiveRegion: boolean; interactiveRegion: HTMLElement | null; regionElementSelectors: readonly string[] }): boolean | null {
-  if (interactiveRegion != null) {
-    if (includeInteractiveRegion && interactiveRegion.matches(":hover")) return true;
-    for (const selector of regionElementSelectors) for (const element of interactiveRegion.querySelectorAll(selector)) if (isVisible(element) && element.matches(":hover")) return true;
+function i({
+  floatingElementSelectors: e,
+  includeInteractiveRegion: t,
+  interactiveRegion: n,
+  regionElementSelectors: r,
+}) {
+  if (n != null) {
+    if (t && n.matches(`:hover`)) return !0;
+    for (let e of r) {
+      let t = n.querySelectorAll(e);
+      for (let e of t) if (o(e) && e.matches(`:hover`)) return !0;
+    }
   }
-  for (const selector of floatingElementSelectors) for (const element of document.querySelectorAll(selector)) if (isVisible(element) && element.matches(":hover")) return true;
-  return document.documentElement.matches(":hover") ? false : null;
+  for (let t of e) {
+    let e = document.querySelectorAll(t);
+    for (let t of e) if (o(t) && t.matches(`:hover`)) return !0;
+  }
+  return !document.documentElement.matches(`:hover`) && null;
 }
-function useFloatingWindowPointerInteractivity({ activationNonce, floatingElementSelectors = [], includeInteractiveRegion = false, interactiveRegionRef, isPaused, onInteractiveChange, publishInitialNonInteractive = true, regionElementSelectors = [] }: FloatingWindowPointerOptions): boolean {
-  initializeFloatingWindowPointerInteractivity();
-  const [isNonInteractive, setNonInteractive] = React.useState(false);
-  const paused = React.useEffectEvent(() => isPaused?.() ?? false);
-  const publish = React.useEffectEvent((interactive: boolean): void => { setNonInteractive(!interactive); onInteractiveChange(interactive); });
-  const restoreInteractive = React.useEffectEvent((): void => onInteractiveChange(true));
-  React.useEffect(() => {
-    let currentInteractive: boolean | null = null;
-    let latestPosition: PointerPosition | null = null;
-    let processedPosition: PointerPosition | null = null;
-    let pendingFrame: number | null = null;
-    const publishIfChanged = (interactive: boolean): void => { if (currentInteractive !== interactive) { currentInteractive = interactive; publish(interactive); } };
-    const calculateAtPoint = (position: PointerPosition): boolean => {
-      const region = interactiveRegionRef.current;
-      if (region == null || (includeInteractiveRegion && isPointInside(position, region))) return true;
-      for (const selector of regionElementSelectors) for (const element of region.querySelectorAll(selector)) if (isPointInside(position, element) && isVisible(element)) return true;
-      for (const selector of floatingElementSelectors) for (const element of document.querySelectorAll(selector)) if (isPointInside(position, element) && isVisible(element)) return true;
-      return false;
-    };
-    const process = (): void => { pendingFrame = null; if (latestPosition == null || paused()) return; processedPosition = latestPosition; publishIfChanged(calculateAtPoint(latestPosition)); };
-    const schedule = (): void => { pendingFrame ??= requestAnimationFrame(process); };
-    const handleMouseMove = (event: MouseEvent): void => { latestPosition = { x: event.clientX, y: event.clientY }; processedPosition = latestPosition; schedule(); };
-    const handleLayoutChange = (): void => { if (processedPosition != null) { latestPosition = processedPosition; schedule(); } };
-    const handleMouseLeave = (): void => { if (!paused()) publishIfChanged(false); };
-    const publishInitial = (): void => {
-      if (paused()) return;
-      const interactive = hoveredInteractiveState({ floatingElementSelectors, includeInteractiveRegion, interactiveRegion: interactiveRegionRef.current, regionElementSelectors });
-      if (interactive != null && (interactive || publishInitialNonInteractive)) publishIfChanged(interactive);
-    };
-    const observer = new MutationObserver(handleLayoutChange);
-    window.addEventListener("mousemove", handleMouseMove);
-    window.addEventListener("resize", handleLayoutChange);
-    window.addEventListener("scroll", handleLayoutChange, true);
-    window.addEventListener("mouseleave", handleMouseLeave);
-    observer.observe(document.body, { attributeFilter: ["aria-hidden", "class", "hidden", "style"], attributes: true, childList: true, subtree: true });
-    publishInitial();
-    const initialFrame = requestAnimationFrame(publishInitial);
-    return () => {
-      window.removeEventListener("mousemove", handleMouseMove);
-      window.removeEventListener("resize", handleLayoutChange);
-      window.removeEventListener("scroll", handleLayoutChange, true);
-      window.removeEventListener("mouseleave", handleMouseLeave);
-      observer.disconnect();
-      cancelAnimationFrame(initialFrame);
-      if (pendingFrame != null) cancelAnimationFrame(pendingFrame);
-      currentInteractive = null;
-      restoreInteractive();
-    };
-  }, [activationNonce, floatingElementSelectors, includeInteractiveRegion, interactiveRegionRef, publishInitialNonInteractive, regionElementSelectors]);
-  return isNonInteractive;
+function a(e, t) {
+  return s(e, t.getBoundingClientRect())
+    ? document.elementsFromPoint(e.x, e.y).some((e) => e === t || t.contains(e))
+    : !1;
 }
-
-export { useFloatingWindowPointerInteractivity as n, initializeFloatingWindowPointerInteractivity as t };
+function o(e) {
+  let t = window.getComputedStyle(e);
+  if (t.display === `none` || t.visibility === `hidden` || t.pointerEvents === `none`) return !1;
+  let n = e.getBoundingClientRect();
+  return n.width > 0 && n.height > 0;
+}
+function s(e, t) {
+  return e.x >= t.left && e.x <= t.right && e.y >= t.top && e.y <= t.bottom;
+}
+var c, l;
+function u() {
+  return (u = e(() => {
+    ((c = t()), (l = n()));
+  }))();
+}
+export { r as n, u as t };

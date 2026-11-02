@@ -1,22 +1,68 @@
-// Five-stage virus life-cycle learning model with localized descriptions.
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-
-interface StageValues { stage?: number | null } interface MessageDescriptor { id: string; defaultMessage: string } interface MessageFormatter { formatMessage(descriptor: MessageDescriptor): string }
-const virusStageControl = { min: 1, max: 5, step: 1, defaultValue: 1 };
-const virusStages = [
-  { id: "attach", label: { id: "learningBlock.virusLifeCycle.stage.attach", defaultMessage: "Attach" }, summary: { id: "learningBlock.virusLifeCycle.summary.attach", defaultMessage: "A virus first binds to the host cell surface." } },
-  { id: "enter", label: { id: "learningBlock.virusLifeCycle.stage.enter", defaultMessage: "Enter" }, summary: { id: "learningBlock.virusLifeCycle.summary.enter", defaultMessage: "The virus enters the host cell before copying begins." } },
-  { id: "copy", label: { id: "learningBlock.virusLifeCycle.stage.copy", defaultMessage: "Copy" }, summary: { id: "learningBlock.virusLifeCycle.summary.copy", defaultMessage: "The cell is used to make viral genomes and parts." } },
-  { id: "assemble", label: { id: "learningBlock.virusLifeCycle.stage.assemble", defaultMessage: "Assemble" }, summary: { id: "learningBlock.virusLifeCycle.summary.assemble", defaultMessage: "New virus particles are put together inside the cell." } },
-  { id: "release", label: { id: "learningBlock.virusLifeCycle.stage.release", defaultMessage: "Release" }, summary: { id: "learningBlock.virusLifeCycle.summary.release", defaultMessage: "Many newly made viruses spread away from the infected cell." } },
-] as const;
-const normalizeVirusStage = (values: StageValues) => ({ stage: Math.min(virusStageControl.max, Math.max(virusStageControl.min, Math.round(Number.isFinite(values.stage) ? Number(values.stage) : virusStageControl.defaultValue))) });
-const deriveVirusLifeCycle = (values: StageValues) => { const safeValues = normalizeVirusStage(values); return { safeValues, activeStage: virusStages[safeValues.stage - 1] }; };
-const findVirusStage = (id: string) => { const stage = virusStages.find((candidate) => candidate.id === id); if (!stage) throw Error("Unknown virus life-cycle stage: " + id); return stage; };
-const formatMessage = (descriptor: MessageDescriptor, formatter?: MessageFormatter): string => formatter ? formatter.formatMessage(descriptor) : descriptor.defaultMessage;
-const formatVirusStageLabel = (id: string, formatter?: MessageFormatter): string => formatMessage(findVirusStage(id).label, formatter);
-const formatVirusStageSummary = (id: string, formatter?: MessageFormatter): string => formatMessage(findVirusStage(id).summary, formatter);
-const formatVirusStageDescription = (values: StageValues, formatter?: MessageFormatter): string => { const { activeStage } = deriveVirusLifeCycle(values); const label = formatVirusStageLabel(activeStage.id, formatter); const summary = formatVirusStageSummary(activeStage.id, formatter); return summary ? label + "\n" + summary : label; };
-function initializeVirusLifeCycle(): void {}
-export { formatVirusStageSummary as a, formatVirusStageLabel as i, formatVirusStageDescription as n, initializeVirusLifeCycle as o, deriveVirusLifeCycle as r, normalizeVirusStage as s, virusStageControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { G2 as t, K2 as n } from "@rchunk/app-shared";
+var r, i, a, o, s, c, l, u, d, f, p, m;
+function h() {
+  return (h = e(() => {
+    (n(),
+      (r = { min: 1, max: 5, step: 1, defaultValue: 1 }),
+      (i = t({
+        attachLabel: { id: `learningBlock.virusLifeCycle.stage.attach`, defaultMessage: `Attach` },
+        attachSummary: {
+          id: `learningBlock.virusLifeCycle.summary.attach`,
+          defaultMessage: `A virus first binds to the host cell surface.`,
+        },
+        enterLabel: { id: `learningBlock.virusLifeCycle.stage.enter`, defaultMessage: `Enter` },
+        enterSummary: {
+          id: `learningBlock.virusLifeCycle.summary.enter`,
+          defaultMessage: `The virus enters the host cell before copying begins.`,
+        },
+        copyLabel: { id: `learningBlock.virusLifeCycle.stage.copy`, defaultMessage: `Copy` },
+        copySummary: {
+          id: `learningBlock.virusLifeCycle.summary.copy`,
+          defaultMessage: `The cell is used to make viral genomes and parts.`,
+        },
+        assembleLabel: {
+          id: `learningBlock.virusLifeCycle.stage.assemble`,
+          defaultMessage: `Assemble`,
+        },
+        assembleSummary: {
+          id: `learningBlock.virusLifeCycle.summary.assemble`,
+          defaultMessage: `New virus particles are put together inside the cell.`,
+        },
+        releaseLabel: {
+          id: `learningBlock.virusLifeCycle.stage.release`,
+          defaultMessage: `Release`,
+        },
+        releaseSummary: {
+          id: `learningBlock.virusLifeCycle.summary.release`,
+          defaultMessage: `Many newly made viruses spread away from the infected cell.`,
+        },
+      })),
+      (a = [
+        { id: `attach`, label: i.attachLabel, summary: i.attachSummary },
+        { id: `enter`, label: i.enterLabel, summary: i.enterSummary },
+        { id: `copy`, label: i.copyLabel, summary: i.copySummary },
+        { id: `assemble`, label: i.assembleLabel, summary: i.assembleSummary },
+        { id: `release`, label: i.releaseLabel, summary: i.releaseSummary },
+      ]),
+      (o = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (s = (e) => o(Math.round(e), r.min, r.max)),
+      (c = (e) => ({ stage: s(Number.isFinite(e.stage) ? Number(e.stage) : r.defaultValue) })),
+      (l = (e) => {
+        let t = c(e);
+        return { safeValues: t, activeStage: a[t.stage - 1] };
+      }),
+      (u = (e) => a.find((t) => t.id === e)),
+      (d = (e, t) => (t ? t.formatMessage(e) : e.defaultMessage)),
+      (f = (e, t) => d(u(e).label, t)),
+      (p = (e, t) => d(u(e).summary, t)),
+      (m = (e, t) => {
+        let { activeStage: n } = l(e),
+          r = f(n.id, t),
+          i = p(n.id, t);
+        return i ? `${r}\n${i}` : r;
+      }));
+  }))();
+}
+export { p as a, f as i, m as n, h as o, l as r, c as s, r as t };

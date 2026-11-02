@@ -1,63 +1,132 @@
-import { $3 as getCompilerRuntime, I3 as getJsxRuntime, K2 as initializeInternationalization, e6 as getReactRuntime, n4 as useIntl } from "@rchunk/app-shared";
-import { mT as initializeSearchInput, pT as SearchInput } from "@rchunk/app-initial";
-import "@rchunk/rolldown-runtime";
-
-export interface KeyboardShortcutsSearchInputProps {
-  ariaLabel?: string;
-  autoFocus?: boolean;
-  isSearchingByKeystrokes?: boolean;
-  onKeyDown?(event: { defaultPrevented: boolean; key: string; preventDefault(): void; stopPropagation(): void }): void;
-  onValueChange(value: string): void;
-  placeholder?: string;
-  trailingContent?: unknown;
-  value: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, e6 as i, n4 as a } from "@rchunk/app-shared";
+import { mT as o, pT as s } from "@rchunk/app-initial";
+function c(e) {
+  let t = (0, l.c)(27),
+    {
+      autoFocus: n,
+      ariaLabel: r,
+      isSearchingByKeystrokes: i,
+      placeholder: o,
+      trailingContent: c,
+      onKeyDown: f,
+      value: p,
+      onValueChange: m,
+    } = e,
+    h = i !== void 0 && i,
+    g = (0, u.useId)(),
+    _ = a(),
+    v;
+  t[0] !== r || t[1] !== _ || t[2] !== h
+    ? ((v = h
+        ? _.formatMessage({
+            id: `settings.keyboardShortcuts.keystrokeSearch.ariaLabel`,
+            defaultMessage: `Keystroke search capture`,
+            description: `Accessible label for the input that captures keyboard shortcuts to search`,
+          })
+        : (r ??
+          _.formatMessage({
+            id: `settings.keyboardShortcuts.search.ariaLabel`,
+            defaultMessage: `Search keyboard shortcuts`,
+            description: `Accessible label for the keyboard shortcuts search input`,
+          }))),
+      (t[0] = r),
+      (t[1] = _),
+      (t[2] = h),
+      (t[3] = v))
+    : (v = t[3]);
+  let y = v,
+    b;
+  t[4] !== _ || t[5] !== h || t[6] !== o
+    ? ((b = h
+        ? _.formatMessage({
+            id: `settings.keyboardShortcuts.keystrokeSearch.placeholder`,
+            defaultMessage: `Press shortcut to search`,
+            description: `Placeholder shown while capturing a keyboard shortcut to search`,
+          })
+        : (o ??
+          _.formatMessage({
+            id: `settings.keyboardShortcuts.search.placeholder`,
+            defaultMessage: `Search shortcuts`,
+            description: `Placeholder for the keyboard shortcuts search input`,
+          }))),
+      (t[4] = _),
+      (t[5] = h),
+      (t[6] = o),
+      (t[7] = b))
+    : (b = t[7]);
+  let x = b,
+    S = h || void 0,
+    C = h ? `keystrokes` : `text`,
+    w = !h,
+    T;
+  t[8] !== f || t[9] !== m || t[10] !== p
+    ? ((T = (e) => {
+        (f?.(e),
+          !e.defaultPrevented &&
+            e.key === `Escape` &&
+            p !== `` &&
+            (e.preventDefault(), e.stopPropagation(), m(``)));
+      }),
+      (t[8] = f),
+      (t[9] = m),
+      (t[10] = p),
+      (t[11] = T))
+    : (T = t[11]);
+  let E;
+  t[12] !== n ||
+  t[13] !== g ||
+  t[14] !== x ||
+  t[15] !== h ||
+  t[16] !== y ||
+  t[17] !== m ||
+  t[18] !== C ||
+  t[19] !== w ||
+  t[20] !== T ||
+  t[21] !== c ||
+  t[22] !== p
+    ? ((E = (0, d.jsx)(s, {
+        id: g,
+        autoFocus: n,
+        inputKey: C,
+        isClearable: w,
+        label: y,
+        placeholder: x,
+        readOnly: h,
+        searchQuery: p,
+        trailingControl: c,
+        onKeyDown: T,
+        onSearchQueryChange: m,
+      })),
+      (t[12] = n),
+      (t[13] = g),
+      (t[14] = x),
+      (t[15] = h),
+      (t[16] = y),
+      (t[17] = m),
+      (t[18] = C),
+      (t[19] = w),
+      (t[20] = T),
+      (t[21] = c),
+      (t[22] = p),
+      (t[23] = E))
+    : (E = t[23]);
+  let D;
+  return (
+    t[24] !== S || t[25] !== E
+      ? ((D = (0, d.jsx)(`div`, { "data-codex-shortcut-capture": S, children: E })),
+        (t[24] = S),
+        (t[25] = E),
+        (t[26] = D))
+      : (D = t[26]),
+    D
+  );
 }
-
-let jsxRuntime: ReturnType<typeof getJsxRuntime> | undefined;
-let reactRuntime: ReturnType<typeof getReactRuntime> | undefined;
-function KeyboardShortcutsSearchInput(props: KeyboardShortcutsSearchInputProps): unknown {
-  const searchingByKeystrokes = props.isSearchingByKeystrokes ?? false;
-  const id = reactRuntime?.useId() ?? "";
-  const intl = useIntl();
-  const label = searchingByKeystrokes
-    ? intl.formatMessage({ id: "settings.keyboardShortcuts.keystrokeSearch.ariaLabel", defaultMessage: "Keystroke search capture", description: "Accessible label for the input that captures keyboard shortcuts to search" })
-    : props.ariaLabel ?? intl.formatMessage({ id: "settings.keyboardShortcuts.search.ariaLabel", defaultMessage: "Search keyboard shortcuts", description: "Accessible label for the keyboard shortcuts search input" });
-  const placeholder = searchingByKeystrokes
-    ? intl.formatMessage({ id: "settings.keyboardShortcuts.keystrokeSearch.placeholder", defaultMessage: "Press shortcut to search", description: "Placeholder shown while capturing a keyboard shortcut to search" })
-    : props.placeholder ?? intl.formatMessage({ id: "settings.keyboardShortcuts.search.placeholder", defaultMessage: "Search shortcuts", description: "Placeholder for the keyboard shortcuts search input" });
-  const onKeyDown = (event: { defaultPrevented: boolean; key: string; preventDefault(): void; stopPropagation(): void }): void => {
-    props.onKeyDown?.(event);
-    if (!event.defaultPrevented && event.key === "Escape" && props.value !== "") {
-      event.preventDefault();
-      event.stopPropagation();
-      props.onValueChange("");
-    }
-  };
-  const input = jsxRuntime?.jsx(SearchInput, {
-    id,
-    autoFocus: props.autoFocus,
-    inputKey: searchingByKeystrokes ? "keystrokes" : "text",
-    isClearable: !searchingByKeystrokes,
-    label,
-    placeholder,
-    readOnly: searchingByKeystrokes,
-    searchQuery: props.value,
-    trailingControl: props.trailingContent,
-    onKeyDown,
-    onSearchQueryChange: props.onValueChange,
-  });
-  return jsxRuntime?.jsx("div", { "data-codex-shortcut-capture": searchingByKeystrokes || undefined, children: input });
+var l, u, d;
+function f() {
+  return (f = e(() => {
+    ((l = t()), (u = i()), r(), o(), (d = n()));
+  }))();
 }
-
-let initialized = false;
-function initializeKeyboardShortcutsSearchInput(): void {
-  if (initialized) return;
-  initialized = true;
-  getCompilerRuntime();
-  reactRuntime = getReactRuntime();
-  initializeInternationalization();
-  initializeSearchInput();
-  jsxRuntime = getJsxRuntime();
-}
-
-export { initializeKeyboardShortcutsSearchInput as n, KeyboardShortcutsSearchInput as t };
+export { f as n, c as t };

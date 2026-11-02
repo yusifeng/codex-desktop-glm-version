@@ -1,190 +1,199 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/mermaid-grammar",
+      "@rchunk/rolldown-runtime",
+      "@exact-chunk/mermaid-54e250569eb6.js",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeCompilerRuntime,
-  Cz as codeThemeIds,
-  H3 as initializeLazyComponents,
-  I3 as getJsxRuntime,
-  K2 as initializeEditorSurface,
-  __ as useStableCallbackValue,
-  dg as initializeGrammarRegistry,
-  e6 as getReactRuntime,
-  fg as useDarkMode,
-  g_ as initializeGrammarRuntime,
-  n4 as useIntl,
-  wL as initializeEditorShared,
-  type JsxRuntime,
-  type ReactRuntime,
+  $3 as t,
+  Cz as n,
+  H3 as r,
+  I3 as i,
+  K2 as a,
+  V3 as o,
+  __ as s,
+  dg as c,
+  e6 as l,
+  fg as u,
+  g_ as d,
+  n4 as f,
+  wL as p,
 } from "@rchunk/app-shared";
 import {
-  Kcn as useThemeSetting,
-  L_n as initializeEditorSettings,
-  Vcn as initializeThemeRuntime,
-  Y_n as registerLanguage,
-  r_t as resolveEditorTheme,
-  wk as initializeThemePreference,
+  Kcn as m,
+  L_n as h,
+  Vcn as g,
+  Y_n as _,
+  r_t as v,
+  wk as y,
 } from "@rchunk/app-initial";
-import {
-  m as initializeDiffCss,
-  n as createDiffCss,
-  p as DiffEditorProvider,
-  r as initializeDiffEditorProvider,
-} from "@rchunk/codex-diff-css";
-import { t as initializePierreThemes } from "@rchunk/register-pierre-themes";
-import { n as initializeFileEditor, t as FileEditorValue } from "@rchunk/pierre-file-editor";
-import { n as initializeEditorRuntime, t as EditorValue } from "@rchunk/pierre-editor-runtime";
-
-interface MermaidCodeEditorProps {
-  editStateKey: string;
-  initialCode: string;
-  onBlur(): void;
-  onChange(value: string): void;
-}
-
-interface EditorFile {
-  cacheKey: string;
-  contents: string;
-  lang: string;
-  name: string;
-}
-
-interface EditorChangeEvent {
-  file: EditorFile;
-}
-
-interface FileEditorProps extends Record<string, unknown> {
-  className: string;
-  disableWorkerPool: boolean;
-  edit: boolean;
-  editStateKey: string;
-  editorOptions: Record<string, unknown>;
-  file: EditorFile;
-  options: Record<string, unknown>;
-}
-
-interface EditorElement {
-  focus(options?: { preventScroll?: boolean }): void;
-}
-
-type FileEditorComponent = (props: FileEditorProps) => unknown;
-type DiffEditorProviderComponent = (props: {
-  children?: unknown;
-  createEditor(element: HTMLElement, options: unknown, state: unknown): unknown;
-}) => unknown;
-type EditorConstructor = new (element: HTMLElement, options: unknown, state: unknown) => unknown;
-type StableCallbackHook = <Arguments extends unknown[], Result>(
-  callback: (...arguments_: Arguments) => Result,
-) => (...arguments_: Arguments) => Result;
-type MermaidGrammar = Array<Record<string, unknown>>;
-
-const FileEditor = FileEditorValue as unknown as FileEditorComponent;
-const Editor = EditorValue as unknown as EditorConstructor;
-const DiffProvider = DiffEditorProvider as unknown as DiffEditorProviderComponent;
-const useStableCallback = useStableCallbackValue as StableCallbackHook;
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-
-function focusEditor(element: EditorElement): void {
-  element.focus({ preventScroll: true });
-}
-
-function createEditor(element: HTMLElement, options: unknown, state: unknown): unknown {
-  return new Editor(element, options, state);
-}
-
-function MermaidCodeEditor({ editStateKey, initialCode, onBlur, onChange }: MermaidCodeEditorProps): unknown {
-  const intl = useIntl();
-  const colorScheme = useDarkMode() === true ? "dark" : "light";
-  const configuredTheme = useThemeSetting(
-    colorScheme === "dark" ? codeThemeIds.darkCodeThemeId : codeThemeIds.lightCodeThemeId,
+import { m as b, n as x, p as S, r as C } from "@rchunk/codex-diff-css";
+import { t as w } from "@rchunk/register-pierre-themes";
+import { n as T, t as E } from "@rchunk/diff-file-view";
+import { n as D, t as O } from "@rchunk/code-editor-runtime";
+function k(e) {
+  let t = (0, M.c)(28),
+    { initialCode: r, editStateKey: i, onChange: a, onBlur: o } = e,
+    c = f(),
+    l = u() ? `dark` : `light`,
+    d = m(l === `dark` ? n.darkCodeThemeId : n.lightCodeThemeId),
+    p;
+  t[0] === a ? (p = t[1]) : ((p = (e) => a(e.contents)), (t[0] = a), (t[1] = p));
+  let h = s(p),
+    g = (0, N.useEffectEvent)(o),
+    _;
+  t[2] === g ? (_ = t[3]) : ((_ = () => () => g()), (t[2] = g), (t[3] = _));
+  let y;
+  (t[4] === Symbol.for(`react.memo_cache_sentinel`) ? ((y = []), (t[4] = y)) : (y = t[4]),
+    (0, N.useEffect)(_, y));
+  let b;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((b = { "mermaid-source": { lineComment: `%%` } }), (t[5] = b))
+    : (b = t[5]);
+  let C;
+  t[6] === h
+    ? (C = t[7])
+    : ((C = {
+        languageCommentConfig: b,
+        onAttach: A,
+        onChange: (e) => {
+          let { file: t } = e;
+          return h(t);
+        },
+      }),
+      (t[6] = h),
+      (t[7] = C));
+  let w;
+  t[8] === c
+    ? (w = t[9])
+    : ((w = c.formatMessage({
+        id: `chatgpt.codeBlocks.editor.ariaLabel`,
+        defaultMessage: `Edit code`,
+        description: `Accessible label for an editable code block in a ChatGPT conversation or its execution dialog`,
+      })),
+      (t[8] = c),
+      (t[9] = w));
+  let T;
+  t[10] !== r || t[11] !== w
+    ? ((T = { name: w, contents: r, lang: `mermaid-source`, cacheKey: `mermaid-source` }),
+      (t[10] = r),
+      (t[11] = w),
+      (t[12] = T))
+    : (T = t[12]);
+  let D;
+  t[13] !== d || t[14] !== l ? ((D = v(d, l)), (t[13] = d), (t[14] = l), (t[15] = D)) : (D = t[15]);
+  let O = D.name,
+    k;
+  t[16] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((k = x({
+        includeDiffHeader: !1,
+        includeSimpleLineSeparators: !1,
+        rootSelector: `[data-file]`,
+        surface: `var(--color-surface)`,
+      })),
+      (t[16] = k))
+    : (k = t[16]);
+  let F;
+  t[17] !== D.name || t[18] !== l
+    ? ((F = {
+        disableFileHeader: !0,
+        overflow: `wrap`,
+        theme: O,
+        themeType: l,
+        useTokenTransformer: !0,
+        unsafeCSS: k,
+      }),
+      (t[17] = D.name),
+      (t[18] = l),
+      (t[19] = F))
+    : (F = t[19]);
+  let I;
+  t[20] !== i || t[21] !== F || t[22] !== C || t[23] !== T
+    ? ((I = (0, P.jsx)(S, {
+        createEditor: j,
+        children: (0, P.jsx)(E, {
+          className: `[--diffs-editor-selection-bg:var(--color-background-info-soft)] [--diffs-min-number-column-width:1ch]`,
+          disableWorkerPool: !0,
+          edit: !0,
+          editStateKey: i,
+          editorOptions: C,
+          file: T,
+          options: F,
+        }),
+      })),
+      (t[20] = i),
+      (t[21] = F),
+      (t[22] = C),
+      (t[23] = T),
+      (t[24] = I))
+    : (I = t[24]);
+  let L;
+  return (
+    t[25] !== o || t[26] !== I
+      ? ((L = (0, P.jsx)(`div`, {
+          className: `h-full overflow-auto pe-4`,
+          onBlur: o,
+          children: I,
+        })),
+        (t[25] = o),
+        (t[26] = I),
+        (t[27] = L))
+      : (L = t[27]),
+    L
   );
-  const onChangeStable = useStableCallback((event: EditorChangeEvent) => onChange(event.file.contents));
-  const onBlurRef = React.useRef(onBlur);
-  onBlurRef.current = onBlur;
-  React.useEffect(() => () => onBlurRef.current(), []);
-
-  const editorOptions = React.useMemo<Record<string, unknown>>(
-    () => ({
-      languageCommentConfig: { "mermaid-source": { lineComment: "%%" } },
-      onAttach: focusEditor,
-      onChange: onChangeStable,
-    }),
-    [onChangeStable],
-  );
-  const accessibleName = String(intl.formatMessage({
-    id: "chatgpt.codeBlocks.editor.ariaLabel",
-    defaultMessage: "Edit code",
-    description: "Accessible label for an editable code block in a ChatGPT conversation or its execution dialog",
-  }));
-  const file = React.useMemo<EditorFile>(
-    () => ({ name: accessibleName, contents: initialCode, lang: "mermaid-source", cacheKey: "mermaid-source" }),
-    [accessibleName, initialCode],
-  );
-  const theme = resolveEditorTheme(configuredTheme, colorScheme);
-  const unsafeCSS = React.useMemo(
-    () => createDiffCss({
-      includeDiffHeader: false,
-      includeSimpleLineSeparators: false,
-      rootSelector: "[data-file]",
-      surface: "var(--color-surface)",
-    }),
-    [],
-  );
-  const options = React.useMemo<Record<string, unknown>>(
-    () => ({
-      disableFileHeader: true,
-      overflow: "wrap",
-      theme: theme.name,
-      themeType: colorScheme,
-      useTokenTransformer: true,
-      unsafeCSS,
-    }),
-    [colorScheme, theme.name, unsafeCSS],
-  );
-  const editor = jsx.jsx(DiffProvider, {
-    createEditor,
-    children: jsx.jsx(FileEditor, {
-      className: "[--diffs-editor-selection-bg:var(--color-background-info-soft)] [--diffs-min-number-column-width:1ch]",
-      disableWorkerPool: true,
-      edit: true,
-      editStateKey,
-      editorOptions,
-      file,
-      options,
-    }),
-  });
-  return jsx.jsx("div", { className: "h-full overflow-auto pe-4", onBlur, children: editor });
 }
-
-initializeCompilerRuntime();
-initializeEditorSettings();
-initializeEditorRuntime();
-initializeDiffCss();
-initializeFileEditor();
-initializeEditorShared();
-React = getReactRuntime();
-initializeEditorSurface();
-initializeDiffEditorProvider();
-initializePierreThemes();
-initializeThemeRuntime();
-initializeThemePreference();
-initializeGrammarRegistry();
-initializeGrammarRuntime();
-jsx = getJsxRuntime();
-initializeLazyComponents();
-registerLanguage("mermaid-source", async () => {
-  const grammarModule = await import("@rchunk/mermaid-grammar");
-  const grammar = grammarModule.default as MermaidGrammar;
-  return {
-    default: grammar.map((definition) => ({
-      ...definition,
-      name: "mermaid-source",
-      scopeName: "source.mermaid",
-      aliases: [],
-      injectionSelector: undefined,
-      patterns: [{ include: "#mermaid" }],
-    })),
-  };
-});
-
-export { MermaidCodeEditor };
+function A(e) {
+  return e.focus({ preventScroll: !0 });
+}
+function j(e, t, n) {
+  return new O(e, t, n);
+}
+var M, N, P;
+function F() {
+  return (F = e(() => {
+    ((M = t()),
+      h(),
+      D(),
+      b(),
+      T(),
+      p(),
+      (N = l()),
+      a(),
+      C(),
+      w(),
+      g(),
+      y(),
+      c(),
+      d(),
+      (P = i()),
+      r(),
+      _(`mermaid-source`, async () => {
+        let { default: e } = await o(
+          async () => {
+            let { default: e } = await import(`@rchunk/mermaid-grammar`);
+            return { default: e };
+          },
+          __vite__mapDeps([0, 1, 2]),
+          import.meta.url,
+        );
+        return {
+          default: e.map((e) => ({
+            ...e,
+            name: `mermaid-source`,
+            scopeName: `source.mermaid`,
+            aliases: [],
+            injectionSelector: void 0,
+            patterns: [{ include: `#mermaid` }],
+          })),
+        };
+      }));
+  }))();
+}
+F();
+export { k as MermaidCodeEditor };

@@ -1,55 +1,68 @@
-// scheduled-shared-task-route —— 共享定时任务的认证分流与弹窗入口。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as sharedTaskDialogChunk from "@rchunk/scheduled-shared-task-dialog-core";
-void runtimeChunk;
-
-const { $3: initializeRuntimeLazy, I3: getJsxRuntime } = appSharedChunk;
-const {
-  M6t: initializeGptResource,
-  N6t: useSessionIdentity,
-  Qgn: initializeAccountContext,
-  Ygn: Navigate,
-  i_n: useLocation,
-  l_n: useRouteParams,
-  o_n: useNavigate,
-} = appInitialChunk;
-const {
-  n: initializeScheduledSharedTaskDialog,
-  t: ScheduledSharedTaskDialog,
-} = sharedTaskDialogChunk;
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function ScheduledSharedTaskRoute(): unknown {
-  const { postId } = useRouteParams();
-  const { search, hash, state } = useLocation();
-  const navigate = useNavigate();
-  const { authMethod, isLoading } = useSessionIdentity();
-  if (isLoading) return null;
-  if (postId == null) return jsx.jsx(Navigate, { to: "/", replace: true });
-  if (authMethod === "chatgpt") {
-    const params = new URLSearchParams(search);
-    params.set("shared_task", postId);
-    return jsx.jsx(Navigate, {
-      to: { pathname: "/scheduled", search: `?${params}`, hash },
-      state,
-      replace: true,
-    });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n } from "@rchunk/app-shared";
+import {
+  M6t as r,
+  N6t as i,
+  Qgn as a,
+  Ygn as o,
+  i_n as s,
+  l_n as c,
+  o_n as l,
+} from "@rchunk/app-initial";
+import { n as u, t as d } from "@rchunk/scheduled-shared-task-dialog-core";
+function f() {
+  let e = (0, p.c)(15),
+    { postId: t } = c(),
+    { search: n, hash: r, state: a } = s(),
+    u = l(),
+    { authMethod: f, isLoading: h } = i();
+  if (h) return null;
+  if (t == null) {
+    let t;
+    return (
+      e[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, m.jsx)(o, { to: `/`, replace: !0 })), (e[0] = t))
+        : (t = e[0]),
+      t
+    );
   }
-  return jsx.jsx(ScheduledSharedTaskDialog, {
-    postId,
-    onClose: () => void navigate("/"),
-  });
+  if (f === `chatgpt`) {
+    let i;
+    e[1] !== t || e[2] !== n
+      ? ((i = new URLSearchParams(n)), i.set(`shared_task`, t), (e[1] = t), (e[2] = n), (e[3] = i))
+      : (i = e[3]);
+    let s = `?${i}`,
+      c;
+    e[4] !== r || e[5] !== s
+      ? ((c = { pathname: `/scheduled`, search: s, hash: r }), (e[4] = r), (e[5] = s), (e[6] = c))
+      : (c = e[6]);
+    let l;
+    return (
+      e[7] !== a || e[8] !== c
+        ? ((l = (0, m.jsx)(o, { to: c, state: a, replace: !0 })),
+          (e[7] = a),
+          (e[8] = c),
+          (e[9] = l))
+        : (l = e[9]),
+      l
+    );
+  }
+  let g;
+  e[10] === u ? (g = e[11]) : ((g = () => void u(`/`)), (e[10] = u), (e[11] = g));
+  let _;
+  return (
+    e[12] !== t || e[13] !== g
+      ? ((_ = (0, m.jsx)(d, { postId: t, onClose: g })), (e[12] = t), (e[13] = g), (e[14] = _))
+      : (_ = e[14]),
+    _
+  );
 }
-
-function initializeScheduledSharedTaskRoute(): void {
-  initializeRuntimeLazy();
-  initializeAccountContext();
-  initializeGptResource();
-  initializeScheduledSharedTaskDialog();
-  jsx = getJsxRuntime();
+var p, m;
+function h() {
+  return (h = e(() => {
+    ((p = t()), a(), r(), u(), (m = n()));
+  }))();
 }
-
-initializeScheduledSharedTaskRoute();
-export { ScheduledSharedTaskRoute };
+h();
+export { f as ScheduledSharedTaskRoute };

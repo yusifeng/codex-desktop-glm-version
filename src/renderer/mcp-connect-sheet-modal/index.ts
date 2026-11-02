@@ -1,100 +1,171 @@
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  HX as useSignalValue,
-  I3 as getJsxRuntime,
-  LX as useScope,
-  ZI as appScope,
+  $3 as t,
+  FX as n,
+  HX as r,
+  I3 as i,
+  LX as a,
+  QI as o,
+  ZI as s,
 } from "@rchunk/app-shared";
-import {
-  Ir as initializeAppConnectState,
-  Lr as useAppConnectFlow,
-  cW as resolveConnectRequest,
-  lW as initializeAppConnectFlow,
-  uW as pendingConnectRequest,
-} from "@rchunk/app-initial";
-import {
-  n as AppConnectModalById,
-  r as initializeAppConnectModalById,
-} from "@rchunk/app-connect-modal-by-id";
-
-export interface McpConnectSheetModalProps {
-  onClose(): void;
+import { Ir as c, Lr as l, cW as u, lW as d, uW as f } from "@rchunk/app-initial";
+import { n as p, r as m } from "@rchunk/app-connect-modal-by-id";
+function h(e) {
+  let t = (0, g.c)(51),
+    { onClose: n } = e,
+    i = a(s),
+    o = r(f),
+    { isAppConnectPending: c, markAppConnectOAuthPending: d } = l();
+  if (o == null || o.result != null) return null;
+  let m, h, v, y, b, x, S, C, w, T, E, D;
+  t[0] !== c ||
+  t[1] !== o.beforeConnect ||
+  t[2] !== o.connectorId ||
+  t[3] !== o.githubRepositoryAccess ||
+  t[4] !== o.hostId ||
+  t[5] !== o.id ||
+  t[6] !== o.reauthLinkId ||
+  t[7] !== o.requireAuth ||
+  t[8] !== i
+    ? ((h = { kind: `mcp-connect-sheet`, requestId: o.id }),
+      (m = p),
+      (v = !1),
+      (b = o.connectorId),
+      (x = o.requireAuth ? `OAUTH` : void 0),
+      (S = !1),
+      (C = o.beforeConnect),
+      (w = o.reauthLinkId != null),
+      (T = o.reauthLinkId),
+      t[21] !== o.githubRepositoryAccess || t[22] !== o.id || t[23] !== i
+        ? ((E =
+            o.githubRepositoryAccess == null
+              ? void 0
+              : {
+                  ...o.githubRepositoryAccess,
+                  onContinue: () =>
+                    u(i, o.id, { didConnect: !0, linkId: o.githubRepositoryAccess?.linkId }),
+                }),
+          (t[21] = o.githubRepositoryAccess),
+          (t[22] = o.id),
+          (t[23] = i),
+          (t[24] = E))
+        : (E = t[24]),
+      (D = o.hostId),
+      (y = c(o.connectorId, h, o.hostId)),
+      (t[0] = c),
+      (t[1] = o.beforeConnect),
+      (t[2] = o.connectorId),
+      (t[3] = o.githubRepositoryAccess),
+      (t[4] = o.hostId),
+      (t[5] = o.id),
+      (t[6] = o.reauthLinkId),
+      (t[7] = o.requireAuth),
+      (t[8] = i),
+      (t[9] = m),
+      (t[10] = h),
+      (t[11] = v),
+      (t[12] = y),
+      (t[13] = b),
+      (t[14] = x),
+      (t[15] = S),
+      (t[16] = C),
+      (t[17] = w),
+      (t[18] = T),
+      (t[19] = E),
+      (t[20] = D))
+    : ((m = t[9]),
+      (h = t[10]),
+      (v = t[11]),
+      (y = t[12]),
+      (b = t[13]),
+      (x = t[14]),
+      (S = t[15]),
+      (C = t[16]),
+      (w = t[17]),
+      (T = t[18]),
+      (E = t[19]),
+      (D = t[20]));
+  let O;
+  t[25] === n ? (O = t[26]) : ((O = (e) => !e && n()), (t[25] = n), (t[26] = O));
+  let k;
+  t[27] !== o.id || t[28] !== i
+    ? ((k = (e) => {
+        u(i, o.id, { didConnect: !0, linkId: e });
+      }),
+      (t[27] = o.id),
+      (t[28] = i),
+      (t[29] = k))
+    : (k = t[29]);
+  let A;
+  t[30] !== d || t[31] !== o.hostId || t[32] !== o.id || t[33] !== h || t[34] !== i
+    ? ((A = (e) => {
+        d({ ...e, hostId: o.hostId, returnTo: `/`, resumeTarget: h }) ??
+          u(i, o.id, { didConnect: !1 });
+      }),
+      (t[30] = d),
+      (t[31] = o.hostId),
+      (t[32] = o.id),
+      (t[33] = h),
+      (t[34] = i),
+      (t[35] = A))
+    : (A = t[35]);
+  let j;
+  return (
+    t[36] !== m ||
+    t[37] !== v ||
+    t[38] !== y ||
+    t[39] !== O ||
+    t[40] !== k ||
+    t[41] !== A ||
+    t[42] !== b ||
+    t[43] !== x ||
+    t[44] !== S ||
+    t[45] !== C ||
+    t[46] !== w ||
+    t[47] !== T ||
+    t[48] !== E ||
+    t[49] !== D
+      ? ((j = (0, _.jsx)(m, {
+          allowBrowserFallback: v,
+          connectorId: b,
+          authTypeOverride: x,
+          closeOnOAuthStarted: S,
+          beforeConnect: C,
+          isReconnecting: w,
+          reauthLinkId: T,
+          githubRepositoryAccess: E,
+          hostId: D,
+          isCompletingConnection: y,
+          onOpenChange: O,
+          onConnected: k,
+          onOAuthStarted: A,
+          waitForConnectedHandler: !0,
+        })),
+        (t[36] = m),
+        (t[37] = v),
+        (t[38] = y),
+        (t[39] = O),
+        (t[40] = k),
+        (t[41] = A),
+        (t[42] = b),
+        (t[43] = x),
+        (t[44] = S),
+        (t[45] = C),
+        (t[46] = w),
+        (t[47] = T),
+        (t[48] = E),
+        (t[49] = D),
+        (t[50] = j))
+      : (j = t[50]),
+    j
+  );
 }
-
-interface PendingConnectRequest {
-  beforeConnect?: unknown;
-  connectorId: string;
-  githubRepositoryAccess?: Record<string, unknown> & { linkId?: string };
-  hostId?: string;
-  id: string;
-  reauthLinkId?: string;
-  requireAuth?: boolean;
-  result?: unknown;
+var g, _;
+function v() {
+  return (v = e(() => {
+    ((g = t()), n(), m(), c(), o(), d(), (_ = i()));
+  }))();
 }
-
-function McpConnectSheetModal({ onClose }: McpConnectSheetModalProps): unknown {
-  const scope = useScope(appScope);
-  const request = useSignalValue(pendingConnectRequest) as
-    | PendingConnectRequest
-    | null;
-  const { isAppConnectPending, markAppConnectOAuthPending } =
-    useAppConnectFlow();
-  if (request == null || request.result != null) return null;
-
-  const resumeTarget = {
-    kind: "mcp-connect-sheet",
-    requestId: request.id,
-  };
-  const complete = (result: Record<string, unknown>) =>
-    resolveConnectRequest(scope, request.id, result);
-  const githubRepositoryAccess =
-    request.githubRepositoryAccess == null
-      ? undefined
-      : {
-          ...request.githubRepositoryAccess,
-          onContinue: () =>
-            complete({
-              didConnect: true,
-              linkId: request.githubRepositoryAccess?.linkId,
-            }),
-        };
-
-  return getJsxRuntime().jsx(AppConnectModalById, {
-    allowBrowserFallback: false,
-    connectorId: request.connectorId,
-    authTypeOverride: request.requireAuth ? "OAUTH" : undefined,
-    closeOnOAuthStarted: false,
-    beforeConnect: request.beforeConnect,
-    isReconnecting: request.reauthLinkId != null,
-    reauthLinkId: request.reauthLinkId,
-    githubRepositoryAccess,
-    hostId: request.hostId,
-    isCompletingConnection: isAppConnectPending(
-      request.connectorId,
-      resumeTarget,
-      request.hostId,
-    ),
-    onOpenChange: (open: boolean) => {
-      if (!open) onClose();
-    },
-    onConnected: (linkId: string) => complete({ didConnect: true, linkId }),
-    onOAuthStarted: (event: Record<string, unknown>) => {
-      markAppConnectOAuthPending({
-        ...event,
-        hostId: request.hostId,
-        returnTo: "/",
-        resumeTarget,
-      }) ?? complete({ didConnect: false });
-    },
-    waitForConnectedHandler: true,
-  });
-}
-
-function initializeMcpConnectSheetModal(): void {
-  initializeAppConnectModalById();
-  initializeAppConnectState();
-  initializeAppConnectFlow();
-}
-
-initializeMcpConnectSheetModal();
-
-export { McpConnectSheetModal };
+v();
+export { h as McpConnectSheetModal };

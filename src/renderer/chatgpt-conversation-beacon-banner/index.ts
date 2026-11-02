@@ -1,176 +1,259 @@
-// In-conversation beacon banner composition. Release chunk: banner-45681dba535f.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as shareActionChunk from "@rchunk/share-conversation-action";
-import * as constantsChunk from "@rchunk/precise-location-banner-constants";
-import * as beaconAnnouncementChunk from "@rchunk/codex-app-home-beacon-announcement-core";
-
-interface Beacon {
-  beacon_id: string;
-  action_items?: unknown;
-  ui_info: { dismiss_variant?: string };
-}
-interface BeaconState {
-  beacon?: Beacon;
-  eventMetadata: { messageId?: string | null; suppressLifecycle?: boolean };
-  productExperience: unknown;
-}
-interface Props {
-  actionOverrides?: Record<string, unknown>;
-  allowConversationSharing?: boolean;
-  allowExternalActions?: boolean;
-  allowRegeneration?: boolean;
-  allowRemoteImages?: boolean;
-  conversationId: string;
-  fallback?: unknown;
-  getActionOverride?: unknown;
-  isTemporaryChat?: boolean;
-  onComposerText?: unknown;
-  onSendPrompt?: unknown;
-  onStartVoice?: unknown;
-  regenerationModelSlug?: string | null;
-}
-interface SharedRuntime {
-  BX<T>(query: unknown, input: unknown): T;
-  LX(scope: unknown): unknown;
-  I3(): {
-    Fragment: unknown;
-    jsx(type: unknown, props: Record<string, unknown>): unknown;
-  };
-  ZI: unknown;
-  QI: unknown;
-}
-interface InitialRuntime {
-  aqt(conversationId: string): string | null;
-  wVt: unknown;
-  fNt: unknown;
-  jVt: unknown;
-  YVt: unknown;
-  WVt: unknown;
-  dHt(value: unknown): boolean;
-  yNt(value: unknown): boolean;
-  gNt(scope: unknown, conversationId: string, state: BeaconState): void;
-  mNt(scope: unknown, conversationId: string, state: BeaconState): void;
-  _Nt(scope: unknown, conversationId: string, state: BeaconState): void;
-}
-interface ShareRuntime {
-  i(value: unknown): boolean;
-  t: unknown;
-  o(input: Record<string, unknown>): unknown;
-  n(input: Record<string, unknown>): unknown;
-  r(input: Record<string, unknown>): unknown;
-}
-const shared = appSharedChunk as unknown as SharedRuntime;
-const initial = appInitialChunk as unknown as InitialRuntime;
-const share = shareActionChunk as unknown as ShareRuntime;
-const BeaconAnnouncement = (beaconAnnouncementChunk as Record<string, unknown>)
-  .t;
-const jsx = shared.I3();
-void appPrimaryChunk;
-void constantsChunk;
-
-export function ChatGptConversationBeaconBanner(props: Props): unknown {
-  const allowConversationSharing = props.allowConversationSharing ?? false;
-  const allowRegeneration = props.allowRegeneration ?? true;
-  const isTemporaryChat = props.isTemporaryChat ?? false;
-  const scope = shared.LX(shared.ZI);
-  const accountId = initial.aqt(props.conversationId);
-  const pcaConversationId = shared.BX<string | null>(
-    initial.wVt,
-    props.conversationId,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  I3 as i,
+  LX as ee,
+  QI as a,
+  ZI as o,
+} from "@rchunk/app-shared";
+import {
+  WPt as s,
+  WVt as te,
+  YVt as ne,
+  _Nt as re,
+  aqt as ie,
+  dHt as c,
+  fNt as ae,
+  gNt as oe,
+  hNt as l,
+  jVt as se,
+  mNt as ce,
+  oqt as u,
+  uHt as d,
+  wVt as le,
+  wW as f,
+  yNt as p,
+} from "@rchunk/app-initial";
+import { Bm as m } from "@rchunk/app-primary";
+import {
+  a as h,
+  i as ue,
+  n as g,
+  o as de,
+  r as _,
+  s as v,
+  t as fe,
+} from "@rchunk/share-conversation-action";
+import { n as y } from "@rchunk/precise-location-banner-constants";
+import { r as b, t as pe } from "@rchunk/codex-app-home-beacon-announcement-core";
+function x(e) {
+  let t = (0, S.c)(62),
+    {
+      actionOverrides: r,
+      allowConversationSharing: i,
+      allowExternalActions: a,
+      allowRegeneration: s,
+      allowRemoteImages: l,
+      conversationId: u,
+      fallback: d,
+      getActionOverride: f,
+      isTemporaryChat: m,
+      onComposerText: h,
+      onSendPrompt: v,
+      onStartVoice: y,
+      regenerationModelSlug: b,
+    } = e,
+    x = i !== void 0 && i,
+    w = s === void 0 || s,
+    T = m !== void 0 && m,
+    E = b === void 0 ? null : b,
+    D = ee(o),
+    O;
+  t[0] === u ? (O = t[1]) : ((O = ie(u)), (t[0] = u), (t[1] = O));
+  let k = O,
+    A = n(le, u),
+    j = n(ae, A ?? u),
+    me = n(se, u),
+    M = n(ne, u),
+    N;
+  t[2] === M ? (N = t[3]) : ((N = c(M)), (t[2] = M), (t[3] = N));
+  let P = N,
+    F = n(te, u),
+    I;
+  t[4] === j
+    ? (I = t[5])
+    : ((I = j != null && p(j.beacon) ? j.beacon : null), (t[4] = j), (t[5] = I));
+  let L = I,
+    R = L != null && ue(L.action_items),
+    z = n(fe, R ? k : null),
+    B;
+  t[6] !== a || t[7] !== j || t[8] !== u || t[9] !== T || t[10] !== D || t[11] !== k
+    ? ((B = void 0),
+      (t[6] = a),
+      (t[7] = j),
+      (t[8] = u),
+      (t[9] = T),
+      (t[10] = D),
+      (t[11] = k),
+      (t[12] = B))
+    : (B = t[12]);
+  let V;
+  t[13] !== w || t[14] !== T || t[15] !== E || t[16] !== D || t[17] !== k
+    ? ((V = w
+        ? de({ scope: D, allowedModelSlug: E, conversationId: k, isTemporaryChat: T })
+        : void 0),
+      (t[13] = w),
+      (t[14] = T),
+      (t[15] = E),
+      (t[16] = D),
+      (t[17] = k),
+      (t[18] = V))
+    : (V = t[18]);
+  let H = x && a !== !1 && !T && !P,
+    U;
+  t[19] !== D || t[20] !== A || t[21] !== H
+    ? ((U = g({ scope: D, canShare: H, conversationId: A })),
+      (t[19] = D),
+      (t[20] = A),
+      (t[21] = H),
+      (t[22] = U))
+    : (U = t[22]);
+  let W;
+  t[23] !== r || t[24] !== V || t[25] !== U || t[26] !== B
+    ? ((W = { ...r, share_location: B, regenerate: V, share_conversation: U }),
+      (t[23] = r),
+      (t[24] = V),
+      (t[25] = U),
+      (t[26] = B),
+      (t[27] = W))
+    : (W = t[27]);
+  let G = W,
+    K;
+  t[28] !== G.share_conversation || t[29] !== f || t[30] !== z
+    ? ((K = (e) =>
+        _({
+          action: e,
+          getActionOverride: f,
+          shareConversationEligible: z,
+          shareConversationOverride: G.share_conversation,
+        })),
+      (t[28] = G.share_conversation),
+      (t[29] = f),
+      (t[30] = z),
+      (t[31] = K))
+    : (K = t[31]);
+  let q = K;
+  if (
+    j == null ||
+    L == null ||
+    L.beacon_id === `precise_location_banner_beacon` ||
+    (F && L.ui_info.dismiss_variant !== `persistent`) ||
+    L.beacon_id.startsWith(`codex_composer_tip_`) ||
+    (L.ui_info.dismiss_variant !== `persistent` &&
+      j.eventMetadata.messageId != null &&
+      j.eventMetadata.messageId !== me) ||
+    j == null ||
+    L == null
+  ) {
+    let e;
+    return (
+      t[32] === d
+        ? (e = t[33])
+        : ((e = d == null ? null : (0, C.jsx)(C.Fragment, { children: d })),
+          (t[32] = d),
+          (t[33] = e)),
+      e
+    );
+  }
+  let J = A ?? u,
+    Y;
+  t[34] !== j.eventMetadata.suppressLifecycle || t[35] !== j.productExperience
+    ? ((Y = {
+        placement: `in_conversation`,
+        productExperience: j.productExperience,
+        suppressLifecycle: j.eventMetadata.suppressLifecycle,
+        treatment: `banner`,
+      }),
+      (t[34] = j.eventMetadata.suppressLifecycle),
+      (t[35] = j.productExperience),
+      (t[36] = Y))
+    : (Y = t[36]);
+  let X;
+  t[37] !== j || t[38] !== u || t[39] !== D
+    ? ((X = () => {
+        oe(D, u, j);
+      }),
+      (t[37] = j),
+      (t[38] = u),
+      (t[39] = D),
+      (t[40] = X))
+    : (X = t[40]);
+  let Z, Q;
+  t[41] !== j || t[42] !== u || t[43] !== D
+    ? ((Z = () => {
+        ce(D, u, j);
+      }),
+      (Q = () => {
+        re(D, u, j);
+      }),
+      (t[41] = j),
+      (t[42] = u),
+      (t[43] = D),
+      (t[44] = Z),
+      (t[45] = Q))
+    : ((Z = t[44]), (Q = t[45]));
+  let $;
+  return (
+    t[46] !== a ||
+    t[47] !== l ||
+    t[48] !== L ||
+    t[49] !== j.eventMetadata ||
+    t[50] !== G ||
+    t[51] !== q ||
+    t[52] !== h ||
+    t[53] !== v ||
+    t[54] !== y ||
+    t[55] !== J ||
+    t[56] !== Y ||
+    t[57] !== X ||
+    t[58] !== Z ||
+    t[59] !== Q ||
+    t[60] !== k
+      ? (($ = (0, C.jsx)(pe, {
+          accountId: J,
+          actionOverrides: G,
+          allowExternalActions: a,
+          allowRemoteImages: l,
+          analyticsContext: Y,
+          beacon: L,
+          eventMetadata: j.eventMetadata,
+          getActionOverride: q,
+          onActionComplete: X,
+          onComposerText: h,
+          onDismiss: Z,
+          onUnsupported: Q,
+          pcaConversationId: k,
+          onSendPrompt: v,
+          onStartVoice: y,
+        })),
+        (t[46] = a),
+        (t[47] = l),
+        (t[48] = L),
+        (t[49] = j.eventMetadata),
+        (t[50] = G),
+        (t[51] = q),
+        (t[52] = h),
+        (t[53] = v),
+        (t[54] = y),
+        (t[55] = J),
+        (t[56] = Y),
+        (t[57] = X),
+        (t[58] = Z),
+        (t[59] = Q),
+        (t[60] = k),
+        (t[61] = $))
+      : ($ = t[61]),
+    $
   );
-  const state = shared.BX<BeaconState | null>(
-    initial.fNt,
-    pcaConversationId ?? props.conversationId,
-  );
-  const latestMessageId = shared.BX<string | null>(
-    initial.jVt,
-    props.conversationId,
-  );
-  const conversationMode = shared.BX<unknown>(
-    initial.YVt,
-    props.conversationId,
-  );
-  const sharingRestricted = initial.dHt(conversationMode);
-  const previouslyDismissed = shared.BX<boolean>(
-    initial.WVt,
-    props.conversationId,
-  );
-  const beacon =
-    state?.beacon != null && initial.yNt(state.beacon) ? state.beacon : null;
-  const shareEligible = beacon != null && share.i(beacon.action_items);
-  const shareLocation = shared.BX<unknown>(
-    share.t,
-    shareEligible ? accountId : null,
-  );
-  const regenerate = allowRegeneration
-    ? share.o({
-        scope,
-        allowedModelSlug: props.regenerationModelSlug ?? null,
-        conversationId: accountId,
-        isTemporaryChat,
-      })
-    : undefined;
-  const canShare =
-    allowConversationSharing &&
-    props.allowExternalActions !== false &&
-    !isTemporaryChat &&
-    !sharingRestricted;
-  const shareConversation = share.n({
-    scope,
-    canShare,
-    conversationId: pcaConversationId,
-  });
-  const actionOverrides = {
-    ...props.actionOverrides,
-    share_location: shareLocation,
-    regenerate,
-    share_conversation: shareConversation,
-  };
-  const getActionOverride = (action: unknown) =>
-    share.r({
-      action,
-      getActionOverride: props.getActionOverride,
-      shareConversationEligible: shareLocation,
-      shareConversationOverride: actionOverrides.share_conversation,
-    });
-  const hidden =
-    state == null ||
-    beacon == null ||
-    beacon.beacon_id === "precise_location_banner_beacon" ||
-    (previouslyDismissed && beacon.ui_info.dismiss_variant !== "persistent") ||
-    beacon.beacon_id.startsWith("codex_composer_tip_") ||
-    (beacon.ui_info.dismiss_variant !== "persistent" &&
-      state.eventMetadata.messageId != null &&
-      state.eventMetadata.messageId !== latestMessageId);
-  if (hidden)
-    return props.fallback == null
-      ? null
-      : jsx.jsx(jsx.Fragment, { children: props.fallback });
-  const conversationId = pcaConversationId ?? props.conversationId;
-  const analyticsContext = {
-    placement: "in_conversation",
-    productExperience: state.productExperience,
-    suppressLifecycle: state.eventMetadata.suppressLifecycle,
-    treatment: "banner",
-  };
-  return jsx.jsx(BeaconAnnouncement, {
-    accountId: conversationId,
-    actionOverrides,
-    allowExternalActions: props.allowExternalActions,
-    allowRemoteImages: props.allowRemoteImages,
-    analyticsContext,
-    beacon,
-    eventMetadata: state.eventMetadata,
-    getActionOverride,
-    onActionComplete: () => initial.gNt(scope, props.conversationId, state),
-    onComposerText: props.onComposerText,
-    onDismiss: () => initial.mNt(scope, props.conversationId, state),
-    onUnsupported: () => initial._Nt(scope, props.conversationId, state),
-    pcaConversationId: accountId,
-    onSendPrompt: props.onSendPrompt,
-    onStartVoice: props.onStartVoice,
-  });
 }
+var S, C;
+function w() {
+  return (w = e(() => {
+    ((S = t()), r(), b(), s(), f(), a(), u(), d(), m(), y(), v(), h(), l(), (C = i()));
+  }))();
+}
+w();
+export { x as ChatGptConversationBeaconBanner };

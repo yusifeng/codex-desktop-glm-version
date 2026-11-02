@@ -1,2 +1,3 @@
-import { kHt as createBrowserExternal } from "@rchunk/app-initial";
-export default createBrowserExternal();
+// @ts-nocheck
+import { kHt as e } from "@rchunk/app-initial";
+export default e();

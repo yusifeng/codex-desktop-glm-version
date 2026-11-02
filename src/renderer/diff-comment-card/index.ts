@@ -1,134 +1,173 @@
-import {
-  $3 as reactCompilerRuntime,
-  I3 as getJsxRuntime,
-  h4 as initializeStyleRuntime,
-  m4 as classNames,
-} from "@rchunk/app-shared";
-
-void reactCompilerRuntime;
-
-export interface DiffCommentBodyProps {
-  action?: unknown;
-  children?: unknown;
-  footer?: unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, h4 as r, m4 as i } from "@rchunk/app-shared";
+var a, o;
+function s() {
+  return (s = e(() => {
+    ((a = `_footer_1mwwy_1`), (o = { footer: a }));
+  }))();
 }
-
-export interface DiffCommentCardProps {
-  authorAvatar?: unknown;
-  authorLabel?: unknown;
-  body?: unknown;
-  className?: string;
-  footer?: unknown;
-  headerAccessory?: unknown;
-  headerLayout?: "truncate" | "wrap";
-  headerSuffix?: unknown;
-  onHeaderClick?: () => void;
-  onPointerDownCapture?: (event: unknown) => void;
-  surfaceVariant?: "default" | "inline" | string;
-}
-
-function DiffCommentBody({ action, children, footer }: DiffCommentBodyProps): unknown {
-  const { jsx, jsxs } = getJsxRuntime();
-  const actionNode =
-    action ??
-    jsx("span", {
-      "aria-hidden": "true",
-      className: "size-token-button-composer-sm shrink-0",
-    });
-  return jsxs("div", {
-    className: "px-3 pt-1 pb-2 text-sm leading-5",
-    children: [
-      jsxs("div", {
-        className: "flex min-w-0 items-start gap-2",
-        children: [
-          jsx("div", {
-            className:
-              "min-h-token-button-composer-sm min-w-0 flex-1 break-words whitespace-pre-wrap",
-            children,
-          }),
-          actionNode,
-        ],
-      }),
-      footer,
-    ],
-  });
-}
-
-function DiffCommentCard({
-  authorAvatar,
-  authorLabel,
-  body,
-  className,
-  footer,
-  headerAccessory,
-  headerLayout = "wrap",
-  headerSuffix,
-  onHeaderClick,
-  onPointerDownCapture,
-  surfaceVariant = "default",
-}: DiffCommentCardProps): unknown {
-  const { jsx, jsxs } = getJsxRuntime();
-  const hasBody = body != null;
-  const rootClassName = classNames(
-    "group/comment overflow-hidden rounded-lg",
-    surfaceVariant !== "inline" && "border border-default",
-    surfaceVariant === "default" && "bg-primary-soft-alpha",
-    className,
+function c(e) {
+  let t = (0, u.c)(10),
+    { children: n, action: r, footer: i } = e,
+    a;
+  t[0] === n
+    ? (a = t[1])
+    : ((a = (0, d.jsx)(`div`, {
+        className: `min-h-token-button-composer-sm min-w-0 flex-1 break-words whitespace-pre-wrap`,
+        children: n,
+      })),
+      (t[0] = n),
+      (t[1] = a));
+  let o;
+  t[2] === r
+    ? (o = t[3])
+    : ((o =
+        r ??
+        (0, d.jsx)(`span`, {
+          "aria-hidden": `true`,
+          className: `size-token-button-composer-sm shrink-0`,
+        })),
+      (t[2] = r),
+      (t[3] = o));
+  let s;
+  t[4] !== a || t[5] !== o
+    ? ((s = (0, d.jsxs)(`div`, { className: `flex min-w-0 items-start gap-2`, children: [a, o] })),
+      (t[4] = a),
+      (t[5] = o),
+      (t[6] = s))
+    : (s = t[6]);
+  let c;
+  return (
+    t[7] !== i || t[8] !== s
+      ? ((c = (0, d.jsxs)(`div`, {
+          className: `px-3 pt-1 pb-2 text-sm leading-5`,
+          children: [s, i],
+        })),
+        (t[7] = i),
+        (t[8] = s),
+        (t[9] = c))
+      : (c = t[9]),
+    c
   );
-  const headerClassName = classNames(
-    "flex items-center justify-between gap-3 px-3 pt-2.5 select-none",
-    headerLayout === "wrap" && "flex-wrap",
-    hasBody || headerSuffix != null ? "pb-0.5" : "pb-2.5",
-    onHeaderClick != null && "cursor-interaction",
-  );
-  const authorClassName = classNames(
-    "flex min-h-6 min-w-0 items-center gap-2.5",
-    headerLayout === "truncate" && "flex-1",
-  );
-  return jsxs("div", {
-    className: rootClassName,
-    onPointerDownCapture,
-    children: [
-      jsxs("div", {
-        className: headerClassName,
-        role: "presentation",
-        onClick: onHeaderClick,
-        children: [
-          jsxs("div", {
-            className: authorClassName,
-            children: [
-              authorAvatar,
-              jsx("div", {
-                className: "flex min-w-0 items-center gap-1.5",
-                children: jsx("span", {
-                  className:
-                    "flex min-w-0 items-center truncate text-xs leading-4 text-codex-description",
-                  children: authorLabel,
-                }),
-              }),
-            ],
-          }),
-          headerAccessory,
-        ],
-      }),
-      headerSuffix,
-      hasBody ? body : null,
-      footer == null
-        ? null
-        : jsx("div", {
-            className: classNames(
-              "_footer_1mwwy_1",
-              "flex items-center justify-end px-3 pt-2 pb-3 text-sm leading-5 text-codex-description",
-            ),
-            children: footer,
-          }),
-    ],
-  });
 }
-
-function initializeDiffCommentCard(): void {
-  initializeStyleRuntime();
-  getJsxRuntime();
+function l(e) {
+  let t = (0, u.c)(30),
+    {
+      authorAvatar: n,
+      authorLabel: r,
+      body: a,
+      className: s,
+      footer: c,
+      headerAccessory: l,
+      headerLayout: f,
+      headerSuffix: p,
+      surfaceVariant: m,
+      onHeaderClick: h,
+      onPointerDownCapture: g,
+    } = e,
+    _ = f === void 0 ? `wrap` : f,
+    v = m === void 0 ? `default` : m,
+    y = a != null,
+    b = v !== `inline` && `border border-default`,
+    x = v === "default" && `bg-primary-soft-alpha`,
+    S;
+  t[0] !== s || t[1] !== b || t[2] !== x
+    ? ((S = i(`group/comment overflow-hidden rounded-lg`, b, x, s)),
+      (t[0] = s),
+      (t[1] = b),
+      (t[2] = x),
+      (t[3] = S))
+    : (S = t[3]);
+  let C = _ === `wrap` && `flex-wrap`,
+    w = y || p != null ? `pb-0.5` : `pb-2.5`,
+    T = h != null && `cursor-interaction`,
+    E;
+  t[4] !== C || t[5] !== w || t[6] !== T
+    ? ((E = i(`flex items-center justify-between gap-3 px-3 pt-2.5 select-none`, C, w, T)),
+      (t[4] = C),
+      (t[5] = w),
+      (t[6] = T),
+      (t[7] = E))
+    : (E = t[7]);
+  let D = _ === `truncate` && `flex-1`,
+    O;
+  t[8] === D
+    ? (O = t[9])
+    : ((O = i(`flex min-h-6 min-w-0 items-center gap-2.5`, D)), (t[8] = D), (t[9] = O));
+  let k;
+  t[10] === r
+    ? (k = t[11])
+    : ((k = (0, d.jsx)(`div`, {
+        className: `flex min-w-0 items-center gap-1.5`,
+        children: (0, d.jsx)(`span`, {
+          className: `flex min-w-0 items-center truncate text-xs leading-4 text-codex-description`,
+          children: r,
+        }),
+      })),
+      (t[10] = r),
+      (t[11] = k));
+  let A;
+  t[12] !== n || t[13] !== O || t[14] !== k
+    ? ((A = (0, d.jsxs)(`div`, { className: O, children: [n, k] })),
+      (t[12] = n),
+      (t[13] = O),
+      (t[14] = k),
+      (t[15] = A))
+    : (A = t[15]);
+  let j;
+  t[16] !== l || t[17] !== h || t[18] !== A || t[19] !== E
+    ? ((j = (0, d.jsxs)(`div`, {
+        className: E,
+        role: `presentation`,
+        onClick: h,
+        children: [A, l],
+      })),
+      (t[16] = l),
+      (t[17] = h),
+      (t[18] = A),
+      (t[19] = E),
+      (t[20] = j))
+    : (j = t[20]);
+  let M = y ? a : null,
+    N;
+  t[21] === c
+    ? (N = t[22])
+    : ((N =
+        c == null
+          ? null
+          : (0, d.jsx)(`div`, {
+              className: i(
+                o.footer,
+                `flex items-center justify-end px-3 pt-2 pb-3 text-sm leading-5 text-codex-description`,
+              ),
+              children: c,
+            })),
+      (t[21] = c),
+      (t[22] = N));
+  let P;
+  return (
+    t[23] !== p || t[24] !== g || t[25] !== j || t[26] !== M || t[27] !== N || t[28] !== S
+      ? ((P = (0, d.jsxs)(`div`, {
+          className: S,
+          onPointerDownCapture: g,
+          children: [j, p, M, N],
+        })),
+        (t[23] = p),
+        (t[24] = g),
+        (t[25] = j),
+        (t[26] = M),
+        (t[27] = N),
+        (t[28] = S),
+        (t[29] = P))
+      : (P = t[29]),
+    P
+  );
 }
-
-export { DiffCommentBody as n, initializeDiffCommentCard as r, DiffCommentCard as t };
+var u, d;
+function f() {
+  return (f = e(() => {
+    ((u = t()), r(), s(), (d = n()));
+  }))();
+}
+export { c as n, f as r, l as t };

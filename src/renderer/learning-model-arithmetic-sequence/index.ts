@@ -1,47 +1,55 @@
-// Arithmetic-sequence learning model.
-import "@rchunk/rolldown-runtime";
-
-interface ArithmeticSequenceValues { firstTerm?: number | null; commonDifference?: number | null; termNumber?: number | null }
-
-const arithmeticSequenceType = "ARITHMETIC_SEQUENCE";
-const arithmeticSequenceThumbnail = "arithmetic-sequence-v1";
-const arithmeticSequenceFormula = "a_n = a_1 + (n - 1)d";
-const arithmeticSequenceParameters = {
-  firstTerm: { kind: "integer", defaultValue: 2, min: -6, max: 6 },
-  commonDifference: { kind: "integer", defaultValue: 3, min: -4, max: 4 },
-  termNumber: { kind: "integer", defaultValue: 5, min: 1, max: 6 },
-};
-const arithmeticSequenceDefinition = { type: arithmeticSequenceType, version: 2, thumbnailAssetKey: arithmeticSequenceThumbnail, canonicalFormula: arithmeticSequenceFormula, parameters: arithmeticSequenceParameters };
-const firstTermControl = { min: arithmeticSequenceDefinition.parameters.firstTerm.min, max: arithmeticSequenceDefinition.parameters.firstTerm.max, step: 1, defaultValue: arithmeticSequenceDefinition.parameters.firstTerm.defaultValue };
-const commonDifferenceControl = { min: arithmeticSequenceDefinition.parameters.commonDifference.min, max: arithmeticSequenceDefinition.parameters.commonDifference.max, step: 1, defaultValue: arithmeticSequenceDefinition.parameters.commonDifference.defaultValue };
-const termNumberControl = { min: arithmeticSequenceDefinition.parameters.termNumber.min, max: arithmeticSequenceDefinition.parameters.termNumber.max, step: 1, defaultValue: arithmeticSequenceDefinition.parameters.termNumber.defaultValue };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeInteger = (value: number | null | undefined, fallback: number, minimum: number, maximum: number): number =>
-  Number.isFinite(value) ? clamp(Math.round(value ?? fallback), minimum, maximum) : fallback;
-const normalizeArithmeticSequenceValues = (values: ArithmeticSequenceValues) => ({
-  firstTerm: normalizeInteger(values.firstTerm, firstTermControl.defaultValue, firstTermControl.min, firstTermControl.max),
-  commonDifference: normalizeInteger(values.commonDifference, commonDifferenceControl.defaultValue, commonDifferenceControl.min, commonDifferenceControl.max),
-  termNumber: normalizeInteger(values.termNumber, termNumberControl.defaultValue, termNumberControl.min, termNumberControl.max),
-});
-
-function calculateArithmeticSequence(values: ArithmeticSequenceValues) {
-  const normalized = normalizeArithmeticSequenceValues(values);
-  const hopCount = normalized.termNumber - 1;
-  const nthTerm = normalized.firstTerm + hopCount * normalized.commonDifference;
-  const terms = Array.from({ length: normalized.termNumber }, (_unused, index) => normalized.firstTerm + index * normalized.commonDifference);
-  return { ...normalized, hopCount, nthTerm, terms };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `ARITHMETIC_SEQUENCE`),
+      (n = `arithmetic-sequence-v1`),
+      (r = `a_n = a_1 + (n - 1)d`),
+      (i = {
+        firstTerm: { kind: `integer`, defaultValue: 2, min: -6, max: 6 },
+        commonDifference: { kind: `integer`, defaultValue: 3, min: -4, max: 4 },
+        termNumber: { kind: `integer`, defaultValue: 5, min: 1, max: 6 },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-
-function initializeArithmeticSequenceSchema(): void {}
-function initializeArithmeticSequenceModel(): void {}
-
-export {
-  initializeArithmeticSequenceModel as a,
-  arithmeticSequenceDefinition as c,
-  calculateArithmeticSequence as i,
-  firstTermControl as n,
-  normalizeArithmeticSequenceValues as o,
-  termNumberControl as r,
-  initializeArithmeticSequenceSchema as s,
-  commonDifferenceControl as t,
-};
+var s, c, l, u, d, f, p;
+function m() {
+  return (m = e(() => {
+    (o(),
+      (s = {
+        min: a.parameters.firstTerm.min,
+        max: a.parameters.firstTerm.max,
+        step: 1,
+        defaultValue: a.parameters.firstTerm.defaultValue,
+      }),
+      (c = {
+        min: a.parameters.commonDifference.min,
+        max: a.parameters.commonDifference.max,
+        step: 1,
+        defaultValue: a.parameters.commonDifference.defaultValue,
+      }),
+      (l = {
+        min: a.parameters.termNumber.min,
+        max: a.parameters.termNumber.max,
+        step: 1,
+        defaultValue: a.parameters.termNumber.defaultValue,
+      }),
+      (u = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (d = (e, t, n, r) => (Number.isFinite(e) ? u(Math.round(e ?? t), n, r) : t)),
+      (f = (e) => ({
+        firstTerm: d(e.firstTerm, s.defaultValue, s.min, s.max),
+        commonDifference: d(e.commonDifference, c.defaultValue, c.min, c.max),
+        termNumber: d(e.termNumber, l.defaultValue, l.min, l.max),
+      })),
+      (p = (e) => {
+        let t = f(e),
+          n = t.termNumber - 1,
+          r = t.firstTerm + n * t.commonDifference,
+          i = Array.from({ length: t.termNumber }, (e, n) => t.firstTerm + n * t.commonDifference);
+        return { ...t, hopCount: n, nthTerm: r, terms: i };
+      }));
+  }))();
+}
+export { m as a, a as c, p as i, s as n, f as o, l as r, o as s, c as t };

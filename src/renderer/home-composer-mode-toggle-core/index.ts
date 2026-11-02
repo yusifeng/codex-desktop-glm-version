@@ -1,233 +1,310 @@
-import "@rchunk/rolldown-runtime";
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import * as primaryChunk from "@rchunk/app-primary";
-
-export type HomeComposerMode = "chat" | "work";
-
-export interface HomeComposerModeToggleProps {
-  autoFocusSelected?: boolean;
-  className?: string;
-  disabled?: boolean;
-  emphasizeWorkUpgrade?: boolean;
-  onSelectedAutoFocus?(): void;
-  onTransitionComplete?(): void;
-  onValueChange(value: HomeComposerMode): void;
-  value: HomeComposerMode;
-  workRequiresUpgrade?: boolean;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $f as n,
+  I3 as r,
+  K2 as i,
+  Y2 as a,
+  a$ as o,
+  c_ as s,
+  e6 as c,
+  eC as ee,
+  f_ as l,
+  h4 as u,
+  lw as d,
+  m4 as f,
+  n4 as te,
+  o$ as p,
+  o_ as m,
+  p_ as h,
+  tp as g,
+} from "@rchunk/app-shared";
+import { Slt as _, xlt as v } from "@rchunk/app-initial";
+import { Qs as y, Zs as ne } from "@rchunk/app-primary";
+var b, x;
+function S() {
+  return (S = e(() => {
+    ((b = `_indicator_1dczx_4`), (x = { indicator: b }));
+  }))();
 }
-
-const shared = sharedChunk as unknown as Record<string, unknown>;
-const initial = initialChunk as unknown as Record<string, unknown>;
-const primary = primaryChunk as unknown as Record<string, unknown>;
-let jsx: {
-  jsx(component: unknown, props: unknown): unknown;
-  jsxs(component: unknown, props: unknown): unknown;
-};
-let React: () => {
-  useState<T>(factory: T | (() => T)): [T, (value: T) => void];
-};
-let classNames: (...values: unknown[]) => string;
-let useIntl: () => {
-  formatMessage(message: Record<string, string>): string;
-};
-let FormattedMessage: unknown;
-let Tooltip: unknown;
-let LockIcon: unknown;
-let motion: { span: unknown };
-let UpgradePopover: unknown;
-let useReducedMotion: () => boolean;
-let noteComposerInteraction: () => void;
-
-const indicatorPosition: Record<HomeComposerMode, string> = {
-  chat: "calc((0% - 0px) * var(--mode-toggle-direction))",
-  work: "calc((100% - 17px) * var(--mode-toggle-direction))",
-};
-const buttonClassName = "cursor-interaction relative z-10 inline-flex h-full min-w-0 items-center justify-center whitespace-nowrap rounded-full px-10 text-sm font-medium @max-xs/home-mode-toggle:px-2.5 disabled:cursor-not-allowed disabled:opacity-40";
-
-function HomeComposerModeToggle({
-  autoFocusSelected = false,
-  className,
-  disabled = false,
-  emphasizeWorkUpgrade = false,
-  onSelectedAutoFocus,
-  onTransitionComplete,
-  onValueChange,
-  value,
-  workRequiresUpgrade = false,
-}: HomeComposerModeToggleProps): unknown {
-  initializeHomeComposerModeToggle();
-  const intl = useIntl();
-  const reducedMotion = useReducedMotion();
-  const selectedPosition = indicatorPosition[value];
-  const [initialPosition] = React().useState(() =>
-    !autoFocusSelected || reducedMotion
-      ? { x: selectedPosition }
-      : { x: indicatorPosition[value === "chat" ? "work" : "chat"] },
-  );
-  const ariaLabel = intl.formatMessage({
-    id: "composer.home.modeToggle.ariaLabel",
-    defaultMessage: "Composer mode",
-    description: "Accessible label for the toggle that switches the Home composer between Work and Chat modes",
-  });
-  const chatSelected = value === "chat";
-  const workSelected = value === "work";
-  const chatButton = jsx.jsx("button", {
-    autoFocus: autoFocusSelected && chatSelected,
-    className: classNames(
-      buttonClassName,
-      "col-start-1 row-start-1 ps-11 pe-9",
-      chatSelected
-        ? "text-mode-toggle-primary"
-        : "text-mode-toggle-inactive hover:text-mode-toggle-primary focus-visible:text-mode-toggle-primary",
-    ),
-    type: "button",
-    "aria-pressed": chatSelected,
-    disabled,
-    onFocus: autoFocusSelected && chatSelected ? onSelectedAutoFocus : undefined,
-    onClick: () => { if (!chatSelected) onValueChange("chat"); },
-    children: jsx.jsx(FormattedMessage, {
-      id: "composer.home.modeToggle.chat",
-      defaultMessage: "Chat",
-      description: "Label for Chat mode in the Home composer mode toggle",
-    }),
-  });
-  const chat = jsx.jsx(Tooltip, {
-    disabled,
-    tooltipContent: jsx.jsx(FormattedMessage, {
-      id: "composer.home.modeToggle.chat.tooltip",
-      defaultMessage: "Ask questions and explore ideas",
-      description: "Concise tooltip for the Chat option in the Home composer mode toggle. It explains that Chat is for asking questions and exploring ideas.",
-    }),
-    children: chatButton,
-  });
-  const workTrigger = ({
-    ariaDescribedBy,
-    isOpen,
-    onActivate,
-    triggerRef,
-  }: {
-    ariaDescribedBy?: string;
-    isOpen?: boolean;
-    onActivate(): void;
-    triggerRef?: unknown;
-  }) => jsx.jsx(Tooltip, {
-    disabled,
-    triggerPopupOpen: isOpen,
-    tooltipContent: jsx.jsx(FormattedMessage, {
-      id: "composer.home.modeToggle.work.tooltip",
-      defaultMessage: "Get tasks done with your files and apps",
-      description: "Concise tooltip for the Work option in the Home composer mode toggle. It explains that Work can complete tasks using the user's files and apps.",
-    }),
-    children: jsx.jsx("button", {
-      ref: triggerRef,
-      autoFocus: autoFocusSelected && workSelected,
-      className: classNames(
-        buttonClassName,
-        "col-start-2 row-start-1 ps-9 pe-11",
-        workSelected
-          ? "text-mode-toggle-primary"
-          : "text-mode-toggle-inactive hover:text-mode-toggle-primary focus-visible:text-mode-toggle-primary",
-      ),
-      type: "button",
-      "aria-describedby": ariaDescribedBy,
-      "aria-pressed": workSelected,
-      disabled,
-      onFocus: autoFocusSelected && workSelected ? onSelectedAutoFocus : undefined,
-      onClick: () => {
-        onActivate();
-        if (!workSelected) onValueChange("work");
-      },
-      children: jsx.jsxs("span", {
-        className: classNames(
-          "inline-flex items-center gap-1",
-          workRequiresUpgrade && !workSelected && (
-            emphasizeWorkUpgrade
-              ? "text-mode-toggle-accent"
-              : "text-mode-toggle-primary opacity-35"
-          ),
-        ),
-        children: [
-          workRequiresUpgrade ? jsx.jsx(LockIcon, {}) : null,
-          jsx.jsx(FormattedMessage, {
-            id: "composer.home.modeToggle.work",
-            defaultMessage: "Work",
-            description: "Label for Work mode in the Home composer mode toggle",
+function C(e) {
+  let t = (0, T.c)(54),
+    {
+      className: n,
+      autoFocusSelected: r,
+      value: i,
+      onValueChange: o,
+      onSelectedAutoFocus: s,
+      onTransitionComplete: c,
+      disabled: l,
+      workRequiresUpgrade: u,
+      emphasizeWorkUpgrade: d,
+    } = e,
+    h = r !== void 0 && r,
+    g = l !== void 0 && l,
+    v = u !== void 0 && u,
+    y = d !== void 0 && d,
+    b = te(),
+    S = _(),
+    C = k[i],
+    j;
+  t[0] !== h || t[1] !== C || t[2] !== S || t[3] !== i
+    ? ((j = () => (!h || S ? { x: C } : { x: k[i === `chat` ? `work` : `chat`] })),
+      (t[0] = h),
+      (t[1] = C),
+      (t[2] = S),
+      (t[3] = i),
+      (t[4] = j))
+    : (j = t[4]);
+  let [M] = (0, E.useState)(j),
+    N;
+  t[5] === n
+    ? (N = t[6])
+    : ((N = f(
+        `relative isolate inline-grid h-9 max-w-full min-w-0 grid-cols-2 gap-0 rounded-full select-none`,
+        n,
+      )),
+      (t[5] = n),
+      (t[6] = N));
+  let P;
+  t[7] === b
+    ? (P = t[8])
+    : ((P = b.formatMessage({
+        id: `composer.home.modeToggle.ariaLabel`,
+        defaultMessage: `Composer mode`,
+        description: `Accessible label for the toggle that switches the Home composer between Work and Chat modes`,
+      })),
+      (t[7] = b),
+      (t[8] = P));
+  let F;
+  t[9] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((F = (0, D.jsx)(`span`, {
+        className: `pointer-events-none absolute inset-x-px top-1/2 z-0 h-8.5 -translate-y-1/2 rounded-full bg-background-mode-toggle-track`,
+        "aria-hidden": `true`,
+      })),
+      (t[9] = F))
+    : (F = t[9]);
+  let I;
+  t[10] === C ? (I = t[11]) : ((I = { x: C }), (t[10] = C), (t[11] = I));
+  let L;
+  t[12] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((L = f(
+        `pointer-events-none relative z-10 col-start-1 row-start-1 rounded-full`,
+        x.indicator,
+      )),
+      (t[12] = L))
+    : (L = t[12]);
+  let R;
+  t[13] === S ? (R = t[14]) : ((R = S ? { duration: 0 } : A), (t[13] = S), (t[14] = R));
+  let z;
+  t[15] !== M || t[16] !== c || t[17] !== R || t[18] !== I
+    ? ((z = (0, D.jsx)(p.span, {
+        animate: I,
+        className: L,
+        initial: M,
+        transition: R,
+        "aria-hidden": `true`,
+        onAnimationComplete: c,
+      })),
+      (t[15] = M),
+      (t[16] = c),
+      (t[17] = R),
+      (t[18] = I),
+      (t[19] = z))
+    : (z = t[19]);
+  let B;
+  t[20] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((B = (0, D.jsx)(a, {
+        id: `composer.home.modeToggle.chat.tooltip`,
+        defaultMessage: `Ask questions and explore ideas`,
+        description: `Concise tooltip for the Chat option in the Home composer mode toggle. It explains that Chat is for asking questions and exploring ideas.`,
+      })),
+      (t[20] = B))
+    : (B = t[20]);
+  let V = h && i === `chat`,
+    H =
+      i === `chat`
+        ? `text-mode-toggle-primary`
+        : `text-mode-toggle-inactive hover:text-mode-toggle-primary focus-visible:text-mode-toggle-primary`,
+    U;
+  t[21] === H
+    ? (U = t[22])
+    : ((U = f(O, `col-start-1 row-start-1 ps-11 pe-9`, H)), (t[21] = H), (t[22] = U));
+  let W = i === `chat`,
+    G = h && i === `chat` ? s : void 0,
+    K;
+  t[23] !== o || t[24] !== i
+    ? ((K = () => {
+        i !== `chat` && o(`chat`);
+      }),
+      (t[23] = o),
+      (t[24] = i),
+      (t[25] = K))
+    : (K = t[25]);
+  let q;
+  t[26] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((q = (0, D.jsx)(a, {
+        id: `composer.home.modeToggle.chat`,
+        defaultMessage: `Chat`,
+        description: `Label for Chat mode in the Home composer mode toggle`,
+      })),
+      (t[26] = q))
+    : (q = t[26]);
+  let J;
+  t[27] !== g || t[28] !== V || t[29] !== U || t[30] !== W || t[31] !== G || t[32] !== K
+    ? ((J = (0, D.jsx)(`button`, {
+        autoFocus: V,
+        className: U,
+        type: `button`,
+        "aria-pressed": W,
+        disabled: g,
+        onFocus: G,
+        onClick: K,
+        children: q,
+      })),
+      (t[27] = g),
+      (t[28] = V),
+      (t[29] = U),
+      (t[30] = W),
+      (t[31] = G),
+      (t[32] = K),
+      (t[33] = J))
+    : (J = t[33]);
+  let Y;
+  t[34] !== g || t[35] !== J
+    ? ((Y = (0, D.jsx)(m, { disabled: g, tooltipContent: B, children: J })),
+      (t[34] = g),
+      (t[35] = J),
+      (t[36] = Y))
+    : (Y = t[36]);
+  let X = v && i === `chat` && !g,
+    Z;
+  t[37] !== h ||
+  t[38] !== g ||
+  t[39] !== y ||
+  t[40] !== s ||
+  t[41] !== o ||
+  t[42] !== i ||
+  t[43] !== v
+    ? ((Z = (e) => {
+        let { ariaDescribedBy: t, isOpen: n, onActivate: r, triggerRef: c } = e;
+        return (0, D.jsx)(m, {
+          disabled: g,
+          triggerPopupOpen: n,
+          tooltipContent: (0, D.jsx)(a, {
+            id: `composer.home.modeToggle.work.tooltip`,
+            defaultMessage: `Get tasks done with your files and apps`,
+            description: `Concise tooltip for the Work option in the Home composer mode toggle. It explains that Work can complete tasks using the user's files and apps.`,
           }),
-          workRequiresUpgrade ? jsx.jsx("span", {
-            className: "sr-only",
-            children: jsx.jsx(FormattedMessage, {
-              id: "composer.home.modeToggle.work.requiresUpgradeSuffix",
-              defaultMessage: "Requires upgrade",
-              description: "Screen-reader-only text appended to the locked Work option in the Home composer mode toggle shown to Free- or Go-plan users. It explains that selecting Work opens an upgrade experience. Keep this suffix concise.",
+          children: (0, D.jsx)(`button`, {
+            ref: c,
+            autoFocus: h && i === `work`,
+            className: f(
+              O,
+              `col-start-2 row-start-1 ps-9 pe-11`,
+              i === `work`
+                ? `text-mode-toggle-primary`
+                : `text-mode-toggle-inactive hover:text-mode-toggle-primary focus-visible:text-mode-toggle-primary`,
+            ),
+            type: `button`,
+            "aria-describedby": t,
+            "aria-pressed": i === `work`,
+            disabled: g,
+            onFocus: h && i === `work` ? s : void 0,
+            onClick: () => {
+              (r(), i !== `work` && o(`work`));
+            },
+            children: (0, D.jsxs)(`span`, {
+              className: f(
+                `inline-flex items-center gap-1`,
+                v &&
+                  i !== `work` &&
+                  (y ? `text-mode-toggle-accent` : `text-mode-toggle-primary opacity-35`),
+              ),
+              children: [
+                v ? (0, D.jsx)(ee, {}) : null,
+                (0, D.jsx)(a, {
+                  id: `composer.home.modeToggle.work`,
+                  defaultMessage: `Work`,
+                  description: `Label for Work mode in the Home composer mode toggle`,
+                }),
+                v
+                  ? (0, D.jsx)(`span`, {
+                      className: `sr-only`,
+                      children: (0, D.jsx)(a, {
+                        id: `composer.home.modeToggle.work.requiresUpgradeSuffix`,
+                        defaultMessage: `Requires upgrade`,
+                        description: `Screen-reader-only text appended to the locked Work option in the Home composer mode toggle shown to Free- or Go-plan users. It explains that selecting Work opens an upgrade experience. Keep this suffix concise.`,
+                      }),
+                    })
+                  : null,
+              ],
             }),
-          }) : null,
-        ],
+          }),
+        });
       }),
-    }),
-  });
-  const work = jsx.jsx(UpgradePopover, {
-    enabled: workRequiresUpgrade && chatSelected && !disabled,
-    target: "tpp-surface-mode-toggle",
-    children: workTrigger,
-  });
-
-  return jsx.jsxs("div", {
-    className: classNames(
-      "relative isolate inline-grid h-9 max-w-full min-w-0 grid-cols-2 gap-0 rounded-full select-none",
-      className,
-    ),
-    role: "group",
-    "aria-label": ariaLabel,
-    onClickCapture: (event: { currentTarget: { contains(value: Node): boolean }; target: EventTarget | null }) => {
-      if (event.target instanceof Node && event.currentTarget.contains(event.target)) {
-        noteComposerInteraction();
-      }
-    },
-    children: [
-      jsx.jsx("span", {
-        className: "pointer-events-none absolute inset-x-px top-1/2 z-0 h-8.5 -translate-y-1/2 rounded-full bg-background-mode-toggle-track",
-        "aria-hidden": true,
-      }),
-      jsx.jsx(motion.span, {
-        animate: { x: selectedPosition },
-        className: "pointer-events-none relative z-10 col-start-1 row-start-1 rounded-full _indicator_1dczx_4",
-        initial: initialPosition,
-        transition: reducedMotion ? { duration: 0 } : { duration: 0.3, ease: shared.$f },
-        "aria-hidden": true,
-        onAnimationComplete: onTransitionComplete,
-      }),
-      chat,
-      work,
-    ],
-  });
+      (t[37] = h),
+      (t[38] = g),
+      (t[39] = y),
+      (t[40] = s),
+      (t[41] = o),
+      (t[42] = i),
+      (t[43] = v),
+      (t[44] = Z))
+    : (Z = t[44]);
+  let Q;
+  t[45] !== X || t[46] !== Z
+    ? ((Q = (0, D.jsx)(ne, { enabled: X, target: `tpp-surface-mode-toggle`, children: Z })),
+      (t[45] = X),
+      (t[46] = Z),
+      (t[47] = Q))
+    : (Q = t[47]);
+  let $;
+  return (
+    t[48] !== z || t[49] !== Y || t[50] !== Q || t[51] !== N || t[52] !== P
+      ? (($ = (0, D.jsxs)(`div`, {
+          className: N,
+          role: `group`,
+          "aria-label": P,
+          onClickCapture: w,
+          children: [F, z, Y, Q],
+        })),
+        (t[48] = z),
+        (t[49] = Y),
+        (t[50] = Q),
+        (t[51] = N),
+        (t[52] = P),
+        (t[53] = $))
+      : ($ = t[53]),
+    $
+  );
 }
-
-function initializeHomeComposerModeToggle(): void {
-  if (jsx != null) return;
-  const call = (candidate: unknown) => { if (typeof candidate === "function") candidate(); };
-  for (const candidate of [
-    shared.h4,
-    shared.a$,
-    shared.K2,
-    primary.Qs,
-    shared.lw,
-    shared.c_,
-    shared.p_,
-    initial.xlt,
-    shared.tp,
-  ]) call(candidate);
-  jsx = (shared.I3 as () => typeof jsx)();
-  React = shared.e6 as typeof React;
-  classNames = shared.m4 as typeof classNames;
-  useIntl = shared.n4 as typeof useIntl;
-  FormattedMessage = shared.Y2;
-  Tooltip = shared.o_;
-  LockIcon = shared.eC;
-  motion = shared.o$ as typeof motion;
-  UpgradePopover = primary.Zs;
-  useReducedMotion = initial.Slt as typeof useReducedMotion;
-  noteComposerInteraction = shared.f_ as typeof noteComposerInteraction;
+function w(e) {
+  e.target instanceof Node && e.currentTarget.contains(e.target) && l();
 }
-
-export { initializeHomeComposerModeToggle as n, HomeComposerModeToggle as t };
+var T, E, D, O, k, A;
+function j() {
+  return (j = e(() => {
+    ((T = t()),
+      u(),
+      o(),
+      (E = c()),
+      i(),
+      y(),
+      d(),
+      s(),
+      h(),
+      v(),
+      g(),
+      S(),
+      (D = r()),
+      (O = `cursor-interaction relative z-10 inline-flex h-full min-w-0 items-center justify-center whitespace-nowrap rounded-full px-10 text-sm font-medium @max-xs/home-mode-toggle:px-2.5 disabled:cursor-not-allowed disabled:opacity-40`),
+      (k = {
+        chat: `calc((0% - 0px) * var(--mode-toggle-direction))`,
+        work: `calc((100% - 17px) * var(--mode-toggle-direction))`,
+      }),
+      (A = { duration: 300 / 1e3, ease: n }));
+  }))();
+}
+export { j as n, C as t };

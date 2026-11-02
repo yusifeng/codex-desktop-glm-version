@@ -1,13 +1,107 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-interface LibraryItem { node: { id: string } }
-interface AnalyticsScope { get?(key: unknown): unknown; log?(event: Record<string, unknown>): void }
-interface ApiErrorLike { errorCode?: string; errorKind?: string; responseStatus?: number }
-const a = { value: crypto.randomUUID() };
-function classify(error: unknown): { code?: string; httpStatus?: number; type: string } | undefined { if (error == null || typeof error !== "object") return undefined; const value = error as ApiErrorLike, status = value.responseStatus, code = value.errorCode != null && /^[a-z0-9_-]{1,64}$/i.test(value.errorCode) ? value.errorCode : undefined, normalized = code?.toLowerCase(); const network = value.errorKind === "network" || status == null; let type: string; if (network) type = "network_error"; else if (status === 507 || normalized?.includes("storage_limit") || normalized?.includes("quota")) type = "storage_limit"; else if (status === 404 || normalized?.includes("not_found") || normalized === "file_expired") type = "missing_library_file"; else if (status === 408 || status === 504) type = "timeout"; else if (status === 401 || status === 403) type = "auth_error"; else if (status === 429) type = "rate_limited"; else if (status >= 500) type = "server_error"; else if (status >= 400) type = "bad_request"; else type = "invalid_response"; return { type, code, httpStatus: !network && Number.isInteger(status) && status >= 100 && status <= 599 ? status : undefined }; }
-function i(scope: AnalyticsScope, items: LibraryItem[]): void { const ids = [...new Set(items.map(item => item.node.id))]; scope.log?.({ event: "library_permanent_delete_initiated", libraryFileIds: JSON.stringify({ libraryFileIds: ids }).length <= 2000 ? ids : undefined, selectedCount: items.length, sessionId: a.value }); }
-function r(scope: AnalyticsScope, items: LibraryItem[]): void { scope.log?.({ event: "library_items_selected_for_delete", artifactIds: items.map(item => item.node.id), itemCount: items.length }); }
-function n(scope: AnalyticsScope, sessionId: string, interactionType: string, error: unknown): void { scope.log?.({ event: "library_permanent_delete_result", interactionType, sessionId, error: classify(error) }); }
-function t(): void {}
-export { a, i, n, r, t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { FX as t, pZ as n } from "@rchunk/app-shared";
+import {
+  $Lt as r,
+  BLt as i,
+  HLt as a,
+  Het as o,
+  ILt as s,
+  Q9t as c,
+  QLt as l,
+  Sdn as u,
+  VLt as d,
+  Vet as f,
+  dRt as p,
+  eRt as m,
+  fRt as h,
+  lK as g,
+  nK as _,
+  nRt as v,
+  ten as y,
+  wdn as b,
+  xpn as x,
+  ypn as S,
+} from "@rchunk/app-initial";
+function C(e, t) {
+  let n = [...new Set(t.map(({ node: e }) => e.id))],
+    r = JSON.stringify({ libraryFileIds: n }).length <= 2e3 ? n : void 0;
+  x(e, d, {
+    interactionType: a.CHATGPT_FILE_LIBRARY_FILE_INTERACTION_TYPE_DELETE_INITIATED,
+    sessionId: e.get(D),
+    libraryVariant: p.CHATGPT_FILE_LIBRARY_VARIANT_DEFAULT,
+    productExperience: e.get(f),
+    libraryOrigin: O,
+    provider: m.CHATGPT_FILE_LIBRARY_PROVIDER_LIBRARY,
+    operation: l.CHATGPT_FILE_LIBRARY_OPERATION_PERMANENT_DELETE,
+    libraryFileIds: r,
+    selectedCount: y(t.length),
+  });
+}
+function w(e, t) {
+  x(e, s, {
+    artifactIds: t.map(({ node: e }) => e.id),
+    directoryIds: [],
+    itemCount: y(t.length),
+    libraryOrigin: O,
+  });
+}
+function T(e, t, n, r) {
+  x(e, d, {
+    interactionType: n,
+    sessionId: t,
+    libraryVariant: p.CHATGPT_FILE_LIBRARY_VARIANT_DEFAULT,
+    productExperience: e.get(f),
+    libraryOrigin: O,
+    operation: l.CHATGPT_FILE_LIBRARY_OPERATION_PERMANENT_DELETE,
+    scope: v.CHATGPT_FILE_LIBRARY_SCOPE_ALL,
+    error: E(r),
+  });
+}
+function E(e) {
+  if (!(e instanceof u)) return;
+  let t = e.responseStatus,
+    n = e.errorKind === `network` || t == null,
+    r = e.errorCode != null && /^[a-z0-9_-]{1,64}$/i.test(e.errorCode) ? e.errorCode : void 0,
+    a = r?.toLowerCase(),
+    o;
+  return (
+    (o = n
+      ? i.CHATGPT_FILE_LIBRARY_ERROR_TYPE_NETWORK_ERROR
+      : t === 507 || a?.includes(`storage_limit`) || a?.includes(`quota`)
+        ? i.CHATGPT_FILE_LIBRARY_ERROR_TYPE_STORAGE_LIMIT
+        : t === 404 ||
+            a?.includes(`missing_library_file`) ||
+            a?.includes(`library_file_not_found`) ||
+            a === `file_not_found` ||
+            a === `file_expired`
+          ? i.CHATGPT_FILE_LIBRARY_ERROR_TYPE_MISSING_LIBRARY_FILE
+          : t === 408 || t === 504
+            ? i.CHATGPT_FILE_LIBRARY_ERROR_TYPE_TIMEOUT
+            : t === 401 || t === 403
+              ? i.CHATGPT_FILE_LIBRARY_ERROR_TYPE_AUTH_ERROR
+              : t === 429
+                ? i.CHATGPT_FILE_LIBRARY_ERROR_TYPE_RATE_LIMITED
+                : t >= 500
+                  ? i.CHATGPT_FILE_LIBRARY_ERROR_TYPE_SERVER_ERROR
+                  : t >= 400
+                    ? i.CHATGPT_FILE_LIBRARY_ERROR_TYPE_BAD_REQUEST
+                    : i.CHATGPT_FILE_LIBRARY_ERROR_TYPE_INVALID_RESPONSE),
+    { type: o, code: r, httpStatus: !n && Number.isInteger(t) && t >= 100 && t <= 599 ? t : void 0 }
+  );
+}
+var D, O;
+function k() {
+  return (k = e(() => {
+    (c(),
+      h(),
+      t(),
+      o(),
+      S(),
+      b(),
+      g(),
+      (D = n(_, () => crypto.randomUUID())),
+      (O = r.CHATGPT_FILE_LIBRARY_ORIGIN_RECENTLY_DELETED_SCREEN));
+  }))();
+}
+export { D as a, C as i, T as n, w as r, k as t };

@@ -1,22 +1,28 @@
-// Odd-number square-sum teaching model. Release chunk: model-439233109749.js.
-import "@rchunk/rolldown-runtime";
-
-interface OddNumberSquareInput { n?: number }
-
-const termCountControl = { min: 1, max: 8, step: 1, defaultValue: 5, thumbnailValue: 4 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeTermCount = (value: number | undefined): number => {
-  const finiteValue = typeof value === "number" && Number.isFinite(value) ? value : termCountControl.defaultValue;
-  return clamp(Math.round(finiteValue), termCountControl.min, termCountControl.max);
-};
-const normalizeOddNumberSquareInput = (input: OddNumberSquareInput) => ({ n: normalizeTermCount(input.n) });
-const calculateOddNumberSquareSum = (input: OddNumberSquareInput) => {
-  const { n } = normalizeOddNumberSquareInput(input);
-  const terms = Array.from({ length: n }, (_, index) => index * 2 + 1);
-  const newestOddNumber = terms[terms.length - 1] ?? 1;
-  const squareArea = n * n;
-  return { n, newestOddNumber, squareArea, terms, sumLatex: `${terms.join("+")}=${squareArea}=${n}^{2}` };
-};
-function initializeOddNumberSquareSumModel(): void {}
-
-export { normalizeTermCount as i, calculateOddNumberSquareSum as n, initializeOddNumberSquareSumModel as r, termCountControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = { min: 1, max: 8, step: 1, defaultValue: 5, thumbnailValue: 4 }),
+      (n = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (r = (e) => {
+        let r = typeof e == `number` && Number.isFinite(e) ? e : t.defaultValue;
+        return n(Math.round(r), t.min, t.max);
+      }),
+      (i = (e) => ({ n: r(e.n) })),
+      (a = (e) => {
+        let { n: t } = i(e),
+          n = Array.from({ length: t }, (e, t) => t * 2 + 1),
+          r = n[n.length - 1] ?? 1,
+          a = t * t;
+        return {
+          n: t,
+          newestOddNumber: r,
+          squareArea: a,
+          terms: n,
+          sumLatex: `${n.join(`+`)}=${a}=${t}^{2}`,
+        };
+      }));
+  }))();
+}
+export { r as i, a as n, o as r, t };

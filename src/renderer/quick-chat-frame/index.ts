@@ -1,122 +1,210 @@
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as getCompilerRuntime,
-  $f as motionEasing,
-  Eh as initializeSurfaceRuntime,
-  I3 as getJsxRuntime,
-  a$ as initializeMotion,
-  h4 as initializeClassNames,
-  m4 as classNames,
-  o$ as motion,
-  tp as initializeSharedUi,
-  type JsxRuntime,
+  $3 as t,
+  $f as n,
+  Eh as r,
+  I3 as i,
+  a$ as a,
+  h4 as o,
+  m4 as s,
+  o$ as c,
+  tp as l,
 } from "@rchunk/app-shared";
 import {
-  $g as defaultQuickChatSize,
-  AS as QuickChatSurface,
-  MS as quickChatStyles,
-  NS as initializeQuickChatStyles,
-  Qat as mergeRefs,
-  Zat as initializeMergedRefs,
-  i_ as initializeQuickChatSurface,
-  jS as initializeQuickChatRuntime,
+  $g as u,
+  AS as d,
+  MS as f,
+  NS as p,
+  Qat as m,
+  Zat as h,
+  i_ as g,
+  jS as _,
 } from "@rchunk/app-initial";
-import { i as resizeHandleRef, o as QuickChatResizeHandles, r as initializeResizeHandles, s as initializeQuickChatObstacles } from "@rchunk/quick-chat-obstacles";
-import "@rchunk/rolldown-runtime";
-
-interface Size { height: number; width: number }
-interface Bounds { bottom: number; left: number; right: number; top: number }
-interface Props {
-  animateSurface?: boolean; background?: "panel" | "window"; children?: unknown; currentSize?: Size;
-  heightLabel?: string; isCompact?: boolean; isCompactChromeRevealed?: boolean; isMinimized?: boolean;
-  keepSurfaceInset?: boolean; maximumSize?: Size; minimizedContent?: unknown; minimizedSurfaceBounds?: Bounds | null;
-  minimumSize?: Size; onResize?(size: Size): void; onResizeEnd?(size: Size): void; onResizingChange?(resizing: boolean): void;
-  prefersCompactPresentation?: boolean; sectionProps?: Record<string, unknown> & { ref?: unknown }; sectionRef?: unknown;
-  shouldReduceMotion?: boolean; variant?: "floating" | "panel" | "window"; verticalResizeEdge?: string; widthLabel?: string;
+import { i as v, o as y, r as b, s as x } from "@rchunk/quick-chat-obstacles";
+var S, C;
+function w() {
+  return (w = e(() => {
+    ((S = `_zoomedViewport_19wqa_1`), (C = { zoomedViewport: S }));
+  }))();
 }
-interface CompilerRuntime { c(size: number): unknown[] }
-let compiler: CompilerRuntime;
-let jsx: JsxRuntime;
-let zoomedViewportClass: string;
-
-function QuickChatFrame(props: Props): unknown {
-  const cache = compiler.c(45);
-  const {
-    animateSurface = true, background, children, currentSize, heightLabel, isCompact, isCompactChromeRevealed,
-    isMinimized, keepSurfaceInset, maximumSize, minimizedContent, minimizedSurfaceBounds, minimumSize,
-    onResize, onResizeEnd, onResizingChange, prefersCompactPresentation, sectionProps = {}, sectionRef,
-    shouldReduceMotion, variant, verticalResizeEdge, widthLabel,
-  } = props;
-  const inset = !isMinimized && (keepSurfaceInset || (isCompact && !isCompactChromeRevealed)) ? 6 : 0;
-  let surfaceBounds: Bounds;
-  if (cache[0] !== isMinimized || cache[1] !== minimizedSurfaceBounds || cache[2] !== inset) {
-    surfaceBounds = isMinimized && minimizedSurfaceBounds != null ? minimizedSurfaceBounds : { top: 0, right: inset, bottom: inset, left: inset };
-    cache[0] = isMinimized; cache[1] = minimizedSurfaceBounds; cache[2] = inset; cache[3] = surfaceBounds;
-  } else surfaceBounds = cache[3] as Bounds;
-  const unstyled = background !== "panel" || prefersCompactPresentation;
-  let ref: unknown;
-  if (cache[4] !== sectionProps.ref || cache[5] !== sectionRef) {
-    ref = mergeRefs(sectionRef, sectionProps.ref, resizeHandleRef);
-    cache[4] = sectionProps.ref; cache[5] = sectionRef; cache[6] = ref;
-  } else ref = cache[6];
-  let sectionClassName: string;
-  if (cache[7] !== background || cache[8] !== keepSurfaceInset || cache[9] !== minimizedSurfaceBounds || cache[10] !== prefersCompactPresentation || cache[11] !== variant) {
-    sectionClassName = classNames(
-      "flex flex-col text-default",
-      background === "window" && "bg-surface-tertiary/55",
-      minimizedSurfaceBounds == null ? "pointer-events-auto" : "pointer-events-none",
-      variant !== "window" && classNames(
-        prefersCompactPresentation && quickChatStyles.floatingSurface,
-        keepSurfaceInset && quickChatStyles.singleLineSurface,
-        variant === "floating"
-          ? "fixed top-0 left-0 z-30 max-h-[calc(100dvh/var(--codex-window-zoom)-var(--height-toolbar)-2rem)] max-w-[calc(50vw/var(--codex-window-zoom))]"
-          : "absolute top-0 left-0 z-30 max-h-full max-w-full",
-        prefersCompactPresentation ? "overflow-visible" : "overflow-hidden",
-      ),
-      variant === "window" && classNames(zoomedViewportClass, "relative overflow-hidden"),
-    );
-    cache[7] = background; cache[8] = keepSurfaceInset; cache[9] = minimizedSurfaceBounds; cache[10] = prefersCompactPresentation; cache[11] = variant; cache[12] = sectionClassName;
-  } else sectionClassName = cache[12] as string;
-  let minimizedSurface: unknown;
-  if (cache[13] !== animateSurface || cache[14] !== background || cache[15] !== keepSurfaceInset || cache[16] !== minimizedContent || cache[17] !== prefersCompactPresentation || cache[18] !== shouldReduceMotion || cache[19] !== surfaceBounds) {
-    minimizedSurface = prefersCompactPresentation ? jsx.jsx(QuickChatSurface, {
-      asChild: true, unstyled: background !== "panel", variant: keepSurfaceInset ? "single-line" : "default",
-      children: jsx.jsx((motion as unknown as { div: unknown }).div, {
-        "aria-hidden": minimizedContent == null || undefined, animate: surfaceBounds, className: "pointer-events-none absolute", initial: false,
-        transition: shouldReduceMotion || !animateSurface ? { duration: 0 } : { duration: 0.3, ease: motionEasing }, children: minimizedContent,
-      }),
-    }) : null;
-    cache[13] = animateSurface; cache[14] = background; cache[15] = keepSurfaceInset; cache[16] = minimizedContent; cache[17] = prefersCompactPresentation; cache[18] = shouldReduceMotion; cache[19] = surfaceBounds; cache[20] = minimizedSurface;
-  } else minimizedSurface = cache[20];
-  let resizeControls: unknown;
-  if (cache[21] !== currentSize || cache[22] !== heightLabel || cache[23] !== isCompact || cache[24] !== isMinimized || cache[25] !== maximumSize || cache[26] !== minimumSize || cache[27] !== onResize || cache[28] !== onResizeEnd || cache[29] !== onResizingChange || cache[30] !== surfaceBounds || cache[31] !== variant || cache[32] !== verticalResizeEdge || cache[33] !== widthLabel) {
-    resizeControls = variant !== "window" && !isCompact && !isMinimized ? jsx.jsx("div", {
-      className: "pointer-events-none absolute", style: surfaceBounds,
-      children: jsx.jsx("div", { className: "pointer-events-auto contents", children: jsx.jsx(QuickChatResizeHandles, {
-        currentSize, defaultSize: defaultQuickChatSize, extendIntoToolbar: false, heightLabel, maximumSize, minimumSize,
-        verticalEdge: verticalResizeEdge, widthLabel, onResize, onResizeEnd, onResizingChange,
-      }) }),
-    }) : null;
-    cache[21] = currentSize; cache[22] = heightLabel; cache[23] = isCompact; cache[24] = isMinimized; cache[25] = maximumSize; cache[26] = minimumSize; cache[27] = onResize; cache[28] = onResizeEnd; cache[29] = onResizingChange; cache[30] = surfaceBounds; cache[31] = variant; cache[32] = verticalResizeEdge; cache[33] = widthLabel; cache[34] = resizeControls;
-  } else resizeControls = cache[34];
-  let section: unknown;
-  if (cache[35] !== children || cache[36] !== sectionProps || cache[37] !== ref || cache[38] !== sectionClassName || cache[39] !== minimizedSurface || cache[40] !== resizeControls) {
-    section = jsx.jsxs((motion as unknown as { section: unknown }).section, { ...sectionProps, ref, className: sectionClassName, children: [minimizedSurface, resizeControls, children] });
-    cache[35] = children; cache[36] = sectionProps; cache[37] = ref; cache[38] = sectionClassName; cache[39] = minimizedSurface; cache[40] = resizeControls; cache[41] = section;
-  } else section = cache[41];
-  let result: unknown;
-  if (cache[42] !== unstyled || cache[43] !== section) {
-    result = jsx.jsx(QuickChatSurface, { asChild: true, unstyled, children: section });
-    cache[42] = unstyled; cache[43] = section; cache[44] = result;
-  } else result = cache[44];
-  return result;
+function T(e) {
+  let t = (0, E.c)(45),
+    {
+      animateSurface: r,
+      background: i,
+      children: a,
+      currentSize: o,
+      heightLabel: l,
+      isCompact: p,
+      isCompactChromeRevealed: h,
+      isMinimized: g,
+      keepSurfaceInset: _,
+      maximumSize: b,
+      minimizedContent: x,
+      minimizedSurfaceBounds: S,
+      minimumSize: w,
+      onResize: T,
+      onResizeEnd: O,
+      onResizingChange: k,
+      prefersCompactPresentation: A,
+      sectionProps: j,
+      sectionRef: M,
+      shouldReduceMotion: N,
+      variant: P,
+      verticalResizeEdge: F,
+      widthLabel: I,
+    } = e,
+    L = r === void 0 || r,
+    R = !g && (_ || (p && !h)) ? 6 : 0,
+    z;
+  t[0] !== g || t[1] !== S || t[2] !== R
+    ? ((z = g && S != null ? S : { top: 0, right: R, bottom: R, left: R }),
+      (t[0] = g),
+      (t[1] = S),
+      (t[2] = R),
+      (t[3] = z))
+    : (z = t[3]);
+  let B = z,
+    V = i !== `panel` || A,
+    H;
+  t[4] !== j.ref || t[5] !== M
+    ? ((H = m(M, j.ref, v)), (t[4] = j.ref), (t[5] = M), (t[6] = H))
+    : (H = t[6]);
+  let U;
+  t[7] !== i || t[8] !== _ || t[9] !== S || t[10] !== A || t[11] !== P
+    ? ((U = s(
+        `flex flex-col text-default`,
+        i === `window` && `bg-surface-tertiary/55`,
+        S == null ? `pointer-events-auto` : `pointer-events-none`,
+        P !== `window` &&
+          s(
+            A && f.floatingSurface,
+            _ && f.singleLineSurface,
+            P === `floating`
+              ? `fixed top-0 left-0 z-30 max-h-[calc(100dvh/var(--codex-window-zoom)-var(--height-toolbar)-2rem)] max-w-[calc(50vw/var(--codex-window-zoom))]`
+              : `absolute top-0 left-0 z-30 max-h-full max-w-full`,
+            A ? `overflow-visible` : `overflow-hidden`,
+          ),
+        P === `window` && s(C.zoomedViewport, `relative overflow-hidden`),
+      )),
+      (t[7] = i),
+      (t[8] = _),
+      (t[9] = S),
+      (t[10] = A),
+      (t[11] = P),
+      (t[12] = U))
+    : (U = t[12]);
+  let W;
+  t[13] !== L ||
+  t[14] !== i ||
+  t[15] !== _ ||
+  t[16] !== x ||
+  t[17] !== A ||
+  t[18] !== N ||
+  t[19] !== B
+    ? ((W = A
+        ? (0, D.jsx)(d, {
+            asChild: !0,
+            unstyled: i !== `panel`,
+            variant: _ ? `single-line` : `default`,
+            children: (0, D.jsx)(c.div, {
+              "aria-hidden": x == null || void 0,
+              animate: B,
+              className: `pointer-events-none absolute`,
+              initial: !1,
+              transition: N || !L ? { duration: 0 } : { duration: 300 / 1e3, ease: n },
+              children: x,
+            }),
+          })
+        : null),
+      (t[13] = L),
+      (t[14] = i),
+      (t[15] = _),
+      (t[16] = x),
+      (t[17] = A),
+      (t[18] = N),
+      (t[19] = B),
+      (t[20] = W))
+    : (W = t[20]);
+  let G;
+  t[21] !== o ||
+  t[22] !== l ||
+  t[23] !== p ||
+  t[24] !== g ||
+  t[25] !== b ||
+  t[26] !== w ||
+  t[27] !== T ||
+  t[28] !== O ||
+  t[29] !== k ||
+  t[30] !== B ||
+  t[31] !== P ||
+  t[32] !== F ||
+  t[33] !== I
+    ? ((G =
+        P !== `window` && !p && !g
+          ? (0, D.jsx)(`div`, {
+              className: `pointer-events-none absolute`,
+              style: B,
+              children: (0, D.jsx)(`div`, {
+                className: `pointer-events-auto contents`,
+                children: (0, D.jsx)(y, {
+                  currentSize: o,
+                  defaultSize: u,
+                  extendIntoToolbar: !1,
+                  heightLabel: l,
+                  maximumSize: b,
+                  minimumSize: w,
+                  verticalEdge: F,
+                  widthLabel: I,
+                  onResize: T,
+                  onResizeEnd: O,
+                  onResizingChange: k,
+                }),
+              }),
+            })
+          : null),
+      (t[21] = o),
+      (t[22] = l),
+      (t[23] = p),
+      (t[24] = g),
+      (t[25] = b),
+      (t[26] = w),
+      (t[27] = T),
+      (t[28] = O),
+      (t[29] = k),
+      (t[30] = B),
+      (t[31] = P),
+      (t[32] = F),
+      (t[33] = I),
+      (t[34] = G))
+    : (G = t[34]);
+  let K;
+  t[35] !== a || t[36] !== j || t[37] !== H || t[38] !== U || t[39] !== W || t[40] !== G
+    ? ((K = (0, D.jsxs)(c.section, { ...j, ref: H, className: U, children: [W, G, a] })),
+      (t[35] = a),
+      (t[36] = j),
+      (t[37] = H),
+      (t[38] = U),
+      (t[39] = W),
+      (t[40] = G),
+      (t[41] = K))
+    : (K = t[41]);
+  let q;
+  return (
+    t[42] !== V || t[43] !== K
+      ? ((q = (0, D.jsx)(d, { asChild: !0, unstyled: V, children: K })),
+        (t[42] = V),
+        (t[43] = K),
+        (t[44] = q))
+      : (q = t[44]),
+    q
+  );
 }
-
-function initializeQuickChatFrame(): void {
-  compiler = getCompilerRuntime() as CompilerRuntime;
-  initializeClassNames(); initializeMotion(); initializeQuickChatObstacles(); initializeQuickChatSurface(); initializeQuickChatRuntime();
-  initializeSurfaceRuntime(); initializeSharedUi(); initializeMergedRefs(); initializeResizeHandles(); initializeQuickChatStyles();
-  zoomedViewportClass = "_zoomedViewport_19wqa_1";
-  jsx = getJsxRuntime();
+var E, D;
+function O() {
+  return (O = e(() => {
+    ((E = t()), o(), a(), x(), g(), _(), r(), l(), h(), b(), w(), p(), (D = i()));
+  }))();
 }
-
-export { initializeQuickChatFrame as n, QuickChatFrame as t };
+export { O as n, T as t };

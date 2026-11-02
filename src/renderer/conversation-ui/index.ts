@@ -1,334 +1,391 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
-
-interface BusinessContext {
-  businessName?: string | null;
-  conversationStarters?: string[];
-  disablePrefill?: boolean;
-  interactionId?: string;
-  logoUrl?: string | null;
-  notice?: string | null;
-  showConversationStarters?: boolean;
-  showDisclosureModal?: boolean;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Ah as n,
+  BX as r,
+  FX as i,
+  I3 as a,
+  Ih as o,
+  K2 as s,
+  Lh as c,
+  Oh as l,
+  Ph as u,
+  Rh as d,
+  Y2 as f,
+  Yh as p,
+  Zh as m,
+  e6 as h,
+  h4 as g,
+  kh as _,
+  m4 as v,
+  zh as y,
+} from "@rchunk/app-shared";
+import {
+  QKt as b,
+  iot as x,
+  n7 as S,
+  r7 as C,
+  rot as w,
+  uHt as T,
+} from "@rchunk/app-initial";
+function E(e) {
+  let t = (0, M.c)(8),
+    { state: n } = e,
+    r = n.status === `ready` ? n.context : n,
+    i = r.businessName ?? null,
+    a = r.logoUrl ?? null,
+    o;
+  t[0] !== i || t[1] !== a
+    ? ((o = (0, P.jsx)(w, { alt: ``, name: i, size: `sm`, src: a })),
+      (t[0] = i),
+      (t[1] = a),
+      (t[2] = o))
+    : (o = t[2]);
+  let s;
+  t[3] === r.businessName
+    ? (s = t[4])
+    : ((s = (0, P.jsx)(`span`, {
+        className: `truncate`,
+        children: (0, P.jsx)(A, { businessName: r.businessName }),
+      })),
+      (t[3] = r.businessName),
+      (t[4] = s));
+  let c;
+  return (
+    t[5] !== o || t[6] !== s
+      ? ((c = (0, P.jsxs)(`div`, {
+          className: `flex min-w-0 items-center gap-2 select-none`,
+          children: [o, s],
+        })),
+        (t[5] = o),
+        (t[6] = s),
+        (t[7] = c))
+      : (c = t[7]),
+    c
+  );
 }
-export type ConversationStarterState =
-  | { status: "ready"; context: BusinessContext }
-  | ({ status: "failed" | "loading" } & BusinessContext);
-interface BoundaryProps {
-  conversationId: string;
-  fallback?: unknown;
-  state?: ConversationStarterState | null;
+function D(e) {
+  let t = (0, M.c)(7),
+    { context: n } = e,
+    r;
+  t[0] === n.businessName
+    ? (r = t[1])
+    : ((r = (0, P.jsx)(j, { businessName: n.businessName })), (t[0] = n.businessName), (t[1] = r));
+  let i;
+  t[2] === n.notice
+    ? (i = t[3])
+    : ((i = n.notice?.trim() ? (0, P.jsx)(`p`, { children: n.notice }) : null),
+      (t[2] = n.notice),
+      (t[3] = i));
+  let a;
+  return (
+    t[4] !== r || t[5] !== i
+      ? ((a = (0, P.jsx)(S, {
+          variant: `callout`,
+          layout: `vertical`,
+          content: (0, P.jsxs)(`div`, { className: `flex flex-col gap-1`, children: [r, i] }),
+        })),
+        (t[4] = r),
+        (t[5] = i),
+        (t[6] = a))
+      : (a = t[6]),
+    a
+  );
 }
-interface EmptyStateProps extends BoundaryProps {
-  onStarterPromptSelect?(prompt: string): void;
-}
-interface SharedRuntime {
-  BX?<Value>(family: unknown, parameter: unknown): Value;
-  I3(): JsxRuntime;
-  Y2?: unknown;
-  e6(): ReactRuntime;
-  [key: string]: unknown;
-}
-interface InitialRuntime {
-  QKt?: unknown;
-  rot?: unknown;
-  n7?: unknown;
-  [key: string]: unknown;
-}
-
-const shared = appSharedChunk as unknown as SharedRuntime;
-const initial = appInitialChunk as unknown as InitialRuntime;
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let initialized = false;
-
-function initializeConversationUi(): void {
-  if (initialized) return;
-  for (const initialize of [
-    shared.$3,
-    shared.FX,
-    shared.K2,
-    initial.iot,
-    initial.r7,
-    shared.Zh,
-    shared.zh,
-    shared.Ph,
-  ]) {
-    if (typeof initialize === "function") (initialize as () => void)();
-  }
-  React = shared.e6();
-  jsx = shared.I3();
-  initialized = true;
-}
-
-function useBusinessState(
-  props: BoundaryProps,
-): ConversationStarterState | null {
-  initializeConversationUi();
-  return props.state !== undefined
-    ? props.state
-    : (shared.BX?.<ConversationStarterState | null>(
-        initial.QKt,
-        props.conversationId,
-      ) ?? null);
-}
-
-function message(
-  id: string,
-  defaultMessage: string,
-  description: string,
-  values?: Record<string, unknown>,
-): unknown {
-  return shared.Y2 == null
-    ? defaultMessage
-    : jsx.jsx(shared.Y2, { id, defaultMessage, description, values });
-}
-
-function businessName(name?: string | null): unknown {
-  return name?.trim()
-    ? name
-    : message(
-        "chatgpt.ads.business_agent.disclosure.fallback_name",
-        "Business Agent",
-        "Fallback title for a Business Agent conversation when no business name is available",
-      );
-}
-
-function disclosure(context: BusinessContext): unknown {
-  const name = context.businessName?.trim();
-  const body = name
-    ? message(
-        "chatgpt.ads.business_agent.disclosure.named.body",
-        "Messages you send in this chat may be shared with {businessName}",
-        "Business Agent data-sharing disclosure with a supplied business name",
-        { businessName: name },
-      )
-    : message(
-        "chatgpt.ads.business_agent.disclosure.unnamed.body",
-        "Messages you send in this chat may be shared with the business operating this Business Agent",
-        "Business Agent data-sharing disclosure without a supplied business name",
-      );
-  const content = jsx.jsxs("div", {
-    className: "flex flex-col gap-1",
-    children: [
-      jsx.jsx("strong", { children: businessName(context.businessName) }),
-      context.notice?.trim()
-        ? jsx.jsx("p", { children: context.notice })
-        : null,
-      jsx.jsx("p", { children: body }),
-    ],
-  });
-  const Callout = initial.n7;
-  return typeof Callout === "function"
-    ? jsx.jsx(Callout, { variant: "callout", layout: "vertical", content })
-    : jsx.jsx("aside", {
-        className: "business-agent-disclosure",
-        children: content,
-      });
-}
-
-function BusinessLogo({
-  context,
-  size,
-}: {
-  context: BusinessContext;
-  size: "lg" | "sm";
-}): unknown {
-  const Logo = initial.rot;
-  if (typeof Logo === "function")
-    return jsx.jsx(Logo, {
-      alt: "",
-      name: context.businessName ?? null,
-      size,
-      src: context.logoUrl ?? null,
-    });
-  return context.logoUrl == null
-    ? null
-    : jsx.jsx("img", {
-        alt: "",
-        className: size === "lg" ? "h-12 w-12" : "h-6 w-6",
-        src: context.logoUrl,
-      });
-}
-
-function ConversationContextBanner({
-  className,
-  conversationId,
-  state: supplied,
-}: BoundaryProps & { className?: string }): unknown {
-  const state = useBusinessState({ conversationId, state: supplied });
-  if (state?.status !== "ready") return null;
-  return jsx.jsx("div", {
-    className: [
-      "mx-auto flex w-[min(100%,var(--thread-content-max-width))] min-w-0 flex-col gap-3 px-panel",
-      className,
-    ]
-      .filter(Boolean)
-      .join(" "),
-    "data-interaction-id": state.context.interactionId,
-    children: disclosure(state.context),
-  });
-}
-
-function BusinessAgentHeading({
-  state,
-}: {
-  state: ConversationStarterState;
-}): unknown {
-  const context = state.status === "ready" ? state.context : state;
-  return jsx.jsxs("div", {
-    className: "flex min-w-0 items-center gap-2 select-none",
-    children: [
-      jsx.jsx(BusinessLogo, { context, size: "sm" }),
-      jsx.jsx("span", {
-        className: "truncate",
-        children: businessName(context.businessName),
-      }),
-    ],
-  });
-}
-
-function DisclosureModal({ context }: { context: BusinessContext }): unknown {
-  const [open, setOpen] = React.useState(context.showDisclosureModal === true);
-  if (!open) return null;
-  const close = (event?: { preventDefault?(): void }) => {
-    event?.preventDefault?.();
-    setOpen(false);
-  };
-  return jsx.jsx("dialog", {
-    open: true,
-    className: "business-agent-disclosure-modal",
-    children: jsx.jsxs("form", {
-      onSubmit: close,
-      children: [
-        jsx.jsx("h2", { children: businessName(context.businessName) }),
-        disclosure(context),
-        jsx.jsx("button", {
-          type: "submit",
-          children: message(
-            "chatgptConversations.businessAgent.disclosureContinue",
-            "Continue",
-            "Dismiss the Business Agent data-sharing disclosure",
-          ),
-        }),
-      ],
-    }),
-  });
-}
-
-function BusinessAgentEmptyState({
-  onStarterPromptSelect,
-  state,
-}: {
-  onStarterPromptSelect?(prompt: string): void;
-  state: ConversationStarterState;
-}): unknown {
-  const context = state.status === "ready" ? state.context : state;
-  const starters =
-    state.status === "ready" && context.showConversationStarters
-      ? context.conversationStarters?.slice(0, 4)
-      : undefined;
-  const status =
-    state.status === "ready"
-      ? disclosure(state.context)
-      : jsx.jsx("div", {
-          "aria-live": "polite",
-          role: state.status === "failed" ? "alert" : "status",
-          children:
-            state.status === "failed"
-              ? message(
-                  "chatgptConversations.businessAgent.unavailable",
-                  "This Business Agent is unavailable. Please return to the ad and try again",
-                  "Business Agent interaction creation failure",
-                )
-              : message(
-                  "chatgptConversations.businessAgent.loading",
-                  "Opening Business Agent…",
-                  "Business Agent interaction creation status",
+function O(e) {
+  let t = (0, M.c)(15),
+    { state: n, onStarterPromptSelect: r } = e,
+    i = n.status === `ready` ? n.context : n,
+    a;
+  if (
+    t[0] !== i.businessName ||
+    t[1] !== i.logoUrl ||
+    t[2] !== i.showConversationStarters ||
+    t[3] !== r ||
+    t[4] !== n.context ||
+    t[5] !== n.status
+  ) {
+    let e =
+        n.status === `ready` && i.showConversationStarters
+          ? n.context.conversationStarters?.slice(0, 4)
+          : void 0,
+      o = i.businessName ?? null,
+      s = i.logoUrl ?? null,
+      c;
+    t[7] !== o || t[8] !== s
+      ? ((c = (0, P.jsx)(w, { alt: ``, name: o, size: `lg`, src: s })),
+        (t[7] = o),
+        (t[8] = s),
+        (t[9] = c))
+      : (c = t[9]);
+    let l;
+    t[10] === i.businessName
+      ? (l = t[11])
+      : ((l = (0, P.jsx)(`h1`, {
+          className: `heading-xl font-normal text-default select-none`,
+          children: (0, P.jsx)(A, { businessName: i.businessName }),
+        })),
+        (t[10] = i.businessName),
+        (t[11] = l));
+    let u;
+    (t[12] !== n.context || t[13] !== n.status
+      ? ((u =
+          n.status === `ready`
+            ? (0, P.jsx)(D, { context: n.context })
+            : (0, P.jsx)(S, {
+                ariaLive: `polite`,
+                role: n.status === `failed` ? `alert` : `status`,
+                type: n.status === `failed` ? `error` : `normal`,
+                content:
+                  n.status === `failed`
+                    ? (0, P.jsx)(f, {
+                        id: `chatgptConversations.businessAgent.unavailable`,
+                        defaultMessage: `This Business Agent is unavailable. Please return to the ad and try again`,
+                        description: `Error on a Business Agent chat destination when creating its interaction fails; sending is unavailable and the user can retry from the original ad`,
+                      })
+                    : (0, P.jsx)(f, {
+                        id: `chatgptConversations.businessAgent.loading`,
+                        defaultMessage: `Opening Business Agent…`,
+                        description: `Loading status on a Business Agent chat destination while its interaction is being created`,
+                      }),
+              })),
+        (t[12] = n.context),
+        (t[13] = n.status),
+        (t[14] = u))
+      : (u = t[14]),
+      (a = (0, P.jsxs)(`div`, {
+        className: `mx-auto flex w-[min(100%,var(--thread-content-max-width))] min-w-0 flex-col items-center gap-3 px-panel text-center`,
+        children: [
+          c,
+          l,
+          u,
+          e != null &&
+          (e.length > 1 ||
+            (e.length === 1 && n.status === `ready` && n.context.disablePrefill === !0))
+            ? (0, P.jsx)(`div`, {
+                className: `mt-3 flex flex-wrap justify-center gap-2 select-none`,
+                children: e.map((e) =>
+                  (0, P.jsx)(
+                    p,
+                    {
+                      color: `secondary`,
+                      size: `medium`,
+                      disabled: r == null,
+                      onClick: () => r?.(e),
+                      children: e,
+                    },
+                    e,
+                  ),
                 ),
-        });
-  return jsx.jsxs("div", {
-    className:
-      "mx-auto flex w-[min(100%,var(--thread-content-max-width))] min-w-0 flex-col items-center gap-3 px-panel text-center",
-    children: [
-      jsx.jsx(BusinessLogo, { context, size: "lg" }),
-      jsx.jsx("h1", {
-        className: "heading-xl font-normal text-default select-none",
-        children: businessName(context.businessName),
+              })
+            : null,
+        ],
+      })),
+      (t[0] = i.businessName),
+      (t[1] = i.logoUrl),
+      (t[2] = i.showConversationStarters),
+      (t[3] = r),
+      (t[4] = n.context),
+      (t[5] = n.status),
+      (t[6] = a));
+  } else a = t[6];
+  return a;
+}
+function k(e) {
+  let t = (0, M.c)(14),
+    { context: r } = e,
+    [i, a] = (0, N.useState)(r.showDisclosureModal === !0),
+    s;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = (e) => {
+        (e.preventDefault(), a(!1));
       }),
-      status,
-      starters != null &&
-      (starters.length > 1 ||
-        (starters.length === 1 &&
-          state.status === "ready" &&
-          state.context.disablePrefill === true))
-        ? jsx.jsx("div", {
-            className: "mt-3 flex flex-wrap justify-center gap-2 select-none",
-            children: starters.map((prompt) =>
-              jsx.jsx(
-                "button",
-                {
-                  disabled: onStarterPromptSelect == null,
-                  onClick: () => onStarterPromptSelect?.(prompt),
-                  type: "button",
-                  children: prompt,
-                },
-                prompt,
-              ),
-            ),
-          })
-        : null,
-    ],
-  });
+      (t[0] = s))
+    : (s = t[0]);
+  let u;
+  t[1] === r.businessName
+    ? (u = t[2])
+    : ((u = (0, P.jsx)(d, { children: (0, P.jsx)(A, { businessName: r.businessName }) })),
+      (t[1] = r.businessName),
+      (t[2] = u));
+  let m;
+  t[3] === r.businessName
+    ? (m = t[4])
+    : ((m = (0, P.jsx)(c, { children: (0, P.jsx)(j, { businessName: r.businessName }) })),
+      (t[3] = r.businessName),
+      (t[4] = m));
+  let h;
+  t[5] !== u || t[6] !== m
+    ? ((h = (0, P.jsx)(n, { title: u, subtitle: m })), (t[5] = u), (t[6] = m), (t[7] = h))
+    : (h = t[7]);
+  let g;
+  t[8] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((g = (0, P.jsx)(_, {
+        children: (0, P.jsx)(p, {
+          color: `primary`,
+          type: `submit`,
+          children: (0, P.jsx)(f, {
+            id: `chatgptConversations.businessAgent.disclosureContinue`,
+            defaultMessage: `Continue`,
+            description: `Button dismissing the data-sharing disclosure for a Business Agent conversation`,
+          }),
+        }),
+      })),
+      (t[8] = g))
+    : (g = t[8]);
+  let v;
+  t[9] === h
+    ? (v = t[10])
+    : ((v = (0, P.jsxs)(l, { as: `form`, onSubmit: s, children: [h, g] })),
+      (t[9] = h),
+      (t[10] = v));
+  let y;
+  return (
+    t[11] !== i || t[12] !== v
+      ? ((y = (0, P.jsx)(o, { open: i, onOpenChange: a, children: v })),
+        (t[11] = i),
+        (t[12] = v),
+        (t[13] = y))
+      : (y = t[13]),
+    y
+  );
 }
-
-function ConversationStarterBoundary(props: BoundaryProps): unknown {
-  const state = useBusinessState(props);
-  return state == null ||
-    (state.status === "ready" && !state.context.showConversationStarters)
-    ? (props.fallback ?? null)
-    : jsx.jsx(BusinessAgentHeading, { state });
+function A(e) {
+  let t = (0, M.c)(2),
+    { businessName: n } = e,
+    r;
+  return (
+    t[0] === n
+      ? (r = t[1])
+      : ((r = n?.trim()
+          ? (0, P.jsx)(P.Fragment, { children: n })
+          : (0, P.jsx)(f, {
+              id: `chatgpt.ads.business_agent.disclosure.fallback_name`,
+              defaultMessage: `Business Agent`,
+              description: `Fallback heading in the compact data-sharing disclosure shown at the top of every organic or sponsored Business Agent conversation. Use a short neutral title that fits on one line. This appears when the business has not supplied a display name.`,
+            })),
+        (t[0] = n),
+        (t[1] = r)),
+    r
+  );
 }
-
-function ConversationEmptyState(props: EmptyStateProps): unknown {
-  const state = useBusinessState(props);
-  if (state == null) return props.fallback ?? null;
-  const content =
-    state.status === "ready" && !state.context.showConversationStarters
-      ? jsx.jsxs("div", {
-          className: "flex w-full min-w-0 flex-col gap-3",
-          children: [
-            jsx.jsx(ConversationContextBanner, {
-              conversationId: props.conversationId,
-              state,
-            }),
-            props.fallback,
-          ],
-        })
-      : jsx.jsx(BusinessAgentEmptyState, {
-          state,
-          onStarterPromptSelect: props.onStarterPromptSelect,
-        });
-  return jsx.jsxs(jsx.Fragment, {
-    children: [
-      content,
-      state.status === "ready"
-        ? jsx.jsx(
-            DisclosureModal,
-            { context: state.context },
-            state.context.interactionId,
-          )
-        : null,
-    ],
-  });
+function j(e) {
+  let t = (0, M.c)(2),
+    { businessName: n } = e,
+    r;
+  return (
+    t[0] === n
+      ? (r = t[1])
+      : ((r = n?.trim()
+          ? (0, P.jsx)(f, {
+              id: `chatgpt.ads.business_agent.disclosure.named.body`,
+              defaultMessage: `Messages you send in this chat may be shared with {businessName}`,
+              values: { businessName: n.trim() },
+              description: `Privacy disclosure displayed below the business name at the top of every Business Agent conversation, whether the person found the business organically or through an advertisement. Explain clearly and neutrally that conversation messages may be shared. The {businessName} placeholder is the nonblank display name supplied by the business and may be long.`,
+            })
+          : (0, P.jsx)(f, {
+              id: `chatgpt.ads.business_agent.disclosure.unnamed.body`,
+              defaultMessage: `Messages you send in this chat may be shared with the business operating this Business Agent`,
+              description: `Privacy disclosure displayed below the generic Business Agent heading at the top of every Business Agent conversation, whether discovered organically or through an advertisement. Explain clearly and neutrally that conversation messages may be shared with the business. This version is used when no business display name is available and has no placeholders.`,
+            })),
+        (t[0] = n),
+        (t[1] = r)),
+    r
+  );
 }
-
-initializeConversationUi();
-export {
-  initializeConversationUi as i,
-  ConversationStarterBoundary as n,
-  ConversationEmptyState as r,
-  ConversationContextBanner as t,
-};
+var M, N, P;
+function F() {
+  return (F = e(() => {
+    ((M = t()), (N = h()), s(), x(), C(), m(), y(), u(), (P = a()));
+  }))();
+}
+function I(e) {
+  let t = (0, z.c)(3),
+    { conversationId: n, fallback: i } = e,
+    a = r(b, n),
+    o;
+  return (
+    t[0] !== i || t[1] !== a
+      ? ((o =
+          a == null || (a.status === `ready` && !a.context.showConversationStarters)
+            ? i
+            : (0, B.jsx)(E, { state: a })),
+        (t[0] = i),
+        (t[1] = a),
+        (t[2] = o))
+      : (o = t[2]),
+    o
+  );
+}
+function L(e) {
+  let t = (0, z.c)(7),
+    { className: n, conversationId: i } = e,
+    a = r(b, i);
+  if (a?.status !== `ready`) return null;
+  let o;
+  t[0] === n
+    ? (o = t[1])
+    : ((o = v(
+        `mx-auto flex w-[min(100%,var(--thread-content-max-width))] min-w-0 flex-col gap-3 px-panel`,
+        n,
+      )),
+      (t[0] = n),
+      (t[1] = o));
+  let s;
+  t[2] === a.context
+    ? (s = t[3])
+    : ((s = (0, B.jsx)(D, { context: a.context })), (t[2] = a.context), (t[3] = s));
+  let c;
+  return (
+    t[4] !== o || t[5] !== s
+      ? ((c = (0, B.jsx)(`div`, { className: o, children: s })), (t[4] = o), (t[5] = s), (t[6] = c))
+      : (c = t[6]),
+    c
+  );
+}
+function R(e) {
+  let t = (0, z.c)(11),
+    { conversationId: n, fallback: i, onStarterPromptSelect: a } = e,
+    o = r(b, n);
+  if (o == null) return i;
+  let s;
+  t[0] !== n || t[1] !== i || t[2] !== a || t[3] !== o
+    ? ((s =
+        o.status === `ready` && !o.context.showConversationStarters
+          ? (0, B.jsxs)(`div`, {
+              className: `flex w-full min-w-0 flex-col gap-3`,
+              children: [(0, B.jsx)(L, { conversationId: n }), i],
+            })
+          : (0, B.jsx)(O, { state: o, onStarterPromptSelect: a })),
+      (t[0] = n),
+      (t[1] = i),
+      (t[2] = a),
+      (t[3] = o),
+      (t[4] = s))
+    : (s = t[4]);
+  let c;
+  t[5] !== o.context || t[6] !== o.status
+    ? ((c =
+        o.status === `ready`
+          ? (0, B.jsx)(k, { context: o.context }, o.context.interactionId)
+          : null),
+      (t[5] = o.context),
+      (t[6] = o.status),
+      (t[7] = c))
+    : (c = t[7]);
+  let l;
+  return (
+    t[8] !== s || t[9] !== c
+      ? ((l = (0, B.jsxs)(B.Fragment, { children: [s, c] })), (t[8] = s), (t[9] = c), (t[10] = l))
+      : (l = t[10]),
+    l
+  );
+}
+var z, B;
+function V() {
+  return (V = e(() => {
+    ((z = t()), g(), i(), T(), F(), (B = a()));
+  }))();
+}
+export { V as i, I as n, R as r, L as t };

@@ -1,43 +1,68 @@
-// remote-middleware —— 按配置并行加载 Segment 远程中间件。
-
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import * as loadScriptChunk from "@rchunk/load-script";
-
-interface Logger {
-  log(level: "error", reason: unknown): void;
-  stats: { increment(metric: "failed_remote_middleware"): void };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { c4 as t, p4 as n, u4 as r } from "@rchunk/app-shared";
+import { a as i, m as a, n as o, o as s } from "@rchunk/load-script";
+function c(e, n, s) {
+  return t(this, void 0, void 0, function () {
+    var c,
+      l,
+      u,
+      d,
+      f,
+      p = this;
+    return r(this, function (m) {
+      switch (m.label) {
+        case 0:
+          return a()
+            ? [2, []]
+            : ((c = i()),
+              (l = n.enabledMiddleware ?? {}),
+              (u = Object.entries(l)
+                .filter(function (e) {
+                  return (e[0], e[1]);
+                })
+                .map(function (e) {
+                  return e[0];
+                })),
+              (d = u.map(function (n) {
+                return t(p, void 0, void 0, function () {
+                  var t, i, a, l;
+                  return r(this, function (r) {
+                    switch (r.label) {
+                      case 0:
+                        ((t = n.replace(`@segment/`, ``)),
+                          (i = t),
+                          s && (i = btoa(t).replace(/=/g, ``)),
+                          (a = `${c}/middleware/${i}/latest/${i}.js.gz`),
+                          (r.label = 1));
+                      case 1:
+                        return (r.trys.push([1, 3, , 4]), [4, o(a)]);
+                      case 2:
+                        return (r.sent(), [2, window[`${t}Middleware`]]);
+                      case 3:
+                        return (
+                          (l = r.sent()),
+                          e.log(`error`, l),
+                          e.stats.increment(`failed_remote_middleware`),
+                          [3, 4]
+                        );
+                      case 4:
+                        return [2];
+                    }
+                  });
+                });
+              })),
+              [4, Promise.all(d)]);
+        case 1:
+          return ((f = m.sent()), (f = f.filter(Boolean)), [2, f]);
+      }
+    });
+  });
 }
-interface RemoteMiddlewareSettings { enabledMiddleware?: Record<string, boolean | null | undefined> }
-interface LoadScriptRuntime {
-  a(): string;
-  m(): boolean;
-  n(url: string): Promise<unknown>;
-  o(): void;
+function l() {
+  return (l = e(() => {
+    (n(), s());
+  }))();
 }
-type RemoteMiddleware = unknown;
-
-const { a: getRemoteBaseUrl, m: remoteLoadingDisabled, n: loadScript, o: initializeLoadScript } = loadScriptChunk as unknown as LoadScriptRuntime;
-
-async function remoteMiddlewares(logger: Logger, settings: RemoteMiddlewareSettings, obfuscateNames = false): Promise<RemoteMiddleware[]> {
-  if (remoteLoadingDisabled()) return [];
-  const baseUrl = getRemoteBaseUrl();
-  const names = Object.entries(settings.enabledMiddleware ?? {}).filter(([, enabled]) => enabled === true).map(([name]) => name);
-  const loaded = await Promise.all(names.map(async (configuredName) => {
-    const name = configuredName.replace("@segment/", "");
-    const remoteName = obfuscateNames ? btoa(name).replace(/=/g, "") : name;
-    const url = baseUrl + "/middleware/" + remoteName + "/latest/" + remoteName + ".js.gz";
-    try {
-      await loadScript(url);
-      return (window as unknown as Record<string, unknown>)[name + "Middleware"];
-    } catch (reason) {
-      logger.log("error", reason);
-      logger.stats.increment("failed_remote_middleware");
-      return undefined;
-    }
-  }));
-  return loaded.filter((middleware): middleware is RemoteMiddleware => middleware != null);
-}
-
-initializeLoadScript();
-export { remoteMiddlewares };
+l();
+export { c as remoteMiddlewares };

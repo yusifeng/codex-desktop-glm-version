@@ -1,158 +1,174 @@
-// magic-link-page —— 邮件 Magic Link 的认证检查、自动回跳与失败重启。
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as pageLayoutChunk from "@rchunk/page-layout";
-void runtimeChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  I3: getJsxRuntime,
-  K2: initializeSharedUi,
-  Y2: FormattedMessage,
-  Yh: Button,
-  Zh: initializeButton,
-  _L: useQuery,
-  gL: initializeUseQuery,
-} = appSharedChunk;
-const {
-  Fx: sanitizeAuthTarget,
-  Ix: initializeAuthTarget,
-  Qgn: initializeAccountContext,
-  Rx: performAuthHandoff,
-  Ycn: getCookieStore,
-  bfn: initializeCookieStore,
-  dJt: initializeAuthHandoff,
-  i_n: useLocation,
-  o_n: useNavigate,
-  uJt: getDeviceId,
-  yfn: getAuthState,
-} = appInitialChunk;
-const { n: initializePageLayout, t: PageLayout } = pageLayoutChunk;
-
-type AuthHandoffResult = { ok: true; url: string } | { ok: false };
-let cookieStore: import("@rchunk/app-initial").CookieStore;
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function BrowserMagicLinkPage(): unknown {
-  const location = useLocation();
-  const navigate = useNavigate();
-  const searchParams = new URLSearchParams(location.search);
-  const target = sanitizeAuthTarget(
-    searchParams.get("callback_path") ?? searchParams.get("next"),
-  );
-  const query = useQuery<AuthHandoffResult>({
-    queryKey: ["browser-magic-link", location.key, location.search],
-    queryFn: ({ signal }) => {
-      if (getAuthState().authStatus === "logged_in")
-        return { ok: true, url: target };
-      const authSessionLoggingId = crypto.randomUUID();
-      cookieStore.setCookie("oai-asli", authSessionLoggingId, {
-        path: "/",
-        sameSite: "lax",
-      });
-      return performAuthHandoff(
-        target,
-        {
-          standalone_magic_link: "true",
-          "ext-oai-did": getDeviceId(),
-          auth_session_logging_id: authSessionLoggingId,
-        },
-        signal,
-      );
-    },
-    staleTime: Infinity,
-    gcTime: 0,
-    retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
-  const pending = query.isFetching || (query.data == null && !query.isError);
-  const title = jsx.jsx(FormattedMessage, {
-    id: "browser.auth.magicLink.title",
-    defaultMessage: "Checking your link",
-    description:
-      "Neutral heading while continuing an emailed login or signup link; the app does not yet know which action the user will complete",
-  });
-  const successResult = query.data?.ok ? query.data : null;
-  const success = successResult
-    ? jsx.jsx("a", {
-        ref: (element: unknown) => {
-          if (element) window.location.replace(successResult.url);
-        },
-        href: successResult.url,
-        children: jsx.jsx(FormattedMessage, {
-          id: "browser.auth.magicLink.continue",
-          defaultMessage: "Continue",
-          description:
-            "Fallback link to continue an email authentication flow if automatic navigation did not occur",
-        }),
-      })
-    : null;
-  const status =
-    !query.data?.ok && pending
-      ? jsx.jsx("p", {
-          role: "status",
-          children: jsx.jsx(FormattedMessage, {
-            id: "browser.auth.magicLink.pending",
-            defaultMessage: "This should only take a moment",
-            description:
-              "Supporting text while an emailed login or signup link is handed to the authentication service",
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  I3 as n,
+  K2 as r,
+  Y2 as i,
+  Yh as a,
+  Zh as o,
+  _L as s,
+  gL as c,
+} from "@rchunk/app-shared";
+import {
+  Fx as l,
+  Ix as u,
+  Qgn as d,
+  Rx as f,
+  Ycn as p,
+  bfn as m,
+  dJt as h,
+  i_n as g,
+  o_n as _,
+  uJt as v,
+  yfn as y,
+} from "@rchunk/app-initial";
+import { n as b, t as x } from "@rchunk/page-layout";
+function S(e) {
+  let t = (0, C.c)(25),
+    n = g(),
+    r = _(),
+    o;
+  if (t[0] !== n.search) {
+    let e = new URLSearchParams(n.search);
+    ((o = l(e.get(`callback_path`) ?? e.get(`next`))), (t[0] = n.search), (t[1] = o));
+  } else o = t[1];
+  let c = o,
+    u;
+  t[2] !== n.key || t[3] !== n.search
+    ? ((u = [`browser-magic-link`, n.key, n.search]), (t[2] = n.key), (t[3] = n.search), (t[4] = u))
+    : (u = t[4]);
+  let d;
+  t[5] === c
+    ? (d = t[6])
+    : ((d = (e) => {
+        let { signal: t } = e;
+        if (y().authStatus === `logged_in`) return { ok: !0, url: c };
+        let n = crypto.randomUUID();
+        return (
+          (0, w.setCookie)(`oai-asli`, n, { path: `/`, sameSite: `lax` }),
+          f(c, { standalone_magic_link: `true`, "ext-oai-did": v(), auth_session_logging_id: n }, t)
+        );
+      }),
+      (t[5] = c),
+      (t[6] = d));
+  let p;
+  t[7] !== u || t[8] !== d
+    ? ((p = {
+        queryKey: u,
+        queryFn: d,
+        staleTime: 1 / 0,
+        gcTime: 0,
+        retry: !1,
+        refetchOnWindowFocus: !1,
+        refetchOnReconnect: !1,
+      }),
+      (t[7] = u),
+      (t[8] = d),
+      (t[9] = p))
+    : (p = t[9]);
+  let { data: m, isError: h, isFetching: b } = s(p),
+    S = b || (m == null && !h),
+    E;
+  t[10] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((E = (0, T.jsx)(i, {
+        id: `browser.auth.magicLink.title`,
+        defaultMessage: `Checking your link`,
+        description: `Neutral heading while continuing an emailed login or signup link; the app does not yet know which action the user will complete`,
+      })),
+      (t[10] = E))
+    : (E = t[10]);
+  let D;
+  t[11] === m
+    ? (D = t[12])
+    : ((D =
+        m?.ok &&
+        (0, T.jsx)(`a`, {
+          ref: (e) => {
+            e && window.location.replace(m.url);
+          },
+          href: m.url,
+          children: (0, T.jsx)(i, {
+            id: `browser.auth.magicLink.continue`,
+            defaultMessage: `Continue`,
+            description: `Fallback link to continue an email authentication flow if automatic navigation did not occur`,
           }),
-        })
-      : null;
-  const failure =
-    !query.data?.ok && !pending
-      ? jsx.jsxs(jsx.Fragment, {
+        })),
+      (t[11] = m),
+      (t[12] = D));
+  let O;
+  t[13] !== m?.ok || t[14] !== S
+    ? ((O =
+        !m?.ok &&
+        S &&
+        (0, T.jsx)(`p`, {
+          role: `status`,
+          children: (0, T.jsx)(i, {
+            id: `browser.auth.magicLink.pending`,
+            defaultMessage: `This should only take a moment`,
+            description: `Supporting text while an emailed login or signup link is handed to the authentication service`,
+          }),
+        })),
+      (t[13] = m?.ok),
+      (t[14] = S),
+      (t[15] = O))
+    : (O = t[15]);
+  let k;
+  t[16] !== c || t[17] !== m?.ok || t[18] !== r || t[19] !== S
+    ? ((k =
+        !m?.ok &&
+        !S &&
+        (0, T.jsxs)(T.Fragment, {
           children: [
-            jsx.jsx("p", {
-              role: "alert",
-              className: "text-sm text-danger",
-              children: jsx.jsx(FormattedMessage, {
-                id: "browser.auth.magicLink.failed",
-                defaultMessage:
-                  "We couldn’t check your link. Start again to get another link.",
-                description:
-                  "Error when the app cannot continue an emailed login or signup link, including network or authentication failures; directs the user to restart without assuming the link expired",
+            (0, T.jsx)(`p`, {
+              role: `alert`,
+              className: `text-sm text-danger`,
+              children: (0, T.jsx)(i, {
+                id: `browser.auth.magicLink.failed`,
+                defaultMessage: `We couldn’t check your link. Start again to get another link.`,
+                description: `Error when the app cannot continue an emailed login or signup link, including network or authentication failures; directs the user to restart without assuming the link expired`,
               }),
             }),
-            jsx.jsx(Button, {
-              type: "button",
-              color: "primary",
-              size: "auth",
+            (0, T.jsx)(a, {
+              type: `button`,
+              color: `primary`,
+              size: `auth`,
               onClick: () => {
-                const url = new URL(target);
-                const restartParams = new URLSearchParams({
-                  next: `${url.pathname}${url.search}${url.hash}`,
-                });
-                navigate(`/auth/login?${restartParams}`, { replace: true });
+                let e = new URL(c),
+                  t = new URLSearchParams({ next: `${e.pathname}${e.search}${e.hash}` });
+                r(`/auth/login?${t}`, { replace: !0 });
               },
-              children: jsx.jsx(FormattedMessage, {
-                id: "browser.auth.magicLink.restart",
-                defaultMessage: "Go back",
-                description:
-                  "Return to login or signup to request a new email link after magic-link handoff fails",
+              children: (0, T.jsx)(i, {
+                id: `browser.auth.magicLink.restart`,
+                defaultMessage: `Go back`,
+                description: `Return to login or signup to request a new email link after magic-link handoff fails`,
               }),
             }),
           ],
-        })
-      : null;
-  return jsx.jsxs(PageLayout, { title, children: [success, status, failure] });
+        })),
+      (t[16] = c),
+      (t[17] = m?.ok),
+      (t[18] = r),
+      (t[19] = S),
+      (t[20] = k))
+    : (k = t[20]);
+  let A;
+  return (
+    t[21] !== D || t[22] !== O || t[23] !== k
+      ? ((A = (0, T.jsxs)(x, { title: E, children: [D, O, k] })),
+        (t[21] = D),
+        (t[22] = O),
+        (t[23] = k),
+        (t[24] = A))
+      : (A = t[24]),
+    A
+  );
 }
-
-function initializeMagicLinkPage(): void {
-  initializeRuntimeLazy();
-  initializeUseQuery();
-  cookieStore = getCookieStore();
-  initializeSharedUi();
-  initializeAccountContext();
-  initializeCookieStore();
-  initializeButton();
-  initializeAuthHandoff();
-  initializePageLayout();
-  initializeAuthTarget();
-  jsx = getJsxRuntime();
+var C, w, T;
+function E() {
+  return (E = e(() => {
+    ((C = t()), c(), (w = p()), r(), d(), m(), o(), h(), b(), u(), (T = n()));
+  }))();
 }
-
-initializeMagicLinkPage();
-export { BrowserMagicLinkPage };
+E();
+export { S as BrowserMagicLinkPage };

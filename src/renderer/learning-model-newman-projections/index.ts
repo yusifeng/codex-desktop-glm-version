@@ -1,33 +1,81 @@
-// Newman-projection conformations for ethane and butane.
-import "@rchunk/rolldown-runtime";
-
-type NewmanMolecule = "ethane" | "butane";
-interface NewmanProjectionValues { molecule?: unknown; rotationStep?: number | null }
-
-const newmanProjectionsType = "NEWMAN_PROJECTIONS";
-const newmanProjectionsThumbnail = "newman-projections-v1";
-const newmanProjectionsParameters = { molecule: { kind: "enum" as const, defaultValue: "butane" as NewmanMolecule, allowedValues: ["ethane", "butane"] as NewmanMolecule[] } };
-const newmanProjectionsSpecification = { type: newmanProjectionsType, version: 2, thumbnailAssetKey: newmanProjectionsThumbnail, parameters: newmanProjectionsParameters };
-const normalizeMolecule = (value: unknown): NewmanMolecule => value === "ethane" || value === "butane" ? value : newmanProjectionsSpecification.parameters.molecule.defaultValue === "ethane" ? "ethane" : "butane";
-const normalizeRotationStep = (value: number | null | undefined): number => Number.isFinite(value) ? (Math.round(value ?? 0) % 6 + 6) % 6 : 3;
-const rotationStepFromDegrees = (degrees: number): number => Number.isFinite(degrees) ? normalizeRotationStep(Math.round(degrees / 60)) : 3;
-const calculateNewmanProjection = (values: NewmanProjectionValues) => {
-  const molecule = normalizeMolecule(values.molecule);
-  const rotationStep = normalizeRotationStep(values.rotationStep);
-  const rotationDegrees = rotationStep * 60;
-  if (molecule === "ethane") {
-    const staggered = rotationStep % 2 === 1;
-    return { molecule, rotationStep, rotationDegrees, methylDihedralDegrees: null, kind: staggered ? "staggered" : "eclipsed", stabilityRank: staggered ? 1 : 4 };
-  }
-  const methylDihedralDegrees = rotationStep === 0 ? 0 : rotationStep === 3 ? 180 : rotationStep === 1 || rotationStep === 5 ? 60 : 120;
-  if (methylDihedralDegrees === 180) return { molecule, rotationStep, rotationDegrees, methylDihedralDegrees, kind: "anti-staggered", stabilityRank: 1 };
-  if (methylDihedralDegrees === 60) return { molecule, rotationStep, rotationDegrees, methylDihedralDegrees, kind: "gauche-staggered", stabilityRank: 2 };
-  if (methylDihedralDegrees === 120) return { molecule, rotationStep, rotationDegrees, methylDihedralDegrees, kind: "partially-eclipsed", stabilityRank: 3 };
-  return { molecule, rotationStep, rotationDegrees, methylDihedralDegrees, kind: "fully-eclipsed", stabilityRank: 4 };
-};
-const defaultNewmanProjectionValues = { molecule: normalizeMolecule(newmanProjectionsSpecification.parameters.molecule.defaultValue), rotationStep: 3 };
-
-function initializeNewmanProjectionsSpecification(): void {}
-function initializeNewmanProjectionsModel(): void {}
-
-export { initializeNewmanProjectionsSpecification as a, rotationStepFromDegrees as i, calculateNewmanProjection as n, newmanProjectionsSpecification as o, initializeNewmanProjectionsModel as r, defaultNewmanProjectionValues as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `NEWMAN_PROJECTIONS`),
+      (n = `newman-projections-v1`),
+      (r = {
+        molecule: { kind: `enum`, defaultValue: `butane`, allowedValues: [`ethane`, `butane`] },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u;
+function d() {
+  return (d = e(() => {
+    (a(),
+      (o = (e) =>
+        e === `ethane` || e === `butane`
+          ? e
+          : i.parameters.molecule.defaultValue === `ethane`
+            ? `ethane`
+            : `butane`),
+      (s = (e) => (Number.isFinite(e) ? ((Math.round(e) % 6) + 6) % 6 : 3)),
+      (c = (e) => (Number.isFinite(e) ? s(Math.round(e / 60)) : 3)),
+      (l = (e) => {
+        let t = o(e.molecule),
+          n = s(e.rotationStep),
+          r = n * 60;
+        if (t === `ethane`) {
+          let e = n % 2 == 1;
+          return {
+            molecule: t,
+            rotationStep: n,
+            rotationDegrees: r,
+            methylDihedralDegrees: null,
+            kind: e ? `staggered` : `eclipsed`,
+            stabilityRank: e ? 1 : 4,
+          };
+        }
+        let i = n === 0 ? 0 : n === 3 ? 180 : n === 1 || n === 5 ? 60 : 120;
+        return i === 180
+          ? {
+              molecule: t,
+              rotationStep: n,
+              rotationDegrees: r,
+              methylDihedralDegrees: i,
+              kind: `anti-staggered`,
+              stabilityRank: 1,
+            }
+          : i === 60
+            ? {
+                molecule: t,
+                rotationStep: n,
+                rotationDegrees: r,
+                methylDihedralDegrees: i,
+                kind: `gauche-staggered`,
+                stabilityRank: 2,
+              }
+            : i === 120
+              ? {
+                  molecule: t,
+                  rotationStep: n,
+                  rotationDegrees: r,
+                  methylDihedralDegrees: i,
+                  kind: `partially-eclipsed`,
+                  stabilityRank: 3,
+                }
+              : {
+                  molecule: t,
+                  rotationStep: n,
+                  rotationDegrees: r,
+                  methylDihedralDegrees: i,
+                  kind: `fully-eclipsed`,
+                  stabilityRank: 4,
+                };
+      }),
+      (u = { molecule: o(i.parameters.molecule.defaultValue), rotationStep: 3 }));
+  }))();
+}
+export { a, c as i, l as n, i as o, d as r, u as t };

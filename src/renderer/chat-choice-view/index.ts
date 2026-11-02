@@ -1,214 +1,234 @@
-// chat-choice-view —— 已迁移 GPT 在原聊天中显示的插件选择公告。
-// 原版：app/webview/assets/chat-choice-view-dbd92be32fed.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as retirementChunk from "@rchunk/gpt-plugin-retirement";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-void runtimeChunk;
-const {
-  $3: initializeJsxRuntime,
-  C_: initializeIconPreset,
-  I3: getJsxRuntime,
-  K2: initializeIntlRuntime,
-  S_: IconAsset,
-  Tl: pluginAnnouncementIcon,
-  Y2: FormattedMessage,
-  Yh: Button,
-  Zh: initializeButton,
-  n4: useIntl,
-  wl: initializePluginAnnouncementIcon,
-} = appSharedChunk;
-const {
-  afn: useExperiment,
-  ifn: initializeExperiments,
-  n7: Announcement,
-  r7: initializeAnnouncement,
-} = appInitialChunk;
-const {
-  r: initializePluginRetirement,
-  t: parseRetirementDate,
-} = retirementChunk;
-
-let jsxRuntime: JsxRuntime | null = null;
-let initialized = false;
-function initializeChatChoiceView(): void {
-  if (initialized) return;
-  initializeJsxRuntime?.();
-  initializePluginAnnouncementIcon?.();
-  initializeIntlRuntime?.();
-  initializeAnnouncement?.();
-  initializeButton?.();
-  initializeIconPreset?.();
-  initializeExperiments?.();
-  initializePluginRetirement();
-  jsxRuntime = getJsxRuntime();
-  initialized = true;
-}
-
-type AccessState = "allowed" | "denied" | "pending" | "error";
-type ChatChoiceViewProps = {
-  gptName: string;
-  accessState: AccessState;
-  onUsePlugin: () => void;
-  onKeepUsingGpt?: () => void;
-  onRetry?: () => void;
-};
-
-function message(
-  id: string,
-  defaultMessage: string,
-  description: string,
-  values?: Record<string, unknown>,
-): unknown {
-  return getInitializedJsxRuntime().jsx(FormattedMessage, {
-    id,
-    defaultMessage,
-    description,
-    values,
-  });
-}
-
-function ChatChoiceView({
-  gptName,
-  accessState,
-  onUsePlugin,
-  onKeepUsingGpt,
-  onRetry,
-}: ChatChoiceViewProps): unknown {
-  initializeChatChoiceView();
-  const jsx = getInitializedJsxRuntime();
-  const intl = useIntl();
-  const experiment = useExperiment("2513446768");
-  const deadline = intl.formatDate(
-    parseRetirementDate(experiment.get("retirement_date", "")),
-    { month: "long", day: "numeric", timeZone: "UTC" },
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  C_ as n,
+  I3 as r,
+  K2 as i,
+  S_ as a,
+  Tl as o,
+  Y2 as s,
+  Yh as c,
+  Zh as l,
+  n4 as u,
+  wl as d,
+} from "@rchunk/app-shared";
+import { afn as f, ifn as p, n7 as m, r7 as h } from "@rchunk/app-initial";
+import { r as g, t as _ } from "@rchunk/gpt-plugin-retirement";
+function v(e) {
+  let t = (0, y.c)(33),
+    { gptName: n, accessState: r, onUsePlugin: i, onKeepUsingGpt: l, onRetry: d } = e,
+    p = u(),
+    h = f(`2513446768`),
+    g;
+  t[0] !== h || t[1] !== p
+    ? ((g = p.formatDate(_(h.get(`retirement_date`, ``)), {
+        month: `long`,
+        day: `numeric`,
+        timeZone: `UTC`,
+      })),
+      (t[0] = h),
+      (t[1] = p),
+      (t[2] = g))
+    : (g = t[2]);
+  let v = g,
+    x;
+  if (r === `error` && d != null) {
+    let e;
+    (t[3] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, b.jsx)(s, {
+          id: `chatgptConversations.gpts.migration.chatChoiceRetry`,
+          defaultMessage: `Try again`,
+          description: `Retry checking access to the migrated plugin`,
+        })),
+        (t[3] = e))
+      : (e = t[3]),
+      (x = e));
+  } else if (r === `allowed` || r === `pending`) {
+    let e;
+    (t[4] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, b.jsx)(s, {
+          id: `chatgptConversations.gpts.migration.chatChoiceUsePlugin`,
+          defaultMessage: `Use plugin`,
+          description: `Opens the migrated plugin detail page from the initial GPT chat choice.`,
+        })),
+        (t[4] = e))
+      : (e = t[4]),
+      (x = e));
+  } else {
+    let e;
+    (t[5] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, b.jsx)(s, {
+          id: `chatgptConversations.gpts.migration.chatChoiceExplorePlugins`,
+          defaultMessage: `Explore plugins`,
+          description: `Opens the plugin directory from a migrated GPT chat banner when access to its plugin was denied or could not be verified after a failed request.`,
+        })),
+        (t[5] = e))
+      : (e = t[5]),
+      (x = e));
+  }
+  let S;
+  if (r === `error` && d == null) {
+    let e;
+    (t[6] === v
+      ? (e = t[7])
+      : ((e = (0, b.jsx)(s, {
+          id: `chatgptConversations.gpts.migration.chatChoiceAccessUnconfirmed`,
+          defaultMessage: `We couldn’t check your access to the plugin. You can keep using this GPT until {deadline}.`,
+          description: `Fallback when the migration banner cannot load. Access is unknown; the user can explore plugins or continue using the GPT.`,
+          values: { deadline: v },
+        })),
+        (t[6] = v),
+        (t[7] = e)),
+      (S = e));
+  } else if (r === `error`) {
+    let e;
+    (t[8] === v
+      ? (e = t[9])
+      : ((e = (0, b.jsx)(s, {
+          id: `chatgptConversations.gpts.migration.chatChoiceAccessError`,
+          defaultMessage: `We couldn’t check your access to the plugin. Try again, or keep using this GPT until {deadline}.`,
+          description: `Migrated GPT notice after a failed plugin-access check; deadline is the localized retirement date`,
+          values: { deadline: v },
+        })),
+        (t[8] = v),
+        (t[9] = e)),
+      (S = e));
+  } else if (r === `denied`) {
+    let e;
+    (t[10] === v
+      ? (e = t[11])
+      : ((e = (0, b.jsx)(s, {
+          id: `chatgptConversations.gpts.migration.chatChoiceAccessDenied`,
+          defaultMessage: `This plugin isn’t available to you. You can keep using this GPT until {deadline}.`,
+          description: `Migrated GPT notice when the destination plugin is inaccessible; deadline is the localized retirement date`,
+          values: { deadline: v },
+        })),
+        (t[10] = v),
+        (t[11] = e)),
+      (S = e));
+  } else if (n.trim()) {
+    let e;
+    (t[12] !== v || t[13] !== n
+      ? ((e = (0, b.jsx)(s, {
+          id: `chatgptConversations.gpts.migration.chatChoiceNamedBody`,
+          defaultMessage: `{gptName} is now available as a plugin. You can keep using this GPT until {deadline}.`,
+          description: `Explains the migrated GPT choice before the composer. gptName is the GPT display name and deadline is a localized month and day.`,
+          values: { gptName: n, deadline: v },
+        })),
+        (t[12] = v),
+        (t[13] = n),
+        (t[14] = e))
+      : (e = t[14]),
+      (S = e));
+  } else {
+    let e;
+    (t[15] === v
+      ? (e = t[16])
+      : ((e = (0, b.jsx)(s, {
+          id: `chatgptConversations.gpts.migration.chatChoiceBody`,
+          defaultMessage: `This GPT is now available as a plugin. You can keep using this GPT until {deadline}.`,
+          description: `Explains the migrated GPT choice when the GPT has no display name; deadline is a localized month and day.`,
+          values: { deadline: v },
+        })),
+        (t[15] = v),
+        (t[16] = e)),
+      (S = e));
+  }
+  let C;
+  t[17] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((C = (0, b.jsx)(a, { asset: o, className: `text-secondary` })), (t[17] = C))
+    : (C = t[17]);
+  let w;
+  t[18] === n
+    ? (w = t[19])
+    : ((w = n.trim()
+        ? (0, b.jsx)(s, {
+            id: `chatgptConversations.gpts.migration.chatChoiceNamedTitle`,
+            defaultMessage: `{gptName} is now a plugin`,
+            description: `Title of the migrated GPT chat choice shown before the composer. gptName is the user-provided GPT name.`,
+            values: { gptName: n },
+          })
+        : (0, b.jsx)(s, {
+            id: `chatgptConversations.gpts.migration.chatChoiceTitle`,
+            defaultMessage: `This GPT is now a plugin`,
+            description: `Title of the migrated GPT chat choice when the GPT has no display name.`,
+          })),
+      (t[18] = n),
+      (t[19] = w));
+  let T = r === `pending`,
+    E = r === `error` && d != null ? d : i,
+    D;
+  t[20] !== x || t[21] !== T || t[22] !== E
+    ? ((D = (0, b.jsx)(c, {
+        color: `primary`,
+        disabled: T,
+        size: `dialog`,
+        type: `button`,
+        onClick: E,
+        children: x,
+      })),
+      (t[20] = x),
+      (t[21] = T),
+      (t[22] = E),
+      (t[23] = D))
+    : (D = t[23]);
+  let O;
+  t[24] === l
+    ? (O = t[25])
+    : ((O =
+        l == null
+          ? null
+          : (0, b.jsx)(c, {
+              color: `outline`,
+              size: `dialog`,
+              type: `button`,
+              onClick: l,
+              children: (0, b.jsx)(s, {
+                id: `chatgptConversations.gpts.migration.chatChoiceKeepUsing`,
+                defaultMessage: `Keep using GPT`,
+                description: `Reveals the existing GPT chat composer for this visit only, keeping its draft. The choice is shown again when the GPT is reopened.`,
+              }),
+            })),
+      (t[24] = l),
+      (t[25] = O));
+  let k;
+  t[26] !== D || t[27] !== O
+    ? ((k = (0, b.jsxs)(`div`, {
+        className: `flex flex-wrap items-center gap-2`,
+        children: [D, O],
+      })),
+      (t[26] = D),
+      (t[27] = O),
+      (t[28] = k))
+    : (k = t[28]);
+  let A;
+  return (
+    t[29] !== S || t[30] !== w || t[31] !== k
+      ? ((A = (0, b.jsx)(`div`, {
+          className: `mx-auto mb-3 w-full max-w-[var(--thread-content-max-width)]`,
+          children: (0, b.jsx)(m, {
+            variant: `announcement`,
+            icon: C,
+            stackOnNarrow: !0,
+            wrapCtas: !0,
+            title: w,
+            content: S,
+            customCtas: k,
+          }),
+        })),
+        (t[29] = S),
+        (t[30] = w),
+        (t[31] = k),
+        (t[32] = A))
+      : (A = t[32]),
+    A
   );
-
-  let primaryLabel: unknown;
-  if (accessState === "error" && onRetry != null) {
-    primaryLabel = message(
-      "chatgptConversations.gpts.migration.chatChoiceRetry",
-      "Try again",
-      "Retry checking access to the migrated plugin",
-    );
-  } else if (accessState === "allowed" || accessState === "pending") {
-    primaryLabel = message(
-      "chatgptConversations.gpts.migration.chatChoiceUsePlugin",
-      "Use plugin",
-      "Opens the migrated plugin detail page from the initial GPT chat choice.",
-    );
-  } else {
-    primaryLabel = message(
-      "chatgptConversations.gpts.migration.chatChoiceExplorePlugins",
-      "Explore plugins",
-      "Opens the plugin directory from a migrated GPT chat banner when access to its plugin was denied or could not be verified after a failed request.",
-    );
-  }
-
-  let content: unknown;
-  if (accessState === "error" && onRetry == null) {
-    content = message(
-      "chatgptConversations.gpts.migration.chatChoiceAccessUnconfirmed",
-      "We couldn’t check your access to the plugin. You can keep using this GPT until {deadline}.",
-      "Fallback when the migration banner cannot load. Access is unknown; the user can explore plugins or continue using the GPT.",
-      { deadline },
-    );
-  } else if (accessState === "error") {
-    content = message(
-      "chatgptConversations.gpts.migration.chatChoiceAccessError",
-      "We couldn’t check your access to the plugin. Try again, or keep using this GPT until {deadline}.",
-      "Migrated GPT notice after a failed plugin-access check; deadline is the localized retirement date",
-      { deadline },
-    );
-  } else if (accessState === "denied") {
-    content = message(
-      "chatgptConversations.gpts.migration.chatChoiceAccessDenied",
-      "This plugin isn’t available to you. You can keep using this GPT until {deadline}.",
-      "Migrated GPT notice when the destination plugin is inaccessible; deadline is the localized retirement date",
-      { deadline },
-    );
-  } else if (gptName.trim()) {
-    content = message(
-      "chatgptConversations.gpts.migration.chatChoiceNamedBody",
-      "{gptName} is now available as a plugin. You can keep using this GPT until {deadline}.",
-      "Explains the migrated GPT choice before the composer. gptName is the GPT display name and deadline is a localized month and day.",
-      { gptName, deadline },
-    );
-  } else {
-    content = message(
-      "chatgptConversations.gpts.migration.chatChoiceBody",
-      "This GPT is now available as a plugin. You can keep using this GPT until {deadline}.",
-      "Explains the migrated GPT choice when the GPT has no display name; deadline is a localized month and day.",
-      { deadline },
-    );
-  }
-
-  const title = gptName.trim()
-    ? message(
-        "chatgptConversations.gpts.migration.chatChoiceNamedTitle",
-        "{gptName} is now a plugin",
-        "Title of the migrated GPT chat choice shown before the composer. gptName is the user-provided GPT name.",
-        { gptName },
-      )
-    : message(
-        "chatgptConversations.gpts.migration.chatChoiceTitle",
-        "This GPT is now a plugin",
-        "Title of the migrated GPT chat choice when the GPT has no display name.",
-      );
-  const primaryAction = jsx.jsx(Button, {
-    color: "primary",
-    disabled: accessState === "pending",
-    size: "dialog",
-    type: "button",
-    onClick: accessState === "error" && onRetry != null ? onRetry : onUsePlugin,
-    children: primaryLabel,
-  });
-  const keepUsingAction =
-    onKeepUsingGpt == null
-      ? null
-      : jsx.jsx(Button, {
-          color: "outline",
-          size: "dialog",
-          type: "button",
-          onClick: onKeepUsingGpt,
-          children: message(
-            "chatgptConversations.gpts.migration.chatChoiceKeepUsing",
-            "Keep using GPT",
-            "Reveals the existing GPT chat composer for this visit only, keeping its draft. The choice is shown again when the GPT is reopened.",
-          ),
-        });
-  const customCtas = jsx.jsxs("div", {
-    className: "flex flex-wrap items-center gap-2",
-    children: [primaryAction, keepUsingAction],
-  });
-  const icon = jsx.jsx(IconAsset, {
-    asset: pluginAnnouncementIcon,
-    className: "text-secondary",
-  });
-  return jsx.jsx("div", {
-    className: "mx-auto mb-3 w-full max-w-[var(--thread-content-max-width)]",
-    children: jsx.jsx(Announcement, {
-      variant: "announcement",
-      icon,
-      stackOnNarrow: true,
-      wrapCtas: true,
-      title,
-      content,
-      customCtas,
-    }),
-  });
 }
-
-function getInitializedJsxRuntime(): JsxRuntime {
-  initializeChatChoiceView();
-  if (jsxRuntime == null) {
-    throw new Error("Chat choice JSX runtime failed to initialize");
-  }
-  return jsxRuntime;
+var y, b;
+function x() {
+  return (x = e(() => {
+    ((y = t()), d(), i(), h(), l(), n(), p(), g(), (b = r()));
+  }))();
 }
-
-initializeChatChoiceView();
-export { initializeChatChoiceView as n, ChatChoiceView as t };
+export { x as n, v as t };

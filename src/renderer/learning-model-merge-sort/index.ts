@@ -1,238 +1,239 @@
-// Merge-sort teaching model. Release chunk: model-4513eb800a0e.js.
-import "@rchunk/rolldown-runtime";
-type Key = `value${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8}`;
-interface Values extends Partial<Record<Key, number>> {
-  activeCount?: number | null;
-  step?: number | null;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `MERGE_SORT`),
+      (n = `merge-sort-v1`),
+      (r = {
+        value1: { kind: `integer`, defaultValue: 38, min: 1, max: 99 },
+        value2: { kind: `integer`, defaultValue: 12, min: 1, max: 99 },
+        value3: { kind: `integer`, defaultValue: 27, min: 1, max: 99 },
+        value4: { kind: `integer`, defaultValue: 43, min: 1, max: 99 },
+        value5: { kind: `integer`, defaultValue: 9, min: 1, max: 99 },
+        value6: { kind: `integer`, defaultValue: 31, min: 1, max: 99 },
+        value7: { kind: `integer`, defaultValue: 18, min: 1, max: 99 },
+        value8: { kind: `integer`, defaultValue: 25, min: 1, max: 99 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-interface Item {
-  id: string;
-  value: number;
+var o, s, c, l, u, d, f, p, m, h, g;
+function _() {
+  return (_ = e(() => {
+    (a(),
+      (o = [`value1`, `value2`, `value3`, `value4`, `value5`, `value6`, `value7`, `value8`]),
+      (s = {
+        value1: i.parameters.value1,
+        value2: i.parameters.value2,
+        value3: i.parameters.value3,
+        value4: i.parameters.value4,
+        value5: i.parameters.value5,
+        value6: i.parameters.value6,
+        value7: i.parameters.value7,
+        value8: i.parameters.value8,
+      }),
+      (c = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (l = (e) => (e === 7 ? 7 : 8)),
+      (u = (e) => {
+        let t = (t) => {
+          let n = s[t],
+            r = e[t];
+          return c(
+            Math.round(Number.isFinite(r) ? (r ?? n.defaultValue) : n.defaultValue),
+            n.min,
+            n.max,
+          );
+        };
+        return {
+          value1: t(`value1`),
+          value2: t(`value2`),
+          value3: t(`value3`),
+          value4: t(`value4`),
+          value5: t(`value5`),
+          value6: t(`value6`),
+          value7: t(`value7`),
+          value8: t(`value8`),
+        };
+      }),
+      (d = () => ({
+        value1: s.value1.defaultValue,
+        value2: s.value2.defaultValue,
+        value3: s.value3.defaultValue,
+        value4: s.value4.defaultValue,
+        value5: s.value5.defaultValue,
+        value6: s.value6.defaultValue,
+        value7: s.value7.defaultValue,
+        value8: s.value8.defaultValue,
+        activeCount: 8,
+        step: 0,
+      })),
+      (f = (e) => {
+        let t = [[e.slice()]],
+          n = t[0] ?? [];
+        for (; n.some((e) => e.length > 1);)
+          ((n = n.flatMap((e) => {
+            if (e.length === 1) return [e];
+            let t = Math.floor(e.length / 2);
+            return [e.slice(0, t), e.slice(t)];
+          })),
+            t.push(n));
+        return t;
+      }),
+      (p = (e, t) => ({
+        activeLeft: [],
+        activeRight: [],
+        completedRuns: [],
+        leftIndex: 0,
+        mergeLevel: 0,
+        mergeStart: 0,
+        output: [],
+        phase: e,
+        rightIndex: 0,
+        splitDepth: t,
+      })),
+      (m = (e, t = 8) => {
+        let n = l(t),
+          r = o.slice(0, n).map((t, n) => ({ id: `source-${n + 1}`, value: e[t] })),
+          i = f(r),
+          a = i.length - 1,
+          s = [p(`initial`, 0)];
+        for (let e = 1; e < a; e += 1) s.push(p(`split`, e));
+        s.push(p(`base`, a));
+        let c = [],
+          u = (e, t) => {
+            if (e.length === 1) return [...e];
+            let n = Math.floor(e.length / 2),
+              r = u(e.slice(0, n), t),
+              i = u(e.slice(n), t + n),
+              o = Math.ceil(Math.log2(e.length)),
+              l = [],
+              d = 0,
+              f = 0;
+            for (; d < r.length && f < i.length;) {
+              let e = r[d],
+                n = i[f];
+              if (!e || !n) throw Error(`Merge sort comparison is missing a front element.`);
+              let u = e.value <= n.value ? `left` : `right`;
+              (s.push({
+                activeLeft: [...r],
+                activeRight: [...i],
+                chosenSide: u,
+                completedRuns: [...c],
+                leftIndex: d,
+                mergeLevel: o,
+                mergeStart: t,
+                output: [...l],
+                phase: `compare`,
+                rightIndex: f,
+                splitDepth: a,
+              }),
+                u === `left` ? (l.push(e), (d += 1)) : (l.push(n), (f += 1)));
+            }
+            return (
+              s.push({
+                activeLeft: [...r],
+                activeRight: [...i],
+                completedRuns: [...c],
+                leftIndex: d,
+                mergeLevel: o,
+                mergeStart: t,
+                output: [...l],
+                phase: `append`,
+                rightIndex: f,
+                splitDepth: a,
+              }),
+              l.push(...r.slice(d), ...i.slice(f)),
+              c.push({ items: [...l], level: o, start: t }),
+              s.push({
+                activeLeft: [...r],
+                activeRight: [...i],
+                completedRuns: [...c],
+                leftIndex: r.length,
+                mergeLevel: o,
+                mergeStart: t,
+                output: [...l],
+                phase: `merged`,
+                rightIndex: i.length,
+                splitDepth: a,
+              }),
+              l
+            );
+          },
+          d = u(r, 0);
+        s.push({
+          activeLeft: [],
+          activeRight: [],
+          completedRuns: [...c],
+          leftIndex: 0,
+          mergeLevel: a,
+          mergeStart: 0,
+          output: [...d],
+          phase: `complete`,
+          rightIndex: 0,
+          splitDepth: a,
+        });
+        let [m, ...h] = s;
+        if (!m) throw Error(`Merge sort trace must contain an initial frame.`);
+        return { completedMerges: c, frames: [m, ...h], splitRows: i };
+      }),
+      (h = (e) => {
+        let t = u(e),
+          n = l(e.activeCount),
+          r = m(t, n),
+          i = r.frames.length - 1,
+          a = Number.isFinite(e.step) ? (e.step ?? 0) : 0,
+          o = c(Math.round(a), 0, i);
+        return {
+          ...r,
+          frame: r.frames[o] ?? r.frames[0],
+          maxStep: i,
+          values: { ...t, activeCount: n, step: o },
+        };
+      }),
+      (g = (e, t = Math.random) => {
+        let n = u(e),
+          r = l(e.activeCount),
+          i = o.map((e) => n[e]),
+          a = i.slice(0, r),
+          s = [...a];
+        for (let e = s.length - 1; e > 0; --e) {
+          let n = c(Math.floor(t() * (e + 1)), 0, e),
+            r = s[e],
+            i = s[n];
+          if (r === void 0 || i === void 0)
+            throw Error(`Merge sort shuffle received an incomplete list.`);
+          ((s[e] = i), (s[n] = r));
+        }
+        if (s.every((e, t) => e === a[t]) && a.some((e) => e !== a[0])) {
+          let e = s.shift();
+          e !== void 0 && s.push(e);
+        }
+        let [d, f, p, m, h, g, _, v] = [...s, ...i.slice(r)];
+        if (
+          d === void 0 ||
+          f === void 0 ||
+          p === void 0 ||
+          m === void 0 ||
+          h === void 0 ||
+          g === void 0 ||
+          _ === void 0 ||
+          v === void 0
+        )
+          throw Error(`Merge sort shuffle must retain all eight values.`);
+        return {
+          value1: d,
+          value2: f,
+          value3: p,
+          value4: m,
+          value5: h,
+          value6: g,
+          value7: _,
+          value8: v,
+          activeCount: r,
+          step: 0,
+        };
+      }));
+  }))();
 }
-interface Run {
-  items: Item[];
-  level: number;
-  start: number;
-}
-interface Frame {
-  activeLeft: Item[];
-  activeRight: Item[];
-  completedRuns: Run[];
-  leftIndex: number;
-  mergeLevel: number;
-  mergeStart: number;
-  output: Item[];
-  phase:
-    "initial" | "split" | "base" | "compare" | "append" | "merged" | "complete";
-  rightIndex: number;
-  splitDepth: number;
-  chosenSide?: "left" | "right";
-}
-const keys: Key[] = [
-    "value1",
-    "value2",
-    "value3",
-    "value4",
-    "value5",
-    "value6",
-    "value7",
-    "value8",
-  ],
-  defaults = [38, 12, 27, 43, 9, 31, 18, 25];
-const definition = {
-  type: "MERGE_SORT",
-  version: 2,
-  thumbnailAssetKey: "merge-sort-v1",
-  parameters: Object.fromEntries(
-    keys.map((key, index) => [
-      key,
-      { kind: "integer", defaultValue: defaults[index], min: 1, max: 99 },
-    ]),
-  ),
-};
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(Math.max(value, min), max);
-const activeCount = (value: unknown) => (value === 7 ? 7 : 8);
-const normalize = (input: Values): Record<Key, number> =>
-  Object.fromEntries(
-    keys.map((key, index) => [
-      key,
-      clamp(
-        Math.round(
-          Number.isFinite(input[key]) ? Number(input[key]) : defaults[index],
-        ),
-        1,
-        99,
-      ),
-    ]),
-  ) as Record<Key, number>;
-const defaultValues = () => ({ ...normalize({}), activeCount: 8, step: 0 });
-const splitRows = (items: Item[]) => {
-  const rows: Item[][][] = [[[...items]]];
-  let row = rows[0]!;
-  while (row.some((run) => run.length > 1)) {
-    row = row.flatMap((run) =>
-      run.length === 1
-        ? [run]
-        : [
-            run.slice(0, Math.floor(run.length / 2)),
-            run.slice(Math.floor(run.length / 2)),
-          ],
-    );
-    rows.push(row);
-  }
-  return rows;
-};
-const emptyFrame = (phase: Frame["phase"], depth: number): Frame => ({
-  activeLeft: [],
-  activeRight: [],
-  completedRuns: [],
-  leftIndex: 0,
-  mergeLevel: 0,
-  mergeStart: 0,
-  output: [],
-  phase,
-  rightIndex: 0,
-  splitDepth: depth,
-});
-const buildTrace = (values: Record<Key, number>, requested = 8) => {
-  const count = activeCount(requested),
-    source = keys
-      .slice(0, count)
-      .map((key, index) => ({ id: `source-${index + 1}`, value: values[key] })),
-    rows = splitRows(source),
-    depth = rows.length - 1,
-    frames: Frame[] = [emptyFrame("initial", 0)];
-  for (let index = 1; index < depth; index += 1)
-    frames.push(emptyFrame("split", index));
-  frames.push(emptyFrame("base", depth));
-  const completed: Run[] = [];
-  const merge = (items: Item[], start: number): Item[] => {
-    if (items.length === 1) return [...items];
-    const middle = Math.floor(items.length / 2),
-      left = merge(items.slice(0, middle), start),
-      right = merge(items.slice(middle), start + middle),
-      level = Math.ceil(Math.log2(items.length)),
-      output: Item[] = [];
-    let leftIndex = 0,
-      rightIndex = 0;
-    while (leftIndex < left.length && rightIndex < right.length) {
-      const leftItem = left[leftIndex],
-        rightItem = right[rightIndex];
-      if (!leftItem || !rightItem)
-        throw Error("Merge sort comparison is missing a front element.");
-      const chosenSide = leftItem.value <= rightItem.value ? "left" : "right";
-      frames.push({
-        activeLeft: [...left],
-        activeRight: [...right],
-        chosenSide,
-        completedRuns: [...completed],
-        leftIndex,
-        mergeLevel: level,
-        mergeStart: start,
-        output: [...output],
-        phase: "compare",
-        rightIndex,
-        splitDepth: depth,
-      });
-      if (chosenSide === "left") {
-        output.push(leftItem);
-        leftIndex += 1;
-      } else {
-        output.push(rightItem);
-        rightIndex += 1;
-      }
-    }
-    frames.push({
-      activeLeft: [...left],
-      activeRight: [...right],
-      completedRuns: [...completed],
-      leftIndex,
-      mergeLevel: level,
-      mergeStart: start,
-      output: [...output],
-      phase: "append",
-      rightIndex,
-      splitDepth: depth,
-    });
-    output.push(...left.slice(leftIndex), ...right.slice(rightIndex));
-    completed.push({ items: [...output], level, start });
-    frames.push({
-      activeLeft: [...left],
-      activeRight: [...right],
-      completedRuns: [...completed],
-      leftIndex: left.length,
-      mergeLevel: level,
-      mergeStart: start,
-      output: [...output],
-      phase: "merged",
-      rightIndex: right.length,
-      splitDepth: depth,
-    });
-    return output;
-  };
-  const sorted = merge(source, 0);
-  frames.push({
-    activeLeft: [],
-    activeRight: [],
-    completedRuns: [...completed],
-    leftIndex: 0,
-    mergeLevel: depth,
-    mergeStart: 0,
-    output: [...sorted],
-    phase: "complete",
-    rightIndex: 0,
-    splitDepth: depth,
-  });
-  return { completedMerges: completed, frames, splitRows: rows };
-};
-const derive = (input: Values) => {
-  const safe = normalize(input),
-    count = activeCount(input.activeCount),
-    trace = buildTrace(safe, count),
-    maxStep = trace.frames.length - 1,
-    step = clamp(
-      Math.round(Number.isFinite(input.step) ? Number(input.step) : 0),
-      0,
-      maxStep,
-    );
-  return {
-    ...trace,
-    frame: trace.frames[step] ?? trace.frames[0],
-    maxStep,
-    values: { ...safe, activeCount: count, step },
-  };
-};
-const shuffle = (input: Values, random: () => number = Math.random) => {
-  const safe = normalize(input),
-    count = activeCount(input.activeCount),
-    all = keys.map((key) => safe[key]),
-    head = all.slice(0, count),
-    mixed = [...head];
-  for (let index = mixed.length - 1; index > 0; index -= 1) {
-    const target = clamp(Math.floor(random() * (index + 1)), 0, index);
-    [mixed[index], mixed[target]] = [mixed[target]!, mixed[index]!];
-  }
-  if (
-    mixed.every((value, index) => value === head[index]) &&
-    head.some((value) => value !== head[0])
-  )
-    mixed.push(mixed.shift()!);
-  return {
-    ...Object.fromEntries(
-      keys.map((key, index) => [key, [...mixed, ...all.slice(count)][index]]),
-    ),
-    activeCount: count,
-    step: 0,
-  } as Record<Key, number> & { activeCount: number; step: number };
-};
-function initializeSpecification(): void {}
-function initializeModel(): void {}
-export {
-  initializeSpecification as a,
-  shuffle as i,
-  defaultValues as n,
-  definition as o,
-  initializeModel as r,
-  derive as t,
-};
+export { a, g as i, d as n, i as o, _ as r, h as t };

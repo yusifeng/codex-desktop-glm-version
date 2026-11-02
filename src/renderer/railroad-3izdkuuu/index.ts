@@ -1,9 +1,11 @@
-// Mermaid railroad diagram service facade. Release chunk: railroad-3IZDKUUU-120ea05f1fcb.js.
-import "@rchunk/rolldown-runtime";
-import { w as initializeMermaidServiceRuntime } from "@rchunk/chunk-KEIR6QF5";
-import { n as createRailroadServices, r as initializeRailroadServices } from "@rchunk/chunk-5TONJI2A";
-
-initializeRailroadServices();
-initializeMermaidServiceRuntime();
-
-export { createRailroadServices };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { w as t } from "@rchunk/chunk-KEIR6QF5";
+import { n, r } from "@rchunk/chunk-5TONJI2A";
+function i() {
+  return (i = e(() => {
+    (r(), t());
+  }))();
+}
+i();
+export { n as createRailroadServices };

@@ -1,34 +1,37 @@
-// Product-of-powers exponent-rule model. Release chunk: model-bc3894cd0f1f.js.
-import "@rchunk/rolldown-runtime";
-
-interface ExponentProductInput { leftExponent?: number; rightExponent?: number }
-
-const leftExponentControl = { label: "First exponent", min: 1, max: 5, step: 1, defaultValue: 2 };
-const rightExponentControl = { label: "Second exponent", min: 1, max: 5, step: 1, defaultValue: 3 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeExponent = (value: number | undefined, fallback: number, minimum: number, maximum: number): number => typeof value === "number" && Number.isFinite(value) ? clamp(Math.round(value), minimum, maximum) : fallback;
-const makeFactors = (count: number): string[] => Array.from({ length: count }, () => "x");
-const normalizeExponentProductInput = (input: ExponentProductInput) => ({
-  leftExponent: normalizeExponent(input.leftExponent, leftExponentControl.defaultValue, leftExponentControl.min, leftExponentControl.max),
-  rightExponent: normalizeExponent(input.rightExponent, rightExponentControl.defaultValue, rightExponentControl.min, rightExponentControl.max),
-});
-const calculateExponentProduct = (input: ExponentProductInput) => {
-  const safeValues = normalizeExponentProductInput(input);
-  const leftFactors = makeFactors(safeValues.leftExponent);
-  const rightFactors = makeFactors(safeValues.rightExponent);
-  return {
-    safeValues,
-    totalExponent: safeValues.leftExponent + safeValues.rightExponent,
-    leftFactors,
-    rightFactors,
-    mergedFactors: [...leftFactors.map((_factor, index) => ({ source: "left", key: `left-${index}` })), ...rightFactors.map((_factor, index) => ({ source: "right", key: `right-${index}` }))],
-  };
-};
-const exponentProductLatex = (input: ExponentProductInput): string => {
-  const result = calculateExponentProduct(input);
-  const { leftExponent, rightExponent } = result.safeValues;
-  return `x^{${leftExponent}} \\cdot x^{${rightExponent}} = x^{${leftExponent}+${rightExponent}} = x^{${result.totalExponent}}`;
-};
-function initializeExponentProductModel(): void {}
-
-export { initializeExponentProductModel as a, calculateExponentProduct as i, rightExponentControl as n, normalizeExponentProductInput as o, exponentProductLatex as r, leftExponentControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c;
+function l() {
+  return (l = e(() => {
+    ((t = { label: `First exponent`, min: 1, max: 5, step: 1, defaultValue: 2 }),
+      (n = { label: `Second exponent`, min: 1, max: 5, step: 1, defaultValue: 3 }),
+      (r = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (i = (e, t, n, i) => (Number.isFinite(e) ? r(Math.round(e ?? t), n, i) : t)),
+      (a = (e) => Array.from({ length: e }, () => `x`)),
+      (o = (e) => ({
+        leftExponent: i(e.leftExponent, t.defaultValue, t.min, t.max),
+        rightExponent: i(e.rightExponent, n.defaultValue, n.min, n.max),
+      })),
+      (s = (e) => {
+        let t = o(e),
+          n = a(t.leftExponent),
+          r = a(t.rightExponent);
+        return {
+          safeValues: t,
+          totalExponent: t.leftExponent + t.rightExponent,
+          leftFactors: n,
+          rightFactors: r,
+          mergedFactors: [
+            ...n.map((e, t) => ({ source: `left`, key: `left-${t}` })),
+            ...r.map((e, t) => ({ source: `right`, key: `right-${t}` })),
+          ],
+        };
+      }),
+      (c = (e) => {
+        let t = s(e),
+          { leftExponent: n, rightExponent: r } = t.safeValues;
+        return `x^{${n}} \\cdot x^{${r}} = x^{${n}+${r}} = x^{${t.totalExponent}}`;
+      }));
+  }))();
+}
+export { l as a, s as i, n, o, c as r, t };

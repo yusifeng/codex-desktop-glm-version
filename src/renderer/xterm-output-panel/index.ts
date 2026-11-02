@@ -1,206 +1,294 @@
-// Read-only xterm output surface used by background terminal tabs.
-
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as themeFontFamilyChunk from "@rchunk/theme-font-family";
-import * as themeFontFaceLoaderChunk from "@rchunk/theme-font-face-loader";
-import * as xtermWindowZoomChunk from "@rchunk/xterm-window-zoom";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Cz as n,
+  I3 as r,
+  e6 as i,
+  wL as a,
+  x_ as o,
+  y_ as s,
+} from "@rchunk/app-shared";
+import {
+  CW as c,
+  Kcn as l,
+  SW as u,
+  Vcn as d,
+  bk as f,
+  vk as ee,
+  xW as p,
+  yk as m,
+} from "@rchunk/app-initial";
+import { t as h } from "@rchunk/theme-font-family";
+import { n as te, t as g } from "@rchunk/theme-font-face-loader";
+import {
+  _,
+  a as ne,
+  c as v,
+  d as y,
+  f as b,
+  h as re,
+  i as ie,
+  l as ae,
+  m as x,
+  n as S,
+  o as C,
+  p as w,
+  s as T,
+  u as E,
+  v as D,
+  y as O,
+} from "@rchunk/xterm-window-zoom";
 import "@rchunk/terminal-panel-bootstrap";
-
-interface JsxRuntime { jsx(type: unknown, props: object, key?: string): unknown }
-interface Ref<Value> { current: Value }
-interface ReactRuntime {
-  useEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void;
-  useEffectEvent?<Arguments extends unknown[], Result>(callback: (...arguments_: Arguments) => Result): (...arguments_: Arguments) => Result;
-  useLayoutEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void;
-  useRef<Value>(initialValue: Value): Ref<Value>;
+function k(e) {
+  let t = (0, A.c)(36),
+    { output: r, onRenderedOutputReady: i } = e,
+    a = o(),
+    s = u(),
+    d = c(s),
+    f = l(n.lightChromeTheme),
+    p = l(n.darkChromeTheme),
+    g = l(n.codeFontSize),
+    _,
+    b,
+    w;
+  t[0] !== p || t[1] !== f || t[2] !== d
+    ? ((_ = d === `light` ? m(f, `light`) : m(p, `dark`)),
+      (b =
+        _.fonts.codeFace != null && h(_.fonts.code, _.fonts.codeFace) ? _.fonts.codeFace : void 0),
+      (w = ne(_.fonts)),
+      (t[0] = p),
+      (t[1] = f),
+      (t[2] = d),
+      (t[3] = _),
+      (t[4] = b),
+      (t[5] = w))
+    : ((_ = t[3]), (b = t[4]), (w = t[5]));
+  let T = w,
+    E = (0, P.useRef)(null),
+    D = (0, P.useRef)(null),
+    O = (0, P.useRef)(null),
+    k = (0, P.useRef)(null),
+    I = (0, P.useRef)(``),
+    L = (0, P.useRef)(a),
+    R;
+  t[6] === i
+    ? (R = t[7])
+    : ((R = (e) => {
+        if (i == null) return;
+        let t = e,
+          n = () => (Array.isArray(t) ? t : ae(t));
+        return (
+          i(n),
+          () => {
+            t = n();
+          }
+        );
+      }),
+      (t[6] = i),
+      (t[7] = R));
+  let z = (0, P.useEffectEvent)(R),
+    B,
+    V;
+  (t[8] === a
+    ? ((B = t[9]), (V = t[10]))
+    : ((B = () => {
+        L.current = a;
+      }),
+      (V = [a]),
+      (t[8] = a),
+      (t[9] = B),
+      (t[10] = V)),
+    (0, P.useLayoutEffect)(B, V));
+  let H, U;
+  (t[11] !== _ || t[12] !== d
+    ? ((H = () => {
+        let e = E.current;
+        e != null && ee(e, _, d);
+      }),
+      (U = [_, d]),
+      (t[11] = _),
+      (t[12] = d),
+      (t[13] = H),
+      (t[14] = U))
+    : ((H = t[13]), (U = t[14])),
+    (0, P.useLayoutEffect)(H, U));
+  let W;
+  t[15] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((W = () => {
+        let e = O.current,
+          t = E.current;
+        e != null &&
+          t != null &&
+          ((e.options.theme = y(t)), e.rows > 0 && e.refresh(0, e.rows - 1));
+      }),
+      (t[15] = W))
+    : (W = t[15]);
+  let G;
+  (t[16] !== _ || t[17] !== d ? ((G = [_, d]), (t[16] = _), (t[17] = d), (t[18] = G)) : (G = t[18]),
+    (0, P.useEffect)(W, G));
+  let K, q;
+  (t[19] !== T || t[20] !== g || t[21] !== b
+    ? ((q = () => {
+        let e = O.current;
+        if (e == null) return;
+        let t = !1,
+          n = null;
+        return (
+          (async () => {
+            (b != null && (await te(b)),
+              await ie(T, g),
+              !t &&
+                ((e.options.fontFamily = T),
+                (e.options.fontSize = g),
+                (n = requestAnimationFrame(() => {
+                  k.current?.fit();
+                }))));
+          })(),
+          () => {
+            ((t = !0), n != null && cancelAnimationFrame(n));
+          }
+        );
+      }),
+      (K = [T, g, b]),
+      (t[19] = T),
+      (t[20] = g),
+      (t[21] = b),
+      (t[22] = K),
+      (t[23] = q))
+    : ((K = t[22]), (q = t[23])),
+    (0, P.useEffect)(q, K));
+  let J;
+  t[24] !== T || t[25] !== g || t[26] !== z
+    ? ((J = () => {
+        let e = D.current,
+          t = E.current;
+        if (e == null || t == null) return;
+        let n = !1,
+          r = null,
+          i = new N.Terminal({
+            allowProposedApi: !0,
+            allowTransparency: !0,
+            cursorStyle: `bar`,
+            disableStdin: !0,
+            fontSize: g,
+            fontFamily: T,
+            letterSpacing: 0,
+            lineHeight: 1.2,
+            linkHandler: re,
+            theme: y(t),
+          }),
+          a = new j.FitAddon(),
+          o = () => {
+            r ??= requestAnimationFrame(() => {
+              ((r = null), i.scrollToBottom());
+            });
+          };
+        ((O.current = i),
+          (k.current = a),
+          i.loadAddon(a),
+          i.loadAddon(new M.WebLinksAddon(x)),
+          i.open(e));
+        let s = S(i, () => L.current);
+        (a.fit(), I.current.length > 0 && (i.write(C(I.current)), o()));
+        let c = new ResizeObserver(() => {
+          n || a.fit();
+        });
+        c.observe(e);
+        let l = z(i);
+        return () => {
+          (l?.(),
+            (n = !0),
+            r != null && (cancelAnimationFrame(r), (r = null)),
+            c.disconnect(),
+            (k.current = null),
+            (O.current = null),
+            s(),
+            i.dispose());
+        };
+      }),
+      (t[24] = T),
+      (t[25] = g),
+      (t[26] = z),
+      (t[27] = J))
+    : (J = t[27]);
+  let Y;
+  (t[28] !== T || t[29] !== g ? ((Y = [T, g]), (t[28] = T), (t[29] = g), (t[30] = Y)) : (Y = t[30]),
+    (0, P.useEffect)(J, Y));
+  let X, Z;
+  (t[31] === r
+    ? ((X = t[32]), (Z = t[33]))
+    : ((X = () => {
+        let e = O.current;
+        if (e == null) {
+          I.current = r;
+          return;
+        }
+        let t = I.current,
+          n = v(e);
+        if (r.startsWith(t)) {
+          let n = r.slice(t.length);
+          n.length > 0 && e.write(C(n));
+        } else (e.reset(), r.length > 0 && e.write(C(r)));
+        if (((I.current = r), !n)) return;
+        let i = requestAnimationFrame(() => {
+          e.scrollToBottom();
+        });
+        return () => {
+          cancelAnimationFrame(i);
+        };
+      }),
+      (Z = [r]),
+      (t[31] = r),
+      (t[32] = X),
+      (t[33] = Z)),
+    (0, P.useEffect)(X, Z));
+  let Q;
+  t[34] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((Q = {
+        backgroundColor: `var(--color-codex-terminal-background)`,
+        color: `var(--color-codex-terminal-foreground)`,
+      }),
+      (t[34] = Q))
+    : (Q = t[34]);
+  let $;
+  return (
+    t[35] === Symbol.for(`react.memo_cache_sentinel`)
+      ? (($ = (0, F.jsx)(`div`, {
+          "data-codex-xterm": !0,
+          ref: E,
+          className: `relative flex h-full w-full flex-col`,
+          style: Q,
+          children: (0, F.jsx)(`div`, {
+            className: `flex-1 overflow-hidden py-3 ps-3 tracking-normal`,
+            children: (0, F.jsx)(`div`, { className: `h-full w-full overflow-hidden`, ref: D }),
+          }),
+        })),
+        (t[35] = $))
+      : ($ = t[35]),
+    $
+  );
 }
-interface TerminalTheme { [key: string]: string | undefined }
-interface TerminalOptions { fontFamily?: string; fontSize?: number; theme?: TerminalTheme; [key: string]: unknown }
-interface TerminalInstance {
-  options: TerminalOptions;
-  rows: number;
-  dispose(): void;
-  loadAddon(addon: unknown): void;
-  open(element: HTMLDivElement): void;
-  refresh(start: number, end: number): void;
-  reset(): void;
-  scrollToBottom(): void;
-  write(output: string): void;
+var A, j, M, N, P, F;
+function I() {
+  return (I = e(() => {
+    ((A = t()),
+      (j = O()),
+      (M = D()),
+      (N = _()),
+      a(),
+      (P = i()),
+      g(),
+      s(),
+      d(),
+      f(),
+      p(),
+      w(),
+      b(),
+      E(),
+      T(),
+      (F = r()));
+  }))();
 }
-interface FitAddonInstance { fit(): void }
-interface ThemeDefinition { fonts: { code: string; codeFace?: string | null }; [key: string]: unknown }
-type OutputReader = () => string | string[];
-
-const shared = appSharedChunk as unknown as {
-  $3?: () => void;
-  Cz?: { lightChromeTheme: unknown; darkChromeTheme: unknown; codeFontSize: unknown };
-  I3: () => JsxRuntime;
-  e6: () => ReactRuntime;
-  wL?: () => void;
-  x_?: () => unknown;
-  y_?: () => void;
-};
-const initial = appInitialChunk as unknown as {
-  CW?: (mode: unknown) => "light" | "dark";
-  Kcn?: <Value>(setting: unknown) => Value;
-  SW?: () => unknown;
-  Vcn?: () => void;
-  bk?: () => void;
-  vk?: (element: HTMLDivElement, theme: ThemeDefinition, colorScheme: "light" | "dark") => void;
-  xW?: () => void;
-  yk?: (theme: unknown, mode: "light" | "dark") => ThemeDefinition;
-};
-const fontFamily = themeFontFamilyChunk as unknown as { t?: (family: string, face: string) => boolean };
-const fontLoader = themeFontFaceLoaderChunk as unknown as { n?: (face: string) => Promise<void>; t?: (family: string, size: number) => Promise<void> };
-const xterm = xtermWindowZoomChunk as unknown as {
-  _?: () => { Terminal: new (options: TerminalOptions) => TerminalInstance };
-  a?: (fonts: ThemeDefinition["fonts"]) => string;
-  c?: (terminal: TerminalInstance) => boolean;
-  d?: (theme: ThemeDefinition) => TerminalTheme;
-  f?: () => void;
-  h?: unknown;
-  i?: (family: string, size: number) => Promise<void>;
-  l?: (terminal: TerminalInstance) => string | string[];
-  m?: unknown;
-  n?: (terminal: TerminalInstance, getModifierState: () => unknown) => () => void;
-  o?: (output: string) => string;
-  p?: () => void;
-  s?: () => void;
-  u?: () => void;
-  v?: () => { WebLinksAddon: new (handler: unknown) => unknown };
-  y?: () => { FitAddon: new () => FitAddonInstance };
-  [key: string]: unknown;
-};
-
-const { $3: initializeSharedRuntime, Cz: settings, I3: getJsxRuntime, e6: getReactRuntime, wL: initializeSharedLinks, x_: useModifierState, y_: initializeSharedTheme } = shared;
-const { CW: resolveColorScheme, Kcn: useSetting, SW: useThemeMode, Vcn: initializeThemeState, bk: initializeThemeConfig, vk: applyTheme, xW: initializeTerminalTheme, yk: resolveTheme } = initial;
-const { t: isFontFaceAvailable } = fontFamily;
-const { n: loadFontFace, t: loadTerminalFont } = fontLoader;
-const { _: getTerminalModule, a: getCodeFontFamily, c: isScrolledToBottom, d: getTerminalTheme, f: initializeXtermTheme, h: linkHandler, i: prepareTerminalFont, l: readTerminalOutput, m: webLinkHandler, n: attachModifierState, o: normalizeTerminalOutput, p: initializeXtermCore, s: initializeXtermLinks, u: initializeXtermFit, v: getWebLinksAddonModule, y: getFitAddonModule } = xterm;
-
-let jsx: JsxRuntime;
-let React: ReactRuntime;
-let TerminalConstructor: new (options: TerminalOptions) => TerminalInstance;
-let FitAddonConstructor: new () => FitAddonInstance;
-let WebLinksAddonConstructor: new (handler: unknown) => unknown;
-let initialized = false;
-
-function initializeXtermOutputPanel(): void {
-  if (initialized) return;
-  initializeSharedRuntime?.();
-  initializeSharedLinks?.();
-  initializeSharedTheme?.();
-  initializeThemeState?.();
-  initializeThemeConfig?.();
-  initializeTerminalTheme?.();
-  initializeXtermCore?.();
-  initializeXtermTheme?.();
-  initializeXtermFit?.();
-  initializeXtermLinks?.();
-  React = getReactRuntime();
-  jsx = getJsxRuntime();
-  TerminalConstructor = getTerminalModule?.().Terminal as new (options: TerminalOptions) => TerminalInstance;
-  FitAddonConstructor = getFitAddonModule?.().FitAddon as new () => FitAddonInstance;
-  WebLinksAddonConstructor = getWebLinksAddonModule?.().WebLinksAddon as new (handler: unknown) => unknown;
-  initialized = true;
-}
-
-function XtermOutputPanel({ output, onRenderedOutputReady }: { output: string; onRenderedOutputReady?: (readOutput: OutputReader) => void | (() => void) }): unknown {
-  initializeXtermOutputPanel();
-  const modifierState = useModifierState?.();
-  const themeMode = useThemeMode?.();
-  const colorScheme = resolveColorScheme?.(themeMode) ?? "dark";
-  const lightTheme = useSetting?.<unknown>(settings?.lightChromeTheme);
-  const darkTheme = useSetting?.<unknown>(settings?.darkChromeTheme);
-  const fontSize = useSetting?.<number>(settings?.codeFontSize) ?? 12;
-  const theme = resolveTheme?.(colorScheme === "light" ? lightTheme : darkTheme, colorScheme) ?? { fonts: { code: "monospace" } };
-  const fontFace = theme.fonts.codeFace != null && isFontFaceAvailable?.(theme.fonts.code, theme.fonts.codeFace) ? theme.fonts.codeFace : undefined;
-  const codeFontFamily = getCodeFontFamily?.(theme.fonts) ?? theme.fonts.code;
-  const outerRef = React.useRef<HTMLDivElement | null>(null);
-  const terminalElementRef = React.useRef<HTMLDivElement | null>(null);
-  const terminalRef = React.useRef<TerminalInstance | null>(null);
-  const fitAddonRef = React.useRef<FitAddonInstance | null>(null);
-  const renderedOutputRef = React.useRef("");
-  const modifierStateRef = React.useRef(modifierState);
-
-  const registerReader = (terminal: TerminalInstance): void | (() => void) => {
-    if (onRenderedOutputReady == null) return;
-    let source: TerminalInstance | string[] = terminal;
-    const read = (): string | string[] => Array.isArray(source) ? source : readTerminalOutput?.(source) ?? "";
-    onRenderedOutputReady(read);
-    return () => { source = Array.isArray(read()) ? read() as string[] : [String(read())]; };
-  };
-  const stableRegisterReader = React.useEffectEvent?.(registerReader) ?? registerReader;
-
-  React.useLayoutEffect(() => { modifierStateRef.current = modifierState; }, [modifierState]);
-  React.useLayoutEffect(() => { if (outerRef.current != null) applyTheme(outerRef.current, theme, colorScheme); }, [theme, colorScheme]);
-  React.useEffect(() => {
-    const terminal = terminalRef.current;
-    if (terminal != null) { terminal.options.theme = getTerminalTheme?.(theme); if (terminal.rows > 0) terminal.refresh(0, terminal.rows - 1); }
-  }, [theme, colorScheme]);
-  React.useEffect(() => {
-    const terminal = terminalRef.current;
-    if (terminal == null) return;
-    let cancelled = false;
-    let frame: number | null = null;
-    void (async () => {
-      if (fontFace != null) await loadFontFace?.(fontFace);
-      await (prepareTerminalFont?.(codeFontFamily, fontSize) ?? loadTerminalFont?.(codeFontFamily, fontSize));
-      if (!cancelled) { terminal.options.fontFamily = codeFontFamily; terminal.options.fontSize = fontSize; frame = requestAnimationFrame(() => fitAddonRef.current?.fit()); }
-    })();
-    return () => { cancelled = true; if (frame != null) cancelAnimationFrame(frame); };
-  }, [codeFontFamily, fontSize, fontFace]);
-  React.useEffect(() => {
-    const element = terminalElementRef.current;
-    const outer = outerRef.current;
-    if (element == null || outer == null) return;
-    let disposed = false;
-    let scrollFrame: number | null = null;
-    const terminal = new TerminalConstructor({ allowProposedApi: true, allowTransparency: true, cursorStyle: "bar", disableStdin: true, fontSize, fontFamily: codeFontFamily, letterSpacing: 0, lineHeight: 1.2, linkHandler, theme: getTerminalTheme?.(theme) });
-    const fitAddon = new FitAddonConstructor();
-    const scheduleBottom = () => { if (scrollFrame == null) scrollFrame = requestAnimationFrame(() => { scrollFrame = null; terminal.scrollToBottom(); }); };
-    terminalRef.current = terminal;
-    fitAddonRef.current = fitAddon;
-    terminal.loadAddon(fitAddon);
-    terminal.loadAddon(new WebLinksAddonConstructor(webLinkHandler));
-    terminal.open(element);
-    const detachModifierState = attachModifierState?.(terminal, () => modifierStateRef.current) ?? (() => undefined);
-    fitAddon.fit();
-    if (renderedOutputRef.current.length > 0) { terminal.write(normalizeTerminalOutput?.(renderedOutputRef.current) ?? renderedOutputRef.current); scheduleBottom(); }
-    const observer = new ResizeObserver(() => { if (!disposed) fitAddon.fit(); });
-    observer.observe(element);
-    const unregisterReader = stableRegisterReader(terminal);
-    return () => {
-      if (typeof unregisterReader === "function") unregisterReader();
-      disposed = true;
-      if (scrollFrame != null) cancelAnimationFrame(scrollFrame);
-      observer.disconnect();
-      fitAddonRef.current = null;
-      terminalRef.current = null;
-      detachModifierState();
-      terminal.dispose();
-    };
-  }, [codeFontFamily, fontSize]);
-  React.useEffect(() => {
-    const terminal = terminalRef.current;
-    if (terminal == null) { renderedOutputRef.current = output; return; }
-    const previous = renderedOutputRef.current;
-    const wasAtBottom = isScrolledToBottom?.(terminal) ?? true;
-    if (output.startsWith(previous)) {
-      const suffix = output.slice(previous.length);
-      if (suffix.length > 0) terminal.write(normalizeTerminalOutput?.(suffix) ?? suffix);
-    } else {
-      terminal.reset();
-      if (output.length > 0) terminal.write(normalizeTerminalOutput?.(output) ?? output);
-    }
-    renderedOutputRef.current = output;
-    if (wasAtBottom) { const frame = requestAnimationFrame(() => terminal.scrollToBottom()); return () => cancelAnimationFrame(frame); }
-  }, [output]);
-
-  return jsx.jsx("div", { "data-codex-xterm": true, ref: outerRef, className: "relative flex h-full w-full flex-col", style: { backgroundColor: "var(--color-codex-terminal-background)", color: "var(--color-codex-terminal-foreground)" }, children: jsx.jsx("div", { className: "flex-1 overflow-hidden py-3 ps-3 tracking-normal", children: jsx.jsx("div", { className: "h-full w-full overflow-hidden", ref: terminalElementRef }) }) });
-}
-
-initializeXtermOutputPanel();
-export { XtermOutputPanel };
+I();
+export { k as XtermOutputPanel };

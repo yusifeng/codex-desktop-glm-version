@@ -1,61 +1,78 @@
-// Reaction-rate-over-time learning model using concentration tangents.
-import "@rchunk/rolldown-runtime";
-
-type ObservedSpecies = "reactant" | "product";
-interface ReactionRateValues { observed_species?: unknown; selectedTimeMinutes?: number | null }
-
-const reactionRateType = "REACTION_RATE_OVER_TIME";
-const reactionRateThumbnail = "reaction-rate-over-time-v1";
-const reactionRateParameters = { observed_species: { kind: "enum", defaultValue: "reactant" as ObservedSpecies, allowedValues: ["reactant", "product"] as ObservedSpecies[] } };
-const reactionRateDefinition = { type: reactionRateType, version: 3, thumbnailAssetKey: reactionRateThumbnail, parameters: reactionRateParameters };
-const observedSpeciesParameter = reactionRateDefinition.parameters.observed_species;
-const maximumTime = 20;
-const timeConstant = 7;
-const guideRun = 2;
-const tangentRun = 4;
-const selectedTimeControl = { min: 0, max: maximumTime, step: 0.5, defaultValue: 5 };
-const defaultReactionRateValues = { observed_species: observedSpeciesParameter.defaultValue, selectedTimeMinutes: selectedTimeControl.defaultValue };
-const isObservedSpecies = (value: unknown): value is ObservedSpecies => value === "reactant" || value === "product";
-const finiteOr = (value: number | null | undefined, fallback: number): number => typeof value === "number" && Number.isFinite(value) ? value : fallback;
-const concentrationAt = (species: ObservedSpecies, time: number): number => {
-  const remainingReactant = Math.exp(-time / timeConstant);
-  return species === "reactant" ? remainingReactant : 1 - remainingReactant;
-};
-const normalizeReactionRateValues = (values: ReactionRateValues) => ({
-  observed_species: isObservedSpecies(values.observed_species) ? values.observed_species : defaultReactionRateValues.observed_species,
-  selectedTimeMinutes: Math.min(selectedTimeControl.max, Math.max(selectedTimeControl.min, finiteOr(values.selectedTimeMinutes, defaultReactionRateValues.selectedTimeMinutes))),
-});
-const buildReactionConcentrationCurve = (species: ObservedSpecies) => Array.from({ length: 81 }, (_unused, index) => {
-  const time = maximumTime * index / 80;
-  return { x: time, y: concentrationAt(species, time) };
-});
-
-function deriveReactionRateState(values: ReactionRateValues) {
-  const normalized = normalizeReactionRateValues(values);
-  const selectedTime = normalized.selectedTimeMinutes;
-  const concentration = concentrationAt(normalized.observed_species, selectedTime);
-  const rateMagnitude = Math.exp(-selectedTime / timeConstant) / timeConstant;
-  const signedGradient = normalized.observed_species === "reactant" ? -rateMagnitude : rateMagnitude;
-  const tangentAt = (time: number): number => concentration + signedGradient * (time - selectedTime);
-  const segmentStart = (run: number): number => Math.min(Math.max(selectedTime - run / 2, selectedTimeControl.min), selectedTimeControl.max - run);
-  const tangentStartTime = segmentStart(tangentRun);
-  const guideStartTime = segmentStart(guideRun);
-  const tangentStart = { x: tangentStartTime, y: tangentAt(tangentStartTime) };
-  const tangentEnd = { x: tangentStartTime + tangentRun, y: tangentAt(tangentStartTime + tangentRun) };
-  const guideStart = { x: guideStartTime, y: tangentAt(guideStartTime) };
-  const guideEnd = { x: guideStartTime + guideRun, y: tangentAt(guideStartTime + guideRun) };
-  return { values: normalized, concentration, rateMagnitude, signedGradient, tangentStart, tangentEnd, guideStart, guideEnd, guideRun, guideRise: guideEnd.y - guideStart.y };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `REACTION_RATE_OVER_TIME`),
+      (n = `reaction-rate-over-time-v1`),
+      (r = {
+        observed_species: {
+          kind: `enum`,
+          defaultValue: `reactant`,
+          allowedValues: [`reactant`, `product`],
+        },
+      }),
+      (i = { type: t, version: 3, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-function initializeReactionRateSchema(): void {}
-function initializeReactionRateModel(): void {}
-
-export {
-  initializeReactionRateModel as a,
-  buildReactionConcentrationCurve as i,
-  selectedTimeControl as n,
-  initializeReactionRateSchema as o,
-  deriveReactionRateState as r,
-  reactionRateDefinition as s,
-  defaultReactionRateValues as t,
-};
+var o, s, c, l, u, d, f, p, m, h, g, _, v;
+function y() {
+  return (y = e(() => {
+    (a(),
+      (o = i.parameters.observed_species),
+      (s = 20),
+      (c = 7),
+      (l = 2),
+      (u = 4),
+      (d = { min: 0, max: s, step: 0.5, defaultValue: 5 }),
+      (f = { observed_species: o.defaultValue, selectedTimeMinutes: d.defaultValue }),
+      (p = (e) => e === `reactant` || e === `product`),
+      (m = (e, t) => (typeof e == `number` && Number.isFinite(e) ? e : t)),
+      (h = (e, t) => {
+        let n = Math.exp(-t / c);
+        return e === `reactant` ? n : 1 - n;
+      }),
+      (g = (e) => ({
+        observed_species: p(e.observed_species) ? e.observed_species : f.observed_species,
+        selectedTimeMinutes: Math.min(
+          d.max,
+          Math.max(d.min, m(e.selectedTimeMinutes, f.selectedTimeMinutes)),
+        ),
+      })),
+      (_ = (e) =>
+        Array.from({ length: 81 }, (t, n) => {
+          let r = (s * n) / 80;
+          return { x: r, y: h(e, r) };
+        })),
+      (v = (e) => {
+        let t = g(e),
+          n = t.selectedTimeMinutes,
+          r = h(t.observed_species, n),
+          i = Math.exp(-n / c) / c,
+          a = t.observed_species === `reactant` ? -i : i,
+          o = (e) => r + a * (e - n),
+          s = (e) => Math.min(Math.max(n - e / 2, d.min), d.max - e),
+          f = s(u),
+          p = f + u,
+          m = s(l),
+          _ = m + l,
+          v = { x: f, y: o(f) },
+          y = { x: p, y: o(p) },
+          b = { x: m, y: o(m) },
+          x = { x: _, y: o(_) };
+        return {
+          values: t,
+          concentration: r,
+          rateMagnitude: i,
+          signedGradient: a,
+          tangentStart: v,
+          tangentEnd: y,
+          guideStart: b,
+          guideEnd: x,
+          guideRun: l,
+          guideRise: x.y - b.y,
+        };
+      }));
+  }))();
+}
+export { y as a, _ as i, d as n, a as o, v as r, i as s, f as t };

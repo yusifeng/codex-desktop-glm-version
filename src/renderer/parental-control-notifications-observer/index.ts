@@ -1,70 +1,77 @@
-// Account-scoped parental-control notification observer. Release chunk: notifications-3700d6e3cd47.js.
-import * as SharedChunk from "@rchunk/app-shared";
-import * as InitialChunk from "@rchunk/app-initial";
-
-interface AccountAccess { accountId: string; status: string; userId: string }
-interface Getter { (signal: unknown): unknown }
-interface WatchScope { watch(factory: (context: { get: Getter }) => void | (() => void)): () => void }
-interface SharedRuntime {
-  FX(): void;
-  H3(): void;
-  Q3: { warning(message: string): void };
-  QI(): void;
-  Z3(): void;
-  ZI: unknown;
-  sZ(signal: unknown, read: (context: { get: Getter }) => unknown, options?: { isEqual?(left: unknown, right: unknown): boolean }): unknown;
-}
-interface InitialRuntime { bL: unknown; xL(): void }
-
-const shared = SharedChunk as unknown as SharedRuntime;
-const initial = InitialChunk as unknown as InitialRuntime;
-let accountSignal: unknown;
-let initialized = false;
-
-function initialize(): void {
-  if (initialized) return;
-  initialized = true;
-  shared.FX();
-  shared.QI();
-  initial.xL();
-  shared.Z3();
-  shared.H3();
-  accountSignal = shared.sZ(
-    shared.ZI,
-    ({ get }) => {
-      const access = get(initial.bL) as AccountAccess;
-      return access.status === "allowed" ? { accountId: access.accountId, userId: access.userId } : null;
-    },
-    {
-      isEqual: (left, right) => {
-        const a = left as { accountId?: string; userId?: string } | null;
-        const b = right as { accountId?: string; userId?: string } | null;
-        return a?.accountId === b?.accountId && a?.userId === b?.userId;
-      },
-    },
-  );
-}
-
-function observeParentalControlNotifications(scope: WatchScope): () => void {
-  initialize();
-  return scope.watch(({ get }) => {
-    const account = get(accountSignal) as { accountId: string; userId: string } | null;
-    if (account == null) return;
-    let cancelled = false;
-    let stop: (() => void) | undefined;
-    void import("@rchunk/parental-control-notifications-runtime")
-      .then(({ listenForParentalControlNotifications }) => {
-        if (!cancelled) stop = listenForParentalControlNotifications(scope, account.userId, account.accountId);
-      })
-      .catch(() => {
-        if (!cancelled) shared.Q3.warning("chatgpt_family_notifications_initialization_failed");
-      });
-    return () => {
-      cancelled = true;
-      stop?.();
-    };
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/parental-control-notifications-runtime",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/settings-parental-presentation",
+      "@rchunk/u18-banner-logging",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  FX as t,
+  H3 as n,
+  Q3 as r,
+  QI as i,
+  V3 as a,
+  Z3 as o,
+  ZI as s,
+  sZ as c,
+} from "@rchunk/app-shared";
+import { bL as l, xL as u } from "@rchunk/app-initial";
+function d(e) {
+  return e.watch(({ get: t }) => {
+    let n = t(f);
+    if (n == null) return;
+    let i = !1,
+      o;
+    return (
+      a(
+        async () => {
+          let { listenForParentalControlNotifications: e } = await import(
+            `@rchunk/parental-control-notifications-runtime`
+          );
+          return { listenForParentalControlNotifications: e };
+        },
+        __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7]),
+        import.meta.url,
+      )
+        .then(({ listenForParentalControlNotifications: t }) => {
+          i || (o = t(e, n.userId, n.accountId));
+        })
+        .catch(() => {
+          i || r.warning(`chatgpt_family_notifications_initialization_failed`);
+        }),
+      () => {
+        ((i = !0), o?.());
+      }
+    );
   });
 }
-
-initialize();
-export { observeParentalControlNotifications };
+var f;
+function p() {
+  return (p = e(() => {
+    (t(),
+      i(),
+      u(),
+      o(),
+      n(),
+      (f = c(
+        s,
+        ({ get: e }) => {
+          let t = e(l);
+          return t.status === `allowed` ? { userId: t.userId, accountId: t.accountId } : null;
+        },
+        { isEqual: (e, t) => e?.userId === t?.userId && e?.accountId === t?.accountId },
+      )));
+  }))();
+}
+p();
+export { d as observeParentalControlNotifications };

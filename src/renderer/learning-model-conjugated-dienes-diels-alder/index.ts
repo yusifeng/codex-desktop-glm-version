@@ -1,35 +1,44 @@
-// Conjugated-diene conformation and progression through a Diels-Alder reaction.
-import "@rchunk/rolldown-runtime";
-
-type DielsAlderExample = "butadiene-and-ethene" | "butadiene-and-methyl-vinyl-ketone" | "butadiene-and-maleic-anhydride";
-type DieneConformation = "s-cis" | "s-trans";
-interface DielsAlderValues { example?: string | null; conformation?: string | null; stage?: number | null; product?: string }
-
-const dielsAlderType = "CONJUGATED_DIENES_AND_DIELS_ALDER";
-const dielsAlderThumbnail = "conjugated-dienes-and-diels-alder-v1";
-const dielsAlderParameters = {
-  example: { kind: "enum" as const, defaultValue: "butadiene-and-ethene" as DielsAlderExample, allowedValues: ["butadiene-and-ethene", "butadiene-and-methyl-vinyl-ketone", "butadiene-and-maleic-anhydride"] as DielsAlderExample[] },
-};
-const dielsAlderSpecification = { type: dielsAlderType, version: 2, thumbnailAssetKey: dielsAlderThumbnail, parameters: dielsAlderParameters };
-const examples = dielsAlderSpecification.parameters.example.allowedValues;
-const defaultExample = dielsAlderSpecification.parameters.example.defaultValue;
-const products: Record<DielsAlderExample, string> = {
-  "butadiene-and-ethene": "cyclohexene",
-  "butadiene-and-maleic-anhydride": "cyclohexene anhydride",
-  "butadiene-and-methyl-vinyl-ketone": "acetylcyclohexene",
-};
-const defaultDielsAlderValues = () => ({ conformation: "s-cis" as DieneConformation, example: defaultExample, stage: 1 });
-const isExample = (value: unknown): value is DielsAlderExample => examples.some((example) => example === value);
-const normalizeDielsAlderValues = (values: DielsAlderValues) => {
-  const example = isExample(values.example) ? values.example : defaultExample;
-  const conformation: DieneConformation = values.conformation === "s-trans" ? "s-trans" : "s-cis";
-  const stage = Math.min(2, Math.max(0, Math.round(Number.isFinite(values.stage) ? values.stage ?? 1 : 1)));
-  return { conformation, example, product: products[example], stage: conformation === "s-trans" ? 0 : stage };
-};
-const setDieneConformation = (values: DielsAlderValues, conformation: DieneConformation) => ({ ...values, conformation, stage: conformation === "s-trans" ? 0 : values.stage });
-const setDielsAlderStage = (values: DielsAlderValues, stage: number) => ({ ...values, conformation: stage > 0 ? "s-cis" as DieneConformation : values.conformation, stage });
-
-function initializeDielsAlderSpecification(): void {}
-function initializeDielsAlderModel(): void {}
-
-export { setDielsAlderStage as a, setDieneConformation as i, defaultDielsAlderValues as n, initializeDielsAlderSpecification as o, initializeDielsAlderModel as r, dielsAlderSpecification as s, normalizeDielsAlderValues as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `CONJUGATED_DIENES_AND_DIELS_ALDER`),
+      (n = `conjugated-dienes-and-diels-alder-v1`),
+      (r = {
+        example: {
+          kind: `enum`,
+          defaultValue: `butadiene-and-ethene`,
+          allowedValues: [
+            `butadiene-and-ethene`,
+            `butadiene-and-methyl-vinyl-ketone`,
+            `butadiene-and-maleic-anhydride`,
+          ],
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    (a(),
+      (o = i.parameters.example.allowedValues),
+      (s = i.parameters.example.defaultValue),
+      (c = {
+        "butadiene-and-ethene": `cyclohexene`,
+        "butadiene-and-maleic-anhydride": `cyclohexene anhydride`,
+        "butadiene-and-methyl-vinyl-ketone": `acetylcyclohexene`,
+      }),
+      (l = () => ({ conformation: `s-cis`, example: s, stage: 1 })),
+      (u = (e) => {
+        let t = o.includes(e.example ?? ``) ? e.example : s,
+          n = e.conformation === `s-trans` ? `s-trans` : `s-cis`,
+          r = Math.min(2, Math.max(0, Math.round(Number.isFinite(e.stage) ? e.stage : 1)));
+        return { conformation: n, example: t, product: c[t], stage: n === `s-trans` ? 0 : r };
+      }),
+      (d = (e, t) => ({ ...e, conformation: t, stage: t === `s-trans` ? 0 : e.stage })),
+      (f = (e, t) => ({ ...e, conformation: t > 0 ? `s-cis` : e.conformation, stage: t })));
+  }))();
+}
+export { f as a, d as i, l as n, a as o, p as r, i as s, u as t };

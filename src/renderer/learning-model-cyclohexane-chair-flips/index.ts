@@ -1,21 +1,33 @@
-// Cyclohexane chair-flip model: classify substituents as axial or equatorial.
-import "@rchunk/rolldown-runtime";
-
-type Chair = "A" | "B";
-type CyclohexaneExample = "methylcyclohexane" | "cis-1,2-dimethylcyclohexane" | "trans-1,2-dimethylcyclohexane";
-interface ChairInput { example?: string; flipped?: boolean }
-interface Substituent { carbon: number; orientation: "up" | "down" }
-
-const cyclohexaneExamples: readonly CyclohexaneExample[] = ["methylcyclohexane", "cis-1,2-dimethylcyclohexane", "trans-1,2-dimethylcyclohexane"];
-const isExample = (value: string | undefined): value is CyclohexaneExample => cyclohexaneExamples.some((example) => example === value);
-const normalizeChairInput = (input: ChairInput) => ({ example: isExample(input.example) ? input.example : "methylcyclohexane" as CyclohexaneExample, flipped: input.flipped === true });
-const substituentsForExample = (example: CyclohexaneExample): Substituent[] => example === "methylcyclohexane"
-  ? [{ carbon: 1, orientation: "up" }]
-  : [{ carbon: 1, orientation: "up" }, { carbon: 2, orientation: example === "cis-1,2-dimethylcyclohexane" ? "up" : "down" }];
-const axialOrientation = (carbon: number, chair: Chair): "up" | "down" => carbon % 2 === 1 === (chair === "A") ? "up" : "down";
-const positionSubstituents = (example: CyclohexaneExample, chair: Chair) => substituentsForExample(example).map((substituent) => ({ ...substituent, position: axialOrientation(substituent.carbon, chair) === substituent.orientation ? "axial" as const : "equatorial" as const }));
-const countAxialSubstituents = (substituents: ReturnType<typeof positionSubstituents>): number => substituents.filter(({ position }) => position === "axial").length;
-const exampleClass = (example: CyclohexaneExample): "mono" | "cis" | "trans" => example === "methylcyclohexane" ? "mono" : example === "cis-1,2-dimethylcyclohexane" ? "cis" : "trans";
-function initializeCyclohexaneChairFlipsModel(): void {}
-
-export { initializeCyclohexaneChairFlipsModel as a, axialOrientation as i, positionSubstituents as n, exampleClass as o, countAxialSubstituents as r, normalizeChairInput as s, cyclohexaneExamples as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s;
+function c() {
+  return (c = e(() => {
+    ((t = [`methylcyclohexane`, `cis-1,2-dimethylcyclohexane`, `trans-1,2-dimethylcyclohexane`]),
+      (n = (e) => ({
+        example: t.includes(e.example) ? e.example : `methylcyclohexane`,
+        flipped: e.flipped === !0,
+      })),
+      (r = (e) =>
+        e === `methylcyclohexane`
+          ? [{ carbon: 1, orientation: `up` }]
+          : [
+              { carbon: 1, orientation: `up` },
+              { carbon: 2, orientation: e === `cis-1,2-dimethylcyclohexane` ? `up` : `down` },
+            ]),
+      (i = (e, t) => ((e % 2 == 1) == (t === `A`) ? `up` : `down`)),
+      (a = (e, t) =>
+        r(e).map((e) => ({
+          ...e,
+          position: i(e.carbon, t) === e.orientation ? `axial` : `equatorial`,
+        }))),
+      (o = (e) => e.filter(({ position: e }) => e === `axial`).length),
+      (s = (e) =>
+        e === `methylcyclohexane`
+          ? `mono`
+          : e === `cis-1,2-dimethylcyclohexane`
+            ? `cis`
+            : `trans`));
+  }))();
+}
+export { c as a, i, a as n, s as o, o as r, n as s, t };

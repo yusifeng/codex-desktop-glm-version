@@ -1,11 +1,42 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/app-primary";
-interface DownloadableFile { downloadUrl?: string; file_name: string; requestHeaders?: Record<string, string> }
-async function fetchFileResponse(file: DownloadableFile, signal?: AbortSignal): Promise<Response> { if (file.downloadUrl == null) throw new Error("File download URL unavailable"); return fetch(file.downloadUrl, { headers: file.requestHeaders, signal }); }
-async function readFileBytes(file: DownloadableFile, signal?: AbortSignal): Promise<Uint8Array> { return new Uint8Array(await (await fetchFileResponse(file, signal)).arrayBuffer()); }
-async function readFileText(file: DownloadableFile, signal?: AbortSignal): Promise<string> { return new TextDecoder().decode(await readFileBytes(file, signal)); }
-async function downloadFile(file: DownloadableFile): Promise<void> { const response = await fetchFileResponse(file); const blobUrl = URL.createObjectURL(await response.blob()); const anchor = document.createElement("a"); anchor.href = blobUrl; anchor.download = file.file_name; anchor.rel = "noopener"; document.body.appendChild(anchor); anchor.click(); anchor.remove(); window.setTimeout(() => URL.revokeObjectURL(blobUrl), 0); }
-function initialize(): void {}
-export { initialize as a, readFileText as i, fetchFileResponse as n, readFileBytes as r, downloadFile as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { II as t, RI as n } from "@rchunk/app-shared";
+import { BGt as r, HGt as i, bz as a } from "@rchunk/app-initial";
+import { Qd as o, Yd as s, Zd as c } from "@rchunk/app-primary";
+async function l(e, t) {
+  return r(await s(e, { showInline: !0 }), t);
+}
+async function u(e, t) {
+  return new TextDecoder().decode(await d(e, t));
+}
+async function d(e, t) {
+  return new Uint8Array(await (await l(e, t)).arrayBuffer());
+}
+async function f(e) {
+  let t = e.provider != null || a(e.file_id) != null ? await o(e) : e,
+    n = await s(t);
+  if (n.requestHeaders == null) {
+    m(n.downloadUrl, p(t));
+    return;
+  }
+  let i = URL.createObjectURL(await r(n));
+  (m(i, p(t)), window.setTimeout(() => URL.revokeObjectURL(i), 0));
+}
+function p(e) {
+  return t(e.file_name) || e.file_name;
+}
+function m(e, t) {
+  let n = document.createElement(`a`);
+  ((n.href = e),
+    (n.download = t),
+    (n.rel = `noopener`),
+    document.body.appendChild(n),
+    n.click(),
+    n.remove());
+}
+function h() {
+  return (h = e(() => {
+    (i(), n(), c());
+  }))();
+}
+export { h as a, u as i, l as n, d as r, f as t };

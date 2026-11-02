@@ -1,14 +1,82 @@
-import "@rchunk/rolldown-runtime";
-const petAssets = Object.freeze({
-  bsod: "bsod-spritesheet-v5-cc54136ce042.webp",
-  codex: "codex-spritesheet-v6-51045ae208c0.webp",
-  dewey: "dewey-spritesheet-v5-f5285016f310.webp",
-  fireball: "fireball-spritesheet-v5-9c2a4146d3f9.webp",
-  hoots: "hoots-spritesheet-v8-21cacd193ace.webp",
-  "null-signal": "null-signal-spritesheet-v7-1e7dbf89200f.webp",
-  rocky: "rocky-spritesheet-v5-97b5d14cdd54.webp",
-  seedy: "seedy-spritesheet-v10-0f6f906a2aec.webp",
-  stacky: "stacky-spritesheet-v6-18d0359c82af.webp",
-});
-function initializePetAssets(): void {}
-export { initializePetAssets as n, petAssets as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t;
+function n() {
+  return (n = e(() => {
+    t = `` + new URL(`bsod-spritesheet-v5-cc54136ce042.webp`, import.meta.url).href;
+  }))();
+}
+var r;
+function i() {
+  return (i = e(() => {
+    r = `` + new URL(`codex-spritesheet-v6-51045ae208c0.webp`, import.meta.url).href;
+  }))();
+}
+var a;
+function o() {
+  return (o = e(() => {
+    a = `` + new URL(`dewey-spritesheet-v5-f5285016f310.webp`, import.meta.url).href;
+  }))();
+}
+var s;
+function c() {
+  return (c = e(() => {
+    s = `` + new URL(`fireball-spritesheet-v5-9c2a4146d3f9.webp`, import.meta.url).href;
+  }))();
+}
+var l;
+function u() {
+  return (u = e(() => {
+    l = `` + new URL(`hoots-spritesheet-v8-21cacd193ace.webp`, import.meta.url).href;
+  }))();
+}
+var d;
+function f() {
+  return (f = e(() => {
+    d = `` + new URL(`null-signal-spritesheet-v7-1e7dbf89200f.webp`, import.meta.url).href;
+  }))();
+}
+var p;
+function m() {
+  return (m = e(() => {
+    p = `` + new URL(`rocky-spritesheet-v5-97b5d14cdd54.webp`, import.meta.url).href;
+  }))();
+}
+var h;
+function g() {
+  return (g = e(() => {
+    h = `` + new URL(`seedy-spritesheet-v10-0f6f906a2aec.webp`, import.meta.url).href;
+  }))();
+}
+var _;
+function v() {
+  return (v = e(() => {
+    _ = `` + new URL(`stacky-spritesheet-v6-18d0359c82af.webp`, import.meta.url).href;
+  }))();
+}
+var y;
+function b() {
+  return (b = e(() => {
+    (n(),
+      i(),
+      o(),
+      c(),
+      u(),
+      f(),
+      m(),
+      g(),
+      v(),
+      (y = {
+        bsod: t,
+        codex: r,
+        dewey: a,
+        fireball: s,
+        hoots: l,
+        "null-signal": d,
+        rocky: p,
+        seedy: h,
+        stacky: _,
+      }));
+  }))();
+}
+export { b as n, y as t };

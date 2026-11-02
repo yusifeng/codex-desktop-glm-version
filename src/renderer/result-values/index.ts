@@ -1,239 +1,253 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeCompilerRuntime,
-  $O as staleTimes,
-  BX as useScopedQuery,
-  FX as initializeMaitai,
-  HX as useSignalValue,
-  I3 as getJsxRuntime,
-  K2 as initializeInternationalization,
-  QI as initializeScope,
-  QX as createQueryFamily,
-  Y2 as FormattedMessage,
-  ZI as appScope,
-  ek as initializeQueryRuntime,
-  type JsxRuntime,
+  $3 as t,
+  $O as n,
+  BX as r,
+  FX as i,
+  HX as a,
+  I3 as o,
+  K2 as s,
+  QI as c,
+  QX as l,
+  Y2 as u,
+  ZI as d,
+  ek as f,
+  yI as p,
 } from "@rchunk/app-shared";
 import {
-  Sun as initializeWorkspaceAccount,
-  mnt as initializeEnvironmentConfigs,
-  mun as workspaceIdSignal,
-  pnt as desktopServices,
-  rht as initializeWorkspaceQuery,
-  uht as useWorkspace,
+  Sun as m,
+  mnt as h,
+  mun as g,
+  pnt as _,
+  rht as v,
+  uht as y,
 } from "@rchunk/app-initial";
-
-type NetworkPolicy =
-  | { type: "disabled" }
-  | { type: "unrestricted" }
-  | {
-      type: "restricted";
-      egress_rules: Array<{ host: string }>;
-      presets?: string[];
-    };
-interface OutboundIdentityConfiguration {
-  accountId: string;
-  configId: string;
-  userId: string;
+var b;
+function x() {
+  return (x = e(() => {
+    (i(),
+      h(),
+      c(),
+      f(),
+      (b = l(d, (e) => {
+        let t = _?.environmentConfigs;
+        return {
+          queryKey: [`environment-outbound-identity`, e?.accountId, e?.userId, e?.configId],
+          enabled: t != null && e != null,
+          staleTime: n.FIVE_SECONDS,
+          refetchOnMount: `always`,
+          retry: !1,
+          queryFn: async () => {
+            try {
+              var n = p();
+              if (t == null || e == null) throw Error(`Outbound identity is unavailable`);
+              let r = n.u(
+                await t.listOutboundIdentityConnections({
+                  accountId: e.accountId,
+                  userId: e.userId,
+                  configId: e.configId,
+                }),
+              );
+              return r.ok ? { ok: !0, data: r.data } : { ok: !1, error: r.error, status: r.status };
+            } catch (e) {
+              n.e = e;
+            } finally {
+              n.d();
+            }
+          },
+        };
+      })));
+  }))();
 }
-interface OutboundIdentityRequirement {
-  connection_id: string;
-}
-interface EnvironmentConfigsService {
-  listOutboundIdentityConnections(
-    input: OutboundIdentityConfiguration,
-  ): Promise<unknown>;
-}
-
-const once = onceExport as (initializer: () => void) => () => void;
-let jsx: JsxRuntime;
-let outboundIdentityQuery: any;
-
-const initializeOutboundIdentityQuery = once(() => {
-  initializeMaitai();
-  initializeEnvironmentConfigs();
-  initializeScope();
-  initializeQueryRuntime();
-  outboundIdentityQuery = createQueryFamily(
-    appScope,
-    (configuration: OutboundIdentityConfiguration | null | undefined) => {
-      const environmentConfigs = (
-        desktopServices as unknown as {
-          environmentConfigs?: EnvironmentConfigsService;
-        }
-      )?.environmentConfigs;
-      return {
-        queryKey: [
-          "environment-outbound-identity",
-          configuration?.accountId,
-          configuration?.userId,
-          configuration?.configId,
-        ],
-        enabled: environmentConfigs != null && configuration != null,
-        staleTime: staleTimes.FIVE_SECONDS,
-        refetchOnMount: "always",
-        retry: false,
-        queryFn: async () => {
-          if (environmentConfigs == null || configuration == null)
-            throw new Error("Outbound identity is unavailable");
-          const response =
-            await environmentConfigs.listOutboundIdentityConnections(
-              configuration,
-            );
-          const parsed = response as {
-            ok: boolean;
-            data?: unknown;
-            error?: unknown;
-            status?: number;
-          };
-          return parsed.ok
-            ? { ok: true, data: parsed.data }
-            : { ok: false, error: parsed.error, status: parsed.status };
-        },
-      };
-    },
+function S(e) {
+  let t = (0, D.c)(2),
+    { script: n } = e,
+    r;
+  return (
+    t[0] === n
+      ? (r = t[1])
+      : ((r = n?.trim()
+          ? (0, O.jsx)(u, {
+              id: `environmentSetup.result.script.configured`,
+              defaultMessage: `Configured`,
+              description: `Summary indicating that an environment install script or start skill contains non-whitespace content; this does not indicate review or validation`,
+            })
+          : (0, O.jsx)(u, {
+              id: `restricted.environmentSetup.result.script.empty`,
+              defaultMessage: `Not set`,
+              description: `Summary for an empty environment install script or start skill`,
+            })),
+        (t[0] = n),
+        (t[1] = r)),
+    r
   );
-});
-
-function ScriptConfiguredValue({ script }: { script?: string }): unknown {
-  return script?.trim()
-    ? jsx.jsx(FormattedMessage, {
-        id: "environmentSetup.result.script.configured",
-        defaultMessage: "Configured",
-        description:
-          "Summary indicating that an environment install script or start skill contains non-whitespace content; this does not indicate review or validation",
-      })
-    : jsx.jsx(FormattedMessage, {
-        id: "restricted.environmentSetup.result.script.empty",
-        defaultMessage: "Not set",
-        description:
-          "Summary for an empty environment install script or start skill",
-      });
 }
-
-function NetworkPolicyValue({ policy }: { policy: NetworkPolicy }): unknown {
-  if (policy.type === "disabled")
-    return jsx.jsx(FormattedMessage, {
-      id: "restricted.environmentSetup.result.network.disabled",
-      defaultMessage: "Disabled",
-      description:
-        "Value shown when networking is disabled for an environment setup result",
-    });
-  if (policy.type === "unrestricted")
-    return jsx.jsx(FormattedMessage, {
-      id: "restricted.environmentSetup.result.network.unrestricted",
-      defaultMessage: "Unrestricted",
-      description:
-        "Summary for an environment that allows unrestricted network access",
-    });
-  const domainCount = new Set(policy.egress_rules.map(({ host }) => host)).size;
-  if (policy.presets?.includes("package_managers")) {
-    return domainCount > 0
-      ? jsx.jsx(FormattedMessage, {
-          id: "restricted.environmentSetup.result.network.packageManagersWithDomains",
-          defaultMessage:
-            "Package managers + {count, plural, one {# allowed domain} other {# allowed domains}}",
-          description:
-            "Network summary for the package-manager preset plus separately allowed domains; the count excludes domains supplied by the preset",
-          values: { count: domainCount },
-        })
-      : jsx.jsx(FormattedMessage, {
-          id: "restricted.environmentSetup.result.network.packageManagers",
-          defaultMessage: "Package managers",
-          description:
-            "Network summary when only the package-manager preset is allowed",
-        });
+function C(e) {
+  let t = (0, D.c)(8),
+    { policy: n } = e;
+  if (n.type === `disabled`) {
+    let e;
+    return (
+      t[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, O.jsx)(u, {
+            id: `restricted.environmentSetup.result.network.disabled`,
+            defaultMessage: `Disabled`,
+            description: `Value shown when networking is disabled for an environment setup result`,
+          })),
+          (t[0] = e))
+        : (e = t[0]),
+      e
+    );
   }
-  return jsx.jsx(FormattedMessage, {
-    id: "restricted.environmentSetup.result.network.domains",
-    defaultMessage:
-      "{count, plural, one {# allowed domain} other {# allowed domains}}",
-    description:
-      "Number of explicitly allowed domains in a restricted environment network policy without presets",
-    values: { count: domainCount },
-  });
-}
-
-function OrganizationAccessValue({
-  detail = false,
-}: {
-  detail?: boolean;
-}): unknown {
-  const { data: workspace } = useWorkspace();
-  const workspaceId = useSignalValue(workspaceIdSignal);
-  const workspaceName =
-    workspace?.id === workspaceId ? workspace.name?.trim() : undefined;
-  if (detail) {
-    return workspaceName
-      ? jsx.jsx(FormattedMessage, {
-          id: "restricted.environmentSetup.access.organizationDescriptionNamed",
-          defaultMessage: "Everyone in {workspaceName} can access",
-          description:
-            "Help text below the organization access option in environment onboarding. workspaceName is the authenticated workspace's display name; selecting the option lets its members use the environment",
-          values: { workspaceName },
-        })
-      : jsx.jsx(FormattedMessage, {
-          id: "restricted.environmentSetup.access.organizationDescriptionFallback",
-          defaultMessage: "Everyone in this workspace can access",
-          description:
-            "Help text below the organization access option in environment onboarding while the authenticated workspace name is unavailable; selecting the option lets workspace members use the environment",
-        });
+  if (n.type === `unrestricted`) {
+    let e;
+    return (
+      t[1] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, O.jsx)(u, {
+            id: `restricted.environmentSetup.result.network.unrestricted`,
+            defaultMessage: `Unrestricted`,
+            description: `Summary for an environment that allows unrestricted network access`,
+          })),
+          (t[1] = e))
+        : (e = t[1]),
+      e
+    );
   }
-  return workspaceName
-    ? jsx.jsx(FormattedMessage, {
-        id: "restricted.environmentSetup.access.organizationName",
-        defaultMessage: "Everyone at {workspaceName}",
-        description:
-          "Short visibility option in environment onboarding, settings, task summary, and result. workspaceName is the authenticated workspace's display name; the other option is private access",
-        values: { workspaceName },
-      })
-    : jsx.jsx(FormattedMessage, {
-        id: "restricted.environmentSetup.access.organizationFallback",
-        defaultMessage: "Everyone in this workspace",
-        description:
-          "Short visibility option in environment onboarding, settings, task summary, and result while the authenticated workspace name is unavailable; the other option is private access",
-      });
+  let r;
+  t[2] === n.egress_rules
+    ? (r = t[3])
+    : ((r = new Set(n.egress_rules.map(w))), (t[2] = n.egress_rules), (t[3] = r));
+  let i = r.size;
+  if (n.presets?.includes(`package_managers`)) {
+    let e;
+    return (
+      t[4] === i
+        ? (e = t[5])
+        : ((e =
+            i > 0
+              ? (0, O.jsx)(u, {
+                  id: `restricted.environmentSetup.result.network.packageManagersWithDomains`,
+                  defaultMessage: `Package managers + {count, plural, one {# allowed domain} other {# allowed domains}}`,
+                  description: `Network summary for the package-manager preset plus separately allowed domains; the count excludes domains supplied by the preset`,
+                  values: { count: i },
+                })
+              : (0, O.jsx)(u, {
+                  id: `restricted.environmentSetup.result.network.packageManagers`,
+                  defaultMessage: `Package managers`,
+                  description: `Network summary when only the package-manager preset is allowed`,
+                })),
+          (t[4] = i),
+          (t[5] = e)),
+      e
+    );
+  }
+  let a;
+  return (
+    t[6] === i
+      ? (a = t[7])
+      : ((a = (0, O.jsx)(u, {
+          id: `restricted.environmentSetup.result.network.domains`,
+          defaultMessage: `{count, plural, one {# allowed domain} other {# allowed domains}}`,
+          description: `Number of explicitly allowed domains in a restricted environment network policy without presets`,
+          values: { count: i },
+        })),
+        (t[6] = i),
+        (t[7] = a)),
+    a
+  );
 }
-
-function OutboundIdentityValue({
-  configuration,
-  requirement,
-}: {
-  configuration?: OutboundIdentityConfiguration;
-  requirement: OutboundIdentityRequirement;
-}): unknown {
-  const { data } = useScopedQuery(outboundIdentityQuery, configuration) as {
-    data?: {
-      ok: boolean;
-      data?: { items: Array<{ connection_id: string; display_name?: string }> };
-    };
-  };
-  const connection = data?.ok
-    ? data.data?.items.find(
-        (item) => item.connection_id === requirement.connection_id,
-      )
-    : undefined;
-  return jsx.jsx(jsx.Fragment, {
-    children: connection?.display_name ?? requirement.connection_id,
-  });
+function w(e) {
+  let { host: t } = e;
+  return t;
 }
-
-const initializeResultValues = once(() => {
-  initializeCompilerRuntime();
-  initializeMaitai();
-  initializeInternationalization();
-  initializeWorkspaceAccount();
-  initializeWorkspaceQuery();
-  initializeOutboundIdentityQuery();
-  jsx = getJsxRuntime();
-});
-
-export {
-  initializeResultValues as a,
-  ScriptConfiguredValue as i,
-  OrganizationAccessValue as n,
-  outboundIdentityQuery as o,
-  OutboundIdentityValue as r,
-  initializeOutboundIdentityQuery as s,
-  NetworkPolicyValue as t,
-};
+function T(e) {
+  let t = (0, D.c)(8),
+    { detail: n } = e,
+    r = n !== void 0 && n,
+    { data: i } = y(),
+    o = a(g),
+    s;
+  t[0] !== i?.id || t[1] !== i?.name || t[2] !== o
+    ? ((s = i?.id === o ? i?.name?.trim() : void 0),
+      (t[0] = i?.id),
+      (t[1] = i?.name),
+      (t[2] = o),
+      (t[3] = s))
+    : (s = t[3]);
+  let c = s;
+  if (r) {
+    let e;
+    return (
+      t[4] === c
+        ? (e = t[5])
+        : ((e = c
+            ? (0, O.jsx)(u, {
+                id: `restricted.environmentSetup.access.organizationDescriptionNamed`,
+                defaultMessage: `Everyone in {workspaceName} can access`,
+                description: `Help text below the organization access option in environment onboarding. workspaceName is the authenticated workspace's display name; selecting the option lets its members use the environment`,
+                values: { workspaceName: c },
+              })
+            : (0, O.jsx)(u, {
+                id: `restricted.environmentSetup.access.organizationDescriptionFallback`,
+                defaultMessage: `Everyone in this workspace can access`,
+                description: `Help text below the organization access option in environment onboarding while the authenticated workspace name is unavailable; selecting the option lets workspace members use the environment`,
+              })),
+          (t[4] = c),
+          (t[5] = e)),
+      e
+    );
+  }
+  let l;
+  return (
+    t[6] === c
+      ? (l = t[7])
+      : ((l = c
+          ? (0, O.jsx)(u, {
+              id: `restricted.environmentSetup.access.organizationName`,
+              defaultMessage: `Everyone at {workspaceName}`,
+              description: `Short visibility option in environment onboarding, settings, task summary, and result. workspaceName is the authenticated workspace's display name; the other option is private access`,
+              values: { workspaceName: c },
+            })
+          : (0, O.jsx)(u, {
+              id: `restricted.environmentSetup.access.organizationFallback`,
+              defaultMessage: `Everyone in this workspace`,
+              description: `Short visibility option in environment onboarding, settings, task summary, and result while the authenticated workspace name is unavailable; the other option is private access`,
+            })),
+        (t[6] = c),
+        (t[7] = l)),
+    l
+  );
+}
+function E(e) {
+  let t = (0, D.c)(5),
+    { configuration: n, requirement: i } = e,
+    { data: a } = r(b, n),
+    o;
+  t[0] !== i || t[1] !== a
+    ? ((o = a?.ok
+        ? a.data.items.find((e) => {
+            let { connection_id: t } = e;
+            return t === i.connection_id;
+          })
+        : void 0),
+      (t[0] = i),
+      (t[1] = a),
+      (t[2] = o))
+    : (o = t[2]);
+  let s = o?.display_name ?? i.connection_id,
+    c;
+  return (
+    t[3] === s
+      ? (c = t[4])
+      : ((c = (0, O.jsx)(O.Fragment, { children: s })), (t[3] = s), (t[4] = c)),
+    c
+  );
+}
+var D, O;
+function k() {
+  return (k = e(() => {
+    ((D = t()), i(), s(), m(), v(), x(), (O = o()));
+  }))();
+}
+export { k as a, S as i, T as n, b as o, E as r, x as s, C as t };

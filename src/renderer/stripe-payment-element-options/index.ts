@@ -1,8 +1,72 @@
-import "@rchunk/rolldown-runtime";
-export interface PaymentElementOptions { billingDetails?: Record<string, unknown>; defaultValues?: Record<string, unknown>; fields?: Record<string, unknown>; wallets?: Record<string, unknown>; [key: string]: unknown }
-export interface PaymentElementOverrides { checkoutSessionId?: string; isGooglePayEnabled?: boolean; isNewStripeCustomer?: boolean; minimalBillingAddress?: Record<string, unknown>; paymentElementLayoutMode?: "accordion" | "auto" | "tabs"; paymentMethodOrder?: string[]; shouldHidePaymentElementName?: boolean; useMinimalBillingAddress?: boolean }
-const hiddenName = { name: "never" };
-function isOpenAiCheckoutSession(id: unknown): id is string { return typeof id === "string" && id.startsWith("oaics_"); }
-function createPaymentElementOptions(options: PaymentElementOptions = {}, overrides: PaymentElementOverrides = {}): Record<string, unknown> { const { defaultValues, fields, wallets, ...rest } = options; const billing = typeof fields?.billingDetails === "object" ? fields.billingDetails : undefined; const billingDetails = isOpenAiCheckoutSession(overrides.checkoutSessionId) ? { ...(overrides.shouldHidePaymentElementName ? hiddenName : {}), address: overrides.useMinimalBillingAddress ? "auto" : "never" } : overrides.shouldHidePaymentElementName ? { ...hiddenName, ...billing } : billing; let nextDefaults = defaultValues; if (overrides.useMinimalBillingAddress && isOpenAiCheckoutSession(overrides.checkoutSessionId)) nextDefaults = { ...defaultValues, billingDetails: { ...(typeof defaultValues?.billingDetails === "object" ? defaultValues.billingDetails : {}), ...(overrides.minimalBillingAddress ? { address: overrides.minimalBillingAddress } : {}) } }; const nextWallets = overrides.isNewStripeCustomer ? { ...wallets, googlePay: overrides.isGooglePayEnabled ? "auto" : "never" } : wallets; return { layout: overrides.paymentElementLayoutMode === "accordion" ? { type: "accordion", defaultCollapsed: false } : { type: overrides.paymentElementLayoutMode === "auto" ? "auto" : "tabs" }, terms: { card: "never" }, fields: { ...fields, ...(billingDetails === undefined ? {} : { billingDetails }) }, ...(nextDefaults === undefined ? {} : { defaultValues: nextDefaults }), ...(overrides.paymentMethodOrder ? { paymentMethodOrder: overrides.paymentMethodOrder } : {}), ...rest, ...(nextWallets === undefined ? {} : { wallets: nextWallets }) }; }
-function initializePaymentElementOptions(): void {}
-export { initializePaymentElementOptions as n, isOpenAiCheckoutSession as r, createPaymentElementOptions as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e, t, r, i) {
+  let o = typeof e == `object` ? e.billingDetails : void 0;
+  return n(r)
+    ? { ...(t ? a : {}), address: i ? `auto` : `never` }
+    : typeof o == `object`
+      ? t
+        ? { ...a, ...o }
+        : o
+      : t
+        ? a
+        : o;
+}
+function n(e) {
+  return typeof e == `string` && e.startsWith(`oaics_`);
+}
+function r(e, t) {
+  if (e === void 0) return e;
+  let r = e.billingDetails;
+  if (typeof r != `object`) return e;
+  let { email: i, ...a } = r;
+  if ((n(t) && i != null && i.length > 0) || i === void 0) return e;
+  if (Object.keys(a).length > 0) return { ...e, billingDetails: a };
+  let { billingDetails: o, ...s } = e;
+  return Object.keys(s).length > 0 ? s : void 0;
+}
+function i(
+  e = {},
+  {
+    checkoutSessionId: i,
+    isNewStripeCustomer: a,
+    useMinimalBillingAddress: o = !1,
+    minimalBillingAddress: s,
+    paymentMethodOrder: c,
+    paymentElementLayoutMode: l = `tabs`,
+    shouldHidePaymentElementName: u = !1,
+    isGooglePayEnabled: d = !1,
+  } = {},
+) {
+  let { defaultValues: f, fields: p, wallets: m, ...h } = e,
+    g = c ? { paymentMethodOrder: c } : {},
+    _ = t(p, u, i, o),
+    v = r(f, i);
+  if (o && n(i)) {
+    let { address: e, ...t } = v?.billingDetails ?? {};
+    v = { ...v, billingDetails: { ...t, ...(s ? { address: s } : {}) } };
+  }
+  let y = m;
+  return (
+    a === !0 && (y = { ...m, googlePay: d ? `auto` : `never` }),
+    {
+      layout:
+        l === `accordion`
+          ? { type: `accordion`, defaultCollapsed: !1 }
+          : { type: l === `auto` ? `auto` : `tabs` },
+      terms: { card: `never` },
+      fields: { ...p, ...(_ === void 0 ? {} : { billingDetails: _ }) },
+      ...(v === void 0 ? {} : { defaultValues: v }),
+      ...g,
+      ...h,
+      ...(y === void 0 ? {} : { wallets: y }),
+    }
+  );
+}
+var a;
+function o() {
+  return (o = e(() => {
+    a = { name: `never` };
+  }))();
+}
+export { o as n, n as r, i as t };

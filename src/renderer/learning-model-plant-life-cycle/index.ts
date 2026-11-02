@@ -1,35 +1,45 @@
-// Flowering-plant life-cycle learning model.
-import "@rchunk/rolldown-runtime";
-
-type PlantLifeStage = "germination" | "seedling" | "mature flowering plant" | "pollination" | "seed formation" | "seed dispersal";
-interface PlantLifeValues { initial_stage?: string }
-
-let plantLifeCycleManifest: { type: string; version: number; thumbnailAssetKey: string; parameters: { initial_stage: { kind: "enum"; defaultValue: string; allowedValues: string[] } } };
-let plantLifeStages: PlantLifeStage[];
-let defaultPlantLifeStage: PlantLifeStage;
-let normalizePlantLifeCycleValues: (values: PlantLifeValues) => { initial_stage: PlantLifeStage };
-let plantLifeStageIndex: (stage: PlantLifeStage) => number;
-let plantLifeStageFromStep: (step: number) => PlantLifeStage;
-let manifestInitialized = false;
-let modelInitialized = false;
-
-function initializePlantLifeCycleManifest(): void {
-  if (manifestInitialized) return;
-  manifestInitialized = true;
-  plantLifeCycleManifest = { type: "PLANT_LIFE_CYCLE", version: 2, thumbnailAssetKey: "plant-life-cycle-v2", parameters: { initial_stage: { kind: "enum", defaultValue: "germination", allowedValues: ["germination", "seedling", "mature flowering plant", "pollination", "seed formation", "seed dispersal"] } } };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `PLANT_LIFE_CYCLE`),
+      (n = `plant-life-cycle-v2`),
+      (r = {
+        initial_stage: {
+          kind: `enum`,
+          defaultValue: `germination`,
+          allowedValues: [
+            `germination`,
+            `seedling`,
+            `mature flowering plant`,
+            `pollination`,
+            `seed formation`,
+            `seed dispersal`,
+          ],
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
 }
-
-function initializePlantLifeCycleModel(): void {
-  if (modelInitialized) return;
-  modelInitialized = true;
-  initializePlantLifeCycleManifest();
-  const isStage = (value: string | undefined): value is PlantLifeStage => value === "germination" || value === "seedling" || value === "mature flowering plant" || value === "pollination" || value === "seed formation" || value === "seed dispersal";
-  plantLifeStages = plantLifeCycleManifest.parameters.initial_stage.allowedValues.filter(isStage);
-  const manifestDefault = plantLifeCycleManifest.parameters.initial_stage.defaultValue;
-  defaultPlantLifeStage = isStage(manifestDefault) ? manifestDefault : "germination";
-  normalizePlantLifeCycleValues = values => ({ initial_stage: plantLifeStages.includes(values.initial_stage as PlantLifeStage) ? values.initial_stage as PlantLifeStage : defaultPlantLifeStage });
-  plantLifeStageIndex = stage => plantLifeStages.indexOf(stage);
-  plantLifeStageFromStep = step => plantLifeStages[Math.max(0, Math.min(plantLifeStages.length - 1, Math.round(step) - 1))] ?? defaultPlantLifeStage;
+var o, s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    (a(),
+      (o = (e) =>
+        e === `germination` ||
+        e === `seedling` ||
+        e === `mature flowering plant` ||
+        e === `pollination` ||
+        e === `seed formation` ||
+        e === `seed dispersal`),
+      (s = i.parameters.initial_stage.allowedValues.filter(o)),
+      (c = o(i.parameters.initial_stage.defaultValue)
+        ? i.parameters.initial_stage.defaultValue
+        : `germination`),
+      (l = (e) => ({ initial_stage: s.includes(e.initial_stage) ? e.initial_stage : c })),
+      (u = (e) => s.indexOf(e)),
+      (d = (e) => s[Math.max(0, Math.min(s.length - 1, Math.round(e) - 1))] ?? c));
+  }))();
 }
-
-export { initializePlantLifeCycleModel as a, plantLifeCycleManifest as c, plantLifeStageIndex as i, plantLifeStages as n, normalizePlantLifeCycleValues as o, plantLifeStageFromStep as r, initializePlantLifeCycleManifest as s, defaultPlantLifeStage as t };
+export { f as a, i as c, u as i, s as n, l as o, d as r, a as s, c as t };

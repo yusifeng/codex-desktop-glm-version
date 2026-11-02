@@ -1,243 +1,278 @@
-import "@rchunk/rolldown-runtime";
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  n as initializeStaggeredItem,
-  t as HomeSuggestionStaggeredItem,
-} from "@rchunk/home-suggestion-staggered-item";
-
-export interface HomeSuggestionListItem {
-  disabled?: boolean;
-  dismissLabel?: string;
-  hidden?: boolean;
-  icon?: unknown;
-  id: string;
-  label: string;
-  listIcon?: unknown;
-  onClick?(): void;
-  onDismiss?(): void;
-  tooltipContent?: unknown;
-  tooltipInteractive?: boolean;
-  trailing?: unknown;
-}
-
-interface HomeSuggestionListProps {
-  composerMode?: string | null;
-  disableWhileModelPickerOpen?: boolean;
-  emptyState?: unknown;
-  items: HomeSuggestionListItem[];
-  placement?: "above-composer" | "below-composer";
-  variant?: "composer" | "feed";
-}
-
-const shared = sharedChunk as unknown as Record<string, unknown>;
-const initial = initialChunk as unknown as Record<string, unknown>;
-let jsx: {
-  Fragment: unknown;
-  jsx(component: unknown, props: unknown, key?: string): unknown;
-  jsxs(component: unknown, props: unknown, key?: string): unknown;
-};
-let React: () => {
-  useState<T>(value: T): [T, (value: T) => void];
-};
-let useSignalValue: <T>(signal: unknown) => T;
-let useIntl: () => {
-  formatMessage(message: Record<string, string>): string;
-};
-let classNames: (...values: unknown[]) => string;
-let Tooltip: unknown;
-let IconButton: unknown;
-let CloseIcon: unknown;
-let Presence: unknown;
-let modelPickerOpenSignal: unknown;
-
-function SuggestionIcon({
-  children,
-  className,
-  size = "small",
-  ...props
-}: {
-  children?: unknown;
-  className?: string;
-  size?: "large" | "small" | "tile";
-  [key: string]: unknown;
-}): unknown {
-  initializeHomeSuggestionList();
-  return jsx.jsx("span", {
-    className: classNames(
-      "flex shrink-0 items-center justify-center",
-      {
-        "size-6": size === "tile",
-        "size-5": size === "large",
-        "size-4": size === "small",
-      },
-      className,
-    ),
-    ...props,
-    children,
-  });
-}
-
-function HomeSuggestionList({
-  composerMode,
-  disableWhileModelPickerOpen = false,
-  emptyState,
-  items,
-  placement = "above-composer",
-  variant = "composer",
-}: HomeSuggestionListProps): unknown {
-  initializeHomeSuggestionList();
-  const intl = useIntl();
-  const modelPickerOpen = useSignalValue<boolean>(
-    disableWhileModelPickerOpen ? modelPickerOpenSignal : null,
-  ) ?? false;
-  const [openTooltipId, setOpenTooltipId] = React().useState<string | null>(null);
-  if (modelPickerOpen && openTooltipId != null) setOpenTooltipId(null);
-  if (items.length === 0 && emptyState === undefined) return null;
-
-  let iconSize: "large" | "small" | "tile" = composerMode == null ? "small" : "large";
-  if (variant === "feed") iconSize = "tile";
-  const containerClassName = classNames(
-    "flex flex-col py-2",
-    variant === "composer" && [
-      "min-h-32",
-      composerMode === "chat" ? "ps-2" : "ps-6",
-    ],
-    placement === "below-composer" ? "justify-start" : "justify-end",
-    modelPickerOpen && "pointer-events-none",
+  $3 as t,
+  FX as n,
+  HX as r,
+  I3 as i,
+  K2 as a,
+  Yh as o,
+  Zh as s,
+  c_ as c,
+  cw as l,
+  d$ as u,
+  e6 as d,
+  f$ as f,
+  h4 as p,
+  lw as m,
+  m4 as h,
+  n4 as g,
+  o_ as _,
+} from "@rchunk/app-shared";
+import { A2 as v, j2 as y } from "@rchunk/app-initial";
+import { n as b, t as x } from "@rchunk/home-suggestion-staggered-item";
+function S(e) {
+  let t = (0, C.c)(12),
+    n,
+    r,
+    i;
+  t[0] === e
+    ? ((n = t[1]), (r = t[2]), (i = t[3]))
+    : (({ className: n, size: i, ...r } = e), (t[0] = e), (t[1] = n), (t[2] = r), (t[3] = i));
+  let a = i === void 0 ? `small` : i,
+    o = a === `tile`,
+    s = a === `large`,
+    c = a === `small`,
+    l;
+  t[4] !== n || t[5] !== o || t[6] !== s || t[7] !== c
+    ? ((l = h(
+        `flex shrink-0 items-center justify-center`,
+        { "size-6": o, "size-5": s, "size-4": c },
+        n,
+      )),
+      (t[4] = n),
+      (t[5] = o),
+      (t[6] = s),
+      (t[7] = c),
+      (t[8] = l))
+    : (l = t[8]);
+  let u;
+  return (
+    t[9] !== r || t[10] !== l
+      ? ((u = (0, w.jsx)(`span`, { className: l, ...r })), (t[9] = r), (t[10] = l), (t[11] = u))
+      : (u = t[11]),
+    u
   );
-  const renderedItems = items.map((item, index) => jsx.jsxs(
-    HomeSuggestionStaggeredItem,
+}
+var C, w;
+function T() {
+  return (T = e(() => {
+    ((C = t()), p(), (w = i()));
+  }))();
+}
+function E(e) {
+  let t = (0, A.c)(33),
     {
-      className: classNames(
-        "group/home-suggestion-list-item relative",
-        item.hidden && "invisible",
-      ),
-      index: variant === "feed" || placement === "below-composer"
-        ? index
-        : items.length - index - 1,
-      variant: variant === "feed" ? "feed" : "list",
-      children: [
-        jsx.jsx(Tooltip, {
-          closeOnTriggerClick: true,
-          delayDuration: item.tooltipInteractive ? 250 : undefined,
-          disabled: modelPickerOpen,
-          interactive: item.tooltipInteractive,
-          keyboardNavigation: item.tooltipInteractive,
-          selectable: item.tooltipInteractive,
-          sideOffset: variant === "feed" ? 14 : undefined,
-          skipDelayKey: variant === "feed" ? item.id : undefined,
-          tooltipBodyClassName: "max-h-full overflow-hidden",
-          tooltipContent: item.tooltipContent == null
-            ? item.tooltipContent
-            : jsx.jsx("div", {
-                className: "min-h-0 flex-1 overflow-y-auto overscroll-contain p-5 leading-relaxed",
-                children: item.tooltipContent,
-              }),
-          tooltipMaxWidth: "min(24rem, var(--radix-tooltip-content-available-width), calc(100vw - 16px))",
-          variant: "rich",
-          onOpenChange: (open: boolean) => setOpenTooltipId(open ? item.id : null),
-          children: jsx.jsxs("button", {
-            ref: (element: HTMLElement | null) => {
-              if (element == null || variant !== "feed" || openTooltipId !== item.id) return;
-              const preventWheel = (event: WheelEvent) => {
-                if (!event.ctrlKey) event.preventDefault();
-              };
-              element.addEventListener("wheel", preventWheel, { passive: false });
-              return () => element.removeEventListener("wheel", preventWheel);
-            },
-            type: "button",
-            className: classNames(
-              "flex w-full cursor-interaction items-center text-start text-sm text-codex-description outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default disabled:opacity-40",
-              variant === "feed"
-                ? "min-h-11 gap-4 rounded-2xl py-2 ps-3 group-focus-within/home-suggestion-list-item:bg-primary-ghost-hover group-hover/home-suggestion-list-item:bg-primary-ghost-hover"
-                : [
-                    "min-h-home-suggestion-row rounded-lg transition-transform duration-basic ease-enter-snappy hover:text-default active:scale-[0.99] browser:text-base browser:leading-relaxed",
-                    {
-                      "gap-1.5": composerMode == null,
-                      "gap-2": composerMode === "chat",
-                      "gap-3": composerMode != null && composerMode !== "chat",
+      composerMode: n,
+      disableWhileModelPickerOpen: i,
+      emptyState: a,
+      items: s,
+      placement: c,
+      variant: d,
+    } = e,
+    f = i !== void 0 && i,
+    p = c === void 0 ? `above-composer` : c,
+    m = d === void 0 ? `composer` : d,
+    y = g(),
+    b = r(f ? v : null) ?? !1,
+    [C, w] = (0, j.useState)(null);
+  b && C != null && w(null);
+  let T;
+  if (
+    (t[0] !== n || t[1] !== m
+      ? ((T = n == null ? `small` : `large`),
+        m === `feed` && (T = `tile`),
+        (t[0] = n),
+        (t[1] = m),
+        (t[2] = T))
+      : (T = t[2]),
+    s.length === 0 && a === void 0)
+  )
+    return null;
+  let E;
+  t[3] !== n || t[4] !== b || t[5] !== p || t[6] !== m
+    ? ((E = h(
+        `flex flex-col py-2`,
+        m === `composer` && [`min-h-32`, n === `chat` ? `ps-2` : `ps-6`],
+        p === `below-composer` ? `justify-start` : `justify-end`,
+        b && `pointer-events-none`,
+      )),
+      (t[3] = n),
+      (t[4] = b),
+      (t[5] = p),
+      (t[6] = m),
+      (t[7] = E))
+    : (E = t[7]);
+  let N = s.length === 0 ? a : null,
+    P;
+  if (
+    t[8] !== n ||
+    t[9] !== T ||
+    t[10] !== y ||
+    t[11] !== b ||
+    t[12] !== s ||
+    t[13] !== C ||
+    t[14] !== p ||
+    t[15] !== m
+  ) {
+    let e;
+    (t[17] !== n ||
+    t[18] !== T ||
+    t[19] !== y ||
+    t[20] !== b ||
+    t[21] !== s.length ||
+    t[22] !== C ||
+    t[23] !== p ||
+    t[24] !== m
+      ? ((e = (e, t) =>
+          (0, M.jsxs)(
+            x,
+            {
+              className: h(`group/home-suggestion-list-item relative`, e.hidden && `invisible`),
+              index: m === `feed` || p === `below-composer` ? t : s.length - t - 1,
+              variant: m === `feed` ? `feed` : `list`,
+              children: [
+                (0, M.jsx)(_, {
+                  disabled: b,
+                  tooltipContent:
+                    e.tooltipContent == null
+                      ? e.tooltipContent
+                      : (0, M.jsx)(`div`, {
+                          className: `min-h-0 flex-1 overflow-y-auto overscroll-contain p-5 leading-relaxed`,
+                          children: e.tooltipContent,
+                        }),
+                  variant: `rich`,
+                  tooltipBodyClassName: `max-h-full overflow-hidden`,
+                  sideOffset: m === `feed` ? 14 : void 0,
+                  closeOnTriggerClick: !0,
+                  skipDelayKey: m === `feed` ? e.id : void 0,
+                  onOpenChange: (t) => w(t ? e.id : null),
+                  interactive: e.tooltipInteractive,
+                  keyboardNavigation: e.tooltipInteractive,
+                  selectable: e.tooltipInteractive,
+                  delayDuration: e.tooltipInteractive ? 250 : void 0,
+                  tooltipMaxWidth: `min(24rem, var(--radix-tooltip-content-available-width), calc(100vw - 16px))`,
+                  children: (0, M.jsxs)(`button`, {
+                    ref: (t) => {
+                      if (t != null && m === `feed` && C === e.id)
+                        return (
+                          t.addEventListener(`wheel`, k, { passive: !1 }),
+                          () => t.removeEventListener(`wheel`, k)
+                        );
                     },
-                  ],
-              variant === "feed" && (item.onDismiss == null ? "pe-2" : "pe-11"),
-              variant === "composer" && (item.onDismiss == null ? "pe-1" : "pe-8"),
-            ),
-            disabled: item.disabled,
-            onClick: item.onClick,
-            onMouseDown: variant === "feed"
-              ? (event: { preventDefault(): void }) => event.preventDefault()
-              : undefined,
-            children: [
-              item.listIcon == null && item.icon == null ? null : jsx.jsx(SuggestionIcon, {
-                "aria-hidden": "true",
-                className: classNames(
-                  variant === "composer" && [
-                    composerMode == null ? "[&_img]:size-4 [&>svg]:size-4" : "browser:size-6",
-                    composerMode === "chat" && "min-w-token-button-composer",
-                  ],
-                ),
-                size: iconSize,
-                children: item.listIcon ?? item.icon,
-              }),
-              jsx.jsx("span", { className: "min-w-0 flex-1 truncate", children: item.label }),
-              item.trailing,
-            ],
-          }),
-        }),
-        item.onDismiss == null ? null : jsx.jsx(IconButton, {
-          "aria-label": item.dismissLabel ?? intl.formatMessage({
-            id: "home.taskSuggestions.dismiss",
-            defaultMessage: "Dismiss suggestion",
-            description: "Accessible label for the X button on one suggested task below the Home composer. It removes only this suggestion without starting the task or changing the draft.",
-          }),
-          className: "pointer-events-none absolute end-1 top-1/2 -translate-y-1/2 opacity-0 group-focus-within/home-suggestion-list-item:pointer-events-auto group-focus-within/home-suggestion-list-item:opacity-100 group-hover/home-suggestion-list-item:pointer-events-auto group-hover/home-suggestion-list-item:opacity-100",
-          color: "ghostTertiary",
-          disabled: item.disabled,
-          size: "compact",
-          uniform: true,
-          onClick: item.onDismiss,
-          onMouseDown: (event: { preventDefault(): void }) => event.preventDefault(),
-          children: jsx.jsx(CloseIcon, {}),
-        }),
-      ],
-    },
-    item.id,
-  ));
-
-  return jsx.jsxs("div", {
-    className: containerClassName,
-    inert: modelPickerOpen,
-    children: [
-      items.length === 0 ? emptyState : null,
-      jsx.jsx(Presence, { children: renderedItems }),
-    ],
-  });
+                    type: `button`,
+                    className: h(
+                      `flex w-full cursor-interaction items-center text-start text-sm text-codex-description outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:cursor-default disabled:opacity-40`,
+                      m === `feed`
+                        ? `min-h-11 gap-4 rounded-2xl py-2 ps-3 group-focus-within/home-suggestion-list-item:bg-primary-ghost-hover group-hover/home-suggestion-list-item:bg-primary-ghost-hover`
+                        : [
+                            `min-h-home-suggestion-row rounded-lg transition-transform duration-basic ease-enter-snappy hover:text-default active:scale-[0.99] browser:text-base browser:leading-relaxed`,
+                            {
+                              "gap-1.5": n == null,
+                              "gap-2": n === `chat`,
+                              "gap-3": n != null && n !== `chat`,
+                            },
+                          ],
+                      m === `feed` && (e.onDismiss == null ? `pe-2` : `pe-11`),
+                      m === `composer` && (e.onDismiss == null ? `pe-1` : `pe-8`),
+                    ),
+                    disabled: e.disabled,
+                    onClick: e.onClick,
+                    onMouseDown: m === `feed` ? O : void 0,
+                    children: [
+                      e.listIcon == null && e.icon == null
+                        ? null
+                        : (0, M.jsx)(S, {
+                            className: h(
+                              m === `composer` && [
+                                n == null ? `[&_img]:size-4 [&>svg]:size-4` : `browser:size-6`,
+                                n === `chat` && `min-w-token-button-composer`,
+                              ],
+                            ),
+                            size: T,
+                            "aria-hidden": `true`,
+                            children: e.listIcon ?? e.icon,
+                          }),
+                      (0, M.jsx)(`span`, {
+                        className: `min-w-0 flex-1 truncate`,
+                        children: e.label,
+                      }),
+                      e.trailing,
+                    ],
+                  }),
+                }),
+                e.onDismiss == null
+                  ? null
+                  : (0, M.jsx)(o, {
+                      className: `pointer-events-none absolute end-1 top-1/2 -translate-y-1/2 opacity-0 group-focus-within/home-suggestion-list-item:pointer-events-auto group-focus-within/home-suggestion-list-item:opacity-100 group-hover/home-suggestion-list-item:pointer-events-auto group-hover/home-suggestion-list-item:opacity-100`,
+                      "aria-label":
+                        e.dismissLabel ??
+                        y.formatMessage({
+                          id: `home.taskSuggestions.dismiss`,
+                          defaultMessage: `Dismiss suggestion`,
+                          description: `Accessible label for the X button on one suggested task below the Home composer. It removes only this suggestion without starting the task or changing the draft.`,
+                        }),
+                      color: `ghostTertiary`,
+                      disabled: e.disabled,
+                      size: `compact`,
+                      uniform: !0,
+                      onClick: e.onDismiss,
+                      onMouseDown: D,
+                      children: (0, M.jsx)(l, {}),
+                    }),
+              ],
+            },
+            e.id,
+          )),
+        (t[17] = n),
+        (t[18] = T),
+        (t[19] = y),
+        (t[20] = b),
+        (t[21] = s.length),
+        (t[22] = C),
+        (t[23] = p),
+        (t[24] = m),
+        (t[25] = e))
+      : (e = t[25]),
+      (P = s.map(e)),
+      (t[8] = n),
+      (t[9] = T),
+      (t[10] = y),
+      (t[11] = b),
+      (t[12] = s),
+      (t[13] = C),
+      (t[14] = p),
+      (t[15] = m),
+      (t[16] = P));
+  } else P = t[16];
+  let F;
+  t[26] === P ? (F = t[27]) : ((F = (0, M.jsx)(u, { children: P })), (t[26] = P), (t[27] = F));
+  let I;
+  return (
+    t[28] !== b || t[29] !== E || t[30] !== N || t[31] !== F
+      ? ((I = (0, M.jsxs)(`div`, { className: E, inert: b, children: [N, F] })),
+        (t[28] = b),
+        (t[29] = E),
+        (t[30] = N),
+        (t[31] = F),
+        (t[32] = I))
+      : (I = t[32]),
+    I
+  );
 }
-
-function initializeHomeSuggestionList(): void {
-  if (jsx != null) return;
-  const call = (value: unknown) => { if (typeof value === "function") value(); };
-  for (const value of [
-    shared.h4,
-    shared.f$,
-    shared.FX,
-    shared.K2,
-    initial.j2,
-    shared.Zh,
-    shared.lw,
-    shared.c_,
-  ]) call(value);
-  initializeStaggeredItem();
-  jsx = (shared.I3 as () => typeof jsx)();
-  React = shared.e6 as typeof React;
-  useSignalValue = shared.HX as typeof useSignalValue;
-  useIntl = shared.n4 as typeof useIntl;
-  classNames = shared.m4 as typeof classNames;
-  Tooltip = shared.o_;
-  IconButton = shared.Yh;
-  CloseIcon = shared.cw;
-  Presence = shared.d$;
-  modelPickerOpenSignal = initial.A2;
+function D(e) {
+  return e.preventDefault();
 }
-
-export { initializeHomeSuggestionList as n, HomeSuggestionList as t };
+function O(e) {
+  return e.preventDefault();
+}
+function k(e) {
+  e.ctrlKey || e.preventDefault();
+}
+var A, j, M;
+function N() {
+  return (N = e(() => {
+    ((A = t()), p(), f(), n(), (j = d()), a(), y(), s(), m(), c(), T(), b(), (M = i()));
+  }))();
+}
+export { N as n, E as t };

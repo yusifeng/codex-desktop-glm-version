@@ -1,114 +1,143 @@
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  BX as useSignalFamilyValue,
-  I3 as getJsxRuntime,
-  LX as useScope,
-  Y2 as FormattedMessage,
-  ZI as appScope,
-  bS as BuildingIcon,
-  jf as Menu,
-  qv as SearchIcon,
+  $3 as t,
+  BX as n,
+  FX as r,
+  I3 as i,
+  If as a,
+  K2 as o,
+  LX as s,
+  QI as c,
+  Y2 as l,
+  ZI as u,
+  bS as d,
+  jf as f,
+  lw as p,
+  qv as m,
 } from "@rchunk/app-shared";
 import {
-  M6t as initializeAuthState,
-  N6t as useAuthState,
-  Ox as normalizeAccounts,
-  Uzt as openModal,
-  Wln as isWorkspacePlan,
-  iht as useAccountsQuery,
-  mC as workspacesQuery,
-  xpn as recordAnalytics,
+  M6t as h,
+  N6t as g,
+  Ox as _,
+  Rln as v,
+  Uzt as y,
+  Vzt as b,
+  Wln as x,
+  gC as S,
+  iht as C,
+  jx as w,
+  mC as T,
+  rht as E,
+  xpn as D,
+  ypn as O,
 } from "@rchunk/app-initial";
 import {
-  c as isWorkspaceDiscoveryEligible,
-  i as initializeWorkspaceDiscoveryAnalytics,
-  l as initializeWorkspaceDiscoveryState,
-  n as initializeWorkspaceDiscovery,
-  r as workspaceDiscoveryOpenedEvent,
-  t as WorkspaceDiscoveryDialog,
+  c as k,
+  i as A,
+  l as j,
+  n as M,
+  r as N,
+  t as P,
 } from "@rchunk/workspace-discovery";
-
-export interface WorkspaceDiscoveryMenuItemProps {
-  onSelect?(): void;
-  placement: "account" | "profile";
-}
-
-function WorkspaceDiscoveryMenuItem({
-  placement,
-  onSelect,
-}: WorkspaceDiscoveryMenuItemProps): unknown {
-  const scope = useScope(appScope);
-  const { userId, accountId, authMethod } = useAuthState();
-  const identity = { userId: userId ?? null, accountId: accountId ?? null };
-  const { data: workspaceDiscovery } = useSignalFamilyValue(
-    workspacesQuery,
-    identity,
-  );
-  const { data: accountsResponse } = useAccountsQuery();
-  const accounts = normalizeAccounts(accountsResponse).filter(
-    (account: { isDeactivated?: boolean }) => !account.isDeactivated,
-  );
-  const onlyPersonal =
-    accounts.length === 1 && accounts[0]?.isPersonalWorkspace === true;
-
+function F(e) {
+  let t = (0, z.c)(14),
+    { placement: r, onSelect: i } = e,
+    a = s(u),
+    { userId: o, accountId: c, authMethod: p } = g(),
+    h = o ?? null,
+    v = c ?? null,
+    b;
+  t[0] !== h || t[1] !== v
+    ? ((b = { userId: h, accountId: v }), (t[0] = h), (t[1] = v), (t[2] = b))
+    : (b = t[2]);
+  let { data: x } = n(T, b),
+    { data: S } = C(),
+    w = _(S).filter(R),
+    E = w.length === 1 && w[0]?.isPersonalWorkspace;
   if (
-    authMethod !== "chatgpt" ||
-    workspaceDiscovery == null ||
-    accountsResponse == null ||
-    accountsResponse.accounts?.some((account: { plan_type?: unknown }) =>
-      isWorkspacePlan(account.plan_type),
-    ) ||
-    (placement === "profile") !== onlyPersonal ||
-    !(
-      isWorkspaceDiscoveryEligible(workspaceDiscovery) ||
-      (placement === "account" &&
-        accounts.some(
-          (account: { isPersonalWorkspace?: boolean }) =>
-            !account.isPersonalWorkspace,
-        ))
-    )
-  ) {
+    p !== `chatgpt` ||
+    x == null ||
+    S == null ||
+    S.accounts?.some(L) ||
+    (r === `profile`) !== E ||
+    !(k(x) || (r === `account` && w.some(I)))
+  )
     return null;
-  }
-
-  const jsx = getJsxRuntime();
-  const icon = jsx.jsx(placement === "profile" ? SearchIcon : BuildingIcon, {});
-  const label =
-    placement === "profile"
-      ? jsx.jsx(FormattedMessage, {
-          id: "workspaceDiscovery.find",
-          defaultMessage: "Find workspaces",
-          description: "Profile menu item that opens workspace discovery",
-        })
-      : jsx.jsx(FormattedMessage, {
-          id: "workspaceDiscovery.createOrJoin",
-          defaultMessage: "Create or join a workspace",
-          description:
-            "Account submenu item that opens workspace discovery and creation",
-        });
-
-  return jsx.jsx(Menu.Item, {
-    leftIcon: icon,
-    onSelect: () => {
-      onSelect?.();
-      recordAnalytics(scope, workspaceDiscoveryOpenedEvent, {
-        location: "expanded_sidebar",
-      });
-      openModal(scope, WorkspaceDiscoveryDialog, {
-        mode: "dismissible" as const,
-        section: "discoverable" as const,
-      });
-    },
-    children: label,
-  });
+  let O;
+  t[3] === r
+    ? (O = t[4])
+    : ((O = r === `profile` ? (0, B.jsx)(m, {}) : (0, B.jsx)(d, {})), (t[3] = r), (t[4] = O));
+  let A;
+  t[5] !== i || t[6] !== a
+    ? ((A = () => {
+        (i?.(),
+          D(a, N, { location: `expanded_sidebar` }),
+          y(a, P, { mode: `dismissible`, section: `discoverable` }));
+      }),
+      (t[5] = i),
+      (t[6] = a),
+      (t[7] = A))
+    : (A = t[7]);
+  let j;
+  t[8] === r
+    ? (j = t[9])
+    : ((j =
+        r === `profile`
+          ? (0, B.jsx)(l, {
+              id: `workspaceDiscovery.find`,
+              defaultMessage: `Find workspaces`,
+              description: `Profile menu item that opens workspace discovery`,
+            })
+          : (0, B.jsx)(l, {
+              id: `workspaceDiscovery.createOrJoin`,
+              defaultMessage: `Create or join a workspace`,
+              description: `Account submenu item that opens workspace discovery and creation`,
+            })),
+      (t[8] = r),
+      (t[9] = j));
+  let M;
+  return (
+    t[10] !== O || t[11] !== A || t[12] !== j
+      ? ((M = (0, B.jsx)(f.Item, { leftIcon: O, onSelect: A, children: j })),
+        (t[10] = O),
+        (t[11] = A),
+        (t[12] = j),
+        (t[13] = M))
+      : (M = t[13]),
+    M
+  );
 }
-
-function initializeWorkspaceDiscoveryMenuItem(): void {
-  initializeWorkspaceDiscoveryAnalytics();
-  initializeAuthState();
-  initializeWorkspaceDiscoveryState();
-  initializeWorkspaceDiscovery();
+function I(e) {
+  return !e.isPersonalWorkspace;
 }
-
-initializeWorkspaceDiscoveryMenuItem();
-
-export { WorkspaceDiscoveryMenuItem };
+function L(e) {
+  return x(e.plan_type);
+}
+function R(e) {
+  return !e.isDeactivated;
+}
+var z, B;
+function V() {
+  return (V = e(() => {
+    ((z = t()),
+      A(),
+      r(),
+      o(),
+      h(),
+      S(),
+      E(),
+      a(),
+      p(),
+      b(),
+      O(),
+      c(),
+      w(),
+      v(),
+      j(),
+      M(),
+      (B = i()));
+  }))();
+}
+V();
+export { F as WorkspaceDiscoveryMenuItem };

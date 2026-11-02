@@ -1,300 +1,301 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import { BrowserAddressSuggestionOverlay } from "@rchunk/browser-address-suggestion-overlay";
-
-const {
-  $3: initializeRuntimeLazy,
-  G3: hostMessageBridge,
-  HG: serializeBrowserTabMention,
-  I3: getJsxRuntime,
-  LG: browserTabMentionSchema,
-  VG: parseBrowserTabMention,
-  e6: getReactRuntime,
-  wu: composerSuggestionPlugin,
-} = appSharedChunk;
-const {
-  UZ: useComposerSuggestionState,
-  VZ: initializeBrowserAutocompleteState,
-} = appInitialChunk as typeof appInitialChunk & {
-  UZ: <Value>(controller: ComposerController, reader: (controller: ComposerController) => Value) => Value;
-};
-
-interface BrowserTabMentionIdentity {
-  browserId: string;
-  pluginId?: string | null;
-  snapshot?: unknown;
-  source: string;
-  tabId: string;
-}
-
-interface BrowserTabMentionUpdate extends BrowserTabMentionIdentity {
-  faviconUrl?: string | null;
-}
-
-interface EditorNode {
-  attrs: Record<string, unknown>;
-  isBlock?: boolean;
-  isInline?: boolean;
-  isText?: boolean;
-  textContent?: string;
-  type: { name: string };
-}
-
-interface EditorDocument {
-  descendants(visitor: (node: EditorNode, position: number) => boolean | void): void;
-}
-
-interface EditorTransaction {
-  docChanged: boolean;
-  setMeta(key: string, value: unknown): EditorTransaction;
-  setNodeMarkup(position: number, type: unknown, attributes: Record<string, unknown>): EditorTransaction;
-}
-
-interface ComposerController {
-  attachBrowserAutocompleteRuntime(runtime: BrowserAutocompleteRuntime): void;
-  eventEmitter: {
-    addListener(event: string, listener: () => void): void;
-    emit(event: string): void;
-    removeListener(event: string, listener: () => void): void;
-  };
-  getBrowserAutocompleteRuntime(): BrowserAutocompleteRuntime | null | undefined;
-  setText(value: string): void;
-  view: {
-    dispatch(transaction: EditorTransaction): void;
-    dom: HTMLElement;
-    hasFocus(): boolean;
-    isDestroyed: boolean;
-    state: {
-      doc: EditorDocument;
-      tr: EditorTransaction;
-    };
-  };
-}
-
-interface BrowserAddressShortcutProps {
-  browserConversationId?: string | null;
-  composerController: ComposerController;
-  composerId: string;
-  placement?: string;
-}
-
-interface BrowserSuggestionState extends Record<string, unknown> {
-  active?: boolean;
-  kind?: string;
-}
-
-const DISMISSAL_EVENT = "browser-autocomplete-mention-dismissal-change";
-
-class BrowserAutocompleteRuntime {
-  private readonly composerController: ComposerController;
-  private mentionDismissalFrame: number | null = null;
-  private mentionDismissalTimeout: number | null = null;
-  private mentionPath: string | null = null;
-  private readonly metadataCleanups = new Set<() => void>();
-  private prefersReducedMotion: boolean | null = null;
-
-  constructor(composerController: ComposerController) {
-    this.composerController = composerController;
-  }
-
-  subscribeMentionDismissal = (listener: () => void): (() => void) => {
-    this.composerController.eventEmitter.addListener(DISMISSAL_EVENT, listener);
-    return () => this.composerController.eventEmitter.removeListener(DISMISSAL_EVENT, listener);
-  };
-
-  getMentionDismissalSnapshot = (): boolean => this.mentionDismissalTimeout != null;
-
-  setReducedMotion(value: boolean | null): void {
-    this.prefersReducedMotion = value;
-  }
-
-  setMentionPath(path: string | null): void {
-    this.mentionPath = path;
-  }
-
-  hasStandaloneMention(): boolean {
-    if (this.mentionPath == null || this.composerController.view.isDestroyed) return false;
-    let foundMention = false;
-    let foundOtherContent = false;
-    this.composerController.view.state.doc.descendants((node) => {
-      if (node.type.name === "browserTabMention" && node.attrs.path === this.mentionPath) {
-        foundOtherContent ||= foundMention;
-        foundMention = true;
-        return false;
-      }
-      if (node.isText) {
-        foundOtherContent ||= (node.textContent ?? "").trim().length > 0;
-      } else if (node.isInline || (node.isBlock && node.type.name !== "paragraph")) {
-        foundOtherContent = true;
-      }
-      return !foundOtherContent;
-    });
-    return foundMention && !foundOtherContent;
-  }
-
-  dismissStandaloneMentionOnBlur(): void {
-    this.cancelMentionDismissal();
-    let canWaitForConnection = true;
-    const check = () => {
-      this.mentionDismissalFrame = null;
-      const view = this.composerController.view;
-      if (view.isDestroyed || view.hasFocus() || !this.hasStandaloneMention()) return;
-      if (!view.dom.isConnected) {
-        if (canWaitForConnection) {
-          canWaitForConnection = false;
-          this.mentionDismissalFrame = requestAnimationFrame(check);
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/browser-address-suggestion-overlay",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/popup",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Eu as n,
+  G3 as r,
+  H3 as i,
+  HG as a,
+  I3 as o,
+  Jm as s,
+  LG as c,
+  V3 as l,
+  VG as u,
+  W3 as d,
+  e6 as f,
+  qm as p,
+  tp as m,
+  wL as h,
+  wu as g,
+} from "@rchunk/app-shared";
+import { UZ as _, VZ as v } from "@rchunk/app-initial";
+var y;
+function b() {
+  return (b = e(() => {
+    (h(),
+      m(),
+      (y = class {
+        composerController;
+        mentionDismissalFrame = null;
+        mentionDismissalTimeout = null;
+        mentionPath = null;
+        metadataCleanups = new Set();
+        prefersReducedMotion = null;
+        constructor(e) {
+          this.composerController = e;
         }
-        return;
-      }
-      if (this.prefersReducedMotion ?? window.matchMedia?.("(prefers-reduced-motion: reduce)").matches) {
-        this.composerController.setText("");
-        return;
-      }
-      this.mentionDismissalTimeout = window.setTimeout(() => this.completeMentionDismissal(), 150);
-      this.composerController.eventEmitter.emit(DISMISSAL_EVENT);
-    };
-    this.mentionDismissalFrame = requestAnimationFrame(check);
-  }
-
-  cancelMentionDismissal(): void {
-    if (this.mentionDismissalFrame != null) {
-      cancelAnimationFrame(this.mentionDismissalFrame);
-      this.mentionDismissalFrame = null;
-    }
-    if (this.mentionDismissalTimeout != null) {
-      window.clearTimeout(this.mentionDismissalTimeout);
-      this.mentionDismissalTimeout = null;
-      this.composerController.eventEmitter.emit(DISMISSAL_EVENT);
-    }
-  }
-
-  completeMentionDismissal(): void {
-    const shouldClear = !this.composerController.view.isDestroyed
-      && !this.composerController.view.hasFocus()
-      && this.hasStandaloneMention();
-    this.cancelMentionDismissal();
-    if (shouldClear) this.composerController.setText("");
-  }
-
-  updateMention(update: BrowserTabMentionUpdate): boolean {
-    if (this.composerController.view.isDestroyed) return false;
-    const parsed = browserTabMentionSchema.safeParse({
-      browserId: update.browserId,
-      pluginId: update.pluginId,
-      source: update.source,
-      tabId: update.tabId,
-      snapshot: update.snapshot,
-    });
-    if (!parsed.success) return false;
-    const nextPath = serializeBrowserTabMention(parsed.data);
-    const faviconUrl = update.faviconUrl ?? "";
-    let transaction = this.composerController.view.state.tr;
-    let found = false;
-    this.composerController.view.state.doc.descendants((node, position) => {
-      if (node.type.name !== "browserTabMention") return true;
-      const identity = typeof node.attrs.path === "string" ? parseBrowserTabMention(node.attrs.path) : null;
-      if (identity == null
-        || identity.browserId !== update.browserId
-        || identity.pluginId !== update.pluginId
-        || identity.source !== update.source
-        || identity.tabId !== update.tabId) return true;
-      found = true;
-      if (node.attrs.path === nextPath && node.attrs.faviconUrl === faviconUrl) return true;
-      if (this.mentionPath === node.attrs.path) this.mentionPath = nextPath;
-      transaction = transaction.setNodeMarkup(position, undefined, {
-        ...node.attrs,
-        faviconUrl,
-        path: nextPath,
-      });
-      return true;
-    });
-    if (transaction.docChanged) {
-      this.composerController.view.dispatch(transaction.setMeta("addToHistory", false));
-    }
-    return found;
-  }
-
-  trackMentionMetadata(cleanup: () => void): () => void {
-    this.metadataCleanups.add(cleanup);
-    return () => {
-      if (this.metadataCleanups.delete(cleanup)) cleanup();
-    };
-  }
-
-  dispose(): void {
-    this.cancelMentionDismissal();
-    this.mentionPath = null;
-    for (const cleanup of this.metadataCleanups) cleanup();
-    this.metadataCleanups.clear();
-  }
+        subscribeMentionDismissal = (e) => (
+          this.composerController.eventEmitter.addListener(
+            `browser-autocomplete-mention-dismissal-change`,
+            e,
+          ),
+          () => {
+            this.composerController.eventEmitter.removeListener(
+              `browser-autocomplete-mention-dismissal-change`,
+              e,
+            );
+          }
+        );
+        getMentionDismissalSnapshot = () => this.mentionDismissalTimeout != null;
+        setReducedMotion(e) {
+          this.prefersReducedMotion = e;
+        }
+        setMentionPath(e) {
+          this.mentionPath = e;
+        }
+        hasStandaloneMention() {
+          if (this.mentionPath == null || this.composerController.view.isDestroyed) return !1;
+          let e = !1,
+            t = !1;
+          return (
+            this.composerController.view.state.doc.descendants((n) =>
+              n.type.name === `browserTabMention` && n.attrs.path === this.mentionPath
+                ? ((t ||= e), (e = !0), !1)
+                : (n.isText
+                    ? (t ||= n.textContent.trim().length > 0)
+                    : (n.isInline || (n.isBlock && n.type.name !== `paragraph`)) && (t = !0),
+                  !t),
+            ),
+            e && !t
+          );
+        }
+        dismissStandaloneMentionOnBlur() {
+          this.cancelMentionDismissal();
+          let e = !0,
+            t = () => {
+              if (
+                ((this.mentionDismissalFrame = null),
+                !(
+                  this.composerController.view.isDestroyed ||
+                  this.composerController.view.hasFocus() ||
+                  !this.hasStandaloneMention()
+                ))
+              ) {
+                if (!this.composerController.view.dom.isConnected) {
+                  e && ((e = !1), (this.mentionDismissalFrame = requestAnimationFrame(t)));
+                  return;
+                }
+                if (
+                  this.prefersReducedMotion ??
+                  window.matchMedia?.(`(prefers-reduced-motion: reduce)`).matches
+                ) {
+                  this.composerController.setText(``);
+                  return;
+                }
+                ((this.mentionDismissalTimeout = window.setTimeout(() => {
+                  this.completeMentionDismissal();
+                }, 150)),
+                  this.composerController.eventEmitter.emit(
+                    `browser-autocomplete-mention-dismissal-change`,
+                  ));
+              }
+            };
+          this.mentionDismissalFrame = requestAnimationFrame(t);
+        }
+        cancelMentionDismissal() {
+          (this.mentionDismissalFrame != null &&
+            (cancelAnimationFrame(this.mentionDismissalFrame), (this.mentionDismissalFrame = null)),
+            this.mentionDismissalTimeout != null &&
+              (window.clearTimeout(this.mentionDismissalTimeout),
+              (this.mentionDismissalTimeout = null),
+              this.composerController.eventEmitter.emit(
+                `browser-autocomplete-mention-dismissal-change`,
+              )));
+        }
+        completeMentionDismissal() {
+          let e =
+            !this.composerController.view.isDestroyed &&
+            !this.composerController.view.hasFocus() &&
+            this.hasStandaloneMention();
+          (this.cancelMentionDismissal(), e && this.composerController.setText(``));
+        }
+        updateMention(e) {
+          if (this.composerController.view.isDestroyed) return !1;
+          let t = c.safeParse({
+            browserId: e.browserId,
+            pluginId: e.pluginId,
+            source: e.source,
+            tabId: e.tabId,
+            snapshot: e.snapshot,
+          });
+          if (!t.success) return !1;
+          let n = a(t.data),
+            r = e.faviconUrl ?? ``,
+            i = this.composerController.view.state.tr,
+            o = !1;
+          return (
+            this.composerController.view.state.doc.descendants((t, a) => {
+              if (t.type.name !== `browserTabMention`) return !0;
+              let s = typeof t.attrs.path == `string` ? u(t.attrs.path) : null;
+              return (
+                s == null ||
+                s.browserId !== e.browserId ||
+                s.pluginId !== e.pluginId ||
+                s.source !== e.source ||
+                s.tabId !== e.tabId ||
+                ((o = !0), t.attrs.path === n && t.attrs.faviconUrl === r) ||
+                (this.mentionPath === t.attrs.path && (this.mentionPath = n),
+                (i = i.setNodeMarkup(a, void 0, { ...t.attrs, faviconUrl: r, path: n })),
+                !0)
+              );
+            }),
+            i.docChanged && this.composerController.view.dispatch(i.setMeta(`addToHistory`, !1)),
+            o
+          );
+        }
+        trackMentionMetadata(e) {
+          return (
+            this.metadataCleanups.add(e),
+            () => {
+              this.metadataCleanups.delete(e) && e();
+            }
+          );
+        }
+        dispose() {
+          (this.cancelMentionDismissal(), (this.mentionPath = null));
+          for (let e of this.metadataCleanups) e();
+          this.metadataCleanups.clear();
+        }
+      }));
+  }))();
 }
-
-let React: import("@rchunk/app-shared").ReactRuntime;
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function readBrowserSuggestionState(controller: ComposerController): BrowserSuggestionState | null {
-  const state = composerSuggestionPlugin.getState(controller.view.state) as BrowserSuggestionState | undefined;
-  return state?.active === true && state.kind === "browser-autocomplete" ? state : null;
-}
-
-function BrowserAddressShortcut({
-  browserConversationId,
-  composerController,
-  composerId,
-  placement,
-}: BrowserAddressShortcutProps): unknown {
-  initializeBrowserAddressShortcut();
-  const [runtime] = React.useState(
-    () => composerController.getBrowserAutocompleteRuntime() ?? new BrowserAutocompleteRuntime(composerController),
+function x(e) {
+  let t = (0, C.c)(21),
+    { browserConversationId: n, composerController: i, composerId: a, placement: o } = e,
+    s;
+  t[0] === i
+    ? (s = t[1])
+    : ((s = () => i.getBrowserAutocompleteRuntime() ?? new y(i)), (t[0] = i), (t[1] = s));
+  let [c] = (0, w.useState)(s),
+    l = (0, w.useSyncExternalStore)(c.subscribeMentionDismissal, c.getMentionDismissalSnapshot),
+    u = _(i, S),
+    d,
+    f;
+  (t[2] !== i || t[3] !== c
+    ? ((d = () => {
+        i.attachBrowserAutocompleteRuntime(c);
+      }),
+      (f = [i, c]),
+      (t[2] = i),
+      (t[3] = c),
+      (t[4] = d),
+      (t[5] = f))
+    : ((d = t[4]), (f = t[5])),
+    (0, w.useLayoutEffect)(d, f));
+  let p;
+  t[6] !== i.view.dom.parentElement || t[7] !== l
+    ? ((p = () => {
+        let e = i.view.dom.parentElement;
+        if (e != null)
+          return (
+            l
+              ? e.setAttribute(`data-dismissing-browser-autocomplete-mention`, ``)
+              : e.removeAttribute(`data-dismissing-browser-autocomplete-mention`),
+            () => {
+              e.removeAttribute(`data-dismissing-browser-autocomplete-mention`);
+            }
+          );
+      }),
+      (t[6] = i.view.dom.parentElement),
+      (t[7] = l),
+      (t[8] = p))
+    : (p = t[8]);
+  let m;
+  (t[9] !== i || t[10] !== l ? ((m = [i, l]), (t[9] = i), (t[10] = l), (t[11] = m)) : (m = t[11]),
+    (0, w.useLayoutEffect)(p, m));
+  let h, g;
+  if (
+    (t[12] === i
+      ? ((h = t[13]), (g = t[14]))
+      : ((h = () =>
+          r.subscribe(`browser-sidebar-web-contents-pointer-down`, () => {
+            i.view.hasFocus() && i.hasStandaloneBrowserAutocompleteMention() && i.view.dom.blur();
+          })),
+        (g = [i]),
+        (t[12] = i),
+        (t[13] = h),
+        (t[14] = g)),
+    (0, w.useEffect)(h, g),
+    u == null)
+  )
+    return null;
+  let v;
+  return (
+    t[15] !== n || t[16] !== u || t[17] !== i || t[18] !== a || t[19] !== o
+      ? ((v = (0, T.jsx)(E, {
+          browserConversationId: n,
+          composerController: i,
+          composerId: a,
+          placement: o,
+          suggestionState: u,
+        })),
+        (t[15] = n),
+        (t[16] = u),
+        (t[17] = i),
+        (t[18] = a),
+        (t[19] = o),
+        (t[20] = v))
+      : (v = t[20]),
+    v
   );
-  const isDismissing = React.useSyncExternalStore(
-    runtime.subscribeMentionDismissal,
-    runtime.getMentionDismissalSnapshot,
-    () => false,
-  );
-  const suggestionState = useComposerSuggestionState(composerController, readBrowserSuggestionState);
-
-  React.useLayoutEffect(() => {
-    composerController.attachBrowserAutocompleteRuntime(runtime);
-  }, [composerController, runtime]);
-
-  React.useLayoutEffect(() => {
-    const parent = composerController.view.dom.parentElement;
-    if (parent == null) return;
-    if (isDismissing) parent.setAttribute("data-dismissing-browser-autocomplete-mention", "");
-    else parent.removeAttribute("data-dismissing-browser-autocomplete-mention");
-    return () => parent.removeAttribute("data-dismissing-browser-autocomplete-mention");
-  }, [composerController, isDismissing]);
-
-  React.useEffect(() => hostMessageBridge.subscribe(
-    "browser-sidebar-web-contents-pointer-down",
-    () => {
-      if (composerController.view.hasFocus() && runtime.hasStandaloneMention()) {
-        composerController.view.dom.blur();
-      }
-    },
-  ), [composerController, runtime]);
-
-  if (suggestionState == null) return null;
-  return jsx.jsx(BrowserAddressSuggestionOverlay, {
-    browserConversationId,
-    composerController,
-    composerId,
-    placement,
-    suggestionState,
-  });
 }
-
-let initialized = false;
-function initializeBrowserAddressShortcut(): void {
-  if (initialized) return;
-  initializeRuntimeLazy();
-  initializeBrowserAutocompleteState();
-  React = getReactRuntime();
-  jsx = getJsxRuntime();
-  initialized = true;
+function S(e) {
+  let t = g.getState(e.view.state);
+  return t?.active === !0 && t.kind === `browser-autocomplete` ? t : null;
 }
-
-initializeBrowserAddressShortcut();
-export { BrowserAddressShortcut };
+var C, w, T, E;
+function D() {
+  return (D = e(() => {
+    ((C = t()),
+      (w = f()),
+      n(),
+      v(),
+      p(),
+      d(),
+      b(),
+      (T = o()),
+      i(),
+      (E = s(
+        async () =>
+          (
+            await l(
+              async () => {
+                let { BrowserAddressSuggestionOverlay: e } = await import(
+                  `@rchunk/browser-address-suggestion-overlay`
+                );
+                return { BrowserAddressSuggestionOverlay: e };
+              },
+              __vite__mapDeps([0, 1, 2, 3, 4, 5, 6]),
+              import.meta.url,
+            )
+          ).BrowserAddressSuggestionOverlay,
+        { propagateLoadError: !0 },
+      )));
+  }))();
+}
+D();
+export { x as BrowserAddressShortcut };

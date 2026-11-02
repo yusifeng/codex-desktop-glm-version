@@ -1,41 +1,78 @@
-// Passive and active transport mechanisms across a cell membrane.
-import "@rchunk/rolldown-runtime";
-
-type TransportMechanism = "diffusion" | "facilitatedDiffusion" | "activeTransport";
-interface TransportValues { mechanism?: unknown }
-interface MessageFormatter { formatMessage(descriptor: { id: string; defaultMessage: string }): string }
-
-const cellMembraneTransportSpecification = {
-  type: "CELL_MEMBRANE_TRANSPORT",
-  version: 1,
-  thumbnailAssetKey: "cell-membrane-transport-v2",
-  parameters: { mechanism: { kind: "enum" as const, defaultValue: "diffusion" as TransportMechanism, allowedValues: ["diffusion", "facilitatedDiffusion", "activeTransport"] as TransportMechanism[] } },
-};
-const isTransportMechanism = (value: unknown): value is TransportMechanism => value === "diffusion" || value === "facilitatedDiffusion" || value === "activeTransport";
-const parseTransportMechanism = (value: unknown): TransportMechanism => {
-  if (!isTransportMechanism(value)) throw new Error(`Unsupported cell membrane transport mechanism: ${String(value)}`);
-  return value;
-};
-const transportMechanisms = cellMembraneTransportSpecification.parameters.mechanism.allowedValues.map(parseTransportMechanism);
-const mechanismIndexControl = { min: 0, max: transportMechanisms.length - 1, step: 1 };
-const defaultTransportMechanism = parseTransportMechanism(cellMembraneTransportSpecification.parameters.mechanism.defaultValue);
-const normalizeTransportValues = (values: TransportValues) => ({ mechanism: isTransportMechanism(values.mechanism) && cellMembraneTransportSpecification.parameters.mechanism.allowedValues.includes(values.mechanism) ? values.mechanism : defaultTransportMechanism });
-const transportMechanismLabel = (formatter: MessageFormatter, mechanism: TransportMechanism): string => {
-  switch (mechanism) {
-    case "diffusion": return formatter.formatMessage({ id: "learningBlock.cellMembraneTransport.mechanism.diffusion", defaultMessage: "Diffusion" });
-    case "facilitatedDiffusion": return formatter.formatMessage({ id: "learningBlock.cellMembraneTransport.mechanism.facilitatedDiffusion", defaultMessage: "Facilitated diffusion" });
-    case "activeTransport": return formatter.formatMessage({ id: "learningBlock.cellMembraneTransport.mechanism.activeTransport", defaultMessage: "Active transport" });
-  }
-};
-const transportCaption = (values: TransportValues, formatter: MessageFormatter): string => {
-  switch (normalizeTransportValues(values).mechanism) {
-    case "diffusion": return formatter.formatMessage({ id: "learningBlock.cellMembraneTransport.caption.diffusion", defaultMessage: "In simple diffusion, small nonpolar molecules move down their concentration gradient directly through the phospholipid bilayer." });
-    case "facilitatedDiffusion": return formatter.formatMessage({ id: "learningBlock.cellMembraneTransport.caption.facilitatedDiffusion", defaultMessage: "In facilitated diffusion, a channel protein allows solute particles to move down their concentration gradient without ATP." });
-    case "activeTransport": return formatter.formatMessage({ id: "learningBlock.cellMembraneTransport.caption.activeTransport", defaultMessage: "In this active transport example, ATP powers a pump that moves solute particles against their concentration gradient." });
-  }
-};
-
-function initializeCellMembraneTransportSpecification(): void {}
-function initializeCellMembraneTransportModel(): void {}
-
-export { transportMechanismLabel as a, initializeCellMembraneTransportSpecification as c, transportCaption as i, cellMembraneTransportSpecification as l, mechanismIndexControl as n, initializeCellMembraneTransportModel as o, transportMechanisms as r, normalizeTransportValues as s, defaultTransportMechanism as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `CELL_MEMBRANE_TRANSPORT`),
+      (n = `cell-membrane-transport-v2`),
+      (r = {
+        mechanism: {
+          kind: `enum`,
+          defaultValue: `diffusion`,
+          allowedValues: [`diffusion`, `facilitatedDiffusion`, `activeTransport`],
+        },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p;
+function m() {
+  return (m = e(() => {
+    (a(),
+      (o = (e) => e === `diffusion` || e === `facilitatedDiffusion` || e === `activeTransport`),
+      (s = (e) => {
+        if (!o(e)) throw Error(`Unsupported cell membrane transport mechanism: ${e}`);
+        return e;
+      }),
+      (c = i.parameters.mechanism.allowedValues.map(s)),
+      (l = { min: 0, max: c.length - 1, step: 1 }),
+      (u = s(i.parameters.mechanism.defaultValue)),
+      (d = (e) => ({
+        mechanism:
+          typeof e.mechanism == `string` &&
+          i.parameters.mechanism.allowedValues.includes(e.mechanism) &&
+          o(e.mechanism)
+            ? e.mechanism
+            : u,
+      })),
+      (f = (e, t) => {
+        switch (t) {
+          case `diffusion`:
+            return e.formatMessage({
+              id: `learningBlock.cellMembraneTransport.mechanism.diffusion`,
+              defaultMessage: `Diffusion`,
+            });
+          case `facilitatedDiffusion`:
+            return e.formatMessage({
+              id: `learningBlock.cellMembraneTransport.mechanism.facilitatedDiffusion`,
+              defaultMessage: `Facilitated diffusion`,
+            });
+          case `activeTransport`:
+            return e.formatMessage({
+              id: `learningBlock.cellMembraneTransport.mechanism.activeTransport`,
+              defaultMessage: `Active transport`,
+            });
+        }
+      }),
+      (p = (e, t) => {
+        switch (d(e).mechanism) {
+          case `diffusion`:
+            return t.formatMessage({
+              id: `learningBlock.cellMembraneTransport.caption.diffusion`,
+              defaultMessage: `In simple diffusion, small nonpolar molecules move down their concentration gradient directly through the phospholipid bilayer.`,
+            });
+          case `facilitatedDiffusion`:
+            return t.formatMessage({
+              id: `learningBlock.cellMembraneTransport.caption.facilitatedDiffusion`,
+              defaultMessage: `In facilitated diffusion, a channel protein allows solute particles to move down their concentration gradient without ATP.`,
+            });
+          case `activeTransport`:
+            return t.formatMessage({
+              id: `learningBlock.cellMembraneTransport.caption.activeTransport`,
+              defaultMessage: `In this active transport example, ATP powers a pump that moves solute particles against their concentration gradient.`,
+            });
+        }
+      }));
+  }))();
+}
+export { f as a, a as c, p as i, i as l, l as n, m as o, c as r, d as s, u as t };

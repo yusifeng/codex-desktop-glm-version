@@ -1,9 +1,79 @@
-import "@rchunk/rolldown-runtime";
-import * as Tokenize from "@rchunk/tokenize-math-block";
-import * as XLike from "@rchunk/x-like";
-import * as MathUtils from "@rchunk/math-block-utils";
-import * as Classify from "@rchunk/classify";
-function splitEquations(input: string): string[] { const body = input.match(/\\begin\{(?:cases|aligned)\}(?<body>[\s\S]*?)\\end\{(?:cases|aligned)\}/i)?.groups?.body ?? input.match(/\\begin\{array\}\{[^}]*\}(?<body>[\s\S]*?)\\end\{array\}/i)?.groups?.body ?? input; return body.split(/\\\\|\r?\n|\\n(?=\s*(?:y|[a-z][a-z0-9_]*\s*\(\s*x\s*\))\s*=)/iu).map((v) => v.replace(/\\(?:displaystyle|textstyle|scriptstyle|scriptscriptstyle)\b/gi, "").replace(/&/g, "").replace(/\\left\s*\\\{|\\right\s*\\\}|\\left\s*\\\.|\\right\s*\\\.|\\\{|\\\}/g, "").replace(/[;,]\s*$/, "").trim()).filter(Boolean); }
-function parseSystem(input: string): string[] | null { const equations = splitEquations(input); if (equations.length < 2) return null; let dependent = false; for (const equation of equations) { if (/\\text\b|\\(?:le|ge|lt|gt)\b|<=|>=|<|>|\\in\b|\\mid\b/i.test(equation)) return null; const match = /^\s*(y|[a-z][a-z0-9_]*\s*\(\s*x\s*\))\s*=\s*(.+)$/i.exec(equation); if (!match) return null; if (/\by\b/i.test(match[2])) return null; if (/\bx\b/i.test(match[2])) dependent = true; else if (!/^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/.test(match[2].trim())) return null; } return dependent ? equations : null; }
-function initialize(): void { (MathUtils as unknown as { r(): void }).r(); (Tokenize as unknown as { n(): void }).n(); (XLike as unknown as { r(): void }).r(); (Classify as unknown as { a(): void }).a(); }
-export { initialize as n, parseSystem as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { n as t, r as n } from "@rchunk/tokenize-math-block";
+import { i as r, n as i, r as a, t as o } from "@rchunk/x-like-identifier-normalization";
+import { n as s, r as c } from "@rchunk/math-block-utils";
+import { a as l, c as u, l as d, o as f, u as p } from "@rchunk/classify";
+var m, h, g, _, v, y, b, x, S, C, w, T, E, D, O;
+function k() {
+  return (k = e(() => {
+    (c(),
+      t(),
+      a(),
+      l(),
+      (m = /\\begin\{cases\}(?<body>[\s\S]*?)\\end\{cases\}/i),
+      (h = /\\begin\{aligned\}(?<body>[\s\S]*?)\\end\{aligned\}/i),
+      (g = /\\begin\{array\}\{[^}]*\}(?<body>[\s\S]*?)\\end\{array\}/i),
+      (_ = /\\(?:displaystyle|textstyle|scriptstyle|scriptscriptstyle)\b/gi),
+      (v = /\\left\s*\\\{|\\right\s*\\\}|\\left\s*\\\.|\\right\s*\\\.|\\\{|\\\}/g),
+      (y = /[;,]\s*$/),
+      (b = /\\text\b|\\(?:le|ge|lt|gt)\b|<=|>=|<|>|\\in\b|\\mid\b/i),
+      (x = /^[a-z][a-z0-9_]*\(x\)$/i),
+      (S = /^[+-]?(?:\d+(?:\.\d*)?|\.\d+)$/),
+      (C =
+        /\\\\|\r?\n|\\n(?=\s*(?:y|[a-z][a-z0-9_]*\s*\(\s*x\s*\))\s*=)|\\(?=\s*(?:y|[a-z][a-z0-9_]*\s*\(\s*x\s*\))\s*=)/giu),
+      (w = 2),
+      (T = (e) => {
+        let t = e.match(m);
+        if (t?.groups?.body) return t.groups.body;
+        let n = e.match(h);
+        if (n?.groups?.body) return n.groups.body;
+        let r = e.match(g);
+        return r?.groups?.body ? r.groups.body : e;
+      }),
+      (E = (e) => {
+        let t = e.replace(_, ``).replace(/&/g, ``).replace(v, ``),
+          n = d(t).replace(/\s+/g, ` `).replace(y, ``).trim();
+        return !n || b.test(n) || s(n).length !== 1 ? null : n;
+      }),
+      (D = (e) => {
+        let t = s(e);
+        if (t.length !== 1) return null;
+        let a = t[0],
+          c = e.slice(0, a).trim(),
+          l = e.slice(a + 1).trim();
+        if (!c || !l) return null;
+        let u = f(c).toLowerCase();
+        if (u !== `y` && !x.test(u)) return null;
+        let d = n(`y=${l}`);
+        if (!d) return null;
+        let p = r(d);
+        if (i(p) || p.some((e) => e.type === `identifier` && e.value === `y`)) return null;
+        let m = o(p);
+        return m.size === 1
+          ? `x-dependent`
+          : m.size !== 0 || !S.test(l) || !Number.isFinite(Number(l)) || !n(e)
+            ? null
+            : `horizontal`;
+      }),
+      (O = (e) => {
+        let t = u(p(e)),
+          n = T(t)
+            .split(C)
+            .map((e) => e.trim())
+            .filter(Boolean);
+        if (n.length < w) return null;
+        let r = [],
+          i = !1;
+        for (let e of n) {
+          let t = E(e);
+          if (!t) return null;
+          let n = D(t);
+          if (!n) return null;
+          ((i ||= n === `x-dependent`), r.push(t));
+        }
+        return r.length >= w && i ? r : null;
+      }));
+  }))();
+}
+export { k as n, O as t };

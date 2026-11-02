@@ -1,18 +1,73 @@
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-
-export interface RequestedPluginConnectionInput { appConnectOptions?: Record<string, unknown>; requestedConnectorId?: string | null; requiresAppSetup?: boolean; fetchConnector?(connectorId: string): Promise<{ description?: string | null; name: string; status?: string }>; fetchLink?(connectorId: string): Promise<{ auth_status?: string | null } | null> }
-export type RequestedPluginConnectionResult = { kind: "ready" | "unavailable" } | { app: { category: null; description: string | null; id: string; installUrl: null; name: string }; kind: "needsAuth" };
-async function requestedPluginConnection(input: RequestedPluginConnectionInput): Promise<RequestedPluginConnectionResult> {
-  const connectorId = input.requestedConnectorId;
-  if (!input.requiresAppSetup || connectorId == null) return { kind: "ready" };
-  if (input.fetchConnector == null || input.fetchLink == null) return { kind: "unavailable" };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { Q3 as t, Z3 as n } from "@rchunk/app-shared";
+import {
+  $3t as r,
+  XF as i,
+  Yr as a,
+  ZF as o,
+  _6t as s,
+  h6t as c,
+  p6t as l,
+  pdn as u,
+  s6t as d,
+  udn as f,
+} from "@rchunk/app-initial";
+async function p(e) {
+  let n = e.requestedConnectorId;
+  if (!e.requiresAppSetup || n == null) return { kind: `ready` };
+  let a = c(n, e.appConnectOptions)?.productSku ?? r(),
+    o = { [l]: a };
   try {
-    const [connector, link] = await Promise.all([input.fetchConnector(connectorId), input.fetchLink(connectorId)]);
-    if (connector.status === "DISABLED_BY_ADMIN") return { kind: "unavailable" };
-    if (link == null || (link.auth_status != null && link.auth_status !== "ACTIVE")) return { kind: "needsAuth", app: { category: null, description: connector.description ?? null, id: connectorId, installUrl: null, name: connector.name } };
-    return { kind: "ready" };
-  } catch { return { kind: "unavailable" }; }
+    let [e, { link: t }] = await Promise.all([
+      f.safeGet(`/aip/connectors/{connector_id}`, {
+        parameters: { path: { connector_id: n } },
+        additionalHeaders: o,
+      }),
+      f.safeGet(`/aip/connectors/{connector_id}/link`, {
+        parameters: { path: { connector_id: n } },
+        additionalHeaders: o,
+      }),
+    ]);
+    if (e.status === `DISABLED_BY_ADMIN`) return { kind: `unavailable` };
+    let r = {
+      category: null,
+      description: e.description ?? null,
+      id: n,
+      installUrl: null,
+      name: e.name,
+    };
+    if (t == null || (t.auth_status != null && t.auth_status !== `ACTIVE`))
+      return { kind: `needsAuth`, app: r };
+    if (
+      a === `CODEX` &&
+      (n === `connector_76869538009648d5b282a4bb21c3d157` ||
+        e.template_id === `templated_apps_GitHubEnterprise` ||
+        e.service === `github`)
+    )
+      try {
+        await f.safeGet(`/wham/github/list-repositories`, {
+          parameters: { query: { connector_id: n, page: 1, per_page: 1 } },
+        });
+      } catch (e) {
+        if (e instanceof Error && i(e)?.type === `missing_github_connector_link`)
+          return { kind: `needsAuth`, app: r };
+        throw e;
+      }
+    return { kind: `ready` };
+  } catch (e) {
+    return (
+      t.info(`Requested plugin connection could not be verified`, {
+        safe: {},
+        sensitive: { error: e },
+      }),
+      { kind: `unavailable` }
+    );
+  }
 }
-const initialize = (): void => {};
-export { requestedPluginConnection as n, initialize as t };
+function m() {
+  return (m = e(() => {
+    (d(), s(), a(), o(), n(), u());
+  }))();
+}
+export { p as n, m as t };

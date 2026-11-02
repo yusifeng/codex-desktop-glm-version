@@ -1,412 +1,432 @@
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
-
-type Destination = "bottom" | "left" | "right";
-type Direction = "ltr" | "rtl";
-
-interface TabIdentity {
-  dndId: string;
-  tabId: string;
-  [key: string]: unknown;
-}
-interface TabController {
-  tabById$: unknown;
-  tabIds$: unknown;
-}
-interface ContentDragState {
-  draggedTab: TabIdentity;
-  sourceController: TabController;
-}
-interface ChatTabDragState {
-  canDrop(destination: Destination): boolean;
-  dropDestinations?: Destination[];
-}
-interface WorkspaceDragContext {
-  chatTabDragState?: ChatTabDragState | null;
-  dragState?: ContentDragState | null;
-  registerSelectionCapture?(capture: () => () => void): () => void;
-}
-interface DroppableResult {
-  isOver: boolean;
-  setNodeRef(node: unknown): void;
-}
-interface FloatingResult {
-  floatingStyles: Record<string, unknown>;
-  refs: { setFloating(node: unknown): void; setReference(node: unknown): void };
-}
-interface ReactDomRuntime {
-  createPortal(node: unknown, container: unknown): unknown;
-}
-interface ScopeApi {
-  get<T>(signal: unknown): T;
-  set<T>(signal: unknown, value: T): void;
-}
-
-interface SharedDependencies {
-  BX<Parameter, Value>(family: unknown, parameter: Parameter): Value;
-  HX<Value>(signal: unknown): Value;
-  I3(): JsxRuntime;
-  LX(scope: unknown): ScopeApi;
-  P3(): ReactDomRuntime;
-  __<Callback extends (...arguments_: never[]) => unknown>(
-    callback: Callback,
-  ): Callback;
-  e6(): ReactRuntime;
-  e$<Input, Output>(input: Input, project: (input: Input) => Output): Output;
-  f1(options: Record<string, unknown>): unknown;
-  m1: unknown;
-  m4(...values: unknown[]): string;
-  o$: { div: unknown };
-  p1(options: Record<string, unknown>): FloatingResult;
-  u1(value: unknown): unknown;
-  x_(): number;
-  [key: string]: unknown;
-}
-interface InitialDependencies {
-  $en: unknown;
-  Bct(
-    input: { kind: "content"; tab: TabIdentity },
-    destination: Destination,
-  ): boolean;
-  Cet: unknown;
-  Hct(
-    scope: ScopeApi,
-    input: { kind: "content"; tab: TabIdentity },
-    destination: Destination,
-    sourceController: TabController,
-  ): void;
-  NDt(tab: TabIdentity): Destination[];
-  T7: unknown;
-  V7: unknown;
-  Vvt: TabController;
-  cvt: unknown;
-  fbt: unknown;
-  mbt: unknown;
-  mxt(
-    contentPaneWidthRatio: number,
-    mainContentWidth: number,
-    mode: "unified",
-  ): number;
-  pxt(): {
-    bottomPanelTargetHeight: number;
-    contentPaneWidthRatio: number;
-    mainContentWidth: number;
-  };
-  rCn(options: { data: Record<string, unknown>; id: string }): DroppableResult;
-  sxt(locale: string): Direction;
-  [key: string]: unknown;
-}
-
-const shared = appSharedChunk as unknown as SharedDependencies;
-const initial = appInitialChunk as unknown as InitialDependencies;
-let jsx: JsxRuntime;
-let react: ReactRuntime;
-let reactDom: ReactDomRuntime;
-
-function QuickChatDropZones(): unknown {
-  initializeQuickChatDropZones();
-  const scope = shared.LX(initial.$en);
-  const portalContainer = react.useContext<HTMLElement | null>(initial.T7);
-  const dragContext = react.useContext<WorkspaceDragContext | null>(
-    initial.Cet,
-  );
-  const contentDrag = dragContext?.dragState ?? null;
-  const chatDrag = dragContext?.chatTabDragState ?? null;
-  const liveTab = shared.BX<string | null, TabIdentity | null>(
-    contentDrag?.sourceController.tabById$ ?? null,
-    contentDrag?.draggedTab.tabId ?? null,
-  );
-  const draggedTab =
-    liveTab?.dndId === contentDrag?.draggedTab.dndId ? liveTab : null;
-  const supportsBottomDestination = shared.HX<boolean>(initial.fbt);
-  const intl = (appSharedChunk as unknown as { n4(): { locale: string } }).n4();
-  const direction = initial.sxt(intl.locale);
-  const captureSelection = react.useCallback(() => {
-    const selection = scope.get<unknown>(initial.cvt);
-    return () => scope.set(initial.cvt, selection);
-  }, [scope]);
-  const stableCapture = shared.__(
-    captureSelection as (...arguments_: never[]) => unknown,
-  );
-  react.useLayoutEffect(
-    () =>
-      dragContext?.registerSelectionCapture?.(
-        stableCapture as () => () => void,
-      ),
-    [stableCapture, dragContext?.registerSelectionCapture],
-  );
-
-  const destinations =
-    chatDrag?.dropDestinations ??
-    (draggedTab == null ? undefined : initial.NDt(draggedTab));
-  if (
-    portalContainer == null ||
-    (contentDrag == null && chatDrag == null) ||
-    destinations == null
-  )
-    return null;
-  const availableDestinations = destinations.filter(
-    (destination) =>
-      (destination !== "bottom" || supportsBottomDestination) &&
-      (chatDrag == null
-        ? draggedTab != null &&
-          initial.Bct({ kind: "content", tab: draggedTab }, destination)
-        : chatDrag.canDrop(destination)),
-  );
-  if (availableDestinations.length === 0) return null;
-
-  return reactDom.createPortal(
-    jsx.jsx("div", {
-      "aria-hidden": true,
-      className: "pointer-events-none absolute inset-0 z-50",
-      dir: direction,
-      children: availableDestinations.map((destination) =>
-        jsx.jsx(
-          DropTarget,
-          {
-            destination,
-            direction,
-            hasBottomDestination: availableDestinations.includes("bottom"),
-          },
-          destination,
-        ),
-      ),
-    }),
-    portalContainer,
-  );
-}
-
-function DropTarget({
-  destination,
-  direction,
-  hasBottomDestination,
-}: {
-  destination: Destination;
-  direction: Direction;
-  hasBottomDestination: boolean;
-}): unknown {
-  const scope = shared.LX(initial.$en);
-  const bottomPanelOffset = react.useContext<number | null>(initial.V7);
-  const canOffsetForBottomPanel = shared.HX<boolean>(initial.mbt);
-  const effectiveBottomOffset = canOffsetForBottomPanel
-    ? (bottomPanelOffset ?? undefined)
-    : undefined;
-  const onDrop = react.useCallback(
-    ({ draggedTab, sourceController }: ContentDragState) =>
-      initial.Hct(
-        scope,
-        { kind: "content", tab: draggedTab },
-        destination,
-        sourceController,
-      ),
-    [destination, scope],
-  );
-  const dropTarget = react.useMemo(
-    () => ({ destination, kind: "app-shell-tab-drop-target", onDrop }),
-    [destination, onDrop],
-  );
-  const { isOver, setNodeRef } = initial.rCn({
-    id: `unified-workspace-${destination}`,
-    data: dropTarget,
-  });
-  const className = shared.m4(
-    "pointer-events-none absolute z-50",
-    destination === "bottom"
-      ? "inset-x-0 bottom-0 h-1/4"
-      : shared.m4(
-          "top-0 w-1/4",
-          destination === "left" ? "left-0" : "right-0",
-          hasBottomDestination ? "bottom-1/4" : "bottom-0",
-        ),
-  );
-  const style = {
-    bottom:
-      destination !== "bottom" && hasBottomDestination
-        ? effectiveBottomOffset
-        : undefined,
-    height: destination === "bottom" ? effectiveBottomOffset : undefined,
-  };
-  return jsx.jsxs(jsx.Fragment, {
-    children: [
-      jsx.jsx(shared.o$.div, {
-        ref: setNodeRef,
-        "aria-hidden": true,
-        className,
-        "data-unified-workspace-drop-target": destination,
-        dir: "ltr",
-        style,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $Q as n,
+  BX as r,
+  FX as i,
+  HX as a,
+  I3 as o,
+  K2 as s,
+  LX as c,
+  P3 as l,
+  __ as u,
+  a$ as d,
+  e$ as f,
+  e6 as p,
+  f1 as m,
+  g_ as h,
+  h4 as g,
+  l1 as _,
+  m1 as v,
+  m4 as y,
+  n4 as b,
+  o$ as x,
+  p1 as S,
+  u1 as C,
+  x_ as w,
+  y_ as T,
+} from "@rchunk/app-shared";
+import {
+  $Sn as E,
+  $en as D,
+  Bct as O,
+  Cet as k,
+  E7 as A,
+  Ebt as j,
+  FDt as M,
+  Hct as N,
+  NDt as P,
+  T7 as F,
+  U7 as I,
+  V7 as L,
+  Vct as R,
+  Vvt as z,
+  Wvt as B,
+  cvt as V,
+  fbt as H,
+  fxt as U,
+  hxt as W,
+  itn as G,
+  mbt as K,
+  mxt as ee,
+  pxt as te,
+  rCn as q,
+  rvt as J,
+  sxt as ne,
+  wet as re,
+} from "@rchunk/app-initial";
+function ie() {
+  let e = (0, X.c)(33),
+    t = c(D),
+    n = (0, Z.useContext)(F),
+    i = (0, Z.useContext)(k),
+    o = i?.dragState ?? null,
+    s = i?.chatTabDragState ?? null,
+    l = r(o?.sourceController.tabById$ ?? null, o?.draggedTab.tabId ?? null),
+    d = l?.dndId === o?.draggedTab.dndId ? l : null,
+    f = a(H),
+    p = b(),
+    m;
+  e[0] === p.locale ? (m = e[1]) : ((m = ne(p.locale)), (e[0] = p.locale), (e[1] = m));
+  let h = m,
+    g = i?.registerSelectionCapture,
+    _;
+  e[2] === t
+    ? (_ = e[3])
+    : ((_ = () => {
+        let e = t.get(V);
+        return () => {
+          t.set(V, e);
+        };
       }),
-      isOver ? jsx.jsx(DropIndicator, { destination, direction }) : null,
-    ],
-  });
+      (e[2] = t),
+      (e[3] = _));
+  let v = u(_),
+    y,
+    x;
+  (e[4] !== v || e[5] !== g
+    ? ((y = () => g?.(v)), (x = [v, g]), (e[4] = v), (e[5] = g), (e[6] = y), (e[7] = x))
+    : ((y = e[6]), (x = e[7])),
+    (0, Z.useLayoutEffect)(y, x));
+  let S, C, w, T, E, A;
+  if (e[8] !== s || e[9] !== d || e[10] !== h || e[11] !== o || e[12] !== f || e[13] !== n) {
+    S = Symbol.for(`react.early_return_sentinel`);
+    bb0: {
+      let t = s?.dropDestinations ?? (d == null ? void 0 : P(d));
+      if (n == null || (o == null && s == null) || t == null) {
+        S = null;
+        break bb0;
+      }
+      let r;
+      e[20] !== s || e[21] !== d || e[22] !== f
+        ? ((r = (e) =>
+            (e !== `bottom` || f) &&
+            (s == null ? d != null && O({ kind: `content`, tab: d }, e) : s.canDrop(e))),
+          (e[20] = s),
+          (e[21] = d),
+          (e[22] = f),
+          (e[23] = r))
+        : (r = e[23]);
+      let i = t.filter(r);
+      if (i.length === 0) {
+        S = null;
+        break bb0;
+      }
+      ((A = Q.createPortal),
+        (C = !0),
+        (w = `pointer-events-none absolute inset-0 z-50`),
+        (T = h),
+        (E = i.map((e) =>
+          (0, $.jsx)(
+            ae,
+            { destination: e, direction: h, hasBottomDestination: i.includes(`bottom`) },
+            e,
+          ),
+        )));
+    }
+    ((e[8] = s),
+      (e[9] = d),
+      (e[10] = h),
+      (e[11] = o),
+      (e[12] = f),
+      (e[13] = n),
+      (e[14] = S),
+      (e[15] = C),
+      (e[16] = w),
+      (e[17] = T),
+      (e[18] = E),
+      (e[19] = A));
+  } else ((S = e[14]), (C = e[15]), (w = e[16]), (T = e[17]), (E = e[18]), (A = e[19]));
+  if (S !== Symbol.for(`react.early_return_sentinel`)) return S;
+  let j;
+  e[24] !== C || e[25] !== w || e[26] !== T || e[27] !== E
+    ? ((j = (0, $.jsx)(`div`, { "aria-hidden": C, className: w, dir: T, children: E })),
+      (e[24] = C),
+      (e[25] = w),
+      (e[26] = T),
+      (e[27] = E),
+      (e[28] = j))
+    : (j = e[28]);
+  let M;
+  return (
+    e[29] !== n || e[30] !== j || e[31] !== A
+      ? ((M = A(j, n)), (e[29] = n), (e[30] = j), (e[31] = A), (e[32] = M))
+      : (M = e[32]),
+    M
+  );
 }
-
-function DropIndicator({
-  destination,
-  direction,
-  surface,
-}: {
-  destination: Destination;
-  direction: Direction;
-  surface?: "chat" | "content";
-}): unknown {
-  initializeQuickChatDropZones();
-  const { bottomPanelTargetHeight, contentPaneWidthRatio, mainContentWidth } =
-    initial.pxt();
-  const dragContext = react.useContext<WorkspaceDragContext | null>(
-    initial.Cet,
-  );
-  const bottomPanelOffset = react.useContext<number | null>(initial.V7);
-  const canOffsetForBottomPanel = shared.HX<boolean>(initial.mbt);
-  const tabIds = shared.HX<string[]>(initial.Vvt.tabIds$);
-  const movingLastContentTab =
-    dragContext?.dragState?.sourceController === initial.Vvt &&
-    tabIds.length === 1;
-  const effectiveBottomOffset =
-    canOffsetForBottomPanel && !movingLastContentTab
-      ? (bottomPanelOffset ?? undefined)
-      : undefined;
-  const splitWidth = shared.e$<[number, number], number>(
-    [mainContentWidth, contentPaneWidthRatio],
-    ([width, ratio]) => {
-      const contentWidth = Math.min(
-        width,
-        initial.mxt(ratio, width, "unified"),
-      );
-      const targetSurface =
-        surface ?? (dragContext?.chatTabDragState == null ? "content" : "chat");
-      return targetSurface === "chat" ? width - contentWidth : contentWidth;
-    },
-  );
-  const floating = shared.p1({
-    placement: "bottom-start",
-    strategy: "fixed",
-    middleware: [
-      shared.u1(
-        ({ rects }: { rects: { reference: { height: number } } }) =>
-          -rects.reference.height,
-      ),
-      shared.f1({
-        apply({
-          elements,
-          rects,
-        }: {
-          elements: { floating: HTMLElement };
-          rects: { reference: { height: number; width: number } };
-        }) {
-          Object.assign(elements.floating.style, {
-            height: `${rects.reference.height}px`,
-            width: `${rects.reference.width}px`,
-          });
-        },
+function ae(e) {
+  let t = (0, X.c)(27),
+    { destination: n, direction: r, hasBottomDestination: i } = e,
+    o = c(D),
+    s = (0, Z.useContext)(L),
+    l = a(K) ? (s ?? void 0) : void 0,
+    u = `unified-workspace-${n}`,
+    d;
+  t[0] !== n || t[1] !== o
+    ? ((d = (e) => {
+        let { draggedTab: t, sourceController: r } = e;
+        return N(o, { kind: `content`, tab: t }, n, r);
       }),
-    ],
-    whileElementsMounted: shared.m1,
-  });
-  const referenceRef = shared.__(
-    floating.refs.setReference as (...arguments_: never[]) => unknown,
+      (t[0] = n),
+      (t[1] = o),
+      (t[2] = d))
+    : (d = t[2]);
+  let f;
+  t[3] !== n || t[4] !== d
+    ? ((f = { destination: n, kind: `app-shell-tab-drop-target`, onDrop: d }),
+      (t[3] = n),
+      (t[4] = d),
+      (t[5] = f))
+    : (f = t[5]);
+  let p = f,
+    m;
+  t[6] !== u || t[7] !== p
+    ? ((m = { id: u, data: p }), (t[6] = u), (t[7] = p), (t[8] = m))
+    : (m = t[8]);
+  let { isOver: h, setNodeRef: g } = q(m),
+    _;
+  t[9] !== n || t[10] !== i
+    ? ((_ = y(
+        `pointer-events-none absolute z-50`,
+        n === `bottom`
+          ? `inset-x-0 bottom-0 h-1/4`
+          : y(`top-0 w-1/4`, n === `left` ? `left-0` : `right-0`, i ? `bottom-1/4` : `bottom-0`),
+      )),
+      (t[9] = n),
+      (t[10] = i),
+      (t[11] = _))
+    : (_ = t[11]);
+  let v = n !== `bottom` && i ? l : void 0,
+    b = n === `bottom` ? l : void 0,
+    S;
+  t[12] !== v || t[13] !== b
+    ? ((S = { bottom: v, height: b }), (t[12] = v), (t[13] = b), (t[14] = S))
+    : (S = t[14]);
+  let C;
+  t[15] !== n || t[16] !== g || t[17] !== _ || t[18] !== S
+    ? ((C = (0, $.jsx)(x.div, {
+        ref: g,
+        "aria-hidden": !0,
+        className: _,
+        "data-unified-workspace-drop-target": n,
+        dir: `ltr`,
+        style: S,
+      })),
+      (t[15] = n),
+      (t[16] = g),
+      (t[17] = _),
+      (t[18] = S),
+      (t[19] = C))
+    : (C = t[19]);
+  let w;
+  t[20] !== n || t[21] !== r || t[22] !== h
+    ? ((w = h ? (0, $.jsx)(Y, { destination: n, direction: r }) : null),
+      (t[20] = n),
+      (t[21] = r),
+      (t[22] = h),
+      (t[23] = w))
+    : (w = t[23]);
+  let T;
+  return (
+    t[24] !== C || t[25] !== w
+      ? ((T = (0, $.jsxs)($.Fragment, { children: [C, w] })), (t[24] = C), (t[25] = w), (t[26] = T))
+      : (T = t[26]),
+    T
   );
-  const floatingRef = shared.__(
-    floating.refs.setFloating as (...arguments_: never[]) => unknown,
-  );
-  const referenceClassName = shared.m4(
-    "pointer-events-none absolute",
-    destination === "bottom" && "inset-x-0 bottom-0",
-    destination === "left" && "inset-y-0 left-0",
-    destination === "right" && "inset-y-0 right-0",
-  );
-  const referenceStyle = {
-    bottom: destination === "bottom" ? undefined : effectiveBottomOffset,
-    height: destination === "bottom" ? bottomPanelTargetHeight : undefined,
-    width: destination === "bottom" ? undefined : splitWidth,
-  };
-  return jsx.jsxs(jsx.Fragment, {
-    children: [
-      jsx.jsx(shared.o$.div, {
-        ref: referenceRef,
-        "aria-hidden": true,
-        className: referenceClassName,
-        dir: "ltr",
-        style: referenceStyle,
+}
+function Y(e) {
+  let t = (0, X.c)(34),
+    { destination: n, direction: r, surface: i } = e,
+    { bottomPanelTargetHeight: o, contentPaneWidthRatio: s, mainContentWidth: c } = te(),
+    l = (0, Z.useContext)(k),
+    d = (0, Z.useContext)(L),
+    p = a(K),
+    h = a(z.tabIds$),
+    g = l?.dragState?.sourceController === z && h.length === 1,
+    _ = p && !g ? (d ?? void 0) : void 0,
+    b;
+  t[0] !== s || t[1] !== c ? ((b = [c, s]), (t[0] = s), (t[1] = c), (t[2] = b)) : (b = t[2]);
+  let w;
+  t[3] !== i || t[4] !== l?.chatTabDragState
+    ? ((w = (e) => {
+        let [t, n] = e,
+          r = Math.min(t, ee(n, t, `unified`));
+        return (i ?? (l?.chatTabDragState == null ? `content` : `chat`)) === `chat` ? t - r : r;
       }),
-      reactDom.createPortal(
-        jsx.jsx("div", {
-          ref: floatingRef,
-          "aria-hidden": true,
-          className: "pointer-events-none z-50",
-          "data-unified-workspace-drop-indicator": destination,
-          dir: direction,
-          style: floating.floatingStyles,
-          children: jsx.jsx(DropOverlay, { destination }),
+      (t[3] = i),
+      (t[4] = l?.chatTabDragState),
+      (t[5] = w))
+    : (w = t[5]);
+  let T = f(b, w),
+    E;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((E = {
+        placement: `bottom-start`,
+        strategy: `fixed`,
+        middleware: [
+          C(oe),
+          m({
+            apply(e) {
+              let { elements: t, rects: n } = e;
+              Object.assign(t.floating.style, {
+                height: `${n.reference.height}px`,
+                width: `${n.reference.width}px`,
+              });
+            },
+          }),
+        ],
+        whileElementsMounted: v,
+      }),
+      (t[6] = E))
+    : (E = t[6]);
+  let { floatingStyles: D, refs: O } = S(E),
+    A;
+  t[7] === O
+    ? (A = t[8])
+    : ((A = (e) => {
+        O.setReference(e);
+      }),
+      (t[7] = O),
+      (t[8] = A));
+  let j = u(A),
+    M;
+  t[9] === O
+    ? (M = t[10])
+    : ((M = (e) => {
+        O.setFloating(e);
+      }),
+      (t[9] = O),
+      (t[10] = M));
+  let N = u(M),
+    P = n === `bottom` && `inset-x-0 bottom-0`,
+    F = n === `left` && `inset-y-0 left-0`,
+    I = n === `right` && `inset-y-0 right-0`,
+    R;
+  t[11] !== P || t[12] !== F || t[13] !== I
+    ? ((R = y(`pointer-events-none absolute`, P, F, I)),
+      (t[11] = P),
+      (t[12] = F),
+      (t[13] = I),
+      (t[14] = R))
+    : (R = t[14]);
+  let B = n === `bottom` ? void 0 : _,
+    V = n === `bottom` ? o : void 0,
+    H = n === `bottom` ? void 0 : T,
+    U;
+  t[15] !== B || t[16] !== V || t[17] !== H
+    ? ((U = { bottom: B, height: V, width: H }), (t[15] = B), (t[16] = V), (t[17] = H), (t[18] = U))
+    : (U = t[18]);
+  let W;
+  t[19] !== j || t[20] !== U || t[21] !== R
+    ? ((W = (0, $.jsx)(x.div, { ref: j, "aria-hidden": !0, className: R, dir: `ltr`, style: U })),
+      (t[19] = j),
+      (t[20] = U),
+      (t[21] = R),
+      (t[22] = W))
+    : (W = t[22]);
+  let G;
+  t[23] === n ? (G = t[24]) : ((G = (0, $.jsx)(se, { destination: n })), (t[23] = n), (t[24] = G));
+  let q;
+  t[25] !== n || t[26] !== r || t[27] !== D || t[28] !== N || t[29] !== G
+    ? ((q = (0, Q.createPortal)(
+        (0, $.jsx)(`div`, {
+          ref: N,
+          "aria-hidden": !0,
+          className: `pointer-events-none z-50`,
+          "data-unified-workspace-drop-indicator": n,
+          dir: r,
+          style: D,
+          children: G,
         }),
         document.body,
-      ),
-    ],
-  });
-}
-
-function DropOverlay({ destination }: { destination: Destination }): unknown {
-  const iconScale = shared.x_();
-  const className = shared.m4(
-    "absolute top-0 left-0 border-default bg-codex-drop-overlay/60 select-none",
-    destination === "bottom" && "border-t",
-    destination === "left" && "border-r",
-    destination === "right" && "border-l",
+      )),
+      (t[25] = n),
+      (t[26] = r),
+      (t[27] = D),
+      (t[28] = N),
+      (t[29] = G),
+      (t[30] = q))
+    : (q = t[30]);
+  let J;
+  return (
+    t[31] !== W || t[32] !== q
+      ? ((J = (0, $.jsxs)($.Fragment, { children: [W, q] })), (t[31] = W), (t[32] = q), (t[33] = J))
+      : (J = t[33]),
+    J
   );
-  return jsx.jsx("div", {
-    className,
-    style: {
-      height: `calc(100% / ${iconScale})`,
-      transform: `scale(${iconScale})`,
-      transformOrigin: "top left",
-      width: `calc(100% / ${iconScale})`,
-    },
-  });
 }
-
-let initialized = false;
-function initializeQuickChatDropZones(): void {
-  if (initialized) return;
-  initialized = true;
-  const call = (name: string) => {
-    const candidate = (
-      name in shared ? shared[name] : initial[name]
-    ) as unknown;
-    if (typeof candidate === "function") (candidate as () => unknown)();
-  };
-  for (const name of [
-    "$Sn",
-    "l1",
-    "h4",
-    "a$",
-    "$Q",
-    "FX",
-    "K2",
-    "U7",
-    "fxt",
-    "E7",
-    "Wvt",
-    "wet",
-    "FDt",
-    "hxt",
-    "Ebt",
-    "y_",
-    "itn",
-    "g_",
-    "Vct",
-    "rvt",
-  ])
-    call(name);
-  react = shared.e6();
-  reactDom = shared.P3();
-  jsx = shared.I3();
+function oe(e) {
+  let { rects: t } = e;
+  return -t.reference.height;
 }
-
-initializeQuickChatDropZones();
-export {
-  QuickChatDropZones as n,
-  initializeQuickChatDropZones as r,
-  DropIndicator as t,
-};
+function se(e) {
+  let t = (0, X.c)(11),
+    { destination: n } = e,
+    r = w(),
+    i = n === `bottom` && `border-t`,
+    a = n === `left` && `border-r`,
+    o = n === `right` && `border-l`,
+    s;
+  t[0] !== i || t[1] !== a || t[2] !== o
+    ? ((s = y(
+        `absolute top-0 left-0 border-default bg-codex-drop-overlay/60 select-none`,
+        i,
+        a,
+        o,
+      )),
+      (t[0] = i),
+      (t[1] = a),
+      (t[2] = o),
+      (t[3] = s))
+    : (s = t[3]);
+  let c = `calc(100% / ${r})`,
+    l = `scale(${r})`,
+    u = `calc(100% / ${r})`,
+    d;
+  t[4] !== c || t[5] !== l || t[6] !== u
+    ? ((d = { height: c, transform: l, transformOrigin: `top left`, width: u }),
+      (t[4] = c),
+      (t[5] = l),
+      (t[6] = u),
+      (t[7] = d))
+    : (d = t[7]);
+  let f;
+  return (
+    t[8] !== s || t[9] !== d
+      ? ((f = (0, $.jsx)(`div`, { className: s, style: d })), (t[8] = s), (t[9] = d), (t[10] = f))
+      : (f = t[10]),
+    f
+  );
+}
+var X, Z, Q, $;
+function ce() {
+  return (ce = e(() => {
+    ((X = t()),
+      E(),
+      _(),
+      g(),
+      d(),
+      n(),
+      i(),
+      (Z = p()),
+      (Q = l()),
+      s(),
+      I(),
+      U(),
+      A(),
+      B(),
+      re(),
+      M(),
+      W(),
+      j(),
+      T(),
+      G(),
+      h(),
+      R(),
+      J(),
+      ($ = o()));
+  }))();
+}
+export { ie as n, ce as r, Y as t };

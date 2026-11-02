@@ -1,264 +1,282 @@
-import "@rchunk/rolldown-runtime";
-// Preserve the published sampling-helper dependency edge. The readable owner
-// below implements the same selection policy locally, while this side-effect
-// import keeps chunk initialization and the cross-chunk contract identical.
-import "@rchunk/values";
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
+// @ts-nocheck
+import { n as e, o as t, t as n } from "@rchunk/rolldown-runtime";
 import {
-  HX as useSignalValue,
-  I3 as getJsxRuntime,
-  LX as useScope,
-  _L as useQuery,
-  sZ as createDerivedSignal,
-  type MaitaiScopeApi,
+  $ as r,
+  $3 as i,
+  BW as a,
+  C_ as o,
+  FX as s,
+  G as c,
+  HX as l,
+  I3 as u,
+  J as d,
+  K as f,
+  LX as p,
+  Lx as m,
+  OT as h,
+  Q as g,
+  QW as ee,
+  Rx as _,
+  S3 as v,
+  S_ as y,
+  U as b,
+  VS as x,
+  W as te,
+  X as ne,
+  Y as re,
+  Z as S,
+  ZS as ie,
+  _L as ae,
+  bV as oe,
+  et as se,
+  gL as ce,
+  kT as C,
+  lw as w,
+  q as T,
+  sZ as E,
 } from "@rchunk/app-shared";
 import {
-  $9t as normalizeSuggestionPosition,
-  HZ as useComposerEditor,
-  PIt as pendingComposerEntries,
-  RIt as initializeComposerSignals,
-  UZ as observeComposerValue,
-  VZ as initializeComposerEditor,
-  b2 as setComposerSystemHints,
-  cJt as initializeApiClient,
-  kht as composerStateRoot,
-  rJt as apiClient,
-  v2 as activeConversationId,
-  xIt as isSketchGenerationPending,
-  xpn as trackProductEvent,
-  yIt as composerAttachments,
-  ypn as initializeComposerAttachments,
+  $9t as D,
+  HZ as O,
+  Hrt as k,
+  PIt as A,
+  RIt as j,
+  Rht as M,
+  UZ as N,
+  VZ as P,
+  b2 as F,
+  cJt as I,
+  kht as L,
+  rJt as R,
+  ren as z,
+  v2 as B,
+  xIt as V,
+  xpn as H,
+  y2 as le,
+  yIt as U,
+  ypn as W,
 } from "@rchunk/app-initial";
-import {
-  Ia as sketchFollowupSelectedEvent,
-  La as initializeSketchComposerState,
-  au as initializeSketchAnalytics,
-  ru as clearSketchComposerState,
-} from "@rchunk/app-primary";
-import {
-  n as initializeHomeSuggestionSurface,
-  t as HomeSuggestionSurface,
-} from "@rchunk/home-suggestion-surface";
-
-export interface SketchFollowupSuggestion {
-  id: string;
-  prompt_text: string;
-  system_hints?: string[] | null;
-  title: string;
-}
-
-interface ComposerAttachment {
-  isBigPaste?: boolean;
-  sketchId?: string | null;
-  status?: string;
-  uploadId?: string | null;
-}
-
-interface SuggestionItem {
-  disabled: false;
-  icon: unknown;
-  id: string;
-  label: string;
-  onClick(): void;
-}
-
-interface SketchHomeSuggestionsProps {
-  mode?: string;
-}
-
-const sharedInitializers = sharedChunk as unknown as Record<string, unknown>;
-const initialInitializers = initialChunk as unknown as Record<string, unknown>;
-let jsx: ReturnType<typeof getJsxRuntime>;
-let readSignal: <T>(signal: unknown) => T;
-
-function callInitializer(value: unknown): void {
-  if (typeof value === "function") value();
-}
-
-function sample<T>(items: readonly T[], count: number): T[] {
-  const pool = [...items];
-  const selected: T[] = [];
-  while (pool.length > 0 && selected.length < count) {
-    selected.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
-  }
-  return selected;
-}
-
-function selectSketchFollowupSuggestions(
-  items: readonly SketchFollowupSuggestion[],
-): SketchFollowupSuggestion[] {
-  const valid = items.filter((item) => item.title.trim() && item.prompt_text.trim());
-  const primary = valid.find((item) =>
-    ["make_art", "make-it-art"].includes(item.id.replace(/,$/, "")),
-  ) ?? valid[0];
-  const animation = valid.find((item) => item.id === "animate_drawing");
-  return primary == null
+import { Ia as ue, La as de, au as fe, ru as pe } from "@rchunk/app-primary";
+import { n as me, t as he } from "@rchunk/home-suggestion-surface";
+import { n as G, t as ge } from "@rchunk/values";
+var _e = n((e, t) => {
+    var n = k(),
+      r = ee(),
+      i = G();
+    function a(e, t) {
+      return i(r(e), n(t, 0, e.length));
+    }
+    t.exports = a;
+  }),
+  ve = n((e, t) => {
+    var n = k(),
+      r = G(),
+      i = ge();
+    function a(e, t) {
+      var a = i(e);
+      return r(a, n(t, 0, a.length));
+    }
+    t.exports = a;
+  }),
+  ye = n((e, t) => {
+    var n = _e(),
+      r = ve(),
+      i = v(),
+      o = a(),
+      s = oe();
+    function c(e, t, a) {
+      return ((t = (a ? o(e, t, a) : t === void 0) ? 1 : s(t)), (i(e) ? n : r)(e, t));
+    }
+    t.exports = c;
+  });
+function be(e) {
+  let t = e.filter((e) => e.title.trim() && e.prompt_text.trim()),
+    n = t.find((e) => [`make_art`, `make-it-art`].includes(e.id.replace(/,$/, ``))) ?? t[0],
+    r = t.find((e) => e.id === `animate_drawing`);
+  return n == null
     ? []
     : [
-        primary,
-        ...sample(valid.filter((item) => item !== primary && item !== animation), 2),
-        ...(animation != null && animation !== primary ? [animation] : []),
+        n,
+        ...(0, K.default)(
+          t.filter((e) => e !== n && e !== r),
+          2,
+        ),
+        ...(r != null && r !== n ? [r] : []),
       ];
 }
-
-async function fetchSketchFollowups({
-  signal,
-}: {
-  signal?: AbortSignal;
-}): Promise<SketchFollowupSuggestion[]> {
-  const response = await apiClient.safeGet("/images/prompt-items", {
-    parameters: { query: { surface: "sketch_followups" } },
-    signal,
-  }) as { items?: SketchFollowupSuggestion[] | null };
-  return selectSketchFollowupSuggestions(response.items ?? []);
+var K;
+function q() {
+  return (q = e(() => {
+    K = t(ye(), 1);
+  }))();
 }
-
-initializeSketchComposerState();
-initializeComposerSignals();
-initializeComposerEditor();
-initializeHomeSuggestionSurface();
-initializeComposerAttachments();
-initializeSketchAnalytics();
-initializeApiClient();
-for (const value of [
-  initialInitializers.ren,
-  sharedInitializers.et,
-  sharedInitializers.Q,
-  sharedInitializers.X,
-  sharedInitializers.q,
-  sharedInitializers.G,
-  sharedInitializers.OT,
-  sharedInitializers.U,
-  sharedInitializers.gL,
-  sharedInitializers.FX,
-  initialInitializers.y2,
-  sharedInitializers.C_,
-  sharedInitializers.lw,
-  initialInitializers.Rht,
-]) callInitializer(value);
-jsx = getJsxRuntime();
-readSignal = useSignalValue as unknown as <T>(signal: unknown) => T;
-
-const sketchUploadId = createDerivedSignal(
-  composerStateRoot,
-  ({ get }) => {
-    const conversationId = get(activeConversationId as never) as unknown;
-    const attachments = get(
-      composerAttachments as never,
-      conversationId,
-    ) as unknown as ComposerAttachment[];
-    const promptAttachments = attachments.filter((entry) => !entry.isBigPaste);
-    const allSketchesReady = promptAttachments.every(
-      (entry) => entry.sketchId != null && entry.status !== "error",
-    );
-    const generationPending = get(
-      isSketchGenerationPending as never,
-      conversationId,
-    ) as unknown as boolean;
-    const pendingEntries = get(
-      pendingComposerEntries as never,
-      conversationId,
-    ) as unknown as unknown[];
-    return allSketchesReady && !generationPending && pendingEntries.length === 0
-      ? (promptAttachments.at(-1)?.uploadId ?? null)
-      : null;
-  },
-);
-
-function SketchSuggestionList({
-  items,
-  mode = "chat",
-  onSelect,
-}: {
-  items: readonly SketchFollowupSuggestion[];
-  mode?: string;
-  onSelect(item: SketchFollowupSuggestion, index: number): void;
-}): unknown {
-  const iconFor = (id: string): unknown => {
-    const key = id.replace(/,$/, "");
-    if (key === "make_art" || key === "make-it-art") {
-      return jsx.jsx(sharedInitializers.Lx, {});
-    }
-    if (key === "explore_logos" || key === "turn-it-into-a-logo") {
-      return jsx.jsx(sharedInitializers.VS, {});
-    }
-    if (key === "make_it_realistic" || key === "make-it-realistic") {
-      return jsx.jsx(sharedInitializers.Rx, {});
-    }
-    const asset = ({
-      solve_problem: sharedInitializers.Z,
-      "solve-this-problem": sharedInitializers.Z,
-      roast_drawing: sharedInitializers.K,
-      "critique-my-drawing": sharedInitializers.K,
-      finish_drawing: sharedInitializers.kT,
-      "finish-the-drawing": sharedInitializers.kT,
-      bring_to_life: sharedInitializers.J,
-      "bring-it-to-life": sharedInitializers.J,
-      make_stickers: sharedInitializers.Y,
-      make_storybook: sharedInitializers.$,
-      animate_drawing: sharedInitializers.W,
-    } as Record<string, unknown>)[key];
-    return asset == null
-      ? jsx.jsx(sharedInitializers.ZS, {})
-      : jsx.jsx(sharedInitializers.S_, { asset, "aria-hidden": true });
-  };
-  const surfaceItems: SuggestionItem[] = items.map((item, index) => ({
-    id: item.id,
-    label: item.title,
-    icon: iconFor(item.id),
-    disabled: false,
-    onClick: () => onSelect(item, index),
-  }));
-  return jsx.jsx(HomeSuggestionSurface, {
-    composerMode: mode,
-    items: surfaceItems,
-    layout: "list",
-    showCloseAction: false,
-  });
+function xe(e) {
+  let t = (0, Y.c)(14),
+    { mode: n } = e,
+    r = p(L),
+    i = l(B),
+    a = l(Q),
+    o = O(),
+    s = N(o, Ce, `document`),
+    c;
+  t[0] !== i || t[1] !== a
+    ? ((c = [`sketch-followups`, i, a]), (t[0] = i), (t[1] = a), (t[2] = c))
+    : (c = t[2]);
+  let u = a != null && s,
+    d;
+  t[3] !== c || t[4] !== u
+    ? ((d = { queryKey: c, enabled: u, queryFn: Se, staleTime: 1 / 0, retry: 2 }),
+      (t[3] = c),
+      (t[4] = u),
+      (t[5] = d))
+    : (d = t[5]);
+  let { data: f } = ae(d),
+    m;
+  return (
+    t[6] !== o ||
+    t[7] !== i ||
+    t[8] !== f ||
+    t[9] !== s ||
+    t[10] !== n ||
+    t[11] !== r ||
+    t[12] !== a
+      ? ((m =
+          a == null || !s || f == null || f.length === 0
+            ? null
+            : (0, X.jsx)(
+                we,
+                {
+                  items: f,
+                  mode: n,
+                  onSelect: (e, t) => {
+                    o.hasText() ||
+                      r.get(Q) == null ||
+                      (pe(r, i),
+                      o.setPromptText(e.prompt_text),
+                      F(r, i, e.system_hints ?? []),
+                      o.focus(),
+                      r.get(U, i).filter(J).length === 1 &&
+                        H(r, ue, { suggestionId: e.id, position: D(t) }));
+                  },
+                },
+                a,
+              )),
+        (t[6] = o),
+        (t[7] = i),
+        (t[8] = f),
+        (t[9] = s),
+        (t[10] = n),
+        (t[11] = r),
+        (t[12] = a),
+        (t[13] = m))
+      : (m = t[13]),
+    m
+  );
 }
-
-function SketchHomeSuggestions({ mode }: SketchHomeSuggestionsProps): unknown {
-  const scope = useScope(composerStateRoot) as MaitaiScopeApi<unknown>;
-  const conversationId = readSignal<unknown>(activeConversationId);
-  const uploadId = readSignal<string | null>(sketchUploadId);
-  const editor = useComposerEditor();
-  const composerEmpty = (observeComposerValue as unknown as (
-    controller: unknown,
-    selector: (value: { hasText(): boolean }) => boolean,
-    channel: string,
-  ) => boolean)(editor, (value) => !value.hasText(), "document");
-  const enabled = uploadId != null && composerEmpty;
-  const { data: items } = useQuery({
-    queryKey: ["sketch-followups", conversationId, uploadId],
-    enabled,
-    queryFn: fetchSketchFollowups,
-    retry: 2,
-    staleTime: Infinity,
-  });
-
-  if (uploadId == null || !enabled || items == null || items.length === 0) return null;
-  return jsx.jsx(SketchSuggestionList, {
-    items,
-    mode,
-    onSelect: (item: SketchFollowupSuggestion, index: number) => {
-      if (editor.hasText() || scope.get(sketchUploadId) == null) return;
-      clearSketchComposerState(scope, conversationId);
-      editor.setPromptText?.(item.prompt_text);
-      setComposerSystemHints(scope, conversationId, item.system_hints ?? []);
-      editor.focus?.();
-      const attachments = scope.get(
-        composerAttachments as never,
-        conversationId,
-      ) as unknown as ComposerAttachment[];
-      if (attachments.filter((entry) => !entry.isBigPaste).length === 1) {
-        trackProductEvent(scope, sketchFollowupSelectedEvent, {
-          position: normalizeSuggestionPosition(index),
-          suggestionId: item.id,
-        });
-      }
-    },
-  }, uploadId);
+function J(e) {
+  return !e.isBigPaste;
 }
-
-export { SketchHomeSuggestions };
+async function Se(e) {
+  let { signal: t } = e,
+    { items: n } = await R.safeGet(`/images/prompt-items`, {
+      parameters: { query: { surface: `sketch_followups` } },
+      signal: t,
+    });
+  return be(n ?? []);
+}
+function Ce(e) {
+  return !e.hasText();
+}
+function we(e) {
+  let t = (0, Y.c)(8),
+    { items: n, mode: r, onSelect: i } = e,
+    a = r === void 0 ? `chat` : r,
+    o;
+  if (t[0] !== n || t[1] !== i) {
+    let e;
+    (t[3] === i
+      ? (e = t[4])
+      : ((e = (e, t) => ({
+          id: e.id,
+          label: e.title,
+          icon: Z[e.id.replace(/,$/, ``)] ?? (0, X.jsx)(ie, {}),
+          disabled: !1,
+          onClick: () => i(e, t),
+        })),
+        (t[3] = i),
+        (t[4] = e)),
+      (o = n.map(e)),
+      (t[0] = n),
+      (t[1] = i),
+      (t[2] = o));
+  } else o = t[2];
+  let s;
+  return (
+    t[5] !== a || t[6] !== o
+      ? ((s = (0, X.jsx)(he, { composerMode: a, layout: `list`, showCloseAction: !1, items: o })),
+        (t[5] = a),
+        (t[6] = o),
+        (t[7] = s))
+      : (s = t[7]),
+    s
+  );
+}
+var Y, X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((Y = i()),
+      de(),
+      z(),
+      se(),
+      g(),
+      ne(),
+      T(),
+      c(),
+      h(),
+      b(),
+      ce(),
+      s(),
+      me(),
+      j(),
+      le(),
+      fe(),
+      I(),
+      P(),
+      o(),
+      w(),
+      W(),
+      M(),
+      q(),
+      (X = u()),
+      (Z = {
+        make_art: (0, X.jsx)(m, {}),
+        "make-it-art": (0, X.jsx)(m, {}),
+        solve_problem: (0, X.jsx)(y, { asset: S, "aria-hidden": !0 }),
+        "solve-this-problem": (0, X.jsx)(y, { asset: S, "aria-hidden": !0 }),
+        roast_drawing: (0, X.jsx)(y, { asset: f, "aria-hidden": !0 }),
+        "critique-my-drawing": (0, X.jsx)(y, { asset: f, "aria-hidden": !0 }),
+        explore_logos: (0, X.jsx)(x, {}),
+        "turn-it-into-a-logo": (0, X.jsx)(x, {}),
+        make_it_realistic: (0, X.jsx)(_, {}),
+        "make-it-realistic": (0, X.jsx)(_, {}),
+        finish_drawing: (0, X.jsx)(y, { asset: C, "aria-hidden": !0 }),
+        "finish-the-drawing": (0, X.jsx)(y, { asset: C, "aria-hidden": !0 }),
+        bring_to_life: (0, X.jsx)(y, { asset: d, "aria-hidden": !0 }),
+        "bring-it-to-life": (0, X.jsx)(y, { asset: d, "aria-hidden": !0 }),
+        make_stickers: (0, X.jsx)(y, { asset: re, "aria-hidden": !0 }),
+        make_storybook: (0, X.jsx)(y, { asset: r, "aria-hidden": !0 }),
+        animate_drawing: (0, X.jsx)(y, { asset: te, "aria-hidden": !0 }),
+      }),
+      (Q = E(L, ({ get: e }) => {
+        let t = e(B),
+          n = e(U, t).filter((e) => !e.isBigPaste);
+        return n.every((e) => e.sketchId != null && e.status !== `error`) &&
+          !e(V, t) &&
+          e(A, t).length === 0
+          ? (n.at(-1)?.uploadId ?? null)
+          : null;
+      })));
+  }))();
+}
+$();
+export { xe as SketchHomeSuggestions };

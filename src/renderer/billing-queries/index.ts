@@ -1,12 +1,38 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import { rJt as apiClient } from "@rchunk/app-initial";
-
-interface BillingApi { safeGet<Response>(path: string, options: Record<string, unknown>): Promise<Response> }
-interface QueryClient { invalidateQueries(input: { queryKey: unknown[] }): Promise<unknown> | unknown }
-const client = apiClient as unknown as BillingApi;
-function billingInfoQuery(accountId: string) { return { queryKey: ["consumer-billing", accountId, "billing-info"], queryFn: ({ signal }: { signal?: AbortSignal }) => client.safeGet("/payments/billing_info", { parameters: { query: { account_id: accountId } }, signal }), staleTime: 0, retry: false }; }
-function paymentMethodsQuery(accountId: string) { return { queryKey: ["consumer-billing", accountId, "payment-methods"], queryFn: ({ signal }: { signal?: AbortSignal }) => client.safeGet("/payments/payment_methods", { parameters: { query: { account_id: accountId } }, signal }), staleTime: 0, retry: false }; }
-async function invalidateBillingQueries(context: { queryClient: QueryClient }, accountId: string): Promise<void> { await Promise.all([["consumer-billing", accountId], ["accounts"], ["usage-settings"]].map(queryKey => context.queryClient.invalidateQueries({ queryKey }))); }
-function initializeBillingQueries(): void {}
-export { invalidateBillingQueries as i, initializeBillingQueries as n, paymentMethodsQuery as r, billingInfoQuery as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { pL as t } from "@rchunk/app-shared";
+import { pdn as n, udn as r } from "@rchunk/app-initial";
+function i(e) {
+  return t({
+    queryKey: [`consumer-billing`, e, `billing-info`],
+    queryFn: ({ signal: t }) =>
+      r.safeGet(`/payments/billing_info`, { parameters: { query: { account_id: e } }, signal: t }),
+    staleTime: 0,
+    retry: !1,
+  });
+}
+function a(e) {
+  return t({
+    queryKey: [`consumer-billing`, e, `payment-methods`],
+    queryFn: ({ signal: t }) =>
+      r.safeGet(`/payments/payment_methods`, {
+        parameters: { query: { account_id: e } },
+        signal: t,
+      }),
+    staleTime: 0,
+    retry: !1,
+  });
+}
+async function o(e, t) {
+  await Promise.all([
+    e.queryClient.invalidateQueries({ queryKey: [`consumer-billing`, t] }),
+    e.queryClient.invalidateQueries({ queryKey: [`accounts`] }),
+    e.queryClient.invalidateQueries({ queryKey: [`usage-settings`] }),
+  ]);
+}
+function s() {
+  return (s = e(() => {
+    n();
+  }))();
+}
+export { o as i, s as n, a as r, i as t };

@@ -1,4 +1,5 @@
+// @ts-nocheck
 import "@rchunk/app-shared";
-import { n as initializeRegisteredTextFileThumbnail, t as CreateTextFileTabThumbnail } from "@rchunk/registered-text-file-thumbnail-core";
-initializeRegisteredTextFileThumbnail();
-export { CreateTextFileTabThumbnail };
+import { n as e, t } from "@rchunk/registered-text-file-thumbnail-core";
+e();
+export { t as CreateTextFileTabThumbnail };

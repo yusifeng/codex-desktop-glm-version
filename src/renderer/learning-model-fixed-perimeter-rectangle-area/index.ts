@@ -1,29 +1,38 @@
-// Fixed-perimeter rectangle model: maximize area when the rectangle is a square.
-import "@rchunk/rolldown-runtime";
-
-const rectangleAreaSchema = {
-  type: "FIXED_PERIMETER_RECTANGLE_AREA",
-  version: 1,
-  thumbnailAssetKey: "fixed-perimeter-rectangle-area-v1",
-  canonicalFormula: "A = w \\times h",
-  parameters: { width: { kind: "number", defaultValue: 4, min: 1, max: 11 } },
-};
-const widthControl = {
-  label: "w",
-  min: rectangleAreaSchema.parameters.width.min,
-  max: rectangleAreaSchema.parameters.width.max,
-  step: 0.5,
-  defaultValue: rectangleAreaSchema.parameters.width.defaultValue,
-  thumbnailDefaultValue: 6,
-};
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const normalizeWidth = (value: number): number => clamp(Number.isFinite(value) ? value : widthControl.defaultValue, widthControl.min, widthControl.max);
-const calculateRectangleArea = (value: number) => {
-  const width = normalizeWidth(value);
-  const height = 12 - width;
-  return { width, height, area: width * height, isMaximum: width === 6 };
-};
-function initializeRectangleAreaSchema(): void {}
-function initializeRectangleAreaModel(): void {}
-
-export { initializeRectangleAreaSchema as a, normalizeWidth as i, calculateRectangleArea as n, rectangleAreaSchema as o, initializeRectangleAreaModel as r, widthControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `FIXED_PERIMETER_RECTANGLE_AREA`),
+      (n = `fixed-perimeter-rectangle-area-v1`),
+      (r = `A = w \\times h`),
+      (i = { width: { kind: `number`, defaultValue: 4, min: 1, max: 11 } }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+var s, c, l, u, d;
+function f() {
+  return (f = e(() => {
+    (o(),
+      (s = a.parameters.width),
+      (c = {
+        label: `w`,
+        min: s.min,
+        max: s.max,
+        step: 0.5,
+        defaultValue: s.defaultValue,
+        thumbnailDefaultValue: 6,
+      }),
+      (l = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (u = (e) => {
+        let t = Number.isFinite(e) ? e : c.defaultValue;
+        return l(t, c.min, c.max);
+      }),
+      (d = (e) => {
+        let t = u(e),
+          n = 12 - t;
+        return { width: t, height: n, area: t * n, isMaximum: t === 6 };
+      }));
+  }))();
+}
+export { o as a, u as i, d as n, a as o, f as r, c as t };

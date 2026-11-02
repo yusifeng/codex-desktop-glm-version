@@ -1,10 +1,14 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-initial";
-
-function partition<Value>(values: Value[], predicate: (value: Value, index: number) => boolean): [Value[], Value[]] {
-  const matching: Value[] = [];
-  const remaining: Value[] = [];
-  values.forEach((value, index) => (predicate(value, index) ? matching : remaining).push(value));
-  return [matching, remaining];
-}
-export { partition as t };
+// @ts-nocheck
+import { t as e } from "@rchunk/rolldown-runtime";
+import { rWt as t } from "@rchunk/app-initial";
+var n = e((e, n) => {
+  n.exports = t()(
+    function (e, t, n) {
+      e[+!n].push(t);
+    },
+    function () {
+      return [[], []];
+    },
+  );
+});
+export { n as t };

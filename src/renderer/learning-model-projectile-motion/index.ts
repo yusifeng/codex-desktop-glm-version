@@ -1,46 +1,80 @@
-// Ideal projectile motion without air resistance.
-import "@rchunk/rolldown-runtime";
-
-interface NumberParameter { kind: "number"; defaultValue: number; min: number; max: number }
-interface ProjectileValues { initialSpeedMetersPerSecond?: number | null; launchAngleDegrees?: number | null }
-interface ProjectileState { flightTime: number; horizontalVelocity: number; initialVerticalVelocity: number }
-
-const projectileMotionType = "PROJECTILE_MOTION";
-const projectileMotionThumbnail = "projectile-motion-v1";
-const projectileMotionParameters: { initialSpeedMetersPerSecond: NumberParameter; launchAngleDegrees: NumberParameter } = {
-  initialSpeedMetersPerSecond: { kind: "number", defaultValue: 18, min: 12, max: 25 },
-  launchAngleDegrees: { kind: "number", defaultValue: 45, min: 25, max: 65 },
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `PROJECTILE_MOTION`),
+      (n = `projectile-motion-v1`),
+      (r = {
+        initialSpeedMetersPerSecond: { kind: `number`, defaultValue: 18, min: 12, max: 25 },
+        launchAngleDegrees: { kind: `number`, defaultValue: 45, min: 25, max: 65 },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y;
+function b() {
+  return (b = e(() => {
+    (a(),
+      (o = 9.8),
+      (s = { ...i.parameters.initialSpeedMetersPerSecond, step: 1 }),
+      (c = { ...i.parameters.launchAngleDegrees, step: 1 }),
+      (l = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (u = { initialSpeedMetersPerSecond: s.defaultValue, launchAngleDegrees: c.defaultValue }),
+      (d = (l(45, c.min, c.max) * Math.PI) / 180),
+      (f = (s.max ** 2 * Math.sin(2 * d)) / o),
+      (p = (s.max * Math.sin((c.max * Math.PI) / 180)) ** 2 / (2 * o)),
+      (m = { xMax: Math.ceil(f / 10) * 10, yMax: Math.ceil(p / 8) * 8 }),
+      (h = (e, t) => {
+        let n = typeof e == `number` && Number.isFinite(e) ? e : t.defaultValue;
+        return l(n, t.min, t.max);
+      }),
+      (g = (e) => ({
+        initialSpeedMetersPerSecond: h(e.initialSpeedMetersPerSecond, s),
+        launchAngleDegrees: h(e.launchAngleDegrees, c),
+      })),
+      (_ = (e) => {
+        let t = g(e),
+          n = (t.launchAngleDegrees * Math.PI) / 180,
+          r = t.initialSpeedMetersPerSecond * Math.cos(n),
+          i = t.initialSpeedMetersPerSecond * Math.sin(n),
+          a = (2 * i) / o;
+        return {
+          ...t,
+          angleRadians: n,
+          horizontalVelocity: r,
+          initialVerticalVelocity: i,
+          flightTime: a,
+          maxHeight: i ** 2 / (2 * o),
+          range: r * a,
+        };
+      }),
+      (v = (e, t) => {
+        let n = l(t, 0, e.flightTime);
+        return {
+          time: n,
+          x: e.horizontalVelocity * n,
+          y: Math.max(0, e.initialVerticalVelocity * n - 0.5 * o * n ** 2),
+          verticalVelocity: e.initialVerticalVelocity - o * n,
+        };
+      }),
+      (y = (e, t) => {
+        let n = Math.max(2, Math.round(t));
+        return Array.from({ length: n }, (t, r) => v(e, (e.flightTime * r) / (n - 1)));
+      }));
+  }))();
+}
+export {
+  m as a,
+  b as c,
+  a as d,
+  i as f,
+  s as i,
+  g as l,
+  u as n,
+  y as o,
+  o as r,
+  v as s,
+  c as t,
+  _ as u,
 };
-const projectileMotionSpecification = { type: projectileMotionType, version: 1, thumbnailAssetKey: projectileMotionThumbnail, parameters: projectileMotionParameters };
-const gravity = 9.8;
-const speedControl = { ...projectileMotionSpecification.parameters.initialSpeedMetersPerSecond, step: 1 };
-const angleControl = { ...projectileMotionSpecification.parameters.launchAngleDegrees, step: 1 };
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum);
-const defaultProjectileValues = { initialSpeedMetersPerSecond: speedControl.defaultValue, launchAngleDegrees: angleControl.defaultValue };
-const chartReferenceAngle = clamp(45, angleControl.min, angleControl.max) * Math.PI / 180;
-const chartMaximumRange = speedControl.max ** 2 * Math.sin(2 * chartReferenceAngle) / gravity;
-const chartMaximumHeight = (speedControl.max * Math.sin(angleControl.max * Math.PI / 180)) ** 2 / (2 * gravity);
-const projectileChartBounds = { xMax: Math.ceil(chartMaximumRange / 10) * 10, yMax: Math.ceil(chartMaximumHeight / 8) * 8 };
-const normalizeParameter = (value: number | null | undefined, control: NumberParameter): number => clamp(typeof value === "number" && Number.isFinite(value) ? value : control.defaultValue, control.min, control.max);
-const normalizeProjectileValues = (values: ProjectileValues) => ({ initialSpeedMetersPerSecond: normalizeParameter(values.initialSpeedMetersPerSecond, speedControl), launchAngleDegrees: normalizeParameter(values.launchAngleDegrees, angleControl) });
-const calculateProjectileMotion = (values: ProjectileValues) => {
-  const normalized = normalizeProjectileValues(values);
-  const angleRadians = normalized.launchAngleDegrees * Math.PI / 180;
-  const horizontalVelocity = normalized.initialSpeedMetersPerSecond * Math.cos(angleRadians);
-  const initialVerticalVelocity = normalized.initialSpeedMetersPerSecond * Math.sin(angleRadians);
-  const flightTime = 2 * initialVerticalVelocity / gravity;
-  return { ...normalized, angleRadians, horizontalVelocity, initialVerticalVelocity, flightTime, maxHeight: initialVerticalVelocity ** 2 / (2 * gravity), range: horizontalVelocity * flightTime };
-};
-const projectileStateAtTime = (projectile: ProjectileState, time: number) => {
-  const safeTime = clamp(time, 0, projectile.flightTime);
-  return { time: safeTime, x: projectile.horizontalVelocity * safeTime, y: Math.max(0, projectile.initialVerticalVelocity * safeTime - 0.5 * gravity * safeTime ** 2), verticalVelocity: projectile.initialVerticalVelocity - gravity * safeTime };
-};
-const sampleProjectileTrajectory = (projectile: ProjectileState, sampleCount: number) => {
-  const count = Math.max(2, Math.round(sampleCount));
-  return Array.from({ length: count }, (_unused, index) => projectileStateAtTime(projectile, projectile.flightTime * index / (count - 1)));
-};
-
-function initializeProjectileMotionSpecification(): void {}
-function initializeProjectileMotionModel(): void {}
-
-export { projectileChartBounds as a, initializeProjectileMotionModel as c, initializeProjectileMotionSpecification as d, projectileMotionSpecification as f, speedControl as i, normalizeProjectileValues as l, defaultProjectileValues as n, sampleProjectileTrajectory as o, gravity as r, projectileStateAtTime as s, angleControl as t, calculateProjectileMotion as u };

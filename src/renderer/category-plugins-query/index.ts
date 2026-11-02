@@ -1,20 +1,113 @@
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-
-export interface CategoryPlugin { id: string; remotePluginId?: string; [key: string]: unknown }
-export interface CategoryQueryInput { categorySlug: string; hostId: string; searchQuery?: string; visibility?: { hiddenPluginIds?: Set<string> } }
-export interface CategoryQueryPage { pagination: { next_page_token?: string | null }; plugins: CategoryPlugin[] }
-function categoryPluginsQuery(input: CategoryQueryInput): Record<string, unknown> {
-  const searchQuery = (input.searchQuery ?? "").trim();
-  return {
-    enabled: true,
-    initialPageParam: null,
-    queryKey: ["plugins", "category", input.hostId, input.categorySlug, ...(searchQuery ? ["search", searchQuery] : [])],
-    retry: false,
-    getNextPageParam: (page: CategoryQueryPage) => page.pagination.next_page_token ?? undefined,
-    select: (data: { pages: CategoryQueryPage[] }) => deduplicate(data.pages.flatMap((page) => page.plugins).filter((plugin) => !input.visibility?.hiddenPluginIds?.has(plugin.id))),
-  };
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import { $O as n, FX as r, QI as i, XX as a, ZI as o, ek as s } from "@rchunk/app-shared";
+import {
+  Bfn as c,
+  E4t as l,
+  Ev as u,
+  G3t as d,
+  G6t as f,
+  K3t as p,
+  _cn as m,
+  _v as h,
+  a4t as g,
+  bcn as _,
+  cv as v,
+  dv as y,
+  f4t as b,
+  gmn as x,
+  hv as S,
+  i4t as C,
+  kv as w,
+  lv as T,
+  m4t as E,
+  p4t as D,
+  pdn as O,
+  udn as k,
+  vv as A,
+  xv as j,
+} from "@rchunk/app-initial";
+var M, N, P, F;
+function I() {
+  return (I = e(() => {
+    ((M = t(x(), 1)),
+      r(),
+      f(),
+      p(),
+      j(),
+      l(),
+      i(),
+      m(),
+      c(),
+      s(),
+      O(),
+      h(),
+      D(),
+      C(),
+      v(),
+      (N = 50),
+      (P = 14),
+      (F = a(
+        o,
+        ({ categorySlug: e, hostId: t, searchQuery: r = ``, visibility: i }, { get: a }) => {
+          let o = r.trim(),
+            s = a(_, { hostId: t }).data?.roots,
+            c = a(T, t).data,
+            l = s == null ? void 0 : a(g, { accountId: null, hostId: t, roots: s }).data,
+            f = c == null ? void 0 : A(c.plugins, i),
+            p =
+              c == null || f == null
+                ? void 0
+                : w({
+                    connectedPlugins: [],
+                    featuredPluginIds: c.featuredPluginIds,
+                    plugins: f,
+                  }).find(({ section: t }) => t.id === `plugins-${e}`)?.plugins,
+            m = new Map();
+          for (let e of [...(l ?? []), ...(f ?? [])])
+            for (let t of [
+              e.plugin.id,
+              e.plugin.remotePluginId,
+              e.plugin.shareContext?.remotePluginId,
+            ])
+              t != null && m.set(t, e);
+          let h = new Set(i.hiddenPluginIds);
+          return {
+            enabled: !0,
+            getNextPageParam: (e) => e.pagination.next_page_token ?? void 0,
+            initialPageParam: null,
+            queryFn: ({ pageParam: t, signal: n }) =>
+              k.safeGet(`/ps/plugin-categories/{category_slug}/plugins`, {
+                parameters: {
+                  path: { category_slug: e },
+                  query: { scope: `GLOBAL`, q: o || void 0, limit: N, pageToken: t ?? void 0 },
+                },
+                additionalHeaders: d(),
+                signal: b(n),
+              }),
+            queryKey: [...E, `category`, t, e, ...(o.length === 0 ? [] : [`search`, o])],
+            retry: !1,
+            select: (e) => {
+              if (l == null || c == null) return;
+              let t = e.pages.flatMap((e) =>
+                e.plugins.flatMap((e) => {
+                  let t = m.get(e.id) ?? null;
+                  return h.has(e.id) || (t != null && h.has(t.plugin.id)) ? [] : [S(e, t)];
+                }),
+              );
+              return (0, M.default)(
+                [
+                  ...t.slice(0, P),
+                  ...(p == null ? [] : (o.length === 0 ? p : u({ plugins: p, query: o })).map(y)),
+                  ...t.slice(P),
+                ],
+                ({ id: e, remotePluginId: t }) => t ?? e,
+              );
+            },
+            staleTime: n.ONE_MINUTE,
+          };
+        },
+      )));
+  }))();
 }
-const deduplicate = (plugins: CategoryPlugin[]): CategoryPlugin[] => [...new Map(plugins.map((plugin) => [plugin.remotePluginId ?? plugin.id, plugin])).values()];
-const initialize = (): void => {};
-export { initialize as n, categoryPluginsQuery as t };
+export { I as n, F as t };

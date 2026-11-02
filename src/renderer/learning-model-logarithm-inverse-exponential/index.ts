@@ -1,17 +1,56 @@
-// Exponential and logarithmic inverse-points learning model.
-import "@rchunk/rolldown-runtime";
-import "@rchunk/adaptive-slider-field";
-
-interface LogarithmValues { base?: number | null; input?: number | null }
-interface NumberParameter { defaultValue: number; min: number; max: number }
-const logarithmType = "LOGARITHM_INVERSE_EXPONENTIAL"; const logarithmThumbnail = "logarithm-inverse-exponential-v1"; const logarithmFormula = "b^x = y \\Longleftrightarrow \\log_b(y) = x";
-const logarithmParameters = { base: { kind: "number", defaultValue: 2, min: 1.2, max: 4 }, input: { kind: "number", defaultValue: 1.2, min: -1.5, max: 1.5 } };
-const logarithmDefinition = { type: logarithmType, version: 1, thumbnailAssetKey: logarithmThumbnail, canonicalFormula: logarithmFormula, parameters: logarithmParameters };
-const baseParameter = logarithmDefinition.parameters.base; const inputParameter = logarithmDefinition.parameters.input; const baseControl = { baseMin: 1.2, baseMax: 4, step: 0.1 }; const inputControl = { baseMin: -1.5, baseMax: 1.5, step: 0.1 }; const defaultLogarithmValues = { base: baseParameter.defaultValue, input: inputParameter.defaultValue }; const logarithmViewport = { xMin: -3, xMax: 9, yMin: -3, yMax: 9 };
-const normalizeParameter = (value: number | null | undefined, parameter: NumberParameter): number => Number.isFinite(value) ? Math.min(parameter.max, Math.max(parameter.min, value as number)) : parameter.defaultValue;
-const normalizeLogarithmValues = (values: LogarithmValues) => ({ base: normalizeParameter(values.base, baseParameter), input: normalizeParameter(values.input, inputParameter) });
-const deriveLogarithmInverseState = (values: LogarithmValues) => { const safe = normalizeLogarithmValues(values); const output = safe.base ** safe.input; return { ...safe, output, exponentialPoint: { x: safe.input, y: output }, logarithmPoint: { x: output, y: safe.input } }; };
-const formatLogarithmNumber = (value: number): string => value.toFixed(2).replace(/\.?0+$/, "");
-function initializeLogarithmSchema(): void {}
-function initializeLogarithmModel(): void {}
-export { inputParameter as a, formatLogarithmNumber as c, initializeLogarithmSchema as d, logarithmDefinition as f, logarithmViewport as i, initializeLogarithmModel as l, baseControl as n, inputControl as o, defaultLogarithmValues as r, deriveLogarithmInverseState as s, baseParameter as t, normalizeLogarithmValues as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { i as t, n } from "@rchunk/adaptive-slider-field";
+var r, i, a, o, s;
+function c() {
+  return (c = e(() => {
+    ((r = `LOGARITHM_INVERSE_EXPONENTIAL`),
+      (i = `logarithm-inverse-exponential-v1`),
+      (a = `b^x = y \\Longleftrightarrow \\log_b(y) = x`),
+      (o = {
+        base: { kind: `number`, defaultValue: 2, min: 1.2, max: 4 },
+        input: { kind: `number`, defaultValue: 1.2, min: -1.5, max: 1.5 },
+      }),
+      (s = { type: r, version: 1, thumbnailAssetKey: i, canonicalFormula: a, parameters: o }));
+  }))();
+}
+var l, u, d, f, p, m, h, g, _;
+function v() {
+  return (v = e(() => {
+    (n(),
+      c(),
+      (l = s.parameters.base),
+      (u = s.parameters.input),
+      (d = { baseMin: 1.2, baseMax: 4, step: 0.1 }),
+      (f = { baseMin: -1.5, baseMax: 1.5, step: 0.1 }),
+      (p = { base: l.defaultValue, input: u.defaultValue }),
+      (m = { xMin: -3, xMax: 9, yMin: -3, yMax: 9 }),
+      (h = (e) => ({ base: t(e.base, l), input: t(e.input, u) })),
+      (g = (e) => {
+        let { base: t, input: n } = h(e),
+          r = t ** n;
+        return {
+          base: t,
+          input: n,
+          output: r,
+          exponentialPoint: { x: n, y: r },
+          logarithmPoint: { x: r, y: n },
+        };
+      }),
+      (_ = (e) => e.toFixed(2).replace(/\.?0+$/, ``)));
+  }))();
+}
+export {
+  u as a,
+  _ as c,
+  c as d,
+  s as f,
+  m as i,
+  v as l,
+  d as n,
+  f as o,
+  p as r,
+  g as s,
+  l as t,
+  h as u,
+};

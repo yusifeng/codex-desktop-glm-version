@@ -1,11 +1,105 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import { n as initializeConversationThumbnailUi, t as ConversationThumbnail } from "@rchunk/conversation-thumbnail-ui";
-
-interface RegisteredChatGptEntityThumbnailProps { conversationId: string; draft?: string; requestExcerpt?: string | null; responseExcerpt?: string | null; statusState?: { type: "error" | "idle" | "loading"; unread?: boolean; unreadCount?: number }; title: string; waitingFor?: "waitingOnApproval" | "waitingOnUserInput" | null }
-initializeConversationThumbnailUi();
-function RegisteredChatGptEntityThumbnail({ conversationId, ...props }: RegisteredChatGptEntityThumbnailProps): unknown {
-  return getJsxRuntime().jsx(ConversationThumbnail, { ...props, "data-conversation-id": conversationId, statusState: props.statusState ?? { type: "idle" } });
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  $3 as n,
+  BX as r,
+  FX as i,
+  I3 as a,
+  l3 as o,
+  rZ as s,
+  yV as c,
+} from "@rchunk/app-shared";
+import {
+  $0 as l,
+  $mn as u,
+  DYt as d,
+  IKt as f,
+  IVt as p,
+  LKt as m,
+  NYt as h,
+  PYt as g,
+  UVt as _,
+  Y0 as v,
+  YVt as y,
+  cet as b,
+  dHt as x,
+  ehn as S,
+  iWt as C,
+  izt as w,
+  let as T,
+  oWt as E,
+  rzt as D,
+  uHt as O,
+} from "@rchunk/app-initial";
+import { n as k, t as A } from "@rchunk/conversation-thumbnail-ui";
+function j(e) {
+  let t = (0, M.c)(4),
+    { conversationId: n, title: i, draft: a } = e,
+    o = r(I, n),
+    s;
+  return (
+    t[0] !== a || t[1] !== o || t[2] !== i
+      ? ((s = (0, F.jsx)(A, { title: i, draft: a, ...o })),
+        (t[0] = a),
+        (t[1] = o),
+        (t[2] = i),
+        (t[3] = s))
+      : (s = t[3]),
+    s
+  );
 }
-export { RegisteredChatGptEntityThumbnail };
+var M, N, P, F, I;
+function L() {
+  return (L = e(() => {
+    ((M = n()),
+      (N = t(c(), 1)),
+      (P = t(o(), 1)),
+      i(),
+      u(),
+      k(),
+      T(),
+      w(),
+      O(),
+      f(),
+      E(),
+      l(),
+      (F = a()),
+      (I = s(
+        b,
+        (e, { get: t }) => {
+          let n = t(D, e),
+            r = t(y, e),
+            i = x(r),
+            a = (0, N.default)(n, (e) => m(e) && !g(e)),
+            o = n?.[a],
+            s = (0, N.default)(
+              n,
+              (e) =>
+                e.author.role === `assistant` &&
+                (e.channel == null || e.channel === `final` || (i && e.channel === `commentary`)) &&
+                !h(e) &&
+                !g(e),
+            ),
+            c = s > a ? n?.[s] : null,
+            l = { type: i ? `loading` : `idle`, unread: t(p, e) };
+          (r === `error` || t(_, e) != null) && (l.type = `error`);
+          let u = null;
+          t(v, e) != null && (u = `waitingOnUserInput`);
+          let f = n?.at(-1),
+            b = f == null || g(f) ? null : C(f);
+          return (
+            b != null && b.request?.type !== `preview` && (u = `waitingOnApproval`),
+            {
+              waitingFor: u,
+              statusState: l,
+              requestExcerpt: o == null ? null : S(d(o).slice(0, 1e3)),
+              responseExcerpt: c == null ? null : S(d(c).slice(0, 1e3)),
+            }
+          );
+        },
+        { isEqual: P.default },
+      )));
+  }))();
+}
+L();
+export { j as RegisteredChatGptEntityThumbnail };

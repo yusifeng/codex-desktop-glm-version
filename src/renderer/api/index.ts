@@ -1,28 +1,117 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/chatgpt-file-upload";
-
-export interface PluginArchiveFile { arrayBuffer(): Promise<ArrayBuffer>; name: string; size: number; type?: string }
-export interface HostedPluginRecord extends Record<string, unknown> { can_refresh_from_source?: boolean; id: string }
-const headers = (accountId: string): HeadersInit => ({ "ChatGPT-Account-Id": accountId });
-function getPluginArchiveError(file: Pick<PluginArchiveFile, "name" | "size">): "size" | "type" | null { return /\.(zip|tar\.gz|tgz)$/i.test(file.name) ? file.size > 100 * 1024 * 1024 ? "size" : null : "type"; }
-async function listHostedPlugin(pluginId: string, accountId: string, signal?: AbortSignal): Promise<HostedPluginRecord | null> {
-  let pageToken: string | undefined;
-  do { const url = new URL("/ps/plugins/workspace/created", "https://chatgpt.com"); url.searchParams.set("limit", "100"); if (pageToken) url.searchParams.set("pageToken", pageToken); const response = await fetch(url, { headers: headers(accountId), signal }); if (!response.ok) return null; const body = await response.json() as { pagination?: { next_page_token?: string }; plugins?: HostedPluginRecord[] }; const match = body.plugins?.find(plugin => plugin.id === pluginId); if (match) return match; pageToken = body.pagination?.next_page_token; } while (pageToken); return null;
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/chatgpt-file-upload",
+      "@rchunk/app-initial",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "./app-initial-e8ceb32eb626.css",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import { H3 as t, V3 as n } from "@rchunk/app-shared";
+import {
+  LGt as r,
+  Sdn as i,
+  _dn as a,
+  pdn as o,
+  udn as s,
+  ydn as c,
+} from "@rchunk/app-initial";
+function l(e) {
+  return /\.(zip|tar\.gz|tgz)$/i.test(e.name) ? (e.size > 104857600 ? `size` : null) : `type`;
 }
-async function uploadArchive(accountId: string, file: PluginArchiveFile, pluginId?: string): Promise<{ etag: string; file_id: string }> {
-  if (getPluginArchiveError(file) != null) throw new Error("Invalid plugin archive");
-  const response = await fetch("https://chatgpt.com/public/plugins/workspace/upload-url", { method: "POST", headers: { ...headers(accountId), "Content-Type": "application/json" }, body: JSON.stringify({ filename: file.name, mime_type: file.name.toLowerCase().endsWith(".zip") ? "application/zip" : "application/gzip", size_bytes: file.size, ...(pluginId ? { plugin_id: pluginId } : {}) }) });
-  if (!response.ok) throw new Error("Plugin upload session could not be created");
-  const session = await response.json() as { etag?: string; file_id?: string; upload_url?: string };
-  if (!session.etag || !session.file_id || !session.upload_url) throw new Error("Plugin upload session is incomplete");
-  const upload = await fetch(session.upload_url, { method: "PUT", body: await file.arrayBuffer() }); if (!upload.ok) throw new Error("Plugin upload failed");
-  return { etag: session.etag, file_id: session.file_id };
+async function u(e, t, n) {
+  return (await d(e, t, n))?.can_refresh_from_source === !1;
 }
-async function createPlugin(accountId: string, file: PluginArchiveFile): Promise<string> { const requestBody = await uploadArchive(accountId, file); const response = await fetch("https://chatgpt.com/public/plugins/workspace", { method: "POST", headers: { ...headers(accountId), "Content-Type": "application/json" }, body: JSON.stringify(requestBody) }); if (!response.ok) throw new Error("Plugin could not be created"); return ((await response.json()) as { plugin_id: string }).plugin_id; }
-async function updatePlugin(pluginId: string, accountId: string, file: PluginArchiveFile): Promise<void> { const requestBody = await uploadArchive(accountId, file, pluginId); const response = await fetch(`https://chatgpt.com/public/plugins/workspace/${encodeURIComponent(pluginId)}`, { method: "POST", headers: { ...headers(accountId), "Content-Type": "application/json" }, body: JSON.stringify(requestBody) }); if (!response.ok) throw new Error("Plugin could not be updated"); }
-async function downloadPlugin(pluginId: string, accountId: string): Promise<Blob> { const response = await fetch(`https://chatgpt.com/ps/plugins/${encodeURIComponent(pluginId)}/archive`, { headers: headers(accountId) }); if (!response.ok) throw new Error("Plugin archive could not be downloaded"); return response.blob(); }
-async function cannotRefreshPlugin(pluginId: string, accountId: string, signal?: AbortSignal): Promise<boolean> { return (await listHostedPlugin(pluginId, accountId, signal))?.can_refresh_from_source === false; }
-function initializePluginApi(): void {}
-export { getPluginArchiveError as a, listHostedPlugin as i, createPlugin as n, initializePluginApi as o, downloadPlugin as r, updatePlugin as s, cannotRefreshPlugin as t };
+async function d(e, t, n) {
+  let r;
+  do {
+    let i = await s.safeGet(`/ps/plugins/workspace/created`, {
+        additionalHeaders: { "ChatGPT-Account-Id": t },
+        parameters: { query: { limit: 100, pageToken: r } },
+        signal: n,
+        expectedErrorStatuses: [403, 404],
+      }),
+      a = i.plugins.find(({ id: t }) => t === e);
+    if (a != null) return a;
+    r = i.pagination.next_page_token ?? void 0;
+  } while (r != null);
+  return null;
+}
+async function f(e, t, n) {
+  let r = await m(t, n, e);
+  await s.safePost(`/public/plugins/workspace/{plugin_id}`, {
+    additionalHeaders: { "ChatGPT-Account-Id": t },
+    parameters: { path: { plugin_id: e } },
+    requestBody: r,
+    expectedErrorStatuses: [400, 403, 409, 422],
+  });
+}
+async function p(e, t) {
+  let n = await m(e, t);
+  return (
+    await s.safePost(`/public/plugins/workspace`, {
+      additionalHeaders: { "ChatGPT-Account-Id": e },
+      requestBody: n,
+      expectedErrorStatuses: [400, 403, 409, 422],
+    })
+  ).plugin_id;
+}
+async function m(e, t, r) {
+  if (l(t) != null) throw Error(`Invalid plugin archive`);
+  let { uploadChatGptFileBytes: a } = await n(
+      async () => {
+        let { uploadChatGptFileBytes: e } = await import(`@rchunk/chatgpt-file-upload`);
+        return { uploadChatGptFileBytes: e };
+      },
+      __vite__mapDeps([0, 1, 2, 3, 4, 5]),
+      import.meta.url,
+    ),
+    o = t.name.toLowerCase().endsWith(`.zip`) ? `application/zip` : `application/gzip`;
+  for (let n = 0; n < 2; n += 1) {
+    let c = await s.safePost(`/public/plugins/workspace/upload-url`, {
+      additionalHeaders: { "ChatGPT-Account-Id": e },
+      requestBody: {
+        filename: t.name,
+        mime_type: o,
+        size_bytes: t.size,
+        ...(r == null ? {} : { plugin_id: r }),
+      },
+      expectedErrorStatuses: [400, 403, 409, 413, 422],
+    });
+    if (!c.etag) throw Error(`Plugin upload session is missing an etag`);
+    try {
+      await a(void 0, {
+        fileId: c.file_id,
+        file: t,
+        fileName: t.name,
+        contentType: o,
+        uploadUrl: c.upload_url,
+      });
+    } catch (e) {
+      if (n === 0 && e instanceof i && e.status === 403) continue;
+      throw e;
+    }
+    return { file_id: c.file_id, etag: c.etag };
+  }
+  throw Error(`Plugin upload failed`);
+}
+async function h(e, t) {
+  let n = await a
+    .getInstance()
+    .fetch(`/ps/plugins/${encodeURIComponent(e)}/archive`, {
+      headers: { "ChatGPT-Account-Id": t },
+    });
+  r(await n.blob(), `plugin.zip`);
+}
+function g() {
+  return (g = e(() => {
+    (o(), c(), t());
+  }))();
+}
+export { l as a, d as i, p as n, g as o, h as r, f as s, u as t };
