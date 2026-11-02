@@ -292,6 +292,15 @@ if (mode === "smoke-readonly") {
     // transition without turning a harmless ambient animation into a failure.
   };
   const assertVisualPage = async (name, expectations) => {
+    if (!expectations.preservePointer && expectations.textRootSelector !== '[role="menu"]') {
+      const viewport = await evaluate(`({ width: window.innerWidth, height: window.innerHeight })`);
+      await command('Input.dispatchMouseEvent', {
+        type: 'mouseMoved',
+        x: Math.max(1, viewport.width / 2),
+        y: 1,
+      });
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
     await waitForVisualStability();
     const result = await evaluate(`(() => {
       const bodyText = document.body?.innerText ?? '';
@@ -344,9 +353,21 @@ if (mode === "smoke-readonly") {
         viewportWidth: window.innerWidth,
       };
     })()`);
+    const screenshot = await command('Page.captureScreenshot', { format: 'png', fromSurface: true });
+    const screenshotPath = path.join(screenshotDirectory, `${name.replaceAll('/', '-')}.png`);
+    fs.writeFileSync(screenshotPath, Buffer.from(screenshot.data, 'base64'));
     for (const text of expectations.text) {
       if (!result.visibleText.includes(text) && (expectations.textRootSelector == null && !result.controlText.includes(text))) {
         throw new Error(`${name} is missing visual content: ${text}`);
+      }
+    }
+    if (expectations.alternativeTextSets != null) {
+      const haystack = `${result.visibleText}\n${result.controlText}`;
+      const matchedAlternative = expectations.alternativeTextSets.some((texts) =>
+        texts.every((text) => haystack.includes(text))
+      );
+      if (!matchedAlternative) {
+        throw new Error(`${name} does not match any valid visual state: ${JSON.stringify(expectations.alternativeTextSets)}`);
       }
     }
     for (const text of expectations.forbidden ?? []) {
@@ -359,10 +380,23 @@ if (mode === "smoke-readonly") {
     if (!expectations.allowHorizontalOverflow && result.documentWidth > result.viewportWidth + 2) {
       throw new Error(`${name} horizontally overflows: ${result.documentWidth}px > ${result.viewportWidth}px`);
     }
-    const screenshot = await command('Page.captureScreenshot', { format: 'png', fromSurface: true });
-    const screenshotPath = path.join(screenshotDirectory, `${name.replaceAll('/', '-')}.png`);
-    fs.writeFileSync(screenshotPath, Buffer.from(screenshot.data, 'base64'));
     checkpoints.push({ name, screenshotPath });
+  };
+  const assertCompactVisualPage = async (name, expectations, viewport = { width: 900, height: 650 }) => {
+    try {
+      await command('Emulation.setDeviceMetricsOverride', {
+        ...viewport,
+        deviceScaleFactor: 1,
+        mobile: false,
+        screenWidth: viewport.width,
+        screenHeight: viewport.height,
+      });
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      await assertVisualPage(`${name}-compact-${viewport.width}x${viewport.height}`, expectations);
+    } finally {
+      await command('Emulation.clearDeviceMetricsOverride');
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
   };
   const assertReversibleSwitch = async (labelText) => {
     const before = await evaluate(`(() => {
@@ -520,6 +554,10 @@ if (mode === "smoke-readonly") {
     forbidden: ['Preferences\nDefault editor\nSend messages'],
     minimumInteractive: 12,
   });
+  await assertCompactVisualPage('settings/general', {
+    text: ['默认权限', '默认文件打开位置', '发送快捷键'],
+    minimumInteractive: 10,
+  });
   await assertReversibleSwitch('在菜单栏中显示');
 
   await clickText('外观');
@@ -527,6 +565,10 @@ if (mode === "smoke-readonly") {
   await assertVisualPage('settings/appearance', {
     text: ['主题', 'UI 字体', '代码字体', '减少动态效果'],
     minimumInteractive: 14,
+  });
+  await assertCompactVisualPage('settings/appearance', {
+    text: ['主题', 'UI 字体', '代码字体'],
+    minimumInteractive: 12,
   });
 
   await clickText('个性化');
@@ -537,12 +579,20 @@ if (mode === "smoke-readonly") {
     forbidden: ['Personalization\nInstructions\nMemory'],
     minimumInteractive: 4,
   });
+  await assertCompactVisualPage('settings/personalization', {
+    text: ['Codex 说明', 'Codex 记忆', '保存'],
+    minimumInteractive: 4,
+  });
 
   await clickText('连接');
   await waitForBodyText(['控制这台 Mac', 'Control this Mac']);
   await assertVisualPage('settings/connections', {
     text: ['控制这台 Mac', '控制其他设备', 'SSH', '允许连接'],
     forbidden: ['Remote connections\nRefreshAdd connection'],
+    minimumInteractive: 5,
+  });
+  await assertCompactVisualPage('settings/connections', {
+    text: ['控制这台 Mac', '控制其他设备', 'SSH'],
     minimumInteractive: 5,
   });
   await clickText('控制其他设备');
@@ -593,6 +643,9 @@ if (mode === "smoke-readonly") {
     await waitForSelectorGone('[role="menu"]');
     if (page.readyText != null) await waitForBodyText(page.readyText, page.readyTimeoutMs ?? 30_000);
     else await new Promise((resolve) => setTimeout(resolve, 250));
+    if (page.unavailableText != null) {
+      await waitForBodyText([...page.text, ...page.unavailableText], page.readyTimeoutMs ?? 30_000);
+    }
     await waitForSettingsPageToSettle();
     if (page.name === 'notifications') {
       for (let attempt = 0; attempt < 2; attempt += 1) {
@@ -607,24 +660,32 @@ if (mode === "smoke-readonly") {
         (document.body?.innerText ?? '').includes('个性化提示')
       `);
       if (!notificationSettingsLoaded) {
-        page.text = ['ChatGPT', '无法加载 ChatGPT 通知设置', '重试'];
         checkpoints.push({ name: 'settings/notifications-network-unavailable' });
       }
+      page.alternativeTextSets = [
+        ['ChatGPT', 'Codex', '个性化提示'],
+        ['ChatGPT', '无法加载 ChatGPT 通知设置', '重试'],
+      ];
     }
     if (page.unavailableText != null) {
       const expectedContentLoaded = await evaluate(`
         (document.body?.innerText ?? '').includes(${JSON.stringify(page.text[0])})
       `);
       if (!expectedContentLoaded) {
-        page.text = page.unavailableText;
         checkpoints.push({ name: `settings/${page.name}-network-unavailable` });
       }
+      page.alternativeTextSets = [page.text, page.unavailableText];
     }
     await assertVisualPage(`settings/${page.name}`, {
-      text: [page.label, ...page.text],
+      text: [page.label, ...(page.alternativeTextSets == null ? page.text : [])],
+      alternativeTextSets: page.alternativeTextSets,
       minimumInteractive: page.minimumInteractive,
     });
     if (page.name === 'usage-and-billing') {
+      await assertCompactVisualPage('settings/usage-and-billing', {
+        text: ['额度余额', '当前余额', '使用限额重置'],
+        minimumInteractive: 8,
+      });
       await clickText('分析');
       await waitForBodyText(['总用量历史记录', 'Total usage history'], 60_000);
       await waitForSettingsPageToSettle(60_000);
@@ -650,6 +711,10 @@ if (mode === "smoke-readonly") {
   await waitForBodyText(['管理插件、技能和 MCP', 'Manage plugins, skills, and MCP']);
   await assertVisualPage('settings/plugins', {
     text: ['浏览目录', '搜索插件'],
+    minimumInteractive: 5,
+  });
+  await assertCompactVisualPage('settings/plugins', {
+    text: ['浏览目录', '插件', 'GitHub'],
     minimumInteractive: 5,
   });
   const pluginSettingsTabs = [
@@ -706,12 +771,20 @@ if (mode === "smoke-readonly") {
     text: ['Git', '分支前缀', 'Pull Request 合并方法', '提交说明'],
     minimumInteractive: 7,
   });
+  await assertCompactVisualPage('settings/git', {
+    text: ['Git', '分支前缀', 'Pull Request 合并方法'],
+    minimumInteractive: 7,
+  });
 
   await clickText('Worktrees');
   await waitForBodyText(['工作树根目录', 'Worktree root']);
   await waitForSettingsPageToSettle();
   await assertVisualPage('settings/worktrees', {
     text: ['Worktrees', '工作树根目录', '自动删除旧工作树', '自动删除限制'],
+    minimumInteractive: 8,
+  });
+  await assertCompactVisualPage('settings/worktrees', {
+    text: ['Worktrees', '工作树根目录', '自动删除旧工作树'],
     minimumInteractive: 8,
   });
 
@@ -721,6 +794,10 @@ if (mode === "smoke-readonly") {
   await assertVisualPage('settings/browser', {
     text: ['浏览器', '网页 URL 和链接打开位置', '浏览数据', '自动填充和密码'],
     minimumInteractive: 10,
+  });
+  await assertCompactVisualPage('settings/browser', {
+    text: ['浏览器', '网页 URL 和链接打开位置', '浏览数据'],
+    minimumInteractive: 9,
   });
 
   if (await evaluate(`[...document.querySelectorAll('button, a')].some((element) => element.innerText?.trim() === '返回应用')`)) {
@@ -741,24 +818,10 @@ if (mode === "smoke-readonly") {
     minimumInteractive: 8,
     allowHorizontalOverflow: true,
   });
-  try {
-    await command('Emulation.setDeviceMetricsOverride', {
-      width: 1100,
-      height: 720,
-      deviceScaleFactor: 1,
-      mobile: false,
-      screenWidth: 1100,
-      screenHeight: 720,
-    });
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    await assertVisualPage('app/shell-compact-1100x720', {
-      text: ['新对话'],
-      minimumInteractive: 8,
-    });
-  } finally {
-    await command('Emulation.clearDeviceMetricsOverride');
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  }
+  await assertCompactVisualPage('app/shell', {
+    text: ['新对话'],
+    minimumInteractive: 8,
+  }, { width: 1100, height: 720 });
 
   for (const popup of [
     {
@@ -881,11 +944,19 @@ if (mode === "smoke-readonly") {
           minimumInteractive: 8,
           allowHorizontalOverflow: true,
         });
+        await assertCompactVisualPage('app/chatgpt-chat-tab', {
+          text: ['聊天', '新对话'],
+          minimumInteractive: 8,
+        });
         await selectChatGptHomeTab('工作');
         await assertVisualPage('app/chatgpt-work-tab', {
           text: ['工作', '我们要做什么？', '选择项目', '插件'],
           minimumInteractive: 8,
           allowHorizontalOverflow: true,
+        });
+        await assertCompactVisualPage('app/chatgpt-work-tab', {
+          text: ['工作', '我们要做什么？', '选择项目', '插件'],
+          minimumInteractive: 8,
         });
       } finally {
         if (originalChatGptHomeTab != null) await selectChatGptHomeTab(originalChatGptHomeTab);
@@ -922,6 +993,7 @@ if (mode === "smoke-readonly") {
     text: ['Pull Request', '站点', '定时任务', '插件'],
     minimumInteractive: 10,
     allowHorizontalOverflow: true,
+    preservePointer: true,
   });
   const navigateToChat = async (context) => {
     await evaluate(`(() => {
@@ -950,9 +1022,9 @@ if (mode === "smoke-readonly") {
     // Meetings is account/feature-flag gated and is absent for some signed-in users.
     { label: 'Meetings', name: 'meetings', readyText: 'Connect Google Calendar', text: ['Connect Google Calendar'], minimumInteractive: 2, optional: true },
     { label: '站点', name: 'sites', readyText: '“站点”使用前须知', text: ['创建并发布网站时', '继续'], minimumInteractive: 3 },
-    { label: 'Pull Request', name: 'pull-requests', readyText: '搜索 Pull Request', text: ['全部', '正在审查', '由我创建'], minimumInteractive: 6 },
-    { label: '定时任务', name: 'automations', readyText: '搜索已安排任务', text: ['全部', '已开启', '已暂停', '已完成'], minimumInteractive: 7 },
-    { label: '插件', name: 'plugins', readyText: '热门', text: ['已安装', '公开', '个人'], minimumInteractive: 10 },
+    { label: 'Pull Request', name: 'pull-requests', readyText: '搜索 Pull Request', text: ['全部', '正在审查', '由我创建'], minimumInteractive: 6, compact: true },
+    { label: '定时任务', name: 'automations', readyText: '搜索已安排任务', text: ['全部', '已开启', '已暂停', '已完成'], minimumInteractive: 7, compact: true },
+    { label: '插件', name: 'plugins', readyText: '热门', text: ['已安装', '公开', '个人'], minimumInteractive: 10, compact: true },
   ];
   const visibleExploreLabels = await evaluate(`
     [...document.querySelectorAll('[role="menuitem"]')].map((element) => element.innerText?.trim()).filter(Boolean)
@@ -995,6 +1067,13 @@ if (mode === "smoke-readonly") {
       minimumInteractive: page.minimumInteractive,
       allowHorizontalOverflow: true,
     });
+    if (page.compact) {
+      await assertCompactVisualPage(`app/${page.name}`, {
+        text: [page.label, ...page.text],
+        minimumInteractive: Math.max(5, page.minimumInteractive - 2),
+        allowHorizontalOverflow: true,
+      });
+    }
     await navigateToChat(page.name);
     if (pageIndex < enabledExplorePages.length - 1) await openExploreMenu();
   }
@@ -1011,6 +1090,10 @@ if (mode === "smoke-readonly") {
     await assertVisualPage('app/projects', {
       text: ['项目', '搜索项目', '名称', '已更新'],
       minimumInteractive: 10,
+    });
+    await assertCompactVisualPage('app/projects', {
+      text: ['项目', '搜索项目', '名称', '已更新'],
+      minimumInteractive: 8,
     });
   }
 
@@ -1076,26 +1159,12 @@ if (mode === "smoke-readonly") {
     // it intentionally remains measurable until its exit transition ends.
     allowHorizontalOverflow: true,
   });
-  try {
-    await command('Emulation.setDeviceMetricsOverride', {
-      width: 1100,
-      height: 720,
-      deviceScaleFactor: 1,
-      mobile: false,
-      screenWidth: 1100,
-      screenHeight: 720,
-    });
-    await new Promise((resolve) => setTimeout(resolve, 500));
-    await assertVisualPage('conversation/history-compact-1100x720', {
-      text: [conversationTitle],
-      minimumInteractive: 8,
-      // The collapsed release summary remains translated off-canvas here too.
-      allowHorizontalOverflow: true,
-    });
-  } finally {
-    await command('Emulation.clearDeviceMetricsOverride');
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  }
+  await assertCompactVisualPage('conversation/history', {
+    text: [conversationTitle],
+    minimumInteractive: 8,
+    // The collapsed release summary remains translated off-canvas here too.
+    allowHorizontalOverflow: true,
+  }, { width: 1100, height: 720 });
 
   await evaluate(`(() => {
     const button = document.querySelector('[aria-label="添加文件等内容"]');
