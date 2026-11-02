@@ -50,6 +50,7 @@ assert.equal(pricing.r("free", "plus"), "/checkout?current_plan=free&target_plan
 assert.equal(pricing.r("free_workspace", "plus"), null);
 assert.equal(pricing.r("plus", "self_serve_business", "month"), "https://chatgpt.com/business?price_interval=month");
 assert.equal(pricing.r("plus", "self_serve_business_usage_based"), "https://chatgpt.com/business/usage");
+assert.equal(pricing.r("plus", "internal_unknown_plan"), null);
 let selected;
 const pricingUi = pricing.t({ currentPlan: "plus", plans: ["free", "plus", "prolite"], offers: { prolite: { price: "$20" } }, onSelectPlan(plan, url) { selected = { plan, url }; } });
 assert.equal(pricingUi.props["aria-label"], "Compare plans");
@@ -63,6 +64,8 @@ assert.equal(selected.plan, "prolite");
 assert.match(selected.url, /target_plan=prolite/);
 assert.equal(pricing.i(), undefined);
 assert.equal(pricing.n(), undefined);
+const featureUi = pricing.t({ currentPlan: "free", plans: ["plus"], offers: { plus: { badge: "Popular", description: "More access", features: ["Advanced models", "More uploads"], price: "$20" } } });
+assert.match(text(featureUi), /Popular.*More access.*Advanced models.*More uploads/);
 
 // billing-form-options: 12
 const billing = await bundle("billing-form-options");
@@ -105,5 +108,7 @@ assert.match(text(embeddedUi), /Secure payment · OpenAI/);
 assert.equal(find(embeddedUi, node => node.props?.["data-payment-element"] === true).type, "div");
 assert.equal(checkout.r(), undefined);
 assert.equal(find(checkout.n({ url: "https://pay.test" }), node => node.props?.children === "Continue").type, "button");
+assert.match(text(find(checkout.n({ url: "javascript:alert(1)" }), node => node.props?.role === "alert")), /Only secure checkout links/);
+assert.match(text(checkout.t({ accountId: "a", userId: "u", checkoutSessionId: "s", status: "complete" })), /Payment complete/);
 
-console.log("50 usage and checkout flow cluster assertions passed");
+console.log("55 usage and checkout flow cluster assertions passed");

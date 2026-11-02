@@ -4,8 +4,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-globalThis.__subscriptionLifecycleTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "subscription-lifecycle-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__subscriptionLifecycleTest.jsx;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+let activeHooks = [], hookCursor = 0;
+const React = { useState(initial) { const hooks = activeHooks, index = hookCursor++; if (!(index in hooks)) hooks[index] = typeof initial === "function" ? initial() : initial; return [hooks[index], value => { hooks[index] = typeof value === "function" ? value(hooks[index]) : value; }]; } };
+globalThis.__subscriptionLifecycleTest = { React, jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
+async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "subscription-lifecycle-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__subscriptionLifecycleTest.jsx;export const e6=globalThis.__subscriptionLifecycleTest.React;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+function mount(Component, props) { const hooks = []; return { render() { activeHooks = hooks; hookCursor = 0; return Component(props); } }; }
 function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(child => walk(child, visit)); else walk(children, visit); }
 function find(node, predicate) { let result; walk(node, value => { if (result == null && predicate(value)) result = value; }); return result; }
 function all(node, predicate) { const result = []; walk(node, value => { if (predicate(value)) result.push(value); }); return result; }
@@ -48,27 +51,48 @@ assert.equal(find(missingMethod, node => node.props?.children === "Add payment m
 const cancellation = await bundle("subscription-cancellation-dialog");
 assert.deepEqual(Object.keys(cancellation), ["CancellationDialog"]);
 const account = { account: { account_id: "a", structure: "personal", plan_type: "Plus" }, entitlement: { has_active_subscription: true, plan_name: "Plus" } };
-const unavailable = cancellation.CancellationDialog({ accountId: "a", activeAccountId: "b", account, onClose() {} });
+const unavailable = mount(cancellation.CancellationDialog, { accountId: "a", activeAccountId: "b", account, onClose() {} }).render();
 assert.match(text(find(unavailable, node => node.props?.role === "alert")), /can no longer be canceled/);
-assert.equal(find(cancellation.CancellationDialog({ accountId: "a", account, isLoading: true, onClose() {} }), node => node.props?.role === "status").props.children, "Checking your subscription…");
-const initialCancel = cancellation.CancellationDialog({ accountId: "a", account, promotion: { label: "Save 50%", description: "Stay for less" }, onClose() {} });
+assert.equal(find(mount(cancellation.CancellationDialog, { accountId: "a", account, isLoading: true, onClose() {} }).render(), node => node.props?.role === "status").props.children, "Checking your subscription…");
+const initialCancel = mount(cancellation.CancellationDialog, { accountId: "a", account, promotion: { label: "Save 50%", description: "Stay for less" }, onClose() {} }).render();
 assert.match(text(initialCancel), /Cancel Plus and return to Free/);
 assert.match(text(initialCancel), /Save 50%/);
-const survey = cancellation.CancellationDialog({ accountId: "a", account, initialStep: "survey", onClose() {} });
+const survey = mount(cancellation.CancellationDialog, { accountId: "a", account, initialStep: "survey", onClose() {} }).render();
 assert.match(text(survey), /Why are you canceling/);
-assert.equal(all(survey, node => node.type === "option").length, 4);
+assert.equal(all(survey, node => node.type === "option").length, 5);
 let cancelReason, cancelClosed = 0;
-const finalCancel = cancellation.CancellationDialog({ accountId: "a", account, initialStep: "things_you_lose", onClose() { cancelClosed++; }, onCancel(reason, detail) { cancelReason = `${reason}:${detail}`; } });
+const finalCancelMount = mount(cancellation.CancellationDialog, { accountId: "a", account, initialStep: "things_you_lose", onClose() { cancelClosed++; }, onCancel(reason, detail) { cancelReason = `${reason}:${detail}`; } });
+const finalCancel = finalCancelMount.render();
 assert.match(text(finalCancel), /You'll no longer have/);
 find(finalCancel, node => node.props?.children === "Cancel subscription").props.onClick();
 await Promise.resolve();
 assert.equal(cancelReason, "null:");
 assert.equal(cancelClosed, 1);
+let lifecycleReason;
+const lifecycleMount = mount(cancellation.CancellationDialog, { accountId: "a", account, onClose() {}, onCancel(reason, detail) { lifecycleReason = `${reason}:${detail}`; } });
+let lifecycleUi = lifecycleMount.render();
+find(lifecycleUi, node => node.props?.children === "Cancel Plus").props.onClick();
+lifecycleUi = lifecycleMount.render();
+find(lifecycleUi, node => node.props?.["aria-label"] === "Cancellation reason").props.onChange({ currentTarget: { value: "too_expensive" } });
+find(lifecycleUi, node => node.type === "textarea").props.onChange({ currentTarget: { value: "  budget  " } });
+lifecycleUi = lifecycleMount.render();
+find(lifecycleUi, node => node.props?.children === "Submit").props.onClick();
+lifecycleUi = lifecycleMount.render();
+find(lifecycleUi, node => node.props?.children === "Cancel subscription").props.onClick();
+await Promise.resolve();
+assert.equal(lifecycleReason, "too_expensive:budget");
+const failedCancelMount = mount(cancellation.CancellationDialog, { accountId: "a", account, initialStep: "things_you_lose", onClose() {}, onCancel() { throw new Error("Cancellation service unavailable"); } });
+let failedCancelUi = failedCancelMount.render();
+find(failedCancelUi, node => node.props?.children === "Cancel subscription").props.onClick();
+await Promise.resolve();
+failedCancelUi = failedCancelMount.render();
+assert.match(text(find(failedCancelUi, node => node.props?.role === "alert")), /Cancellation service unavailable/);
 
 const credits = await bundle("credit-reload-dialog-host");
 assert.deepEqual(Object.keys(credits), ["CreditReloadDialogHost"]);
 let checkoutCredits, creditsClosed = 0;
-const purchase = credits.CreditReloadDialogHost({ source: "settings", variant: "one-time-purchase", creditBalance: 3, pricingOptions: [{ creditCount: 20, price: 10 }], onClose() { creditsClosed++; }, onStartCheckout(count) { checkoutCredits = count; } });
+const purchaseMount = mount(credits.CreditReloadDialogHost, { source: "settings", variant: "one-time-purchase", creditBalance: 3, pricingOptions: [{ creditCount: 20, price: 10 }], onClose() { creditsClosed++; }, onStartCheckout(count) { checkoutCredits = count; } });
+const purchase = purchaseMount.render();
 assert.match(text(purchase), /Add credits/);
 assert.match(text(purchase), /Current balance: 3 credits/);
 assert.match(text(purchase), /20 credits — \$10\.00/);
@@ -77,13 +101,32 @@ await Promise.resolve();
 assert.equal(checkoutCredits, 20);
 assert.equal(creditsClosed, 1);
 let autoReloadSettings;
-const setup = credits.CreditReloadDialogHost({ source: "billing", variant: "setup-auto-reload", pricingOptions: [{ creditCount: 25, price: 12 }], onClose() {}, onSaveAutoReload(settings) { autoReloadSettings = settings; } });
+const setupMount = mount(credits.CreditReloadDialogHost, { source: "billing", variant: "setup-auto-reload", pricingOptions: [{ creditCount: 25, price: 12 }], onClose() {}, onSaveAutoReload(settings) { autoReloadSettings = settings; } });
+const setup = setupMount.render();
 assert.match(text(setup), /Set up auto-reload/);
 assert.equal(all(setup, node => node.type === "input" && node.props?.type === "number").length, 2);
 find(setup, node => node.type === "form").props.onSubmit({ preventDefault() {} });
 await Promise.resolve();
 assert.equal(autoReloadSettings.reloadAmount, 25);
-const failedCredits = credits.CreditReloadDialogHost({ source: "billing", variant: "manage-auto-reload", error: "bad", onClose() {} });
+const failedCredits = mount(credits.CreditReloadDialogHost, { source: "billing", variant: "manage-auto-reload", error: "bad", onClose() {} }).render();
 assert.match(text(find(failedCredits, node => node.props?.role === "alert")), /couldn’t load available/);
+
+let disabled = 0;
+const manageMount = mount(credits.CreditReloadDialogHost, { source: "billing", variant: "manage-auto-reload", autoReloadSettings: { enabled: true, minimumBalance: 5, reloadAmount: 20 }, pricingOptions: [{ creditCount: 20, price: 10 }], onClose() {}, onDisableAutoReload() { disabled++; } });
+let manageUi = manageMount.render();
+find(manageUi, node => node.props?.children === "Turn off auto-reload").props.onClick();
+manageUi = manageMount.render();
+assert.equal(find(manageUi, node => node.props?.role === "alertdialog").type, "div");
+find(find(manageUi, node => node.props?.role === "alertdialog"), node => node.props?.children === "Turn off auto-reload").props.onClick();
+await Promise.resolve();
+assert.equal(disabled, 1);
+const failedDisableMount = mount(credits.CreditReloadDialogHost, { source: "billing", variant: "manage-auto-reload", autoReloadSettings: { enabled: true, minimumBalance: 5, reloadAmount: 20 }, pricingOptions: [{ creditCount: 20, price: 10 }], onClose() {}, onDisableAutoReload() { throw new Error("Auto-reload service unavailable"); } });
+let failedDisableUi = failedDisableMount.render();
+find(failedDisableUi, node => node.props?.children === "Turn off auto-reload").props.onClick();
+failedDisableUi = failedDisableMount.render();
+find(find(failedDisableUi, node => node.props?.role === "alertdialog"), node => node.props?.children === "Turn off auto-reload").props.onClick();
+await Promise.resolve();
+failedDisableUi = failedDisableMount.render();
+assert.match(text(find(failedDisableUi, node => node.props?.role === "alert")), /Auto-reload service unavailable/);
 
 console.log("subscription billing lifecycle cluster tests passed");

@@ -45,7 +45,8 @@ assert.equal(profileUi.props["data-profile-v2-enabled"], true);
 assert.equal(profileUi.props["data-today"], "2026-09-28T00:00:00.000Z");
 assert.match(text(profileUi), /David's profile/);
 assert.match(text(profileUi), /Tokens/);
-assert.equal(find(profileUi, node => node.type === "dd").props.children, 42);
+assert.equal(find(profileUi, node => node.type === "dd").props.children, "42");
+assert.equal(find(profileUi, node => node.type === "dd").props["data-raw-value"], 42);
 assert.match(text(profileUi), /Shipped feature/);
 assert.equal(find(profileUi, node => node.type === "time").props.dateTime, "2026-09-28");
 find(profileUi, node => node.props?.["data-avatar-id"] === "codex").props.onClick();
@@ -57,6 +58,14 @@ assert.match(find(profileError, node => node.props?.role === "alert").props.chil
 const Layout = ({ children }) => ({ type: "layout", props: { children } });
 assert.equal(profile.t({ Layout }).type, "layout");
 assert.equal(profile.n(), undefined);
+let openedShowcase, editedShowcase = 0;
+const showcaseUi = profile.t({ isOwnProfile: true, username: "David", stats: [{ key: "longestTaskDurationMs", value: 3_900_000 }, { key: "currentStreakDays", value: 1 }], showcase: [{ id: "site", kind: "site", title: "Launch page", description: "A published site" }], onOpenShowcaseItem(item) { openedShowcase = item.id; }, onEditShowcase() { editedShowcase++; } });
+assert.match(text(showcaseUi), /1h 5m/);
+assert.match(text(showcaseUi), /1 day/);
+find(showcaseUi, node => node.props?.children === "Launch page").props.onClick();
+find(showcaseUi, node => node.props?.children === "Edit showcase").props.onClick();
+assert.equal(openedShowcase, "site");
+assert.equal(editedShowcase, 1);
 
 // app-card: 16
 const appCard = await bundle("app-card");
@@ -84,4 +93,4 @@ assert.equal(managed, 1);
 find(cardUi, node => node.props?.role === "switch").props.onClick();
 assert.equal(enabled, true);
 
-console.log("47 profile and app card cluster assertions passed");
+console.log("52 profile and app card cluster assertions passed");
