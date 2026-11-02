@@ -267,3 +267,10 @@ the delete-task confirmation uses the production request client with duplicate-s
 restoration. Structural route-root drafts are now zero and the source-build gate reports zero compatibility modules and zero
 structural drafts. Remote-conversation fidelity, review-side-panel fidelity, remaining preserved owners, and the final E2E
 matrix are still open; these results therefore do not establish whole-project completion.
+
+The next remote-conversation and review-layout batch fixes a production composition error where the contribution-only thread
+shell was treated as a page wrapper and could discard the remote thread body. The page now renders its body beside the shell
+contribution, uses the production composer when available, and presents structured cloud turns, attachments, pull requests,
+reviews, diffs, previews, archived mode, and hotkey layout. Review source controls and notices now occupy the side-panel header
+slots, while the diff body receives the real expanded-action portal target. Focused stateful tests cover these lifecycles, but
+the complete remote event reducer and every release Review workflow remain part of the outstanding fidelity work.
