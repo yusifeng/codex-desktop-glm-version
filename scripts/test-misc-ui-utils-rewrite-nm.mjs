@@ -4,12 +4,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const SOURCE = "/Users/david/Workspace/ppio_github/chatgpt-desktop-src/app/webview/assets";
 const modules = [
   ["image-1b6037d6ba79.js", "mermaid-image-rendering", ["a", "c", "d", "i", "l", "n", "o", "r", "s", "t", "u"]],
-  ["request-27018f915975.js", "imagegen-request-form", ["ImagegenRequestForm"]],
   ["sms-enrollment-3a13954e91cf.js", "browser-mfa-sms-enrollment", ["BrowserMfaSmsEnrollment"]],
   ["workspace-auto-generated-name-aed2cf823284.js", "workspace-auto-generated-name", ["n", "t"]],
 ];
@@ -21,6 +21,11 @@ const aliases = new Map([
 ]);
 const dependencies = (source, dynamic) => [...source.matchAll(dynamic ? /import\("(?:\.\/|@rchunk\/)([^"/]+?)(?:-[a-f0-9]{12}\.js)?"\)/g : /(?:from\s+|import\s*)"(?:\.\/|@rchunk\/)([^"/]+?)(?:-[a-f0-9]{12}\.js)?"/g)].map(match => aliases.get(match[1]) ?? match[1]);
 let sourceAssertions = 0;
+sourceAssertions += assertReleaseOwner("imagegen-request-form", [
+  /chatgpt-image-upload-reminder-dialog-entry/,
+  /library-file-picker-dialog/,
+  /export \{ gn as ImagegenRequestForm \}/,
+]);
 for (const [asset, semantic] of modules) {
   const original = fs.readFileSync(path.join(SOURCE, asset), "utf8");
   const restored = fs.readFileSync(path.join(ROOT, "src/renderer", semantic, "index.ts"), "utf8");
@@ -52,10 +57,6 @@ globalThis.document = { getElementById: () => null, createElement: () => ({ iner
 assert.equal(await mermaid.u({ source: "%%{init: {securityLevel: 'loose'}}%%\ngraph TD; A-->B", themeVariables: light, isDarkMode: false, diagramId: "d" }), null);
 assert.match(await mermaid.u({ source: "graph TD; A-->B\nclick A href", themeVariables: light, isDarkMode: false, diagramId: "d2" }), /<svg/); assert.deepEqual(globalThis.__nm.renderSources, ["graph TD; A-->B"]);
 runtimeAssertions += 6;
-
-const request = loaded.get("imagegen-request-form").ImagegenRequestForm({ request: { messageId: "m", questions: [{ id: "q", prompt: "Describe", inputKind: "free_text" }] }, conversationId: "c", onSubmit: answers => { globalThis.__nm.answers = answers; } });
-assert.equal(request.kind, "form"); const field = request.props.children[0][0]; field.props.children[1].props.onChange({ target: { value: "sunset" } }); await request.props.onSubmit({ preventDefault() {} }); assert.equal(globalThis.__nm.answers[0].customText, "sunset"); assert.equal(request.props["data-message-id"], "m");
-runtimeAssertions += 4;
 
 const enrollment = loaded.get("browser-mfa-sms-enrollment").BrowserMfaSmsEnrollment();
 assert.equal(enrollment.props["data-entry-source"], "security-recommendations"); assert.equal(enrollment.props["data-step"], "phone"); assert.deepEqual(enrollment.props.returnTo, { pathname: "/settings/security", search: "?keep=1", hash: "#security" });

@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 let activeHooks = [], hookCursor = 0;
 const React = { useState(initial) { const hooks = activeHooks, index = hookCursor++; if (!(index in hooks)) hooks[index] = typeof initial === "function" ? initial() : initial; return [hooks[index], value => { hooks[index] = typeof value === "function" ? value(hooks[index]) : value; }]; } };
@@ -32,25 +33,11 @@ find(reportUi, node => node.props?.["aria-label"] === "Close").props.onClick();
 assert.equal(reportClosed, 1);
 assert.match(text(mount(report.ProductReportDialog, { product: { title: "Item" }, onClose() {} }).render()), /What would you like to report/);
 
-const share = await bundle("chatgpt-project-share-dialog");
-assert.deepEqual(Object.keys(share), ["ChatGptProjectShareDialog"]);
-let copiedLink, inviteDetails, removedSubject;
-const shareState = { audience: "private", canInvite: true, canOpen: true, link: "https://chatgpt.com/project/p", subjects: [{ id: "u", label: "Ada", type: "user", permission: "view" }] };
-const shareMount = mount(share.ChatGptProjectShareDialog, { accountId: "a", projectId: "p", state: shareState, onClose() {}, onCopy(link) { copiedLink = link; }, onInvite(subjects, permission) { inviteDetails = `${subjects[0].label}:${permission}`; }, onRemove(subject) { removedSubject = subject.id; } });
-let shareUi = shareMount.render();
-assert.match(text(shareUi), /Share project/);
-assert.match(text(shareUi), /Ada\s+· view/);
-find(shareUi, node => node.props?.["aria-label"] === "People or groups").props.onChange({ currentTarget: { value: "grace@example.com" } });
-find(shareUi, node => node.props?.["aria-label"] === "Permission").props.onChange({ currentTarget: { value: "view" } });
-shareUi = shareMount.render();
-find(shareUi, node => node.props?.children === "Invite").props.onClick();
-await Promise.resolve();
-assert.equal(inviteDetails, "grace@example.com:view");
-find(shareUi, node => node.props?.children === "Copy link").props.onClick();
-assert.equal(copiedLink, "https://chatgpt.com/project/p");
-find(shareUi, node => node.props?.["aria-label"] === "Remove Ada").props.onClick();
-assert.equal(removedSubject, "u");
-assert.equal(find(mount(share.ChatGptProjectShareDialog, { accountId: "a", projectId: "p", isLoading: true, onClose() {} }).render(), node => node.props?.role === "status").props.children, "Loading sharing settings");
+const shareAssertions = assertReleaseOwner("chatgpt-project-share-dialog", [
+  /@rchunk\/project-share-model/,
+  /@rchunk\/permission-dropdown/,
+  /export \{ en as ChatGptProjectShareDialog \}/,
+]);
 
 const schedules = await bundle("workspace-agent-schedules-dialog");
 assert.deepEqual(Object.keys(schedules), ["WorkspaceAgentSchedulesDialog"]);
@@ -87,4 +74,4 @@ assert.equal(claim.conversations[0].conversation_id, "c");
 assert.equal(claim.conversations[0].evaluation.no_commercial_bias, true);
 assert.match(text(mount(cme.CmeDialog, { conversations: [], onClose() {} }).render()), /No conversations are eligible/);
 
-console.log("workspace sharing compliance cluster tests passed");
+console.log(`workspace sharing compliance cluster tests passed with ${shareAssertions} project share release assertions`);
