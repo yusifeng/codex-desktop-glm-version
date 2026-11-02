@@ -35,29 +35,7 @@ assert.equal(messages.t("edge").defaultMessage, "Install this extension in Edge 
 assert.equal(messages.n("unknown").defaultMessage, "ChatGPT browser extension");
 assert.equal(messages.t("unknown").defaultMessage, "Install this extension to connect ChatGPT to your browser");
 
-const setup = await load("plugin-setup");
-setup.r();
-const calendarApp = { id: "Google-Calendar" };
-const calendarPlugin = { marketplaceName: "openai", canonicalAppId: "google_calendar", plugin: { id: "calendar-plugin", name: "Calendar" } };
-assert.equal(setup.a(calendarApp, calendarPlugin), true);
-assert.equal(setup.a({ id: "drive" }, calendarPlugin), false);
-assert.equal(setup.a(calendarApp, { ...calendarPlugin, marketplaceName: undefined }), false);
-assert.equal(setup.n.key, "plugin-setup-state");
-const readyInput = { status: "ready", data: { kind: "plugin-directory", candidates: [{ id: "Calendar" }, { id: "Slack" }], directoryApps: [], runtimeApps: [{ id: "Slack", isAccessible: true }] } };
-const merged = setup.t({ inputsResult: readyInput, pluginDirectory: { errorMessage: null, isLoading: false, plugins: [calendarPlugin], refetch() {} } });
-assert.equal(merged.status, "ready");
-assert.equal(merged.data.importedPlugins.length, 1);
-assert.equal(merged.data.importedPlugins[0].plugin.plugin.id, "calendar-plugin");
-assert.deepEqual(merged.data.appsRequiringConnection, []);
-assert.equal(setup.t({ inputsResult: readyInput, pluginDirectory: { isLoading: true, plugins: [], refetch() {} } }).status, "loading");
-const retry = () => {};
-const failed = setup.t({ inputsResult: readyInput, pluginDirectory: { errorMessage: "offline", isLoading: false, plugins: [], refetch: retry } });
-assert.equal(failed.status, "error");
-assert.equal(failed.retry, retry);
-const complete = { status: "ready", data: { kind: "complete", setup: { appsRequiringConnection: [calendarApp], importedPlugins: [] } } };
-assert.deepEqual(setup.t({ inputsResult: complete, pluginDirectory: { isLoading: false, plugins: [], refetch() {} } }).data, complete.data.setup);
-const loadingInput = { status: "loading" };
-assert.equal(setup.t({ inputsResult: loadingInput, pluginDirectory: { isLoading: false, plugins: [], refetch() {} } }), loadingInput);
+const pluginSetupReleaseAssertions = assertReleaseOwner("plugin-setup");
 
 const category = await load("category-plugins-query");
 category.n();
@@ -73,7 +51,7 @@ assert.deepEqual(category.t({ categorySlug: "all", hostId: "remote" }).queryKey,
 
 const hostedActionsReleaseAssertions = assertReleaseOwner("hosted-plugin-creation-actions");
 
-const restoredOwnerAssertions = hostedActionsReleaseAssertions +
+const restoredOwnerAssertions = pluginSetupReleaseAssertions + hostedActionsReleaseAssertions +
   assertReleaseOwner("hosted-plugin-create-dialog") +
   assertReleaseOwner("create-dialog");
 

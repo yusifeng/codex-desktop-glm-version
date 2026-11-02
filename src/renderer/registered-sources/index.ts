@@ -1,81 +1,434 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  BX as useSignalFamilyValue,
-  FX as initializeSignalRuntime,
-  I3 as getJsxRuntime,
-  Ib as SourcesIcon,
-  Y2 as FormattedMessage,
-  ZI as appScope,
-  mg as fileIconForPath,
-  oZ as createSignalFamily,
-  type ScopedSignalFamily,
+  $3 as t,
+  BX as n,
+  Dy as r,
+  FX as i,
+  I3 as a,
+  Ib as o,
+  K2 as s,
+  Y2 as c,
+  e6 as l,
+  gg as u,
+  lw as d,
+  mg as f,
+  oZ as p,
 } from "@rchunk/app-shared";
-import { HZt as initializeConversationModel, Xd as TabThumbnail } from "@rchunk/app-initial";
-import { t as hostnameFromUrl } from "@rchunk/local-conversation-webmcp-tools-model";
-import "@rchunk/local-conversation-external-resources";
-import "@rchunk/local-conversation-summary-panel-sources-model";
-
-type SourceActivity = "created" | "provided" | "read" | "updated";
-type ThumbnailSource =
-  | { activity: SourceActivity | null; kind: "external"; label: string }
-  | { kind: "file"; label: string; path: string }
-  | { activityLabel: string | null; kind: "tool"; label: string }
-  | { kind: "web"; pageCount: number; searchCount: number }
-  | { callCount: number; kind: "webmcp"; label: string };
-interface ThumbnailState { sources: ThumbnailSource[]; totalCount: number | null; }
-interface RegisteredLocalSourcesThumbnailProps { conversationId: string; hostId?: string; title: string; }
-
-const localSourcesThumbnailSignal: ScopedSignalFamily<
-  Record<string, unknown>,
-  { conversationId: string; hostId?: string },
-  ThumbnailState | null
-> = (() => {
-  initializeSignalRuntime();
-  initializeConversationModel();
-  return createSignalFamily(appScope, () => null);
-})();
-
-function activityLabel(activity: SourceActivity | null): string | null {
-  if (activity == null) return null;
-  return ({ created: "Created", provided: "Provided", read: "Read", updated: "Updated" })[activity];
+import {
+  $sn as m,
+  Fin as h,
+  HEt as g,
+  HZt as _,
+  Iin as v,
+  Lin as y,
+  MEt as b,
+  Xd as x,
+  Zd as S,
+  cet as C,
+  ecn as w,
+  en as T,
+  let as E,
+  mpn as D,
+  ppn as O,
+  tn as k,
+  vZt as A,
+} from "@rchunk/app-initial";
+import { a as j, n as M, r as N } from "@rchunk/local-conversation-external-resources";
+import { i as P, n as F, t as I } from "@rchunk/local-conversation-webmcp-tools-model";
+import {
+  a as L,
+  i as ee,
+  n as R,
+  r as z,
+  t as B,
+} from "@rchunk/local-conversation-summary-panel-sources-model";
+function V(e) {
+  let t = (0, G.c)(12),
+    { sources: n, title: r, totalCount: i } = e;
+  if (n.length === 0) return null;
+  let a;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((a = (0, q.jsx)(o, {})), (t[0] = a))
+    : (a = t[0]);
+  let s;
+  t[1] === i
+    ? (s = t[2])
+    : ((s =
+        i == null
+          ? null
+          : (0, q.jsx)(c, {
+              id: `tabThumbnail.localSources.count`,
+              defaultMessage: `{count, plural, one {# source} other {# sources}}`,
+              description: `Known total number of sources in a Local Sources tab thumbnail`,
+              values: { count: i },
+            })),
+      (t[1] = i),
+      (t[2] = s));
+  let l;
+  if (t[3] !== n || t[4] !== i) {
+    let e;
+    (t[6] === i
+      ? (e = t[7])
+      : ((e = (e) => ({
+          kind: `block`,
+          content: (0, q.jsx)(H, { hasCompleteCounts: i != null, source: e }),
+        })),
+        (t[6] = i),
+        (t[7] = e)),
+      (l = n.slice(0, 5).map(e)),
+      (t[3] = n),
+      (t[4] = i),
+      (t[5] = l));
+  } else l = t[5];
+  let u;
+  return (
+    t[8] !== s || t[9] !== l || t[10] !== r
+      ? ((u = (0, q.jsx)(x, { icon: a, title: r, subtitle: s, sections: l })),
+        (t[8] = s),
+        (t[9] = l),
+        (t[10] = r),
+        (t[11] = u))
+      : (u = t[11]),
+    u
+  );
 }
-
-function sourceUsage(source: ThumbnailSource, complete: boolean): unknown {
-  const runtime = getJsxRuntime();
-  if (source.kind === "external") return activityLabel(source.activity);
-  if (source.kind === "file") return "Attached";
-  if (source.kind === "tool") return source.activityLabel;
-  if (source.kind === "webmcp") return complete ? `${source.callCount} ${source.callCount === 1 ? "call" : "calls"}` : "Used";
-  if (!complete) return "Searched";
-  if (source.searchCount > 0) return `${source.searchCount} ${source.searchCount === 1 ? "search" : "searches"}`;
-  if (source.pageCount > 0) return `${source.pageCount} ${source.pageCount === 1 ? "page" : "pages"}`;
-  return runtime.jsx(FormattedMessage, { id: "tabThumbnail.localSources.searched", defaultMessage: "Searched" });
+function H(e) {
+  let t = (0, G.c)(25),
+    { hasCompleteCounts: n, source: i } = e,
+    a,
+    s,
+    l;
+  bb0: switch (i.kind) {
+    case `external`: {
+      let e;
+      (t[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, q.jsx)(o, { className: `text-codex-description` })), (t[0] = e))
+        : (e = t[0]),
+        (a = e),
+        (s = i.label));
+      let n;
+      (t[1] === i.activity
+        ? (n = t[2])
+        : ((n = (0, q.jsx)(U, { activity: i.activity })), (t[1] = i.activity), (t[2] = n)),
+        (l = n));
+      break bb0;
+    }
+    case `file`: {
+      let e;
+      (t[3] === i.path
+        ? (e = t[4])
+        : ((e = (0, K.createElement)(f(i.path), { className: `icon-sm text-codex-description` })),
+          (t[3] = i.path),
+          (t[4] = e)),
+        (a = e),
+        (s = i.label));
+      let n;
+      (t[5] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((n = (0, q.jsx)(c, {
+            id: `tabThumbnail.localSources.fileAttached`,
+            defaultMessage: `Attached`,
+            description: `Compact usage label for a file attached to a conversation in a Local Sources tab thumbnail`,
+          })),
+          (t[5] = n))
+        : (n = t[5]),
+        (l = n));
+      break bb0;
+    }
+    case `tool`: {
+      let e;
+      (t[6] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, q.jsx)(r, { className: `text-codex-description` })), (t[6] = e))
+        : (e = t[6]),
+        (a = e),
+        (s = i.label),
+        (l = i.activityLabel));
+      break bb0;
+    }
+    case `web`: {
+      let e;
+      (t[7] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, q.jsx)(o, { className: `text-codex-description` })), (t[7] = e))
+        : (e = t[7]),
+        (a = e));
+      let r;
+      (t[8] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((r = (0, q.jsx)(c, {
+            id: `codex.localConversation.sources.webSearch`,
+            defaultMessage: `Web search`,
+            description: `Label for web search in the thread summary side panel sources section`,
+          })),
+          (t[8] = r))
+        : (r = t[8]),
+        (s = r));
+      let u;
+      (t[9] !== n || t[10] !== i.pageCount || t[11] !== i.searchCount
+        ? ((u = n
+            ? (0, q.jsx)(W, { pageCount: i.pageCount, searchCount: i.searchCount })
+            : (0, q.jsx)(c, {
+                id: `tabThumbnail.localSources.searched`,
+                defaultMessage: `Searched`,
+                description: `Compact usage label for incomplete cached Web search activity in a Local Sources tab thumbnail`,
+              })),
+          (t[9] = n),
+          (t[10] = i.pageCount),
+          (t[11] = i.searchCount),
+          (t[12] = u))
+        : (u = t[12]),
+        (l = u));
+      break bb0;
+    }
+    case `webmcp`: {
+      let e;
+      (t[13] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, q.jsx)(o, { className: `text-codex-description` })), (t[13] = e))
+        : (e = t[13]),
+        (a = e),
+        (s = i.label));
+      let r;
+      (t[14] !== n || t[15] !== i.callCount
+        ? ((r = n
+            ? (0, q.jsx)(c, {
+                id: `tabThumbnail.localSources.webMcpCalls`,
+                defaultMessage: `{count, plural, one {# call} other {# calls}}`,
+                description: `Known number of WebMCP calls for one hostname in a Local Sources tab thumbnail`,
+                values: { count: i.callCount },
+              })
+            : (0, q.jsx)(c, {
+                id: `tabThumbnail.localSources.used`,
+                defaultMessage: `Used`,
+                description: `Compact usage label for incomplete cached WebMCP activity in a Local Sources tab thumbnail`,
+              })),
+          (t[14] = n),
+          (t[15] = i.callCount),
+          (t[16] = r))
+        : (r = t[16]),
+        (l = r));
+    }
+  }
+  let u;
+  t[17] === s
+    ? (u = t[18])
+    : ((u = (0, q.jsx)(`span`, { className: `min-w-0 flex-1 truncate`, children: s })),
+      (t[17] = s),
+      (t[18] = u));
+  let d;
+  t[19] === l
+    ? (d = t[20])
+    : ((d =
+        l == null
+          ? null
+          : (0, q.jsx)(`span`, {
+              className: `shrink-0 text-xs text-codex-description`,
+              children: l,
+            })),
+      (t[19] = l),
+      (t[20] = d));
+  let p;
+  return (
+    t[21] !== a || t[22] !== u || t[23] !== d
+      ? ((p = (0, q.jsxs)(`div`, {
+          className: `flex min-w-0 items-center gap-1.5 text-sm leading-5`,
+          children: [a, u, d],
+        })),
+        (t[21] = a),
+        (t[22] = u),
+        (t[23] = d),
+        (t[24] = p))
+      : (p = t[24]),
+    p
+  );
 }
-
-function sourceRow(source: ThumbnailSource, complete: boolean): unknown {
-  const runtime = getJsxRuntime();
-  const icon = source.kind === "file"
-    ? runtime.jsx(fileIconForPath(source.path), { className: "icon-sm text-codex-description" })
-    : runtime.jsx(SourcesIcon, { className: "text-codex-description" });
-  const label = source.kind === "web" ? "Web search" : source.label;
-  return runtime.jsxs("div", {
-    className: "flex min-w-0 items-center gap-1.5 text-sm leading-5",
-    children: [icon, runtime.jsx("span", { className: "min-w-0 flex-1 truncate", children: label }), runtime.jsx("span", { className: "shrink-0 text-xs text-codex-description", children: sourceUsage(source, complete) })],
-  });
+function U(e) {
+  let t = (0, G.c)(4),
+    { activity: n } = e;
+  switch (n) {
+    case `created`: {
+      let e;
+      return (
+        t[0] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, q.jsx)(c, {
+              id: `tabThumbnail.localSources.created`,
+              defaultMessage: `Created`,
+              description: `Compact usage label for an external source created during a conversation`,
+            })),
+            (t[0] = e))
+          : (e = t[0]),
+        e
+      );
+    }
+    case `provided`: {
+      let e;
+      return (
+        t[1] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, q.jsx)(c, {
+              id: `tabThumbnail.localSources.provided`,
+              defaultMessage: `Provided`,
+              description: `Compact usage label for an external source provided in a conversation`,
+            })),
+            (t[1] = e))
+          : (e = t[1]),
+        e
+      );
+    }
+    case `read`: {
+      let e;
+      return (
+        t[2] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, q.jsx)(c, {
+              id: `tabThumbnail.localSources.read`,
+              defaultMessage: `Read`,
+              description: `Compact usage label for an external source read during a conversation`,
+            })),
+            (t[2] = e))
+          : (e = t[2]),
+        e
+      );
+    }
+    case `updated`: {
+      let e;
+      return (
+        t[3] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, q.jsx)(c, {
+              id: `tabThumbnail.localSources.updated`,
+              defaultMessage: `Updated`,
+              description: `Compact usage label for an external source updated during a conversation`,
+            })),
+            (t[3] = e))
+          : (e = t[3]),
+        e
+      );
+    }
+    case null:
+      return null;
+  }
 }
-
-function RegisteredLocalSourcesThumbnail(props: RegisteredLocalSourcesThumbnailProps): unknown {
-  const state = useSignalFamilyValue(localSourcesThumbnailSignal, { conversationId: props.conversationId, hostId: props.hostId }) as ThumbnailState | null;
-  if (state == null || state.sources.length === 0) return null;
-  const runtime = getJsxRuntime();
-  const complete = state.totalCount != null;
-  return runtime.jsx(TabThumbnail, {
-    icon: runtime.jsx(SourcesIcon, {}),
-    title: props.title,
-    subtitle: state.totalCount == null ? null : `${state.totalCount} ${state.totalCount === 1 ? "source" : "sources"}`,
-    sections: state.sources.slice(0, 5).map((source) => ({ kind: "block", content: sourceRow(source, complete) })),
-  });
+function W(e) {
+  let t = (0, G.c)(4),
+    { pageCount: n, searchCount: r } = e;
+  if (r > 0) {
+    let e;
+    return (
+      t[0] === r
+        ? (e = t[1])
+        : ((e = (0, q.jsx)(c, {
+            id: `tabThumbnail.localSources.webSearches`,
+            defaultMessage: `{count, plural, one {# search} other {# searches}}`,
+            description: `Known search count for Web search in a Local Sources tab thumbnail`,
+            values: { count: r },
+          })),
+          (t[0] = r),
+          (t[1] = e)),
+      e
+    );
+  }
+  if (n > 0) {
+    let e;
+    return (
+      t[2] === n
+        ? (e = t[3])
+        : ((e = (0, q.jsx)(c, {
+            id: `tabThumbnail.localSources.webPages`,
+            defaultMessage: `{count, plural, one {# page} other {# pages}}`,
+            description: `Known opened-page count for Web search in a Local Sources tab thumbnail`,
+            values: { count: n },
+          })),
+          (t[2] = n),
+          (t[3] = e)),
+      e
+    );
+  }
+  return null;
 }
-
-void hostnameFromUrl;
-export { RegisteredLocalSourcesThumbnail };
+var G, K, q;
+function J() {
+  return (J = e(() => {
+    ((G = t()), (K = l()), s(), S(), d(), u(), (q = a()));
+  }))();
+}
+function Y(e) {
+  let t = (0, X.c)(6),
+    { conversationId: r, hostId: i, title: a } = e,
+    o;
+  t[0] !== r || t[1] !== i
+    ? ((o = { conversationId: r, hostId: i }), (t[0] = r), (t[1] = i), (t[2] = o))
+    : (o = t[2]);
+  let s = n(Q, o),
+    c;
+  return (
+    t[3] !== s || t[4] !== a
+      ? ((c = s == null ? null : (0, Z.jsx)(V, { title: a, ...s })),
+        (t[3] = s),
+        (t[4] = a),
+        (t[5] = c))
+      : (c = t[5]),
+    c
+  );
+}
+var X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((X = t()),
+      i(),
+      _(),
+      v(),
+      E(),
+      T(),
+      O(),
+      g(),
+      m(),
+      N(),
+      L(),
+      P(),
+      J(),
+      (Z = a()),
+      (Q = p(C, ({ conversationId: e, hostId: t }, { scope: n }) => {
+        let r = n.get(A, t)?.getConversation(e);
+        if (r == null) return null;
+        let i = h(r),
+          a = n.query.getData(b, t),
+          { externalSources: o, webSearchSource: s } = ee(M(i, a ?? [], !1).filter(j), z(i)),
+          c = R(
+            i,
+            a ?? [],
+            n.get(D),
+            void 0,
+            n.query.getData(w, t),
+            new Set(o.flatMap((e) => (e.provider == null ? [] : [e.provider.id]))),
+            !1,
+          ),
+          l = new Map();
+        if (n.get(k))
+          for (let e of F(i))
+            e.sourceHostname != null && l.set(e.sourceHostname, (l.get(e.sourceHostname) ?? 0) + 1);
+        for (let e of o) {
+          let t = I(e.url);
+          t != null && e.title === t && l.delete(t);
+        }
+        let u = [
+          ...B(i).map((e) => ({
+            kind: `file`,
+            label: e.label,
+            path: e.fsPath || e.path || e.label,
+          })),
+          ...o.map((e) => ({
+            kind: `external`,
+            activity: e.activities.at(-1) ?? null,
+            label: e.title,
+          })),
+          ...Array.from(l, ([e, t]) => ({ kind: `webmcp`, callCount: t, label: e })),
+          ...c.map((e) => ({
+            kind: `tool`,
+            activityLabel: e.activities[0]?.label ?? null,
+            label: e.name.trim() || e.pluginDisplayNames.join(`, `),
+          })),
+          ...(s == null
+            ? []
+            : [{ kind: `web`, pageCount: s.viewedLinks.length, searchCount: s.queryCount }]),
+        ];
+        return { sources: u, totalCount: a != null && y(r) ? u.length : null };
+      })));
+  }))();
+}
+$();
+export { Y as RegisteredLocalSourcesThumbnail };

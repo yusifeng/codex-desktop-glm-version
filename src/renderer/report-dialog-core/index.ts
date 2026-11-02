@@ -1,329 +1,672 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, e6 as getReactRuntime } from "@rchunk/app-shared";
-import { cJt as initializeApiClient } from "@rchunk/app-initial";
-
-interface AdditionalField {
-  id: string;
-  placeholder: string;
-  required?: boolean;
-  type?: "email" | "int" | "multi_line_text" | "text" | "url";
-}
-
-interface ReportReason {
-  additional_fields?: AdditionalField[];
-  cta?: string;
-  details_placeholder?: string;
-  explanation?: string;
-  has_details?: boolean;
-  id: string;
-  label?: string;
-  link_attachment?: string;
-  link_explanation?: string;
-  sub_reasons?: ReportReason[];
-  subtext?: string;
-  title?: string;
-  [key: string]: unknown;
-}
-
-interface ReportReasonsPayload {
-  header?: unknown;
-  header_explanation?: unknown;
-  reasons: ReportReason[];
-}
-
-interface ReportDialogProps {
-  contentClassName?: string;
-  dialogVariant?: string;
-  gcTime?: number;
-  includeServerFields?: boolean;
-  initialReasons?: ReportReason[] | ReportReasonsPayload;
-  loadReasons(context: { signal: AbortSignal }): Promise<ReportReasonsPayload | ReportReason[]>;
-  onBack?(): void;
-  onClose(): void;
-  openExternalForm?(url: string): void;
-  preventCloseWhileSubmitting?: boolean;
-  queryKey: readonly unknown[];
-  submitReport(input: {
-    additionalFields?: Record<string, string>;
-    details: string;
-    path: ReportReason[];
-    reason: ReportReason;
-  }): Promise<unknown>;
-  successBody?: unknown;
-  title: unknown;
-}
-
-const jsx = getJsxRuntime();
-const React = getReactRuntime();
-
-function normalizeReasons(value: ReportReasonsPayload | ReportReason[]): ReportReasonsPayload {
-  return Array.isArray(value) ? { reasons: value } : value;
-}
-
-function reasonLabel(reason: ReportReason): string {
-  return reason.cta ?? reason.label ?? reason.title ?? reason.id;
-}
-
-function hasAdditionalFields(reason: ReportReason | null): boolean {
-  return (reason?.additional_fields?.length ?? 0) > 0;
-}
-
-function needsDetails(reason: ReportReason | null, includeServerFields: boolean): boolean {
-  return reason != null && (
-    reason.details_placeholder != null
-    || (includeServerFields && reason.has_details === true)
-    || (includeServerFields && hasAdditionalFields(reason))
-  );
-}
-
-function isImmediateLeaf(reason: ReportReason, includeServerFields: boolean): boolean {
-  return (
-    (!includeServerFields || (reason.has_details !== true && !hasAdditionalFields(reason)))
-    && (reason.sub_reasons?.length ?? 0) === 0
-    && reason.details_placeholder == null
-    && reason.link_attachment == null
-    && reason.subtext == null
-  );
-}
-
-function ReportDialog(props: ReportDialogProps): unknown {
-  const initialPayload = props.initialReasons == null ? null : normalizeReasons(props.initialReasons);
-  const [payload, setPayload] = React.useState<ReportReasonsPayload | null>(initialPayload);
-  const [loadState, setLoadState] = React.useState<"error" | "loading" | "ready">(
-    initialPayload == null ? "loading" : "ready",
-  );
-  const [selectedReasonId, setSelectedReasonId] = React.useState<string | null>(null);
-  const [details, setDetails] = React.useState("");
-  const [additionalFields, setAdditionalFields] = React.useState<Record<string, string>>({});
-  const [path, setPath] = React.useState<ReportReason[]>([]);
-  const [submitState, setSubmitState] = React.useState<"error" | "idle" | "submitting" | "success">("idle");
-
-  React.useEffect(() => {
-    if (props.initialReasons != null) {
-      setPayload(normalizeReasons(props.initialReasons));
-      setLoadState("ready");
-      return;
-    }
-    const controller = new AbortController();
-    setLoadState("loading");
-    props.loadReasons({ signal: controller.signal }).then(
-      value => {
-        if (controller.signal.aborted) return;
-        setPayload(normalizeReasons(value));
-        setLoadState("ready");
-      },
-      () => {
-        if (!controller.signal.aborted) setLoadState("error");
-      },
-    );
-    return () => controller.abort();
-  }, [props.initialReasons, props.loadReasons, props.queryKey]);
-
-  const activeReason = path.at(-1) ?? null;
-  const reasons = activeReason == null ? payload?.reasons ?? [] : activeReason.sub_reasons ?? [];
-  const selectedReason = reasons.find(reason => reason.id === selectedReasonId) ?? null;
-  const detailStep = needsDetails(activeReason, props.includeServerFields === true);
-  const linkStep = activeReason?.link_attachment != null;
-  const terminalTextStep = activeReason?.subtext != null && reasons.length === 0 && !detailStep && !linkStep;
-  const completed = submitState === "success" || loadState === "error";
-  const canClose = !props.preventCloseWhileSubmitting || submitState !== "submitting";
-
-  const resetStep = (): void => {
-    setDetails("");
-    setAdditionalFields({});
-    setSubmitState("idle");
-  };
-
-  const goBack = (): void => {
-    if (activeReason == null) {
-      props.onBack?.();
-      return;
-    }
-    const previous = path.at(-1) ?? null;
-    setPath(current => current.slice(0, -1));
-    setSelectedReasonId(previous?.id ?? null);
-    resetStep();
-  };
-
-  const openExternalForm = (): void => {
-    if (activeReason?.link_attachment == null) return;
-    props.openExternalForm?.(activeReason.link_attachment);
-  };
-
-  const submitSelectedReason = async (reason: ReportReason, reportPath: ReportReason[]): Promise<void> => {
-    setSubmitState("submitting");
-    try {
-      await props.submitReport({
-        ...(props.includeServerFields === true ? { additionalFields } : {}),
-        details: details.trim(),
-        path: reportPath,
-        reason,
-      });
-      setSubmitState("success");
-    } catch {
-      setSubmitState("error");
-    }
-  };
-
-  const advance = async (event: {
-    currentTarget?: { reportValidity?(): boolean };
-    preventDefault(): void;
-  }): Promise<void> => {
-    event.preventDefault();
-    if (submitState === "submitting") return;
-    if (completed) {
-      if (canClose) props.onClose();
-      return;
-    }
-    if (props.includeServerFields === true && event.currentTarget?.reportValidity?.() === false) return;
-    if (linkStep) {
-      openExternalForm();
-      return;
-    }
-    if (detailStep && activeReason != null) {
-      await submitSelectedReason(activeReason, path);
-      return;
-    }
-    if (selectedReason == null || terminalTextStep) return;
-    if (isImmediateLeaf(selectedReason, props.includeServerFields === true)) {
-      await submitSelectedReason(selectedReason, [...path, selectedReason]);
-      return;
-    }
-    setPath(current => [...current, selectedReason]);
-    setSelectedReasonId(null);
-    resetStep();
-  };
-
-  const subtitle = submitState === "success"
-    ? null
-    : activeReason == null
-      ? payload?.header_explanation ?? payload?.header ?? null
-      : reasonLabel(activeReason);
-  const primaryLabel = completed
-    ? "Close"
-    : linkStep
-      ? "View form"
-      : detailStep
-        ? "Submit"
-        : "Next";
-  const primaryDisabled = !completed
-    && !linkStep
-    && !detailStep
-    && (selectedReason == null || loadState !== "ready" || submitState === "submitting");
-
-  const reasonOptions = jsx.jsx("fieldset", {
-    "aria-label": "Reporting options",
-    children: reasons.map(reason => jsx.jsxs("label", {
-      children: [
-        jsx.jsx("input", {
-          "aria-checked": selectedReasonId === reason.id,
-          checked: selectedReasonId === reason.id,
-          name: "report-reason",
-          onChange: () => setSelectedReasonId(reason.id),
-          role: "radio",
-          type: "radio",
-          value: reason.id,
-        }),
-        reasonLabel(reason),
-      ],
-    }, reason.id)),
-  });
-
-  let body: unknown;
-  if (submitState === "success") {
-    body = jsx.jsx("div", { children: props.successBody ?? "Our team will review the content to determine if it violates our policies." });
-  } else if (loadState === "loading") {
-    body = jsx.jsx("p", { role: "status", children: "Loading reporting options…" });
-  } else if (loadState === "error") {
-    body = jsx.jsx("p", { role: "alert", children: "We couldn't load reporting options. Please try again in a moment." });
-  } else if (detailStep && activeReason != null) {
-    body = jsx.jsxs("div", { children: [
-      props.includeServerFields === true && activeReason.explanation != null
-        ? jsx.jsx("p", { children: activeReason.explanation })
-        : null,
-      activeReason.details_placeholder != null || (props.includeServerFields === true && activeReason.has_details === true)
-        ? jsx.jsx("textarea", {
-            "aria-label": "Add details",
-            autoFocus: true,
-            onChange: (event: { currentTarget: { value: string } }) => setDetails(event.currentTarget.value),
-            placeholder: activeReason.details_placeholder,
-            rows: 5,
-            value: details,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $O as n,
+  Ah as r,
+  I3 as i,
+  Ih as a,
+  K2 as o,
+  Lh as s,
+  Mh as c,
+  Oh as ee,
+  Ph as l,
+  Rh as te,
+  Y2 as u,
+  Yh as ne,
+  Zh as re,
+  _L as ie,
+  e6 as d,
+  ek as f,
+  gL as p,
+  h4 as m,
+  iL as ae,
+  jh as oe,
+  kh as se,
+  m4 as h,
+  n4 as ce,
+  rL as le,
+  zh as ue,
+} from "@rchunk/app-shared";
+import {
+  Dft as g,
+  Jat as de,
+  Oft as fe,
+  Xat as pe,
+  Yat as me,
+  kft as he,
+} from "@rchunk/app-initial";
+function _(e) {
+  let t = (0, y.c)(108),
+    {
+      onBack: i,
+      onClose: o,
+      queryKey: l,
+      loadReasons: re,
+      submitReport: d,
+      openExternalForm: f,
+      successBody: p,
+      title: m,
+      gcTime: h,
+      includeServerFields: le,
+      preventCloseWhileSubmitting: ue,
+      dialogVariant: g,
+      contentClassName: pe,
+    } = e,
+    _ = le !== void 0 && le,
+    S = ue !== void 0 && ue,
+    xe = ce(),
+    C;
+  t[0] === h ? (C = t[1]) : ((C = h == null ? {} : { gcTime: h }), (t[0] = h), (t[1] = C));
+  let Se;
+  t[2] !== re || t[3] !== l || t[4] !== C
+    ? ((Se = { queryKey: l, queryFn: re, ...C, staleTime: n.ONE_MINUTE }),
+      (t[2] = re),
+      (t[3] = l),
+      (t[4] = C),
+      (t[5] = Se))
+    : (Se = t[5]);
+  let { data: w, isPending: Ce, isError: we } = ie(Se),
+    Te;
+  t[6] === d ? (Te = t[7]) : ((Te = { mutationFn: d }), (t[6] = d), (t[7] = Te));
+  let T = ae(Te),
+    [E, Ee] = (0, b.useState)(``),
+    De;
+  t[8] === Symbol.for(`react.memo_cache_sentinel`) ? ((De = {}), (t[8] = De)) : (De = t[8]);
+  let [D, Oe] = (0, b.useState)(De),
+    [O, ke] = (0, b.useState)(null),
+    Ae;
+  t[9] === Symbol.for(`react.memo_cache_sentinel`) ? ((Ae = []), (t[9] = Ae)) : (Ae = t[9]);
+  let [k, je] = (0, b.useState)(Ae),
+    A = k.length === 0 ? null : k[k.length - 1],
+    j,
+    M,
+    N,
+    P,
+    F,
+    I,
+    L;
+  t[10] !== A || t[11] !== _ || t[12] !== w?.reasons || t[13] !== O
+    ? ((L = (A == null ? w?.reasons : A.sub_reasons) ?? []),
+      (F = L.find((e) => e.id === O) ?? null),
+      (j = A?.details_placeholder != null || (_ && A?.has_details === !0)),
+      (M = j || (_ && (A?.additional_fields?.length ?? 0) > 0)),
+      (P = A?.link_attachment != null),
+      (N = A?.subtext != null && L.length === 0 && !M && !P),
+      (I = M || (F != null && be(F, _))),
+      (t[10] = A),
+      (t[11] = _),
+      (t[12] = w?.reasons),
+      (t[13] = O),
+      (t[14] = j),
+      (t[15] = M),
+      (t[16] = N),
+      (t[17] = P),
+      (t[18] = F),
+      (t[19] = I),
+      (t[20] = L))
+    : ((j = t[14]), (M = t[15]), (N = t[16]), (P = t[17]), (F = t[18]), (I = t[19]), (L = t[20]));
+  let R = I,
+    Me = F == null || Ce || T.isPending,
+    z = T.isSuccess || we,
+    Ne = !z && !R && !P && Me,
+    B;
+  t[21] !== o || t[22] !== S || t[23] !== T.isPending
+    ? ((B = (e) => {
+        !e && (!S || !T.isPending) && o();
+      }),
+      (t[21] = o),
+      (t[22] = S),
+      (t[23] = T.isPending),
+      (t[24] = B))
+    : (B = t[24]);
+  let Pe = B,
+    V;
+  t[25] !== A || t[26] !== i || t[27] !== k
+    ? ((V = () => {
+        if (A == null) {
+          i?.();
+          return;
+        }
+        let e = k[k.length - 1];
+        (je(ge), ke(e?.id ?? null), Ee(``), Oe({}));
+      }),
+      (t[25] = A),
+      (t[26] = i),
+      (t[27] = k),
+      (t[28] = V))
+    : (V = t[28]);
+  let Fe = V,
+    H;
+  t[29] !== A ||
+  t[30] !== D ||
+  t[31] !== E ||
+  t[32] !== _ ||
+  t[33] !== M ||
+  t[34] !== N ||
+  t[35] !== P ||
+  t[36] !== o ||
+  t[37] !== f ||
+  t[38] !== T ||
+  t[39] !== F ||
+  t[40] !== k ||
+  t[41] !== z
+    ? ((H = (e) => {
+        if ((e.preventDefault(), !T.isPending && (!_ || e.currentTarget.reportValidity()))) {
+          if (z) {
+            o();
+            return;
+          }
+          if (!N) {
+            if (P && A?.link_attachment != null) {
+              if (f != null) {
+                f(A.link_attachment);
+                return;
+              }
+              he({
+                href: A.link_attachment,
+                initiator: `open_in_browser_bridge`,
+                openTarget: `external-browser`,
+              });
+              return;
+            }
+            if (M && A != null) {
+              T.mutate({
+                details: E.trim(),
+                reason: A,
+                path: k,
+                ...(_ ? { additionalFields: D } : {}),
+              });
+              return;
+            }
+            if (F != null) {
+              if (be(F, _)) {
+                T.mutate({ details: ``, reason: F, path: [...k, F] });
+                return;
+              }
+              (je((e) => [...e, F]), ke(null), Ee(``), Oe({}));
+            }
+          }
+        }
+      }),
+      (t[29] = A),
+      (t[30] = D),
+      (t[31] = E),
+      (t[32] = _),
+      (t[33] = M),
+      (t[34] = N),
+      (t[35] = P),
+      (t[36] = o),
+      (t[37] = f),
+      (t[38] = T),
+      (t[39] = F),
+      (t[40] = k),
+      (t[41] = z),
+      (t[42] = H))
+    : (H = t[42]);
+  let Ie = H,
+    Le;
+  t[43] !== A || t[44] !== f
+    ? ((Le = (e) => {
+        if (A?.link_attachment != null) {
+          if (f != null) {
+            f(A.link_attachment);
+            return;
+          }
+          fe({
+            event: e,
+            href: A.link_attachment,
+            initiator: `open_in_browser_bridge`,
+            openTarget: `external-browser`,
+          });
+        }
+      }),
+      (t[43] = A),
+      (t[44] = f),
+      (t[45] = Le))
+    : (Le = t[45]);
+  let Re = Le,
+    ze;
+  t[46] !== A || t[47] !== w || t[48] !== T.isSuccess
+    ? ((ze = ye({ activeReason: A, reportReasons: w, isSuccess: T.isSuccess })),
+      (t[46] = A),
+      (t[47] = w),
+      (t[48] = T.isSuccess),
+      (t[49] = ze))
+    : (ze = t[49]);
+  let Be = ze,
+    U;
+  t[50] !== T.isSuccess || t[51] !== m
+    ? ((U = T.isSuccess
+        ? (0, x.jsx)(u, {
+            id: `codexThreadReportDialog.successTitle`,
+            defaultMessage: `Thanks for your report`,
+            description: `Title shown after a safety or legal report is submitted`,
           })
-        : null,
-      activeReason.subtext == null ? null : jsx.jsx("p", { children: activeReason.subtext }),
-      props.includeServerFields === true
-        ? activeReason.additional_fields?.map(field => jsx.jsxs("label", {
-            children: [
-              field.placeholder,
-              field.type === "multi_line_text"
-                ? jsx.jsx("textarea", {
-                    onChange: (event: { currentTarget: { value: string } }) => setAdditionalFields(current => ({ ...current, [field.id]: event.currentTarget.value })),
-                    required: field.required,
-                    value: additionalFields[field.id] ?? "",
-                  })
-                : jsx.jsx("input", {
-                    onChange: (event: { currentTarget: { value: string } }) => setAdditionalFields(current => ({ ...current, [field.id]: event.currentTarget.value })),
-                    required: field.required,
-                    type: field.type === "int" ? "number" : field.type ?? "text",
-                    value: additionalFields[field.id] ?? "",
-                  }),
-            ],
-          }, field.id))
-        : null,
-    ] });
-  } else if (linkStep) {
-    body = jsx.jsx("p", {
-      children: (props.includeServerFields === true
-        ? activeReason?.link_explanation ?? activeReason?.explanation
-        : activeReason?.link_explanation ?? activeReason?.subtext)
-        ?? "Open the linked form to finish this report.",
-    });
-  } else {
-    body = jsx.jsxs(jsx.Fragment, {
-      children: [terminalTextStep ? jsx.jsx("p", { children: activeReason?.subtext }) : null, terminalTextStep ? null : reasonOptions],
-    });
-  }
-
-  return jsx.jsx("dialog", {
-    className: props.contentClassName,
-    "data-variant": props.dialogVariant,
-    onClose: () => { if (canClose) props.onClose(); },
-    open: true,
-    children: jsx.jsxs("form", {
-      onSubmit: event => { void advance(event); },
-      children: [
-        jsx.jsxs("header", {
-          children: [
-            jsx.jsx("h2", { children: submitState === "success" ? "Thanks for your report" : props.title }),
-            subtitle == null ? null : jsx.jsx("p", { children: subtitle }),
-          ],
-        }),
-        body,
-        submitState === "error" ? jsx.jsx("p", { role: "alert", children: "We couldn't submit your report. Please try again in a moment." }) : null,
-        jsx.jsxs("footer", {
-          children: [
-            (activeReason != null || props.onBack != null) && submitState !== "success"
-              ? jsx.jsx("button", { disabled: submitState === "submitting", onClick: goBack, type: "button", children: "Back" })
-              : null,
-            jsx.jsx("button", { disabled: !canClose, onClick: () => { if (canClose) props.onClose(); }, type: "button", children: "Cancel" }),
-            terminalTextStep && !completed
-              ? null
-              : jsx.jsx("button", {
-                  disabled: primaryDisabled,
-                  onClick: linkStep ? openExternalForm : undefined,
-                  type: linkStep ? "button" : "submit",
-                  children: primaryLabel,
+        : m),
+      (t[50] = T.isSuccess),
+      (t[51] = m),
+      (t[52] = U))
+    : (U = t[52]);
+  let W;
+  t[53] === U ? (W = t[54]) : ((W = (0, x.jsx)(te, { children: U })), (t[53] = U), (t[54] = W));
+  let G;
+  t[55] === Be
+    ? (G = t[56])
+    : ((G = Be == null ? void 0 : (0, x.jsx)(s, { children: Be })), (t[55] = Be), (t[56] = G));
+  let K;
+  t[57] !== W || t[58] !== G
+    ? ((K = (0, x.jsx)(oe, {
+        children: (0, x.jsx)(r, { title: W, subtitle: G, titleSize: `dialog` }),
+      })),
+      (t[57] = W),
+      (t[58] = G),
+      (t[59] = K))
+    : (K = t[59]);
+  let q;
+  t[60] !== A ||
+  t[61] !== D ||
+  t[62] !== E ||
+  t[63] !== j ||
+  t[64] !== _ ||
+  t[65] !== xe ||
+  t[66] !== M ||
+  t[67] !== N ||
+  t[68] !== P ||
+  t[69] !== Ce ||
+  t[70] !== we ||
+  t[71] !== T.isSuccess ||
+  t[72] !== O ||
+  t[73] !== p ||
+  t[74] !== L
+    ? ((q = T.isSuccess
+        ? (0, x.jsx)(v, {
+            children:
+              p ??
+              (0, x.jsx)(u, {
+                id: `codexThreadReportDialog.successBody`,
+                defaultMessage: `Our team will review the content to determine if it violates our policies`,
+                description: `Body shown after a Codex thread safety or legal report is submitted`,
+              }),
+          })
+        : Ce
+          ? (0, x.jsx)(v, {
+              children: (0, x.jsx)(u, {
+                id: `codexThreadReportDialog.loading`,
+                defaultMessage: `Loading reporting options…`,
+                description: `Loading text while Codex thread report reasons are fetched`,
+              }),
+            })
+          : we
+            ? (0, x.jsx)(v, {
+                children: (0, x.jsx)(u, {
+                  id: `codexThreadReportDialog.loadError`,
+                  defaultMessage: `We couldn't load reporting options. Please try again in a moment`,
+                  description: `Error text shown when Codex thread report reasons fail to load`,
                 }),
-          ],
+              })
+            : M && A != null
+              ? (0, x.jsxs)(c, {
+                  className: `gap-3`,
+                  children: [
+                    _ && A.explanation != null ? (0, x.jsx)(v, { children: A.explanation }) : null,
+                    j
+                      ? (0, x.jsx)(me, {
+                          autoFocus: !0,
+                          rows: 5,
+                          placeholder: A.details_placeholder ?? void 0,
+                          "aria-label": xe.formatMessage({
+                            id: `codexThreadReportDialog.detailsLabel`,
+                            defaultMessage: `Add details`,
+                            description: `Accessible label for Codex thread report details field`,
+                          }),
+                          value: E,
+                          onChange: (e) => {
+                            Ee(e.target.value);
+                          },
+                        })
+                      : null,
+                    A.subtext == null ? null : (0, x.jsx)(v, { children: A.subtext }),
+                    _
+                      ? A.additional_fields?.map((e) => {
+                          let t = `text`;
+                          return (
+                            e.type === `int`
+                              ? (t = `number`)
+                              : (e.type === `email` || e.type === `url`) && (t = e.type),
+                            (0, x.jsxs)(
+                              `label`,
+                              {
+                                className: `flex flex-col gap-2 text-sm`,
+                                children: [
+                                  e.placeholder,
+                                  e.type === `multi_line_text`
+                                    ? (0, x.jsx)(me, {
+                                        required: e.required,
+                                        value: D[e.id] ?? ``,
+                                        onChange: (t) =>
+                                          Oe((n) => ({ ...n, [e.id]: t.target.value })),
+                                      })
+                                    : (0, x.jsx)(de, {
+                                        type: t,
+                                        required: e.required,
+                                        value: D[e.id] ?? ``,
+                                        onChange: (t) =>
+                                          Oe((n) => ({ ...n, [e.id]: t.target.value })),
+                                      }),
+                                ],
+                              },
+                              e.id,
+                            )
+                          );
+                        })
+                      : null,
+                  ],
+                })
+              : P
+                ? (0, x.jsx)(v, {
+                    children:
+                      (_
+                        ? (A?.link_explanation ?? A?.explanation)
+                        : (A?.link_explanation ?? A?.subtext)) ??
+                      (0, x.jsx)(u, {
+                        id: `codexThreadReportDialog.linkBody`,
+                        defaultMessage: `Open the linked form to finish this report`,
+                        description: `Body shown when a Codex thread report reason needs an external form`,
+                      }),
+                  })
+                : (0, x.jsxs)(x.Fragment, {
+                    children: [
+                      N ? (0, x.jsx)(v, { children: A?.subtext }) : null,
+                      N
+                        ? null
+                        : (0, x.jsx)(ve, {
+                            reasons: L,
+                            selectedReasonId: O,
+                            setSelectedReasonId: ke,
+                          }),
+                    ],
+                  })),
+      (t[60] = A),
+      (t[61] = D),
+      (t[62] = E),
+      (t[63] = j),
+      (t[64] = _),
+      (t[65] = xe),
+      (t[66] = M),
+      (t[67] = N),
+      (t[68] = P),
+      (t[69] = Ce),
+      (t[70] = we),
+      (t[71] = T.isSuccess),
+      (t[72] = O),
+      (t[73] = p),
+      (t[74] = L),
+      (t[75] = q))
+    : (q = t[75]);
+  let J;
+  t[76] === T.isError
+    ? (J = t[77])
+    : ((J = T.isError
+        ? (0, x.jsx)(`p`, {
+            className: `text-sm`,
+            children: (0, x.jsx)(u, {
+              id: `codexThreadReportDialog.submitError`,
+              defaultMessage: `We couldn't submit your report. Please try again in a moment`,
+              description: `Error text shown when Codex thread report submission fails`,
+            }),
+          })
+        : null),
+      (t[76] = T.isError),
+      (t[77] = J));
+  let Y;
+  t[78] !== q || t[79] !== J
+    ? ((Y = (0, x.jsxs)(oe, { children: [q, J] })), (t[78] = q), (t[79] = J), (t[80] = Y))
+    : (Y = t[80]);
+  let X;
+  t[81] !== A || t[82] !== Fe || t[83] !== i || t[84] !== T.isPending || t[85] !== T.isSuccess
+    ? ((X =
+        (A != null || i != null) && !T.isSuccess
+          ? (0, x.jsx)(ne, {
+              color: `secondary`,
+              disabled: T.isPending,
+              type: `button`,
+              onClick: Fe,
+              children: (0, x.jsx)(u, {
+                id: `codexThreadReportDialog.back`,
+                defaultMessage: `Back`,
+                description: `Back button for Codex thread report reason selection`,
+              }),
+            })
+          : null),
+      (t[81] = A),
+      (t[82] = Fe),
+      (t[83] = i),
+      (t[84] = T.isPending),
+      (t[85] = T.isSuccess),
+      (t[86] = X))
+    : (X = t[86]);
+  let Z;
+  t[87] !== Re ||
+  t[88] !== N ||
+  t[89] !== P ||
+  t[90] !== Ne ||
+  t[91] !== R ||
+  t[92] !== T.isPending ||
+  t[93] !== z
+    ? ((Z =
+        !N || z
+          ? (0, x.jsx)(ne, {
+              color: `primary`,
+              disabled: Ne,
+              loading: T.isPending,
+              type: P ? `button` : `submit`,
+              onClick: P ? Re : void 0,
+              children: (0, x.jsx)(_e, { close: z, isLinkStep: P, isSubmitStep: R }),
+            })
+          : null),
+      (t[87] = Re),
+      (t[88] = N),
+      (t[89] = P),
+      (t[90] = Ne),
+      (t[91] = R),
+      (t[92] = T.isPending),
+      (t[93] = z),
+      (t[94] = Z))
+    : (Z = t[94]);
+  let Q;
+  t[95] !== X || t[96] !== Z
+    ? ((Q = (0, x.jsx)(oe, { children: (0, x.jsxs)(se, { children: [X, Z] }) })),
+      (t[95] = X),
+      (t[96] = Z),
+      (t[97] = Q))
+    : (Q = t[97]);
+  let $;
+  t[98] !== Ie || t[99] !== K || t[100] !== Y || t[101] !== Q
+    ? (($ = (0, x.jsxs)(ee, { as: `form`, className: `gap-4`, onSubmit: Ie, children: [K, Y, Q] })),
+      (t[98] = Ie),
+      (t[99] = K),
+      (t[100] = Y),
+      (t[101] = Q),
+      (t[102] = $))
+    : ($ = t[102]);
+  let Ve;
+  return (
+    t[103] !== pe || t[104] !== g || t[105] !== Pe || t[106] !== $
+      ? ((Ve = (0, x.jsx)(a, {
+          open: !0,
+          onOpenChange: Pe,
+          size: `wide`,
+          variant: g,
+          contentClassName: pe,
+          children: $,
+        })),
+        (t[103] = pe),
+        (t[104] = g),
+        (t[105] = Pe),
+        (t[106] = $),
+        (t[107] = Ve))
+      : (Ve = t[107]),
+    Ve
+  );
+}
+function ge(e) {
+  return e.slice(0, -1);
+}
+function _e(e) {
+  let t = (0, y.c)(4),
+    { close: n, isLinkStep: r, isSubmitStep: i } = e;
+  if (n) {
+    let e;
+    return (
+      t[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, x.jsx)(u, {
+            id: `codexThreadReportDialog.close`,
+            defaultMessage: `Close`,
+            description: `Close button for Codex thread report dialog`,
+          })),
+          (t[0] = e))
+        : (e = t[0]),
+      e
+    );
+  }
+  if (r) {
+    let e;
+    return (
+      t[1] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, x.jsx)(u, {
+            id: `codexThreadReportDialog.viewForm`,
+            defaultMessage: `View form`,
+            description: `Button label for opening an external Codex report form`,
+          })),
+          (t[1] = e))
+        : (e = t[1]),
+      e
+    );
+  }
+  if (i) {
+    let e;
+    return (
+      t[2] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, x.jsx)(u, {
+            id: `codexThreadReportDialog.submit`,
+            defaultMessage: `Submit`,
+            description: `Submit button for Codex thread report dialog`,
+          })),
+          (t[2] = e))
+        : (e = t[2]),
+      e
+    );
+  }
+  let a;
+  return (
+    t[3] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((a = (0, x.jsx)(u, {
+          id: `codexThreadReportDialog.next`,
+          defaultMessage: `Next`,
+          description: `Next button for Codex thread report reason selection`,
+        })),
+        (t[3] = a))
+      : (a = t[3]),
+    a
+  );
+}
+function ve(e) {
+  let t = (0, y.c)(12),
+    { reasons: n, selectedReasonId: r, setSelectedReasonId: i } = e,
+    a = ce(),
+    o;
+  t[0] === a
+    ? (o = t[1])
+    : ((o = a.formatMessage({
+        id: `codexThreadReportDialog.optionsLabel`,
+        defaultMessage: `Reporting options`,
+        description: `Accessible label for Codex thread report reason options`,
+      })),
+      (t[0] = a),
+      (t[1] = o));
+  let s;
+  if (t[2] !== n || t[3] !== r || t[4] !== i) {
+    let e;
+    (t[6] !== r || t[7] !== i
+      ? ((e = (e) => {
+          let t = r === e.id;
+          return (0, x.jsx)(
+            `button`,
+            {
+              type: `button`,
+              role: `radio`,
+              "aria-checked": t,
+              onClick: () => {
+                i(e.id);
+              },
+              className: h(
+                `border-default cursor-interaction rounded-lg border px-3 py-2 text-start text-sm`,
+                `focus-visible:ring-ring focus-visible:outline-none focus-visible:ring-2`,
+                t
+                  ? `bg-primary-solid text-primary-solid`
+                  : `text-default hover:bg-surface-elevated/60`,
+              ),
+              children: e.cta,
+            },
+            e.id,
+          );
         }),
-      ],
-    }),
-  });
+        (t[6] = r),
+        (t[7] = i),
+        (t[8] = e))
+      : (e = t[8]),
+      (s = n.map(e)),
+      (t[2] = n),
+      (t[3] = r),
+      (t[4] = i),
+      (t[5] = s));
+  } else s = t[5];
+  let c;
+  return (
+    t[9] !== o || t[10] !== s
+      ? ((c = (0, x.jsx)(`div`, {
+          role: `radiogroup`,
+          "aria-label": o,
+          className: `flex flex-col gap-2 select-none`,
+          children: s,
+        })),
+        (t[9] = o),
+        (t[10] = s),
+        (t[11] = c))
+      : (c = t[11]),
+    c
+  );
 }
-
-function initializeReportDialog(): void {
-  initializeApiClient();
+function v(e) {
+  let t = (0, y.c)(2),
+    { children: n } = e,
+    r;
+  return (
+    t[0] === n
+      ? (r = t[1])
+      : ((r = (0, x.jsx)(`div`, { className: `text-sm text-codex-description`, children: n })),
+        (t[0] = n),
+        (t[1] = r)),
+    r
+  );
 }
-
-export { initializeReportDialog as n, ReportDialog as t };
+function ye({ activeReason: e, isSuccess: t, reportReasons: n }) {
+  return t ? null : e == null ? n?.header_explanation || n?.header || null : e.cta;
+}
+function be(e, t) {
+  return (
+    (!t || (!e.has_details && (e.additional_fields?.length ?? 0) === 0)) &&
+    (e.sub_reasons?.length ?? 0) === 0 &&
+    e.details_placeholder == null &&
+    e.link_attachment == null &&
+    e.subtext == null
+  );
+}
+var y, b, x;
+function S() {
+  return (S = e(() => {
+    ((y = t()), le(), p(), m(), (b = d()), o(), re(), ue(), l(), g(), pe(), f(), (x = i()));
+  }))();
+}
+export { S as n, _ as t };

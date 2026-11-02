@@ -4,13 +4,12 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MODULES = [
   "linked-app-logo",
   "confirmation",
-  "history",
-  "order-yubikey-dialog",
   "security-settings",
 ];
 const state = (globalThis.__securityFlowTest = {
@@ -110,7 +109,7 @@ function generic(moduleName, exportName) {
 }
 
 function mockModule(name) {
-  if (name === "rolldown-runtime") return "export {};";
+  if (name === "rolldown-runtime") return "export const n=initializer=>{let value;return()=>value??(value=initializer())};";
   const names = importedNamesByModule.get(name) ?? new Set();
   return [...names]
     .map(
@@ -198,59 +197,8 @@ const descriptionMessage = confirmation.props.children.props.children[0].props.c
 const learnLink = descriptionMessage.props.values.link("Learn more");
 assert.match(learnLink.props.href, /lockdown-mode/);
 
-const historyModule = await bundle("history");
-state.historyPage = {
-  events: [{ event_type: "login_success", id: "event-1", timestamp_second: 1 }],
-  has_more: true,
-  next_cursor: "cursor-2",
-};
-state.stateValues = [];
-state.stateCursor = 0;
-state.runEffects = true;
-let history = historyModule.SecurityHistorySettings({ accountId: "account-1", onBack() {} });
-await new Promise(resolve => setImmediate(resolve));
-assert.equal(history.type(history.props).type, "SecuritySubpage");
-assert.equal(state.apiGets.at(-1).path, "/accounts/security_settings/history");
-assert.equal(state.apiGets.at(-1).options.additionalHeaders["ChatGPT-Account-ID"], "account-1");
-assert.equal(state.stateValues[0][0].id, "event-1");
-assert.equal(state.stateValues[1], "cursor-2");
-state.runEffects = false;
-state.stateValues = [[
-  { event_type: "login_success", id: "login", timestamp_second: 1, device_description: "Mac", location_description: "Shanghai" },
-  { event_type: "password_changed", id: "password", timestamp_second: 1, device_description: "Chrome" },
-], null, true, false, false];
-state.stateCursor = 0;
-history = historyModule.SecurityHistorySettings({ accountId: "account-1", onBack() {} });
-const historyBody = history.props.children;
-assert.equal(historyBody.props.children[0].props["data-history-date"], "1970-1-1");
-const rows = historyBody.props.children[0].props.children[1].props.children;
-assert.equal(rows.length, 2);
-assert.equal(rows[0].props.label, "Signed in");
-assert.equal(rows[0].props.description, "Mac • Shanghai");
-assert.equal(rows[1].props.label, "Password updated");
-assert.equal(historyBody.props.children[1].type, "Button");
-
-const orderModule = await bundle("order-yubikey-dialog");
-let orderClosed = 0;
-let prevented = false;
-state.stateValues = [];
-state.stateCursor = 0;
-let order = orderModule.OrderYubikeyDialog({ accountId: "account-2", onClose: () => orderClosed++ });
-assert.equal(order.type, "DialogContent");
-assert.equal(order.props.open, true);
-order.props.children.props.onSubmit({ preventDefault: () => { prevented = true; } });
-state.stateCursor = 0;
-order = orderModule.OrderYubikeyDialog({ accountId: "account-2", onClose: () => orderClosed++ });
-assert.equal(order.props.children.props.children[1].props.children[1].props.disabled, true);
-await new Promise(resolve => setImmediate(resolve));
-assert.equal(prevented, true);
-assert.equal(state.apiPosts.at(-1).path, "/accounts/security_settings/yubikey/order_link");
-assert.equal(state.apiPosts.at(-1).options.additionalHeaders["ChatGPT-Account-ID"], "account-2");
-assert.equal(state.opened.at(-1).href, "https://order.example/key");
-state.stateCursor = 0;
-order = orderModule.OrderYubikeyDialog({ accountId: "account-2", onClose: () => orderClosed++ });
-order.props.onOpenChange(false);
-assert.equal(orderClosed, 1);
+assertReleaseOwner("history");
+assertReleaseOwner("order-yubikey-dialog");
 
 const settingsModule = await bundle("security-settings");
 assert.equal(settingsModule.ChatGptSecuritySettings({}).props["data-security-settings-empty"], true);

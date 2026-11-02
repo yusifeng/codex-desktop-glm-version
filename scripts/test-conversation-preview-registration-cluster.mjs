@@ -7,7 +7,7 @@ import * as esbuild from "esbuild";
 import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["open-pending-site-preview", "site-preview-persistence-bridge", "registered-conversation-thumbnail-core", "registered-sources", "automation-side-panel-tab-core"];
+const MODULES = ["open-pending-site-preview", "site-preview-persistence-bridge", "registered-conversation-thumbnail-core", "automation-side-panel-tab-core"];
 const state = globalThis.__conversationRegistrationTest = {
   effects: [], initialized: [], openTabs: [], persisted: [], signalValue: null,
 };
@@ -131,25 +131,7 @@ assert.equal(conversationNode.props.draft, "draft");
 state.signalValue = null;
 assert.equal(conversationThumbnail.t({ conversationId: "c1", title: "Chat" }), null);
 
-// Registered sources thumbnail
-state.signalValue = { totalCount: 7, sources: [
-  { kind: "file", label: "report.md", path: "/repo/report.md" },
-  { activity: "read", kind: "external", label: "Docs" },
-  { callCount: 2, kind: "webmcp", label: "example.com" },
-  { kind: "web", pageCount: 1, searchCount: 3 },
-] };
-const sourcesThumbnail = await bundle("registered-sources");
-assert.deepEqual(Object.keys(sourcesThumbnail), ["RegisteredLocalSourcesThumbnail"]);
-const sourcesNode = sourcesThumbnail.RegisteredLocalSourcesThumbnail({ conversationId: "c1", title: "Sources" });
-assert.equal(sourcesNode.type, "TabThumbnail");
-assert.equal(sourcesNode.props.subtitle, "7 sources");
-assert.equal(sourcesNode.props.sections.length, 4);
-assert.equal(sourcesNode.props.sections[0].content.props.children[1].props.children, "report.md");
-assert.equal(sourcesNode.props.sections[1].content.props.children[2].props.children, "Read");
-assert.equal(sourcesNode.props.sections[2].content.props.children[2].props.children, "2 calls");
-assert.equal(sourcesNode.props.sections[3].content.props.children[2].props.children, "3 searches");
-state.signalValue = { totalCount: 0, sources: [] };
-assert.equal(sourcesThumbnail.RegisteredLocalSourcesThumbnail({ conversationId: "c1", title: "Sources" }), null);
+assertReleaseOwner("registered-sources");
 
 assertReleaseOwner("automation-side-panel-tab-core");
 

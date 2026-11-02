@@ -8,7 +8,6 @@ import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MODULES = [
-  "report-dialog-core",
   "codex-thread-report-dialog",
   "remote-connection-editor-dialog",
   "plugin-share-dialog-core",
@@ -177,32 +176,7 @@ function nodes(root) {
 const byText = (tree, text) =>
   nodes(tree).find((node) => node.props?.children === text);
 
-// report-dialog-core: 7
-const reportCore = await bundle("report-dialog-core");
-reportCore.n();
-assert.equal(state.initialized.includes("api"), true);
-let reportClosed = false;
-const reportTree = reportCore.t({
-  title: "Report item",
-  queryKey: ["reasons"],
-  initialReasons: [{ id: "spam", label: "Spam" }],
-  loadReasons: async () => [],
-  submitReport: async () => {},
-  onClose: () => {
-    reportClosed = true;
-  },
-});
-assert.equal(reportTree.type, "dialog");
-assert.equal(reportTree.props.open, true);
-assert.equal(byText(reportTree, "Report item").type, "h2");
-assert.equal(
-  nodes(reportTree).find((node) => node.props?.name === "report-reason").props
-    .value,
-  "spam",
-);
-byText(reportTree, "Cancel").props.onClick();
-assert.equal(reportClosed, true);
-assert.equal(byText(reportTree, "Next").props.disabled, true);
+assertReleaseOwner("report-dialog-core");
 
 // codex-thread-report-dialog: 10
 const codexReport = await bundle("codex-thread-report-dialog");

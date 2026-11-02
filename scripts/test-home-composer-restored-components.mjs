@@ -403,4 +403,5 @@ assert.equal(scrollContext.r(), globalThis.__homeComposerRestored.scrollControll
 
 assertReleaseOwner("thread-scroll-layout");
 
+assertReleaseOwner("task-announcement-candidates");
 console.log("home composer restored component tests passed");

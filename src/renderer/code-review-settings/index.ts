@@ -1,401 +1,743 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  a as useCloudUserPreferences,
-  o as useUpdateCloudUserPreferences,
-  r as initializeCloudPreferences,
-} from "@rchunk/cloud-preferences";
-
-const {
-  $3: initializeRuntimeLazy,
-  I3: getJsxRuntime,
-  LX: useScope,
-  ZI: AppScope,
-  n4: useIntl,
-  pk: toastManagerSignal,
-} = appSharedChunk;
-
-type ReviewPreference = "always" | "repo_default";
-type ReviewTrigger = "pr_open" | "every_push" | "smart_detect";
-type SecurityTrigger = ReviewTrigger | "code_review";
-type Severity = "critical" | "high" | "medium" | "low";
-
-interface SecurityReviewPreferences {
-  manual_severity_threshold?: Severity | null;
-  preference?: ReviewPreference | null;
-  severity_threshold?: Severity | null;
-  trigger_policy?: SecurityTrigger | null;
-}
-
-interface CodeReviewPreferences {
-  allow_credits_for_code_reviews: boolean;
-  code_review_preference?: ReviewPreference | null;
-  code_review_trigger_policy?: ReviewTrigger | null;
-  exhaustive_code_review: boolean;
-  security_review?: SecurityReviewPreferences | null;
-}
-
-type PreferencesUpdate = Partial<CodeReviewPreferences> & {
-  security_review?: Partial<SecurityReviewPreferences>;
-};
-
-interface PreferencesQuery {
-  data: CodeReviewPreferences | null | undefined;
-  isError: boolean;
-  refetch(): void;
-}
-
-interface PreferencesMutation {
-  isPending: boolean;
-  mutate(update: PreferencesUpdate, callbacks: { onError(): void }): void;
-}
-
-interface ToastManager {
-  danger(message: string, options: { errorAnalytics: { toastId: string } }): void;
-}
-
-const codeReviewRuntime = appInitialChunk as unknown as {
-  dS: () => { canManageCreditSettings: boolean };
-  ofn: (gateId: string) => boolean;
-};
-const {
-  dS: useCreditSettingsAvailability,
-  ofn: useFeatureGate,
-} = codeReviewRuntime;
-
-const PERSONAL_TRIGGERS: readonly ReviewTrigger[] = ["pr_open", "every_push", "smart_detect"];
-const SECURITY_TRIGGERS: readonly SecurityTrigger[] = ["pr_open", "every_push", "smart_detect", "code_review"];
-const SEVERITIES: readonly Severity[] = ["critical", "high", "medium", "low"];
-
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function SettingRow({
-  control,
-  description,
-  label,
-}: {
-  control: unknown;
-  description?: string;
-  label: string;
-}): unknown {
-  return jsx.jsxs("div", {
-    className: "flex min-h-14 items-center justify-between gap-4 px-4 py-3",
-    children: [
-      jsx.jsxs("div", {
-        className: "min-w-0",
-        children: [
-          jsx.jsx("div", { className: "font-medium", children: label }),
-          description == null ? null : jsx.jsx("div", { className: "mt-0.5 text-sm text-secondary", children: description }),
-        ],
-      }),
-      jsx.jsx("div", { className: "shrink-0", children: control }),
-    ],
-  });
-}
-
-function Section({
-  children,
-  subtitle,
-  title,
-}: {
-  children: unknown;
-  subtitle?: string;
-  title: string;
-}): unknown {
-  return jsx.jsxs("section", {
-    className: "overflow-hidden rounded-xl border border-token-border-light bg-surface-primary",
-    children: [
-      jsx.jsxs("header", {
-        className: "border-b border-token-border-light px-4 py-3",
-        children: [
-          jsx.jsx("h2", { className: "font-semibold", children: title }),
-          subtitle == null ? null : jsx.jsx("p", { className: "mt-0.5 text-sm text-secondary", children: subtitle }),
-        ],
-      }),
-      jsx.jsx("div", { className: "divide-y divide-token-border-light", children }),
-    ],
-  });
-}
-
-function Toggle({
-  ariaLabel,
-  checked,
-  disabled,
-  onChange,
-}: {
-  ariaLabel: string;
-  checked: boolean;
-  disabled: boolean;
-  onChange(value: boolean): void;
-}): unknown {
-  return jsx.jsx("button", {
-    type: "button",
-    role: "switch",
-    "aria-label": ariaLabel,
-    "aria-checked": checked,
-    disabled,
-    className: "rounded-full border px-3 py-1 text-sm",
-    onClick: () => onChange(!checked),
-    children: checked ? "On" : "Off",
-  });
-}
-
-function Select<Value extends string>({
-  ariaLabel,
-  disabled,
-  labels,
-  onChange,
-  options,
-  value,
-}: {
-  ariaLabel: string;
-  disabled: boolean;
-  labels: Record<Value, string>;
-  onChange(value: Value): void;
-  options: readonly Value[];
-  value: Value;
-}): unknown {
-  return jsx.jsx("select", {
-    "aria-label": ariaLabel,
-    disabled,
-    value,
-    onChange: (event: { currentTarget: { value: string } }) => onChange(event.currentTarget.value as Value),
-    children: options.map((option) => jsx.jsx("option", { value: option, children: labels[option] }, option)),
-  });
-}
-
-const REVIEW_TRIGGER_LABELS: Record<ReviewTrigger, string> = {
-  every_push: "On every push",
-  pr_open: "On PR open",
-  smart_detect: "Smart trigger",
-};
-
-const SECURITY_TRIGGER_LABELS: Record<SecurityTrigger, string> = {
-  code_review: "Whenever code review runs",
-  every_push: "On every push",
-  pr_open: "On PR open",
-  smart_detect: "Smart detect (Experimental)",
-};
-
-const SEVERITY_LABELS: Record<Severity, string> = {
-  critical: "Critical",
-  high: "High",
-  low: "Low",
-  medium: "Medium",
-};
-
-function PersonalPreferences({
-  disabled,
-  onUpdate,
-  preferences,
-  showCreditPreference,
-}: {
-  disabled: boolean;
-  onUpdate(update: PreferencesUpdate): void;
-  preferences: CodeReviewPreferences;
-  showCreditPreference: boolean;
-}): unknown {
-  const trigger = preferences.code_review_trigger_policy ?? "pr_open";
-  return jsx.jsx(Section, {
-    title: "Personal preferences",
-    children: [
-      jsx.jsx(SettingRow, {
-        label: "Automatic review",
-        description: "Automatically review pull requests in repositories with code review enabled",
-        control: jsx.jsx(Toggle, {
-          ariaLabel: "Enable automatic code review",
-          checked: preferences.code_review_preference === "always",
-          disabled,
-          onChange: (enabled) => onUpdate({ code_review_preference: enabled ? "always" : "repo_default" }),
+  $3 as t,
+  FX as n,
+  I3 as r,
+  If as i,
+  K2 as a,
+  LX as o,
+  Lf as s,
+  QI as c,
+  Qc as l,
+  Rf as u,
+  Y2 as d,
+  Yh as f,
+  ZI as p,
+  Zc as m,
+  Zh as h,
+  al as g,
+  e6 as _,
+  jf as v,
+  kf as y,
+  lk as b,
+  n4 as x,
+  pk as S,
+  rl as C,
+} from "@rchunk/app-shared";
+import {
+  Xl as w,
+  Yl as T,
+  aa as E,
+  au as D,
+  dS as O,
+  ifn as k,
+  iu as A,
+  oa as j,
+  ofn as M,
+  ql as N,
+  ru as P,
+  su as F,
+  uS as I,
+} from "@rchunk/app-initial";
+import { a as L, o as R, r as z } from "@rchunk/cloud-preferences";
+function ee(e) {
+  let t = (0, U.c)(35),
+    { disabled: n, preferences: r, onUpdate: i } = e,
+    a = (0, W.useId)(),
+    o = M(`579168209`),
+    c = r.trigger_policy ?? `code_review`,
+    l;
+  t[0] !== o || t[1] !== c
+    ? ((l = K.filter((e) => e !== `smart_detect` || o || c === `smart_detect`)),
+      (t[0] = o),
+      (t[1] = c),
+      (t[2] = l))
+    : (l = t[2]);
+  let u = l,
+    f;
+  t[3] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((f = (0, G.jsx)(E.Header, {
+        title: (0, G.jsx)(d, {
+          id: `settings.codeReview.security.title`,
+          defaultMessage: `Personal security review preferences`,
+          description: `Title for personal security review preferences`,
         }),
-      }, "automatic"),
-      jsx.jsx(SettingRow, {
-        label: "Review trigger",
-        description: "Choose when ChatGPT should review your pull requests",
-        control: jsx.jsx(Select<ReviewTrigger>, {
-          ariaLabel: "Review trigger",
-          disabled,
-          labels: REVIEW_TRIGGER_LABELS,
-          options: PERSONAL_TRIGGERS,
-          value: trigger,
-          onChange: (value) => onUpdate({ code_review_trigger_policy: value }),
+        subtitle: (0, G.jsx)(d, {
+          id: `settings.codeReview.security.subtitle`,
+          defaultMessage: `Control how Codex reviews your pull requests for security by default`,
+          description: `Description for personal security review preferences`,
         }),
-      }, "trigger"),
-      jsx.jsx(SettingRow, {
-        label: "Exhaustive code review",
-        description: "Keep looking for findings until ChatGPT stops finding new issues",
-        control: jsx.jsx(Toggle, {
-          ariaLabel: "Enable exhaustive code review",
-          checked: preferences.exhaustive_code_review,
-          disabled,
-          onChange: (enabled) => onUpdate({ exhaustive_code_review: enabled }),
-        }),
-      }, "exhaustive"),
-      showCreditPreference ? jsx.jsx(SettingRow, {
-        label: "Use credits for reviews",
-        description: "Allow credits to be consumed for reviews after rate limits",
-        control: jsx.jsx(Toggle, {
-          ariaLabel: "Allow credits for code reviews",
-          checked: preferences.allow_credits_for_code_reviews,
-          disabled,
-          onChange: (enabled) => onUpdate({ allow_credits_for_code_reviews: enabled }),
-        }),
-      }, "credits") : null,
-    ],
-  });
-}
-
-function SecurityPreferences({
-  disabled,
-  onUpdate,
-  preferences,
-}: {
-  disabled: boolean;
-  onUpdate(update: PreferencesUpdate): void;
-  preferences: SecurityReviewPreferences;
-}): unknown {
-  const smartDetectEnabled = useFeatureGate("579168209");
-  const trigger = preferences.trigger_policy ?? "code_review";
-  const triggerOptions = SECURITY_TRIGGERS.filter((option) => option !== "smart_detect" || smartDetectEnabled || trigger === "smart_detect");
-  return jsx.jsx(Section, {
-    title: "Personal security review preferences",
-    subtitle: "Control how Codex reviews your pull requests for security by default",
-    children: [
-      jsx.jsx(SettingRow, {
-        label: "Automatic security review",
-        description: "Automatically review your pull requests in enabled repositories for security",
-        control: jsx.jsx(Toggle, {
-          ariaLabel: "Enable automatic security review",
-          checked: preferences.preference === "always",
-          disabled,
-          onChange: (enabled) => onUpdate({ security_review: { preference: enabled ? "always" : "repo_default" } }),
-        }),
-      }, "security-automatic"),
-      jsx.jsx(SettingRow, {
-        label: "Security review trigger",
-        description: "Choose when Codex should review your pull requests for security",
-        control: jsx.jsx(Select<SecurityTrigger>, {
-          ariaLabel: "Security review trigger",
-          disabled,
-          labels: SECURITY_TRIGGER_LABELS,
-          options: triggerOptions,
-          value: trigger,
-          onChange: (value) => onUpdate({ security_review: { trigger_policy: value } }),
-        }),
-      }, "security-trigger"),
-      jsx.jsx(SettingRow, {
-        label: "Minimum automatic review reporting severity",
-        description: "Choose the lowest severity reported for automated reviews",
-        control: jsx.jsx(Select<Severity>, {
-          ariaLabel: "Minimum automatic review reporting severity",
-          disabled,
-          labels: SEVERITY_LABELS,
-          options: SEVERITIES,
-          value: preferences.severity_threshold ?? "high",
-          onChange: (value) => onUpdate({ security_review: { severity_threshold: value } }),
-        }),
-      }, "automatic-severity"),
-      jsx.jsx(SettingRow, {
-        label: "Minimum manual review reporting severity",
-        description: "Choose the lowest severity reported for reviews requested with @codex",
-        control: jsx.jsx(Select<Severity>, {
-          ariaLabel: "Minimum manual review reporting severity",
-          disabled,
-          labels: SEVERITY_LABELS,
-          options: SEVERITIES,
-          value: preferences.manual_severity_threshold ?? "medium",
-          onChange: (value) => onUpdate({ security_review: { manual_severity_threshold: value } }),
-        }),
-      }, "manual-severity"),
-    ],
-  });
-}
-
-function CodeReviewContent(): unknown {
-  const scope = useScope(AppScope);
-  const intl = useIntl();
-  const preferencesQuery = useCloudUserPreferences() as PreferencesQuery;
-  const mutation = useUpdateCloudUserPreferences() as PreferencesMutation;
-  const { canManageCreditSettings } = useCreditSettingsAvailability();
-  const save = (update: PreferencesUpdate) => mutation.mutate(update, {
-    onError: () => {
-      const toast = scope.get(toastManagerSignal) as unknown as ToastManager;
-      toast.danger(String(intl.formatMessage({
-        id: "settings.codeReview.save.error",
-        defaultMessage: "Unable to save code review settings",
-      })), { errorAnalytics: { toastId: "settings.codeReview.save.error" } });
-    },
-  });
-
-  if (preferencesQuery.data == null) {
-    if (preferencesQuery.isError) {
-      return jsx.jsx(Section, {
-        title: "Code review settings",
-        children: jsx.jsx(SettingRow, {
-          label: "Unable to load code review settings",
-          control: jsx.jsx("button", {
-            type: "button",
-            className: "rounded-md border px-3 py-1.5 text-sm",
-            onClick: () => preferencesQuery.refetch(),
-            children: "Retry",
+      })),
+      (t[3] = f))
+    : (f = t[3]);
+  let p, h;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((p = (0, G.jsx)(d, {
+        id: `settings.codeReview.security.autoReview.label`,
+        defaultMessage: `Automatic security review`,
+        description: `Label for automatic security review preference`,
+      })),
+      (h = (0, G.jsx)(d, {
+        id: `settings.codeReview.security.autoReview.description`,
+        defaultMessage: `Automatically review your pull requests in enabled repositories for security`,
+        description: `Description for automatic security review preference`,
+      })),
+      (t[4] = p),
+      (t[5] = h))
+    : ((p = t[4]), (h = t[5]));
+  let g;
+  t[6] !== n || t[7] !== i || t[8] !== r.preference
+    ? ((g = (0, G.jsx)(C, {
+        label: p,
+        description: h,
+        control: (e) =>
+          (0, G.jsx)(s, {
+            ...e,
+            checked: r.preference === `always`,
+            disabled: n,
+            onChange: (e) => {
+              i({ security_review: { preference: e ? `always` : `repo_default` } });
+            },
           }),
+      })),
+      (t[6] = n),
+      (t[7] = i),
+      (t[8] = r.preference),
+      (t[9] = g))
+    : (g = t[9]);
+  let _, b;
+  t[10] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((_ = (0, G.jsx)(d, {
+        id: `settings.codeReview.security.trigger.label`,
+        defaultMessage: `Security review trigger`,
+        description: `Label for security review trigger preference`,
+      })),
+      (b = (0, G.jsx)(d, {
+        id: `settings.codeReview.security.trigger.description`,
+        defaultMessage: `Choose when Codex should review your pull requests for security`,
+        description: `Description for security review trigger preference`,
+      })),
+      (t[10] = _),
+      (t[11] = b))
+    : ((_ = t[10]), (b = t[11]));
+  let x;
+  t[12] !== n || t[13] !== i || t[14] !== u || t[15] !== c || t[16] !== a
+    ? ((x = (0, G.jsx)(C, {
+        label: _,
+        description: b,
+        control: (e) =>
+          (0, G.jsx)(y, {
+            contentWidth: `panelWide`,
+            triggerButton: (0, G.jsx)(N, {
+              ...e,
+              "aria-labelledby": `${e[`aria-labelledby`]} ${a}`,
+              disabled: n,
+              children: (0, G.jsx)(`span`, { id: a, children: (0, G.jsx)(H, { value: c }) }),
+            }),
+            children: u.map((e) =>
+              (0, G.jsx)(
+                v.Item,
+                {
+                  subTextAllowWrap: !0,
+                  SubText: (0, G.jsx)(d, {
+                    id: `settings.codeReview.security.trigger.option.description`,
+                    defaultMessage: `{policy, select, pr_open {Review when a pull request is opened.} every_push {Review again whenever new commits are pushed after the initial review.} smart_detect {Codex decides whether to review again based on changes since the last completed security review. Experimental and may change.} code_review {Review whenever Codex runs a code review.} other {}}`,
+                    description: `Explanation for each security review trigger option`,
+                    values: { policy: e },
+                  }),
+                  onSelect: () => {
+                    i({ security_review: { trigger_policy: e } });
+                  },
+                  children: (0, G.jsx)(H, { value: e }),
+                },
+                e,
+              ),
+            ),
+          }),
+      })),
+      (t[12] = n),
+      (t[13] = i),
+      (t[14] = u),
+      (t[15] = c),
+      (t[16] = a),
+      (t[17] = x))
+    : (x = t[17]);
+  let S, w;
+  t[18] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((w = (0, G.jsx)(d, {
+        id: `settings.codeReview.security.autoSeverity.label`,
+        defaultMessage: `Minimum automatic review reporting severity`,
+        description: `Label for the minimum automatic security review severity`,
+      })),
+      (S = (0, G.jsx)(d, {
+        id: `settings.codeReview.security.autoSeverity.description`,
+        defaultMessage: `Choose the lowest severity reported for automated reviews`,
+        description: `Description for the minimum automatic security review severity`,
+      })),
+      (t[18] = S),
+      (t[19] = w))
+    : ((S = t[18]), (w = t[19]));
+  let T;
+  t[20] !== n || t[21] !== i || t[22] !== r.severity_threshold
+    ? ((T = (0, G.jsx)(C, {
+        label: w,
+        description: S,
+        control: (e) =>
+          (0, G.jsx)(B, {
+            ...e,
+            disabled: n,
+            value: r.severity_threshold ?? `high`,
+            onChange: (e) => {
+              i({ security_review: { severity_threshold: e } });
+            },
+          }),
+      })),
+      (t[20] = n),
+      (t[21] = i),
+      (t[22] = r.severity_threshold),
+      (t[23] = T))
+    : (T = t[23]);
+  let D, O;
+  t[24] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((D = (0, G.jsx)(d, {
+        id: `settings.codeReview.security.manualSeverity.label`,
+        defaultMessage: `Minimum manual review reporting severity`,
+        description: `Label for the minimum manual security review severity`,
+      })),
+      (O = (0, G.jsx)(d, {
+        id: `settings.codeReview.security.manualSeverity.description`,
+        defaultMessage: `Choose the lowest severity reported for reviews requested with @codex`,
+        description: `Description for the minimum manual security review severity`,
+      })),
+      (t[24] = D),
+      (t[25] = O))
+    : ((D = t[24]), (O = t[25]));
+  let k;
+  t[26] !== n || t[27] !== i || t[28] !== r.manual_severity_threshold
+    ? ((k = (0, G.jsx)(C, {
+        label: D,
+        description: O,
+        control: (e) =>
+          (0, G.jsx)(B, {
+            ...e,
+            disabled: n,
+            value: r.manual_severity_threshold ?? `medium`,
+            onChange: (e) => {
+              i({ security_review: { manual_severity_threshold: e } });
+            },
+          }),
+      })),
+      (t[26] = n),
+      (t[27] = i),
+      (t[28] = r.manual_severity_threshold),
+      (t[29] = k))
+    : (k = t[29]);
+  let A;
+  return (
+    t[30] !== T || t[31] !== k || t[32] !== g || t[33] !== x
+      ? ((A = (0, G.jsxs)(E, {
+          children: [
+            f,
+            (0, G.jsx)(E.Content, { children: (0, G.jsxs)(m, { children: [g, x, T, k] }) }),
+          ],
+        })),
+        (t[30] = T),
+        (t[31] = k),
+        (t[32] = g),
+        (t[33] = x),
+        (t[34] = A))
+      : (A = t[34]),
+    A
+  );
+}
+function B(e) {
+  let t = (0, U.c)(20),
+    n,
+    r,
+    i,
+    a;
+  t[0] === e
+    ? ((n = t[1]), (r = t[2]), (i = t[3]), (a = t[4]))
+    : (({ disabled: r, value: a, onChange: i, ...n } = e),
+      (t[0] = e),
+      (t[1] = n),
+      (t[2] = r),
+      (t[3] = i),
+      (t[4] = a));
+  let o = (0, W.useId)(),
+    s = `${n[`aria-labelledby`]} ${o}`,
+    c;
+  t[5] === a ? (c = t[6]) : ((c = (0, G.jsx)(V, { value: a })), (t[5] = a), (t[6] = c));
+  let l;
+  t[7] !== c || t[8] !== o
+    ? ((l = (0, G.jsx)(`span`, { id: o, children: c })), (t[7] = c), (t[8] = o), (t[9] = l))
+    : (l = t[9]);
+  let u;
+  t[10] !== n || t[11] !== r || t[12] !== s || t[13] !== l
+    ? ((u = (0, G.jsx)(N, { ...n, "aria-labelledby": s, disabled: r, children: l })),
+      (t[10] = n),
+      (t[11] = r),
+      (t[12] = s),
+      (t[13] = l),
+      (t[14] = u))
+    : (u = t[14]);
+  let d;
+  t[15] === i
+    ? (d = t[16])
+    : ((d = q.map((e) =>
+        (0, G.jsx)(
+          v.Item,
+          {
+            onSelect: () => {
+              i(e);
+            },
+            children: (0, G.jsx)(V, { value: e }),
+          },
+          e,
+        ),
+      )),
+      (t[15] = i),
+      (t[16] = d));
+  let f;
+  return (
+    t[17] !== u || t[18] !== d
+      ? ((f = (0, G.jsx)(y, { triggerButton: u, children: d })),
+        (t[17] = u),
+        (t[18] = d),
+        (t[19] = f))
+      : (f = t[19]),
+    f
+  );
+}
+function V(e) {
+  let t = (0, U.c)(2),
+    { value: n } = e,
+    r;
+  return (
+    t[0] === n
+      ? (r = t[1])
+      : ((r = (0, G.jsx)(d, {
+          id: `settings.codeReview.security.severity`,
+          defaultMessage: `{severity, select, critical {Critical} high {High} medium {Medium} low {Low} other {Unknown}}`,
+          description: `Severity threshold label for security review findings`,
+          values: { severity: n },
+        })),
+        (t[0] = n),
+        (t[1] = r)),
+    r
+  );
+}
+function H(e) {
+  let t = (0, U.c)(2),
+    { value: n } = e,
+    r;
+  return (
+    t[0] === n
+      ? (r = t[1])
+      : ((r = (0, G.jsx)(d, {
+          id: `settings.codeReview.security.trigger.option`,
+          defaultMessage: `{policy, select, pr_open {On PR open} every_push {On every push} smart_detect {Smart detect (Experimental)} code_review {Whenever code review runs} other {Unknown}}`,
+          description: `Trigger policy label for security reviews`,
+          values: { policy: n },
+        })),
+        (t[0] = n),
+        (t[1] = r)),
+    r
+  );
+}
+var U, W, G, K, q;
+function J() {
+  return (J = e(() => {
+    ((U = t()),
+      (W = _()),
+      a(),
+      i(),
+      u(),
+      j(),
+      g(),
+      w(),
+      l(),
+      k(),
+      (G = r()),
+      (K = [`pr_open`, `every_push`, `smart_detect`, `code_review`]),
+      (q = [`critical`, `high`, `medium`, `low`]));
+  }))();
+}
+function te() {
+  let e = (0, X.c)(11),
+    t = o(p),
+    n = x(),
+    r = L(),
+    i = R(),
+    { canManageCreditSettings: a } = O(),
+    s;
+  e[0] !== n || e[1] !== t || e[2] !== i
+    ? ((s = (e) => {
+        i.mutate(e, {
+          onError: () => {
+            t.get(S).danger(
+              n.formatMessage({
+                id: `settings.codeReview.save.error`,
+                defaultMessage: `Unable to save code review settings`,
+                description: `Toast shown when saving code review settings fails`,
+              }),
+              { errorAnalytics: { toastId: `settings.codeReview.save.error` } },
+            );
+          },
+        });
+      }),
+      (e[0] = n),
+      (e[1] = t),
+      (e[2] = i),
+      (e[3] = s))
+    : (s = e[3]);
+  let c = s,
+    l,
+    u;
+  e[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((l = (0, Z.jsx)(T, { slug: `code-review` })),
+      (u = (0, Z.jsx)(d, {
+        id: `settings.codeReview.subtitle`,
+        defaultMessage: `Set up ChatGPT to automatically review pull requests`,
+        description: `Subtitle for automatic code review settings`,
+      })),
+      (e[4] = l),
+      (e[5] = u))
+    : ((l = e[4]), (u = e[5]));
+  let h;
+  return (
+    e[6] !== a || e[7] !== c || e[8] !== r || e[9] !== i.isPending
+      ? ((h = (0, Z.jsx)(D, {
+          title: l,
+          subtitle: u,
+          children:
+            r.data == null
+              ? r.isError
+                ? (0, Z.jsx)(E, {
+                    children: (0, Z.jsx)(E.Content, {
+                      children: (0, Z.jsx)(m, {
+                        children: (0, Z.jsx)(C, {
+                          label: (0, Z.jsx)(d, {
+                            id: `settings.codeReview.error`,
+                            defaultMessage: `Unable to load code review settings`,
+                            description: `Error state for code review settings`,
+                          }),
+                          control: (0, Z.jsx)(f, {
+                            color: `secondary`,
+                            size: `toolbar`,
+                            onClick: () => {
+                              r.refetch();
+                            },
+                            children: (0, Z.jsx)(d, {
+                              id: `settings.codeReview.retry`,
+                              defaultMessage: `Retry`,
+                              description: `Button to retry loading code review settings`,
+                            }),
+                          }),
+                        }),
+                      }),
+                    }),
+                  })
+                : (0, Z.jsx)(P, {
+                    children: (0, Z.jsx)(d, {
+                      id: `settings.codeReview.loading`,
+                      defaultMessage: `Loading code review settings…`,
+                      description: `Loading state for code review settings`,
+                    }),
+                  })
+              : (0, Z.jsxs)(Z.Fragment, {
+                  children: [
+                    (0, Z.jsx)(ne, {
+                      disabled: i.isPending,
+                      showCreditPreference: a,
+                      preferences: r.data,
+                      onUpdate: c,
+                    }),
+                    r.data.security_review == null
+                      ? null
+                      : (0, Z.jsx)(ee, {
+                          disabled: i.isPending,
+                          preferences: r.data.security_review,
+                          onUpdate: c,
+                        }),
+                  ],
+                }),
+        })),
+        (e[6] = a),
+        (e[7] = c),
+        (e[8] = r),
+        (e[9] = i.isPending),
+        (e[10] = h))
+      : (h = e[10]),
+    h
+  );
+}
+function ne(e) {
+  let t = (0, X.c)(46),
+    { disabled: n, preferences: r, showCreditPreference: i, onUpdate: a } = e,
+    o = x(),
+    c = r.code_review_trigger_policy ?? Q[0],
+    l;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((l = (0, Z.jsx)(E.Header, {
+        title: (0, Z.jsx)(d, {
+          id: `settings.codeReview.personal.title`,
+          defaultMessage: `Personal preferences`,
+          description: `Title for personal code review preferences`,
         }),
+      })),
+      (t[0] = l))
+    : (l = t[0]);
+  let u, f;
+  t[1] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((u = (0, Z.jsx)(d, {
+        id: `settings.codeReview.personal.autoReview.label`,
+        defaultMessage: `Automatic review`,
+        description: `Label for automatic code review preference`,
+      })),
+      (f = (0, Z.jsx)(d, {
+        id: `settings.codeReview.personal.autoReview.description`,
+        defaultMessage: `Automatically review pull requests in repositories with code review enabled`,
+        description: `Description for automatic code review preference`,
+      })),
+      (t[1] = u),
+      (t[2] = f))
+    : ((u = t[1]), (f = t[2]));
+  let p;
+  t[3] === o
+    ? (p = t[4])
+    : ((p = o.formatMessage({
+        id: `settings.codeReview.personal.autoReview.aria`,
+        defaultMessage: `Enable automatic code review`,
+        description: `Accessible label for automatic code review`,
+      })),
+      (t[3] = o),
+      (t[4] = p));
+  let h = r.code_review_preference === `always`,
+    g;
+  t[5] === a
+    ? (g = t[6])
+    : ((g = (e) => {
+        a({ code_review_preference: e ? `always` : `repo_default` });
+      }),
+      (t[5] = a),
+      (t[6] = g));
+  let _;
+  t[7] !== n || t[8] !== p || t[9] !== h || t[10] !== g
+    ? ((_ = (0, Z.jsx)(C, {
+        label: u,
+        description: f,
+        control: (0, Z.jsx)(s, { ariaLabel: p, checked: h, disabled: n, onChange: g }),
+      })),
+      (t[7] = n),
+      (t[8] = p),
+      (t[9] = h),
+      (t[10] = g),
+      (t[11] = _))
+    : (_ = t[11]);
+  let b, S;
+  t[12] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((b = (0, Z.jsx)(d, {
+        id: `settings.codeReview.personal.trigger.label`,
+        defaultMessage: `Review trigger`,
+        description: `Label for review trigger preference`,
+      })),
+      (S = (0, Z.jsx)(d, {
+        id: `settings.codeReview.personal.trigger.description`,
+        defaultMessage: `Choose when ChatGPT should review your pull requests`,
+        description: `Description for review trigger preference`,
+      })),
+      (t[12] = b),
+      (t[13] = S))
+    : ((b = t[12]), (S = t[13]));
+  let w;
+  t[14] === c ? (w = t[15]) : ((w = Y(c)), (t[14] = c), (t[15] = w));
+  let T;
+  t[16] !== n || t[17] !== w
+    ? ((T = (0, Z.jsx)(N, { disabled: n, children: w })), (t[16] = n), (t[17] = w), (t[18] = T))
+    : (T = t[18]);
+  let D;
+  t[19] === a
+    ? (D = t[20])
+    : ((D = Q.map((e) =>
+        (0, Z.jsx)(
+          v.Item,
+          {
+            onSelect: () => {
+              a({ code_review_trigger_policy: e });
+            },
+            children: Y(e),
+          },
+          e,
+        ),
+      )),
+      (t[19] = a),
+      (t[20] = D));
+  let O;
+  t[21] !== T || t[22] !== D
+    ? ((O = (0, Z.jsx)(C, {
+        label: b,
+        description: S,
+        control: (0, Z.jsx)(y, { triggerButton: T, children: D }),
+      })),
+      (t[21] = T),
+      (t[22] = D),
+      (t[23] = O))
+    : (O = t[23]);
+  let k, A;
+  t[24] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((k = (0, Z.jsx)(d, {
+        id: `settings.codeReview.personal.exhaustive.label`,
+        defaultMessage: `Exhaustive code review`,
+        description: `Label for exhaustive code review preference`,
+      })),
+      (A = (0, Z.jsx)(d, {
+        id: `settings.codeReview.personal.exhaustive.description`,
+        defaultMessage: `Keep looking for findings until ChatGPT stops finding new issues`,
+        description: `Description for exhaustive code review preference`,
+      })),
+      (t[24] = k),
+      (t[25] = A))
+    : ((k = t[24]), (A = t[25]));
+  let j;
+  t[26] === o
+    ? (j = t[27])
+    : ((j = o.formatMessage({
+        id: `settings.codeReview.personal.exhaustive.aria`,
+        defaultMessage: `Enable exhaustive code review`,
+        description: `Accessible label for exhaustive code review`,
+      })),
+      (t[26] = o),
+      (t[27] = j));
+  let M;
+  t[28] === a
+    ? (M = t[29])
+    : ((M = (e) => {
+        a({ exhaustive_code_review: e });
+      }),
+      (t[28] = a),
+      (t[29] = M));
+  let P;
+  t[30] !== n || t[31] !== r.exhaustive_code_review || t[32] !== j || t[33] !== M
+    ? ((P = (0, Z.jsx)(C, {
+        label: k,
+        description: A,
+        control: (0, Z.jsx)(s, {
+          ariaLabel: j,
+          checked: r.exhaustive_code_review,
+          disabled: n,
+          onChange: M,
+        }),
+      })),
+      (t[30] = n),
+      (t[31] = r.exhaustive_code_review),
+      (t[32] = j),
+      (t[33] = M),
+      (t[34] = P))
+    : (P = t[34]);
+  let F;
+  t[35] !== n ||
+  t[36] !== o ||
+  t[37] !== a ||
+  t[38] !== r.allow_credits_for_code_reviews ||
+  t[39] !== i
+    ? ((F = i
+        ? (0, Z.jsx)(C, {
+            label: (0, Z.jsx)(d, {
+              id: `settings.codeReview.personal.credits.label`,
+              defaultMessage: `Use credits for reviews`,
+              description: `Label for code review credits preference`,
+            }),
+            description: (0, Z.jsx)(d, {
+              id: `settings.codeReview.personal.credits.description`,
+              defaultMessage: `Allow credits to be consumed for reviews after rate limits`,
+              description: `Description for code review credits preference`,
+            }),
+            control: (0, Z.jsx)(s, {
+              ariaLabel: o.formatMessage({
+                id: `settings.codeReview.personal.credits.aria`,
+                defaultMessage: `Allow credits for code reviews`,
+                description: `Accessible label for code review credits preference`,
+              }),
+              checked: r.allow_credits_for_code_reviews,
+              disabled: n,
+              onChange: (e) => {
+                a({ allow_credits_for_code_reviews: e });
+              },
+            }),
+          })
+        : null),
+      (t[35] = n),
+      (t[36] = o),
+      (t[37] = a),
+      (t[38] = r.allow_credits_for_code_reviews),
+      (t[39] = i),
+      (t[40] = F))
+    : (F = t[40]);
+  let I;
+  return (
+    t[41] !== O || t[42] !== P || t[43] !== F || t[44] !== _
+      ? ((I = (0, Z.jsxs)(E, {
+          children: [
+            l,
+            (0, Z.jsx)(E.Content, { children: (0, Z.jsxs)(m, { children: [_, O, P, F] }) }),
+          ],
+        })),
+        (t[41] = O),
+        (t[42] = P),
+        (t[43] = F),
+        (t[44] = _),
+        (t[45] = I))
+      : (I = t[45]),
+    I
+  );
+}
+function Y(e) {
+  switch (e) {
+    case `pr_open`:
+      return (0, Z.jsx)(d, {
+        id: `settings.codeReview.personal.trigger.prOpen`,
+        defaultMessage: `On PR open`,
+        description: `Code review trigger option for pull request creation`,
       });
-    }
-    return jsx.jsx("div", {
-      role: "status",
-      className: "py-8 text-center text-secondary",
-      children: "Loading code review settings…",
-    });
+    case `every_push`:
+      return (0, Z.jsx)(d, {
+        id: `settings.codeReview.personal.trigger.everyPush`,
+        defaultMessage: `On every push`,
+        description: `Code review trigger option for every push`,
+      });
+    case `smart_detect`:
+      return (0, Z.jsx)(d, {
+        id: `settings.codeReview.personal.trigger.smart`,
+        defaultMessage: `Smart trigger`,
+        description: `Experimental smart code review trigger option`,
+      });
   }
-
-  return jsx.jsxs("div", {
-    className: "flex flex-col gap-5",
-    children: [
-      jsx.jsx(PersonalPreferences, {
-        disabled: mutation.isPending,
-        onUpdate: save,
-        preferences: preferencesQuery.data,
-        showCreditPreference: canManageCreditSettings,
-      }),
-      preferencesQuery.data.security_review == null ? null : jsx.jsx(SecurityPreferences, {
-        disabled: mutation.isPending,
-        onUpdate: save,
-        preferences: preferencesQuery.data.security_review,
-      }),
-    ],
-  });
 }
-
-function CodeReviewSettings(): unknown {
-  initializeCodeReviewSettings();
-  return jsx.jsxs("div", {
-    className: "flex h-full min-h-0 flex-col",
-    children: [
-      jsx.jsxs("header", {
-        className: "border-b border-token-border-light px-5 py-4",
-        children: [
-          jsx.jsx("h1", { className: "text-lg font-semibold", children: "Code review" }),
-          jsx.jsx("p", { className: "mt-1 text-sm text-secondary", children: "Set up ChatGPT to automatically review pull requests" }),
-        ],
-      }),
-      jsx.jsx("main", {
-        className: "flex-1 overflow-auto p-5",
-        children: jsx.jsx("div", { className: "mx-auto max-w-3xl", children: jsx.jsx(CodeReviewContent, {}) }),
-      }),
-    ],
-  });
+var X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((X = t()),
+      n(),
+      a(),
+      h(),
+      i(),
+      b(),
+      u(),
+      I(),
+      c(),
+      F(),
+      j(),
+      A(),
+      g(),
+      w(),
+      l(),
+      z(),
+      J(),
+      (Z = r()),
+      (Q = [`pr_open`, `every_push`, `smart_detect`]));
+  }))();
 }
-
-let initialized = false;
-function initializeCodeReviewSettings(): void {
-  if (initialized) return;
-  initializeRuntimeLazy();
-  initializeCloudPreferences();
-  jsx = getJsxRuntime();
-  initialized = true;
-}
-
-initializeCodeReviewSettings();
-export { CodeReviewSettings };
+$();
+export { te as CodeReviewSettings };

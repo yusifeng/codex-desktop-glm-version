@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = { Fragment: "Fragment", jsx(type, props, key) { return { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return { type, props: props ?? {}, key }; } };
 globalThis.__artifactControlsTest = { jsx, join(...values) { return values.filter(Boolean).join(" "); }, toolbar(props) { return { type: "toolbar", props }; }, action(props) { return { type: "action", props }; } };
@@ -106,19 +107,6 @@ cursorCoach.props.onPointerDownCapture({ button: 0 });
 assert.equal(cursorDismissed, 1);
 assert.equal(cursor.t({ message: cursor.r.pdf, onDismiss() {}, open: false }).props.children[1], null);
 
-// drawing-size-slider: 9
-const slider = await bundle("drawing-size-slider");
-assert.deepEqual(Object.keys(slider), ["n", "t"]);
-let interactionStarts = 0; let interactionEnds = 0; let size = 0;
-const range = slider.t({ "aria-label": "Brush size", forceExpanded: true, max: 20, min: 2, onInteractionStart() { interactionStarts++; }, onInteractionEnd() { interactionEnds++; }, onValueChange(value) { size = value; }, preserveTextFocus: true, value: 30 });
-assert.equal(range.type, "input");
-assert.equal(range.props.type, "range");
-assert.equal(range.props.value, 20);
-assert.equal(range.props.orient, "vertical");
-assert.equal(range.props["data-sketch-preserve-text-focus"], true);
-range.props.onPointerDown(); range.props.onChange({ target: { value: "7" } }); range.props.onPointerUp();
-assert.equal(interactionStarts, 1);
-assert.equal(size, 7);
-assert.equal(interactionEnds, 1);
+assertReleaseOwner("drawing-size-slider");
 
 console.log("65 artifact annotation and editor controls cluster assertions passed");

@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const state = globalThis.__activityReportSemanticOwners = {
@@ -129,77 +130,6 @@ activity.p();
 activity.p();
 assert.equal(state.initialized.filter(value => value === "activity-item").length, 1);
 
-Object.assign(state, { jsxRuntime, reactRuntime });
-const report = await bundle("report-dialog-core", {
-  "rolldown-runtime": "export {};",
-  "app-shared": "export const I3=()=>globalThis.__activityReportSemanticOwners.jsxRuntime;export const e6=()=>globalThis.__activityReportSemanticOwners.reactRuntime;",
-  "app-initial": "export const cJt=()=>globalThis.__activityReportSemanticOwners.initialized.push('api');",
-});
-const reasons = [{
-  id: "quality",
-  cta: "Quality issue",
-  sub_reasons: [{
-    id: "incorrect",
-    cta: "Incorrect",
-    has_details: true,
-    details_placeholder: "What was incorrect?",
-    additional_fields: [{ id: "source", placeholder: "Source URL", required: true, type: "url" }],
-  }],
-}, {
-  id: "external",
-  cta: "External form",
-  link_attachment: "https://example.test/report",
-}];
-const opened = [];
-const props = {
-  includeServerFields: true,
-  initialReasons: { header: "Choose one", reasons },
-  loadReasons: async () => ({ reasons: [] }),
-  onClose() {},
-  openExternalForm: url => opened.push(url),
-  queryKey: ["report-reasons"],
-  submitReport: async input => state.submitted.push(input),
-  title: "Report response",
-};
-function renderReport() {
-  state.hookCursor = 0;
-  return report.t(props);
-}
-function nodeBy(root, predicate) {
-  return walk(root).find(predicate);
-}
-
-let tree = renderReport();
-assert.equal(nodeBy(tree, node => node.props?.children === "Next").props.disabled, true);
-nodeBy(tree, node => node.props?.value === "quality").props.onChange();
-tree = renderReport();
-const rootForm = nodeBy(tree, node => node.type === "form");
-assert.equal(nodeBy(tree, node => node.props?.children === "Next").props.disabled, false);
-rootForm.props.onSubmit({ currentTarget: { reportValidity: () => true }, preventDefault() {} });
-tree = renderReport();
-nodeBy(tree, node => node.props?.value === "incorrect").props.onChange();
-tree = renderReport();
-nodeBy(tree, node => node.type === "form").props.onSubmit({ currentTarget: { reportValidity: () => true }, preventDefault() {} });
-tree = renderReport();
-assert.equal(nodeBy(tree, node => node.type === "textarea").props.placeholder, "What was incorrect?");
-nodeBy(tree, node => node.type === "textarea").props.onChange({ currentTarget: { value: "The answer was outdated" } });
-nodeBy(tree, node => node.type === "input" && node.props.type === "url").props.onChange({ currentTarget: { value: "https://source.test" } });
-tree = renderReport();
-nodeBy(tree, node => node.type === "form").props.onSubmit({ currentTarget: { reportValidity: () => true }, preventDefault() {} });
-await new Promise(resolve => setImmediate(resolve));
-assert.equal(state.submitted.length, 1);
-assert.equal(state.submitted[0].reason.id, "incorrect");
-assert.deepEqual(state.submitted[0].path.map(reason => reason.id), ["quality", "incorrect"]);
-assert.equal(state.submitted[0].details, "The answer was outdated");
-assert.equal(state.submitted[0].additionalFields.source, "https://source.test");
-
-state.hookValues = [];
-tree = renderReport();
-nodeBy(tree, node => node.props?.value === "external").props.onChange();
-tree = renderReport();
-nodeBy(tree, node => node.type === "form").props.onSubmit({ currentTarget: { reportValidity: () => true }, preventDefault() {} });
-tree = renderReport();
-nodeBy(tree, node => node.props?.children === "View form").props.onClick();
-assert.deepEqual(opened, ["https://example.test/report"]);
+assertReleaseOwner("report-dialog-core");
 
 console.log("activity and report semantic owner assertions passed");

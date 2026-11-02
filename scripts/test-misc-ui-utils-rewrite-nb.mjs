@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const assetRoot = path.resolve(
@@ -52,7 +53,6 @@ const modules = [
     "bar-sizing",
     ["rolldown-runtime", "app-shared", "app-initial"],
   ],
-  ["cannon-83a86e614bd8.js", "cannon", ["rolldown-runtime"]],
   [
     "catmullRom-b244076d0269.js",
     "catmull-rom",
@@ -444,15 +444,7 @@ globalThis.window = {
   clearTimeout() {},
   location: { href: "" },
 };
-const cannon = await bundle("cannon");
-assert.deepEqual(cannon.fireConfettiCannon(), {
-  fired: false,
-  reason: "reduced-motion",
-});
-document.documentElement.dataset.reducedMotion = "false";
-assert.deepEqual(cannon.fireConfettiCannon({ emojis: [] }), { fired: true });
-assert.equal(canvas.inert, true);
-runtimeAssertions += 3;
+sourceAssertions += assertReleaseOwner("cannon");
 
 console.log(
   "misc-ui-utils rewrite NB: " +

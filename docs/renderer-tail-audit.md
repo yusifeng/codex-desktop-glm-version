@@ -1,5 +1,23 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Security/report/plugin release-owner recovery：一次性恢复
+`registered-sources`、`appgen-database-page`、`task-announcement-candidates`、
+`subscription-payment-announcement`、`drawing-size-slider`、
+`popcorn-chart-hover-tooltip`、`cannon`、`order-yubikey-dialog`、
+`feedback-form-dialog`、`report-dialog-core`、`code-review-settings`、
+`browser-logout-page`、`pull-request-revision-tab`、`voice-personalization-dialog` 与
+`plugin-setup` 十五个发布 owner，净恢复 5,161 行发布 TypeScript。旧缩减
+ABI/mock 回归已迁移为发布一致性验证，同时保留同簇安全设置、feedback、
+activity/report、Git review、dialog 与 plugin journey 行为覆盖。23 组聚焦测试、
+12,448/12,448 transform check、1,888/1,888 renderer build/verify、
+2,247/2,247 app-code coverage、0 semantic tail、typecheck 与 1,912-script test-index
+通过。严格 hub 消费推进到 app-shared 1,777/3,185、app-initial 5,658/8,204、
+app-primary 743/917，仍为 0 unreviewed、0 invalid consumers。按发布源码正向
+行数缺口口径，剩余由 60,934 行降至 55,773 行，覆盖率约 94.63%；
+当前仍有 1,509 个可比对 owner 与发布证据不完全一致，425 个 preserved 边界、
+三个聚合 hub 的剩余耦合导出与最终真实 E2E 仍未完成，因此本批不构成
+“完整反编译完成”。
+
 2026-11-02 Safety/worktree/checkout release-owner recovery：一次性恢复
 `chatgpt-code-block-editor`、`stable-worktree-status-dialog`、terminal `runtime`、
 `result-card`、`hotkey-window-detail-layout`、`verify-age-page`、

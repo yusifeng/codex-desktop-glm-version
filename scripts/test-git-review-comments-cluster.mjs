@@ -7,7 +7,7 @@ import * as esbuild from "esbuild";
 import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["pull-request-revision-tab", "registered-pull-request-thumbnail", "pull-request-readonly-comment", "bookmarked-thread-user-message-navigation", "artifact-file-preview-icon"];
+const MODULES = ["registered-pull-request-thumbnail", "pull-request-readonly-comment", "bookmarked-thread-user-message-navigation", "artifact-file-preview-icon"];
 const state = globalThis.__gitReviewCommentsTest = {};
 state.jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
 state.bookmarkWrites = [];
@@ -23,15 +23,7 @@ const nodeOfType = (tree, type) => nodes(tree).find(node => node.type === type);
 
 assertReleaseOwner("pull-request-actions");
 
-// pull-request-revision-tab
-const revisionTab = await bundle("pull-request-revision-tab");
-const revisionTree = revisionTab.PullRequestRevisionTab({ request: { number: 7 }, title: "PR #7" });
-assert.equal(revisionTree.props["data-testid"], "pull-request-revision-tab");
-assert.equal(nodeOfType(revisionTree, "h1").props.children, "PR #7");
-assert.equal(nodes(revisionTree).find(node => node.props["data-review-request"]).props.children, "Review changes");
-const unavailableTree = revisionTab.PullRequestRevisionTab({ unavailableReason: "Revision unavailable" });
-assert.equal(nodes(unavailableTree).find(node => node.props.role === "alert").props.children, "Revision unavailable");
-assert.equal(nodeOfType(unavailableTree, "h1").props.children, "Pull request review");
+assertReleaseOwner("pull-request-revision-tab");
 
 // registered-pull-request-thumbnail
 const thumbnail = await bundle("registered-pull-request-thumbnail");

@@ -118,37 +118,7 @@ assertReleaseOwner("subscription-renewal-dialog");
 
 assertReleaseOwner("upgrade-plan-dialog");
 
-const voice = await bundle("voice-personalization-dialog");
-assert.deepEqual(Object.keys(voice), ["VoicePersonalizationDialog"]);
-const voiceBase = { accountId: "acct", onBack() {}, onClose() {}, onComplete() {} };
-assert.equal(mount(voice.VoicePersonalizationDialog, { ...voiceBase, activeAccountId: "other" }).render(), null);
-assert.equal(find(mount(voice.VoicePersonalizationDialog, { ...voiceBase, isLoading: true }).render(), node => node.props?.role === "status").props.children, "Loading voices");
-let retried = 0;
-const emptyVoice = mount(voice.VoicePersonalizationDialog, { ...voiceBase, onRetry() { retried++; } }).render();
-assert.match(text(find(emptyVoice, node => node.props?.role === "alert")), /Voices aren’t available/);
-find(emptyVoice, node => node.props?.children === "Try again").props.onClick();
-assert.equal(retried, 1);
-let backed = 0;
-let voiceClosed = 0;
-let completed = 0;
-let savedVoice;
-const voices = [{ slug: "ember", name: "Ember" }, { slug: "spruce", name: "Spruce", description: "Warm" }];
-const voiceMount = mount(voice.VoicePersonalizationDialog, { accountId: "acct", selectedVoice: "ember", voices, onBack() { backed++; }, onClose() { voiceClosed++; }, onComplete() { completed++; }, onSave(slug) { savedVoice = slug; } });
-let voiceUi = voiceMount.render();
-const radios = all(voiceUi, node => node.type === "input");
-assert.equal(radios.length, 2);
-assert.equal(radios[0].props.checked, true);
-radios[1].props.onChange();
-voiceUi = voiceMount.render();
-assert.equal(all(voiceUi, node => node.type === "input")[1].props.checked, true);
-find(voiceUi, node => node.props?.children === "Back").props.onClick();
-find(voiceUi, node => node.props?.children === "Close").props.onClick();
-find(voiceUi, node => node.props?.children === "Continue").props.onClick();
-await Promise.resolve();
-assert.equal(backed, 1);
-assert.equal(voiceClosed, 1);
-assert.equal(savedVoice, "spruce");
-assert.equal(completed, 1);
+assertReleaseOwner("voice-personalization-dialog");
 
 const slidesOutlineReleaseAssertions = assertReleaseOwner("slides-outline-template-picker");
 

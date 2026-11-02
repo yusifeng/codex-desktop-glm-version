@@ -1,37 +1,373 @@
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/canonical-plugin-query";
-
-export interface SetupApp { id: string; isAccessible?: boolean; [key: string]: unknown }
-export interface SetupPlugin { canonicalAppId?: string | null; marketplaceName?: string; plugin: { id: string; installed?: boolean; name?: string; [key: string]: unknown }; [key: string]: unknown }
-export interface SetupResult { appsRequiringConnection: SetupApp[]; importedPlugins: Array<{ app: SetupApp; plugin: SetupPlugin }> }
-export type SetupInputResult = { status: "loading" } | { retry?(): void; status: "error" } | { data: { kind: "plugin-directory"; candidates: SetupApp[]; directoryApps: SetupApp[]; runtimeApps: SetupApp[] } | { kind: "complete" | "targeted-plugins"; setup: SetupResult }; status: "ready" };
-
-const canonicalId = (value: string): string => value.trim().toLowerCase().replace(/[^a-z0-9]/g, "");
-function matchesCanonicalApp(app: SetupApp, plugin: SetupPlugin): boolean { return plugin.marketplaceName != null && (plugin.canonicalAppId == null ? canonicalId(plugin.plugin.name ?? plugin.plugin.id) === canonicalId(app.id) : canonicalId(plugin.canonicalAppId) === canonicalId(app.id)); }
-function resolvePluginSetup({ candidates, directoryApps, plugins, runtimeApps, useCanonicalAppIds = false }: { candidates: SetupApp[]; directoryApps: SetupApp[]; plugins: SetupPlugin[]; runtimeApps: SetupApp[]; useCanonicalAppIds?: boolean }): SetupResult {
-  const availableApps = uniqueApps([...directoryApps, ...candidates]);
-  const runtimeById = new Map(runtimeApps.map((app) => [canonicalId(app.id), app]));
-  const seenPlugins = new Set<string>();
-  const appsRequiringConnection: SetupApp[] = [];
-  const importedPlugins: Array<{ app: SetupApp; plugin: SetupPlugin }> = [];
-  for (const app of availableApps) {
-    const matching = plugins.filter((plugin) => useCanonicalAppIds ? matchesCanonicalApp(app, plugin) : canonicalId(plugin.plugin.name ?? plugin.plugin.id) === canonicalId(app.id));
-    if (matching.length === 0 || matching.some((plugin) => plugin.plugin.installed)) { if (!runtimeById.get(canonicalId(app.id))?.isAccessible) appsRequiringConnection.push(app); continue; }
-    const plugin = matching[0];
-    if (plugin != null && !seenPlugins.has(plugin.plugin.id)) { seenPlugins.add(plugin.plugin.id); importedPlugins.push({ app, plugin }); }
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  $O as n,
+  FX as r,
+  QI as i,
+  QX as a,
+  ZI as o,
+  ek as s,
+  rZ as c,
+} from "@rchunk/app-shared";
+import {
+  $2t as l,
+  Bfn as u,
+  DA as d,
+  E4t as f,
+  EA as p,
+  G6t as m,
+  HEt as h,
+  I1t as ee,
+  K6t as g,
+  MEt as _,
+  O4t as v,
+  OA as y,
+  Oln as b,
+  PEt as x,
+  QA as S,
+  Sln as C,
+  T4t as w,
+  X2t as T,
+  Xv as E,
+  Yv as te,
+  _cn as ne,
+  a4t as re,
+  bcn as ie,
+  cv as ae,
+  e4t as oe,
+  gmn as se,
+  h4t as D,
+  i4t as O,
+  l4t as k,
+  lv as A,
+  mcn as j,
+  mfn as M,
+  o4t as N,
+  ont as P,
+  pfn as F,
+  q6t as I,
+  snt as L,
+  u4t as R,
+  ugn as z,
+  uj as B,
+} from "@rchunk/app-initial";
+import { n as V, t as H } from "@rchunk/canonical-plugin-query";
+function U({
+  candidates: e,
+  directoryApps: t,
+  plugins: n,
+  runtimeApps: r,
+  useCanonicalAppIds: i = !1,
+}) {
+  let a = [],
+    o = [],
+    s = new Map(r.map((e) => [e.id, e])),
+    c = new Set();
+  for (let r of y({ apps: t, candidates: e })) {
+    let e = n.filter((e) => (i ? W(r, e) : v(e.marketplaceName) && E(r, e.plugin)));
+    if (e.length === 0) {
+      s.get(r.id)?.isAccessible || a.push(r);
+      continue;
+    }
+    if (e.some((e) => e.plugin.installed)) {
+      s.get(r.id)?.isAccessible || a.push(r);
+      continue;
+    }
+    let t = e[0];
+    t != null && !c.has(t.plugin.id) && (c.add(t.plugin.id), o.push({ app: r, plugin: t }));
   }
-  return { appsRequiringConnection, importedPlugins };
+  return { appsRequiringConnection: a, importedPlugins: o };
 }
-function mergeSetupResult({ inputsResult, pluginDirectory }: { inputsResult: SetupInputResult; pluginDirectory: { errorMessage?: string | null; isLoading: boolean; plugins: SetupPlugin[]; refetch(): void } }): SetupInputResult | { data?: SetupResult; retry?(): void; status: "error" | "loading" | "ready" } {
-  if (inputsResult.status !== "ready") return inputsResult;
-  if (inputsResult.data.kind !== "plugin-directory") return { data: inputsResult.data.setup, status: "ready" };
-  if (pluginDirectory.errorMessage != null) return { status: "error", retry: pluginDirectory.refetch };
-  if (pluginDirectory.isLoading) return { status: "loading" };
-  return { data: resolvePluginSetup({ candidates: inputsResult.data.candidates, directoryApps: inputsResult.data.directoryApps, plugins: pluginDirectory.plugins, runtimeApps: inputsResult.data.runtimeApps }), status: "ready" };
+function W(e, t) {
+  return (
+    v(t.marketplaceName) &&
+    (t.canonicalAppId == null ? E(e, t.plugin) : I(t.canonicalAppId) === I(e.id))
+  );
 }
-const pluginSetupState = { key: "plugin-setup-state" };
-const initializeMatching = (): void => {};
-const initializeState = (): void => {};
-const uniqueApps = (apps: SetupApp[]): SetupApp[] => [...new Map(apps.map((app) => [canonicalId(app.id), app])).values()];
-export { matchesCanonicalApp as a, initializeMatching as i, pluginSetupState as n, initializeState as r, mergeSetupResult as t };
+function G() {
+  return (G = e(() => {
+    (te(), f(), d());
+  }))();
+}
+var K, q, J, Y;
+function X() {
+  return (X = e(() => {
+    ((K = t(ee(), 1)),
+      (q = t(se(), 1)),
+      r(),
+      m(),
+      b(),
+      O(),
+      ae(),
+      k(),
+      f(),
+      V(),
+      l(),
+      i(),
+      ne(),
+      u(),
+      s(),
+      G(),
+      (J = c(o, ({ hostId: e, apps: t }, { get: n }) => {
+        let r = N(e),
+          i = n(g),
+          a = r ? !0 : n(R, e);
+        if (a == null || (r && i == null) || (!r && e === `local` && n(C).authLoading))
+          return { status: `loading`, data: void 0 };
+        let o = r ? null : n(ie, { hostId: e }),
+          s = r ? null : n(j, { hostId: e });
+        if (o?.error != null || s?.error != null)
+          return {
+            status: `error`,
+            data: void 0,
+            retry: () => {
+              (o?.refetch(), s?.refetch());
+            },
+          };
+        if (!r && (o?.data == null || s?.data == null)) return { status: `loading`, data: void 0 };
+        let c = r
+            ? void 0
+            : w({ hostId: e, workspaceRoots: o?.data?.roots, codexHome: s?.data?.codexHome }),
+          l = n(re, { accountId: r ? i : null, hostId: e, roots: c }),
+          u = r ? null : n(A, e),
+          d = [o, s, l, u];
+        if (d.some((e) => e?.error != null))
+          return {
+            status: `error`,
+            data: void 0,
+            retry: () => {
+              for (let e of d) e?.refetch();
+            },
+          };
+        if (d.some((e) => e != null && e.data == null)) return { status: `loading`, data: void 0 };
+        let f = (0, q.default)(
+            [...(l.data ?? []), ...(u?.data?.plugins ?? [])],
+            ({ plugin: e }) => e.id,
+          ),
+          p = t.filter((e) => !f.some((t) => W(e, t))),
+          m =
+            a && i != null && p.length > 0
+              ? n(Y, { hostId: e, appIds: p.map((e) => I(e.id)), roots: c })
+              : null;
+        if (m?.error != null)
+          return {
+            status: `error`,
+            data: void 0,
+            retry: () => {
+              m.refetch();
+            },
+          };
+        if (m != null && m.data == null) return { status: `loading`, data: void 0 };
+        let h = new Map(f.map((e) => [e.plugin.id, e]));
+        for (let e of m?.data ?? []) {
+          let t = h.get(e.plugin.id);
+          h.set(
+            e.plugin.id,
+            t?.plugin.installed
+              ? {
+                  ...e,
+                  plugin: {
+                    ...e.plugin,
+                    installed: !0,
+                    installedAt: t.plugin.installedAt,
+                    enabled: t.plugin.enabled,
+                    installPolicy: t.plugin.installPolicy,
+                    installPolicySource: t.plugin.installPolicySource,
+                    localVersion: t.plugin.localVersion,
+                    remotePluginId: e.plugin.remotePluginId ?? t.plugin.remotePluginId,
+                  },
+                }
+              : e,
+          );
+        }
+        return {
+          status: `ready`,
+          data: {
+            plugins: Array.from(h.values()),
+            isFetching: d.some((e) => e?.isFetching) || m?.isFetching === !0,
+          },
+        };
+      })),
+      (Y = a(o, ({ hostId: e, appIds: t, roots: r }, { get: i, scope: a }) => {
+        let o = i(g);
+        return {
+          queryKey: [`plugins`, `imported-details`, e, o, t, r],
+          queryFn: async ({ signal: n }) => {
+            let i = [];
+            for (let s of (0, K.default)(t, 4)) {
+              n.throwIfAborted();
+              let t = await Promise.all(
+                s.map(async (t) => {
+                  let { plugin_id: i } = await a.queryClient.fetchQuery(H(t, o));
+                  if (i == null) return null;
+                  n.throwIfAborted();
+                  let s = await a.queryClient.fetchQuery({
+                    ...a.query.getOptions(
+                      oe,
+                      T({ hostId: e, pluginId: i, remotePluginId: i, roots: r }),
+                    ),
+                    retry: !1,
+                  });
+                  return { ...D(s), canonicalAppId: t };
+                }),
+              );
+              i.push(...t.filter((e) => e != null));
+            }
+            return (n.throwIfAborted(), i);
+          },
+          retry: !1,
+          staleTime: n.ONE_MINUTE,
+        };
+      })));
+  }))();
+}
+function ce({ inputsResult: e, pluginDirectory: t }) {
+  return e.status === `ready`
+    ? e.data.kind === `plugin-directory`
+      ? t.errorMessage == null
+        ? t.isLoading
+          ? { data: void 0, status: `loading` }
+          : {
+              data: U({
+                candidates: e.data.candidates,
+                directoryApps: e.data.directoryApps,
+                plugins: t.plugins,
+                runtimeApps: e.data.runtimeApps,
+              }),
+              status: `ready`,
+            }
+        : {
+            data: void 0,
+            status: `error`,
+            retry: () => {
+              t.refetch();
+            },
+          }
+      : { data: e.data.setup, status: `ready` }
+    : e;
+}
+var Z, Q;
+function $() {
+  return ($ = e(() => {
+    (r(),
+      m(),
+      O(),
+      h(),
+      L(),
+      i(),
+      u(),
+      F(),
+      B(),
+      d(),
+      X(),
+      G(),
+      (Z = a(o, (e, { get: t, scope: n }) => x(n, e, void 0))),
+      (Q = c(o, (e, { get: t }) => {
+        let n = e === z,
+          r = n ? t(p, e) : null,
+          i = t(S, e),
+          a = n ? r?.data?.connectors : [],
+          o = i.data;
+        if (o == null || (a == null && (r?.error != null || o.length === 0)))
+          return r?.error != null || i.error != null
+            ? {
+                data: void 0,
+                status: `error`,
+                retry: () => {
+                  (r?.refetch(), i.refetch());
+                },
+              }
+            : { data: void 0, status: `loading` };
+        let s = [...(a ?? []), ...o];
+        if (s.length === 0)
+          return {
+            data: { kind: `complete`, setup: { appsRequiringConnection: [], importedPlugins: [] } },
+            status: `ready`,
+          };
+        let c = t(P, e),
+          l = c.data;
+        if (l == null)
+          return c.error == null
+            ? { data: void 0, status: `loading` }
+            : {
+                data: void 0,
+                status: `error`,
+                retry: () => {
+                  c.refetch();
+                },
+              };
+        if (!l.some((e) => e.name === `apps` && e.enabled))
+          return {
+            data: { kind: `complete`, setup: { appsRequiringConnection: [], importedPlugins: [] } },
+            status: `ready`,
+          };
+        let u = t(Z, e),
+          d = u.data;
+        if (d == null)
+          return u.error == null
+            ? { data: void 0, status: `loading` }
+            : {
+                data: void 0,
+                status: `error`,
+                retry: () => {
+                  u.refetch();
+                },
+              };
+        let f = y({ apps: d, candidates: s });
+        if (f.length === 0)
+          return {
+            data: { kind: `complete`, setup: { appsRequiringConnection: [], importedPlugins: [] } },
+            status: `ready`,
+          };
+        let m = t(_, e),
+          h = m.data;
+        if (h == null)
+          return m.error == null
+            ? { data: void 0, status: `loading` }
+            : {
+                data: void 0,
+                status: `error`,
+                retry: () => {
+                  m.refetch();
+                },
+              };
+        if (l.find((e) => e.name === `plugins`)?.enabled === !1) {
+          let e = new Map(h.map((e) => [e.id, e]));
+          return {
+            data: {
+              kind: `complete`,
+              setup: {
+                appsRequiringConnection: f.filter((t) => !e.get(t.id)?.isAccessible),
+                importedPlugins: [],
+              },
+            },
+            status: `ready`,
+          };
+        }
+        if (t(M, `3350594702`) && (e === `local` || N(e))) {
+          let n = t(J, { hostId: e, apps: f });
+          return n.status === `ready`
+            ? {
+                status: `ready`,
+                data: {
+                  kind: `targeted-plugins`,
+                  ...n.data,
+                  setup: U({
+                    candidates: s,
+                    directoryApps: d,
+                    plugins: n.data.plugins,
+                    runtimeApps: h,
+                    useCanonicalAppIds: !0,
+                  }),
+                },
+              }
+            : n;
+        }
+        return {
+          data: { candidates: s, directoryApps: d, kind: `plugin-directory`, runtimeApps: h },
+          status: `ready`,
+        };
+      })));
+  }))();
+}
+export { W as a, G as i, Q as n, $ as r, ce as t };

@@ -1,139 +1,487 @@
-// Subscription payment recovery announcements. Release chunk: announcement-1bd76f90c419.js.
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as renewalStateChunk from "@rchunk/workspace-renewal-state";
-import * as announcementSlotChunk from "@rchunk/home-announcement-slot";
-import * as subscriptionQueriesChunk from "@rchunk/subscription-queries";
-import * as recoveryEventsChunk from "@rchunk/subscription-recovery-events";
-
-interface Candidate {
-  content: unknown;
-  isEligible: boolean;
-  isLoading: boolean;
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/subscription-recovery-dialog",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/billing-queries",
+      "@rchunk/billing-query-error",
+      "@rchunk/checkout-error",
+      "@rchunk/stripe-client",
+      "@rchunk/stripe-pure",
+      "@rchunk/billing-state",
+      "@rchunk/add-payment-method",
+      "@rchunk/billing-form-options",
+      "@rchunk/prop-types-runtime",
+      "@rchunk/stripe-payment-element-options",
+      "@rchunk/account-action-integrity",
+      "@rchunk/payment-method-display",
+      "@rchunk/edit-payment-method",
+      "@rchunk/format-amount",
+      "@rchunk/stripe-payment-confirmation",
+      "@rchunk/confirm-subscription-upgrade",
+      "@rchunk/delinquent-upgrade-preparation",
+      "@rchunk/queries",
+      "@rchunk/subscription-recovery-events",
+      "@rchunk/chatgpt-subscription-events",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $O as n,
+  BX as r,
+  FX as i,
+  H3 as a,
+  HX as o,
+  I3 as s,
+  Jm as c,
+  K2 as l,
+  LX as u,
+  QI as d,
+  QX as f,
+  V3 as p,
+  Y2 as m,
+  ZI as h,
+  e6 as g,
+  ek as _,
+  lw as v,
+  n4 as y,
+  qm as b,
+  sb as x,
+} from "@rchunk/app-shared";
+import {
+  Dft as S,
+  Hln as C,
+  O0 as w,
+  Oft as T,
+  Rln as ee,
+  Sun as E,
+  _un as te,
+  cJt as ne,
+  dun as re,
+  eEt as D,
+  j0 as ie,
+  jTt as ae,
+  n7 as O,
+  r7 as k,
+  rJt as A,
+  rht as j,
+  sP as M,
+  uP as N,
+  uht as P,
+  uun as oe,
+} from "@rchunk/app-initial";
+import { Jp as se, Yp as ce } from "@rchunk/app-primary";
+import { n as le, r as ue, t as de } from "@rchunk/workspace-renewal-state";
+import { n as F, t as I } from "@rchunk/home-announcement-slot";
+import { i as fe, o as pe } from "@rchunk/subscription-queries";
+import { n as L, t as R } from "@rchunk/subscription-recovery-events";
+function z(e) {
+  let t = (0, V.c)(25),
+    { entries: n, renderSlot: i, trackVisibility: a } = e,
+    o = a === void 0 || a,
+    { data: s, isLoading: c } = P(),
+    l;
+  t[0] === s
+    ? (l = t[1])
+    : ((l =
+        s?.structure === `workspace` && s.account_user_role === `account-owner` && C(s.plan_type)
+          ? s.id
+          : null),
+      (t[0] = s),
+      (t[1] = l));
+  let u = l,
+    { data: d, isLoading: f } = r(ue, u),
+    p;
+  t[2] === d
+    ? (p = t[3])
+    : ((p =
+        d?.grace_period_end_timestamp == null ? null : Date.parse(d.grace_period_end_timestamp)),
+      (t[2] = d),
+      (t[3] = p));
+  let m = N(p),
+    h;
+  t[4] !== m || t[5] !== d ? ((h = de(d, m)), (t[4] = m), (t[5] = d), (t[6] = h)) : (h = t[6]);
+  let g = h;
+  if (n == null) {
+    let e;
+    return (
+      t[7] === g
+        ? (e = t[8])
+        : ((e = g == null ? null : (0, U.jsx)(B, { gracePeriodEnd: g })), (t[7] = g), (t[8] = e)),
+      e
+    );
+  }
+  let _;
+  t[9] === g
+    ? (_ = t[10])
+    : ((_ = g == null ? null : (0, U.jsx)(B, { gracePeriodEnd: g })), (t[9] = g), (t[10] = _));
+  let v = u != null && g != null,
+    y = c || (u != null && f),
+    b,
+    x,
+    S;
+  if (
+    t[11] !== n ||
+    t[12] !== g ||
+    t[13] !== i ||
+    t[14] !== _ ||
+    t[15] !== v ||
+    t[16] !== y ||
+    t[17] !== o
+  ) {
+    let e = [{ content: _, isEligible: v, isLoading: y }, ...n];
+    ((b = H.Fragment),
+      (x = g),
+      (S = i?.(e) ?? (0, U.jsx)(I, { entries: e, trackVisibility: o })),
+      (t[11] = n),
+      (t[12] = g),
+      (t[13] = i),
+      (t[14] = _),
+      (t[15] = v),
+      (t[16] = y),
+      (t[17] = o),
+      (t[18] = b),
+      (t[19] = x),
+      (t[20] = S));
+  } else ((b = t[18]), (x = t[19]), (S = t[20]));
+  let w;
+  return (
+    t[21] !== b || t[22] !== x || t[23] !== S
+      ? ((w = (0, U.jsx)(b, { children: S }, x)),
+        (t[21] = b),
+        (t[22] = x),
+        (t[23] = S),
+        (t[24] = w))
+      : (w = t[24]),
+    w
+  );
 }
-interface Props {
-  entries?: Candidate[];
-  renderSlot?(entries: Candidate[]): unknown;
-  trackVisibility?: boolean;
+function B(e) {
+  let t = (0, V.c)(9),
+    { gracePeriodEnd: n } = e,
+    r = y(),
+    i;
+  t[0] !== n || t[1] !== r
+    ? ((i = r.formatDate(n, { month: `long`, day: `numeric` })), (t[0] = n), (t[1] = r), (t[2] = i))
+    : (i = t[2]);
+  let a;
+  t[3] === i
+    ? (a = t[4])
+    : ((a = (0, U.jsx)(m, {
+        id: `codex.workspaceRenewalPaymentBanner.description`,
+        defaultMessage: `Update your payment method before {date} to keep access to your workspace`,
+        description: `Warning that a Business workspace payment must be updated before {date}, when the grace period ends`,
+        values: { date: i },
+      })),
+      (t[3] = i),
+      (t[4] = a));
+  let o;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((o = (0, U.jsx)(m, {
+        id: `codex.workspaceRenewalPaymentBanner.updatePayment`,
+        defaultMessage: `Update payment`,
+        description: `Opens workspace billing settings to update the payment method`,
+      })),
+      (t[5] = o))
+    : (o = t[5]);
+  let s;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = (0, U.jsx)(m, {
+        id: `codex.workspaceRenewalPaymentBanner.title`,
+        defaultMessage: `Workspace renewal failed`,
+        description: `Title shown when a Business workspace renewal payment fails`,
+      })),
+      (t[6] = s))
+    : (s = t[6]);
+  let c;
+  return (
+    t[7] === a
+      ? (c = t[8])
+      : ((c = (0, U.jsx)(O, {
+          ariaLive: `polite`,
+          content: a,
+          Icon: se,
+          layout: `warningCallout`,
+          onPrimaryCtaClick: me,
+          primaryCtaText: o,
+          role: `status`,
+          stackOnNarrow: !0,
+          title: s,
+          type: `warning`,
+        })),
+        (t[7] = a),
+        (t[8] = c)),
+    c
+  );
 }
-interface Account {
-  account_id: string;
-  structure: string;
-  role?: string;
-  plan_type?: string;
+function me(e) {
+  T({ event: e, href: ae, initiator: `open_in_browser_bridge` });
 }
-interface SharedRuntime {
-  I3(): { jsx(type: unknown, props: Record<string, unknown>): unknown };
-  BX(query: unknown, input: unknown): { data?: unknown; isPending?: boolean };
-  Y2: unknown;
-  Yh: unknown;
-  [key: string]: unknown;
+var V, H, U;
+function W() {
+  return (W = e(() => {
+    ((V = t()), i(), (H = g()), l(), j(), D(), k(), S(), M(), F(), ce(), ee(), le(), (U = s()));
+  }))();
 }
-interface InitialRuntime {
-  uht(): Account | null;
-  n7: unknown;
-  O0(plan: string): { displayPlan?: string } | null;
-  Hln(plan?: string): boolean;
-  [key: string]: unknown;
+function he(e, t) {
+  return (
+    e?.plan_type !== `team` &&
+    e?.is_processor_stripe === !0 &&
+    e.is_delinquent === !0 &&
+    e.grace_period_end_timestamp != null &&
+    Date.parse(e.grace_period_end_timestamp) > t.getTime()
+  );
 }
-const shared = appSharedChunk as unknown as SharedRuntime;
-const initial = appInitialChunk as unknown as InitialRuntime;
-const primary = appPrimaryChunk as Record<string, unknown>;
-const renewal = renewalStateChunk as Record<string, unknown>;
-const slot = announcementSlotChunk as Record<string, unknown>;
-const queries = subscriptionQueriesChunk as Record<string, unknown>;
-const events = recoveryEventsChunk as Record<string, unknown>;
-const jsx = shared.I3();
-const loadRecoveryDialog = () => import("@rchunk/subscription-recovery-dialog");
-function renderEntries(props: Props, candidate: Candidate): unknown {
-  const entries = [candidate, ...(props.entries ?? [])];
-  if (props.renderSlot) return props.renderSlot(entries);
-  const Slot = (slot.t ?? slot.default) as unknown;
-  return jsx.jsx(Slot, { entries, trackVisibility: props.trackVisibility });
+var G, K, q;
+function J() {
+  return (J = e(() => {
+    (i(),
+      ne(),
+      d(),
+      oe(),
+      _(),
+      fe(),
+      (G = re(`subscription-payment-recovery-dismissed-at`, null, {
+        coerceStoredValue: (e) => (typeof e == `number` ? e : null),
+      })),
+      (K = f(h, (e) => ({ ...pe(e), staleTime: n.ONE_MINUTE, refetchInterval: n.ONE_MINUTE }))),
+      (q = f(h, (e) => ({
+        queryKey: [`subscription-complete-payment-recovery-assignment`, e],
+        queryFn: ({ signal: t }) =>
+          A.safePost(`/subscriptions/complete_payment/recovery_assignment`, {
+            requestBody: { account_id: e },
+            signal: t,
+          }),
+        staleTime: n.ONE_MINUTE,
+        retry: !1,
+      }))));
+  }))();
 }
-function WorkspaceAnnouncement(props: Props, account: Account): unknown {
-  void primary;
-  const result = shared.BX(renewal.r, account.account_id);
-  const candidate: Candidate = {
-    isLoading: Boolean(result.isPending),
-    isEligible:
-      account.role === "account-owner" &&
-      initial.Hln(account.plan_type) &&
-      result.data != null,
-    content: jsx.jsx(initial.n7, {
-      variant: "warning",
-      title: jsx.jsx(shared.Y2, {
-        id: "subscription.paymentRecovery.workspace.title",
-        defaultMessage: "Update your payment method",
+function ge(e) {
+  let t = (0, Y.c)(4),
+    { data: n } = P(),
+    r = o(te),
+    i;
+  return (
+    t[0] !== n || t[1] !== e || t[2] !== r
+      ? ((i =
+          n?.structure === `personal`
+            ? (0, Z.jsx)(_e, { ...e, accountId: n.id }, `${r}:${n.id}`)
+            : (0, Z.jsx)(z, { ...e })),
+        (t[0] = n),
+        (t[1] = e),
+        (t[2] = r),
+        (t[3] = i))
+      : (i = t[3]),
+    i
+  );
+}
+function _e(e) {
+  let t = (0, Y.c)(6),
+    { accountId: n, entries: i, renderSlot: a, trackVisibility: s } = e,
+    c = s === void 0 || s,
+    { data: l, isPending: u } = r(K, n),
+    d = o(G),
+    f;
+  t[0] === l
+    ? (f = t[1])
+    : ((f =
+        l?.grace_period_end_timestamp == null ? null : Date.parse(l.grace_period_end_timestamp)),
+      (t[0] = l),
+      (t[1] = f));
+  let p = N(f),
+    m = he(l, p) && (d == null || p.getTime() > d + 864e5),
+    { data: h, isPending: g } = r(q, n, { enabled: m }),
+    _ = m && h?.recovery_surface === `payment_recovery_banner`,
+    v = w(l?.plan_type)?.displayPlan ?? `pro`,
+    y =
+      _ && l != null
+        ? (0, Z.jsx)(ve, { accountId: n, planName: v.charAt(0).toUpperCase() + v.slice(1) })
+        : null;
+  if (i == null) return y;
+  let b = [{ content: y, isEligible: _, isLoading: u || (m && g) }, ...i],
+    x = X.Fragment,
+    S = _ ? `recovery` : `fallback`,
+    C = a?.(b) ?? (0, Z.jsx)(I, { entries: b, trackVisibility: c }),
+    T;
+  return (
+    t[2] !== x || t[3] !== S || t[4] !== C
+      ? ((T = (0, Z.jsx)(x, { children: C }, S)), (t[2] = x), (t[3] = S), (t[4] = C), (t[5] = T))
+      : (T = t[5]),
+    T
+  );
+}
+function ve(e) {
+  let t = (0, Y.c)(30),
+    { accountId: n, planName: r } = e,
+    i = u(h),
+    { data: a } = P(),
+    [o, s] = (0, X.useState)(!1),
+    c,
+    l;
+  (t[0] !== a || t[1] !== i
+    ? ((c = () => {
+        a != null && L(i, `shown`);
       }),
-      content: jsx.jsx(shared.Y2, {
-        id: "subscription.paymentRecovery.workspace.description",
-        defaultMessage:
-          "Your workspace subscription needs a valid payment method.",
+      (l = [a, i]),
+      (t[0] = a),
+      (t[1] = i),
+      (t[2] = c),
+      (t[3] = l))
+    : ((c = t[2]), (l = t[3])),
+    (0, X.useEffect)(c, l));
+  let d;
+  t[4] === i
+    ? (d = t[5])
+    : ((d = () => {
+        (i.set(G, Date.now()), s(!1));
       }),
-    }),
-  };
-  return renderEntries(props, candidate);
-}
-function PersonalAnnouncement(props: Props, account: Account): unknown {
-  const subscription = shared.BX(queries.n, account.account_id);
-  const assignment = shared.BX(queries.r, account.account_id);
-  const data = subscription.data as
-    | {
-        plan_type?: string;
-        payment_processor?: string;
-        is_delinquent?: boolean;
-        grace_period_end?: string;
-      }
-    | undefined;
-  const grace =
-    data?.grace_period_end == null
-      ? Number.NaN
-      : Date.parse(data.grace_period_end);
-  const eligible =
-    data?.payment_processor === "stripe" &&
-    data.is_delinquent === true &&
-    Number.isFinite(grace) &&
-    grace > Date.now() &&
-    (assignment.data as { recovery_surface?: string } | undefined)
-      ?.recovery_surface === "payment_recovery_banner";
-  const planName = initial.O0(data?.plan_type ?? "pro")?.displayPlan ?? "pro";
-  const open = async () => {
-    const module = await loadRecoveryDialog();
-    const log = events.n;
-    if (typeof log === "function")
-      (log as (event: string) => void)("payment_recovery_banner_clicked");
-    return module.RecoveryDialog({
-      accountId: account.account_id,
-      planName,
-      onClose() {},
-      onComplete() {},
-    });
-  };
-  const candidate: Candidate = {
-    isLoading: Boolean(subscription.isPending || assignment.isPending),
-    isEligible: eligible,
-    content: jsx.jsx(initial.n7, {
-      variant: "warning",
-      title: jsx.jsx(shared.Y2, {
-        id: "subscription.paymentRecovery.personal.title",
-        defaultMessage: `Review your ${planName} payment`,
+      (t[4] = i),
+      (t[5] = d));
+  let f = d,
+    p;
+  t[6] === r
+    ? (p = t[7])
+    : ((p = (0, Z.jsx)(m, {
+        id: `codex.subscriptionPaymentRecovery.banner.title`,
+        defaultMessage: `{planName} plan failed to renew`,
+        description: `Warning banner for a personal subscriber whose renewal payment failed. planName is their short branded plan name, such as Plus or Pro.`,
+        values: { planName: r },
+      })),
+      (t[6] = r),
+      (t[7] = p));
+  let g;
+  t[8] === r
+    ? (g = t[9])
+    : ((g = (0, Z.jsx)(m, {
+        id: `codex.subscriptionPaymentRecovery.banner.description`,
+        defaultMessage: `Update your payment method to continue using ChatGPT {planName}`,
+        description: `Recovery banner explaining how a personal subscriber can keep access after a failed renewal. planName is the short branded plan name.`,
+        values: { planName: r },
+      })),
+      (t[8] = r),
+      (t[9] = g));
+  let _;
+  t[10] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((_ = (0, Z.jsx)(m, {
+        id: `codex.subscriptionPaymentRecovery.banner.review`,
+        defaultMessage: `Review payment`,
+        description: `Short button in the failed personal renewal banner that opens the invoice and saved payment methods for review before payment.`,
+      })),
+      (t[10] = _))
+    : (_ = t[10]);
+  let v;
+  t[11] === i
+    ? (v = t[12])
+    : ((v = () => {
+        (L(i, `cta_clicked`), s(!0));
       }),
-      content: jsx.jsx(shared.Yh, {
-        onClick: open,
-        children: "Review payment",
+      (t[11] = i),
+      (t[12] = v));
+  let y;
+  t[13] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((y = (0, Z.jsx)(m, {
+        id: `codex.subscriptionPaymentRecovery.banner.dismiss`,
+        defaultMessage: `Dismiss`,
+        description: `Dismisses the personal subscription payment recovery banner for one day without changing the subscription or making a payment.`,
+      })),
+      (t[13] = y))
+    : (y = t[13]);
+  let b;
+  t[14] !== f || t[15] !== i
+    ? ((b = () => {
+        (L(i, `dismissed`), f());
       }),
-    }),
-  };
-  return renderEntries(props, candidate);
+      (t[14] = f),
+      (t[15] = i),
+      (t[16] = b))
+    : (b = t[16]);
+  let S;
+  t[17] !== p || t[18] !== g || t[19] !== v || t[20] !== b
+    ? ((S = (0, Z.jsx)(O, {
+        ariaLive: `polite`,
+        role: `status`,
+        type: `warning`,
+        layout: `warningCallout`,
+        stackOnNarrow: !0,
+        Icon: x,
+        title: p,
+        content: g,
+        primaryCtaText: _,
+        onPrimaryCtaClick: v,
+        secondaryCtaText: y,
+        secondaryCtaColor: `ghost`,
+        onSecondaryCtaClick: b,
+      })),
+      (t[17] = p),
+      (t[18] = g),
+      (t[19] = v),
+      (t[20] = b),
+      (t[21] = S))
+    : (S = t[21]);
+  let C;
+  t[22] !== n || t[23] !== f || t[24] !== o || t[25] !== r
+    ? ((C = o ? (0, Z.jsx)(Q, { accountId: n, planName: r, onClose: f, onComplete: f }) : null),
+      (t[22] = n),
+      (t[23] = f),
+      (t[24] = o),
+      (t[25] = r),
+      (t[26] = C))
+    : (C = t[26]);
+  let w;
+  return (
+    t[27] !== S || t[28] !== C
+      ? ((w = (0, Z.jsxs)(Z.Fragment, { children: [S, C] })), (t[27] = S), (t[28] = C), (t[29] = w))
+      : (w = t[29]),
+    w
+  );
 }
-export function SubscriptionPaymentAnnouncement(props: Props): unknown {
-  const account = initial.uht();
-  if (account == null)
-    return props.renderSlot ? props.renderSlot(props.entries ?? []) : null;
-  return account.structure === "personal"
-    ? PersonalAnnouncement(props, account)
-    : WorkspaceAnnouncement(props, account);
+var Y, X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((Y = t()),
+      i(),
+      (X = g()),
+      l(),
+      W(),
+      E(),
+      j(),
+      k(),
+      v(),
+      b(),
+      M(),
+      ie(),
+      F(),
+      d(),
+      R(),
+      J(),
+      (Z = s()),
+      a(),
+      (Q = c(
+        async () =>
+          (
+            await p(
+              async () => {
+                let { RecoveryDialog: e } = await import(`@rchunk/subscription-recovery-dialog`);
+                return { RecoveryDialog: e };
+              },
+              __vite__mapDeps([
+                0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22,
+                23, 24, 25,
+              ]),
+              import.meta.url,
+            )
+          ).RecoveryDialog,
+      )));
+  }))();
 }
+$();
+export { ge as SubscriptionPaymentAnnouncement };

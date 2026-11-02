@@ -1,35 +1,381 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, e6 as getReact, m4 as cn } from "@rchunk/app-shared";
-import { I as CloseIcon, g as CloseSmallIcon, i as PreviousIcon, n as NextIcon } from "@rchunk/popcorn-icons";
-import "@rchunk/artifact-source-bootstrap";
-import { c as screenToFrozenWorld, i as initializeFreezePanes, u as worldToFrozenScreen } from "@rchunk/freeze-panes";
-
-const React = getReact(), jsxRuntime = getJsxRuntime();
-export interface ChartTarget { anchorX: number; anchorY: number; category?: string | null; color?: string | null; cx?: number; cy?: number; endAngle?: number; height?: number; kind: string; rInner?: number; rOuter?: number; seriesName?: string | null; startAngle?: number; value?: unknown; width?: number; x?: number; y?: number }
-export interface FindBarProps { focusToken?: unknown; onClose(): void; onNavigateNext(): void; onNavigatePrevious(): void; onQueryChange(value: string): void; open: boolean; query: string; summary: string }
-function PopcornFindBar({ open, query, summary, focusToken, onQueryChange, onNavigatePrevious, onNavigateNext, onClose }: FindBarProps): unknown {
-  const inputRef = React.useRef<HTMLInputElement | null>(null);
-  React.useEffect(() => { if (open) { inputRef.current?.focus(); inputRef.current?.select(); } }, [focusToken, open]);
-  if (!open) return null;
-  const hasResults = summary.length > 0 && summary !== "No results";
-  return jsxRuntime.jsxs("div", { "data-testid": "popcorn-find-bar", className: "absolute end-3 top-3 z-40 flex h-10 items-center gap-2", children: [jsxRuntime.jsx("input", { ref: inputRef, value: query, placeholder: "Find", "aria-label": "Find", onChange: (event: { target: { value: string } }) => onQueryChange(event.target.value), onKeyDown: (event: { key: string; preventDefault(): void; shiftKey?: boolean; stopPropagation(): void }) => { event.stopPropagation(); if (event.key === "Enter") { event.preventDefault(); event.shiftKey ? onNavigatePrevious() : onNavigateNext(); } else if (event.key === "Escape") { event.preventDefault(); onClose(); } } }), jsxRuntime.jsx("div", { className: cn("min-w-[64px] text-right text-xs", hasResults ? "text-token-text-secondary" : "text-token-text-tertiary"), children: summary }), jsxRuntime.jsx("button", { type: "button", "aria-label": "Previous search result", disabled: !hasResults, onClick: onNavigatePrevious, children: jsxRuntime.jsx(PreviousIcon, {}) }), jsxRuntime.jsx("button", { type: "button", "aria-label": "Next search result", disabled: !hasResults, onClick: onNavigateNext, children: jsxRuntime.jsx(NextIcon, {}) }), jsxRuntime.jsx("button", { type: "button", "aria-label": "Close find", onClick: onClose, children: jsxRuntime.jsx(CloseSmallIcon ?? CloseIcon, {}) })] });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  I3 as t,
+  d1 as n,
+  e6 as r,
+  h4 as i,
+  l1 as a,
+  m1 as o,
+  m4 as s,
+  p1 as c,
+  s1 as l,
+  u1 as u,
+} from "@rchunk/app-shared";
+import { I as d, g as f, i as p, n as m } from "@rchunk/popcorn-icons";
+import { nt as h, rt as g } from "@rchunk/artifact-source-bootstrap";
+import { c as _, i as v, u as y } from "@rchunk/freeze-panes";
+function b({
+  open: e,
+  query: t,
+  summary: n,
+  focusToken: r,
+  onQueryChange: i,
+  onNavigatePrevious: a,
+  onNavigateNext: o,
+  onClose: c,
+}) {
+  let l = (0, x.useRef)(null);
+  if (
+    ((0, x.useEffect)(() => {
+      e && (l.current?.focus(), l.current?.select());
+    }, [r, e]),
+    !e)
+  )
+    return null;
+  let u = n.length > 0 && n !== `No results`;
+  return (0, S.jsxs)(`div`, {
+    "data-testid": `popcorn-find-bar`,
+    className: `border-token-border-light bg-token-bg-primary pointer-events-auto absolute end-3 top-3 z-40 flex h-10 items-center gap-2 rounded-xl border px-2 shadow-lg`,
+    children: [
+      (0, S.jsx)(`div`, {
+        className: `border-token-border-light bg-token-bg-primary flex h-8 items-center rounded-lg border`,
+        children: (0, S.jsx)(`input`, {
+          ref: l,
+          value: t,
+          onChange: (e) => i(e.target.value),
+          onKeyDown: (e) => {
+            if ((e.stopPropagation(), e.key === `Enter`)) {
+              if ((e.preventDefault(), e.shiftKey)) {
+                a();
+                return;
+              }
+              o();
+              return;
+            }
+            e.key === `Escape` && (e.preventDefault(), c());
+          },
+          placeholder: `Find`,
+          "aria-label": `Find`,
+          className: `text-token-text-primary placeholder:text-token-text-tertiary h-8 w-[220px] rounded-lg border-0 bg-transparent px-2 text-sm outline-none`,
+        }),
+      }),
+      (0, S.jsx)(`div`, {
+        className: s(
+          `min-w-[64px] text-right text-xs`,
+          u ? `text-token-text-secondary` : `text-token-text-tertiary`,
+        ),
+        children: n,
+      }),
+      (0, S.jsx)(`button`, {
+        type: `button`,
+        "aria-label": `Previous search result`,
+        className: `text-token-text-primary hover:bg-token-bg-secondary inline-flex size-8 items-center justify-center rounded-md disabled:cursor-default disabled:opacity-40`,
+        disabled: !u,
+        onClick: a,
+        children: (0, S.jsx)(p, { className: `size-3.5` }),
+      }),
+      (0, S.jsx)(`button`, {
+        type: `button`,
+        "aria-label": `Next search result`,
+        className: `text-token-text-primary hover:bg-token-bg-secondary inline-flex size-8 items-center justify-center rounded-md disabled:cursor-default disabled:opacity-40`,
+        disabled: !u,
+        onClick: o,
+        children: (0, S.jsx)(m, { className: `size-3.5` }),
+      }),
+      (0, S.jsx)(`button`, {
+        type: `button`,
+        "aria-label": `Close find`,
+        className: `text-token-text-primary hover:bg-token-bg-secondary inline-flex size-8 items-center justify-center rounded-md`,
+        onClick: c,
+        children: (0, S.jsx)(f, { className: `size-4` }),
+      }),
+    ],
+  });
 }
-const isPointTarget = (kind: string): boolean => kind === "scatter-point" || kind === "bubble-point" || kind === "line-point";
-const isRectangleTarget = (kind: string): boolean => kind === "bar-vertical" || kind === "bar-horizontal" || kind === "line-point" || kind === "area-point" || kind === "legend";
-function findChartTarget(targets: readonly ChartTarget[], point: { x: number; y: number }, minimumRadius = 12): ChartTarget | null { for (let index = targets.length - 1; index >= 0; index -= 1) { const target = targets[index]; if (!target) continue; if (isPointTarget(target.kind)) { if (target.x == null || target.y == null || target.width == null || target.height == null) continue; const centerX = target.x + target.width / 2, centerY = target.y + target.height / 2, radius = Math.max(target.width, target.height) / 2 + Math.max(0, minimumRadius); if (point.x >= centerX - radius && point.x <= centerX + radius && point.y >= centerY - radius && point.y <= centerY + radius) return target; continue; } if (isRectangleTarget(target.kind)) { if (target.x != null && target.y != null && target.width != null && target.height != null && point.x >= target.x && point.x <= target.x + target.width && point.y >= target.y && point.y <= target.y + target.height) return target; continue; } if (target.kind === "pie" && target.cx != null && target.cy != null) { const x = point.x - target.cx, y = point.y - target.cy, radius = Math.hypot(x, y); if (radius < (target.rInner ?? 0) || radius > (target.rOuter ?? 0)) continue; let angle = Math.atan2(y, x); if (angle < 0) angle += Math.PI * 2; let start = target.startAngle ?? 0, end = target.endAngle ?? 0; if (start < 0) start += Math.PI * 2; if (end < 0) end += Math.PI * 2; if (start <= end ? angle >= start && angle <= end : angle >= start || angle <= end) return target; } } return null; }
-function clientToScreen(element: { getBoundingClientRect(): { left: number; top: number } }, clientX: number, clientY: number): { screenX: number; screenY: number } { const bounds = element.getBoundingClientRect(); return { screenX: clientX - bounds.left, screenY: clientY - bounds.top }; }
-function initializeChartHoverRuntime(): void {}
-export interface ChartHoverTooltipOptions { canvasRef: { current: { addEventListener?(name: string, listener: (event: MouseEvent) => void): void; getBoundingClientRect(): { left: number; top: number }; removeEventListener?(name: string, listener: (event: MouseEvent) => void): void; style: { cursor: string } } | null }; chartTargetsRef: { current: readonly ChartTarget[] }; columnWidths?: number[]; freezePanes?: { columnCount: number; rowCount: number }; getCamera(): { k: number; x: number; y: number }; minPointHitRadius?: number; rowHeights?: number[]; selectedFloatingElement?: { interactionState?: string } | null; subscribeToCameraChanges?(callback: () => void): (() => void) | void; subscribeToPointerEvents?(callback: (event: { pointerType?: string; type: string; world: { x: number; y: number } }) => void): (() => void) | void; suppressHover?: boolean; viewportRef: { current: { style: { cursor: string } } | null } }
-function useChartHoverTooltip(options: ChartHoverTooltipOptions): unknown {
-  const [target, setTarget] = React.useState<ChartTarget | null>(null), suppressed = options.suppressHover || ["dragging", "resizing", "rotating"].includes(options.selectedFloatingElement?.interactionState ?? ""), clear = React.useCallback(() => { setTarget(null); if (options.canvasRef.current) options.canvasRef.current.style.cursor = ""; if (options.viewportRef.current) options.viewportRef.current.style.cursor = ""; }, [options.canvasRef, options.viewportRef]), update = React.useCallback((x: number, y: number) => { if (suppressed) return clear(); const camera = options.getCamera(), hit = findChartTarget(options.chartTargetsRef.current, { x, y }, (options.minPointHitRadius ?? 12) / Math.max(camera.k, 1e-4)); setTarget(hit); const cursor = hit ? "pointer" : ""; if (options.canvasRef.current) options.canvasRef.current.style.cursor = cursor; if (options.viewportRef.current) options.viewportRef.current.style.cursor = cursor; }, [clear, options, suppressed]);
-  React.useEffect(() => { if (suppressed) clear(); }, [suppressed, clear]);
-  React.useEffect(() => options.subscribeToPointerEvents?.(event => { if (event.type === "pointerMove") update(event.world.x, event.world.y); else clear(); }), [options.subscribeToPointerEvents, update, clear]);
-  React.useEffect(() => options.subscribeToCameraChanges?.(clear), [options.subscribeToCameraChanges, clear]);
-  React.useEffect(() => { if (options.subscribeToPointerEvents) return; const canvas = options.canvasRef.current; if (!canvas?.addEventListener) return; const move = (event: MouseEvent) => { const screen = clientToScreen(canvas, event.clientX, event.clientY), world = screenToFrozenWorld({ camera: options.getCamera(), screenX: screen.screenX, screenY: screen.screenY, freezePanes: options.freezePanes ?? { columnCount: 0, rowCount: 0 }, columnWidths: options.columnWidths ?? [], rowHeights: options.rowHeights ?? [] }); update(world.x, world.y); }; canvas.addEventListener("mousemove", move); return () => canvas.removeEventListener?.("mousemove", move); }, [options, update]);
-  if (!target || target.kind === "legend") return null;
-  const camera = options.getCamera(), anchor = worldToFrozenScreen({ camera, worldX: target.anchorX, worldY: target.anchorY, freezePanes: options.freezePanes ?? { columnCount: 0, rowCount: 0 }, columnWidths: options.columnWidths ?? [], rowHeights: options.rowHeights ?? [] }), label = target.category?.trim() || target.seriesName?.trim() || "";
-  return jsxRuntime.jsx("div", { "data-testid": "popcorn-chart-hover-tooltip", className: "pointer-events-none font-sans", style: { position: "fixed", left: anchor.x, top: anchor.y, zIndex: 1000 }, children: jsxRuntime.jsxs("div", { children: [jsxRuntime.jsx("div", { children: label }), jsxRuntime.jsxs("div", { children: [jsxRuntime.jsx("span", { style: { backgroundColor: target.color ?? "transparent" } }), jsxRuntime.jsx("span", { children: target.seriesName ?? "" }), jsxRuntime.jsx("span", { children: target.value })] })] }) });
+var x, S;
+function C() {
+  return (C = e(() => {
+    ((x = r()), i(), d(), (S = t()));
+  }))();
 }
-function initializePopcornChartHoverTooltip(): void { initializeFreezePanes(); initializeChartHoverRuntime(); }
-function initializePopcornFindBar(): void {}
-export { PopcornFindBar as a, initializeChartHoverRuntime as i, initializePopcornChartHoverTooltip as n, initializePopcornFindBar as o, clientToScreen as r, useChartHoverTooltip as t };
+function w(e, t, n = 12) {
+  for (let r = e.length - 1; r >= 0; --r) {
+    let i = e[r];
+    if (i) {
+      if (T(i.kind)) {
+        if (i.x === void 0 || i.y === void 0 || i.width === void 0 || i.height === void 0) continue;
+        let e = i.x + i.width / 2,
+          r = i.y + i.height / 2,
+          a = Math.max(i.width, i.height) / 2 + Math.max(0, n);
+        if (t.x >= e - a && t.x <= e + a && t.y >= r - a && t.y <= r + a) return i;
+        continue;
+      }
+      if (E(i.kind)) {
+        if (
+          i.x !== void 0 &&
+          i.y !== void 0 &&
+          i.width !== void 0 &&
+          i.height !== void 0 &&
+          t.x >= i.x &&
+          t.x <= i.x + i.width &&
+          t.y >= i.y &&
+          t.y <= i.y + i.height
+        )
+          return i;
+        continue;
+      }
+      if (i.kind === `pie` && i.cx != null && i.cy != null) {
+        let e = t.x - i.cx,
+          n = t.y - i.cy,
+          r = Math.hypot(e, n);
+        if (r < (i.rInner ?? 0) || r > (i.rOuter ?? 0)) continue;
+        let a = Math.atan2(n, e);
+        a < 0 && (a += Math.PI * 2);
+        let o = i.startAngle ?? 0,
+          s = i.endAngle ?? 0;
+        if (
+          (o < 0 && (o += Math.PI * 2),
+          s < 0 && (s += Math.PI * 2),
+          o <= s ? a >= o && a <= s : a >= o || a <= s)
+        )
+          return i;
+      }
+    }
+  }
+  return null;
+}
+function T(e) {
+  return e === `scatter-point` || e === `bubble-point` || e === `line-point`;
+}
+function E(e) {
+  return (
+    e === `bar-vertical` ||
+    e === `bar-horizontal` ||
+    e === `line-point` ||
+    e === `area-point` ||
+    e === `legend`
+  );
+}
+function D(e, t, n) {
+  let r = g(e, t, n);
+  return { screenX: r.x, screenY: r.y };
+}
+function O() {
+  return (O = e(() => {}))();
+}
+function k(e) {
+  return e?.trim() || void 0;
+}
+function A({
+  canvasRef: e,
+  viewportRef: t,
+  chartTargetsRef: r,
+  getCamera: i,
+  selectedFloatingElement: a,
+  suppressHover: d = !1,
+  freezePanes: f,
+  columnWidths: p,
+  rowHeights: m,
+  minPointHitRadius: g = 12,
+  subscribeToPointerEvents: v,
+  subscribeToCameraChanges: b,
+  screenToWorld: x,
+  worldToScreen: S,
+}) {
+  let [C, T] = (0, j.useState)(null),
+    {
+      x: E,
+      y: O,
+      strategy: A,
+      refs: I,
+      update: L,
+    } = c({
+      placement: `top`,
+      middleware: [u(6), l(), n({ padding: 8 })],
+      whileElementsMounted: o,
+      strategy: `fixed`,
+    }),
+    R = (0, j.useRef)(null),
+    z = (0, j.useRef)(!1),
+    B = (0, j.useCallback)(
+      (n) => {
+        if (n == null && !z.current) return;
+        let r = n ?? ``,
+          i = e.current;
+        i && (i.style.cursor = r);
+        let a = t.current;
+        (a && (a.style.cursor = r), (z.current = n != null));
+      },
+      [e, t],
+    ),
+    V = (0, j.useCallback)(() => {
+      (T(null), B(null));
+    }, [B]),
+    H =
+      d ||
+      a?.interactionState === `dragging` ||
+      a?.interactionState === `resizing` ||
+      a?.interactionState === `rotating`,
+    U = (0, j.useCallback)(
+      (e, t) =>
+        x
+          ? x({ x: e, y: t })
+          : _({
+              camera: i(),
+              screenX: e,
+              screenY: t,
+              freezePanes: f ?? F,
+              columnWidths: p ?? [],
+              rowHeights: m ?? [],
+            }),
+      [p, f, i, m, x],
+    ),
+    W = (0, j.useCallback)(
+      (e, t) =>
+        S
+          ? S({ x: e, y: t })
+          : y({
+              camera: i(),
+              worldX: e,
+              worldY: t,
+              freezePanes: f ?? F,
+              columnWidths: p ?? [],
+              rowHeights: m ?? [],
+            }),
+      [p, f, i, m, S],
+    ),
+    G = (0, j.useCallback)(
+      (e, t) => {
+        if (H) {
+          V();
+          return;
+        }
+        let n = i(),
+          a = g / Math.max(n.k, 1e-4),
+          o = w(r.current, { x: e, y: t }, a);
+        (T(o), B(o ? `pointer` : null));
+      },
+      [r, i, H, g, V, B],
+    );
+  if (
+    ((0, j.useEffect)(() => {
+      H && V();
+    }, [H, V]),
+    (0, j.useEffect)(() => {
+      if (!C || C.kind === `legend` || !e.current) return;
+      let t = e.current,
+        n = W(C.anchorX, C.anchorY),
+        r = h(t, n.x, n.y),
+        i = { getBoundingClientRect: () => new DOMRect(r.x, r.y, 0, 0) };
+      ((R.current = i), I.setReference(i), L?.());
+    }, [e, C, I, W, L]),
+    (0, j.useEffect)(() => {
+      if (v)
+        return v((e) => {
+          if (e.type === `pointerLeave`) {
+            V();
+            return;
+          }
+          if (e.type === `pointerDown`) {
+            V();
+            return;
+          }
+          if (e.type === `pointerUp` && e.pointerType !== `mouse`) {
+            V();
+            return;
+          }
+          e.type === `pointerMove` && G(e.world.x, e.world.y);
+        });
+    }, [V, v, G]),
+    (0, j.useEffect)(() => {
+      if (v) return;
+      let t = e.current;
+      if (!t) return;
+      let n = (e) => {
+          let n = D(t, e.clientX, e.clientY),
+            r = U(n.screenX, n.screenY);
+          G(r.x, r.y);
+        },
+        r = () => V(),
+        i = () => V();
+      return (
+        t.addEventListener(`mousemove`, n),
+        t.addEventListener(`mouseleave`, r),
+        t.addEventListener(`mousedown`, i),
+        () => {
+          (t.removeEventListener(`mousemove`, n),
+            t.removeEventListener(`mouseleave`, r),
+            t.removeEventListener(`mousedown`, i),
+            V());
+        }
+      );
+    }, [e, V, v, G, U]),
+    (0, j.useEffect)(() => {
+      if (b)
+        return b(() => {
+          V();
+        });
+    }, [V, b]),
+    !C || C.kind === `legend`)
+  )
+    return null;
+  let K = k(C.category) ?? k(C.seriesName) ?? ``;
+  return (0, M.jsx)(`div`, {
+    ref: I.setFloating,
+    style: { position: A, left: E ?? 0, top: O ?? 0, zIndex: 1e3 },
+    className: `pointer-events-none font-sans`,
+    "data-testid": `popcorn-chart-hover-tooltip`,
+    children: (0, M.jsxs)(`div`, {
+      className: s(
+        `bg-token-main-surface-primary text-token-text-primary relative rounded-lg border px-2 py-1.5`,
+        N,
+      ),
+      style: { borderColor: P },
+      children: [
+        (0, M.jsx)(`div`, {
+          className: `flex w-full flex-col px-1 py-0.5 text-xs leading-tight`,
+          children: (0, M.jsx)(`div`, { className: `me-6 w-full min-w-[88px]`, children: K }),
+        }),
+        (0, M.jsx)(`div`, {
+          className: `mt-0.5 flex flex-col border-t border-solid pt-2`,
+          style: { borderTopColor: P },
+          children: (0, M.jsxs)(`div`, {
+            className: `flex flex-row items-stretch px-1 py-0 text-xs leading-tight`,
+            children: [
+              (0, M.jsxs)(`div`, {
+                className: `flex items-center`,
+                children: [
+                  (0, M.jsx)(`div`, {
+                    className: `me-1.5 h-2 w-2 rounded-[2px]`,
+                    style: { backgroundColor: C.color ?? `transparent` },
+                  }),
+                  (0, M.jsx)(`div`, {
+                    className: `me-6 min-w-[88px]`,
+                    children: C.seriesName ?? ``,
+                  }),
+                ],
+              }),
+              (0, M.jsx)(`div`, { className: `grow text-end`, children: C.value }),
+            ],
+          }),
+        }),
+      ],
+    }),
+  });
+}
+var j, M, N, P, F;
+function I() {
+  return (I = e(() => {
+    (a(),
+      i(),
+      (j = r()),
+      v(),
+      O(),
+      (M = t()),
+      (N = `shadow-[0_5px_8px_3px_rgba(0,0,0,0.025),_0_0.5px_1px_0px_rgba(0,0,0,0.045)]`),
+      (P = `rgba(13, 13, 13, 0.08)`),
+      (F = { rowCount: 0, columnCount: 0 }));
+  }))();
+}
+export { b as a, O as i, I as n, C as o, D as r, A as t };

@@ -4,24 +4,9 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const cases = [
-  [
-    "announcement-1bd76f90c419.js",
-    "subscription-payment-announcement",
-    [
-      "rolldown-runtime",
-      "app-shared",
-      "app-initial",
-      "app-primary",
-      "workspace-renewal-state",
-      "home-announcement-slot",
-      "subscription-queries",
-      "subscription-recovery-events",
-    ],
-    1,
-    ["SubscriptionPaymentAnnouncement"],
-  ],
   [
     "banner-235b1db18610.js",
     "workspace-seat-banner",
@@ -145,16 +130,6 @@ for (const [_asset, directory, _deps, _dynamic, exports] of cases) {
     assert.equal(module.ViewOnlySeatBanner().type.name, "SeatBanner");
     assertions += 2;
   }
-  if (directory === "subscription-payment-announcement") {
-    state.account = null;
-    assert.equal(
-      module.SubscriptionPaymentAnnouncement({
-        renderSlot: (entries) => entries.length,
-      }),
-      0,
-    );
-    assertions++;
-  }
   if (directory === "chatgpt-header-upgrade") {
     state.account = { account_id: "a", plan_type: "free" };
     const result = module.ChatGptHeaderUpgrade({ isHomepage: true });
@@ -163,4 +138,5 @@ for (const [_asset, directory, _deps, _dynamic, exports] of cases) {
     assertions += 2;
   }
 }
+assertions += assertReleaseOwner("subscription-payment-announcement");
 console.log(`misc-ui-utils NK: ${assertions} assertions passed`);
