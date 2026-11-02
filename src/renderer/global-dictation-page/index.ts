@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { createDeferred as oe } from "../app-shared/runtime/deferred";
+import { formatKeyboardShortcut as k } from "../app-shared/runtime/keyboard-shortcut-label";
 import { classNames as re, initializeClassNames as E } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -34,10 +36,8 @@ import {
   m_ as O,
   n4 as ie,
   o_ as ae,
-  pG as oe,
   sw as se,
   wL as ce,
-  xp as k,
 } from "@rchunk/app-shared";
 import {
   $ as le,

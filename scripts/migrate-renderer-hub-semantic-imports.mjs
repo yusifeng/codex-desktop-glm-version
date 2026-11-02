@@ -61,6 +61,9 @@ const EXPLICIT_EXPORTS = new Map([
   ["app-shared:sJ", ["src/renderer/app-shared/runtime/file-predicates.ts", "isFileLargerThanUploadLimit"]],
   ["app-shared:qp", ["src/renderer/app-shared/runtime/command-metadata-policy.ts", "isCommandAvailableIn"]],
   ["app-shared:Up", ["src/renderer/app-shared/runtime/command-metadata-policy.ts", "isCommandShortcutConfigurable"]],
+  ["app-shared:PK", ["src/renderer/app-shared/runtime/local-url-policy.ts", "isSafeLocalUrl"]],
+  ["app-shared:pG", ["src/renderer/app-shared/runtime/deferred.ts", "createDeferred"]],
+  ["app-shared:xp", ["src/renderer/app-shared/runtime/keyboard-shortcut-label.ts", "formatKeyboardShortcut"]],
   ["app-initial:w$t", ["src/renderer/app-initial/runtime/flatten-conversation-items.ts", "flattenConversationItems"]],
   ["app-initial:Asn", ["src/renderer/app-initial/runtime/parse-http-url.ts", "parseHttpUrl"]],
   ["app-initial:Fsn", ["src/renderer/app-initial/runtime/parse-origin-pattern.ts", "domainMatchesPattern"]],
@@ -160,6 +163,13 @@ const EXPLICIT_EXPORTS = new Map([
   ["app-primary:_p", ["src/renderer/app-primary/runtime/submission-state-policy.ts", "getNonSuccessSubmissionState"]],
   ["app-primary:Nt", ["src/renderer/app-primary/runtime/submission-state-policy.ts", "toggleComposerWorktreeMode"]],
   ["app-primary:yp", ["src/renderer/app-primary/runtime/submission-state-policy.ts", "matchesDestinationHostWorktreeOperation"]],
+  ["app-primary:ih", ["src/renderer/app-primary/runtime/checkout-return-path-policy.ts", "resolveCheckoutReturnPath"]],
+  ["app-primary:ch", ["src/renderer/app-primary/runtime/checkout-return-path-policy.ts", "applyCheckoutReturnPath"]],
+  ["app-primary:im", ["src/renderer/app-primary/runtime/connector-link-policy.ts", "hasConnectorLink"]],
+  ["app-primary:tc", ["src/renderer/app-primary/runtime/save-shortcut-policy.ts", "handleCmdOrCtrlSave"]],
+  ["app-primary:qg", ["src/renderer/app-primary/runtime/annotation-color-policy.ts", "getAnnotationAccentColor"]],
+  ["app-primary:Yg", ["src/renderer/app-primary/runtime/annotation-color-policy.ts", "formatAnnotationRgbColor"]],
+  ["app-primary:Jg", ["src/renderer/app-primary/runtime/annotation-color-policy.ts", "formatAnnotationMutedColor"]],
 ]);
 
 function walk(directory) {

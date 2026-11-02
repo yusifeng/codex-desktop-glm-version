@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { formatKeyboardShortcut as A } from "../app-shared/runtime/keyboard-shortcut-label";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -31,7 +32,6 @@ import {
   rl as D,
   wL as O,
   xD as k,
-  xp as A,
 } from "@rchunk/app-shared";
 import {
   E6t as te,
@@ -63,7 +63,10 @@ import {
   yA as de,
   ypn as fe,
 } from "@rchunk/app-initial";
-import { Cm as pe, Sm as me } from "@rchunk/app-primary";
+import {
+  Cm as pe,
+  Sm as me,
+} from "@rchunk/app-primary";
 var q;
 function he() {
   return (he = e(() => {

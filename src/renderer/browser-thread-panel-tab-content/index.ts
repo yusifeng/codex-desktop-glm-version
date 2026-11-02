@@ -27,6 +27,7 @@ const __vite__mapDeps = (
       "@rchunk/browser-site-annotation-permission-dialog",
     ]),
 ) => i.map((i) => d[i]);
+import { formatKeyboardShortcut as mt } from "../app-shared/runtime/keyboard-shortcut-label";
 import { getBrowserSidebarSubmitAvailability as Gr, getBrowserSidebarSubmitStarted as Hr, subscribeBrowserSidebarSubmitAvailability as Ur } from "../app-primary/runtime/browser-sidebar-submit-contract";
 import { getPrimaryModifierPressed as ne } from "../app-shared/runtime/command-metadata-policy";
 import { hasItems as f } from "../app-shared/runtime/non-empty-collection";
@@ -143,7 +144,6 @@ import {
   x_ as dt,
   xh as ft,
   xm as pt,
-  xp as mt,
   y_ as ht,
   zh as gt,
 } from "@rchunk/app-shared";

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isSafeLocalUrl as s } from "../app-shared/runtime/local-url-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -7,7 +8,6 @@ import {
   K2 as i,
   LX as a,
   NK as o,
-  PK as s,
   UI as c,
   _L as l,
   e6 as u,

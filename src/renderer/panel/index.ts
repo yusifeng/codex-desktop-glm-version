@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { formatKeyboardShortcut as Ht } from "../app-shared/runtime/keyboard-shortcut-label";
 import { isClientNewThreadId as Mt } from "../app-shared/runtime/runtime-identifier-policy";
 import { isWebMcpServer as ot } from "../app-shared/runtime/is-web-mcp-server";
 import { worktreeSettings as ye } from "../app-shared/runtime/worktree-settings";
@@ -138,7 +139,6 @@ import {
   xD as zt,
   xR as Bt,
   x_ as Vt,
-  xp as Ht,
   xx as Ut,
   yI as Wt,
   y_ as Gt,

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { handleCmdOrCtrlSave as _t } from "../app-primary/runtime/save-shortcut-policy";
 import { isHeartbeatAutomation as ce } from "../app-shared/runtime/automation-models";
 import { classNames as ie, initializeClassNames as O } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -122,7 +123,6 @@ import {
   ic as mt,
   nc as ht,
   rc as gt,
-  tc as _t,
 } from "@rchunk/app-primary";
 import { a as vt, i as yt, n as bt, r as xt, t as St } from "@rchunk/automation-dialog";
 import { a as Ct, i as wt, r as Tt, t as Et } from "@rchunk/automation-frequency-section";

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createDeferred as fe } from "../app-shared/runtime/deferred";
 import { createRuntimeUuid as ge } from "../app-shared/runtime/runtime-identifier-policy";
 import { classNames as ue, initializeClassNames as oe } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
@@ -46,7 +47,6 @@ import {
   lw as N,
   my as P,
   n4 as de,
-  pG as fe,
   pk as pe,
   q4 as F,
   rZ as me,

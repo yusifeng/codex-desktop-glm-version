@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { formatKeyboardShortcut as le } from "../app-shared/runtime/keyboard-shortcut-label";
 import { gitSettings as c } from "../app-shared/runtime/git-settings";
 import { parseGitRemoteUrl as M } from "../app-shared/runtime/parse-git-remote-url";
 import { stripTerminalCommandToken as Xe } from "../app-primary/runtime/strip-terminal-command-token";
@@ -58,7 +59,6 @@ import {
   tm as K,
   wL as q,
   xD as ce,
-  xp as le,
   zh as ue,
 } from "@rchunk/app-shared";
 import {

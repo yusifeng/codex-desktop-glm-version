@@ -16,6 +16,7 @@ const __vite__mapDeps = (
       "./tweaks-toolbar-view-7c0f5f44eb6e.css",
     ]),
 ) => i.map((i) => d[i]);
+import { createDeferred as be } from "../app-shared/runtime/deferred";
 import { getPrimaryModifierPressed as E } from "../app-shared/runtime/command-metadata-policy";
 import { hasItems as u } from "../app-shared/runtime/non-empty-collection";
 import { classNames as pe, initializeClassNames as X } from "../app-shared/ui/class-names";
@@ -88,7 +89,6 @@ import {
   n4 as _e,
   nm as ve,
   o_ as ye,
-  pG as be,
   pI as xe,
   ph as Se,
   q2 as Ce,

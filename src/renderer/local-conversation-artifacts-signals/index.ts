@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isSafeLocalUrl as s } from "../app-shared/runtime/local-url-policy";
 import { resolvePath as i } from "../app-shared/runtime/path-key-policy";
 import { createCaseInsensitivePathKey as n } from "../app-shared/runtime/path-key-policy";
 import { isWebMcpServer as d } from "../app-shared/runtime/is-web-mcp-server";
@@ -8,7 +9,6 @@ import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   FX as r,
   OK as o,
-  PK as s,
   QI as c,
   RI as l,
   ZI as u,

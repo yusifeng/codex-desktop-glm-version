@@ -16,6 +16,7 @@ const __vite__mapDeps = (
       "./app-primary-484df789f2f5.css",
     ]),
 ) => i.map((i) => d[i]);
+import { createDeferred as ve } from "../app-shared/runtime/deferred";
 import { isImageFile as ee } from "../app-shared/runtime/file-predicates";
 import { classNames as j, initializeClassNames as pe } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
@@ -66,7 +67,6 @@ import {
   lw as ge,
   my as M,
   n4 as _e,
-  pG as ve,
   qm as ye,
   rS as N,
   wL as be,

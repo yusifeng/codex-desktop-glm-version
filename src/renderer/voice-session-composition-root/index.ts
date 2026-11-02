@@ -22,6 +22,7 @@ const __vite__mapDeps = (
       "@rchunk/voice-dsp-entry",
     ]),
 ) => i.map((i) => d[i]);
+import { createDeferred as be } from "../app-shared/runtime/deferred";
 import { classNames as he, initializeClassNames as ce } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -81,7 +82,6 @@ import {
   n4 as _e,
   o$ as ve,
   o_ as ye,
-  pG as be,
   pZ as B,
   pk as xe,
   q4 as V,

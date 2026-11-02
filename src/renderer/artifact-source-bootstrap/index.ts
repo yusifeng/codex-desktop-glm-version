@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { formatAnnotationMutedColor as x, formatAnnotationRgbColor as C, getAnnotationAccentColor as T } from "../app-primary/runtime/annotation-color-policy";
 import { classNames as c, initializeClassNames as s } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -14,11 +15,8 @@ import { Bt as u, Vt as d, et as f, gt as p, ht as m, tt as h } from "@rchunk/ar
 import { I as g, d as _, g as v, l as y } from "@rchunk/popcorn-icons";
 import {
   Bg as b,
-  Jg as x,
   Ug as S,
-  Yg as C,
   Zg as w,
-  qg as T,
 } from "@rchunk/app-primary";
 import {
   a as E,

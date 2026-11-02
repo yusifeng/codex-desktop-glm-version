@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { resolveCheckoutReturnPath as Ge } from "../app-primary/runtime/checkout-return-path-policy";
+import { createDeferred as re } from "../app-shared/runtime/deferred";
 import { queryOptions as z } from "../app-shared/runtime/query-options";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -42,7 +44,6 @@ import {
   n4 as L,
   ny as R,
   o_ as ne,
-  pG as re,
   q4 as B,
   rL as V,
   ry as H,
@@ -100,7 +101,6 @@ import {
   ypn as We,
 } from "@rchunk/app-initial";
 import {
-  ih as Ge,
   sh as Ke,
 } from "@rchunk/app-primary";
 import { i as qe, n as Je } from "@rchunk/queries";

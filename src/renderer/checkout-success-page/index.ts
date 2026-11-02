@@ -14,6 +14,7 @@ const __vite__mapDeps = (
       "@rchunk/pending-image-download",
     ]),
 ) => i.map((i) => d[i]);
+import { resolveCheckoutReturnPath as $e } from "../app-primary/runtime/checkout-return-path-policy";
 import { EXPECTED_ACCOUNT_ID_HEADER as ie } from "../app-shared/runtime/request-protocol";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -122,7 +123,6 @@ import {
   yun as Qe,
 } from "@rchunk/app-initial";
 import {
-  ih as $e,
   sh as et,
 } from "@rchunk/app-primary";
 import { r as tt, t as nt } from "@rchunk/document-title";

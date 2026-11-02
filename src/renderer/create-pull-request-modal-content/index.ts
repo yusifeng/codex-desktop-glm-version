@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { formatKeyboardShortcut as v } from "../app-shared/runtime/keyboard-shortcut-label";
 import { getPrimaryModifierPressed as s } from "../app-shared/runtime/command-metadata-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -18,7 +19,6 @@ import {
   m_ as h,
   n4 as g,
   o_ as _,
-  xp as v,
 } from "@rchunk/app-shared";
 import {
   M$ as y,

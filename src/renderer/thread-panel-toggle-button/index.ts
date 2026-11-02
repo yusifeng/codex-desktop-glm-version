@@ -205,6 +205,7 @@ const __vite__mapDeps = (
       "@rchunk/thread-tab-entity",
     ]),
 ) => i.map((i) => d[i]);
+import { isSafeLocalUrl as L } from "../app-shared/runtime/local-url-policy";
 import { getPrimaryModifierPressed as V } from "../app-shared/runtime/command-metadata-policy";
 import { formatBrowserUrl as Xi } from "../app-primary/runtime/format-browser-url";
 import { getPathBasename as S } from "../app-shared/runtime/get-path-basename";
@@ -245,7 +246,6 @@ import {
   Nm as P,
   Of as F,
   P3 as I,
-  PK as L,
   Pi as R,
   Q3 as z,
   QI as B,

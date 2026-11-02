@@ -126,6 +126,7 @@ const __vite__mapDeps = (
       "./image-preview-16f4d2bd26ed.css",
     ]),
 ) => i.map((i) => d[i]);
+import { hasConnectorLink as Ds } from "../app-primary/runtime/connector-link-policy";
 import { isLibraryFileId as it } from "../app-shared/runtime/file-predicates";
 import { lookupConnectorId as js } from "../app-primary/runtime/lookup-connector-id";
 import { stableJsonStringify as o } from "../app-shared/runtime/stable-json-stringify";
@@ -575,7 +576,6 @@ import {
   ao as ws,
   dc as Ts,
   do as Es,
-  im as Ds,
   io as Os,
   ks,
   nm as As,

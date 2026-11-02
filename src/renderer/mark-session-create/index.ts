@@ -10,6 +10,7 @@ const __vite__mapDeps = (
       "./app-shared-fa570b9eb9dd.css",
     ]),
 ) => i.map((i) => d[i]);
+import { createDeferred as m } from "../app-shared/runtime/deferred";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   FX as t,
@@ -25,7 +26,6 @@ import {
   dZ as d,
   g4 as f,
   lZ as p,
-  pG as m,
   pZ as h,
   q4 as g,
   rZ as _,

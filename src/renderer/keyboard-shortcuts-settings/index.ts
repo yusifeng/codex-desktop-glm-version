@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { formatKeyboardShortcut as he } from "../app-shared/runtime/keyboard-shortcut-label";
 import { isCommandShortcutConfigurable as E } from "../app-shared/runtime/command-metadata-policy";
 import { allowsBareOsGlobalModifiers as _ } from "../app-shared/runtime/command-metadata-policy";
 import { isOsGlobalShortcut as l } from "../app-shared/runtime/shortcut-scope-policy";
@@ -55,7 +56,6 @@ import {
   sy as fe,
   uz as pe,
   wL as me,
-  xp as he,
   zh as ge,
 } from "@rchunk/app-shared";
 import {

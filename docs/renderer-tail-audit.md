@@ -1,5 +1,20 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Checkout/editor/runtime utility convergence：一次迁移 10 个公开压缩 alias、40 个
+renderer 调用绑定和 32 个调用文件。app-primary 范围包括 current/legacy checkout return-path
+校验与传播、五类 connector link/active-auth 判定、四个编辑器共用的严格 Cmd/Ctrl+S 事件边界，
+以及 artifact/workbook 共用的 CSS accent/rgb/muted color parser；app-shared 范围包括十个异步
+协调 owner 共用的 deferred factory、Browser local HTTP/file URL 安全判定，以及九个界面共用的
+Mac/Linux/Windows shortcut label formatter。保存快捷键契约按发布 `EK/Hsa` 继续复核后要求
+Ctrl/Meta/Alt/Shift 全部精确匹配，避免在 Mac 的 Ctrl+Cmd+S 上误触发。新增专项覆盖 45 条
+断言，test-index 增至 1,923；app-shared 直接 hub 消费由 1,820 降至 1,817，app-primary
+由 729 降至 722，三 hub 保持 0 unreviewed、0 invalid consumers，迁移检查为 0 遗漏绑定。
+全量 `npm run check` 通过 12,464 transform、11 main roots、1,916 renderer chunks 和 33 个
+preserved vendor/generated route sources；真实登录态 `npm run e2e:critical` 覆盖 settings、Git、
+worktrees、Browser/IAB、conversation history/add-context，并发送
+`E2E_REPLY_20261102084213` 后收到 assistant 同 marker。本批是聚合 Hub 真实依赖削减，不把
+仍保留的生成/vendor surface 或单轮关键矩阵通过解释为全项目完成。
+
 2026-11-02 Navigation/submission/file-policy convergence：以一个合并批次恢复 22 个公开
 压缩契约，并将其中仍有直接 renderer 调用的 15 个 alias、32 个绑定迁到 checked-in
 TypeScript owner。app-shared 范围包括 Chrome Extension Store URL、hotkey remote、computer

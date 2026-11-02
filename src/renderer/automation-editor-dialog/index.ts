@@ -14,6 +14,7 @@ const __vite__mapDeps = (
       "@rchunk/chatgpt-tasks-runtime",
     ]),
 ) => i.map((i) => d[i]);
+import { handleCmdOrCtrlSave as Jt } from "../app-primary/runtime/save-shortcut-policy";
 import { initializeMountedState as je, useIsMounted as fe } from "../app-shared/runtime/mounted-state";
 import { classNames as be, initializeClassNames as K } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -168,7 +169,6 @@ import {
 } from "@rchunk/app-initial";
 import {
   nc as qt,
-  tc as Jt,
 } from "@rchunk/app-primary";
 import { n as Yt, r as Xt } from "@rchunk/appgen-automations-state";
 import { a as Zt, i as Qt } from "@rchunk/automation-frequency-section";

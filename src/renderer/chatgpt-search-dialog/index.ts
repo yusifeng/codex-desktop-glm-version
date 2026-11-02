@@ -102,6 +102,7 @@ const __vite__mapDeps = (
       "@rchunk/cloud-file-preview",
     ]),
 ) => i.map((i) => d[i]);
+import { hasConnectorLink as wn } from "../app-primary/runtime/connector-link-policy";
 import { isImageFile as w } from "../app-shared/runtime/file-predicates";
 import { classNames as F, initializeClassNames as be } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
@@ -282,7 +283,6 @@ import {
 import {
   am as Sn,
   ao as Cn,
-  im as wn,
   ro as Tn,
 } from "@rchunk/app-primary";
 import { n as En, t as Dn } from "@rchunk/security-tabs";

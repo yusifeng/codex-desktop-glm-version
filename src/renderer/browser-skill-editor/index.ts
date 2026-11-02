@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { handleCmdOrCtrlSave as Oe } from "../app-primary/runtime/save-shortcut-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -74,7 +75,11 @@ import {
   ypn as Ce,
   zh as we,
 } from "@rchunk/app-initial";
-import { nc as Te, on as Ee, sn as De, tc as Oe } from "@rchunk/app-primary";
+import {
+  nc as Te,
+  on as Ee,
+  sn as De,
+} from "@rchunk/app-primary";
 import { n as ke, t as Ae } from "@rchunk/chatgpt-code-block-editor";
 import { n as je, t as Me } from "@rchunk/pending-edits-dialog";
 import {

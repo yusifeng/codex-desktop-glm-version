@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { formatKeyboardShortcut as re } from "../app-shared/runtime/keyboard-shortcut-label";
 import { getPrimaryModifierPressed as te } from "../app-shared/runtime/command-metadata-policy";
 import { hasItems as ee } from "../app-shared/runtime/non-empty-collection";
 import { hasQueuedDesignChange as n } from "../app-shared/runtime/has-queued-design-change";
@@ -18,7 +19,6 @@ import {
   n4 as ne,
   wL as m,
   xm as h,
-  xp as re,
 } from "@rchunk/app-shared";
 import {
   a as g,

@@ -12,6 +12,7 @@ const __vite__mapDeps = (
       "./app-initial-e8ceb32eb626.css",
     ]),
 ) => i.map((i) => d[i]);
+import { formatKeyboardShortcut as ke } from "../app-shared/runtime/keyboard-shortcut-label";
 import { createCommandQueryKey as Pe } from "../app-initial/runtime/create-command-query-key";
 import { isCapabilitySupported as Qt } from "../app-primary/runtime/is-capability-supported";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -90,7 +91,6 @@ import {
   wL as Ee,
   wO as De,
   xD as Oe,
-  xp as ke,
   zX as Ae,
   zh as je,
 } from "@rchunk/app-shared";

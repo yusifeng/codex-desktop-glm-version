@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { applyCheckoutReturnPath as N, resolveCheckoutReturnPath as P } from "../app-primary/runtime/checkout-return-path-policy";
 import { queryOptions as _ } from "../app-shared/runtime/query-options";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -37,8 +38,6 @@ import {
   wT as M,
 } from "@rchunk/app-initial";
 import {
-  ch as N,
-  ih as P,
   sh as F,
 } from "@rchunk/app-primary";
 import {

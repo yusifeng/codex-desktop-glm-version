@@ -306,11 +306,11 @@
     "hub": "app-primary",
     "alias": "qg",
     "sourceSymbol": "bE",
-    "startLine": 3376,
-    "endLine": 3380,
-    "classification": "generated-local-theme-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The helper resolves the accent text color from an element's computed style with a stable blue fallback. It is only part of the generated annotation/theme styling pipeline and has no named renderer consumer or independent lifecycle boundary."
+    "startLine": 3389,
+    "endLine": 3394,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/annotation-color-policy.ts",
+    "evidence": "The accent CSS-variable projection has a stable blue fallback and is now shared directly by the artifact and workbook owners instead of app-primary qg."
   },
   {
     "hub": "app-primary",
@@ -335,21 +335,22 @@
   {
     "hub": "app-primary",
     "alias": "Yg",
-    "startLine": 3435,
-    "endLine": 3437,
-    "classification": "generated-local-color-formatter",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The formatter converts parseable color values to an rgb string and otherwise preserves the original token. It is consumed only by the adjacent generated annotation styling pipeline and has no standalone renderer contract."
+    "sourceSymbol": "$Oe",
+    "startLine": 3448,
+    "endLine": 3451,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/annotation-color-policy.ts",
+    "evidence": "The CSS color-to-rgb formatter now has a typed parser owner and direct artifact/workbook consumers instead of app-primary Yg."
   },
   {
     "hub": "app-primary",
     "alias": "Jg",
     "sourceSymbol": "eke",
-    "startLine": 3439,
-    "endLine": 3441,
-    "classification": "generated-local-color-formatter",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The formatter converts parseable color values to a translucent rgba token with a generated fallback. Its alpha policy is coupled to the local annotation styling pipeline and is not independently consumed by renderer code."
+    "startLine": 3452,
+    "endLine": 3455,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/annotation-color-policy.ts",
+    "evidence": "The muted annotation color formatter preserves the release alpha and fallback and is directly consumed instead of app-primary Jg."
   },
   {
     "hub": "app-primary",
@@ -5035,7 +5036,7 @@
   ,{ "hub": "app-shared", "alias": "pD", "sourceSymbol": "z1", "startLine": 80233, "endLine": 80241, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated shared runtime/module surface is coupled to renderer lifecycle." }
   ,{ "hub": "app-shared", "alias": "pE", "sourceSymbol": "L0", "startLine": 82444, "endLine": 82452, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated shared runtime/module surface is coupled to renderer lifecycle." }
   ,{ "hub": "app-shared", "alias": "pF", "sourceSymbol": "GQ", "startLine": 26395, "endLine": 26403, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated shared runtime/module surface is coupled to renderer lifecycle." }
-  ,{ "hub": "app-shared", "alias": "pG", "sourceSymbol": "BB", "startLine": 63765, "endLine": 63773, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated shared runtime/module surface is coupled to renderer lifecycle." }
+  ,{ "hub": "app-shared", "alias": "pG", "sourceSymbol": "BB", "startLine": 63765, "endLine": 63775, "classification": "semantic-business-logic", "module": "src/renderer/app-shared/runtime/deferred.ts", "evidence": "The deferred promise factory is a generic coordination primitive now consumed directly by ten renderer owners instead of app-shared pG." }
   ,{ "hub": "app-shared", "alias": "pH", "sourceSymbol": "cH", "startLine": 66010, "endLine": 66018, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated shared runtime/module surface is coupled to renderer lifecycle." }
   ,{ "hub": "app-shared", "alias": "pI", "sourceSymbol": "FYe", "startLine": 73069, "endLine": 73077, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated shared runtime/module surface is coupled to renderer lifecycle." }
   ,{ "hub": "app-shared", "alias": "pJ", "sourceSymbol": "lFe", "startLine": 61589, "endLine": 61597, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated shared runtime/module surface is coupled to renderer lifecycle." }
@@ -5499,7 +5500,7 @@
   ,{ "hub": "app-shared", "alias": "xm", "sourceSymbol": "Slt", "startLine": 100821, "endLine": 100829, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated shared runtime/module surface is coupled to renderer lifecycle." }
   ,{ "hub": "app-shared", "alias": "xn", "sourceSymbol": "gEt", "startLine": 120569, "endLine": 120577, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated shared runtime/module surface is coupled to renderer lifecycle." }
   ,{ "hub": "app-shared", "alias": "xo", "sourceSymbol": "uSt", "startLine": 117063, "endLine": 117071, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated shared runtime/module surface is coupled to renderer lifecycle." }
-  ,{ "hub": "app-shared", "alias": "xp", "sourceSymbol": "Iut", "startLine": 103230, "endLine": 103238, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated shared runtime/module surface is coupled to renderer lifecycle." }
+  ,{ "hub": "app-shared", "alias": "xp", "sourceSymbol": "Iut", "startLine": 103230, "endLine": 103234, "classification": "semantic-business-logic", "module": "src/renderer/app-shared/runtime/keyboard-shortcut-label.ts", "evidence": "Cross-platform shortcut label formatting, modifier ordering and special key labels now have a typed owner consumed directly instead of app-shared xp." }
   ,{ "hub": "app-shared", "alias": "xq", "sourceSymbol": "GFe", "startLine": 61962, "endLine": 61970, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated shared runtime/module surface is coupled to renderer lifecycle." }
   ,{ "hub": "app-shared", "alias": "xr", "sourceSymbol": "hTt", "startLine": 119755, "endLine": 119763, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated shared runtime/module surface is coupled to renderer lifecycle." }
   ,{ "hub": "app-shared", "alias": "xs", "sourceSymbol": "txt", "startLine": 115804, "endLine": 115812, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated shared runtime/module surface is coupled to renderer lifecycle." }
@@ -13413,7 +13414,7 @@
   ,{ "hub": "app-primary", "alias": "ca", "sourceSymbol": "V$", "startLine": 35, "endLine": 43, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-primary", "alias": "cc", "sourceSymbol": "BG", "startLine": 35506, "endLine": 35514, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-primary", "alias": "cd", "sourceSymbol": "EL", "startLine": 18027, "endLine": 18035, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
-  ,{ "hub": "app-primary", "alias": "ch", "sourceSymbol": "Jke", "startLine": 5503, "endLine": 5511, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
+  ,{ "hub": "app-primary", "alias": "ch", "sourceSymbol": "Jke", "startLine": 5516, "endLine": 5519, "classification": "semantic-business-logic", "module": "src/renderer/app-primary/runtime/checkout-return-path-policy.ts", "evidence": "Validated checkout return-path propagation is a deterministic URLSearchParams contract now consumed directly instead of app-primary ch." }
   ,{ "hub": "app-primary", "alias": "ci", "sourceSymbol": "t2", "startLine": 78796, "endLine": 78804, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-primary", "alias": "cm", "sourceSymbol": "hj", "startLine": 9205, "endLine": 9213, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-primary", "alias": "cn", "sourceSymbol": "D8", "startLine": 99741, "endLine": 99749, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
@@ -13482,10 +13483,10 @@
   ,{ "hub": "app-primary", "alias": "ia", "sourceSymbol": "W$", "startLine": 35, "endLine": 43, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-primary", "alias": "ic", "sourceSymbol": "nK", "startLine": 1, "endLine": 9, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-primary", "alias": "id", "sourceSymbol": "LL", "startLine": 18155, "endLine": 18163, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
-  ,{ "hub": "app-primary", "alias": "ih", "sourceSymbol": "kk", "startLine": 5496, "endLine": 5504, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
+  ,{ "hub": "app-primary", "alias": "ih", "sourceSymbol": "kk", "startLine": 5509, "endLine": 5515, "classification": "semantic-business-logic", "module": "src/renderer/app-primary/runtime/checkout-return-path-policy.ts", "evidence": "Current and legacy checkout return-path resolution now has a typed same-origin/path validation owner and direct consumers instead of app-primary ih." }
   ,{ "hub": "app-primary", "alias": "ii", "sourceSymbol": "i2", "startLine": 1, "endLine": 9, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-primary", "alias": "il", "sourceSymbol": "zU", "startLine": 29151, "endLine": 29159, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
-  ,{ "hub": "app-primary", "alias": "im", "sourceSymbol": "Aj", "startLine": 10268, "endLine": 10276, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
+  ,{ "hub": "app-primary", "alias": "im", "sourceSymbol": "Aj", "startLine": 10281, "endLine": 10283, "classification": "semantic-business-logic", "module": "src/renderer/app-primary/runtime/connector-link-policy.ts", "evidence": "Connector-link presence and active-auth matching now have a typed canonical connector-id owner consumed directly instead of app-primary im." }
   ,{ "hub": "app-primary", "alias": "in", "sourceSymbol": "Sut", "startLine": 99935, "endLine": 99943, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-primary", "alias": "io", "sourceSymbol": "fX", "startLine": 48084, "endLine": 48092, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-primary", "alias": "ip", "sourceSymbol": "TN", "startLine": 12175, "endLine": 12183, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
@@ -13616,7 +13617,7 @@
   ,{ "hub": "app-primary", "alias": "st", "sourceSymbol": "egt", "startLine": 112862, "endLine": 112870, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-primary", "alias": "su", "sourceSymbol": "gPe", "startLine": 22430, "endLine": 22438, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-primary", "alias": "ta", "sourceSymbol": "e1", "startLine": 68379, "endLine": 68387, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
-  ,{ "hub": "app-primary", "alias": "tc", "sourceSymbol": "FWe", "startLine": 36146, "endLine": 36154, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
+  ,{ "hub": "app-primary", "alias": "tc", "sourceSymbol": "FWe", "startLine": 36159, "endLine": 36165, "classification": "semantic-business-logic", "module": "src/renderer/app-primary/runtime/save-shortcut-policy.ts", "evidence": "The scoped Cmd/Ctrl+S handler has an exact event ownership/repeat contract now shared by four editors instead of app-primary tc." }
   ,{ "hub": "app-primary", "alias": "tf", "sourceSymbol": "cI", "startLine": 17004, "endLine": 17012, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-primary", "alias": "th", "sourceSymbol": "eA", "startLine": 5705, "endLine": 5713, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
   ,{ "hub": "app-primary", "alias": "ti", "sourceSymbol": "n2", "startLine": 78883, "endLine": 78891, "classification": "preserved-coupled", "module": "src/webview/assets/app-primary-d66705000d76.ts", "evidence": "Generated primary renderer surface is coupled to shared renderer lifecycle." }
@@ -13723,7 +13724,7 @@
   ,{ "hub": "app-shared", "alias": "Of", "sourceSymbol": "Kft", "startLine": 106965, "endLine": 106973, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated renderer hub export is coupled to generated runtime/lifecycle surface and has no standalone semantic owner." }
   ,{ "hub": "app-shared", "alias": "Oh", "sourceSymbol": "Zot", "startLine": 98319, "endLine": 98327, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated renderer hub export is coupled to generated runtime/lifecycle surface and has no standalone semantic owner." }
   ,{ "hub": "app-shared", "alias": "Ot", "sourceSymbol": "lDt", "startLine": 121375, "endLine": 121383, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated renderer hub export is coupled to generated runtime/lifecycle surface and has no standalone semantic owner." }
-  ,{ "hub": "app-shared", "alias": "PK", "sourceSymbol": "TIe", "startLine": 62293, "endLine": 62301, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated renderer hub export is coupled to generated runtime/lifecycle surface and has no standalone semantic owner." }
+  ,{ "hub": "app-shared", "alias": "PK", "sourceSymbol": "TIe", "startLine": 62293, "endLine": 62302, "classification": "semantic-business-logic", "module": "src/renderer/app-shared/runtime/local-url-policy.ts", "evidence": "Local HTTP(S) and safe file URL recognition is a deterministic Browser target policy now consumed directly instead of app-shared PK." }
   ,{ "hub": "app-shared", "alias": "Pu", "sourceSymbol": "r_t", "startLine": 112527, "endLine": 112535, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated renderer hub export is coupled to generated runtime/lifecycle surface and has no standalone semantic owner." }
   ,{ "hub": "app-shared", "alias": "QX", "sourceSymbol": "Vje", "startLine": 59471, "endLine": 59479, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated renderer hub export is coupled to generated runtime/lifecycle surface and has no standalone semantic owner." }
   ,{ "hub": "app-shared", "alias": "Qc", "sourceSymbol": "Cyt", "startLine": 114660, "endLine": 114668, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "Generated renderer hub export is coupled to generated runtime/lifecycle surface and has no standalone semantic owner." }

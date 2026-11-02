@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { handleCmdOrCtrlSave as be } from "../app-primary/runtime/save-shortcut-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -48,7 +49,6 @@ import {
   ni as x,
   oi as S,
   ri as C,
-  tc as be,
   ti as xe,
 } from "@rchunk/app-primary";
 function Se(e) {

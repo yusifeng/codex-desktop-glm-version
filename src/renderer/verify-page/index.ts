@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { applyCheckoutReturnPath as oe, resolveCheckoutReturnPath as v } from "../app-primary/runtime/checkout-return-path-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -27,7 +28,9 @@ import {
   v0 as g,
   vT as _,
 } from "@rchunk/app-initial";
-import { ch as oe, ih as v, sh as y } from "@rchunk/app-primary";
+import {
+  sh as y,
+} from "@rchunk/app-primary";
 import {
   A as se,
   S as b,
