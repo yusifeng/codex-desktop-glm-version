@@ -850,15 +850,46 @@ if (mode === "smoke-readonly") {
       allowHorizontalOverflow: true,
     });
     if (alternateMode === 'ChatGPT') {
-      await clickText('工作');
-      await new Promise((resolve) => setTimeout(resolve, 750));
-      await assertVisualPage('app/chatgpt-work-tab', {
-        text: ['工作', '我们要做什么？', '选择项目', '插件'],
-        minimumInteractive: 8,
-        allowHorizontalOverflow: true,
-      });
-      await clickText('聊天');
-      await new Promise((resolve) => setTimeout(resolve, 500));
+      const originalChatGptHomeTab = await evaluate(`(() =>
+        [...document.querySelectorAll('button[aria-pressed]')]
+          .find((button) => button.getAttribute('aria-pressed') === 'true' && ['聊天', '工作'].includes(button.innerText?.trim()))
+          ?.innerText?.trim() ?? null
+      )()`);
+      const selectChatGptHomeTab = async (label) => {
+        await evaluate(`(() => {
+          const target = [...document.querySelectorAll('button[aria-pressed]')]
+            .find((button) => button.innerText?.trim() === ${JSON.stringify(label)});
+          if (target == null) throw new Error(${JSON.stringify('ChatGPT home tab not found: ')} + ${JSON.stringify(label)});
+          target.click();
+        })()`);
+        const deadline = Date.now() + 15_000;
+        do {
+          const selected = await evaluate(`(() =>
+            [...document.querySelectorAll('button[aria-pressed]')]
+              .find((button) => button.innerText?.trim() === ${JSON.stringify(label)})
+              ?.getAttribute('aria-pressed') === 'true'
+          )()`);
+          if (selected) return;
+          if (Date.now() >= deadline) throw new Error(`Timed out selecting ChatGPT home tab: ${label}`);
+          await new Promise((resolve) => setTimeout(resolve, 100));
+        } while (true);
+      };
+      try {
+        await selectChatGptHomeTab('聊天');
+        await assertVisualPage('app/chatgpt-chat-tab', {
+          text: ['聊天', '新对话'],
+          minimumInteractive: 8,
+          allowHorizontalOverflow: true,
+        });
+        await selectChatGptHomeTab('工作');
+        await assertVisualPage('app/chatgpt-work-tab', {
+          text: ['工作', '我们要做什么？', '选择项目', '插件'],
+          minimumInteractive: 8,
+          allowHorizontalOverflow: true,
+        });
+      } finally {
+        if (originalChatGptHomeTab != null) await selectChatGptHomeTab(originalChatGptHomeTab);
+      }
     }
   } finally {
     const active = await evaluate(`document.querySelector(${JSON.stringify(modeSelector)})?.getAttribute('aria-label') ?? ''`);
@@ -1287,6 +1318,77 @@ if (mode === "smoke-readonly") {
     await waitUntil("general settings after route regression", () => evaluate(`
       document.querySelector('[aria-label="纯文本编辑器"]') != null
     `));
+
+    await clickText("个性化");
+    await waitUntil("Codex instructions editor", () => evaluate(`
+      document.querySelector('textarea#personal-agents-editor:not([disabled])') != null
+    `));
+    const originalCodexInstructions = await evaluate(`document.querySelector('textarea#personal-agents-editor')?.value ?? null`);
+    if (originalCodexInstructions == null) throw new Error('Codex instructions value is unavailable');
+    const codexInstructionsProbe = `${originalCodexInstructions}${originalCodexInstructions ? '\n' : ''}[temporary e2e personalization probe]`;
+    const setCodexInstructions = (value) => evaluate(`(() => {
+      const textarea = document.querySelector('textarea#personal-agents-editor');
+      if (!(textarea instanceof HTMLTextAreaElement)) throw new Error('Codex instructions editor not found');
+      Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype, 'value').set.call(textarea, ${JSON.stringify(value)});
+      textarea.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: null }));
+      return textarea.value;
+    })()`);
+    const findCodexInstructionsSave = () => evaluate(`(() => {
+      const textarea = document.querySelector('textarea#personal-agents-editor');
+      if (textarea == null) return null;
+      for (let ancestor = textarea.parentElement; ancestor != null; ancestor = ancestor.parentElement) {
+        const buttons = [...ancestor.querySelectorAll('button')]
+          .filter((button) => button.innerText?.trim() === '保存');
+        if (buttons.length === 1) return { disabled: buttons[0].disabled };
+      }
+      return null;
+    })()`);
+    const clickCodexInstructionsSave = () => evaluate(`(() => {
+      const textarea = document.querySelector('textarea#personal-agents-editor');
+      if (textarea == null) throw new Error('Codex instructions editor not found');
+      for (let ancestor = textarea.parentElement; ancestor != null; ancestor = ancestor.parentElement) {
+        const buttons = [...ancestor.querySelectorAll('button')]
+          .filter((button) => button.innerText?.trim() === '保存');
+        if (buttons.length === 1) {
+          if (buttons[0].disabled) throw new Error('Codex instructions save is disabled');
+          buttons[0].click();
+          return true;
+        }
+      }
+      throw new Error('Codex instructions save button not found');
+    })()`);
+    try {
+      await setCodexInstructions(codexInstructionsProbe);
+      await waitUntil("Codex instructions save enabled", async () => (await findCodexInstructionsSave())?.disabled === false);
+      await clickCodexInstructionsSave();
+      await waitUntil("Codex instructions probe saved", async () =>
+        (await findCodexInstructionsSave())?.disabled === true &&
+        await evaluate(`document.querySelector('textarea#personal-agents-editor')?.value === ${JSON.stringify(codexInstructionsProbe)}`)
+      );
+      await clickText("外观");
+      await waitUntil("appearance during Codex instructions remount", () => evaluate(`
+        document.querySelector('[aria-label="使用指针光标"]') != null
+      `));
+      await clickText("个性化");
+      await waitUntil("persisted Codex instructions probe", () => evaluate(`
+        document.querySelector('textarea#personal-agents-editor')?.value === ${JSON.stringify(codexInstructionsProbe)}
+      `));
+      deepChecks.push("Codex instructions save persistence across remount");
+    } finally {
+      await waitUntil("Codex instructions editor for restore", () => evaluate(`
+        document.querySelector('textarea#personal-agents-editor:not([disabled])') != null
+      `));
+      if (await evaluate(`document.querySelector('textarea#personal-agents-editor')?.value !== ${JSON.stringify(originalCodexInstructions)}`)) {
+        await setCodexInstructions(originalCodexInstructions);
+        await waitUntil("Codex instructions restore save enabled", async () => (await findCodexInstructionsSave())?.disabled === false);
+        await clickCodexInstructionsSave();
+        await waitUntil("Codex instructions restored", async () =>
+          (await findCodexInstructionsSave())?.disabled === true &&
+          await evaluate(`document.querySelector('textarea#personal-agents-editor')?.value === ${JSON.stringify(originalCodexInstructions)}`)
+        );
+      }
+    }
+    await assertNoInteractionException("restoring Codex instructions");
 
     await clickText("外观");
     await waitUntil("appearance controls", () => evaluate(`
