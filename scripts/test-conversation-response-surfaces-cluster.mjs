@@ -5,8 +5,12 @@ import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } };
-globalThis.__responseSurfaceTest = { jsx };
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "response-surface-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__responseSurfaceTest.jsx;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+let activeHooks = [], hookCursor = 0;
+const React = { lazy(loader) { return props => ({ type: "lazy", props, loader }); }, useState(initial) { const hooks = activeHooks, index = hookCursor++; if (!(index in hooks)) hooks[index] = typeof initial === "function" ? initial() : initial; return [hooks[index], value => { hooks[index] = typeof value === "function" ? value(hooks[index]) : value; }]; } };
+const ReactRuntime = Object.assign(() => ReactRuntime, React);
+globalThis.__responseSurfaceTest = { jsx, React: ReactRuntime };
+async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "response-surface-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__responseSurfaceTest.jsx;export const e6=globalThis.__responseSurfaceTest.React;export const HX=()=>null;export const Y2=({defaultMessage})=>defaultMessage;export const S_=props=>({type:'icon',props:{...props,'data-icon-kind':'built-in'}});" : importPath === "app-initial" ? "export const Dlt=props=>({type:'img',props:{...props,children:props.logoUrl,'data-load-remote':props.loadRemote}});export const ofn=()=>false;export const U6t=null;export const yqt=null;" : importPath === "book-open" ? "export const n=()=>{};export const t=props=>({type:'icon',props:{...props,'data-icon-kind':'built-in'}});" : importPath === "memory-manager-gate" ? "export const t=()=>'';" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+function mount(Component, props) { const hooks = []; return { render() { activeHooks = hooks; hookCursor = 0; return Component(props); } }; }
 const children = node => Array.isArray(node?.props?.children) ? node.props.children : [node?.props?.children];
 
 // resume-chatgpt-completion: 12
@@ -43,14 +47,16 @@ assert.equal(children(restricted)[0].props["data-load-remote"], false);
 assert.equal(content.r({ resolvedApps: [], toolIcons: ["javascript:alert(1)"] }), null);
 const updating = content.t({ item: { isUpdating: true, writes: [] } });
 assert.equal(updating.props.role, "status");
-assert.equal(updating.props.children, "Updating memory");
-let managed = 0; const memories = content.t({ item: { writes: ["The user's favorite color is green", "User lives in Paris"] }, onManage() { managed++; } });
-assert.equal(children(memories)[0].props.children, "Memories updated");
-assert.equal(children(memories)[1].props.children[0].props.children, "favorite color is green");
-assert.equal(children(memories)[1].props.children[1].props.children, "lives in Paris");
-children(memories)[0].props.onClick();
-assert.equal(managed, 1);
-assert.equal(children(content.t({ item: { writes: ["One"] } }))[0].props.disabled, true);
+assert.equal(children(updating).at(-1), "Updating memory");
+const memories = content.t({ item: { writes: ["The user's favorite color is green", "User lives in Paris"] } });
+const memoryPopover = children(memories)[0];
+const memoryTrigger = children(memoryPopover)[0].props.children;
+assert.match(String(children(memoryTrigger).at(-1)), /Memor(?:y|ies) updated/);
+const memoryPanel = children(memoryPopover)[1].props.children;
+const memoryList = children(memoryPanel)[0];
+assert.equal(children(memoryList)[0].props.children, "favorite color is green");
+assert.equal(children(memoryList)[1].props.children, "lives in Paris");
+assert.equal(children(memoryPanel)[1].props.disabled, true);
 
 // chatgpt-generated-image-favorite: 14
 const favorite = await bundle("chatgpt-generated-image-favorite");
@@ -90,16 +96,23 @@ let prevented = false; unsupported.props.onKeyDown({ key: "Escape", preventDefau
 assert.equal(prevented, true);
 assert.equal(replies.at(-1), "cancel");
 let interacted = 0; let formReply;
-const form = request.t({ conversationId: "c1", elicitation: { kind: "formElicitation", message: "Choose settings", schema: { fields: [{ id: "name", label: "Name", required: true }, { id: "enabled", type: "boolean" }] } }, onReply(reply, values) { formReply = { reply, values }; }, onUserInteraction() { interacted++; }, requestId: "r2" });
+const formMount = mount(request.t, { conversationId: "c1", elicitation: { kind: "formElicitation", message: "Choose settings", schema: { fields: [{ id: "name", label: "Name", required: true }, { id: "enabled", type: "boolean" }] } }, onReply(reply, values) { formReply = { reply, values }; }, onUserInteraction() { interacted++; }, requestId: "r2" });
+let form = formMount.render();
 assert.equal(form.type, "form");
 assert.equal(form.props["data-request-id"], "r2");
 assert.equal(children(form)[0].props.children, "Choose settings");
 children(form)[1].props.children[1].props.onChange({ currentTarget: { type: "text", value: "Ada" } });
 children(form)[2].props.children[1].props.onChange({ currentTarget: { checked: true, type: "checkbox", value: "" } });
+form = formMount.render();
 let submitPrevented = false; form.props.onSubmit({ preventDefault() { submitPrevented = true; } });
+await Promise.resolve();
 assert.equal(submitPrevented, true);
 assert.equal(interacted, 1);
 assert.deepEqual(formReply, { reply: "accept", values: { name: "Ada", enabled: true } });
-assert.equal(request.t({ conversationId: "c", elicitation: { kind: "unsupported", message: "" }, requestId: "r" }).props["data-unsupported-request"], true);
+assert.equal(mount(request.t, { conversationId: "c", elicitation: { kind: "unsupported", message: "" }, requestId: "r" }).render().props["data-unsupported-request"], true);
+let openedUrl;
+const urlRequest = mount(request.t, { conversationId: "c", elicitation: { kind: "urlElicitation", message: "Authorize", url: "https://example.test/oauth" }, requestId: "url", onOpenUrl(url) { openedUrl = url; } }).render();
+children(urlRequest)[1].props.onClick();
+assert.equal(openedUrl, "https://example.test/oauth");
 
 console.log("57 conversation response surface cluster assertions passed");

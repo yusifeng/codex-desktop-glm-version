@@ -6,7 +6,7 @@ import * as esbuild from "esbuild";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__gitReviewRemainingTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "git-review-remaining-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__gitReviewRemainingTest.jsx;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "git-review-remaining-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\/pull-request-detail-query$/ }, () => ({ path: path.join(ROOT, "src/renderer/pull-request-detail-query/index.ts") })); build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__gitReviewRemainingTest.jsx;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(child => walk(child, visit)); else walk(children, visit); }
 function find(node, predicate) { let result; walk(node, value => { if (result == null && predicate(value)) result = value; }); return result; }
 function all(node, predicate) { const result = []; walk(node, value => { if (predicate(value)) result.push(value); }); return result; }
@@ -219,11 +219,8 @@ assert.match(text(registrationUi), /Review branch/);
 const pullRequest = await bundle("pull-request-detail-query");
 assert.deepEqual(Object.keys(pullRequest), ["C", "S", "_", "a", "b", "c", "d", "f", "g", "h", "i", "l", "m", "n", "o", "p", "r", "s", "t", "u", "v", "x", "y"]);
 assert.equal(pullRequest.s.key, "pull-request-repository-compatibility");
-assert.equal(pullRequest.u({ hasOpenPr: false }), "closed-pr");
-assert.equal(pullRequest.u({ hasOpenPr: true, conversationId: null }), "missing-conversation");
-assert.equal(pullRequest.u({ hasOpenPr: true, conversationId: "c", baseBranch: null }), "missing-branch-info");
-assert.equal(pullRequest.u({ hasOpenPr: true, conversationId: "c", baseBranch: "main", headBranch: "work", prNumber: null }), "missing-pr-info");
-assert.equal(pullRequest.u({ hasOpenPr: true, conversationId: "c", baseBranch: "main", headBranch: "work", prNumber: 1 }), null);
+assert.match(text(pullRequest.u({ reviewers: [] })), /No reviewers/);
+assert.match(text(pullRequest.u({ provider: "github", reviewers: [{ login: "octocat" }] })), /octocat/);
 const checksUi = pullRequest.S({ checks: [{ name: "Pass", status: "passing" }, { name: "Fail", status: "failing" }] });
 assert.match(text(checksUi), /^Fail/);
 assert.equal(all(checksUi, node => node.type === "li").length, 2);
