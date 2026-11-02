@@ -4,11 +4,11 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MODULES = [
   "latest-turn-preview",
-  "local-conversation-sources-side-panel-tab-core",
   "registered-conversation-thumbnail",
 ];
 const state = (globalThis.__conversationPreviewSourcesTest = {
@@ -560,111 +560,7 @@ assert.equal(closed, 1);
 assert.deepEqual(actionCalls, ["log-credits", "click-credits"]);
 assert.equal(state.lifecycleEvents.at(-1).action, "cta");
 
-// local-conversation-sources-side-panel-tab-core: grouping and all open paths.
-state.sources = {
-  fileSources: [{ id: "file-1", label: "image.png", path: "/tmp/image.png" }],
-  externalSources: [
-    {
-      activities: ["read"],
-      key: "external-1",
-      title: "example.com",
-      url: "https://example.com/page",
-    },
-  ],
-  toolSources: [
-    {
-      activities: [
-        {
-          label: "search",
-          calls: [{ callId: "call-1" }, { callId: "call-2" }],
-        },
-      ],
-      id: "tool-1",
-      mcpAppId: "app-1",
-      name: "  ",
-      pluginDisplayNames: ["Search App"],
-    },
-  ],
-  webMcpCalls: [
-    {
-      kind: "invokeTool",
-      inputJson: '{"q":1}',
-      outputJson: '{"ok":true}',
-      sourceHostname: "example.com",
-      toolName: "lookup",
-    },
-    {
-      kind: "result",
-      outputJson: "raw",
-      sourceHostname: "unclaimed.test",
-      toolName: "other",
-    },
-  ],
-  webSearchSource: {
-    queryCount: 1,
-    queries: ["question"],
-    viewedLinks: [{ label: "Page", url: "https://page.test" }],
-  },
-};
-const sourcePanel = await bundle(
-  "local-conversation-sources-side-panel-tab-core",
-);
-assert.deepEqual(Object.keys(sourcePanel), [
-  "LocalConversationSourcesSidePanelTab",
-]);
-assert.equal(
-  state.initialized.filter((name) => name === "sources-hook").length,
-  1,
-);
-assert.equal(state.initialized.includes("file-preview"), true);
-assert.equal(state.initialized.includes("webmcp-model"), true);
-assert.equal(state.initialized.includes("mcp-content"), true);
-const openedFiles = [];
-const openedImages = [];
-const openedApps = [];
-const panelTree = sourcePanel.LocalConversationSourcesSidePanelTab({
-  conversationId: "conversation-1",
-  hostId: "local",
-  getImagePreviewSrc: () => "preview://image",
-  onOpenFile: (source) => openedFiles.push(source),
-  onOpenImage: (...args) => openedImages.push(args),
-  onOpenMcpApp: (id) => openedApps.push(id),
-});
-assert.equal(panelTree.type, "SourcesSidePanel");
-assert.equal(
-  find(panelTree, (node) => node.type === "SourcesSidePanelList").props.label,
-  "Sources",
-);
-const detailNodes = findAll(panelTree, (node) => node.type === "SourceDetails");
-assert.equal(detailNodes.length, 5);
-assert.equal(detailNodes[0].props.label, "image.png");
-detailNodes[0].props.onOpen();
-assert.equal(openedImages.length, 1);
-assert.equal(openedFiles.length, 0);
-assert.equal(detailNodes[1].props.label, "example.com");
-detailNodes[1].props.onOpen({ type: "click" });
-assert.equal(state.externalOpens[0].href, "https://example.com/page");
-assert.equal(
-  findAll(detailNodes[1], (node) => node.type === "CodeBlock").length,
-  2,
-);
-assert.equal(
-  find(detailNodes[1], (node) => node.type === "CodeBlock").props.content,
-  '{\n  "q": 1\n}',
-);
-assert.equal(detailNodes[2].props.label, "unclaimed.test");
-assert.equal(detailNodes[3].props.label, "Search App");
-detailNodes[3].props.onOpen();
-assert.deepEqual(openedApps, ["app-1"]);
-assert.equal(
-  findAll(detailNodes[3], (node) => node.type === "McpToolItemContent").length,
-  2,
-);
-assert.equal(detailNodes[4].props.label, "Web search");
-const pageButton = find(detailNodes[4], (node) => node.type === "button");
-pageButton.props.onClick({ type: "click" });
-assert.equal(state.externalOpens.at(-1).href, "https://page.test");
-assert.equal(state.externalOpens.at(-1).initiator, "open_in_browser_bridge");
+assertReleaseOwner("local-conversation-sources-side-panel-tab-core");
 
 // registered-conversation-thumbnail: eager registration plus semantic re-export.
 const thumbnail = await bundle("registered-conversation-thumbnail");

@@ -57,19 +57,7 @@ assert.equal(invalidations.at(-1), "delete");
 assert.equal(errors.length, 0);
 assert.equal(calls.filter(call => call[0] === "delete").length, 2);
 
-// version-history: 7
-const history = await bundle("version-history");
-assert.deepEqual(Object.keys(history), ["n", "r", "t"]);
-assert.equal(history.n({ file: { libraryFileId: "f" }, isLoading: true }).props.role, "status");
-assert.equal(history.n({ file: { libraryFileId: "f" }, error: "Offline" }).props.role, "alert");
-let restored, loaded = 0;
-const historyUi = history.n({ file: { libraryFileId: "f" }, versions: [{ id: "v1", label: "Current", is_current: true }, { id: "v0", label: "Earlier" }], hasNextPage: true, onRestore(version) { restored = version.id; }, onLoadMore() { loaded++; } });
-assert.equal(find(historyUi, node => node.props?.children?.[0] === "Current").props.disabled, true);
-find(historyUi, node => node.props?.children?.[0] === "Earlier").props.onClick();
-assert.equal(restored, "v0");
-find(historyUi, node => node.props?.children === "Load more").props.onClick();
-assert.equal(loaded, 1);
-assert.equal(historyUi.props["aria-label"], "Version history");
+assertReleaseOwner("version-history");
 
 // lazy-version-history: 4
 const lazy = await bundle("lazy-version-history");

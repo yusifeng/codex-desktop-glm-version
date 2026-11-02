@@ -1,65 +1,590 @@
-// composer-tip —— Composer 教育 tip 的资格判断、展示事件和 action 执行。
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/ambient-suggestion-apps";
-import "@rchunk/home-beacon";
-import "@rchunk/catalog";
-
-export type ComposerTipAction =
-  | { type: "prefill"; prompt: string }
-  | { type: "prefill-with-skill"; prompt: string; skillName: string }
-  | { type: "prefill-with-plugin"; prompt: string; pluginId: string }
-  | { type: "navigate"; path: string; state?: unknown }
-  | { type: "new-chat" }
-  | { type: "open-notification-settings" }
-  | { type: "start-voice" }
-  | { type: "switch-to-work" };
-
-export interface ComposerTipDefinition {
-  id: string; badgeLabel: unknown; content: unknown; actionLabel: unknown; action: ComposerTipAction;
-  isEligible?(capabilities: Record<string, unknown>): boolean;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  G2 as i,
+  HX as a,
+  I3 as o,
+  K2 as s,
+  LX as c,
+  PG as l,
+  QI as u,
+  Y2 as d,
+  Yh as f,
+  ZI as p,
+  Zh as m,
+  ag as h,
+  e6 as g,
+  eZ as _,
+  ig as v,
+  kG as y,
+  n4 as ee,
+  sZ as b,
+} from "@rchunk/app-shared";
+import {
+  ANt as x,
+  BEt as S,
+  Bfn as C,
+  DNt as w,
+  GEt as te,
+  GWt as T,
+  HEt as E,
+  HZt as D,
+  Het as ne,
+  Iwt as O,
+  Jet as re,
+  K2t as ie,
+  Lwt as ae,
+  M6t as k,
+  N6t as oe,
+  ONt as se,
+  PWt as ce,
+  QCt as le,
+  Qgn as A,
+  Rht as ue,
+  W2t as de,
+  Xet as fe,
+  ZCt as pe,
+  Zet as j,
+  _cn as me,
+  bcn as he,
+  bsn as ge,
+  c2 as _e,
+  c4t as ve,
+  cEt as M,
+  dwt as ye,
+  fNt as be,
+  fit as xe,
+  gNt as Se,
+  hNt as Ce,
+  hwt as we,
+  i4t as N,
+  itt as Te,
+  jNt as P,
+  jVt as Ee,
+  kht as F,
+  lEt as De,
+  lwt as Oe,
+  mNt as ke,
+  mnt as Ae,
+  o_n as je,
+  pit as I,
+  pnt as Me,
+  s2 as Ne,
+  stt as L,
+  uHt as Pe,
+  ugn as Fe,
+  wQt as R,
+  wVt as Ie,
+  xwt as Le,
+  yNt as Re,
+} from "@rchunk/app-initial";
+import { r as z, t as ze } from "@rchunk/ambient-suggestion-apps";
+import { n as Be, t as B } from "@rchunk/home-beacon";
+import { n as Ve, t as He } from "@rchunk/catalog";
+function Ue(e) {
+  let t = (0, V.c)(28),
+    { impressionId: n, onDismiss: r, onPrimaryAction: i, onShown: a, tip: o } = e,
+    s = ee(),
+    c;
+  t[0] === a
+    ? (c = t[1])
+    : ((c = () => {
+        a?.();
+      }),
+      (t[0] = a),
+      (t[1] = c));
+  let l = (0, H.useEffectEvent)(c),
+    u;
+  t[2] === l
+    ? (u = t[3])
+    : ((u = () => {
+        l();
+      }),
+      (t[2] = l),
+      (t[3] = u));
+  let p;
+  (t[4] === n ? (p = t[5]) : ((p = [n]), (t[4] = n), (t[5] = p)), (0, H.useEffect)(u, p));
+  let m;
+  t[6] === o.badgeLabel
+    ? (m = t[7])
+    : ((m = (0, U.jsx)(xe, {
+        className: `shrink-0`,
+        variant: `tip`,
+        children: (0, U.jsx)(d, { ...o.badgeLabel }),
+      })),
+      (t[6] = o.badgeLabel),
+      (t[7] = m));
+  let h;
+  t[8] === o.content
+    ? (h = t[9])
+    : ((h = (0, U.jsx)(`span`, {
+        className: `min-w-0 text-center`,
+        children: (0, U.jsx)(d, { ...o.content }),
+      })),
+      (t[8] = o.content),
+      (t[9] = h));
+  let g;
+  t[10] === o.actionLabel
+    ? (g = t[11])
+    : ((g = (0, U.jsx)(d, { ...o.actionLabel })), (t[10] = o.actionLabel), (t[11] = g));
+  let _;
+  t[12] !== i || t[13] !== g
+    ? ((_ = (0, U.jsx)(f, {
+        className: `underline decoration-dotted underline-offset-4`,
+        color: `ghostMuted`,
+        onClick: i,
+        size: `inline`,
+        children: g,
+      })),
+      (t[12] = i),
+      (t[13] = g),
+      (t[14] = _))
+    : (_ = t[14]);
+  let y;
+  t[15] !== h || t[16] !== _
+    ? ((y = (0, U.jsxs)(`span`, {
+        className: `flex min-w-0 flex-wrap items-center justify-center gap-x-3 gap-y-1 text-sm text-secondary`,
+        children: [h, _],
+      })),
+      (t[15] = h),
+      (t[16] = _),
+      (t[17] = y))
+    : (y = t[17]);
+  let b;
+  t[18] === s ? (b = t[19]) : ((b = s.formatMessage(We.dismiss)), (t[18] = s), (t[19] = b));
+  let x;
+  t[20] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((x = (0, U.jsx)(v, {})), (t[20] = x))
+    : (x = t[20]);
+  let S;
+  t[21] !== r || t[22] !== b
+    ? ((S = (0, U.jsx)(f, {
+        "aria-label": b,
+        className: `pointer-events-none absolute top-1/2 right-0 -translate-y-1/2 opacity-0 group-hover:pointer-events-auto group-hover:opacity-100 focus-visible:pointer-events-auto focus-visible:opacity-100`,
+        color: `secondary`,
+        onClick: r,
+        radius: `large`,
+        size: `iconMd`,
+        children: x,
+      })),
+      (t[21] = r),
+      (t[22] = b),
+      (t[23] = S))
+    : (S = t[23]);
+  let C;
+  return (
+    t[24] !== S || t[25] !== m || t[26] !== y
+      ? ((C = (0, U.jsx)(`aside`, {
+          "aria-live": `polite`,
+          className: `flex w-full justify-center`,
+          role: `status`,
+          children: (0, U.jsxs)(`div`, {
+            className: `group relative flex max-w-full flex-wrap items-center justify-center gap-x-2 gap-y-1 px-7 py-1 select-none`,
+            children: [m, y, S],
+          }),
+        })),
+        (t[24] = S),
+        (t[25] = m),
+        (t[26] = y),
+        (t[27] = C))
+      : (C = t[27]),
+    C
+  );
 }
-
-function useComposerTip(input: {
-  conversationId: string; enabled?: boolean; isWorkMode?: boolean;
-  event?: { beaconId: string; messageId?: string | null; conversationId?: string; dismissVariant?: string } | null;
-  tips?: ComposerTipDefinition[]; capabilities?: Record<string, unknown>;
-  composer?: { appendText(text: string): void; insertTextAtSelection(text: string): void; insertSkillMentionAtSelection(skill: unknown): void; insertMentionAtSelection(plugin: unknown): void; focus(): void } | null;
-  skills?: Array<{ name: string; enabled: boolean }>; plugins?: Array<{ plugin: { id: string }; [key: string]: unknown }>;
-  navigate?(path: string, options?: { state?: unknown }): void; openNotificationSettings?(): void; onStartVoice?(): void;
-  onSwitchToWork?(): void; onShown?(tip: ComposerTipDefinition): void; onDismiss?(tip: ComposerTipDefinition): void; onClick?(tip: ComposerTipDefinition): void;
-}) {
-  if (input.enabled === false || input.event == null) return null;
-  const tip = input.tips?.find((candidate) => candidate.id === input.event!.beaconId);
-  if (tip == null || tip.isEligible?.(input.capabilities ?? {}) === false) return null;
-  if (input.event.dismissVariant !== "persistent" && input.event.messageId == null) return null;
-  const run = () => {
-    const action = tip.action;
-    switch (action.type) {
-      case "prefill": input.composer?.appendText(action.prompt); input.composer?.focus(); break;
-      case "prefill-with-skill": {
-        const skill = input.skills?.find((item) => item.enabled && item.name.toLowerCase() === action.skillName);
-        if (skill != null && input.composer != null) { input.composer.appendText(action.prompt); input.composer.insertTextAtSelection(" "); input.composer.insertSkillMentionAtSelection(skill); input.composer.focus(); }
-        break;
-      }
-      case "prefill-with-plugin": {
-        const plugin = input.plugins?.find((item) => item.plugin.id === action.pluginId);
-        if (plugin != null && input.composer != null) { input.composer.appendText(action.prompt); input.composer.insertTextAtSelection(" "); input.composer.insertMentionAtSelection(plugin); input.composer.focus(); }
-        break;
-      }
-      case "navigate": input.navigate?.(action.path, { state: action.state }); break;
-      case "new-chat": input.navigate?.("/"); break;
-      case "open-notification-settings": input.openNotificationSettings?.(); break;
-      case "start-voice": input.onStartVoice?.(); break;
-      case "switch-to-work": input.onSwitchToWork?.(); input.navigate?.("/"); break;
-    }
-  };
-  return {
-    kind: "composer-tip" as const, impressionId: `${tip.id}:${input.event.conversationId ?? input.conversationId}:${input.event.messageId ?? ""}`,
-    tip, ariaLive: "polite", role: "status", dismissLabel: "Dismiss tip",
-    shown: () => input.onShown?.(tip), dismiss: () => input.onDismiss?.(tip),
-    primaryAction() { input.onClick?.(tip); run(); },
-  };
+var V, H, U, We;
+function W() {
+  return (W = e(() => {
+    ((V = t()),
+      (H = g()),
+      s(),
+      I(),
+      m(),
+      h(),
+      (U = o()),
+      (We = i({
+        dismiss: {
+          id: `composerTips.dismiss`,
+          defaultMessage: `Dismiss tip`,
+          description: `Accessible label for permanently dismissing an educational tip shown above the composer`,
+        },
+      })));
+  }))();
 }
-
-export { useComposerTip };
+function Ge(e) {
+  let t = (0, et.c)(59),
+    { conversationId: r, enabled: i, isWorkMode: o, onStartVoice: s } = e,
+    l = i === void 0 || i,
+    u = c(p),
+    d = (0, tt.useContext)(Ne),
+    f = ee(),
+    m = je(),
+    h = n(Ie, r),
+    g = n(be, h ?? r),
+    _;
+  t[0] === g
+    ? (_ = t[1])
+    : ((_ = g != null && Re(g.beacon) ? g.beacon : null), (t[0] = g), (t[1] = _));
+  let v = _,
+    y;
+  t[2] === g
+    ? (y = t[3])
+    : ((y =
+        g == null
+          ? null
+          : {
+              placement: `in_conversation`,
+              productExperience: g.productExperience,
+              treatment: `banner`,
+            }),
+      (t[2] = g),
+      (t[3] = y));
+  let b = y,
+    x = n(Ee, r),
+    C = a(at),
+    w;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((w = { name: `automations.local` }), (t[4] = w))
+    : (w = t[4]);
+  let T = n(fe, w),
+    E;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((E = { name: `automations.cloud` }), (t[5] = E))
+    : (E = t[5]);
+  let D = n(fe, E),
+    ne = T.isCapable || D.isCapable,
+    { accountId: O, isLoading: ae } = oe(),
+    k = a(Le),
+    A = O == null ? void 0 : Oe(k, O),
+    ue =
+      !ae &&
+      k !== void 0 &&
+      (A == null ||
+        A.dismissed === !0 ||
+        A.expired === !0 ||
+        !A.items.some($e) ||
+        we(A, `enable_notifications`)),
+    { data: de, isLoading: pe } = a(it),
+    j;
+  t[6] === T.isCapable
+    ? (j = t[7])
+    : ((j = { enabled: T.isCapable }), (t[6] = T.isCapable), (t[7] = j));
+  let { data: me, error: ge, isLoading: _e } = a(le, j),
+    M;
+  t[8] === D.isCapable
+    ? (M = t[9])
+    : ((M = { enabled: D.isCapable }), (t[8] = D.isCapable), (t[9] = M));
+  let { data: ye, error: xe, isLoading: Ce } = a(Te, M),
+    N;
+  t[10] === C ? (N = t[11]) : ((N = { hostId: C }), (t[10] = C), (t[11] = N));
+  let { data: F, isLoading: Ae } = n(he, N),
+    I = F?.roots,
+    L;
+  t[12] !== C || t[13] !== I
+    ? ((L = { hostId: C, roots: I }), (t[12] = C), (t[13] = I), (t[14] = L))
+    : (L = t[14]);
+  let { data: Pe, isLoading: Fe } = ve(L),
+    R = F != null,
+    z;
+  t[15] === R ? (z = t[16]) : ((z = { enabled: R }), (t[15] = R), (t[16] = z));
+  let { skills: B, isLoading: Ve } = De(F?.roots, C, z),
+    V;
+  t[17] === C ? (V = t[18]) : ((V = { hostId: C }), (t[17] = C), (t[18] = V));
+  let { data: H, isLoading: U } = te(V),
+    We = H == null ? null : new Set(ze(S(H)).keys()),
+    W = Pe == null ? null : Pe.filter(Qe),
+    Ge = W == null ? null : new Set(W.map(Ze)),
+    ot = W == null ? null : new Set(W.map(Xe)),
+    st = ie(rt),
+    ct = Array.from(st.values()).some(Ye),
+    lt = Array.from(st.values()).some(Je),
+    ut = !ae && k !== void 0 && !pe && !_e && !Ce && !Ae && !Fe && !Ve && !U && !lt,
+    dt = {
+      automationsAvailable: ne,
+      availableSkillNames: new Set(B.filter(qe).map(Ke)),
+      browserExtensionInstalled: lt ? null : ct,
+      connectedAppNames: We,
+      connectedPluginNames: Ge,
+      enabledPluginIds: ot,
+      hasAutomations:
+        _e || Ce || ge != null || xe != null
+          ? null
+          : (me?.items.length ?? 0) > 0 || (ye?.items.length ?? 0) > 0,
+      isWorkMode: o,
+      notificationOnboardingResolved: ue,
+      notificationPermissionStatus: de ?? null,
+      voiceAvailable: s != null,
+    },
+    ft = v == null ? null : He(v.beacon_id),
+    G =
+      l &&
+      ut &&
+      v != null &&
+      ft?.isEligible(dt) === !0 &&
+      (v.ui_info.dismiss_variant === `persistent` ||
+        g?.eventMetadata.messageId == null ||
+        g.eventMetadata.messageId === x)
+        ? ft
+        : null,
+    K = G?.id ?? null,
+    q =
+      K == null || g == null
+        ? null
+        : `${K}:${g.eventMetadata.conversationId}:${g.eventMetadata.messageId}`,
+    pt = (0, tt.useRef)(null),
+    J;
+  t[19] !== O || t[20] !== u || t[21] !== v || t[22] !== b || t[23] !== g || t[24] !== r
+    ? ((J = () => {
+        g != null &&
+          v != null &&
+          b != null &&
+          (Be(u, O ?? r, v, g.eventMetadata) && P(u, { action: `impression`, beacon: v, ...b }),
+          P(u, { action: `composer_tip_presented`, beacon: v, ...b }));
+      }),
+      (t[19] = O),
+      (t[20] = u),
+      (t[21] = v),
+      (t[22] = b),
+      (t[23] = g),
+      (t[24] = r),
+      (t[25] = J))
+    : (J = t[25]);
+  let mt = J,
+    Y;
+  t[26] !== q || t[27] !== mt || t[28] !== K
+    ? ((Y = () => {
+        if (q == null || K == null) {
+          pt.current = null;
+          return;
+        }
+        pt.current !== q && ((pt.current = q), mt());
+      }),
+      (t[26] = q),
+      (t[27] = mt),
+      (t[28] = K),
+      (t[29] = Y))
+    : (Y = t[29]);
+  let ht = Y,
+    X;
+  t[30] !== u ||
+  t[31] !== d ||
+  t[32] !== W ||
+  t[33] !== f ||
+  t[34] !== m ||
+  t[35] !== s ||
+  t[36] !== B
+    ? ((X = function (e) {
+        switch (e.type) {
+          case `prefill`:
+            (d?.appendText(f.formatMessage(e.prompt)), d?.focus());
+            return;
+          case `prefill-with-skill`: {
+            let t = B.find((t) => {
+              let { enabled: n, name: r } = t;
+              return n && r.toLowerCase() === e.skillName;
+            });
+            if (d == null || t == null) return;
+            (d.appendText(f.formatMessage(e.prompt)),
+              d.insertTextAtSelection(` `),
+              d.insertSkillMentionAtSelection(t),
+              d.focus());
+            return;
+          }
+          case `prefill-with-plugin`: {
+            let t = W?.find((t) => {
+              let { plugin: n } = t,
+                { id: r } = n;
+              return r === e.pluginId;
+            });
+            if (d == null || t == null) return;
+            (d.appendText(f.formatMessage(e.prompt)),
+              d.insertTextAtSelection(` `),
+              d.insertMentionAtSelection(ce(t)),
+              d.focus());
+            return;
+          }
+          case `navigate`:
+            m(e.path, { state: e.state });
+            return;
+          case `new-chat`:
+            m(`/`);
+            return;
+          case `open-notification-settings`:
+            Me.systemPermissions?.openNotificationSettings();
+            return;
+          case `start-voice`:
+            s?.();
+            return;
+          case `switch-to-work`:
+            (re(u, `work`), m(`/`));
+            return;
+        }
+      }),
+      (t[30] = u),
+      (t[31] = d),
+      (t[32] = W),
+      (t[33] = f),
+      (t[34] = m),
+      (t[35] = s),
+      (t[36] = B),
+      (t[37] = X))
+    : (X = t[37]);
+  let gt = X;
+  if (G == null || g == null || v == null || b == null) return null;
+  let Z;
+  t[38] !== u || t[39] !== v || t[40] !== b || t[41] !== g || t[42] !== r
+    ? ((Z = () => {
+        (P(u, { action: `dismiss`, beacon: v, ...b }), ke(u, r, g));
+      }),
+      (t[38] = u),
+      (t[39] = v),
+      (t[40] = b),
+      (t[41] = g),
+      (t[42] = r),
+      (t[43] = Z))
+    : (Z = t[43]);
+  let Q;
+  t[44] !== u ||
+  t[45] !== v ||
+  t[46] !== b ||
+  t[47] !== g ||
+  t[48] !== r ||
+  t[49] !== gt ||
+  t[50] !== G.action ||
+  t[51] !== G.id
+    ? ((Q = () => {
+        let e =
+          v.action_items.find((e) => {
+            let { id: t } = e;
+            return t === G.id;
+          }) ?? v.action_items[0];
+        (P(u, {
+          action: `click`,
+          actionId: G.id,
+          actionType: e?.type ?? `primary`,
+          beacon: v,
+          destinationAction: e?.action_v2.action_enum,
+          ...b,
+        }),
+          se({ beacon: v, eventType: `click`, eventCtaId: G.id, metadata: g.eventMetadata }),
+          Se(u, r, g),
+          gt(G.action));
+      }),
+      (t[44] = u),
+      (t[45] = v),
+      (t[46] = b),
+      (t[47] = g),
+      (t[48] = r),
+      (t[49] = gt),
+      (t[50] = G.action),
+      (t[51] = G.id),
+      (t[52] = Q))
+    : (Q = t[52]);
+  let $;
+  return (
+    t[53] !== q || t[54] !== ht || t[55] !== Z || t[56] !== Q || t[57] !== G
+      ? (($ = (0, nt.jsx)(Ue, {
+          impressionId: q,
+          onShown: ht,
+          tip: G,
+          onDismiss: Z,
+          onPrimaryAction: Q,
+        })),
+        (t[53] = q),
+        (t[54] = ht),
+        (t[55] = Z),
+        (t[56] = Q),
+        (t[57] = G),
+        (t[58] = $))
+      : ($ = t[58]),
+    $
+  );
+}
+function Ke(e) {
+  let { name: t } = e;
+  return t.toLowerCase();
+}
+function qe(e) {
+  let { enabled: t } = e;
+  return t;
+}
+function Je(e) {
+  let { isLoading: t } = e;
+  return t;
+}
+function Ye(e) {
+  let { isInstalled: t } = e;
+  return t;
+}
+function Xe(e) {
+  let { plugin: t } = e;
+  return t.id;
+}
+function Ze(e) {
+  let { plugin: t } = e;
+  return t.name;
+}
+function Qe(e) {
+  let { plugin: t } = e;
+  return t.installed && t.enabled;
+}
+function $e(e) {
+  return e.id === `enable_notifications` && ae(e);
+}
+var et, tt, nt, rt, it, at;
+function ot() {
+  return (ot = e(() => {
+    ((et = t()),
+      ge(),
+      r(),
+      (tt = g()),
+      s(),
+      A(),
+      z(),
+      W(),
+      B(),
+      j(),
+      D(),
+      k(),
+      pe(),
+      L(),
+      w(),
+      x(),
+      Ce(),
+      Pe(),
+      Ve(),
+      ne(),
+      T(),
+      _e(),
+      O(),
+      ye(),
+      de(),
+      N(),
+      E(),
+      Ae(),
+      u(),
+      ue(),
+      me(),
+      C(),
+      M(),
+      (nt = o()),
+      (rt = Object.keys(y)
+        .filter(l)
+        .map((e) => ({ browserFamily: e }))),
+      (it = _(p, () => ({
+        enabled: Me.systemPermissions != null,
+        queryKey: [`composer-tips`, `notification-permission-status`],
+        queryFn: async () =>
+          (await Me.systemPermissions?.getNotificationPermissionStatus()) ?? null,
+        refetchOnWindowFocus: `always`,
+        staleTime: 0,
+      }))),
+      (at = b(F, ({ get: e, scope: t }) =>
+        t.value.kind === `local` ? e(R, t.value.conversationId) : Fe,
+      )));
+  }))();
+}
+ot();
+export { Ge as useComposerTip };

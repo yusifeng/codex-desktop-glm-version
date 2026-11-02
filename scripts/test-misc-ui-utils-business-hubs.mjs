@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const assets = path.join(root, "src/webview/assets");
 const preserve = [
@@ -184,6 +185,7 @@ assert.equal(rendered.props.accountId, "pca");
 rendered.props.onDismiss();
 assert.deepEqual(state.lifecycle, ["dismiss"]);
 assertions += 6;
+assertions += assertReleaseOwner("composer-tip");
 console.log(
   `misc-ui-utils business hubs: ${assertions} assertions passed; 1 rewrite, 5 audited preserve`,
 );

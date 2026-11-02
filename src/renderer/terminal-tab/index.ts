@@ -1,258 +1,738 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import "@rchunk/app-primary";
-import "@rchunk/terminal-workspace-warning-state";
-import "@rchunk/shell-label";
-import { TerminalPanel } from "@rchunk/terminal-panel";
-import { getPathBasename } from "../app-shared/runtime/get-path-basename";
-
-const {
-  $3: initializeRuntimeLazy,
-  I3: getJsxRuntime,
-  Y2: FormattedMessage,
-  Yh: Button,
-  e6: getReactRuntime,
-  m4: classNames,
-} = appSharedChunk as typeof appSharedChunk & {
-  Yh: (props: Record<string, unknown>) => unknown;
-};
-const {
-  E6t: usePlatform,
-  Rgn: terminalSessions,
-  ket: EmptyState,
-} = appInitialChunk as typeof appInitialChunk & {
-  E6t: () => { platform: string };
-  Rgn: TerminalTabSessionManager;
-  ket: (props: Record<string, unknown>) => unknown;
-};
-
-interface TerminalBinding {
-  environmentId?: string | null;
-  workspaceRoot?: string | null;
-}
-
-interface ConversationTerminalSnapshot {
-  cwdBySessionId?: Record<string, string>;
-  sessionIds: readonly string[];
-}
-
-interface TerminalTabSessionManager {
-  getConversationSnapshot?(conversationId: string): ConversationTerminalSnapshot | null;
-  getShellCwd?(sessionId: string, workspaceRoot: string): Promise<string | null>;
-  getSnapshot?(sessionId: string): { error?: unknown; shell?: string } | null;
-  getWorkspaceBinding?(sessionId: string): TerminalBinding | null;
-  hasUserInteraction?(sessionId: string): boolean;
-  isSessionAttached?(sessionId: string): boolean;
-  subscribeToConversation?(conversationId: string, listener: () => void): () => void;
-  subscribeToSessionSnapshot?(sessionId: string, listener: () => void): () => void;
-  write(sessionId: string, data: string, source: "user"): void;
-}
-
-export interface TerminalTabProps {
-  conversationId: string;
-  conversationTitle: string;
-  cwd?: string | null;
-  currentWorkspaceRoot?: string | null;
-  environmentId?: string | null;
-  hostId: string;
-  onNewTerminalTab(value?: unknown): void;
-  renderSlots(slots: { content: unknown; headerRows: readonly unknown[] }): unknown;
-  sessionId: string;
-  workspaceRoots?: readonly string[];
-}
-
-let React: import("@rchunk/app-shared").ReactRuntime;
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function useConversationSnapshot(conversationId: string): ConversationTerminalSnapshot | null {
-  return React.useSyncExternalStore(
-    (listener) => terminalSessions.subscribeToConversation?.(conversationId, listener) ?? (() => undefined),
-    () => terminalSessions.getConversationSnapshot?.(conversationId) ?? null,
-    () => null,
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/terminal-panel",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/theme-font-family",
+      "@rchunk/theme-font-face-loader",
+      "@rchunk/xterm-window-zoom",
+      "./xterm-window-zoom-241c9f83d2ce.css",
+      "@rchunk/terminal-panel-bootstrap",
+      "./terminal-panel-e74d48fceaac.css",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  H3 as i,
+  HX as a,
+  I3 as o,
+  II as s,
+  IK as c,
+  Jm as l,
+  K2 as u,
+  LX as d,
+  QI as f,
+  RI as p,
+  V3 as m,
+  Y2 as h,
+  Yh as g,
+  ZI as _,
+  Zh as v,
+  __ as y,
+  c_ as b,
+  e6 as x,
+  g_ as S,
+  h4 as C,
+  iZ as w,
+  m4 as T,
+  n4 as E,
+  o_ as D,
+  qm as O,
+  wL as k,
+} from "@rchunk/app-shared";
+import {
+  $en as A,
+  Aet as j,
+  Cyt as M,
+  Dyt as ee,
+  E6t as te,
+  Ftn as ne,
+  Lgn as N,
+  Rgn as P,
+  Syt as re,
+  T6t as ie,
+  _cn as ae,
+  byt as oe,
+  ddt as se,
+  fcn as ce,
+  itn as le,
+  ket as F,
+  n7 as ue,
+  pdt as de,
+  r7 as fe,
+  wtn as pe,
+} from "@rchunk/app-initial";
+import { Jp as me, Yp as he } from "@rchunk/app-primary";
+import { n as ge, r as I, t as _e } from "@rchunk/terminal-workspace-warning-state";
+import { n as ve, t as ye } from "@rchunk/shell-label";
+function L(e) {
+  let t = (0, R.c)(4),
+    n;
+  t[0] === e
+    ? (n = t[1])
+    : ((n = (t) => P.subscribeToSessionSnapshot(e, t)), (t[0] = e), (t[1] = n));
+  let r;
+  return (
+    t[2] === e ? (r = t[3]) : ((r = () => P.getWorkspaceBinding(e)), (t[2] = e), (t[3] = r)),
+    (0, z.useSyncExternalStore)(n, r, be)
   );
 }
-
-function useWorkspaceBinding(sessionId: string): TerminalBinding | null {
-  return React.useSyncExternalStore(
-    (listener) => terminalSessions.subscribeToSessionSnapshot?.(sessionId, listener) ?? (() => undefined),
-    () => terminalSessions.getWorkspaceBinding?.(sessionId) ?? null,
-    () => null,
+function be() {
+  return null;
+}
+function xe(e) {
+  let t = (0, R.c)(4),
+    { conversationId: n } = e,
+    r;
+  t[0] === n
+    ? (r = t[1])
+    : ((r = (e) => (n == null ? Ce : P.subscribeToConversation(n, e))), (t[0] = n), (t[1] = r));
+  let i;
+  return (
+    t[2] === n
+      ? (i = t[3])
+      : ((i = () => (n == null ? null : P.getConversationSnapshot(n))), (t[2] = n), (t[3] = i)),
+    (0, z.useSyncExternalStore)(r, i, Se)
   );
 }
-
-function commandForWorkspace(shell: string, workspaceRoot: string): string | null {
-  const normalizedShell = shell.toLowerCase();
-  if (normalizedShell.includes("powershell")) {
-    return "Set-Location -LiteralPath '" + workspaceRoot.replaceAll("'", "''") + "'\r";
-  }
-  if (normalizedShell === "cmd" || normalizedShell.includes("command prompt")) {
-    return /[%!]/.test(workspaceRoot) ? null : "cd /d \"" + workspaceRoot + "\"\r";
-  }
-  return "cd -- '" + workspaceRoot.replaceAll("'", "'\\''") + "'\r";
+function Se() {
+  return null;
 }
-
-function WorkspaceRootHint({
-  currentWorkspaceRoot,
-  onSelectWorkspaceRoot,
-  sessionId,
-  workspaceRoots,
-}: {
-  currentWorkspaceRoot?: string | null;
-  onSelectWorkspaceRoot(root: string): void;
-  sessionId: string;
-  workspaceRoots: readonly string[];
-}): unknown {
-  const { platform } = usePlatform();
-  if (workspaceRoots.length < 2 || terminalSessions.hasUserInteraction?.(sessionId)) return null;
-  return jsx.jsxs("div", {
-    role: "group",
-    "aria-label": "Terminal source directories",
-    className: "flex w-fit max-w-full flex-col gap-3 text-sm leading-5 text-secondary select-none",
-    children: [
-      jsx.jsx(FormattedMessage, {
-        id: "codex.terminal.workspaceRootPromptHint.title",
-        defaultMessage: "Source directories",
-      }),
-      jsx.jsx("div", {
-        className: "flex flex-col gap-1",
-        children: workspaceRoots.map((root, index) => jsx.jsxs("button", {
-          type: "button",
-          "aria-current": root === currentWorkspaceRoot ? "location" : undefined,
-          className: classNames("flex max-w-full gap-3 bg-transparent", root === currentWorkspaceRoot ? "underline" : "hover:underline"),
-          onClick: () => onSelectWorkspaceRoot(root),
-          children: [
-            jsx.jsx("span", { className: "w-4 text-end tabular-nums", children: index + 1 }),
-            jsx.jsx("span", { className: "truncate", children: getPathBasename(root) || root }),
-          ],
-        }, root)),
-      }),
-      jsx.jsx(FormattedMessage, {
-        id: platform === "macOS"
-          ? "codex.terminal.workspaceRootPromptHint.instructions.macOS"
-          : "codex.terminal.workspaceRootPromptHint.instructions.otherPlatforms",
-        defaultMessage: platform === "macOS"
-          ? "Press ⌥ Opt + Number to change directory"
-          : "Press Alt + Number to change directory",
-      }),
-    ],
-  });
+function Ce() {}
+var R, z;
+function B() {
+  return (B = e(() => {
+    ((R = t()), (z = x()), N());
+  }))();
 }
-
-function CloudTerminal(props: TerminalTabProps): unknown {
-  const binding = useWorkspaceBinding(props.sessionId);
-  const snapshot = terminalSessions.getSnapshot?.(props.sessionId);
-  if (snapshot?.error != null) {
-    return jsx.jsx(EmptyState, {
-      title: jsx.jsx(FormattedMessage, {
-        id: "cloudTerminal.startFailed",
-        defaultMessage: "Couldn’t open the terminal",
-      }),
-      description: String(snapshot.error),
-      actions: jsx.jsx(Button, {
-        color: "secondary",
-        onClick: () => props.onNewTerminalTab(),
-        children: jsx.jsx(FormattedMessage, {
-          id: "cloudTerminal.openNew",
-          defaultMessage: "New terminal",
+function we(e) {
+  let t = (0, H.c)(24),
+    r = d(A),
+    i = L(e.sessionId),
+    o = a(M),
+    s = o?.hostId === e.hostId ? o.environmentId : null,
+    c = e.cwd;
+  i ?? (c = o?.hostId === e.hostId ? o.cwd : null);
+  let l;
+  t[0] !== e || t[1] !== r
+    ? ((l = () => e.onNewTerminalTab(r)), (t[0] = e), (t[1] = r), (t[2] = l))
+    : (l = t[2]);
+  let u = y(l),
+    f = n(G, e.sessionId),
+    p = n(K, e.sessionId);
+  if (f != null) {
+    let e;
+    t[3] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, U.jsx)(h, {
+          id: `cloudTerminal.startFailed`,
+          defaultMessage: `Couldn’t open the terminal`,
+          description: `Title when starting a Cloud terminal fails`,
+        })),
+        (t[3] = e))
+      : (e = t[3]);
+    let n;
+    t[4] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((n = (0, U.jsx)(h, {
+          id: `cloudTerminal.openNew`,
+          defaultMessage: `New terminal`,
+          description: `Button that opens a new Cloud terminal tab after an error`,
+        })),
+        (t[4] = n))
+      : (n = t[4]);
+    let r;
+    t[5] === u
+      ? (r = t[6])
+      : ((r = (0, U.jsx)(g, { color: `secondary`, onClick: u, children: n })),
+        (t[5] = u),
+        (t[6] = r));
+    let i;
+    return (
+      t[7] !== f || t[8] !== r
+        ? ((i = (0, U.jsx)(F, { title: e, description: f, actions: r })),
+          (t[7] = f),
+          (t[8] = r),
+          (t[9] = i))
+        : (i = t[9]),
+      i
+    );
+  }
+  if (s == null || (i != null && i.environmentId !== s)) {
+    let e;
+    t[10] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, U.jsx)(h, {
+          id: `cloudTerminal.environmentUnavailable`,
+          defaultMessage: `Terminal environment unavailable`,
+          description: `Title when a Cloud terminal has no executor or its environment changed`,
+        })),
+        (t[10] = e))
+      : (e = t[10]);
+    let n;
+    return (
+      t[11] === i
+        ? (n = t[12])
+        : ((n = (0, U.jsx)(F, {
+            title: e,
+            description:
+              i == null
+                ? (0, U.jsx)(h, {
+                    id: `cloudTerminal.waitingForEnvironment`,
+                    defaultMessage: `The terminal will start when the task has an environment`,
+                    description: `Explains that a terminal opened before a Cloud executor is selected will start automatically`,
+                  })
+                : (0, U.jsx)(h, {
+                    id: `cloudTerminal.environmentUnavailableDescription`,
+                    defaultMessage: `Open a new terminal tab for the task’s current environment`,
+                    description: `Instructions when a Cloud terminal cannot safely attach to its environment`,
+                  }),
+          })),
+          (t[11] = i),
+          (t[12] = n)),
+      n
+    );
+  }
+  let m;
+  t[13] === p ? (m = t[14]) : ((m = p ? null : (0, U.jsx)(V, {})), (t[13] = p), (t[14] = m));
+  let _;
+  return (
+    t[15] !== c ||
+    t[16] !== s ||
+    t[17] !== u ||
+    t[18] !== e.conversationId ||
+    t[19] !== e.conversationTitle ||
+    t[20] !== e.hostId ||
+    t[21] !== e.sessionId ||
+    t[22] !== m
+      ? ((_ = (0, U.jsx)(W, {
+          conversationId: e.conversationId,
+          conversationTitle: e.conversationTitle,
+          cwd: c,
+          environmentId: s,
+          hostId: e.hostId,
+          sessionId: e.sessionId,
+          workspaceRoot: null,
+          loadingOverlay: m,
+          onNewTerminalTab: u,
+        })),
+        (t[15] = c),
+        (t[16] = s),
+        (t[17] = u),
+        (t[18] = e.conversationId),
+        (t[19] = e.conversationTitle),
+        (t[20] = e.hostId),
+        (t[21] = e.sessionId),
+        (t[22] = m),
+        (t[23] = _))
+      : (_ = t[23]),
+    _
+  );
+}
+function V(e) {
+  let t = (0, H.c)(1),
+    n;
+  return (
+    t[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((n = (0, U.jsx)(`div`, {
+          className: `select-none`,
+          role: `status`,
+          children: (0, U.jsx)(F, {
+            title: (0, U.jsx)(h, {
+              id: `cloudTerminal.opening`,
+              defaultMessage: `Opening terminal…`,
+              description: `Status while the Cloud terminal UI loads and its shell session starts`,
+            }),
+          }),
+        })),
+        (t[0] = n))
+      : (n = t[0]),
+    n
+  );
+}
+var H, U, W, G, K;
+function q() {
+  return (q = e(() => {
+    ((H = t()),
+      r(),
+      u(),
+      v(),
+      j(),
+      O(),
+      f(),
+      le(),
+      oe(),
+      N(),
+      B(),
+      S(),
+      (U = o()),
+      i(),
+      (W = l(
+        async () => {
+          let { TerminalPanel: e } = await m(
+            async () => {
+              let { TerminalPanel: e } = await import(`@rchunk/terminal-panel`);
+              return { TerminalPanel: e };
+            },
+            __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
+            import.meta.url,
+          );
+          return e;
+        },
+        { fallback: (0, U.jsx)(V, {}), propagateLoadError: !0 },
+      )),
+      (G = w(
+        _,
+        (e) => null,
+        (e, { set: t }) => {
+          let n = () => t(P.getSnapshot(e)?.error ?? null);
+          return (n(), P.subscribeToSessionSnapshot(e, n));
+        },
+      )),
+      (K = w(
+        _,
+        (e) => P.isSessionAttached(e),
+        (e, { set: t }) => {
+          let n = () => t(P.isSessionAttached(e));
+          return (n(), P.subscribeToSessionSnapshot(e, n));
+        },
+      )));
+  }))();
+}
+function Te(e) {
+  let t = (0, Ee.c)(10),
+    { onDismiss: n, onOpenNewTerminal: r } = e,
+    i;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((i = (0, J.jsx)(h, {
+        id: `terminal.workspaceWarning.message`,
+        defaultMessage: `This terminal's workspace does not match this chat's current worktree`,
+        description: `Warning shown when a terminal belongs to a different workspace than its chat`,
+      })),
+      (t[0] = i))
+    : (i = t[0]);
+  let a;
+  t[1] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((a = (0, J.jsx)(h, {
+        id: `terminal.workspaceWarning.dismiss`,
+        defaultMessage: `Dismiss`,
+        description: `Button that dismisses the transferred terminal workspace warning`,
+      })),
+      (t[1] = a))
+    : (a = t[1]);
+  let o;
+  t[2] === n
+    ? (o = t[3])
+    : ((o = (0, J.jsx)(g, { color: `ghostActive`, size: `composerSm`, onClick: n, children: a })),
+      (t[2] = n),
+      (t[3] = o));
+  let s;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = (0, J.jsx)(h, {
+        id: `terminal.workspaceWarning.openNewTerminal`,
+        defaultMessage: `Open new terminal`,
+        description: `Button that opens a new terminal in the chat's current worktree`,
+      })),
+      (t[4] = s))
+    : (s = t[4]);
+  let c;
+  t[5] === r
+    ? (c = t[6])
+    : ((c = (0, J.jsx)(g, { color: `primary`, size: `composerSm`, onClick: r, children: s })),
+      (t[5] = r),
+      (t[6] = c));
+  let l;
+  return (
+    t[7] !== o || t[8] !== c
+      ? ((l = (0, J.jsx)(ue, {
+          type: `warning`,
+          Icon: me,
+          stackOnNarrow: !0,
+          role: `status`,
+          content: i,
+          customCtas: (0, J.jsxs)(J.Fragment, { children: [o, c] }),
+        })),
+        (t[7] = o),
+        (t[8] = c),
+        (t[9] = l))
+      : (l = t[9]),
+    l
+  );
+}
+var Ee, J;
+function De() {
+  return (De = e(() => {
+    ((Ee = t()), u(), fe(), v(), he(), (J = o()));
+  }))();
+}
+function Oe(e, t) {
+  let n = ye(t);
+  return n === `powershell`
+    ? `Set-Location -LiteralPath '${e.replaceAll(`'`, `''`)}'\r`
+    : n === `cmd` || t.toLowerCase() === `command prompt`
+      ? /[%!]/.test(e)
+        ? null
+        : `cd /d "${e}"\r`
+      : `cd -- '${e.replaceAll(`'`, `'\\''`)}'\r`;
+}
+function ke() {
+  return (ke = e(() => {
+    ve();
+  }))();
+}
+function Ae(e) {
+  let t = (0, Y.c)(23),
+    { currentWorkspaceRoot: r, onSelectWorkspaceRoot: i, sessionId: a, workspaceRoots: o } = e,
+    l = E(),
+    { platform: u } = te(),
+    d = n(Me, a);
+  if (o.length < 2 || d) return null;
+  let f;
+  t[0] !== r || t[1] !== o
+    ? ((f = r == null ? 0 : o.findIndex((e) => c(e, r))), (t[0] = r), (t[1] = o), (t[2] = f))
+    : (f = t[2]);
+  let p = f,
+    m;
+  t[3] === l
+    ? (m = t[4])
+    : ((m = l.formatMessage({
+        id: `codex.terminal.workspaceRootPromptHint.label`,
+        defaultMessage: `Terminal source directories`,
+        description: `Accessible label for a list of source directories that can change the terminal's working directory`,
+      })),
+      (t[3] = l),
+      (t[4] = m));
+  let g;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((g = (0, X.jsx)(h, {
+        id: `codex.terminal.workspaceRootPromptHint.title`,
+        defaultMessage: `Source directories`,
+        description: `Heading above source directory shortcuts shown inside a terminal`,
+      })),
+      (t[5] = g))
+    : (g = t[5]);
+  let _;
+  if (t[6] !== l || t[7] !== i || t[8] !== p || t[9] !== o) {
+    let e;
+    (t[11] !== l || t[12] !== i || t[13] !== p
+      ? ((e = (e, t) => {
+          let n = s(e) || e,
+            r = t === p;
+          return (0, X.jsx)(
+            D,
+            {
+              tooltipContent: e,
+              children: (0, X.jsxs)(`button`, {
+                type: `button`,
+                "aria-label": l.formatMessage(
+                  {
+                    id: `codex.terminal.workspaceRootPromptHint.folderLabel`,
+                    defaultMessage: `{number} {folderName}`,
+                    description: `Accessible label for a numbered source folder in the terminal directory picker`,
+                  },
+                  { folderName: n, number: t + 1 },
+                ),
+                "aria-current": r ? `location` : void 0,
+                className: T(
+                  `flex w-fit max-w-full min-w-0 cursor-interaction items-baseline gap-3 border-0 bg-transparent p-0 text-start text-inherit underline-offset-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring`,
+                  r ? `underline` : `hover:underline`,
+                ),
+                onClick: () => {
+                  i(e);
+                },
+                onMouseDown: je,
+                children: [
+                  (0, X.jsx)(`span`, {
+                    className: `w-4 shrink-0 text-end tabular-nums`,
+                    children: t + 1,
+                  }),
+                  (0, X.jsx)(`span`, { className: `min-w-0 truncate`, children: n }),
+                ],
+              }),
+            },
+            e,
+          );
         }),
-      }),
-    });
-  }
-  const environmentId = props.environmentId ?? binding?.environmentId ?? null;
-  if (environmentId == null) {
-    return jsx.jsx(EmptyState, {
-      title: jsx.jsx(FormattedMessage, {
-        id: "cloudTerminal.environmentUnavailable",
-        defaultMessage: "Terminal environment unavailable",
-      }),
-      description: jsx.jsx(FormattedMessage, {
-        id: "cloudTerminal.waitingForEnvironment",
-        defaultMessage: "The terminal will start when the task has an environment",
-      }),
-    });
-  }
-  return jsx.jsx(TerminalPanel, {
-    conversationId: props.conversationId,
-    conversationTitle: props.conversationTitle,
-    cwd: props.cwd ?? null,
-    environmentId,
-    hostId: props.hostId,
-    sessionId: props.sessionId,
-    workspaceRoot: null,
-    loadingOverlay: terminalSessions.isSessionAttached?.(props.sessionId) ? null : jsx.jsx("div", { role: "status", children: "Opening terminal…" }),
-    onNewTerminalTab: () => props.onNewTerminalTab(),
-  });
+        (t[11] = l),
+        (t[12] = i),
+        (t[13] = p),
+        (t[14] = e))
+      : (e = t[14]),
+      (_ = o.map(e)),
+      (t[6] = l),
+      (t[7] = i),
+      (t[8] = p),
+      (t[9] = o),
+      (t[10] = _));
+  } else _ = t[10];
+  let v;
+  t[15] === _
+    ? (v = t[16])
+    : ((v = (0, X.jsx)(`div`, { className: `flex flex-col gap-1`, children: _ })),
+      (t[15] = _),
+      (t[16] = v));
+  let y;
+  t[17] === u
+    ? (y = t[18])
+    : ((y =
+        u === `macOS`
+          ? (0, X.jsx)(h, {
+              id: `codex.terminal.workspaceRootPromptHint.instructions.macOS`,
+              defaultMessage: `Press ⌥ Opt + Number to change directory`,
+              description: `Instructions below terminal source directories on macOS`,
+            })
+          : (0, X.jsx)(h, {
+              id: `codex.terminal.workspaceRootPromptHint.instructions.otherPlatforms`,
+              defaultMessage: `Press Alt + Number to change directory`,
+              description: `Instructions below terminal source directories on Windows and Linux`,
+            })),
+      (t[17] = u),
+      (t[18] = y));
+  let b;
+  return (
+    t[19] !== m || t[20] !== v || t[21] !== y
+      ? ((b = (0, X.jsxs)(`div`, {
+          role: `group`,
+          "aria-label": m,
+          className: `flex w-fit max-w-full flex-col gap-3 text-sm leading-5 text-secondary select-none`,
+          children: [g, v, y],
+        })),
+        (t[19] = m),
+        (t[20] = v),
+        (t[21] = y),
+        (t[22] = b))
+      : (b = t[22]),
+    b
+  );
 }
-
-function LocalTerminal(props: TerminalTabProps): unknown {
-  const conversation = useConversationSnapshot(props.conversationId);
-  if (!conversation?.sessionIds.includes(props.sessionId)) return null;
-  const binding = useWorkspaceBinding(props.sessionId);
-  const workspaceRoots = props.workspaceRoots ?? [];
-  const currentWorkspaceRoot = conversation.cwdBySessionId?.[props.sessionId]
-    ?? binding?.workspaceRoot
-    ?? props.currentWorkspaceRoot
-    ?? props.cwd
-    ?? null;
-  const selectWorkspaceRoot = async (root: string) => {
-    const shell = terminalSessions.getSnapshot?.(props.sessionId)?.shell;
-    if (shell == null || shell === "unknown") return;
-    const cwd = await terminalSessions.getShellCwd?.(props.sessionId, root);
-    if (cwd == null) return;
-    const command = commandForWorkspace(shell, cwd);
-    if (command != null) terminalSessions.write(props.sessionId, command, "user");
-  };
-  const onKeyEvent = (event: KeyboardEvent): boolean => {
-    if (workspaceRoots.length < 2 || terminalSessions.hasUserInteraction?.(props.sessionId)) return true;
-    if (event.type !== "keydown" || !event.altKey || event.ctrlKey || event.metaKey || event.shiftKey) return true;
-    const match = /^Digit([1-9])$/.exec(event.code);
-    const root = match == null ? null : workspaceRoots[Number(match[1]) - 1] ?? null;
-    if (root == null) return true;
-    event.preventDefault();
-    event.stopPropagation();
-    void selectWorkspaceRoot(root);
-    return false;
-  };
-  return jsx.jsx("div", {
-    className: "min-h-0 flex-1",
-    children: jsx.jsx(TerminalPanel, {
-      conversationId: props.conversationId,
-      conversationTitle: props.conversationTitle,
-      cwd: props.cwd ?? null,
-      hostId: props.hostId,
-      initialPromptHint: jsx.jsx(WorkspaceRootHint, {
-        currentWorkspaceRoot,
-        onSelectWorkspaceRoot: selectWorkspaceRoot,
-        sessionId: props.sessionId,
-        workspaceRoots,
+function je(e) {
+  e.preventDefault();
+}
+var Y, X, Me;
+function Ne() {
+  return (Ne = e(() => {
+    ((Y = t()),
+      C(),
+      r(),
+      u(),
+      b(),
+      ie(),
+      ne(),
+      N(),
+      p(),
+      (X = o()),
+      (Me = w(
+        pe,
+        (e) => P.hasUserInteraction(e),
+        (e, { set: t }) => {
+          let n = () => {
+            t(P.hasUserInteraction(e));
+          };
+          return (n(), P.subscribeToSessionSnapshot(e, n));
+        },
+      )));
+  }))();
+}
+function Pe(e) {
+  let t = (0, Z.c)(2),
+    n;
+  return (
+    t[0] === e
+      ? (n = t[1])
+      : ((n = e.renderSlots({
+          headerRows: [],
+          content: e.hostId === `durable` ? (0, Q.jsx)(we, { ...e }) : (0, Q.jsx)(Fe, { ...e }),
+        })),
+        (t[0] = e),
+        (t[1] = n)),
+    n
+  );
+}
+function Fe(e) {
+  let t = (0, Z.c)(28),
+    {
+      conversationId: r,
+      conversationTitle: i,
+      cwd: o,
+      hostId: s,
+      onNewTerminalTab: c,
+      sessionId: l,
+    } = e,
+    u = d(A),
+    f = a(ce),
+    p = a(se),
+    m = { hostId: a(ee), workspaceRoot: a(re) },
+    h = n(I, l),
+    g = L(l),
+    _;
+  t[0] === r ? (_ = t[1]) : ((_ = { conversationId: r }), (t[0] = r), (t[1] = _));
+  let v = xe(_),
+    b = v?.cwdBySessionId[l] || g?.workspaceRoot || o,
+    x =
+      !(f && m.workspaceRoot == null) &&
+      ge({ binding: g, currentTarget: m, currentWorkspaceRoots: p, dismissedTarget: h }),
+    S;
+  t[2] !== c || t[3] !== u
+    ? ((S = () => {
+        c(u);
       }),
-      onKeyEvent,
-      sessionId: props.sessionId,
-      workspaceRoot: props.cwd ?? null,
-      onNewTerminalTab: () => props.onNewTerminalTab(),
-    }),
-  });
+      (t[2] = c),
+      (t[3] = u),
+      (t[4] = S))
+    : (S = t[4]);
+  let C = y(S),
+    w;
+  t[5] === l
+    ? (w = t[6])
+    : ((w = (e) => {
+        let t = P.getSnapshot(l)?.shell;
+        t != null &&
+          t !== `unknown` &&
+          P.getShellCwd(l, e).then((e) => {
+            if (e == null) return;
+            let n = Oe(e, t);
+            n != null && P.write(l, n, `user`);
+          });
+      }),
+      (t[5] = l),
+      (t[6] = w));
+  let T = y(w),
+    E;
+  t[7] !== T || t[8] !== l || t[9] !== p
+    ? ((E = (e) => {
+        if (
+          p.length < 2 ||
+          P.hasUserInteraction(l) ||
+          e.type !== `keydown` ||
+          !e.altKey ||
+          e.ctrlKey ||
+          e.metaKey ||
+          e.shiftKey
+        )
+          return !0;
+        let t = /^Digit([1-9])$/.exec(e.code),
+          n = t == null ? null : (p[Number(t[1]) - 1] ?? null);
+        return n == null || (e.preventDefault(), e.stopPropagation(), T(n), !1);
+      }),
+      (t[7] = T),
+      (t[8] = l),
+      (t[9] = p),
+      (t[10] = E))
+    : (E = t[10]);
+  let D = y(E);
+  if (!v?.sessionIds.includes(l)) return null;
+  let O = x
+      ? (0, Q.jsx)(`div`, {
+          className: `shrink-0 p-2 pb-0`,
+          children: (0, Q.jsx)(Te, {
+            onDismiss: () => {
+              u.set(I, l, m);
+            },
+            onOpenNewTerminal: C,
+          }),
+        })
+      : null,
+    k;
+  t[11] !== b || t[12] !== T || t[13] !== l || t[14] !== p
+    ? ((k = (0, Q.jsx)(Ae, {
+        currentWorkspaceRoot: b,
+        onSelectWorkspaceRoot: T,
+        sessionId: l,
+        workspaceRoots: p,
+      })),
+      (t[11] = b),
+      (t[12] = T),
+      (t[13] = l),
+      (t[14] = p),
+      (t[15] = k))
+    : (k = t[15]);
+  let j;
+  t[16] !== r ||
+  t[17] !== i ||
+  t[18] !== o ||
+  t[19] !== D ||
+  t[20] !== s ||
+  t[21] !== C ||
+  t[22] !== l ||
+  t[23] !== k
+    ? ((j = (0, Q.jsx)(`div`, {
+        className: `min-h-0 flex-1`,
+        children: (0, Q.jsx)(Ie, {
+          conversationId: r,
+          conversationTitle: i,
+          cwd: o,
+          hostId: s,
+          initialPromptHint: k,
+          onKeyEvent: D,
+          sessionId: l,
+          workspaceRoot: o,
+          onNewTerminalTab: C,
+        }),
+      })),
+      (t[16] = r),
+      (t[17] = i),
+      (t[18] = o),
+      (t[19] = D),
+      (t[20] = s),
+      (t[21] = C),
+      (t[22] = l),
+      (t[23] = k),
+      (t[24] = j))
+    : (j = t[24]);
+  let M;
+  return (
+    t[25] !== O || t[26] !== j
+      ? ((M = (0, Q.jsxs)(`div`, { className: `flex h-full min-h-0 flex-col`, children: [O, j] })),
+        (t[25] = O),
+        (t[26] = j),
+        (t[27] = M))
+      : (M = t[27]),
+    M
+  );
 }
-
-function TerminalTab(props: TerminalTabProps): unknown {
-  initializeTerminalTab();
-  return props.renderSlots({
-    headerRows: [],
-    content: props.hostId === "durable"
-      ? jsx.jsx(CloudTerminal, { ...props })
-      : jsx.jsx(LocalTerminal, { ...props }),
-  });
+var Z, Q, Ie;
+function $() {
+  return ($ = e(() => {
+    ((Z = t()),
+      r(),
+      k(),
+      O(),
+      q(),
+      de(),
+      le(),
+      oe(),
+      ae(),
+      N(),
+      De(),
+      _e(),
+      B(),
+      ke(),
+      Ne(),
+      S(),
+      (Q = o()),
+      i(),
+      (Ie = l(
+        async () => {
+          let { TerminalPanel: e } = await m(
+            async () => {
+              let { TerminalPanel: e } = await import(`@rchunk/terminal-panel`);
+              return { TerminalPanel: e };
+            },
+            __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
+            import.meta.url,
+          );
+          return e;
+        },
+        { propagateLoadError: !0 },
+      )));
+  }))();
 }
-
-let initialized = false;
-function initializeTerminalTab(): void {
-  if (initialized) return;
-  initializeRuntimeLazy();
-  React = getReactRuntime();
-  jsx = getJsxRuntime();
-  initialized = true;
-}
-
-initializeTerminalTab();
-export { TerminalTab };
+$();
+export { Pe as TerminalTab };

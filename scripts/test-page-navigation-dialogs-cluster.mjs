@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = {
@@ -70,19 +71,7 @@ assert.equal(scrolled.at(-1).options.behavior, "auto");
 navigation.goToPage(-10);
 assert.equal(scrolled.at(-1).page, 1);
 
-const keyboard = await load("keyboard-shortcuts-dialog");
-let keyboardOpen = true;
-const keyboardDialog = keyboard.KeyboardShortcutsDialog({
-  commands: [{ id: "run", section: "Tasks", title: "Run task", shortcutLabels: ["⌘", "R"] }],
-  onOpenChange: (open) => { keyboardOpen = open; },
-});
-assert.equal(keyboardDialog.type, "dialog");
-assert.equal(keyboardDialog.props.children[2][0].props.children[0].props.children, "Tasks");
-assert.equal(keyboardDialog.props.children[2][0].props.children[1].props.children[0].props.children[1].props.children, "⌘ R");
-keyboardDialog.props.children[0].props.children[1].props.onClick();
-assert.equal(keyboardOpen, false);
-const emptyKeyboard = keyboard.KeyboardShortcutsDialog({ commands: [], onOpenChange() {} });
-assert.equal(emptyKeyboard.props.children[2].props.role, "status");
+assertReleaseOwner("keyboard-shortcuts-dialog");
 
 const changelog = await load("changelog-modal");
 let closed = false;

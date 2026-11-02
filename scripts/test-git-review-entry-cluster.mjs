@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__gitReviewTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
 async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "git-review-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__gitReviewTest.jsx;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
@@ -26,33 +27,7 @@ await nudgeUi.props.onSubmit({ preventDefault() {} });
 await Promise.resolve();
 assert.deepEqual(enabled, { conversationId: "c1", hostId: "local" });
 
-const diff = await bundle("editor-diff-page");
-assert.deepEqual(Object.keys(diff), ["EditorDiffPage"]);
-assert.equal(diff.EditorDiffPage({ error: "broken" }).props.role, "alert");
-assert.match(text(diff.EditorDiffPage({})), /No diff available/);
-const content = `diff --git a/src/a.ts b/src/a.ts
-index 111..222 100644
---- a/src/a.ts
-+++ b/src/a.ts
-@@ -1 +1,2 @@
- old
-+new
-diff --git a/old.txt b/old.txt
-deleted file mode 100644
---- a/old.txt
-+++ /dev/null
-@@ -1 +0,0 @@
--gone`;
-const diffUi = diff.EditorDiffPage({ conversationId: "c2", diffContent: content, initialViewType: "unified", richPreviewEnabled: true });
-assert.equal(diffUi.type, "main");
-assert.equal(diffUi.props["data-conversation-id"], "c2");
-assert.equal(diffUi.props["data-view-type"], "unified");
-assert.match(text(diffUi), /Rich preview/);
-assert.match(text(diffUi), /src\/a.ts/);
-const added = diff.EditorDiffPage({ conversationId: "c", diffContent: "diff --git a/new b/new\nnew file mode 100644\n+++ b/new\n+x" });
-assert.match(text(added), /new file mode/);
-const huge = `diff --git a/a b/a\n${Array.from({ length: 2001 }, () => "+x").join("\n")}`;
-assert.match(text(diff.EditorDiffPage({ conversationId: "c", diffContent: huge })), /diff --git/);
+assertReleaseOwner("editor-diff-page");
 
 const reviewSource = fs.readFileSync(path.join(ROOT, "src/renderer/review-slash-command-submenu-registration/index.ts"), "utf8");
 const releaseReviewSource = fs.readFileSync(path.join(ROOT, "src/webview/assets/review-slash-command-submenu-registration-8268b8759915.ts"), "utf8")

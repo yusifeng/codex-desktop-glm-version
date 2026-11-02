@@ -7,7 +7,7 @@ import * as esbuild from "esbuild";
 import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["pull-request-actions", "pull-request-revision-tab", "registered-pull-request-thumbnail", "pull-request-readonly-comment", "bookmarked-thread-user-message-navigation", "artifact-file-preview-icon"];
+const MODULES = ["pull-request-revision-tab", "registered-pull-request-thumbnail", "pull-request-readonly-comment", "bookmarked-thread-user-message-navigation", "artifact-file-preview-icon"];
 const state = globalThis.__gitReviewCommentsTest = {};
 state.jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
 state.bookmarkWrites = [];
@@ -21,33 +21,7 @@ async function bundle(directory) { const result = await esbuild.build({ entryPoi
 function nodes(root) { const output = []; const visit = value => { if (value == null || typeof value !== "object") return; if (Array.isArray(value)) return value.forEach(visit); if ("type" in value && "props" in value) output.push(value); visit(value.props?.children); }; visit(root); return output; }
 const nodeOfType = (tree, type) => nodes(tree).find(node => node.type === type);
 
-// pull-request-actions
-const actions = await bundle("pull-request-actions"); actions.v(); actions.m(); actions.t();
-const baseComment = { id: "one", content: [{ content_type: "text", text: "First" }], position: { line: 4, path: "src/main.ts", side: "right" } };
-assert.deepEqual(actions.h("abc123", baseComment), { commentKey: "one", revision: "abc123" });
-const nextComment = { id: "two", content: [{ content_type: "text", text: "Second" }], position: { line: 5, path: "src/main.ts", side: "right" } };
-assert.deepEqual(actions._({ currentComments: [baseComment], nextComments: [baseComment, nextComment] }), [nextComment]);
-const draft = { id: "draft", content: [{ content_type: "text", text: "" }], position: { line: 6, path: "src/main.ts", side: "right" }, replyToReviewThreadId: "thread" };
-const filled = { ...draft, content: [{ content_type: "text", text: "Reply" }] };
-assert.deepEqual(actions._({ currentComments: [draft], nextComments: [filled] }), [filled]);
-const counts = actions.g({ comments: [baseComment, nextComment], filePaths: ["src/main.ts", "README.md"] });
-assert.equal(counts.get("src/main.ts"), 2);
-assert.equal(counts.has("README.md"), false);
-const generated = await actions.p({ body: "Existing", detail: { baseBranch: "main", headBranch: "feature", unifiedDiff: "+line" }, pullRequestInstructions: "Keep concise", title: "Fix bug" });
-assert.match(generated, /Update the existing/);
-assert.match(generated, /Head: feature/);
-assert.match(generated, /Keep concise/);
-const generationError = new actions.f("head_changed");
-assert.equal(generationError.reason, "head_changed");
-assert.equal(generationError.name, "PullRequestDescriptionGenerationError");
-assert.equal(typeof actions.a, "object");
-assert.equal(typeof actions.c, "object");
-assert.equal(typeof actions.d, "object");
-assert.equal(typeof actions.i, "object");
-assert.equal(typeof actions.l, "object");
-assert.equal(typeof actions.n, "object");
-assert.equal(typeof actions.r, "object");
-assert.equal(typeof actions.s, "object");
+assertReleaseOwner("pull-request-actions");
 
 // pull-request-revision-tab
 const revisionTab = await bundle("pull-request-revision-tab");

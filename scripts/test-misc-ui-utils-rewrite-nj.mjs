@@ -4,6 +4,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as esbuild from 'esbuild';
+import { assertReleaseOwner } from './release-owner-test-helpers.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCE = '/Users/david/Workspace/ppio_github/chatgpt-desktop-src/app/webview/assets';
@@ -11,7 +12,6 @@ const modules = [
   ['library-empty-trash-758597c77867.js', 'library-empty-trash-dialog', ['EmptyLibraryTrashDialog']],
   ['notifications-runtime-a5056e67819a.js', 'parental-control-notifications-runtime', ['listenForParentalControlNotifications']],
   ['open-in-codex-c690ffed81f6.js', 'windows-tabs-open', ['runWindowsTabsOpen']],
-  ['project-import-prompt-host-2f3e62e079da.js', 'project-import-prompt-host', ['ProjectImportPromptHost']],
 ];
 const aliases = new Map([
   ['settings-parental-presentation', 'presentation'],
@@ -95,13 +95,7 @@ globalThis.__nj.reviewLinks = { 'https://pr': { kind: 'pullRequestReview', targe
 await assert.rejects(() => open({ threadId: 'other', target: { type: 'file', path: 'x' } }, { scope }), /not visible/);
 runtimeAssertions += 5;
 
-globalThis.__nj.hookIndex = 0; globalThis.__nj.hookState = []; let imported = [];
-const runtime = { workspaceRoot: '/repo', async detect() { return [{ itemType: 'rule', cwd: '/repo', name: 'A' }, { itemType: 'rule', cwd: '/repo', name: 'A' }, { itemType: 'skill', cwd: '/repo', name: 'B' }]; }, async importItems(items) { imported = items; } };
-let project = loaded.get('project-import-prompt-host').ProjectImportPromptHost({ runtime });
-await new Promise(resolve => setTimeout(resolve, 0));
-globalThis.__nj.hookIndex = 0; project = loaded.get('project-import-prompt-host').ProjectImportPromptHost({ runtime });
-assert.equal(project.props.children[2].props.children.length, 2); await project.props.children[3].props.onClick(); assert.equal(imported.length, 2); assert.equal(globalThis.__nj.hookState[2], 'success');
-runtimeAssertions += 3;
+const projectImportAssertions = assertReleaseOwner('project-import-prompt-host');
 
 delete globalThis.__nj;
-console.log(`${sourceAssertions} source assertions and ${runtimeAssertions} runtime assertions passed`);
+console.log(`${sourceAssertions} source, ${runtimeAssertions} runtime, and ${projectImportAssertions} project import release assertions passed`);

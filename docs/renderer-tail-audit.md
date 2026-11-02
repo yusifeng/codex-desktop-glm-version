@@ -1,5 +1,20 @@
 # Renderer 尾部资产审计
 
+2026-11-02 PR/composer/GPT/payment/terminal/editor release-owner recovery：一次性恢复
+`pull-request-actions`、`composer-tip`、`my-gpts-page`、`add-payment-method`、
+`duplicate-agent`、`project-import-prompt-host`、`version-history`、
+`profile-share-dialog-content`、`terminal-tab`、`appshots-settings`、
+`workbook-review-utils`、`local-conversation-sources-side-panel-tab-core`、
+`editor-diff-page`、`keyboard-shortcuts-dialog` 与 `demo-tools-setup-page` 十五个发布
+owner，净恢复 7,289 行发布 TypeScript。绑定旧精简 export 与 mock ABI 的 PR、GPT、payment、
+agent、project import、history、profile sharing、terminal、Appshots、workbook、sources、editor、
+keyboard 与 demo tests 已迁移为发布一致性验证，并保留同簇相邻 owner 的行为覆盖。整批通过
+12,448/12,448 transform check、1,888/1,888 renderer build/verify、2,247/2,247 app-code
+coverage、0 semantic tail 与 typecheck。严格 hub 消费推进到 app-shared 1,765/3,185、
+app-initial 5,603/8,204、app-primary 722/917，仍为 0 unreviewed、0 invalid consumers。
+按发布源码正向行数缺口口径，剩余由 80,249 行降至 72,960 行，覆盖率约由 92.2% 推进到
+92.9%；425 个 preserved 边界、三个聚合 hub 的剩余耦合导出与最终真实 E2E 仍未完成。
+
 2026-11-02 Thread/memory/billing/settings/browser release-owner recovery：一次性恢复
 `dictionary-dialog`、`thread-scroll-layout`、`editable-review-file-source-tab-content`、
 `ads-controls-settings`、`saved-memory-history`、`personal-vault-settings`、

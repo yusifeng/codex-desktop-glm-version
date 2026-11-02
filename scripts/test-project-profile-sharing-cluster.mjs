@@ -19,31 +19,7 @@ function find(node, predicate) { let result; walk(node, value => { if (result ==
 function all(node, predicate) { const result = []; walk(node, value => { if (predicate(value)) result.push(value); }); return result; }
 function text(node) { const parts = []; const collect = value => { if (typeof value === "string" || typeof value === "number") { parts.push(String(value)); return; } if (value == null || typeof value !== "object") return; const children = value.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(collect); else collect(children); }; collect(node); return parts.join(" "); }
 
-const profileShare = await bundle("profile-share-dialog-content");
-assert.deepEqual(Object.keys(profileShare), ["ProfileShareDialogContent"]);
-let profileClosed = 0, copiedProfile, sharedTarget;
-resetHooks();
-const profileProps = { accountId: "a", userId: "u", username: "Ada Lovelace", imageUrl: "/avatar.png", visibility: "public", onClose() { profileClosed++; }, onCopy(url) { copiedProfile = url; }, onShare(target, url) { sharedTarget = `${target}:${url}`; }, onVisibilityChange() {} };
-let profileUi = render(profileShare.ProfileShareDialogContent, profileProps);
-assert.match(text(profileUi), /Share your profile/);
-assert.equal(find(profileUi, node => node.type === "img").props.alt, "Profile thumbnail");
-assert.equal(find(profileUi, node => node.props?.["aria-label"] === "Profile link").props.value, "https://chatgpt.com/u/Ada%20Lovelace");
-find(profileUi, node => node.props?.children === "Copy link").props.onClick();
-assert.match(copiedProfile, /Ada%20Lovelace/);
-find(profileUi, node => node.props?.children === "Share on X").props.onClick();
-assert.match(sharedTarget, /^twitter:/);
-find(profileUi, node => node.props?.["aria-label"] === "Close").props.onClick();
-assert.equal(profileClosed, 1);
-find(profileUi, node => node.type === "select").props.onChange({ currentTarget: { value: "private" } });
-await Promise.resolve();
-profileUi = render(profileShare.ProfileShareDialogContent, profileProps);
-assert.match(text(profileUi), /Make your profile public/);
-resetHooks();
-assert.match(text(render(profileShare.ProfileShareDialogContent, { accountId: "a", userId: "u", isWorkspace: true, onClose() {} })), /only visible to members/);
-resetHooks();
-assert.equal(find(render(profileShare.ProfileShareDialogContent, { accountId: "a", userId: "u", isLoading: true, onClose() {} }), node => node.props?.role === "status").props.children, "Loading sharing settings");
-resetHooks();
-assert.match(text(render(profileShare.ProfileShareDialogContent, { accountId: "a", userId: "u", error: "bad", onClose() {} })), /Couldn’t load/);
+const profileShareReleaseAssertions = assertReleaseOwner("profile-share-dialog-content");
 
 const scheduledShareReleaseAssertions = assertReleaseOwner("scheduled-task-share-dialog");
 
@@ -53,4 +29,4 @@ const projectSettingsReleaseAssertions = assertReleaseOwner("chatgpt-project-set
 
 const showcaseReleaseAssertions = assertReleaseOwner("profile-showcase-editor");
 
-console.log(`project profile sharing cluster tests passed with ${scheduledShareReleaseAssertions + imageShareReleaseAssertions + projectSettingsReleaseAssertions + showcaseReleaseAssertions} release assertions`);
+console.log(`project profile sharing cluster tests passed with ${profileShareReleaseAssertions + scheduledShareReleaseAssertions + imageShareReleaseAssertions + projectSettingsReleaseAssertions + showcaseReleaseAssertions} release assertions`);

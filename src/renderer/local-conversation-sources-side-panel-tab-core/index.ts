@@ -1,262 +1,720 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $d as CodeBlock,
-  A_ as GlobeIcon,
-  HF as analyticsClient,
-  HX as useSignalValue,
-  I3 as getJsxRuntime,
-  LX as useScope,
-  S_ as IconAsset,
-  UF as sourceSectionType,
-  Y2 as FormattedMessage,
-  fI as initializeIntlRuntime,
-  n4 as useIntl,
-  qT as externalLinkAsset,
+  $3 as t,
+  $d as n,
+  A_ as r,
+  C_ as i,
+  FX as a,
+  HF as o,
+  HX as s,
+  I3 as c,
+  K2 as l,
+  KT as u,
+  LX as d,
+  S_ as f,
+  UF as p,
+  Y2 as m,
+  ef as h,
+  fI as g,
+  j_ as _,
+  n4 as ee,
+  qT as v,
 } from "@rchunk/app-shared";
 import {
-  $en as routeScope,
-  Dlt as AppLogo,
-  G3 as hostMessageBridge,
-  Oft as openExternalLink,
-  W3 as DefaultAppIcon,
-  bS as sourcePanelComponents,
-  mmn as attachmentKey,
-  n0 as initializeFavicon,
-  t0 as Favicon,
-  tn as webMcpEnabledSignal,
-  xpn as logSourcesPanelExpansion,
+  $en as te,
+  Dft as y,
+  Dlt as ne,
+  G3 as b,
+  Oft as x,
+  Olt as S,
+  W3 as re,
+  bS as C,
+  en as w,
+  hmn as T,
+  itn as E,
+  mmn as ie,
+  n0 as D,
+  t0 as O,
+  tn as k,
+  xS as A,
+  xpn as j,
+  ypn as M,
 } from "@rchunk/app-initial";
-import { n as initializeFilePreviewIcon, t as ArtifactFilePreviewIcon } from "@rchunk/artifact-file-preview-icon";
+import { n as N, t as P } from "@rchunk/artifact-file-preview-icon";
+import { i as F, r as I, t as ae } from "@rchunk/local-conversation-webmcp-tools-model";
 import {
-  i as initializeWebMcpToolsModel,
-  r as groupWebMcpCallsByTool,
-  t as hostnameFromUrl,
-} from "@rchunk/local-conversation-webmcp-tools-model";
-import {
-  i as initializeExternalResourceIcon,
-  n as initializeKnownAppIcon,
-  r as knownAppIdForToolSource,
-  t as ExternalResourceIcon,
+  i as L,
+  n as R,
+  r as oe,
+  t as se,
 } from "@rchunk/local-conversation-external-resource-icon";
-import { n as useLocalConversationSources, t as initializeLocalConversationSources } from "@rchunk/use-local-conversation-sources";
-import { n as initializeToolActivityDisclosure, t as ToolActivityDisclosure } from "@rchunk/tool-activity-disclosure";
-import { n as initializeMcpToolItemContent, t as McpToolItemContent } from "@rchunk/mcp-tool-item-content";
-
-interface WebMcpCall extends Record<string, unknown> {
-  inputJson?: string | null;
-  inputTruncated?: boolean;
-  kind: string;
-  outputJson?: string | null;
-  outputTruncated?: boolean;
-  sourceHostname?: string | null;
+import { n as z, t as ce } from "@rchunk/use-local-conversation-sources";
+import { n as B, t as V } from "@rchunk/tool-activity-disclosure";
+import { n as H, t as U } from "@rchunk/mcp-tool-item-content";
+function W(e) {
+  let t = (0, K.c)(6),
+    { calls: n } = e,
+    r,
+    i;
+  if (t[0] !== n) {
+    let e = I(n);
+    ((r = `flex flex-col gap-1`), (i = e.map(le)), (t[0] = n), (t[1] = r), (t[2] = i));
+  } else ((r = t[1]), (i = t[2]));
+  let a;
+  return (
+    t[3] !== r || t[4] !== i
+      ? ((a = (0, q.jsx)(`ul`, { className: r, children: i })), (t[3] = r), (t[4] = i), (t[5] = a))
+      : (a = t[5]),
+    a
+  );
 }
-
-interface WebMcpCallGroup { calls: WebMcpCall[]; name: string; }
-interface FileSource extends Record<string, unknown> { fsPath?: string; label: string; path?: string; }
-interface ExternalSource extends Record<string, unknown> {
-  activities: Array<"created" | "provided" | "read" | "updated">;
-  key: string;
-  openInitiator?: string;
-  provider?: { name: string } | null;
-  title: string;
-  url: string;
-}
-interface McpCall extends Record<string, unknown> { callId: string; }
-interface ToolActivity { calls: McpCall[]; label: string; }
-interface ToolSource extends Record<string, unknown> {
-  activities: ToolActivity[];
-  id: string;
-  logoUrl?: string;
-  logoUrlDark?: string;
-  mcpAppId?: string | null;
-  name: string;
-  pluginDisplayNames: string[];
-  trustedAnalyticsAppName?: string;
-}
-interface WebSearchSource {
-  queryCount: number;
-  queries: string[];
-  viewedLinks: Array<{ label: string; url: string }>;
-}
-interface SourceCollection {
-  externalSources: ExternalSource[];
-  fileSources: FileSource[];
-  toolSources: ToolSource[];
-  webMcpCalls: WebMcpCall[];
-  webSearchSource?: WebSearchSource | null;
-}
-interface LocalConversationSourcesSidePanelTabProps {
-  conversationId: string;
-  getImagePreviewSrc?(path: string): string | null | undefined;
-  hostId: string;
-  onOpenFile?(source: FileSource): void;
-  onOpenImage?(source: FileSource, previewSrc: string): void;
-  onOpenMcpApp?(appId: string): void;
-}
-interface SourcesPanelRegistry {
-  Body?: (props: { children?: unknown }) => unknown;
-  Item?: (props: Record<string, unknown>) => unknown;
-  SourceDetails: (props: Record<string, unknown>) => unknown;
-  SourcesSidePanel: (props: { children?: unknown }) => unknown;
-  SourcesSidePanelList: (props: { children?: unknown; label: string }) => unknown;
-}
-
-const SourcesUi = sourcePanelComponents as unknown as SourcesPanelRegistry;
-
-function prettyJson(value: string): string {
-  try { return JSON.stringify(JSON.parse(value), null, 2); }
-  catch { return value; }
-}
-
-function callHasDetails(call: WebMcpCall): boolean {
-  return (call.kind === "invokeTool" && call.inputJson != null) || call.outputJson != null;
-}
-
-function WebMcpCalls(props: { calls: WebMcpCall[] }): unknown {
-  const runtime = getJsxRuntime();
-  const groups = groupWebMcpCallsByTool(props.calls) as unknown as WebMcpCallGroup[];
-  return runtime.jsx("ul", {
-    className: "flex flex-col gap-1",
-    children: groups.map((group) => {
-      const detailedCalls = group.calls.filter(callHasDetails);
-      return runtime.jsx("li", {
-        children: runtime.jsx(ToolActivityDisclosure, {
-          icon: null,
-          indentContent: false,
-          status: "completed",
-          summary: runtime.jsx(FormattedMessage, {
-            id: "codex.localConversation.sources.panel.toolUseCount",
-            defaultMessage: "{name} {count, plural, one {once} other {# times}}",
-            values: { count: group.calls.length, name: group.name },
-          }),
-          children: detailedCalls.length === 0 ? null : runtime.jsx("ul", {
-            className: "flex flex-col gap-2",
-            children: detailedCalls.map((call, index) => runtime.jsxs("li", {
-              className: "flex min-w-0 flex-col gap-2",
-              children: [
-                call.kind !== "invokeTool" || call.inputJson == null ? null : runtime.jsx(CodeBlock, {
-                  content: prettyJson(call.inputJson), language: "json",
-                  title: call.inputTruncated ? "Input (truncated)" : "Input",
-                }),
-                call.outputJson == null ? null : runtime.jsx(CodeBlock, {
-                  content: prettyJson(call.outputJson), language: "json",
-                  title: call.outputTruncated ? "Result (truncated)" : "Result",
-                }),
-              ],
-            }, `${group.name}:${index}`)),
+function le(e) {
+  let t = e.calls.filter(ue);
+  return (0, q.jsx)(
+    `li`,
+    {
+      children: (0, q.jsx)(V, {
+        icon: null,
+        indentContent: !1,
+        status: `completed`,
+        summary: (0, q.jsx)(`span`, {
+          className: `text-sm leading-5 text-secondary`,
+          children: (0, q.jsx)(m, {
+            id: `codex.localConversation.sources.panel.toolUseCount`,
+            defaultMessage: `{name} {count, plural, one {once} other {# times}}`,
+            description: `Completed tool activity label and number of uses of a source`,
+            values: { count: e.calls.length, name: e.name },
           }),
         }),
-      }, group.name);
-    }),
-  });
+        children:
+          t.length === 0
+            ? null
+            : (0, q.jsx)(`ul`, {
+                className: `flex flex-col gap-2`,
+                children: t.map((t, r) =>
+                  (0, q.jsxs)(
+                    `li`,
+                    {
+                      className: `flex min-w-0 flex-col gap-2`,
+                      children: [
+                        t.kind !== `invokeTool` || t.inputJson == null
+                          ? null
+                          : (0, q.jsx)(n, {
+                              codeContainerClassName: `max-h-48 overflow-auto`,
+                              content: G(t.inputJson),
+                              language: `json`,
+                              showStickyRightContent: !1,
+                              title: t.inputTruncated
+                                ? (0, q.jsx)(m, {
+                                    id: `codex.localConversation.webMcpTools.inputTruncated`,
+                                    defaultMessage: `Input (truncated)`,
+                                    description: `Title for truncated WebMCP tool input JSON`,
+                                  })
+                                : (0, q.jsx)(m, {
+                                    id: `codex.localConversation.webMcpTools.input`,
+                                    defaultMessage: `Input`,
+                                    description: `Title for WebMCP tool input JSON`,
+                                  }),
+                            }),
+                        t.outputJson == null
+                          ? null
+                          : (0, q.jsx)(n, {
+                              codeContainerClassName: `max-h-48 overflow-auto`,
+                              content: G(t.outputJson),
+                              language: `json`,
+                              showStickyRightContent: !1,
+                              title: t.outputTruncated
+                                ? (0, q.jsx)(m, {
+                                    id: `codex.localConversation.webMcpTools.resultTruncated`,
+                                    defaultMessage: `Result (truncated)`,
+                                    description: `Title for truncated WebMCP tool result JSON`,
+                                  })
+                                : (0, q.jsx)(m, {
+                                    id: `codex.localConversation.webMcpTools.result`,
+                                    defaultMessage: `Result`,
+                                    description: `Title for WebMCP tool result JSON`,
+                                  }),
+                            }),
+                      ],
+                    },
+                    `${e.name}:${r}`,
+                  ),
+                ),
+              }),
+      }),
+    },
+    e.name,
+  );
 }
-
-function ActivityLabel(props: { activity: ExternalSource["activities"][number] }): unknown {
-  const messages = { created: "Created during the chat", provided: "Provided in the conversation", read: "Read during the chat", updated: "Updated during the chat" };
-  return getJsxRuntime().jsx(FormattedMessage, {
-    id: `codex.localConversation.sources.panel.activity.${props.activity}`,
-    defaultMessage: messages[props.activity],
-  });
+function ue(e) {
+  return (e.kind === `invokeTool` && e.inputJson != null) || e.outputJson != null;
 }
-
-function McpCallContent(props: {
-  conversationId: string; expandedContentOnly?: boolean; hostId: string; item: McpCall;
-  onExpand?(): void; summary?: unknown;
-}): unknown {
-  return getJsxRuntime().jsx(McpToolItemContent, {
-    ...props,
-    hideTextBlocksWithStructuredContent: true,
-    loadRemoteLogos: false,
-    renderMcpApps: false,
-    summaryIcon: null,
-  });
+function G(e) {
+  try {
+    return JSON.stringify(JSON.parse(e), null, 2);
+  } catch {
+    return e;
+  }
 }
-
-function sourceName(source: ToolSource): string {
-  return source.name.trim() || source.pluginDisplayNames.join(", ");
+var K, q;
+function J() {
+  return (J = e(() => {
+    ((K = t()), l(), h(), B(), F(), (q = c()));
+  }))();
 }
-
-function SourcesPanel(props: LocalConversationSourcesSidePanelTabProps & SourceCollection): unknown {
-  const runtime = getJsxRuntime();
-  const scope = useScope(routeScope);
-  const intl = useIntl();
-  const webMcpEnabled = useSignalValue(webMcpEnabledSignal);
-  const webMcpCallsByHost = new Map<string, WebMcpCall[]>();
-  if (webMcpEnabled) {
-    for (const call of props.webMcpCalls) {
-      if (call.sourceHostname == null) continue;
-      const calls = webMcpCallsByHost.get(call.sourceHostname) ?? [];
-      calls.push(call);
-      webMcpCallsByHost.set(call.sourceHostname, calls);
+function de(e) {
+  let t = (0, Z.c)(8),
+    {
+      conversationId: n,
+      getImagePreviewSrc: r,
+      hostId: i,
+      onOpenFile: a,
+      onOpenImage: o,
+      onOpenMcpApp: s,
+    } = e,
+    c = z(n, i),
+    l;
+  return (
+    t[0] !== n || t[1] !== r || t[2] !== i || t[3] !== a || t[4] !== o || t[5] !== s || t[6] !== c
+      ? ((l = (0, Q.jsx)(fe, {
+          ...c,
+          conversationId: n,
+          getImagePreviewSrc: r,
+          hostId: i,
+          onOpenFile: a,
+          onOpenImage: o,
+          onOpenMcpApp: s,
+        })),
+        (t[0] = n),
+        (t[1] = r),
+        (t[2] = i),
+        (t[3] = a),
+        (t[4] = o),
+        (t[5] = s),
+        (t[6] = c),
+        (t[7] = l))
+      : (l = t[7]),
+    l
+  );
+}
+function fe(e) {
+  let t = (0, Z.c)(53),
+    {
+      conversationId: n,
+      externalSources: i,
+      fileSources: a,
+      getImagePreviewSrc: c,
+      hostId: l,
+      onOpenFile: u,
+      onOpenImage: f,
+      onOpenMcpApp: h,
+      toolSources: g,
+      webMcpCalls: _,
+      webSearchSource: v,
+    } = e,
+    y = d(te),
+    b = ee(),
+    S = s(k),
+    w;
+  t[0] === b
+    ? (w = t[1])
+    : ((w = b.formatMessage({
+        id: `codex.localConversation.sources.panel.listLabel`,
+        defaultMessage: `Sources`,
+        description: `Accessible label for the complete source list side panel`,
+      })),
+      (t[0] = b),
+      (t[1] = w));
+  let T = w,
+    E,
+    D,
+    O,
+    A,
+    M,
+    N;
+  if (
+    t[2] !== i ||
+    t[3] !== a ||
+    t[4] !== c ||
+    t[5] !== u ||
+    t[6] !== f ||
+    t[7] !== T ||
+    t[8] !== S ||
+    t[9] !== _
+  ) {
+    if (((N = new Map()), S))
+      for (let e of _) {
+        if (e.sourceHostname == null) continue;
+        let t = N.get(e.sourceHostname);
+        t == null ? N.set(e.sourceHostname, [e]) : t.push(e);
+      }
+    if (
+      ((D = C.SourcesSidePanel),
+      (E = C.SourcesSidePanelList),
+      (O = T),
+      t[16] !== a || t[17] !== c || t[18] !== u || t[19] !== f)
+    ) {
+      let e;
+      (t[21] !== c || t[22] !== u || t[23] !== f
+        ? ((e = (e) => {
+            let t = e.fsPath || e.path || e.label,
+              n = c?.(t) ?? null,
+              r;
+            return (
+              n != null && f != null ? (r = () => f(e, n)) : u != null && (r = () => u(e)),
+              (0, Q.jsx)(
+                C.SourceDetails,
+                {
+                  icon: (0, Q.jsx)(P, {
+                    getImagePreviewSrc: c,
+                    iconClassName: `icon-sm`,
+                    imageClassName: `size-[18px] rounded-[3px] border border-default`,
+                    path: t,
+                  }),
+                  label: e.label,
+                  meta: t,
+                  onOpen: r,
+                  children: (0, Q.jsx)(m, {
+                    id: `codex.localConversation.sources.panel.fileAttached`,
+                    defaultMessage: `Attached to the conversation`,
+                    description: `Explanation of how a file source was used`,
+                  }),
+                },
+                ie(e),
+              )
+            );
+          }),
+          (t[21] = c),
+          (t[22] = u),
+          (t[23] = f),
+          (t[24] = e))
+        : (e = t[24]),
+        (A = a.map(e)),
+        (t[16] = a),
+        (t[17] = c),
+        (t[18] = u),
+        (t[19] = f),
+        (t[20] = A));
+    } else A = t[20];
+    ((M = i.map((e) => {
+      let t = ae(e.url),
+        n = t == null || e.title !== t ? [] : (N.get(t) ?? []);
+      t != null && e.title === t && N.delete(t);
+      let r;
+      return (
+        e.activities.includes(`provided`) ||
+          (r = e.provider == null ? e.url : `${e.provider.name} · ${e.url}`),
+        (0, Q.jsxs)(
+          C.SourceDetails,
+          {
+            icon: (0, Q.jsx)(se, { resource: e }),
+            label: e.title,
+            meta: r,
+            onOpen: (t) => {
+              x({ event: t, href: e.url, initiator: e.openInitiator });
+            },
+            children: [
+              (0, Q.jsx)(`ul`, {
+                className: `flex flex-col gap-1`,
+                children: e.activities.map(he),
+              }),
+              n.length === 0 ? null : (0, Q.jsx)(W, { calls: n }),
+            ],
+          },
+          e.key,
+        )
+      );
+    })),
+      (t[2] = i),
+      (t[3] = a),
+      (t[4] = c),
+      (t[5] = u),
+      (t[6] = f),
+      (t[7] = T),
+      (t[8] = S),
+      (t[9] = _),
+      (t[10] = E),
+      (t[11] = D),
+      (t[12] = O),
+      (t[13] = A),
+      (t[14] = M),
+      (t[15] = N));
+  } else ((E = t[10]), (D = t[11]), (O = t[12]), (A = t[13]), (M = t[14]), (N = t[15]));
+  let F;
+  t[25] === N ? (F = t[26]) : ((F = Array.from(N, me)), (t[25] = N), (t[26] = F));
+  let I;
+  if (t[27] !== n || t[28] !== l || t[29] !== h || t[30] !== y || t[31] !== g) {
+    let e;
+    (t[33] !== n || t[34] !== l || t[35] !== h || t[36] !== y
+      ? ((e = (e) => {
+          let t = _e(e),
+            r = e.mcpAppId;
+          return (0, Q.jsx)(
+            C.SourceDetails,
+            {
+              icon: (0, Q.jsx)(ne, {
+                alt: ``,
+                className: `icon-sm shrink-0 object-contain`,
+                fallback: (0, Q.jsx)(re, { className: `icon-sm shrink-0` }),
+                knownAppId: oe(e),
+                logoDarkUrl: e.logoUrlDark,
+                logoUrl: e.logoUrl,
+              }),
+              label: t,
+              onOpen: r == null || h == null ? void 0 : () => h(r),
+              children: (0, Q.jsx)(`ul`, {
+                className: `flex flex-col gap-1`,
+                children: e.activities.flatMap((t) => {
+                  if (t.calls.length === 0) return [];
+                  let r = (0, Q.jsx)(`span`, {
+                      className: `text-sm leading-5 text-secondary`,
+                      children: (0, Q.jsx)(m, {
+                        id: `codex.localConversation.sources.panel.toolUseCount`,
+                        defaultMessage: `{name} {count, plural, one {once} other {# times}}`,
+                        description: `Completed tool activity label and number of uses of a source`,
+                        values: { count: t.calls.length, name: t.label },
+                      }),
+                    }),
+                    i = () => {
+                      j(y, o, {
+                        sectionType: p.CODEX_SOURCES_SECTION_TYPE_MCP_TOOL_CALLS,
+                        appName: e.trustedAnalyticsAppName,
+                        itemCount: t.calls.length,
+                      });
+                    };
+                  return t.calls.length === 1
+                    ? t.calls.map((e) =>
+                        (0, Q.jsx)(
+                          `li`,
+                          {
+                            children: (0, Q.jsx)(X, {
+                              conversationId: n,
+                              hostId: l,
+                              item: e,
+                              onExpand: i,
+                              summary: r,
+                            }),
+                          },
+                          e.callId,
+                        ),
+                      )
+                    : [
+                        (0, Q.jsx)(
+                          `li`,
+                          {
+                            children: (0, Q.jsx)(V, {
+                              icon: null,
+                              indentContent: !1,
+                              onExpand: i,
+                              status: `completed`,
+                              summary: r,
+                              children: (0, Q.jsx)(`ul`, {
+                                className: `flex flex-col gap-1`,
+                                children: t.calls.map((e) =>
+                                  (0, Q.jsx)(
+                                    `li`,
+                                    {
+                                      children: (0, Q.jsx)(X, {
+                                        conversationId: n,
+                                        expandedContentOnly: !0,
+                                        hostId: l,
+                                        item: e,
+                                      }),
+                                    },
+                                    e.callId,
+                                  ),
+                                ),
+                              }),
+                            }),
+                          },
+                          t.label,
+                        ),
+                      ];
+                }),
+              }),
+            },
+            e.id,
+          );
+        }),
+        (t[33] = n),
+        (t[34] = l),
+        (t[35] = h),
+        (t[36] = y),
+        (t[37] = e))
+      : (e = t[37]),
+      (I = g.map(e)),
+      (t[27] = n),
+      (t[28] = l),
+      (t[29] = h),
+      (t[30] = y),
+      (t[31] = g),
+      (t[32] = I));
+  } else I = t[32];
+  let L;
+  t[38] !== b || t[39] !== y || t[40] !== v
+    ? ((L =
+        v == null
+          ? null
+          : (0, Q.jsx)(C.SourceDetails, {
+              icon: (0, Q.jsx)(r, { "aria-hidden": !0, className: `icon-sm shrink-0` }),
+              label: b.formatMessage({
+                id: `codex.localConversation.sources.webSearch`,
+                defaultMessage: `Web search`,
+                description: `Label for web search in the thread summary side panel sources section`,
+              }),
+              children: (0, Q.jsxs)(`ul`, {
+                className: `flex flex-col gap-1`,
+                children: [
+                  v.queryCount > 0
+                    ? (0, Q.jsx)(`li`, {
+                        children: (0, Q.jsx)(V, {
+                          icon: null,
+                          indentContent: !1,
+                          onExpand: () => {
+                            j(y, o, {
+                              sectionType: p.CODEX_SOURCES_SECTION_TYPE_WEB_SEARCHES,
+                              itemCount: v.queryCount,
+                            });
+                          },
+                          status: `completed`,
+                          summary: (0, Q.jsx)(m, {
+                            id: `codex.localConversation.sources.panel.webSearchCount`,
+                            defaultMessage: `{count, plural, one {Searched once} other {Searched # times}}`,
+                            description: `Summary of how many web search queries were sent`,
+                            values: { count: v.queryCount },
+                          }),
+                          children:
+                            v.queries.length === 0
+                              ? null
+                              : (0, Q.jsx)(`ul`, {
+                                  className: `flex flex-col gap-1`,
+                                  children: v.queries.map(pe),
+                                }),
+                        }),
+                      })
+                    : null,
+                  v.viewedLinks.length > 0
+                    ? (0, Q.jsx)(`li`, {
+                        children: (0, Q.jsx)(V, {
+                          icon: null,
+                          indentContent: !1,
+                          onExpand: () => {
+                            j(y, o, {
+                              sectionType: p.CODEX_SOURCES_SECTION_TYPE_WEB_PAGES,
+                              itemCount: v.viewedLinks.length,
+                            });
+                          },
+                          status: `completed`,
+                          summary: (0, Q.jsx)(m, {
+                            id: `codex.localConversation.sources.panel.webPageCount`,
+                            defaultMessage: `{count, plural, one {Opened one page} other {Opened # pages}}`,
+                            description: `Summary of how many web pages were opened`,
+                            values: { count: v.viewedLinks.length },
+                          }),
+                          children: (0, Q.jsx)(`ul`, {
+                            className: `flex flex-col gap-1.5`,
+                            children: v.viewedLinks.map(Y),
+                          }),
+                        }),
+                      })
+                    : null,
+                ],
+              }),
+            })),
+      (t[38] = b),
+      (t[39] = y),
+      (t[40] = v),
+      (t[41] = L))
+    : (L = t[41]);
+  let R;
+  t[42] !== E ||
+  t[43] !== O ||
+  t[44] !== A ||
+  t[45] !== M ||
+  t[46] !== F ||
+  t[47] !== I ||
+  t[48] !== L
+    ? ((R = (0, Q.jsxs)(E, { label: O, children: [A, M, F, I, L] })),
+      (t[42] = E),
+      (t[43] = O),
+      (t[44] = A),
+      (t[45] = M),
+      (t[46] = F),
+      (t[47] = I),
+      (t[48] = L),
+      (t[49] = R))
+    : (R = t[49]);
+  let z;
+  return (
+    t[50] !== D || t[51] !== R
+      ? ((z = (0, Q.jsx)(D, { children: R })), (t[50] = D), (t[51] = R), (t[52] = z))
+      : (z = t[52]),
+    z
+  );
+}
+function Y(e) {
+  return (0, Q.jsx)(
+    `li`,
+    {
+      children: (0, Q.jsxs)(`button`, {
+        className: `flex min-w-0 cursor-interaction items-center gap-1.5 rounded-sm text-start text-info hover:underline focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring`,
+        title: e.url,
+        type: `button`,
+        onClick: (t) => {
+          x({ event: t, href: e.url, initiator: `browser_use`, source: `browser_use` });
+        },
+        children: [
+          (0, Q.jsx)(f, { className: `shrink-0`, asset: v }),
+          (0, Q.jsx)(`span`, { className: `truncate`, children: e.label }),
+        ],
+      }),
+    },
+    e.url,
+  );
+}
+function pe(e) {
+  return (0, Q.jsx)(`li`, { className: `break-words`, children: e }, e);
+}
+function me(e) {
+  let [t, n] = e;
+  return (0, Q.jsx)(
+    C.SourceDetails,
+    {
+      icon: (0, Q.jsx)(O, { className: `icon-sm shrink-0`, href: `https://${t}` }),
+      label: t,
+      children: (0, Q.jsx)(W, { calls: n }),
+    },
+    t,
+  );
+}
+function he(e) {
+  return (0, Q.jsx)(`li`, { children: (0, Q.jsx)(ge, { activity: e }) }, e);
+}
+function X(e) {
+  let t = (0, Z.c)(7),
+    { conversationId: n, expandedContentOnly: r, hostId: i, item: a, onExpand: o, summary: s } = e,
+    c = r !== void 0 && r,
+    l;
+  return (
+    t[0] !== n || t[1] !== c || t[2] !== i || t[3] !== a || t[4] !== o || t[5] !== s
+      ? ((l = (0, Q.jsx)(U, {
+          conversationId: n,
+          expandedContentOnly: c,
+          hideTextBlocksWithStructuredContent: !0,
+          hostId: i,
+          item: a,
+          loadRemoteLogos: !1,
+          onExpand: o,
+          renderMcpApps: !1,
+          summary: s,
+          summaryIcon: null,
+        })),
+        (t[0] = n),
+        (t[1] = c),
+        (t[2] = i),
+        (t[3] = a),
+        (t[4] = o),
+        (t[5] = s),
+        (t[6] = l))
+      : (l = t[6]),
+    l
+  );
+}
+function ge(e) {
+  let t = (0, Z.c)(4),
+    { activity: n } = e;
+  switch (n) {
+    case `provided`: {
+      let e;
+      return (
+        t[0] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Q.jsx)(m, {
+              id: `codex.localConversation.sources.panel.activity.provided`,
+              defaultMessage: `Provided in the conversation`,
+              description: `Source activity label for a resource provided by the user`,
+            })),
+            (t[0] = e))
+          : (e = t[0]),
+        e
+      );
+    }
+    case `read`: {
+      let e;
+      return (
+        t[1] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Q.jsx)(m, {
+              id: `codex.localConversation.sources.panel.activity.read`,
+              defaultMessage: `Read during the chat`,
+              description: `Source activity label for a resource read during the task`,
+            })),
+            (t[1] = e))
+          : (e = t[1]),
+        e
+      );
+    }
+    case `created`: {
+      let e;
+      return (
+        t[2] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Q.jsx)(m, {
+              id: `codex.localConversation.sources.panel.activity.created`,
+              defaultMessage: `Created during the chat`,
+              description: `Source activity label for a resource created during the task`,
+            })),
+            (t[2] = e))
+          : (e = t[2]),
+        e
+      );
+    }
+    case `updated`: {
+      let e;
+      return (
+        t[3] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Q.jsx)(m, {
+              id: `codex.localConversation.sources.panel.activity.updated`,
+              defaultMessage: `Updated during the chat`,
+              description: `Source activity label for a resource updated during the task`,
+            })),
+            (t[3] = e))
+          : (e = t[3]),
+        e
+      );
     }
   }
-  const files = props.fileSources.map((source) => {
-    const path = source.fsPath || source.path || source.label;
-    const previewSrc = props.getImagePreviewSrc?.(path) ?? null;
-    const onOpen = previewSrc != null && props.onOpenImage != null
-      ? () => props.onOpenImage?.(source, previewSrc)
-      : props.onOpenFile == null ? undefined : () => props.onOpenFile?.(source);
-    return runtime.jsx(SourcesUi.SourceDetails, {
-      icon: runtime.jsx(ArtifactFilePreviewIcon, { getImagePreviewSrc: props.getImagePreviewSrc, iconClassName: "icon-sm", path }),
-      label: source.label, meta: path, onOpen,
-      children: runtime.jsx(FormattedMessage, { id: "codex.localConversation.sources.panel.fileAttached", defaultMessage: "Attached to the conversation" }),
-    }, attachmentKey(source));
-  });
-  const external = props.externalSources.map((source) => {
-    const hostname = hostnameFromUrl(source.url);
-    const relatedCalls = hostname == null || source.title !== hostname ? [] : (webMcpCallsByHost.get(hostname) ?? []);
-    if (hostname != null && source.title === hostname) webMcpCallsByHost.delete(hostname);
-    return runtime.jsxs(SourcesUi.SourceDetails, {
-      icon: runtime.jsx(ExternalResourceIcon, { resource: source }),
-      label: source.title,
-      meta: source.activities.includes("provided") ? undefined : source.provider == null ? source.url : `${source.provider.name} · ${source.url}`,
-      onOpen: (event: unknown) => openExternalLink({ event, href: source.url, initiator: (source.openInitiator ?? "open_in_browser_bridge") as "open_in_browser_bridge" }),
-      children: [runtime.jsx("ul", { children: source.activities.map((activity) => runtime.jsx("li", { children: runtime.jsx(ActivityLabel, { activity }) }, activity)) }), relatedCalls.length === 0 ? null : runtime.jsx(WebMcpCalls, { calls: relatedCalls })],
-    }, source.key);
-  });
-  const unclaimedWebMcpCalls = Array.from(webMcpCallsByHost, ([hostname, calls]) => runtime.jsx(SourcesUi.SourceDetails, {
-    icon: runtime.jsx(Favicon, { className: "icon-sm shrink-0", href: `https://${hostname}` }),
-    label: hostname,
-    children: runtime.jsx(WebMcpCalls, { calls }),
-  }, hostname));
-  const tools = props.toolSources.map((source) => runtime.jsx(SourcesUi.SourceDetails, {
-    icon: runtime.jsx(AppLogo, { alt: "", fallback: runtime.jsx(DefaultAppIcon, {}), knownAppId: knownAppIdForToolSource(source), logoDarkUrl: source.logoUrlDark, logoUrl: source.logoUrl }),
-    label: sourceName(source),
-    onOpen: source.mcpAppId == null || props.onOpenMcpApp == null ? undefined : () => props.onOpenMcpApp?.(source.mcpAppId as string),
-    children: runtime.jsx("ul", { children: source.activities.flatMap((activity) => {
-      if (activity.calls.length === 0) return [];
-      const summary = runtime.jsx(FormattedMessage, { id: "codex.localConversation.sources.panel.toolUseCount", defaultMessage: "{name} {count, plural, one {once} other {# times}}", values: { count: activity.calls.length, name: activity.label } });
-      const onExpand = (): void => logSourcesPanelExpansion(scope, analyticsClient, { sectionType: sourceSectionType.CODEX_SOURCES_SECTION_TYPE_MCP_TOOL_CALLS, appName: source.trustedAnalyticsAppName, itemCount: activity.calls.length });
-      if (activity.calls.length === 1) return activity.calls.map((call) => runtime.jsx("li", { children: runtime.jsx(McpCallContent, { conversationId: props.conversationId, hostId: props.hostId, item: call, onExpand, summary }) }, call.callId));
-      return [runtime.jsx("li", { children: runtime.jsx(ToolActivityDisclosure, { icon: null, indentContent: false, onExpand, status: "completed", summary, children: runtime.jsx("ul", { children: activity.calls.map((call) => runtime.jsx("li", { children: runtime.jsx(McpCallContent, { conversationId: props.conversationId, expandedContentOnly: true, hostId: props.hostId, item: call }) }, call.callId)) }) }) }, activity.label)];
-    }) }),
-  }, source.id));
-  const webSearch = props.webSearchSource == null ? null : runtime.jsx(SourcesUi.SourceDetails, {
-    icon: runtime.jsx(GlobeIcon, { "aria-hidden": true, className: "icon-sm shrink-0" }),
-    label: intl.formatMessage({ id: "codex.localConversation.sources.webSearch", defaultMessage: "Web search" }),
-    children: runtime.jsxs("ul", { children: [
-      props.webSearchSource.queryCount === 0 ? null : runtime.jsx("li", { children: runtime.jsx(ToolActivityDisclosure, { icon: null, indentContent: false, status: "completed", summary: `${props.webSearchSource.queryCount} searches`, children: runtime.jsx("ul", { children: props.webSearchSource.queries.map((query) => runtime.jsx("li", { children: query }, query)) }) }) }),
-      props.webSearchSource.viewedLinks.length === 0 ? null : runtime.jsx("li", { children: runtime.jsx(ToolActivityDisclosure, { icon: null, indentContent: false, status: "completed", summary: `${props.webSearchSource.viewedLinks.length} opened pages`, children: runtime.jsx("ul", { children: props.webSearchSource.viewedLinks.map((link) => runtime.jsx("li", { children: runtime.jsxs("button", { title: link.url, type: "button", onClick: (event: unknown) => openExternalLink({ event, href: link.url, initiator: "open_in_browser_bridge" }), children: [runtime.jsx(IconAsset, { asset: externalLinkAsset }), link.label] }) }, link.url)) }) }) }),
-    ] }),
-  });
-  const label = intl.formatMessage({ id: "codex.localConversation.sources.panel.listLabel", defaultMessage: "Sources" });
-  return runtime.jsx(SourcesUi.SourcesSidePanel, { children: runtime.jsxs(SourcesUi.SourcesSidePanelList, { label, children: [files, external, unclaimedWebMcpCalls, tools, webSearch] }) });
 }
-
-function LocalConversationSourcesSidePanelTab(props: LocalConversationSourcesSidePanelTabProps): unknown {
-  const sources = useLocalConversationSources(props.conversationId, props.hostId) as unknown as SourceCollection;
-  return getJsxRuntime().jsx(SourcesPanel, { ...props, ...sources });
+function _e(e) {
+  return e.name.trim() || e.pluginDisplayNames.join(`, `);
 }
-
-let initialized = false;
-function initializeSourcesPanel(): void {
-  if (initialized) return;
-  initialized = true;
-  initializeIntlRuntime(); initializeFilePreviewIcon(); initializeFavicon();
-  initializeMcpToolItemContent(); initializeToolActivityDisclosure(); initializeKnownAppIcon();
-  initializeExternalResourceIcon(); initializeWebMcpToolsModel(); initializeLocalConversationSources();
-  void hostMessageBridge;
+var Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((Z = t()),
+      g(),
+      u(),
+      a(),
+      T(),
+      l(),
+      N(),
+      w(),
+      S(),
+      y(),
+      D(),
+      i(),
+      b(),
+      _(),
+      H(),
+      B(),
+      M(),
+      E(),
+      R(),
+      L(),
+      J(),
+      F(),
+      A(),
+      ce(),
+      (Q = c()));
+  }))();
 }
-
-initializeSourcesPanel();
-export { LocalConversationSourcesSidePanelTab };
+$();
+export { de as LocalConversationSourcesSidePanelTab };

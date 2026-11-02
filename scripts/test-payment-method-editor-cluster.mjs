@@ -11,28 +11,8 @@ function nodes(root) { const output = []; const visit = value => { if (value == 
 function find(root, predicate) { return nodes(root).find(predicate); }
 function text(root) { return nodes(root).flatMap(node => typeof node.props?.children === "string" ? [node.props.children] : []).join(" "); }
 
-// add-payment-method: 10
-const add = await bundle("add-payment-method");
-assert.deepEqual(Object.keys(add), ["n", "t"]);
-assert.equal(find(add.t({ accountId: "a", isLoading: true, onClose() {} }), node => node.props?.role === "status").props.children, "Preparing secure payment form…");
-let retried = 0;
-const addError = add.t({ accountId: "a", error: "Offline", onClose() {}, onRetry() { retried++; } });
-assert.equal(find(addError, node => node.props?.role === "alert").type, "div");
-find(addError, node => node.props?.children === "Retry").props.onClick();
-assert.equal(retried, 1);
-let added, succeeded, addClosed = 0;
-const addUi = add.t({ accountId: "account", onClose() { addClosed++; }, onSubmit(input) { added = input; return { paymentMethodId: "pm" }; }, onSuccess(method) { succeeded = method; } });
-assert.match(text(addUi), /Add payment method.*Name on card.*Card details.*Continue/);
-await find(addUi, node => node.type === "form").props.onSubmit({ preventDefault() {}, currentTarget: { elements: { billingName: { value: " David " }, cardComplete: { checked: true } } } });
-assert.deepEqual(added, { accountId: "account", billingName: "David", cardComplete: true });
-assert.deepEqual(succeeded, { paymentMethodId: "pm" });
-find(addUi, node => node.props?.children === "Close").props.onClick();
-assert.equal(addClosed, 1);
-const busyAdd = add.t({ accountId: "a", isSubmitting: true, onClose() { addClosed++; } });
-assert.equal(find(busyAdd, node => node.props?.children === "Close").props.disabled, true);
-find(busyAdd, node => node.props?.children === "Close").props.onClick();
-assert.equal(addClosed, 1);
+const addReleaseAssertions = assertReleaseOwner("add-payment-method");
 
 const editReleaseAssertions = assertReleaseOwner("edit-payment-method");
 
-console.log(`add payment method assertions and ${editReleaseAssertions} edit payment release assertions passed`);
+console.log(`${addReleaseAssertions + editReleaseAssertions} payment method release assertions passed`);

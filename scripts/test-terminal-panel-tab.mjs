@@ -126,38 +126,7 @@ function keyboardEvent(key, overrides = {}) {
 
 const terminalPanelReleaseAssertions = assertReleaseOwner("terminal-panel");
 
-const tab = await load("terminal-tab");
-assert.deepEqual(Object.keys(tab), ["TerminalTab"]);
-const baseProps = {
-  conversationId: "conversation-1",
-  conversationTitle: "Terminal test",
-  cwd: "/repo/one",
-  hostId: "local",
-  onNewTerminalTab() {},
-  renderSlots(slots) { return slots; },
-  sessionId: "local-1",
-  workspaceRoots: ["/repo/one", "/repo/two"],
-};
-const localSlots = tab.TerminalTab(baseProps);
-assert.deepEqual(localSlots.headerRows, []);
-assert.equal(localSlots.content.type, "div");
-assert.equal(localSlots.content.props.children.type, "terminal-panel");
-assert.equal(localSlots.content.props.children.props.sessionId, "local-1");
-assert.equal(localSlots.content.props.children.props.initialPromptHint.props.children[1].props.children.length, 2);
-const switchRoot = keyboardEvent("2", { altKey: true, code: "Digit2" });
-assert.equal(localSlots.content.props.children.props.onKeyEvent(switchRoot), false);
-await Promise.resolve();
-await Promise.resolve();
-assert.deepEqual(state.writes.at(-1), { id: "local-1", data: "cd -- '/repo/two'\r", source: "user" });
-state.conversation = { sessionIds: [] };
-assert.equal(tab.TerminalTab(baseProps).content, null);
-state.snapshot = { output: "", shell: "bash" };
-const cloudSlots = tab.TerminalTab({ ...baseProps, environmentId: "environment-1", hostId: "durable", sessionId: "cloud-1" });
-assert.equal(cloudSlots.content.type, "terminal-panel");
-assert.equal(cloudSlots.content.props.environmentId, "environment-1");
-assert.equal(cloudSlots.content.props.loadingOverlay.props.role, "status");
-state.snapshot = { error: "boom", shell: "bash" };
-assert.equal(tab.TerminalTab({ ...baseProps, hostId: "durable", sessionId: "cloud-2" }).content.type, "empty-state");
+const terminalTabReleaseAssertions = assertReleaseOwner("terminal-tab");
 
 const assertionCount = [...fs.readFileSync(fileURLToPath(import.meta.url), "utf8").matchAll(/\bassert\./g)].length;
-console.log(assertionCount + ` terminal tab assertions and ${terminalPanelReleaseAssertions} terminal panel release assertions passed`);
+console.log(assertionCount + ` assertions and ${terminalTabReleaseAssertions + terminalPanelReleaseAssertions} terminal release assertions passed`);

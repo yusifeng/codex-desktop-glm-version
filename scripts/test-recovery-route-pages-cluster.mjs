@@ -66,15 +66,8 @@ assert.match(authError.BrowserAuthErrorPage().props.children[0].props.children, 
 globalThis.__location = { ...globalThis.__location, search: "?error=not-real" };
 assert.equal(authError.BrowserAuthErrorPage().props["data-error"], "default");
 
-const demo = await load("demo-tools-setup-page");
-globalThis.__stateOverrides = [{ downloadUrl: "https://example.com/app", installStatus: "installed" }, null];
-const demoPage = demo.DemoToolsSetupPage();
-assert.equal(demoPage.props.children[0].props.children, "Set up a demo install");
-assert.equal(demoPage.props.children[3].props.children.length, 4);
-assert.equal(demoPage.props.children[3].props.children[0].props.children.props.disabled, false);
-assert.equal(demoPage.props.children[3].props.children[3].props.children, "Ready to launch");
-assert.equal(demoPage.props.children[2], null);
+const demoReleaseAssertions = assertReleaseOwner("demo-tools-setup-page");
 
 const callbackReleaseAssertions = assertReleaseOwner("app-connect-oauth-callback-page");
 
-console.log(`recovery route pages cluster complete with ${callbackReleaseAssertions} OAuth callback release assertions`);
+console.log(`recovery route pages cluster complete with ${demoReleaseAssertions + callbackReleaseAssertions} release assertions`);

@@ -1,503 +1,1023 @@
-// my-gpts-page — Created/shared GPT management, pagination, and row actions.
-
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-// @ts-ignore -- semantic dependency exists in the published renderer asset graph.
-import * as directoryBannerChunk from "@rchunk/directory-banner";
-import * as managementUrlChunk from "@rchunk/gpt-management-url";
-import * as migratedAccessChunk from "@rchunk/migrated-plugin-access";
-import * as migratedNoticeChunk from "@rchunk/migrated-plugin-notice";
-import "@rchunk/rolldown-runtime";
-import * as skillsGridChunk from "@rchunk/skills-page-grid";
-import * as tabsChunk from "@rchunk/security-tabs";
-
-interface JsxRuntime {
-  Fragment: unknown;
-  jsx(type: unknown, props: unknown, key?: string): unknown;
-  jsxs(type: unknown, props: unknown, key?: string): unknown;
-}
-
-interface ReactRuntime {
-  useState<Value>(value: Value): [Value, (next: Value) => void];
-}
-
-interface IntlShape {
-  formatMessage(descriptor: MessageDescriptor): string;
-}
-
-interface MessageDescriptor {
-  defaultMessage: string;
-  description: string;
-  id: string;
-  values?: Record<string, unknown>;
-}
-
-interface FeatureConfig {
-  get(name: string, fallback?: boolean): boolean;
-}
-
-interface Account {
-  account_user_id?: string | null;
-  id: string;
-  name: string;
-  structure: "personal" | "workspace";
-}
-
-interface GptPermission {
-  can_delete?: boolean;
-  can_write?: boolean;
-}
-
-interface GptResource {
-  gizmo: {
-    author: { user_id?: string | null };
-    current_user_permission?: GptPermission;
-    display: {
-      description?: string;
-      name: string;
-      profile_picture_url?: string | null;
-    };
-    id: string;
-    live_version?: number | null;
-    migrated_plugin_id?: string | null;
-    share_recipient?: string | null;
-    vanity_metrics?: { num_conversations_str?: string | null } | null;
-    workspace_id?: string | null;
-  };
-}
-
-interface GptPage {
-  list: {
-    cursor?: string | null;
-    items: Array<{ resource: GptResource }>;
-  };
-}
-
-interface InfiniteQueryResult {
-  data?: { pages: GptPage[] } | null;
-  fetchNextPage(): Promise<unknown> | unknown;
-  hasNextPage?: boolean;
-  isFetchNextPageError?: boolean;
-  isFetchingNextPage?: boolean;
-  isPending?: boolean;
-  refetch(): Promise<unknown> | unknown;
-}
-
-interface Scope {
-  queryClient: {
-    refetchQueries(input: { queryKey: string[] }): Promise<unknown> | unknown;
-  };
-}
-
-interface AppSharedApi {
-  $3(): void;
-  $I(): void;
-  $O: { ONE_MINUTE: number };
-  BX<Value>(family: unknown, parameter: string, options?: { enabled: boolean }): { data?: Value };
-  FX(): void;
-  H3(): void;
-  I3(): JsxRuntime;
-  Jm(loader: () => Promise<unknown>): unknown;
-  K2(): void;
-  Kv: unknown;
-  Kx: unknown;
-  LX(scope: unknown): Scope;
-  QI(): void;
-  Xv: unknown;
-  Y2: unknown;
-  YC: unknown;
-  Yh: unknown;
-  ZI: unknown;
-  Zh(): void;
-  c_(): void;
-  cb: unknown;
-  e6(): ReactRuntime;
-  eL(options: Record<string, unknown>): InfiniteQueryResult;
-  ek(): void;
-  lw(): void;
-  mx: unknown;
-  n4(): IntlShape;
-  o_: unknown;
-  qm(): void;
-}
-
-interface AppInitialApi {
-  $d(): void;
-  Dft(): void;
-  Dln: unknown;
-  F7(scope: unknown, conversationId: null): void;
-  Het(): void;
-  Jet(scope: unknown, mode: string): void;
-  M6t(): void;
-  N6t(): { accountId: string | null; userId: string | null };
-  Oft(input: Record<string, unknown>): void;
-  Oln(): void;
-  P7(): void;
-  Qd: unknown;
-  Qgn(): void;
-  Uzt(scope: unknown, component: unknown, props: Record<string, unknown>): void;
-  Vzt(): void;
-  Ygn: unknown;
-  _tn: string;
-  afn(key: string): FeatureConfig;
-  cT: unknown;
-  f7: { Header: unknown & { Toolbar: unknown }; HeaderToolbar: unknown & { Actions: unknown } };
-  gmn(): unknown;
-  iE(): void;
-  ifn(): void;
-  lT: unknown;
-  o_n(): (destination: unknown) => void;
-  ofn(key: string): boolean;
-  p7(): void;
-  rE: string;
-  rht(): void;
-  sfn(key: string): boolean;
-  uT(): void;
-  uht(accountId?: string, options?: { preview: boolean }): {
-    data?: Account | null;
-    isError?: boolean;
-  };
-  xtn(): void;
-  ytn(gptId: string): string;
-}
-
-interface DirectoryBannerApi {
-  a: (props: { onRetry(): void }) => unknown;
-  d(): void;
-  i(): void;
-  l(): void;
-  n(): void;
-  o: () => unknown;
-  r: () => unknown;
-  t: (props: { showMigrationAction: boolean }) => unknown;
-  u(input: { cutId: string; cursor?: unknown; limit: number; signal?: unknown }): Promise<GptPage>;
-}
-
-interface MigratedAccessApi {
-  i(account: Account, workspaceGate: boolean, permissions?: string[]): boolean;
-  r(input: {
-    resource: GptResource;
-    account: Account;
-    accountId: string | null;
-    userId: string | null;
-    enabled: boolean;
-  }): boolean;
-}
-
-const {
-  $3: initializeCompilerRuntime,
-  $I: initializeInteropRuntime,
-  $O: timeConstants,
-  BX: useSignalFamilyValue,
-  FX: initializeSignalRuntime,
-  H3: initializeSharedComponents,
-  I3: getJsxRuntime,
-  Jm: lazy,
-  K2: initializeIntlRuntime,
-  Kv: WorkspaceIcon,
-  Kx: EditIcon,
-  LX: useScope,
-  QI: initializeScopeRuntime,
-  Xv: ChatsIcon,
-  Y2: FormattedMessage,
-  YC: DeleteIcon,
-  Yh: Button,
-  ZI: applicationScope,
-  Zh: initializeButton,
-  c_: initializeTooltip,
-  cb: PublicIcon,
-  e6: getReactRuntime,
-  eL: useInfiniteQuery,
-  ek: initializeQueryRuntime,
-  lw: initializeReactQueryRuntime,
-  mx: PrivateIcon,
-  n4: useIntl,
-  o_: Tooltip,
-  qm: initializeIcons,
-} = appSharedChunk as unknown as AppSharedApi;
-
-const {
-  $d: initializeAccountChecks,
-  Dft: initializeExternalLinks,
-  Dln: workspacePermissionsFamily,
-  F7: clearConversation,
-  Het: initializeAccountRuntime,
-  Jet: setConversationMode,
-  M6t: initializeGptResources,
-  N6t: useSessionIdentity,
-  Oft: openExternalLink,
-  Oln: initializeWorkspacePermissions,
-  P7: initializeRouteRuntime,
-  Qd: GptAvatar,
-  Qgn: initializeAuthentication,
-  Uzt: openDialog,
-  Vzt: initializeDialogRuntime,
-  Ygn: Redirect,
-  _tn: homeRoute,
-  afn: getExperiment,
-  cT: Inset,
-  f7: AppHeader,
-  gmn: initializeUniqByRuntime,
-  iE: initializeNavigationRuntime,
-  ifn: initializeFeatureGates,
-  lT: PageLayout,
-  o_n: useNavigate,
-  ofn: useFeatureGate,
-  p7: initializePageRuntime,
-  rE: gptBuilderRoute,
-  rht: initializeAccountQueries,
-  sfn: useFeatureGateLoading,
-  uT: initializeComposerRuntime,
-  uht: useAccount,
-  xtn: initializeConversationRouting,
-  ytn: buildGptConversationRoute,
-} = appInitialChunk as unknown as AppInitialApi;
-
-const {
-  a: ErrorState,
-  d: initializeDirectoryQueries,
-  i: initializeDirectoryActions,
-  l: initializeDirectoryLayout,
-  n: initializeDirectoryBanner,
-  o: LoadingState,
-  r: CreateGptAction,
-  t: DirectoryBanner,
-  u: fetchGpts,
-} = directoryBannerChunk as unknown as DirectoryBannerApi;
-
-const { n: initializeTabs, t: Tabs } = tabsChunk;
-const { r: initializeSkillsGrid, t: SkillsGrid } = skillsGridChunk;
-const { i: hasMigrationWorkspaceAccess, r: canMigrateResource } =
-  migratedAccessChunk as unknown as MigratedAccessApi;
-const { n: initializeManagementUrl, t: buildGptManagementUrl } = managementUrlChunk;
-const { r: initializeMigratedNotice, t: MigratedPluginNotice } = migratedNoticeChunk;
-
-const ACCOUNT_QUERY_OPTIONS = { preview: false };
-const PAGE_SIZE = 20;
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let MigrationDialog: unknown;
-let DeleteDialog: unknown;
-let initialized = false;
-
-function message(descriptor: MessageDescriptor): unknown {
-  return jsx.jsx(FormattedMessage, descriptor);
-}
-
-function initializeMyGptsPage(): void {
-  if (initialized) return;
-  initializeCompilerRuntime();
-  initializeInteropRuntime();
-  initializeSignalRuntime();
-  initializeSharedComponents();
-  initializeIntlRuntime();
-  initializeScopeRuntime();
-  initializeButton();
-  initializeTooltip();
-  initializeQueryRuntime();
-  initializeReactQueryRuntime();
-  initializeIcons();
-  initializeAccountChecks();
-  initializeExternalLinks();
-  initializeAccountRuntime();
-  initializeGptResources();
-  initializeWorkspacePermissions();
-  initializeRouteRuntime();
-  initializeAuthentication();
-  initializeDialogRuntime();
-  initializeUniqByRuntime();
-  initializeNavigationRuntime();
-  initializeFeatureGates();
-  initializePageRuntime();
-  initializeAccountQueries();
-  initializeComposerRuntime();
-  initializeConversationRouting();
-  initializeTabs();
-  initializeSkillsGrid();
-  initializeDirectoryQueries();
-  initializeDirectoryActions();
-  initializeDirectoryLayout();
-  initializeDirectoryBanner();
-  initializeManagementUrl();
-  initializeMigratedNotice();
-  React = getReactRuntime();
-  jsx = getJsxRuntime();
-  MigrationDialog = lazy(async () => {
-    const module = await import("@rchunk/gpt-plugin-migration-dialog");
-    return { default: module.GptPluginMigrationDialog };
-  });
-  DeleteDialog = lazy(async () => {
-    const module = await import("@rchunk/my-gpt-delete-dialog");
-    return { default: module.MyGptDeleteDialog };
-  });
-  initialized = true;
-}
-
-function AudienceDetails({ resource, account }: { resource: GptResource; account: Account }): unknown {
-  const recipient = resource.gizmo.share_recipient ?? "private";
-  const count = resource.gizmo.vanity_metrics?.num_conversations_str;
-  const audienceIcon =
-    recipient === "link" || recipient === "marketplace"
-      ? PublicIcon
-      : recipient === "workspace" || recipient === "workspace_link"
-        ? WorkspaceIcon
-        : PrivateIcon;
-  const audienceCopy: Record<string, MessageDescriptor> = {
-    link: { id: "chatgptConversations.gpts.mine.audience.link", defaultMessage: "Anyone with the link", description: "GPT link audience" },
-    marketplace: { id: "chatgptConversations.gpts.mine.audience.public", defaultMessage: "Everyone", description: "GPT public audience" },
-    workspace: { id: "chatgptConversations.gpts.mine.audience.workspace", defaultMessage: "Anyone at {workspaceName}", description: "GPT workspace audience", values: { workspaceName: account.name } },
-    workspace_link: { id: "chatgptConversations.gpts.mine.audience.workspaceLink", defaultMessage: "Anyone at {workspaceName} with the link", description: "GPT workspace-link audience", values: { workspaceName: account.name } },
-    email: { id: "chatgptConversations.gpts.mine.audience.invited", defaultMessage: "Invite only", description: "GPT invited audience" },
-    group: { id: "chatgptConversations.gpts.mine.audience.invited", defaultMessage: "Invite only", description: "GPT invited audience" },
-    user: { id: "chatgptConversations.gpts.mine.audience.invited", defaultMessage: "Invite only", description: "GPT invited audience" },
-    private: { id: "chatgptConversations.gpts.mine.audience.private", defaultMessage: "Only me", description: "GPT private audience" },
-  };
-  return jsx.jsxs("div", {
-    className: "flex min-w-0 flex-col gap-1 text-sm text-secondary select-none",
-    children: [
-      recipient !== "private" && count != null
-        ? jsx.jsxs("div", { className: "flex items-center gap-1.5", children: [jsx.jsx(ChatsIcon, {}), message({ id: "chatgptConversations.gpts.mine.chats", defaultMessage: "{count} chats", description: "GPT usage count", values: { count } })] })
-        : null,
-      jsx.jsxs("div", { className: "flex items-center gap-1.5", children: [jsx.jsx(audienceIcon, {}), jsx.jsx("span", { className: "truncate", children: message(audienceCopy[recipient] ?? audienceCopy.private) })] }),
-    ],
-  });
-}
-
-function GptRow({ resource, account }: { resource: GptResource; account: Account }): unknown {
-  const scope = useScope(applicationScope);
-  const intl = useIntl();
-  const navigate = useNavigate();
-  const { accountId, userId } = useSessionIdentity();
-  const migrationEnabled = useFeatureGate("2160578039");
-  const workspaceMigrationEnabled = useFeatureGate("1355972088");
-  const migrationExperiment = getExperiment("2562735250").get("enabled", false);
-  const controlsExperiment = getExperiment("2826703856").get("enable_gpt_fe_controls", false);
-  const updatesDisabled = getExperiment("2513446768").get("disable_gpt_updates", false);
-  const permissionsEnabled = account.structure === "workspace" && (workspaceMigrationEnabled || controlsExperiment);
-  const { data: workspacePermissions } = useSignalFamilyValue<{ permissions?: string[] }>(workspacePermissionsFamily, account.id, { enabled: permissionsEnabled });
-  const pluginId = migrationEnabled ? resource.gizmo.migrated_plugin_id ?? null : null;
-  const draft = (resource.gizmo.live_version ?? 0) === 0 && pluginId == null;
-  const displayName = resource.gizmo.display.name.trim() || intl.formatMessage({ id: "chatgptConversations.gpts.mine.untitled", defaultMessage: "Untitled", description: "Fallback GPT name" });
-  const controlsAllowed = !controlsExperiment || account.structure === "personal" || workspacePermissions?.permissions?.includes("chatgpt.workspace.gpt.crud") === true;
-  const isOwner = pluginId != null && resource.gizmo.author.user_id === (account.structure === "personal" ? userId : account.account_user_id) && (resource.gizmo.workspace_id ?? null) === (account.structure === "workspace" ? account.id : null);
-  const canWrite = controlsAllowed && (isOwner || resource.gizmo.current_user_permission?.can_write === true);
-  const canDelete = controlsAllowed && (isOwner || resource.gizmo.current_user_permission?.can_delete === true);
-  const migrationAllowed = migrationEnabled && migrationExperiment && hasMigrationWorkspaceAccess(account, workspaceMigrationEnabled, workspacePermissions?.permissions) && canMigrateResource({ resource, account, accountId, userId, enabled: migrationEnabled });
-  const editLabel = intl.formatMessage({ id: "chatgptConversations.gpts.mine.edit", defaultMessage: "Edit GPT", description: "Edit GPT action" });
-  const deleteLabel = intl.formatMessage({ id: "chatgptConversations.gpts.mine.delete", defaultMessage: "Delete GPT", description: "Delete GPT action" });
-  const edit = (event: unknown): void => {
-    if (draft) {
-      navigate({ pathname: gptBuilderRoute, search: new URLSearchParams({ gizmo: resource.gizmo.id }).toString() });
-      return;
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/gpt-plugin-migration-dialog",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/migrated-plugin-access",
+      "@rchunk/gpt-management-url",
+      "@rchunk/migrated-plugin-notice",
+      "@rchunk/chat-choice-view",
+      "@rchunk/gpt-plugin-retirement",
+      "@rchunk/gpt-plugin-migration-failure",
+      "@rchunk/my-gpt-delete-dialog",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  $3 as n,
+  $I as r,
+  $O as i,
+  BX as a,
+  FX as o,
+  H3 as s,
+  I3 as c,
+  Jm as l,
+  K2 as u,
+  Kv as d,
+  Kx as f,
+  LX as p,
+  QI as m,
+  V3 as h,
+  Xv as g,
+  Y2 as _,
+  YC as v,
+  Yh as ee,
+  ZI as y,
+  Zh as b,
+  c_ as x,
+  cb as S,
+  e6 as C,
+  eL as te,
+  ek as ne,
+  lw as w,
+  mx as re,
+  n4 as ie,
+  o_ as ae,
+  qm as oe,
+} from "@rchunk/app-shared";
+import {
+  $d as T,
+  Dft as E,
+  Dln as se,
+  F7 as ce,
+  Het as le,
+  Jet as ue,
+  M6t as D,
+  N6t as de,
+  Oft as fe,
+  Oln as O,
+  P7 as pe,
+  Qd as me,
+  Qgn as he,
+  Uzt as ge,
+  Vzt as _e,
+  Ygn as ve,
+  _tn as ye,
+  afn as be,
+  cT as k,
+  f7 as A,
+  gmn as j,
+  iE as M,
+  ifn as N,
+  lT as P,
+  o_n as xe,
+  ofn as Se,
+  p7 as Ce,
+  rE as we,
+  rht as F,
+  sfn as Te,
+  uT as I,
+  uht as L,
+  xtn as R,
+  ytn as Ee,
+} from "@rchunk/app-initial";
+import { n as z, t as B } from "@rchunk/security-tabs";
+import { r as V, t as H } from "@rchunk/skills-page-grid";
+import {
+  a as U,
+  d as W,
+  i as G,
+  l as K,
+  n as q,
+  o as J,
+  r as Y,
+  t as X,
+  u as De,
+} from "@rchunk/gpt-directory-banner-runtime";
+import { i as Oe, r as ke } from "@rchunk/migrated-plugin-access";
+import { t as Ae } from "@rchunk/gpt-management-url";
+import { r as je, t as Me } from "@rchunk/migrated-plugin-notice";
+function Ne(e) {
+  let t = (0, Pe.c)(22),
+    { resource: n, account: r } = e,
+    i = n.gizmo.share_recipient ?? `private`,
+    a = n.gizmo.vanity_metrics?.num_conversations_str,
+    o,
+    s;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = (0, Z.jsx)(re, {})), (t[0] = s))
+    : (s = t[0]);
+  let c = s;
+  if (i === `link` || i === `marketplace`) {
+    let e;
+    (t[1] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, Z.jsx)(S, {})), (t[1] = e))
+      : (e = t[1]),
+      (c = e));
+  } else if (i === `workspace` || i === `workspace_link`) {
+    let e;
+    (t[2] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, Z.jsx)(d, {})), (t[2] = e))
+      : (e = t[2]),
+      (c = e));
+  }
+  bb0: switch (i) {
+    case `link`: {
+      let e;
+      (t[3] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Z.jsx)(_, {
+            id: `chatgptConversations.gpts.mine.audience.link`,
+            defaultMessage: `Anyone with the link`,
+            description: `GPT audience when anyone who has its link can use it`,
+          })),
+          (t[3] = e))
+        : (e = t[3]),
+        (o = e));
+      break bb0;
     }
-    openExternalLink({ event, href: `${buildGptManagementUrl("/gpts/editor")}/${encodeURIComponent(resource.gizmo.id)}`, initiator: "open_in_browser_bridge", openTarget: "external-browser" });
-  };
-  const open = (event: unknown): void => {
-    if (draft) edit(event);
-    else {
-      setConversationMode(scope, "chat");
-      clearConversation(scope, null);
-      navigate(buildGptConversationRoute(resource.gizmo.id));
+    case `marketplace`: {
+      let e;
+      (t[4] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Z.jsx)(_, {
+            id: `chatgptConversations.gpts.mine.audience.public`,
+            defaultMessage: `Everyone`,
+            description: `GPT audience when published publicly in the GPT Store`,
+          })),
+          (t[4] = e))
+        : (e = t[4]),
+        (o = e));
+      break bb0;
     }
-  };
-  const migrationAction = pluginId != null
-    ? jsx.jsx(MigratedPluginNotice, { pluginId, presentation: "row" })
-    : migrationAllowed
-      ? jsx.jsx(Button, { className: "w-full", color: "primary", size: "entityRowAction", onClick: () => openDialog(scope, MigrationDialog, { resource }), children: message({ id: "chatgptConversations.gpts.mine.migrate", defaultMessage: "Migrate to plugin", description: "Migrate GPT action" }) })
-      : null;
-  const iconUrl = resource.gizmo.display.profile_picture_url ?? null;
-  const draftDisabled = draft && (!canWrite || updatesDisabled);
-  return jsx.jsxs("div", {
-    role: "listitem",
-    className: "flex flex-wrap items-center gap-x-6 gap-y-3 py-4 @lg:flex-nowrap",
-    children: [
-      jsx.jsxs("div", { className: "flex min-w-0 flex-1 basis-full items-center gap-6 @lg:basis-auto", children: [
-        jsx.jsxs("button", { type: "button", "aria-label": displayName, className: "flex min-w-0 flex-1 cursor-interaction items-center gap-3 text-start select-none", disabled: draftDisabled, onClick: open, children: [
-          jsx.jsx(GptAvatar, { customGpt: { id: resource.gizmo.id, name: displayName, iconUrl }, presentation: "avatar", className: "size-8 shrink-0" }),
-          jsx.jsxs("div", { className: "min-w-0 flex-1", children: [jsx.jsxs("div", { className: "flex items-center gap-2", children: [jsx.jsx("span", { className: "truncate text-base font-semibold text-default", children: displayName }), draft ? jsx.jsx(Tooltip, { tooltipContent: message({ id: "chatgptConversations.gpts.mine.draft", defaultMessage: "Draft", description: "Draft GPT status" }), children: jsx.jsx("span", { className: "size-1.5 shrink-0 rounded-full bg-text-tertiary/30" }) }) : null] }), jsx.jsx("p", { className: "min-h-5 truncate text-sm text-secondary", children: resource.gizmo.display.description })] }),
-        ] }),
-        jsx.jsx("div", { className: "hidden w-50 shrink-0 @2xl:block", children: jsx.jsx(AudienceDetails, { resource, account }) }),
-      ] }),
-      jsx.jsx("div", { className: "basis-full @2xl:hidden", children: jsx.jsx(AudienceDetails, { resource, account }) }),
-      jsx.jsxs("div", { className: "ms-auto flex w-55.25 shrink-0 items-center justify-end gap-3", children: [
-        jsx.jsx("div", { className: "flex w-34.25 shrink-0 justify-end", children: migrationAction }),
-        jsx.jsxs("div", { className: "flex w-18 shrink-0 items-center", children: [
-          canWrite ? jsx.jsx(Tooltip, { tooltipContent: pluginId == null ? editLabel : message({ id: "chatgptConversations.gpts.mine.editMigratedTooltip", defaultMessage: "This GPT has been migrated to a plugin and can no longer be edited", description: "Migrated GPT edit disabled" }), children: jsx.jsx(Button, { "aria-label": editLabel, color: "ghostActive", size: "entityHeader", disabled: updatesDisabled || pluginId != null, onClick: edit, children: jsx.jsx(EditIcon, {}) }) }) : null,
-          canDelete ? jsx.jsx(Tooltip, { tooltipContent: pluginId == null ? deleteLabel : message({ id: "chatgptConversations.gpts.mine.deleteMigratedTooltip", defaultMessage: "This GPT has been migrated to a plugin and can no longer be deleted", description: "Migrated GPT delete disabled" }), children: jsx.jsx(Button, { "aria-label": deleteLabel, color: "ghostActive", size: "entityHeader", disabled: pluginId != null, onClick: () => openDialog(scope, DeleteDialog, { resource }), children: jsx.jsx(DeleteIcon, { className: "text-danger" }) }) }) : null,
-        ] }),
-      ] }),
-    ],
-  });
-}
-
-function uniqueResources(pages: GptPage[]): GptResource[] {
-  const seen = new Set<string>();
-  const resources: GptResource[] = [];
-  for (const page of pages) {
-    for (const item of page.list.items) {
-      if (!seen.has(item.resource.gizmo.id)) {
-        seen.add(item.resource.gizmo.id);
-        resources.push(item.resource);
-      }
+    case `workspace`: {
+      let e;
+      (t[5] === r.name
+        ? (e = t[6])
+        : ((e = (0, Z.jsx)(_, {
+            id: `chatgptConversations.gpts.mine.audience.workspace`,
+            defaultMessage: `Anyone at {workspaceName}`,
+            description: `GPT audience when shared with everyone in the named workspace`,
+            values: { workspaceName: r.name },
+          })),
+          (t[5] = r.name),
+          (t[6] = e)),
+        (o = e));
+      break bb0;
+    }
+    case `workspace_link`: {
+      let e;
+      (t[7] === r.name
+        ? (e = t[8])
+        : ((e = (0, Z.jsx)(_, {
+            id: `chatgptConversations.gpts.mine.audience.workspaceLink`,
+            defaultMessage: `Anyone at {workspaceName} with the link`,
+            description: `GPT audience when anyone in the named workspace who has its link can use it`,
+            values: { workspaceName: r.name },
+          })),
+          (t[7] = r.name),
+          (t[8] = e)),
+        (o = e));
+      break bb0;
+    }
+    case `email`:
+    case `group`:
+    case `user`: {
+      let e;
+      (t[9] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Z.jsx)(_, {
+            id: `chatgptConversations.gpts.mine.audience.invited`,
+            defaultMessage: `Invite only`,
+            description: `GPT audience restricted to invited users and groups`,
+          })),
+          (t[9] = e))
+        : (e = t[9]),
+        (o = e));
+      break bb0;
+    }
+    case `private`: {
+      let e;
+      (t[10] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Z.jsx)(_, {
+            id: `chatgptConversations.gpts.mine.audience.private`,
+            defaultMessage: `Only me`,
+            description: `GPT audience when only its creator can use it`,
+          })),
+          (t[10] = e))
+        : (e = t[10]),
+        (o = e));
     }
   }
-  return resources;
+  let l;
+  t[11] !== a || t[12] !== i
+    ? ((l =
+        i !== `private` && a != null
+          ? (0, Z.jsxs)(`div`, {
+              className: `flex items-center gap-1.5`,
+              children: [
+                (0, Z.jsx)(g, {}),
+                (0, Z.jsx)(`span`, {
+                  className: `truncate`,
+                  children: (0, Z.jsx)(_, {
+                    id: `chatgptConversations.gpts.mine.chats`,
+                    defaultMessage: `{count} chats`,
+                    description: `GPT usage count; count is an already formatted conversation count, such as 2.4k`,
+                    values: { count: a },
+                  }),
+                }),
+              ],
+            })
+          : null),
+      (t[11] = a),
+      (t[12] = i),
+      (t[13] = l))
+    : (l = t[13]);
+  let u;
+  t[14] === o
+    ? (u = t[15])
+    : ((u = (0, Z.jsx)(`span`, { className: `truncate`, children: o })), (t[14] = o), (t[15] = u));
+  let f;
+  t[16] !== c || t[17] !== u
+    ? ((f = (0, Z.jsxs)(`div`, { className: `flex items-center gap-1.5`, children: [c, u] })),
+      (t[16] = c),
+      (t[17] = u),
+      (t[18] = f))
+    : (f = t[18]);
+  let p;
+  return (
+    t[19] !== l || t[20] !== f
+      ? ((p = (0, Z.jsxs)(`div`, {
+          className: `flex min-w-0 flex-col gap-1 text-sm text-secondary select-none`,
+          children: [l, f],
+        })),
+        (t[19] = l),
+        (t[20] = f),
+        (t[21] = p))
+      : (p = t[21]),
+    p
+  );
 }
-
-function getNextPageParam(page: GptPage): string | undefined {
-  return page.list.cursor ?? undefined;
+var Pe, Z;
+function Fe() {
+  return (Fe = e(() => {
+    ((Pe = n()), u(), w(), (Z = c()));
+  }))();
 }
-
-function MyGptsContent({ account }: { account: Account }): unknown {
-  const intl = useIntl();
-  const [selectedTab, setSelectedTab] = React.useState("mine");
-  const query = useInfiniteQuery({
-    queryKey: ["chatgpt-gizmos", account.id, "my-gpts", selectedTab],
-    initialPageParam: undefined,
-    staleTime: timeConstants.ONE_MINUTE,
-    getNextPageParam,
-    queryFn: ({ pageParam, signal }: { pageParam?: unknown; signal?: unknown }) =>
-      fetchGpts({ cutId: selectedTab, cursor: pageParam, limit: PAGE_SIZE, signal }),
-  });
-  let content: unknown;
-  if (query.isPending) content = jsx.jsx(LoadingState, {});
-  else if (query.data == null) content = jsx.jsx(ErrorState, { onRetry: () => void query.refetch() });
-  else {
-    const resources = uniqueResources(query.data.pages);
-    content = jsx.jsxs(jsx.Fragment, { children: [
-      jsx.jsx("div", { role: "list", className: "@container flex flex-col", children: resources.map((resource) => jsx.jsx(GptRow, { resource, account }, resource.gizmo.id)) }),
-      resources.length === 0 && !query.hasNextPage ? jsx.jsx("p", { className: "py-6 text-sm text-secondary select-none", children: message(selectedTab === "shared_with_me" ? { id: "chatgptConversations.gpts.mine.sharedEmpty", defaultMessage: "No GPTs have been shared with you yet", description: "Shared GPTs empty state" } : { id: "chatgptConversations.gpts.mine.empty", defaultMessage: "No GPTs here yet", description: "Owned GPTs empty state" }) }) : null,
-      query.hasNextPage ? jsx.jsx("div", { className: "flex justify-center", children: jsx.jsx(Button, { color: "secondary", loading: query.isFetchingNextPage, onClick: () => void query.fetchNextPage(), children: message(query.isFetchNextPageError ? { id: "chatgptConversations.gpts.mine.retryMore", defaultMessage: "Try again", description: "Retry GPT pagination" } : { id: "chatgptConversations.gpts.mine.loadMore", defaultMessage: "Load more", description: "Load more GPTs" }) }) }) : null,
-    ] });
+function Ie(e) {
+  let t = (0, Le.c)(91),
+    { resource: n, account: r } = e,
+    i = p(y),
+    o = ie(),
+    s = xe(),
+    { accountId: c, userId: l } = de(),
+    u = Se(`2160578039`),
+    d = Se(`1355972088`),
+    m = be(`2562735250`).get(`enabled`, !1),
+    h = be(`2826703856`),
+    g;
+  t[0] === h ? (g = t[1]) : ((g = h.get(`enable_gpt_fe_controls`, !1)), (t[0] = h), (t[1] = g));
+  let b = g,
+    x = be(`2513446768`),
+    S;
+  t[2] === x ? (S = t[3]) : ((S = x.get(`disable_gpt_updates`, !1)), (t[2] = x), (t[3] = S));
+  let C = S,
+    te = r.structure === `workspace` && (d || b),
+    ne;
+  t[4] === te ? (ne = t[5]) : ((ne = { enabled: te }), (t[4] = te), (t[5] = ne));
+  let { data: w } = a(se, r.id, ne),
+    re = m && ke({ resource: n, account: r, accountId: c, userId: l, enabled: u }),
+    oe = u && m && Oe(r, d, w?.permissions),
+    T = u ? n.gizmo.migrated_plugin_id : null,
+    E = (n.gizmo.live_version ?? 0) === 0 && T == null,
+    le;
+  t[6] !== o || t[7] !== n.gizmo.display.name
+    ? ((le =
+        n.gizmo.display.name.trim() ||
+        o.formatMessage({
+          id: `chatgptConversations.gpts.mine.untitled`,
+          defaultMessage: `Untitled`,
+          description: `Fallback name for a GPT with no name in My GPTs`,
+        })),
+      (t[6] = o),
+      (t[7] = n.gizmo.display.name),
+      (t[8] = le))
+    : (le = t[8]);
+  let D = le,
+    O;
+  t[9] !== r.structure || t[10] !== b || t[11] !== w?.permissions
+    ? ((O =
+        !b ||
+        r.structure === `personal` ||
+        w?.permissions?.includes(`chatgpt.workspace.gpt.crud`) === !0),
+      (t[9] = r.structure),
+      (t[10] = b),
+      (t[11] = w?.permissions),
+      (t[12] = O))
+    : (O = t[12]);
+  let pe = O,
+    he =
+      T != null &&
+      n.gizmo.author.user_id === (r.structure === `personal` ? l : r.account_user_id) &&
+      (n.gizmo.workspace_id ?? null) === (r.structure === `workspace` ? r.id : null),
+    _e = pe && (he || n.gizmo.current_user_permission?.can_write),
+    ve = pe && (he || n.gizmo.current_user_permission?.can_delete),
+    ye;
+  t[13] === o
+    ? (ye = t[14])
+    : ((ye = o.formatMessage({
+        id: `chatgptConversations.gpts.mine.edit`,
+        defaultMessage: `Edit GPT`,
+        description: `Edit this GPT in the app builder for drafts or the web editor for published GPTs`,
+      })),
+      (t[13] = o),
+      (t[14] = ye));
+  let k = ye,
+    A;
+  t[15] === o
+    ? (A = t[16])
+    : ((A = o.formatMessage({
+        id: `chatgptConversations.gpts.mine.delete`,
+        defaultMessage: `Delete GPT`,
+        description: `Open the confirmation dialog to permanently delete this GPT`,
+      })),
+      (t[15] = o),
+      (t[16] = A));
+  let j = A,
+    M;
+  t[17] !== E || t[18] !== s || t[19] !== n.gizmo.id
+    ? ((M = function (e) {
+        E
+          ? s({ pathname: we, search: new URLSearchParams({ gizmo: n.gizmo.id }).toString() })
+          : fe({
+              event: e,
+              href: `${Ae(`/gpts/editor`)}/${encodeURIComponent(n.gizmo.id)}`,
+              initiator: `open_in_browser_bridge`,
+              openTarget: `external-browser`,
+            });
+      }),
+      (t[17] = E),
+      (t[18] = s),
+      (t[19] = n.gizmo.id),
+      (t[20] = M))
+    : (M = t[20]);
+  let N = M,
+    P = null;
+  if (T != null) {
+    let e;
+    (t[21] === T
+      ? (e = t[22])
+      : ((e = (0, Q.jsx)(Me, { pluginId: T, presentation: `row` })), (t[21] = T), (t[22] = e)),
+      (P = e));
+  } else if (oe && re) {
+    let e;
+    t[23] !== n || t[24] !== i
+      ? ((e = () => ge(i, Re, { resource: n })), (t[23] = n), (t[24] = i), (t[25] = e))
+      : (e = t[25]);
+    let r;
+    t[26] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((r = (0, Q.jsx)(_, {
+          id: `chatgptConversations.gpts.mine.migrate`,
+          defaultMessage: `Migrate to plugin`,
+          description: `Open migration confirmation for this published GPT`,
+        })),
+        (t[26] = r))
+      : (r = t[26]);
+    let a;
+    (t[27] === e
+      ? (a = t[28])
+      : ((a = (0, Q.jsx)(ee, {
+          className: `w-full`,
+          color: `primary`,
+          size: `entityRowAction`,
+          onClick: e,
+          children: r,
+        })),
+        (t[27] = e),
+        (t[28] = a)),
+      (P = a));
   }
-  const controls = account.structure === "workspace"
-    ? jsx.jsx(Inset, { inset: false, children: jsx.jsx(Tabs, { variant: "underline", ariaLabel: intl.formatMessage({ id: "chatgptConversations.gpts.mine.tabs", defaultMessage: "My GPTs", description: "My GPTs tabs" }), selectedKey: selectedTab, onSelect: setSelectedTab, tabs: [
-      { key: "mine", name: message({ id: "chatgptConversations.gpts.mine.created", defaultMessage: "Created by me", description: "Owned GPTs tab" }) },
-      { key: "shared_with_me", name: message({ id: "chatgptConversations.gpts.mine.shared", defaultMessage: "Shared with me", description: "Shared GPTs tab" }) },
-    ] }) })
-    : undefined;
-  return jsx.jsxs("div", {
-    className: "flex h-full min-h-0 flex-col bg-surface text-default",
-    children: [
-      jsx.jsx(AppHeader.Header, { className: "flex shrink-0 px-panel", children: jsx.jsx(AppHeader.HeaderToolbar, { children: jsx.jsx(AppHeader.HeaderToolbar.Actions, { children: jsx.jsx(CreateGptAction, {}) }) }) }),
-      jsx.jsx(SkillsGrid, { className: "flex h-full w-full flex-1 flex-col gap-8", children: jsx.jsx(PageLayout, { animateContentLayout: false, headerVariant: "compact", title: message({ id: "chatgptConversations.gpts.mine.title", defaultMessage: "My GPTs", description: "My GPTs page title" }), banner: jsx.jsx(DirectoryBanner, { showMigrationAction: false }), controls, children: content }) }),
-    ],
-  });
+  let Ce = E && (!_e || C),
+    F;
+  t[29] !== E || t[30] !== N || t[31] !== s || t[32] !== n.gizmo.id || t[33] !== i
+    ? ((F = (e) => {
+        E ? N(e) : (ue(i, `chat`), ce(i, null), s(Ee(n.gizmo.id)));
+      }),
+      (t[29] = E),
+      (t[30] = N),
+      (t[31] = s),
+      (t[32] = n.gizmo.id),
+      (t[33] = i),
+      (t[34] = F))
+    : (F = t[34]);
+  let Te = n.gizmo.display.profile_picture_url ?? null,
+    I;
+  t[35] !== D || t[36] !== n.gizmo.id || t[37] !== Te
+    ? ((I = (0, Q.jsx)(me, {
+        customGpt: { id: n.gizmo.id, name: D, iconUrl: Te },
+        presentation: `avatar`,
+        className: `size-8 shrink-0`,
+      })),
+      (t[35] = D),
+      (t[36] = n.gizmo.id),
+      (t[37] = Te),
+      (t[38] = I))
+    : (I = t[38]);
+  let L;
+  t[39] === D
+    ? (L = t[40])
+    : ((L = (0, Q.jsx)(`span`, {
+        className: `truncate text-base font-semibold text-default`,
+        children: D,
+      })),
+      (t[39] = D),
+      (t[40] = L));
+  let R;
+  t[41] !== E || t[42] !== o
+    ? ((R = E
+        ? (0, Q.jsx)(ae, {
+            tooltipContent: o.formatMessage({
+              id: `chatgptConversations.gpts.mine.draft`,
+              defaultMessage: `Draft`,
+              description: `Unpublished GPT; migration requires a published version`,
+            }),
+            children: (0, Q.jsx)(`span`, {
+              className: `size-1.5 shrink-0 rounded-full bg-text-tertiary/30`,
+            }),
+          })
+        : null),
+      (t[41] = E),
+      (t[42] = o),
+      (t[43] = R))
+    : (R = t[43]);
+  let z;
+  t[44] !== L || t[45] !== R
+    ? ((z = (0, Q.jsxs)(`div`, { className: `flex items-center gap-2`, children: [L, R] })),
+      (t[44] = L),
+      (t[45] = R),
+      (t[46] = z))
+    : (z = t[46]);
+  let B;
+  t[47] === n.gizmo.display.description
+    ? (B = t[48])
+    : ((B = (0, Q.jsx)(`p`, {
+        className: `min-h-5 truncate text-sm text-secondary`,
+        children: n.gizmo.display.description,
+      })),
+      (t[47] = n.gizmo.display.description),
+      (t[48] = B));
+  let V;
+  t[49] !== z || t[50] !== B
+    ? ((V = (0, Q.jsxs)(`div`, { className: `min-w-0 flex-1`, children: [z, B] })),
+      (t[49] = z),
+      (t[50] = B),
+      (t[51] = V))
+    : (V = t[51]);
+  let H;
+  t[52] !== D || t[53] !== Ce || t[54] !== F || t[55] !== I || t[56] !== V
+    ? ((H = (0, Q.jsxs)(`button`, {
+        type: `button`,
+        "aria-label": D,
+        className: `flex min-w-0 flex-1 cursor-interaction items-center gap-3 text-start select-none`,
+        disabled: Ce,
+        onClick: F,
+        children: [I, V],
+      })),
+      (t[52] = D),
+      (t[53] = Ce),
+      (t[54] = F),
+      (t[55] = I),
+      (t[56] = V),
+      (t[57] = H))
+    : (H = t[57]);
+  let U;
+  t[58] !== r || t[59] !== n
+    ? ((U = (0, Q.jsx)(`div`, {
+        className: `hidden w-50 shrink-0 @2xl:block`,
+        children: (0, Q.jsx)(Ne, { resource: n, account: r }),
+      })),
+      (t[58] = r),
+      (t[59] = n),
+      (t[60] = U))
+    : (U = t[60]);
+  let W;
+  t[61] !== H || t[62] !== U
+    ? ((W = (0, Q.jsxs)(`div`, {
+        className: `flex min-w-0 flex-1 basis-full items-center gap-6 @lg:basis-auto`,
+        children: [H, U],
+      })),
+      (t[61] = H),
+      (t[62] = U),
+      (t[63] = W))
+    : (W = t[63]);
+  let G;
+  t[64] !== r || t[65] !== n
+    ? ((G = (0, Q.jsx)(`div`, {
+        className: `basis-full @2xl:hidden`,
+        children: (0, Q.jsx)(Ne, { resource: n, account: r }),
+      })),
+      (t[64] = r),
+      (t[65] = n),
+      (t[66] = G))
+    : (G = t[66]);
+  let K;
+  t[67] === P
+    ? (K = t[68])
+    : ((K = (0, Q.jsx)(`div`, { className: `flex w-34.25 shrink-0 justify-end`, children: P })),
+      (t[67] = P),
+      (t[68] = K));
+  let q;
+  t[69] !== N || t[70] !== k || t[71] !== C || t[72] !== T || t[73] !== _e
+    ? ((q = _e
+        ? (0, Q.jsx)(ae, {
+            tooltipContent:
+              T == null
+                ? k
+                : (0, Q.jsx)(_, {
+                    id: `chatgptConversations.gpts.mine.editMigratedTooltip`,
+                    defaultMessage: `This GPT has been migrated to a plugin and can no longer be edited`,
+                    description: `Explains why the edit action is disabled for a migrated GPT`,
+                  }),
+            children: (0, Q.jsx)(`span`, {
+              className: `inline-flex rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring`,
+              role: T == null ? void 0 : `group`,
+              "aria-label": T == null ? void 0 : k,
+              "aria-disabled": T != null || void 0,
+              tabIndex: T == null ? void 0 : 0,
+              children: (0, Q.jsx)(ee, {
+                "aria-label": k,
+                color: `ghostActive`,
+                size: `entityHeader`,
+                disabled: C || T != null,
+                onClick: N,
+                children: (0, Q.jsx)(f, {}),
+              }),
+            }),
+          })
+        : null),
+      (t[69] = N),
+      (t[70] = k),
+      (t[71] = C),
+      (t[72] = T),
+      (t[73] = _e),
+      (t[74] = q))
+    : (q = t[74]);
+  let J;
+  t[75] !== j || t[76] !== T || t[77] !== n || t[78] !== i || t[79] !== ve
+    ? ((J = ve
+        ? (0, Q.jsx)(ae, {
+            tooltipContent:
+              T == null
+                ? j
+                : (0, Q.jsx)(_, {
+                    id: `chatgptConversations.gpts.mine.deleteMigratedTooltip`,
+                    defaultMessage: `This GPT has been migrated to a plugin and can no longer be deleted`,
+                    description: `Explains why the delete action is disabled for a migrated GPT`,
+                  }),
+            children: (0, Q.jsx)(`span`, {
+              className: `ms-auto inline-flex rounded-lg outline-none focus-visible:ring-2 focus-visible:ring-ring`,
+              role: T == null ? void 0 : `group`,
+              "aria-label": T == null ? void 0 : j,
+              "aria-disabled": T != null || void 0,
+              tabIndex: T == null ? void 0 : 0,
+              children: (0, Q.jsx)(ee, {
+                "aria-label": j,
+                color: `ghostActive`,
+                size: `entityHeader`,
+                disabled: T != null,
+                onClick: () => ge(i, ze, { resource: n }),
+                children: (0, Q.jsx)(v, { className: `text-danger` }),
+              }),
+            }),
+          })
+        : null),
+      (t[75] = j),
+      (t[76] = T),
+      (t[77] = n),
+      (t[78] = i),
+      (t[79] = ve),
+      (t[80] = J))
+    : (J = t[80]);
+  let Y;
+  t[81] !== q || t[82] !== J
+    ? ((Y = (0, Q.jsxs)(`div`, { className: `flex w-18 shrink-0 items-center`, children: [q, J] })),
+      (t[81] = q),
+      (t[82] = J),
+      (t[83] = Y))
+    : (Y = t[83]);
+  let X;
+  t[84] !== K || t[85] !== Y
+    ? ((X = (0, Q.jsxs)(`div`, {
+        className: `ms-auto flex w-55.25 shrink-0 items-center justify-end gap-3`,
+        children: [K, Y],
+      })),
+      (t[84] = K),
+      (t[85] = Y),
+      (t[86] = X))
+    : (X = t[86]);
+  let De;
+  return (
+    t[87] !== W || t[88] !== G || t[89] !== X
+      ? ((De = (0, Q.jsxs)(`div`, {
+          role: `listitem`,
+          className: `flex flex-wrap items-center gap-x-6 gap-y-3 py-4 @lg:flex-nowrap`,
+          children: [W, G, X],
+        })),
+        (t[87] = W),
+        (t[88] = G),
+        (t[89] = X),
+        (t[90] = De))
+      : (De = t[90]),
+    De
+  );
 }
-
-function MyGptsPage(): unknown {
-  const scope = useScope(applicationScope);
-  const featureEnabled = useFeatureGate("2160578039");
-  const featureLoading = useFeatureGateLoading("2160578039");
-  const { accountId } = useSessionIdentity();
-  const accountQuery = useAccount(undefined, ACCOUNT_QUERY_OPTIONS);
-  if (featureLoading) return jsx.jsx(LoadingState, {});
-  if (!featureEnabled) return jsx.jsx(Redirect, { to: homeRoute, replace: true });
-  if (accountQuery.isError) return jsx.jsx(ErrorState, { onRetry: () => void scope.queryClient.refetchQueries({ queryKey: ["accounts", "check"] }) });
-  if (accountQuery.data == null || accountQuery.data.id !== accountId) return jsx.jsx(LoadingState, {});
-  return jsx.jsx(MyGptsContent, { account: accountQuery.data }, accountQuery.data.id);
+var Le, Q, Re, ze;
+function Be() {
+  return (Be = e(() => {
+    ((Le = n()),
+      M(),
+      o(),
+      u(),
+      he(),
+      O(),
+      D(),
+      T(),
+      je(),
+      R(),
+      le(),
+      b(),
+      E(),
+      w(),
+      oe(),
+      _e(),
+      x(),
+      pe(),
+      m(),
+      N(),
+      Fe(),
+      (Q = c()),
+      s(),
+      (Re = l(
+        async () =>
+          (
+            await h(
+              async () => {
+                let { GptPluginMigrationDialog: e } = await import(`@rchunk/gpt-plugin-migration-dialog`);
+                return { GptPluginMigrationDialog: e };
+              },
+              __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]),
+              import.meta.url,
+            )
+          ).GptPluginMigrationDialog,
+      )),
+      (ze = l(
+        async () =>
+          (
+            await h(
+              async () => {
+                let { MyGptDeleteDialog: e } = await import(
+                  `@rchunk/my-gpt-delete-dialog`
+                );
+                return { MyGptDeleteDialog: e };
+              },
+              __vite__mapDeps([12, 1, 2, 3, 4, 5]),
+              import.meta.url,
+            )
+          ).MyGptDeleteDialog,
+      )));
+  }))();
 }
-
-initializeMyGptsPage();
-export { MyGptsPage };
+function Ve() {
+  let e = (0, qe.c)(8),
+    t = p(y),
+    n = Se(`2160578039`),
+    r = Te(`2160578039`),
+    { accountId: i } = de(),
+    a;
+  e[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((a = { preview: !1 }), (e[0] = a))
+    : (a = e[0]);
+  let { data: o, isError: s } = L(void 0, a);
+  if (r) {
+    let t;
+    return (
+      e[1] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, $.jsx)(J, {})), (e[1] = t))
+        : (t = e[1]),
+      t
+    );
+  }
+  if (!n) {
+    let t;
+    return (
+      e[2] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, $.jsx)(ve, { to: ye, replace: !0 })), (e[2] = t))
+        : (t = e[2]),
+      t
+    );
+  }
+  if (s) {
+    let n;
+    return (
+      e[3] === t.queryClient
+        ? (n = e[4])
+        : ((n = (0, $.jsx)(U, {
+            onRetry: () => void t.queryClient.refetchQueries({ queryKey: [`accounts`, `check`] }),
+          })),
+          (e[3] = t.queryClient),
+          (e[4] = n)),
+      n
+    );
+  }
+  let c;
+  return (
+    e[5] !== o || e[6] !== i
+      ? ((c = o == null || o.id !== i ? (0, $.jsx)(J, {}) : (0, $.jsx)(He, { account: o }, o.id)),
+        (e[5] = o),
+        (e[6] = i),
+        (e[7] = c))
+      : (c = e[7]),
+    c
+  );
+}
+function He(e) {
+  let t = (0, qe.c)(42),
+    { account: n } = e,
+    r = ie(),
+    [a, o] = (0, Ye.useState)(`mine`),
+    s;
+  t[0] !== n.id || t[1] !== a
+    ? ((s = [`chatgpt-gizmos`, n.id, `my-gpts`, a]), (t[0] = n.id), (t[1] = a), (t[2] = s))
+    : (s = t[2]);
+  let c;
+  t[3] === a
+    ? (c = t[4])
+    : ((c = (e) => {
+        let { pageParam: t, signal: n } = e;
+        return De({ cutId: a, cursor: t, limit: 20, signal: n });
+      }),
+      (t[3] = a),
+      (t[4] = c));
+  let l;
+  t[5] !== s || t[6] !== c
+    ? ((l = {
+        queryKey: s,
+        initialPageParam: void 0,
+        staleTime: i.ONE_MINUTE,
+        getNextPageParam: Ke,
+        queryFn: c,
+      }),
+      (t[5] = s),
+      (t[6] = c),
+      (t[7] = l))
+    : (l = t[7]);
+  let {
+      data: u,
+      isPending: d,
+      refetch: f,
+      fetchNextPage: p,
+      hasNextPage: m,
+      isFetchingNextPage: h,
+      isFetchNextPageError: g,
+    } = te(l),
+    v;
+  if (
+    t[8] !== n ||
+    t[9] !== a ||
+    t[10] !== u ||
+    t[11] !== p ||
+    t[12] !== m ||
+    t[13] !== g ||
+    t[14] !== h ||
+    t[15] !== d ||
+    t[16] !== f
+  ) {
+    let e = (0, Je.default)(u?.pages.flatMap(We) ?? [], Ue);
+    if (d) {
+      let e;
+      (t[18] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, $.jsx)(J, {})), (t[18] = e))
+        : (e = t[18]),
+        (v = e));
+    } else if (u == null) {
+      let e;
+      (t[19] === f
+        ? (e = t[20])
+        : ((e = (0, $.jsx)(U, { onRetry: () => void f() })), (t[19] = f), (t[20] = e)),
+        (v = e));
+    } else {
+      let r;
+      t[21] === n
+        ? (r = t[22])
+        : ((r = (e) => (0, $.jsx)(Ie, { resource: e, account: n }, e.gizmo.id)),
+          (t[21] = n),
+          (t[22] = r));
+      let i = (0, $.jsx)(`div`, {
+          role: `list`,
+          className: `@container flex flex-col`,
+          children: e.map(r),
+        }),
+        o =
+          e.length === 0 && !m
+            ? (0, $.jsx)(`p`, {
+                className: `py-6 text-sm text-secondary select-none`,
+                children:
+                  a === `shared_with_me`
+                    ? (0, $.jsx)(_, {
+                        id: `chatgptConversations.gpts.mine.sharedEmpty`,
+                        defaultMessage: `No GPTs have been shared with you yet`,
+                        description: `Empty state in the Shared with me tab when no GPTs have been shared with the current user`,
+                      })
+                    : (0, $.jsx)(_, {
+                        id: `chatgptConversations.gpts.mine.empty`,
+                        defaultMessage: `No GPTs here yet`,
+                        description: `Empty state in the Created by me tab when the current user has no GPTs`,
+                      }),
+              })
+            : null,
+        s;
+      t[23] !== p || t[24] !== m || t[25] !== g || t[26] !== h
+        ? ((s = m
+            ? (0, $.jsx)(`div`, {
+                className: `flex justify-center`,
+                children: (0, $.jsx)(ee, {
+                  color: `secondary`,
+                  loading: h,
+                  onClick: () => void p(),
+                  children: g
+                    ? (0, $.jsx)(_, {
+                        id: `chatgptConversations.gpts.mine.retryMore`,
+                        defaultMessage: `Try again`,
+                        description: `Retry loading the next page of My GPTs`,
+                      })
+                    : (0, $.jsx)(_, {
+                        id: `chatgptConversations.gpts.mine.loadMore`,
+                        defaultMessage: `Load more`,
+                        description: `Load the next page of created or shared GPTs`,
+                      }),
+                }),
+              })
+            : null),
+          (t[23] = p),
+          (t[24] = m),
+          (t[25] = g),
+          (t[26] = h),
+          (t[27] = s))
+        : (s = t[27]);
+      let c;
+      (t[28] !== i || t[29] !== o || t[30] !== s
+        ? ((c = (0, $.jsxs)($.Fragment, { children: [i, o, s] })),
+          (t[28] = i),
+          (t[29] = o),
+          (t[30] = s),
+          (t[31] = c))
+        : (c = t[31]),
+        (v = c));
+    }
+    ((t[8] = n),
+      (t[9] = a),
+      (t[10] = u),
+      (t[11] = p),
+      (t[12] = m),
+      (t[13] = g),
+      (t[14] = h),
+      (t[15] = d),
+      (t[16] = f),
+      (t[17] = v));
+  } else v = t[17];
+  let y;
+  t[32] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((y = (0, $.jsx)(A.Header, {
+        className: `flex shrink-0 px-panel`,
+        children: (0, $.jsx)(A.HeaderToolbar, {
+          children: (0, $.jsx)(A.HeaderToolbar.Actions, { children: (0, $.jsx)(Y, {}) }),
+        }),
+      })),
+      (t[32] = y))
+    : (y = t[32]);
+  let b, x;
+  t[33] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((b = (0, $.jsx)(_, {
+        id: `chatgptConversations.gpts.mine.title`,
+        defaultMessage: `My GPTs`,
+        description: `Page containing GPTs created by or shared with the current user`,
+      })),
+      (x = (0, $.jsx)(X, { showMigrationAction: !1 })),
+      (t[33] = b),
+      (t[34] = x))
+    : ((b = t[33]), (x = t[34]));
+  let S;
+  t[35] !== n.structure || t[36] !== a || t[37] !== r
+    ? ((S =
+        n.structure === `workspace`
+          ? (0, $.jsx)(k, {
+              inset: !1,
+              children: (0, $.jsx)(B, {
+                variant: `underline`,
+                ariaLabel: r.formatMessage({
+                  id: `chatgptConversations.gpts.mine.tabs`,
+                  defaultMessage: `My GPTs`,
+                  description: `Navigation between GPTs created by the user and GPTs shared with them`,
+                }),
+                selectedKey: a,
+                onSelect: o,
+                tabs: [
+                  {
+                    key: `mine`,
+                    name: (0, $.jsx)(_, {
+                      id: `chatgptConversations.gpts.mine.created`,
+                      defaultMessage: `Created by me`,
+                      description: `Tab for GPTs owned by the current user`,
+                    }),
+                  },
+                  {
+                    key: `shared_with_me`,
+                    name: (0, $.jsx)(_, {
+                      id: `chatgptConversations.gpts.mine.shared`,
+                      defaultMessage: `Shared with me`,
+                      description: `Tab for GPTs shared with the current workspace member`,
+                    }),
+                  },
+                ],
+              }),
+            })
+          : void 0),
+      (t[35] = n.structure),
+      (t[36] = a),
+      (t[37] = r),
+      (t[38] = S))
+    : (S = t[38]);
+  let C;
+  return (
+    t[39] !== v || t[40] !== S
+      ? ((C = (0, $.jsxs)(`div`, {
+          className: `flex h-full min-h-0 flex-col bg-surface text-default`,
+          children: [
+            y,
+            (0, $.jsx)(H, {
+              className: `flex h-full w-full flex-1 flex-col gap-8`,
+              children: (0, $.jsx)(P, {
+                animateContentLayout: !1,
+                headerVariant: `compact`,
+                title: b,
+                banner: x,
+                controls: S,
+                children: v,
+              }),
+            }),
+          ],
+        })),
+        (t[39] = v),
+        (t[40] = S),
+        (t[41] = C))
+      : (C = t[41]),
+    C
+  );
+}
+function Ue(e) {
+  return e.gizmo.id;
+}
+function We(e) {
+  return e.list.items.map(Ge);
+}
+function Ge(e) {
+  return e.resource;
+}
+function Ke(e) {
+  return e.list.cursor ?? void 0;
+}
+var qe, Je, Ye, $;
+function Xe() {
+  return (Xe = e(() => {
+    ((qe = n()),
+      r(),
+      (Je = t(j(), 1)),
+      o(),
+      (Ye = C()),
+      u(),
+      he(),
+      Ce(),
+      D(),
+      K(),
+      W(),
+      G(),
+      q(),
+      R(),
+      F(),
+      b(),
+      I(),
+      z(),
+      m(),
+      V(),
+      N(),
+      ne(),
+      Be(),
+      ($ = c()));
+  }))();
+}
+Xe();
+export { Ve as MyGptsPage };
