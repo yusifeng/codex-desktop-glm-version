@@ -1,5 +1,25 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Preserved application-surface promotion：对“454 个缺少双方可比资产”与
+“425 个 preserved 边界”完成集合去重，确认 454 项精确由 425 个 preserved、3 个
+incremental hubs 和 26 个 source-owned 无发布 TS 资产 owner 构成，并非 879 项独立
+缺口。随后将 preserved 中 28 个仍承载应用语义的页面/运行时一次性提升为独立
+`src/renderer` owner，共恢复 119,249 行发布一致 TypeScript。范围覆盖 view-state、
+Ads placement/controls、Browser thread panel、voice session/DSP、image preview、
+permissions、virtual try-on、data controls、Browser skills、artifact/multiplayer document、
+billing、first-run、GPT directory/banner、browser comment popup、announcement、app action、
+skill、trusted contact、composer tip、DIL/React visual bridge，以及最大的 product
+intervention runtime。28/28 owner 均通过发布全文一致性验证，renderer rewritten 由
+1,888 增至 1,916，preserved 由 425 降至 397。剩余 397 项按理由收敛为 83 个 vendor、
+73 个纯数据、16 个 worker、224 个生成代码/视觉资产和 1 个 bundler runtime；已无以
+compiled application surface/runtime/page 为理由保留的应用模块。整批通过
+12,448/12,448 transform check、1,916/1,916 renderer build/verify、
+2,247/2,247 app-code coverage、typecheck 与 1,913-script test-index。严格 hub 消费
+推进到 app-shared 1,918/3,185、app-initial 6,391/8,204、app-primary 828/917，仍为
+0 unreviewed、0 invalid consumers。当前双方可比资产增至 1,890，缺少双方可比资产的
+集合由 454 降至 426（397 preserved + 3 hubs + 26 source-owned）。该收敛仍不替代三个
+聚合 hub 的继续拆分及最终登录态 Electron E2E。
+
 2026-11-02 Comparable-owner exact closure：将剩余 837 个仍与发布证据不完全一致的
 renderer owner 一次性恢复为标准化后逐字一致的发布 TypeScript；本批 renderer 新增
 54,152 行、删除 78,571 行，净删除 24,419 行。删除项是旧手写兼容层、mock 和重复实现
