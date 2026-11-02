@@ -1,7 +1,157 @@
-// Double-entry transaction effects model. Release chunk: model-9aaba6ef3b2a.js.
-import "@rchunk/rolldown-runtime";
-type Transaction = "owner investment for cash" | "equipment purchase for cash" | "supplies purchase on account" | "payment of accounts payable"; type Category = "assets" | "liabilities" | "equity"; interface Effect { account: string; accountType: "asset" | "liability" | "equity"; direction: "increase" | "decrease"; entrySide: "debit" | "credit"; amountUsd: number; equationCategory: Category; equationDeltaUsd: number } interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: { transaction_type: { kind: "enum"; defaultValue: Transaction; allowedValues: Transaction[] } } }
-let manifest: Manifest; let transactions: Transaction[]; let defaultTransaction: Transaction; let normalizeValues: (values: { transaction_type?: string | null }) => { transaction_type: Transaction }; let calculate: (values: { transaction_type?: string | null }) => { values: { transaction_type: Transaction }; definition: { effects: Effect[] }; debitTotalUsd: number; creditTotalUsd: number; equationEffects: Record<Category, number[]>; equationTotals: Record<Category, number>; isJournalBalanced: boolean; isEquationBalanced: boolean }; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "DOUBLE_ENTRY_TRANSACTION_EFFECTS", version: 2, thumbnailAssetKey: "double-entry-transaction-effects-v1", parameters: { transaction_type: { kind: "enum", defaultValue: "owner investment for cash", allowedValues: ["owner investment for cash", "equipment purchase for cash", "supplies purchase on account", "payment of accounts payable"] } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); const amount = 10_000; const isTransaction = (value: unknown): value is Transaction => value === "owner investment for cash" || value === "equipment purchase for cash" || value === "supplies purchase on account" || value === "payment of accounts payable"; transactions = manifest.parameters.transaction_type.allowedValues.filter(isTransaction); if (transactions.length !== manifest.parameters.transaction_type.allowedValues.length) throw Error("type.json contains an unsupported transaction type."); if (!isTransaction(manifest.parameters.transaction_type.defaultValue)) throw Error("type.json contains an invalid default transaction type."); defaultTransaction = manifest.parameters.transaction_type.defaultValue; const definitions: Record<Transaction, { effects: Effect[] }> = { "owner investment for cash": { effects: [{ account: "cash", accountType: "asset", direction: "increase", entrySide: "debit", amountUsd: amount, equationCategory: "assets", equationDeltaUsd: amount }, { account: "owners-capital", accountType: "equity", direction: "increase", entrySide: "credit", amountUsd: amount, equationCategory: "equity", equationDeltaUsd: amount }] }, "equipment purchase for cash": { effects: [{ account: "equipment", accountType: "asset", direction: "increase", entrySide: "debit", amountUsd: amount, equationCategory: "assets", equationDeltaUsd: amount }, { account: "cash", accountType: "asset", direction: "decrease", entrySide: "credit", amountUsd: amount, equationCategory: "assets", equationDeltaUsd: -amount }] }, "supplies purchase on account": { effects: [{ account: "supplies", accountType: "asset", direction: "increase", entrySide: "debit", amountUsd: amount, equationCategory: "assets", equationDeltaUsd: amount }, { account: "accounts-payable", accountType: "liability", direction: "increase", entrySide: "credit", amountUsd: amount, equationCategory: "liabilities", equationDeltaUsd: amount }] }, "payment of accounts payable": { effects: [{ account: "cash", accountType: "asset", direction: "decrease", entrySide: "credit", amountUsd: amount, equationCategory: "assets", equationDeltaUsd: -amount }, { account: "accounts-payable", accountType: "liability", direction: "decrease", entrySide: "debit", amountUsd: amount, equationCategory: "liabilities", equationDeltaUsd: -amount }] } }; normalizeValues = values => ({ transaction_type: isTransaction(values.transaction_type) ? values.transaction_type : defaultTransaction }); const sum = (values: number[]) => values.reduce((total, value) => total + value, 0); calculate = values => { const normalized = normalizeValues(values); const definition = definitions[normalized.transaction_type]; const debitTotalUsd = sum(definition.effects.filter(effect => effect.entrySide === "debit").map(effect => effect.amountUsd)); const creditTotalUsd = sum(definition.effects.filter(effect => effect.entrySide === "credit").map(effect => effect.amountUsd)); const equationEffects: Record<Category, number[]> = { assets: [], liabilities: [], equity: [] }; definition.effects.forEach(effect => equationEffects[effect.equationCategory].push(effect.equationDeltaUsd)); const equationTotals = { assets: sum(equationEffects.assets), liabilities: sum(equationEffects.liabilities), equity: sum(equationEffects.equity) }; return { values: normalized, definition, debitTotalUsd, creditTotalUsd, equationEffects, equationTotals, isJournalBalanced: debitTotalUsd === creditTotalUsd, isEquationBalanced: equationTotals.assets === equationTotals.liabilities + equationTotals.equity }; }; }
-export { normalizeValues as a, initializeModel as i, transactions as n, initializeManifest as o, calculate as r, manifest as s, defaultTransaction as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `DOUBLE_ENTRY_TRANSACTION_EFFECTS`),
+      (n = `double-entry-transaction-effects-v1`),
+      (r = {
+        transaction_type: {
+          kind: `enum`,
+          defaultValue: `owner investment for cash`,
+          allowedValues: [
+            `owner investment for cash`,
+            `equipment purchase for cash`,
+            `supplies purchase on account`,
+            `payment of accounts payable`,
+          ],
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m;
+function h() {
+  return (h = e(() => {
+    if (
+      (a(),
+      (o = 1e4),
+      (s = (e) =>
+        e === `owner investment for cash` ||
+        e === `equipment purchase for cash` ||
+        e === `supplies purchase on account` ||
+        e === `payment of accounts payable`),
+      (c = i.parameters.transaction_type.allowedValues.filter(s)),
+      c.length !== i.parameters.transaction_type.allowedValues.length)
+    )
+      throw Error(`type.json contains an unsupported transaction type.`);
+    ((l = () => {
+      let e = i.parameters.transaction_type.defaultValue;
+      if (!s(e)) throw Error(`type.json contains an invalid default transaction type.`);
+      return e;
+    }),
+      (u = l()),
+      (d = {
+        "owner investment for cash": {
+          effects: [
+            {
+              account: `cash`,
+              accountType: `asset`,
+              direction: `increase`,
+              entrySide: `debit`,
+              amountUsd: o,
+              equationCategory: `assets`,
+              equationDeltaUsd: o,
+            },
+            {
+              account: `owners-capital`,
+              accountType: `equity`,
+              direction: `increase`,
+              entrySide: `credit`,
+              amountUsd: o,
+              equationCategory: `equity`,
+              equationDeltaUsd: o,
+            },
+          ],
+        },
+        "equipment purchase for cash": {
+          effects: [
+            {
+              account: `equipment`,
+              accountType: `asset`,
+              direction: `increase`,
+              entrySide: `debit`,
+              amountUsd: o,
+              equationCategory: `assets`,
+              equationDeltaUsd: o,
+            },
+            {
+              account: `cash`,
+              accountType: `asset`,
+              direction: `decrease`,
+              entrySide: `credit`,
+              amountUsd: o,
+              equationCategory: `assets`,
+              equationDeltaUsd: -1e4,
+            },
+          ],
+        },
+        "supplies purchase on account": {
+          effects: [
+            {
+              account: `supplies`,
+              accountType: `asset`,
+              direction: `increase`,
+              entrySide: `debit`,
+              amountUsd: o,
+              equationCategory: `assets`,
+              equationDeltaUsd: o,
+            },
+            {
+              account: `accounts-payable`,
+              accountType: `liability`,
+              direction: `increase`,
+              entrySide: `credit`,
+              amountUsd: o,
+              equationCategory: `liabilities`,
+              equationDeltaUsd: o,
+            },
+          ],
+        },
+        "payment of accounts payable": {
+          effects: [
+            {
+              account: `cash`,
+              accountType: `asset`,
+              direction: `decrease`,
+              entrySide: `credit`,
+              amountUsd: o,
+              equationCategory: `assets`,
+              equationDeltaUsd: -1e4,
+            },
+            {
+              account: `accounts-payable`,
+              accountType: `liability`,
+              direction: `decrease`,
+              entrySide: `debit`,
+              amountUsd: o,
+              equationCategory: `liabilities`,
+              equationDeltaUsd: -1e4,
+            },
+          ],
+        },
+      }),
+      (f = (e) => ({ transaction_type: s(e.transaction_type) ? e.transaction_type : u })),
+      (p = (e) => e.reduce((e, t) => e + t, 0)),
+      (m = (e) => {
+        let t = f(e),
+          n = d[t.transaction_type],
+          r = p(n.effects.filter((e) => e.entrySide === `debit`).map((e) => e.amountUsd)),
+          i = p(n.effects.filter((e) => e.entrySide === `credit`).map((e) => e.amountUsd)),
+          a = { assets: [], liabilities: [], equity: [] };
+        for (let e of n.effects) a[e.equationCategory].push(e.equationDeltaUsd);
+        let o = { assets: p(a.assets), liabilities: p(a.liabilities), equity: p(a.equity) };
+        return {
+          values: t,
+          definition: n,
+          debitTotalUsd: r,
+          creditTotalUsd: i,
+          equationEffects: a,
+          equationTotals: o,
+          isJournalBalanced: r === i,
+          isEquationBalanced: o.assets === o.liabilities + o.equity,
+        };
+      }));
+  }))();
+}
+export { f as a, h as i, c as n, a as o, m as r, i as s, u as t };

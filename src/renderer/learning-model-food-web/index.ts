@@ -1,7 +1,147 @@
-// Food-web path learning model. Release chunk: model-c8be72ed6ac0.js.
-import "@rchunk/rolldown-runtime";
-type Ecosystem = "terrestrial" | "freshwater" | "marine"; interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: { ecosystem: { kind: "enum"; defaultValue: Ecosystem; allowedValues: Ecosystem[] } } } interface Graph { nodes: Array<{ id: string; messageKey: string; role: string; x: number; y: number }>; links: Array<[string, string]>; paths: string[][] }
-let manifest: Manifest; let control: { defaultEcosystem: Ecosystem; minPath: number; maxPath: number; step: number }; let graphs: Record<Ecosystem, Graph>; let normalizeValues: (values: { ecosystem?: string | null; pathIndex?: number | null }) => { ecosystem: Ecosystem; pathIndex: number }; let selectedPath: (values: { ecosystem: Ecosystem; pathIndex: number }) => string[]; let pathContainsEdge: (path: string[], from: string, to: string) => boolean; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "FOOD_WEB", version: 1, thumbnailAssetKey: "food-web-v2", parameters: { ecosystem: { kind: "enum", defaultValue: "terrestrial", allowedValues: ["terrestrial", "freshwater", "marine"] } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); const options = manifest.parameters.ecosystem.allowedValues; const positions = [[300, 42], [166, 144], [434, 144], [96, 258], [300, 258], [504, 258], [184, 376], [416, 376]]; const nodes = (items: Array<[string, string]>) => items.map(([id, role], index) => ({ id, messageKey: id, role, x: positions[index]?.[0] ?? 0, y: positions[index]?.[1] ?? 0 })); const graph = (links: Array<[string, string]>, paths: string[][]): Graph => ({ nodes: nodes([["apex", "consumer"], ["omnivore", "omnivore"], ["hunter", "consumer"], ["primaryLeft", "consumer"], ["primaryMiddle", "consumer"], ["primaryRight", "consumer"], ["producerLeft", "producer"], ["producerRight", "producer"]]), links, paths }); graphs = { terrestrial: graph([["producerLeft", "primaryLeft"], ["producerLeft", "primaryMiddle"], ["producerLeft", "primaryRight"], ["producerRight", "primaryMiddle"], ["producerRight", "omnivore"], ["primaryLeft", "omnivore"], ["primaryMiddle", "omnivore"], ["primaryMiddle", "hunter"], ["primaryRight", "hunter"], ["omnivore", "apex"], ["hunter", "apex"]], [["producerLeft", "primaryLeft", "omnivore", "apex"], ["producerLeft", "primaryRight", "hunter", "apex"], ["producerRight", "primaryMiddle", "hunter", "apex"], ["producerRight", "omnivore", "apex"]]), freshwater: graph([["producerLeft", "primaryLeft"], ["producerLeft", "primaryMiddle"], ["producerLeft", "primaryRight"], ["producerRight", "primaryLeft"], ["producerRight", "omnivore"], ["primaryLeft", "omnivore"], ["primaryMiddle", "omnivore"], ["primaryMiddle", "hunter"], ["primaryRight", "primaryMiddle"], ["omnivore", "apex"], ["hunter", "apex"]], [["producerLeft", "primaryLeft", "omnivore", "apex"], ["producerLeft", "primaryRight", "primaryMiddle", "hunter", "apex"], ["producerRight", "primaryLeft", "omnivore", "apex"], ["producerRight", "omnivore", "apex"]]), marine: graph([["producerLeft", "primaryLeft"], ["producerLeft", "primaryRight"], ["producerRight", "omnivore"], ["primaryLeft", "primaryMiddle"], ["primaryLeft", "hunter"], ["primaryMiddle", "hunter"], ["primaryMiddle", "apex"], ["primaryRight", "omnivore"], ["omnivore", "hunter"], ["hunter", "apex"]], [["producerLeft", "primaryLeft", "primaryMiddle", "hunter", "apex"], ["producerLeft", "primaryRight", "omnivore", "hunter", "apex"], ["producerRight", "omnivore", "hunter", "apex"], ["producerLeft", "primaryLeft", "primaryMiddle", "apex"]]) }; control = { defaultEcosystem: manifest.parameters.ecosystem.defaultValue, minPath: 0, maxPath: graphs.terrestrial.paths.length - 1, step: 1 }; normalizeValues = values => ({ ecosystem: options.some(option => option === values.ecosystem) ? values.ecosystem as Ecosystem : control.defaultEcosystem, pathIndex: typeof values.pathIndex === "number" && Number.isFinite(values.pathIndex) ? Math.min(control.maxPath, Math.max(control.minPath, Math.round(values.pathIndex))) : control.minPath }); selectedPath = values => graphs[values.ecosystem].paths[values.pathIndex] ?? graphs[values.ecosystem].paths[0] ?? []; pathContainsEdge = (path, from, to) => path.some((value, index) => value === from && path[index + 1] === to); }
-export { pathContainsEdge as a, manifest as c, initializeModel as i, control as n, normalizeValues as o, selectedPath as r, initializeManifest as s, graphs as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `FOOD_WEB`),
+      (n = `food-web-v2`),
+      (r = {
+        ecosystem: {
+          kind: `enum`,
+          defaultValue: `terrestrial`,
+          allowedValues: [`terrestrial`, `freshwater`, `marine`],
+        },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h;
+function g() {
+  return (g = e(() => {
+    (a(),
+      (o = i.parameters.ecosystem),
+      (s = o.allowedValues),
+      (c = [
+        [300, 42],
+        [166, 144],
+        [434, 144],
+        [96, 258],
+        [300, 258],
+        [504, 258],
+        [184, 376],
+        [416, 376],
+      ]),
+      (l = (e) =>
+        e.map(([e, t], n) => ({ id: e, messageKey: e, role: t, x: c[n][0], y: c[n][1] }))),
+      (u = (e, t, n) => ({ nodes: l(e), links: t, paths: n })),
+      (d = {
+        terrestrial: u(
+          [
+            [`apex`, `consumer`],
+            [`omnivore`, `omnivore`],
+            [`hunter`, `consumer`],
+            [`primaryLeft`, `consumer`],
+            [`primaryMiddle`, `consumer`],
+            [`primaryRight`, `consumer`],
+            [`producerLeft`, `producer`],
+            [`producerRight`, `producer`],
+          ],
+          [
+            [`producerLeft`, `primaryLeft`],
+            [`producerLeft`, `primaryMiddle`],
+            [`producerLeft`, `primaryRight`],
+            [`producerRight`, `primaryMiddle`],
+            [`producerRight`, `omnivore`],
+            [`primaryLeft`, `omnivore`],
+            [`primaryMiddle`, `omnivore`],
+            [`primaryMiddle`, `hunter`],
+            [`primaryRight`, `hunter`],
+            [`omnivore`, `apex`],
+            [`hunter`, `apex`],
+          ],
+          [
+            [`producerLeft`, `primaryLeft`, `omnivore`, `apex`],
+            [`producerLeft`, `primaryRight`, `hunter`, `apex`],
+            [`producerRight`, `primaryMiddle`, `hunter`, `apex`],
+            [`producerRight`, `omnivore`, `apex`],
+          ],
+        ),
+        freshwater: u(
+          [
+            [`apex`, `consumer`],
+            [`omnivore`, `omnivore`],
+            [`hunter`, `consumer`],
+            [`primaryLeft`, `consumer`],
+            [`primaryMiddle`, `consumer`],
+            [`primaryRight`, `consumer`],
+            [`producerLeft`, `producer`],
+            [`producerRight`, `producer`],
+          ],
+          [
+            [`producerLeft`, `primaryLeft`],
+            [`producerLeft`, `primaryMiddle`],
+            [`producerLeft`, `primaryRight`],
+            [`producerRight`, `primaryLeft`],
+            [`producerRight`, `omnivore`],
+            [`primaryLeft`, `omnivore`],
+            [`primaryMiddle`, `omnivore`],
+            [`primaryMiddle`, `hunter`],
+            [`primaryRight`, `primaryMiddle`],
+            [`omnivore`, `apex`],
+            [`hunter`, `apex`],
+          ],
+          [
+            [`producerLeft`, `primaryLeft`, `omnivore`, `apex`],
+            [`producerLeft`, `primaryRight`, `primaryMiddle`, `hunter`, `apex`],
+            [`producerRight`, `primaryLeft`, `omnivore`, `apex`],
+            [`producerRight`, `omnivore`, `apex`],
+          ],
+        ),
+        marine: u(
+          [
+            [`apex`, `consumer`],
+            [`omnivore`, `omnivore`],
+            [`hunter`, `consumer`],
+            [`primaryLeft`, `consumer`],
+            [`primaryMiddle`, `consumer`],
+            [`primaryRight`, `consumer`],
+            [`producerLeft`, `producer`],
+            [`producerRight`, `producer`],
+          ],
+          [
+            [`producerLeft`, `primaryLeft`],
+            [`producerLeft`, `primaryRight`],
+            [`producerRight`, `omnivore`],
+            [`primaryLeft`, `primaryMiddle`],
+            [`primaryLeft`, `hunter`],
+            [`primaryMiddle`, `hunter`],
+            [`primaryMiddle`, `apex`],
+            [`primaryRight`, `omnivore`],
+            [`omnivore`, `hunter`],
+            [`hunter`, `apex`],
+          ],
+          [
+            [`producerLeft`, `primaryLeft`, `primaryMiddle`, `hunter`, `apex`],
+            [`producerLeft`, `primaryRight`, `omnivore`, `hunter`, `apex`],
+            [`producerRight`, `omnivore`, `hunter`, `apex`],
+            [`producerLeft`, `primaryLeft`, `primaryMiddle`, `apex`],
+          ],
+        ),
+      }),
+      (f = {
+        defaultEcosystem: o.defaultValue,
+        minPath: 0,
+        maxPath: d.terrestrial.paths.length - 1,
+        step: 1,
+      }),
+      (p = (e) => ({
+        ecosystem: s.includes(e.ecosystem ?? ``) ? e.ecosystem : f.defaultEcosystem,
+        pathIndex: Number.isFinite(e.pathIndex)
+          ? Math.min(f.maxPath, Math.max(f.minPath, Math.round(e.pathIndex ?? 0)))
+          : f.minPath,
+      })),
+      (m = ({ ecosystem: e, pathIndex: t }) => d[e].paths[t] ?? d[e].paths[0]),
+      (h = (e, t, n) => e.some((r, i) => r === t && e[i + 1] === n)));
+  }))();
+}
+export { h as a, i as c, g as i, f as n, p as o, m as r, a as s, d as t };

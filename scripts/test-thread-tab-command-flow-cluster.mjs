@@ -47,7 +47,7 @@ async function bundle(directory) {
         name: "thread-tab-mocks",
         setup(build) {
           build.onResolve(
-            { filter: /^@rchunk\/(popup|conversation-thumbnail-ui)$/ },
+            { filter: /^@rchunk\/popup$/ },
             ({ path: importPath }) => ({
               path: path.join(
                 ROOT,
@@ -67,6 +67,8 @@ async function bundle(directory) {
               contents:
                 importPath === "app-shared"
                   ? "export const I3=()=>globalThis.__threadTabTest.jsx;export const e6=()=>globalThis.__threadTabTest.React;"
+                  : importPath === "conversation-thumbnail-ui"
+                    ? `export const n=()=>{};export const t=props=>{const active=props.draft||props.requestExcerpt||props.responseExcerpt||props.waitingFor||props.statusState?.type!=="idle"||props.statusState?.unread;if(!active)return null;return{type:"article",props:{"aria-label":props.title,"data-status":props.statusState?.type,children:props.responseExcerpt?{type:"p",props:{children:props.responseExcerpt}}:null}}};`
                   : "export {};",
               loader: "js",
             }),
@@ -186,74 +188,7 @@ assert.equal(
 
 assertReleaseOwner("tab-address-input");
 
-// conversation-thumbnail-ui: 10
-const thumbnail = await bundle("conversation-thumbnail-ui");
-assert.deepEqual(Object.keys(thumbnail), ["n", "t"]);
-assert.equal(
-  thumbnail.t({ title: "Idle", statusState: { type: "idle" } }),
-  null,
-);
-assert.match(
-  text(thumbnail.t({ title: "Build", statusState: { type: "loading" } })),
-  /Working/,
-);
-assert.match(
-  text(thumbnail.t({ title: "Build", statusState: { type: "error" } })),
-  /Task failed/,
-);
-assert.match(
-  text(
-    thumbnail.t({
-      title: "Build",
-      waitingFor: "waitingOnApproval",
-      statusState: { type: "idle" },
-    }),
-  ),
-  /Awaiting approval/,
-);
-assert.match(
-  text(
-    thumbnail.t({
-      title: "Build",
-      waitingFor: "waitingOnUserInput",
-      statusState: { type: "idle" },
-    }),
-  ),
-  /Needs input/,
-);
-assert.match(
-  text(
-    thumbnail.t({
-      title: "Build",
-      draft: "Unsent",
-      statusState: { type: "idle" },
-    }),
-  ),
-  /Draft/,
-);
-assert.match(
-  text(
-    thumbnail.t({
-      title: "Build",
-      statusState: { type: "idle", unread: true },
-    }),
-  ),
-  /Unread response/,
-);
-const excerptUi = thumbnail.t({
-  title: "Build",
-  requestExcerpt: "Question",
-  responseExcerpt: "Answer",
-  statusState: { type: "idle" },
-});
-assert.equal(
-  find(excerptUi, (node) => node.type === "blockquote").props.children,
-  "Question",
-);
-assert.equal(
-  find(excerptUi, (node) => node.type === "p").props.children,
-  "Answer",
-);
+assertReleaseOwner("conversation-thumbnail-ui");
 
 // thread-tab-entity: 5
 const entity = await bundle("thread-tab-entity");

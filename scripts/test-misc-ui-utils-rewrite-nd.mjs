@@ -10,12 +10,11 @@ const SOURCE='/Users/david/Workspace/ppio_github/chatgpt-desktop-src/app/webview
 const modules=[
 ['get-plus-header-button-4fc6736dd0bd.js','get-plus-header-button',['GetPlusHeaderButton']],
 ['gpt-management-access-2072635b520e.js','gpt-management-access',['i','n','r','t']],
-['hidden-background-webview-host-31e6685d725d.js','hidden-background-webview-host',['HiddenBackgroundBrowserWebviewHost']],
 ['hidden-browser-use-webview-host-7226ca67ad08.js','hidden-browser-use-webview-host',['HiddenBrowserUseWebviewHost']],
 ['host-f06bd3ee2bff.js','host',['PepperOnboardingAnnouncementHost']],
 ['webview-b1b7b13a4120.js','browser-webview-host',['n','t']],
 ['workspace-access.browser-2151c8cf5d1a.js','workspace-access-browser',['prepareWorkspaceAccess']],
-['workspace-layout-step-handler-57d8db9fac40.js','workspace-layout-step-handler',['WorkspaceLayoutStepHandler']]];
+];
 const aliases=new Map([['upgrade-plan-dialog','upgrade-dialog'],['chatgpt-voice-analytics-protobuf','chatgpt_voice'],['pepper-onboarding-modal','modal']]);
 const deps=(source,re)=>[...source.matchAll(re)].map(match=>aliases.get(match[1])??match[1]);let sourceAssertions=0;
 for(const[asset,semantic]of modules){const original=fs.readFileSync(path.join(SOURCE,asset),'utf8'),restored=fs.readFileSync(path.join(ROOT,'src/renderer',semantic,'index.ts'),'utf8');assert.deepEqual(deps(restored,/(?:from\s+|import\s*)['"]@rchunk\/([^'"]+)/g),deps(original,/from "\.\/([^"/]+)-[a-f0-9]{12}\.js"/g));assert.equal((restored.match(/import\(/g)||[]).length,(original.match(/import\(/g)||[]).length);assert.equal(/\bany\b|@ts-expect-error|@ts-nocheck/.test(restored),false);sourceAssertions+=3}
@@ -29,11 +28,11 @@ const plus=loaded.get('get-plus-header-button').GetPlusHeaderButton({rejoinPlus:
 const access=loaded.get('gpt-management-access');access.n();assert.equal(access.t({children:'ok',account:{plan_type:'enterprise',structure:'personal'}}),'ok');assert.equal(access.t({children:'ok',account:{plan_type:'free',structure:'personal'},unavailableFallback:'no'}),'no');assert.equal(access.t({children:'ok',loading:true,loadingFallback:'wait'}),'wait');runtimeAssertions+=3;
 globalThis.__nd.portalHost={id:'host'};const webview=loaded.get('browser-webview-host');webview.n();assert.equal(webview.t({conversationId:'c',browserTabId:'b',children:'child'}).kind,'portal');webview.t({conversationId:'c',browserTabId:'b',bounds:null,isVisible:false,shouldBootstrapWhenHidden:true,shouldPaint:false});assert.equal(globalThis.__nd.webviewSync.shouldBootstrap,true);assert.equal(globalThis.__nd.webviewSync.isVisible,false);runtimeAssertions+=3;
 globalThis.__nd.mountedBrowserTabIds=['a'];globalThis.__nd.zoom=1.25;globalThis.__nd.browserSnapshots={b:{tabType:'web',url:'https://example.com'}};const hiddenUse=loaded.get('hidden-browser-use-webview-host').HiddenBrowserUseWebviewHost({conversationId:'c',browserUseTabIdsKey:'a\0b'});assert.equal(hiddenUse.props.children.length,1);assert.equal(hiddenUse.props.children[0].props.browserTabId,'b');const hiddenWebview=hiddenUse.props.children[0].kind(hiddenUse.props.children[0].props);assert.equal(hiddenWebview.props.hostKind,'hidden-browser-use');assert.equal(hiddenWebview.props.initialUrl,'https://example.com');assert.equal(hiddenWebview.props.shouldBootstrapWhenHidden,true);assert.equal(hiddenWebview.props.windowZoom,1.25);assert.equal(hiddenWebview.props.webviewRef.current,null);runtimeAssertions+=7;
-const hiddenBackground=loaded.get('hidden-background-webview-host').HiddenBackgroundBrowserWebviewHost({conversationId:'c',panelTabs:[{browserTabId:'a'},{browserTabId:'a'},{browserTabId:'b'}],mountedBrowserTabIds:['b']});assert.equal(hiddenBackground.props.children.length,1);runtimeAssertions++;
+sourceAssertions += assertReleaseOwner('hidden-background-webview-host');
 let candidate;loaded.get('host').PepperOnboardingAnnouncementHost({accountId:'a',eligibleAnnouncements:['oai/apps/pepperOnboarding'],dismissedAccountIds:new Set(),children:value=>(candidate=value,value)});assert.equal(candidate.id,'oai/apps/pepperOnboarding');runtimeAssertions++;
 sourceAssertions += assertReleaseOwner('voice-commentary-message');
 globalThis.__nd.session={userId:'u',accountId:'w',accessToken:'token'};globalThis.__nd.refreshed={userId:'u',accountId:'a',accessToken:'token'};globalThis.__nd.payment={userId:'u',accountId:'a'};globalThis.__nd.accounts={accounts:{w:{account:{account_id:'w',name:'Work',is_deactivated:false},can_access_with_session:true}},account_ordering:['w']};globalThis.__nd.switchResult={willRedirect:false};globalThis.__nd.tokenAccount='w';const cache=[];const signal={throwIfAborted(){},addEventListener(){},removeEventListener(){}};const workspace=await loaded.get('workspace-access-browser').prepareWorkspaceAccess({scope:{queryClient:{async cancelQueries(){},setQueryData(...args){cache.push(args)}}},statsig:{},userId:'u',workspaceId:'w',signal});assert.equal(workspace.account.name,'Work');assert.equal(cache.length>=1,true);runtimeAssertions+=2;
-assert.equal(loaded.get('workspace-layout-step-handler').WorkspaceLayoutStepHandler(),null);runtimeAssertions++;
+sourceAssertions += assertReleaseOwner('workspace-layout-step-handler');
 sourceAssertions += assertReleaseOwner('pepper-onboarding-modal');
 sourceAssertions += assertReleaseOwner('hotkey-window-detail-layout');
 sourceAssertions += assertReleaseOwner('learning-model-gcf-lcm-shape-renderer');

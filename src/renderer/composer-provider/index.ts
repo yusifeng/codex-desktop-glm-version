@@ -1,228 +1,371 @@
-import "@rchunk/rolldown-runtime";
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import * as scrollChunk from "@rchunk/thread-scroll-controller-context-value";
-
-export interface ResponseSpacerHandle {
-  clear(): void;
-  getHeightPx(): number;
-  place(): void;
-  scrollToBottom(): void;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  I3 as r,
+  LX as i,
+  QI as a,
+  ZI as o,
+  __ as s,
+  e6 as c,
+  g_ as l,
+} from "@rchunk/app-shared";
+import {
+  Aat as u,
+  Dat as d,
+  Eat as f,
+  G1t as p,
+  K1t as m,
+  LSt as h,
+  MSt as g,
+  NSt as _,
+  Oat as v,
+  SHt as y,
+  Z1t as b,
+  kat as x,
+  pht as S,
+  rht as C,
+  t0t as w,
+  uHt as T,
+  vW as E,
+  wVt as D,
+  yW as O,
+} from "@rchunk/app-initial";
+import { n as k, r as A } from "@rchunk/thread-scroll-controller-context-value";
+function j(e) {
+  let t = (0, P.c)(50),
+    { initialPlacementKey: n, onResponseSpacerStateChange: r } = e,
+    i = (0, F.useRef)(0),
+    a = (0, F.useRef)(0),
+    o = (0, F.useRef)(null),
+    c = (0, F.useRef)(null),
+    l = A(),
+    u = (0, F.useContext)(x),
+    d;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = (e) => {
+        ((i.current = e), c.current != null && (c.current.style.height = `${e}px`));
+      }),
+      (t[0] = d))
+    : (d = t[0]);
+  let p = s(d),
+    m;
+  t[1] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((m = () => {
+        (o.current != null && (window.cancelAnimationFrame(o.current), (o.current = null)),
+          (a.current = 0));
+      }),
+      (t[1] = m))
+    : (m = t[1]);
+  let h = s(m),
+    g;
+  t[2] !== h || t[3] !== p
+    ? ((g = () => {
+        (h(), p(0));
+      }),
+      (t[2] = h),
+      (t[3] = p),
+      (t[4] = g))
+    : (g = t[4]);
+  let _ = s(g),
+    y;
+  t[5] !== _ || t[6] !== l
+    ? ((y = () => {
+        (_(), l.scrollToBottom());
+      }),
+      (t[5] = _),
+      (t[6] = l),
+      (t[7] = y))
+    : (y = t[7]);
+  let b = s(y),
+    S;
+  t[8] !== l || t[9] !== p
+    ? ((S = () => {
+        let e = i.current,
+          t = l.getScrollElement(),
+          n = c.current;
+        if (e <= 0 || t == null || n == null) return;
+        let r = l.getLastScrollDistanceFromBottomPx(),
+          a = t.getBoundingClientRect(),
+          o = a.height / t.clientHeight,
+          s = a.bottom - M(t) * o;
+        (r < e && n.getBoundingClientRect().top < s - z * o) ||
+          (p(0), l.scrollToDistanceFromBottomPx(Math.max(0, r - e), `instant`));
+      }),
+      (t[8] = l),
+      (t[9] = p),
+      (t[10] = S))
+    : (S = t[10]);
+  let C = s(S),
+    w;
+  t[11] !== C || t[12] !== l || t[13] !== p
+    ? ((w = (e) => {
+        if (e <= 0) return;
+        let t = i.current,
+          n = Math.max(0, t - e);
+        if (n === t) return;
+        let r = l.getLastScrollDistanceFromBottomPx();
+        (p(n), l.compensateScrollToDistanceFromBottomPx(Math.max(0, r - (t - n))), C());
+      }),
+      (t[11] = C),
+      (t[12] = l),
+      (t[13] = p),
+      (t[14] = w))
+    : (w = t[14]);
+  let T = s(w),
+    E;
+  t[15] === T
+    ? (E = t[16])
+    : ((E = () => {
+        o.current = null;
+        let e = a.current;
+        ((a.current = 0), T(e));
+      }),
+      (t[15] = T),
+      (t[16] = E));
+  let D = s(E),
+    O;
+  t[17] !== h || t[18] !== l || t[19] !== p
+    ? ((O = () => {
+        let e = l.getScrollElement();
+        e != null && (h(), p(N(e)), l.scrollToDistanceFromBottomPx(V, `instant`));
+      }),
+      (t[17] = h),
+      (t[18] = l),
+      (t[19] = p),
+      (t[20] = O))
+    : (O = t[20]);
+  let k = s(O),
+    j;
+  t[21] !== l || t[22] !== p
+    ? ((j = () => {
+        let e = l.getScrollElement(),
+          t = i.current;
+        if (e == null || e.clientHeight <= 0 || t <= 0) return;
+        let n = Math.min(t, N(e));
+        if (n === t) return;
+        let r = Math.max(0, -e.scrollTop);
+        (p(n), l.compensateScrollToDistanceFromBottomPx(Math.max(0, r - (t - n))));
+      }),
+      (t[21] = l),
+      (t[22] = p),
+      (t[23] = j))
+    : (j = t[23]);
+  let L = s(j),
+    R,
+    H;
+  (t[24] !== L || t[25] !== u || t[26] !== l
+    ? ((R = () => {
+        let e = l.getScrollElement();
+        if (e == null) return;
+        let t = null,
+          n = () => {
+            t ??= window.requestAnimationFrame(() => {
+              ((t = null), L());
+            });
+          },
+          r = e.parentElement?.querySelector(`[data-thread-scroll-footer]`),
+          i = r == null ? [e] : [e, r];
+        for (let e of i) f({ element: e, callback: n, observer: u });
+        return () => {
+          for (let e of i) v({ element: e, callback: n, observer: u });
+          t != null && window.cancelAnimationFrame(t);
+        };
+      }),
+      (H = [L, u, l]),
+      (t[24] = L),
+      (t[25] = u),
+      (t[26] = l),
+      (t[27] = R),
+      (t[28] = H))
+    : ((R = t[27]), (H = t[28])),
+    (0, F.useLayoutEffect)(R, H));
+  let U, W;
+  (t[29] !== C || t[30] !== l
+    ? ((U = () => {
+        let e = l.getScrollElement(),
+          t = c.current;
+        if (e == null || t == null || typeof IntersectionObserver > `u`) return;
+        let n = new IntersectionObserver(C, { root: e, threshold: B });
+        return (
+          n.observe(t),
+          () => {
+            n.disconnect();
+          }
+        );
+      }),
+      (W = [C, l]),
+      (t[29] = C),
+      (t[30] = l),
+      (t[31] = U),
+      (t[32] = W))
+    : ((U = t[31]), (W = t[32])),
+    (0, F.useLayoutEffect)(U, W));
+  let G, K;
+  (t[33] !== h || t[34] !== _ || t[35] !== D || t[36] !== l
+    ? ((G = () => {
+        let e = l.addScrollListener((e) => {
+            i.current > 0 && l.getUnroundedScrollDistanceFromBottomPx(e) === 0 && _();
+          }),
+          t = l.addUserScrollListener((e, t) => {
+            if (t == null) return;
+            let n = e - t;
+            n <= 0 || ((a.current += n), (o.current ??= window.requestAnimationFrame(D)));
+          });
+        return () => {
+          (e(), t(), h());
+        };
+      }),
+      (K = [h, _, D, l]),
+      (t[33] = h),
+      (t[34] = _),
+      (t[35] = D),
+      (t[36] = l),
+      (t[37] = G),
+      (t[38] = K))
+    : ((G = t[37]), (K = t[38])),
+    (0, F.useLayoutEffect)(G, K));
+  let q, J;
+  (t[39] !== _ || t[40] !== r || t[41] !== k || t[42] !== b
+    ? ((q = () => (
+        r({ clear: _, getHeightPx: () => i.current, place: k, scrollToBottom: b }),
+        () => {
+          r(null);
+        }
+      )),
+      (J = [_, r, k, b]),
+      (t[39] = _),
+      (t[40] = r),
+      (t[41] = k),
+      (t[42] = b),
+      (t[43] = q),
+      (t[44] = J))
+    : ((q = t[43]), (J = t[44])),
+    (0, F.useLayoutEffect)(q, J));
+  let Y, X;
+  (t[45] !== n || t[46] !== k
+    ? ((Y = () => {
+        n != null && k();
+      }),
+      (X = [n, k]),
+      (t[45] = n),
+      (t[46] = k),
+      (t[47] = Y),
+      (t[48] = X))
+    : ((Y = t[47]), (X = t[48])),
+    (0, F.useLayoutEffect)(Y, X));
+  let Z;
+  return (
+    t[49] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((Z = (0, I.jsx)(`div`, { ref: c, className: `shrink-0`, "aria-hidden": !0 })), (t[49] = Z))
+      : (Z = t[49]),
+    Z
+  );
 }
-
-interface ResponseSpacerProps {
-  initialPlacementKey?: unknown;
-  onResponseSpacerStateChange(handle: ResponseSpacerHandle | null): void;
+function M(e) {
+  let t = Number.parseFloat(e.style.getPropertyValue(`--thread-scroll-padding-bottom`));
+  return Number.isFinite(t) ? t : 0;
 }
-
-const shared = sharedChunk as unknown as Record<string, unknown>;
-const initial = initialChunk as unknown as Record<string, unknown>;
-const scroll = scrollChunk as unknown as Record<string, unknown>;
-let React: {
-  useContext<T>(context: unknown): T;
-  useEffect(effect: () => void | (() => void), deps: unknown[]): void;
-  useLayoutEffect(effect: () => void | (() => void), deps: unknown[]): void;
-  useRef<T>(value: T): { current: T };
-  useState<T>(value: T | (() => T)): [T, (value: T) => void];
-};
-let jsx: { jsx(component: unknown, props: Record<string, unknown>): unknown };
-let responseSpacerInitialized = false;
-let responseWatcherInitialized = false;
-let composerProviderInitialized = false;
-
-function call(value: unknown): void { if (typeof value === "function") value(); }
-function viewportPadding(element: HTMLElement): number {
-  const value = Number.parseFloat(element.style.getPropertyValue("--thread-scroll-padding-bottom"));
-  return Number.isFinite(value) ? value : 0;
+function N(e) {
+  let t = Math.max(0, e.clientHeight - M(e));
+  return Math.max(0, Math.min(t * L, t - R));
 }
-function desiredSpacerHeight(element: HTMLElement): number {
-  const available = Math.max(0, element.clientHeight - viewportPadding(element));
-  return Math.max(0, Math.min(available * (2 / 3), available - 240));
+var P, F, I, L, R, z, B, V;
+function H() {
+  return (H = e(() => {
+    ((P = t()),
+      (F = c()),
+      u(),
+      d(),
+      k(),
+      l(),
+      (I = r()),
+      (L = 2 / 3),
+      (R = 240),
+      (z = 1),
+      (B = Array.from({ length: 101 }, (e, t) => t / 100)),
+      (V = 1));
+  }))();
 }
-
-function ResponseSpacer({ initialPlacementKey, onResponseSpacerStateChange }: ResponseSpacerProps): unknown {
-  initializeResponseSpacer();
-  const height = React.useRef(0);
-  const pendingReduction = React.useRef(0);
-  const frame = React.useRef<number | null>(null);
-  const elementRef = React.useRef<HTMLDivElement | null>(null);
-  const controller = (scroll.r as () => {
-    addScrollListener(listener: (distanceFromBottomPx: number) => void): () => void;
-    addUserScrollListener(listener: (current: number, previous: number | null) => void): () => void;
-    compensateScrollToDistanceFromBottomPx(distance: number): void;
-    getLastScrollDistanceFromBottomPx(): number;
-    getScrollElement(): HTMLElement | null;
-    getUnroundedScrollDistanceFromBottomPx(distanceFromBottomPx: number): number;
-    scrollToBottom(): void;
-    scrollToDistanceFromBottomPx(distance: number, behavior: "instant"): void;
-  })();
-  const observer = React.useContext<unknown>(initial.kat);
-  const useStableCallback = shared.__ as <Callback extends (...args: never[]) => unknown>(callback: Callback) => Callback;
-  const setHeight = useStableCallback((value: number) => {
-    height.current = value;
-    if (elementRef.current != null) elementRef.current.style.height = `${value}px`;
-  });
-  const cancelFrame = useStableCallback(() => {
-    if (frame.current != null) window.cancelAnimationFrame(frame.current);
-    frame.current = null;
-    pendingReduction.current = 0;
-  });
-  const clear = useStableCallback(() => { cancelFrame(); setHeight(0); });
-  const scrollToBottom = useStableCallback(() => { clear(); controller.scrollToBottom(); });
-  const reconcile = useStableCallback(() => {
-    const current = height.current;
-    const scrollElement = controller.getScrollElement();
-    const spacer = elementRef.current;
-    if (current <= 0 || scrollElement == null || spacer == null) return;
-    const distance = controller.getLastScrollDistanceFromBottomPx();
-    const bounds = scrollElement.getBoundingClientRect();
-    const scale = bounds.height / scrollElement.clientHeight;
-    const viewportBottom = bounds.bottom - viewportPadding(scrollElement) * scale;
-    if (distance < current && spacer.getBoundingClientRect().top < viewportBottom - scale) return;
-    setHeight(0);
-    controller.scrollToDistanceFromBottomPx(Math.max(0, distance - current), "instant");
-  });
-  const reduce = useStableCallback((delta: number) => {
-    if (delta <= 0) return;
-    const previous = height.current;
-    const next = Math.max(0, previous - delta);
-    if (next === previous) return;
-    const distance = controller.getLastScrollDistanceFromBottomPx();
-    setHeight(next);
-    controller.compensateScrollToDistanceFromBottomPx(Math.max(0, distance - (previous - next)));
-    reconcile();
-  });
-  const flushReduction = useStableCallback(() => {
-    frame.current = null;
-    const delta = pendingReduction.current;
-    pendingReduction.current = 0;
-    reduce(delta);
-  });
-  const place = useStableCallback(() => {
-    const scrollElement = controller.getScrollElement();
-    if (scrollElement == null) return;
-    cancelFrame();
-    setHeight(desiredSpacerHeight(scrollElement));
-    controller.scrollToDistanceFromBottomPx(1, "instant");
-  });
-  const constrainToViewport = useStableCallback(() => {
-    const scrollElement = controller.getScrollElement();
-    const current = height.current;
-    if (scrollElement == null || scrollElement.clientHeight <= 0 || current <= 0) return;
-    const next = Math.min(current, desiredSpacerHeight(scrollElement));
-    if (next === current) return;
-    const overscroll = Math.max(0, -scrollElement.scrollTop);
-    setHeight(next);
-    controller.compensateScrollToDistanceFromBottomPx(Math.max(0, overscroll - (current - next)));
-  });
-  React.useLayoutEffect(() => {
-    const scrollElement = controller.getScrollElement();
-    if (scrollElement == null) return;
-    let resizeFrame: number | null = null;
-    const onResize = () => { resizeFrame ??= window.requestAnimationFrame(() => { resizeFrame = null; constrainToViewport(); }); };
-    const footer = scrollElement.parentElement?.querySelector<HTMLElement>("[data-thread-scroll-footer]");
-    const elements = footer == null ? [scrollElement] : [scrollElement, footer];
-    for (const element of elements) (initial.Eat as (input: Record<string, unknown>) => void)({ element, callback: onResize, observer });
-    return () => {
-      for (const element of elements) (initial.Oat as (input: Record<string, unknown>) => void)({ element, callback: onResize, observer });
-      if (resizeFrame != null) window.cancelAnimationFrame(resizeFrame);
+function U(e) {
+  let t = (0, W.c)(5),
+    { conversationId: n } = e,
+    r = i(o),
+    { mutate: a } = S(),
+    s,
+    c;
+  return (
+    t[0] !== n || t[1] !== a || t[2] !== r
+      ? ((s = () => {
+          y(r, n, !0);
+          let e = r.watch((e) => {
+            let { get: t } = e,
+              i = t(D, n);
+            if (i == null || t(_, i) !== !0) return;
+            let o = b(i);
+            (m(r, o, r.get(h, o)), a(i));
+          });
+          return () => {
+            (e(), y(r, n, !1));
+          };
+        }),
+        (c = [n, a, r]),
+        (t[0] = n),
+        (t[1] = a),
+        (t[2] = r),
+        (t[3] = s),
+        (t[4] = c))
+      : ((s = t[3]), (c = t[4])),
+    (0, G.useEffect)(s, c),
+    null
+  );
+}
+var W, G;
+function K() {
+  return (K = e(() => {
+    ((W = t()), n(), (G = c()), C(), a(), p(), g(), w(), T());
+  }))();
+}
+function q(e) {
+  let t = (0, Y.c)(3),
+    { children: n } = e,
+    [r] = (0, X.useState)(J),
+    i;
+  return (
+    t[0] !== r || t[1] !== n
+      ? ((i = (0, Z.jsx)(E, { value: r, children: n })), (t[0] = r), (t[1] = n), (t[2] = i))
+      : (i = t[2]),
+    i
+  );
+}
+function J() {
+  let e = null,
+    t = new Set(),
+    n = (n) => {
+      e = n;
+      for (let e of t) e();
     };
-  }, [constrainToViewport, controller, observer]);
-  React.useLayoutEffect(() => {
-    const scrollElement = controller.getScrollElement();
-    const spacer = elementRef.current;
-    if (scrollElement == null || spacer == null || typeof IntersectionObserver === "undefined") return;
-    const intersection = new IntersectionObserver(reconcile, { root: scrollElement, threshold: Array.from({ length: 101 }, (_, index) => index / 100) });
-    intersection.observe(spacer);
-    return () => intersection.disconnect();
-  }, [controller, reconcile]);
-  React.useLayoutEffect(() => {
-    const removeScroll = controller.addScrollListener(distance => {
-      if (height.current > 0 && controller.getUnroundedScrollDistanceFromBottomPx(distance) === 0) clear();
-    });
-    const removeUserScroll = controller.addUserScrollListener((current, previous) => {
-      if (previous == null || current - previous <= 0) return;
-      pendingReduction.current += current - previous;
-      frame.current ??= window.requestAnimationFrame(flushReduction);
-    });
-    return () => { removeScroll(); removeUserScroll(); cancelFrame(); };
-  }, [cancelFrame, clear, controller, flushReduction]);
-  React.useLayoutEffect(() => {
-    onResponseSpacerStateChange({ clear, getHeightPx: () => height.current, place, scrollToBottom });
-    return () => onResponseSpacerStateChange(null);
-  }, [clear, onResponseSpacerStateChange, place, scrollToBottom]);
-  React.useLayoutEffect(() => { if (initialPlacementKey != null) place(); }, [initialPlacementKey, place]);
-  return jsx.jsx("div", { ref: elementRef, className: "shrink-0", "aria-hidden": true });
-}
-
-function createResponseSpacerStore() {
-  let value: ResponseSpacerHandle | null = null;
-  const listeners = new Set<() => void>();
-  const set = (next: ResponseSpacerHandle | null) => { value = next; for (const listener of listeners) listener(); };
   return {
-    getSnapshot: () => value,
-    subscribe(listener: () => void) { listeners.add(listener); return () => listeners.delete(listener); },
-    register(next: ResponseSpacerHandle) { set(next); return () => { if (value === next) set(null); }; },
+    getSnapshot: () => e,
+    subscribe: (e) => (
+      t.add(e),
+      () => {
+        t.delete(e);
+      }
+    ),
+    register: (t) => (
+      n(t),
+      () => {
+        e === t && n(null);
+      }
+    ),
   };
 }
-
-function ComposerProvider({ children }: { children?: unknown }): unknown {
-  initializeComposerProvider();
-  const [store] = React.useState(createResponseSpacerStore);
-  return jsx.jsx(initial.vW, { value: store, children });
+var Y, X, Z;
+function Q() {
+  return (Q = e(() => {
+    ((Y = t()), (X = c()), O(), (Z = r()));
+  }))();
 }
-
-function ConversationResponseWatcher({ conversationId }: { conversationId: string }): null {
-  initializeConversationResponseWatcher();
-  const scope = (shared.LX as (root: unknown) => {
-    get(signal: unknown, key: unknown): unknown;
-    watch(listener: (state: { get(signal: unknown, key: unknown): unknown }) => void): () => void;
-  })(shared.ZI);
-  const { mutate } = (initial.pht as () => { mutate(id: unknown): void })();
-  React.useEffect(() => {
-    (initial.SHt as (scope: unknown, id: string, watching: boolean) => void)(scope, conversationId, true);
-    const unwatch = scope.watch(({ get }) => {
-      const responseId = get(initial.wVt, conversationId);
-      if (responseId == null || get(initial.NSt, responseId) !== true) return;
-      const key = (initial.Z1t as (id: unknown) => unknown)(responseId);
-      (initial.K1t as (scope: unknown, key: unknown, value: unknown) => void)(scope, key, scope.get(initial.LSt, key));
-      mutate(responseId);
-    });
-    return () => { unwatch(); (initial.SHt as (scope: unknown, id: string, watching: boolean) => void)(scope, conversationId, false); };
-  }, [conversationId, mutate, scope]);
-  return null;
-}
-
-function initializeResponseSpacer(): void {
-  if (responseSpacerInitialized) return;
-  responseSpacerInitialized = true;
-  call(shared.$3);
-  React = (shared.e6 as () => typeof React)();
-  for (const value of [initial.Aat, initial.Dat, scroll.n, shared.g_]) call(value);
-  jsx = (shared.I3 as () => typeof jsx)();
-}
-function initializeConversationResponseWatcher(): void {
-  if (responseWatcherInitialized) return;
-  responseWatcherInitialized = true;
-  call(shared.$3);
-  call(shared.FX);
-  React = (shared.e6 as () => typeof React)();
-  for (const value of [initial.rht, shared.QI, initial.G1t, initial.MSt, initial.t0t, initial.uHt]) call(value);
-}
-function initializeComposerProvider(): void {
-  if (composerProviderInitialized) return;
-  composerProviderInitialized = true;
-  call(shared.$3);
-  React = (shared.e6 as () => typeof React)();
-  call(initial.yW);
-  jsx = (shared.I3 as () => typeof jsx)();
-}
-
-export {
-  ResponseSpacer as a,
-  initializeConversationResponseWatcher as i,
-  initializeComposerProvider as n,
-  initializeResponseSpacer as o,
-  ConversationResponseWatcher as r,
-  ComposerProvider as t,
-};
+export { j as a, K as i, Q as n, H as o, U as r, q as t };

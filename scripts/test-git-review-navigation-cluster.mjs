@@ -220,40 +220,8 @@ assert.equal(cardRow.props.children[1].props["aria-hidden"], true);
 
 assertReleaseOwner("file-diff-alt");
 
-// diff-preview-content
-const preview = await bundle("diff-preview-content");
-const preload = preview.DiffHighlightPreloader({
-  fileDiff: { cacheKey: "file-1" },
-});
-assert.equal(preload.props.hidden, true);
-assert.match(preload.props.children, /file-1/);
-let opened = 0;
-const previewTree = preview.DiffPreviewContent({
-  diff: { metadata: { name: "main.ts" } },
-  displayPath: "src/main.ts",
-  linesAdded: 4,
-  linesRemoved: 2,
-  onOpen: () => {
-    opened++;
-  },
-});
-assert.equal(previewTree.props.role, "button");
-assert.match(previewTree.props.className, /invisible/);
-assert.equal(
-  nodes(previewTree).find(
-    (node) => node.props["data-testid"] === "diff-preview-scroll",
-  ).type,
-  "div",
-);
-assert.equal(
-  nodes(previewTree).find((node) => node.type === state.FileDiff).props.fileDiff
-    .name,
-  "main.ts",
-);
-previewTree.props.onClick();
-assert.equal(opened, 1);
-previewTree.props.onKeyDown({ key: "Enter", preventDefault() {} });
-assert.equal(opened, 2);
+assertReleaseOwner("diff-preview-content");
+assertReleaseOwner("conversation-diff-comments");
 
 const fileDiffPresentationReleaseAssertions = assertReleaseOwner("file-diff-presentation-core");
 

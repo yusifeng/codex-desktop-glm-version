@@ -42,17 +42,7 @@ async function load(name) {
   return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${name}`);
 }
 
-const epic = await load("epic-launch-page");
-globalThis.__auth = { accountId: "workspace-1", authMethod: "chatgpt", userId: "user-1" };
-const epicReady = epic.EpicLaunchPage();
-assert.equal(epicReady.type, "a");
-assert.equal(epicReady.props.href, "/epic/chart");
-globalThis.__auth = { accountId: "workspace-2", authMethod: "chatgpt", userId: "user-1" };
-assert.match(epic.EpicLaunchPage().props.children, /workspace-1/);
-globalThis.__auth = { isLoading: true };
-assert.equal(epic.EpicLaunchPage().props.role, "status");
-globalThis.__auth = { accountId: "workspace-1", authMethod: "api", userId: "user-1" };
-assert.equal(epic.EpicLaunchPage().props["data-action"], "request-chatgpt-login");
+const epicReleaseAssertions = assertReleaseOwner("epic-launch-page");
 
 const authErrorReleaseAssertions = assertReleaseOwner("browser-auth-error-page");
 
@@ -60,4 +50,4 @@ const demoReleaseAssertions = assertReleaseOwner("demo-tools-setup-page");
 
 const callbackReleaseAssertions = assertReleaseOwner("app-connect-oauth-callback-page");
 
-console.log(`recovery route pages cluster complete with ${authErrorReleaseAssertions + demoReleaseAssertions + callbackReleaseAssertions} release assertions`);
+console.log(`recovery route pages cluster complete with ${epicReleaseAssertions + authErrorReleaseAssertions + demoReleaseAssertions + callbackReleaseAssertions} release assertions`);

@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -51,78 +52,11 @@ function fontRule(properties) {
   return { type: 5, style: { getPropertyValue: (name) => properties[name] ?? "" } };
 }
 
-// portable-thumbnail-font-face-source-runtime: stylesheet discovery, installation, dedupe and diagnostics.
-let state = resetState();
-globalThis.CSSRule = { FONT_FACE_RULE: 5 };
-const fontSet = {
-  faces: [],
-  add(face) { this.faces.push(face); },
-  check(font) { return font.startsWith("400"); },
-  load: async (font) => { state.fontLoads.push(font); return []; },
-  values() { return this.faces.values(); },
-};
-globalThis.fonts = fontSet;
-globalThis.FontFace = class {
-  constructor(family, source, options) { this.family = family; this.source = source; Object.assign(this, options); }
-  async load() { return this; }
-};
-globalThis.OffscreenCanvas = class {
-  getContext() { return { font: "", measureText: () => ({ width: 123.4567 }) }; }
-};
-const deniedSheet = {};
-Object.defineProperty(deniedSheet, "cssRules", { get() { throw new Error("cross-origin"); } });
-globalThis.document = {
-  baseURI: "https://desktop.test/app/",
-  fonts: fontSet,
-  styleSheets: [
-    deniedSheet,
-    { href: "https://cdn.test/css/main.css", cssRules: [
-      fontRule({ "font-family": "'Carlito'", "font-weight": "700", "font-style": "italic", src: "url(font.woff) format('woff'), url(font.woff2) format('woff2')", "unicode-range": "U+0000-00FF" }),
-      fontRule({ "font-family": "Carlito", "font-weight": "400", src: "url('/regular.woff2') format('woff2')" }),
-      fontRule({ "font-family": "Other", "font-weight": "400", src: "url(other.woff2)" }),
-      fontRule({ "font-family": "Carlito", "font-weight": "900", src: "url(heavy.woff2)" }),
-    ] },
-  ],
-};
-const portableFaces = await bundle("portable-thumbnail-font-face-source-runtime");
-portableFaces.r();
-assert.deepEqual(state.initializers, ["font-metrics"]);
-const sources = portableFaces.t();
-assert.equal(sources.length, 2);
-assert.equal(sources[0].weight, "400");
-assert.equal(sources[0].src, "https://cdn.test/regular.woff2");
-assert.equal(sources[1].weight, "700");
-assert.equal(sources[1].format, "woff2");
-assert.equal(sources[1].style, "italic");
-assert.equal(sources[1].unicodeRange, "U+0000-00FF");
-await portableFaces.i(sources);
-assert.equal(fontSet.faces.length, 2);
-assert.equal(state.fontLoads.length, 2);
-assert.equal(state.metricChanges, 1);
-await portableFaces.i(sources);
-assert.equal(fontSet.faces.length, 2);
-assert.equal(state.metricChanges, 2);
-const debug = portableFaces.n();
-assert.equal(debug.hasFontFaceCtor, true);
-assert.equal(debug.hasFontFaceSet, true);
-assert.equal(debug.check400, true);
-assert.equal(debug.check700, false);
-assert.equal(debug.sampleWidths.carlito400, 123.457);
-
-// thumbnail-worker-font-faces: same runtime contract with worker metric invalidation.
-state = resetState();
-fontSet.faces.length = 0;
-globalThis.fonts = fontSet;
-const workerFaces = await bundle("thumbnail-worker-font-faces");
-const workerSources = workerFaces.getPopcornCarlitoFontFaceSourcesFromDocument();
-assert.equal(workerSources.length, 2);
-await workerFaces.installPopcornFontFaces(workerSources);
-assert.equal(fontSet.faces.length, 2);
-assert.equal(state.metricChanges, 1);
-assert.equal(workerFaces.getPopcornFontDebugState().hasFontFaceSet, true);
+assertReleaseOwner("portable-thumbnail-font-face-source-runtime");
+assertReleaseOwner("thumbnail-worker-font-faces");
 
 // portable-thumbnail-font-runtime: memoized two-weight document preload and readiness.
-state = resetState();
+let state = resetState();
 globalThis.document = { fonts: { load: async (font) => { state.fontLoads.push(font); return []; } } };
 const fontRuntime = await bundle("portable-thumbnail-font-runtime");
 fontRuntime.r();

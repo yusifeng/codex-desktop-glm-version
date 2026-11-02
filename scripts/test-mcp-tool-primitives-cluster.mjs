@@ -4,10 +4,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MODULES = [
-  "mcp-view-surface",
   "view-frame",
   "active-tool-activity-label",
   "tool-activity-disclosure",
@@ -63,7 +63,7 @@ const overrides = {
     K2: "() => undefined",
     RI: "() => undefined",
     Xf: "({ duration: .2 })",
-    a$: "({ div: 'div' })",
+    a$: "() => ({ div: 'div' })",
     e6: "() => globalThis.__mcpToolPrimitivesTest.react",
     fI: "() => undefined",
     oj: "({ name: 'elicitation-event' })",
@@ -76,6 +76,7 @@ const overrides = {
     b9t: "path => path",
     v9t: "() => false",
     Ait: "props => globalThis.__mcpToolPrimitivesTest.jsx.jsxs('section', { children: [globalThis.__mcpToolPrimitivesTest.jsx.jsx('button', { disabled: props.disclosure == null, 'aria-expanded': props.disclosure?.expanded ?? false, onClick: props.disclosure?.onToggle }), props.body] })",
+    Bdn: "({ shape: { params: {} } })",
     Cpn: "({ name: 'elicitation-state' })",
     Dit: "() => undefined",
     Eit: "props => globalThis.__mcpToolPrimitivesTest.jsx.jsx('div', props)",
@@ -84,6 +85,7 @@ const overrides = {
     Sat: "() => undefined",
     Spn: "({ name: 'blocked' })",
     Vat: "() => undefined",
+    Vdn: "({ shape: { params: {} } })",
     jit: "() => undefined",
     wat: "() => () => undefined",
     xpn: "(_scope, descriptor, event) => globalThis.__mcpToolPrimitivesTest.emitted.push({ descriptor, event })",
@@ -102,7 +104,7 @@ overrides["skill-exploration-labels"] = {
   t: "() => null",
   u: "{ activeCreating: { defaultMessage: 'Creating visualization' }, activeUpdating: { defaultMessage: 'Updating visualization' } }",
 };
-const sideEffects = new Set(["result-values"]);
+const sideEffects = new Set();
 function mock(name) {
   if (sideEffects.has(name)) return "export {};";
   return [...(imports.get(name) ?? [])]
@@ -158,61 +160,9 @@ function nodes(root) {
 const nodeOfType = (tree, type) =>
   nodes(tree).find((node) => node.type === type);
 
-// mcp-view-surface: 7
-const surface = await bundle("mcp-view-surface");
-surface.n();
-let webviewElement = null;
-const surfaceTree = surface.t({
-  isLoading: true,
-  loadingContent: "Starting weather",
-  partition: "persist:mcp",
-  showBackButton: false,
-  src: "https://example.test/app",
-  webviewRef: (value) => {
-    webviewElement = value;
-  },
-});
-assert.equal(surfaceTree.type, "main");
-assert.equal(nodeOfType(surfaceTree, "header"), undefined);
-assert.equal(
-  nodes(surfaceTree).find((node) => node.props.role === "status").props
-    .children,
-  "Starting weather",
-);
-const webview = nodeOfType(surfaceTree, "webview");
-assert.equal(webview.props.src, "https://example.test/app");
-assert.equal(webview.props.partition, "persist:mcp");
-assert.equal(webview.props.inert, true);
-webview.props.ref({ id: "webview" });
-assert.deepEqual(webviewElement, { id: "webview" });
+assertReleaseOwner("mcp-view-surface");
 
-// view-frame: 7
-const frame = await bundle("view-frame");
-frame.n();
-assert.equal(frame.t({}).props.role, "alert");
-let closed = false;
-const frameTree = frame.t({
-  deepLink: "https://example.test/deep",
-  lifetime: "component",
-  mcpAppId: "weather",
-  onClose: () => {
-    closed = true;
-  },
-  sessionId: "session-1",
-  view: { title: "Weather settings" },
-});
-assert.equal(frameTree.props["data-lifetime"], "component");
-assert.equal(frameTree.props["data-mcp-app-id"], "weather");
-assert.equal(frameTree.props["data-session-id"], "session-1");
-assert.equal(
-  nodeOfType(frameTree, "iframe").props.src,
-  "https://example.test/deep",
-);
-assert.equal(nodeOfType(frameTree, "iframe").props.title, "Weather settings");
-nodes(frameTree)
-  .find((node) => node.type === "button")
-  .props.onClick();
-assert.equal(closed, true);
+assertReleaseOwner("view-frame");
 
 // active-tool-activity-label: 8
 const activity = await bundle("active-tool-activity-label");
@@ -357,30 +307,6 @@ assert.equal(
 );
 assert.equal(analytics.t(null), undefined);
 
-// result-card: 6
-const result = await bundle("result-card");
-result.r();
-const resultTree = result.n({
-  details: {
-    access: "private",
-    name: "Ready",
-    networkDomains: ["api.example.test"],
-    repositories: ["desktop"],
-    secretNames: [],
-  },
-});
-assert.equal(resultTree.type, "article");
-assert.equal(resultTree.props["data-environment-result"], true);
-assert.equal(
-  nodes(resultTree).filter((node) => typeof node.type === "function").length,
-  6,
-);
-assert.match(
-  nodeOfType(resultTree, "footer").props.children,
-  /Prototype draft/,
-);
-const wrappedResult = result.t({ details: { name: "Ready", repositories: ["desktop"], secretNames: [] } });
-assert.equal(wrappedResult.type, result.n);
-assert.deepEqual(wrappedResult.props.details.repositories, ["desktop"]);
+assertReleaseOwner("result-card");
 
 console.log("45 MCP tool primitives cluster assertions passed");

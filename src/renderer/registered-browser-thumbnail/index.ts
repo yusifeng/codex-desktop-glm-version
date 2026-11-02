@@ -1,12 +1,167 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>): unknown; jsxs(type: unknown, props: Record<string, unknown>): unknown }
-const { $3: initializeRuntime, BX: useSignal, FX: initializeSignals, Hm: getHostname, I3: getJsxRuntime, Ib: BrowserIcon, K2: initializeCompiler, OK: normalizeUrl, Um: initializeUrlRuntime, Y2: FormattedMessage, lw: initializeIcons, wL: initializeLinks } = appSharedChunk as unknown as { $3(): void; BX(signal: unknown, key: unknown): unknown; FX(): void; Hm(url: string): string | null; I3(): JsxRuntime; Ib: unknown; K2(): void; OK(url: string): string; Um(): void; Y2: unknown; lw(): void; wL(): void };
-const { $1: browserTabSignal, Fgt: getRestoredUrl, Mgt: initializeBrowserRestore, Q1: browserScreenshotQuery, Xd: TabThumbnail, Zd: initializeTabThumbnail, e0: initializeBrowserQueries, mnt: initializeBrowserTabs, pnt: browserCapability } = appInitialChunk as unknown as { $1: unknown; Fgt(conversationId: string, tabId: string): string | null; Mgt(): void; Q1: unknown; Xd: unknown; Zd(): void; e0(): void; mnt(): void; pnt?: { browserHost?: unknown } };
-interface Props { props: { browserConversationId: string; browserTabId: string; fallbackRestoreUrl?: string }; tab: { icon?: unknown; statusContent?: unknown; title?: string } }
-let jsx: JsxRuntime;
-function BrowserThumbnailView({ icon, status, title, url, imageDataUrl, isNewTab = false }: { icon?: unknown; status?: unknown; title?: string; url: string; imageDataUrl?: string | null; isNewTab?: boolean }): unknown { const hostname = getHostname(url); const displayTitle = title || hostname || jsx.jsx(FormattedMessage, { id: "thread.sidePanel.emptyBrowserTab", defaultMessage: "New tab" }); const empty = isNewTab ? { kind: "block", fill: true, content: jsx.jsxs("div", { className: "flex h-full flex-col items-center justify-center gap-3 bg-surface-secondary text-codex-description", children: [jsx.jsx(BrowserIcon, {}), jsx.jsx(FormattedMessage, { id: "thread.sidePanel.emptyBrowserTab", defaultMessage: "New tab" })] }) } : null; const image = !isNewTab && imageDataUrl != null ? { kind: "image", src: imageDataUrl, fit: "cover" } : null; return jsx.jsx(TabThumbnail, { icon, status, subtitle: hostname, title: displayTitle, sections: [empty, image] }); }
-function RegisteredBrowserThumbnail({ props, tab }: Props): unknown { const key = { conversationId: props.browserConversationId, browserTabId: props.browserTabId }; const state = useSignal(browserTabSignal, key) as { canCapture?: boolean; isLoading?: boolean; isNewTab?: boolean; url?: string } | null; const screenshot = useSignal(browserScreenshotQuery, key) as { data?: { dataUrl?: string } | null; isError?: boolean; isSuccess?: boolean }; const url = state?.url ?? getRestoredUrl(props.browserConversationId, props.browserTabId) ?? props.fallbackRestoreUrl ?? ""; const isNewTab = state?.isNewTab ?? normalizeUrl(url).length === 0; const canCapture = state?.canCapture === true; if (!isNewTab && state?.isLoading !== true && (browserCapability?.browserHost == null || !canCapture || screenshot.isError || screenshot.isSuccess && screenshot.data == null)) return null; return jsx.jsx(BrowserThumbnailView, { icon: tab.icon, status: tab.statusContent, title: tab.title, url, imageDataUrl: canCapture ? screenshot.data?.dataUrl ?? null : null, isNewTab }); }
-let initialized = false; function initializeRegisteredBrowserThumbnail(): void { if (initialized) return; initialized = true; initializeRuntime(); initializeCompiler(); initializeUrlRuntime(); initializeTabThumbnail(); initializeLinks(); initializeBrowserRestore(); initializeBrowserTabs(); initializeBrowserQueries(); initializeIcons(); initializeSignals(); jsx = getJsxRuntime(); }
-initializeRegisteredBrowserThumbnail(); export { RegisteredBrowserThumbnail };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  Hm as i,
+  I3 as a,
+  Ib as o,
+  K2 as s,
+  OK as c,
+  Um as l,
+  Y2 as u,
+  lw as d,
+  wL as f,
+} from "@rchunk/app-shared";
+import {
+  $1 as p,
+  Fgt as m,
+  Mgt as h,
+  Q1 as g,
+  Xd as _,
+  Zd as v,
+  e0 as y,
+  mnt as b,
+  pnt as x,
+} from "@rchunk/app-initial";
+function S(e) {
+  let t = (0, C.c)(19),
+    { icon: n, status: r, title: a, url: s, imageDataUrl: c, isNewTab: l } = e,
+    d = l !== void 0 && l,
+    f;
+  t[0] === s ? (f = t[1]) : ((f = i(s)), (t[0] = s), (t[1] = f));
+  let p = f,
+    m;
+  t[2] !== p || t[3] !== a
+    ? ((m =
+        a ||
+        p ||
+        (0, w.jsx)(u, {
+          id: `thread.sidePanel.emptyBrowserTab`,
+          defaultMessage: `New tab`,
+          description: `Title for an empty browser tab in the task side panel`,
+        })),
+      (t[2] = p),
+      (t[3] = a),
+      (t[4] = m))
+    : (m = t[4]);
+  let h;
+  t[5] === d
+    ? (h = t[6])
+    : ((h = d
+        ? {
+            kind: `block`,
+            fill: !0,
+            content: (0, w.jsxs)(`div`, {
+              className: `flex h-full flex-col items-center justify-center gap-3 bg-surface-secondary text-codex-description`,
+              children: [
+                (0, w.jsx)(o, {}),
+                (0, w.jsx)(u, {
+                  id: `thread.sidePanel.emptyBrowserTab`,
+                  defaultMessage: `New tab`,
+                  description: `Title for an empty browser tab in the task side panel`,
+                }),
+              ],
+            }),
+          }
+        : null),
+      (t[5] = d),
+      (t[6] = h));
+  let g;
+  t[7] !== c || t[8] !== d
+    ? ((g = !d && c != null ? { kind: `image`, src: c, fit: `cover` } : null),
+      (t[7] = c),
+      (t[8] = d),
+      (t[9] = g))
+    : (g = t[9]);
+  let v;
+  t[10] !== h || t[11] !== g ? ((v = [h, g]), (t[10] = h), (t[11] = g), (t[12] = v)) : (v = t[12]);
+  let y;
+  return (
+    t[13] !== p || t[14] !== n || t[15] !== r || t[16] !== m || t[17] !== v
+      ? ((y = (0, w.jsx)(_, { icon: n, status: r, subtitle: p, title: m, sections: v })),
+        (t[13] = p),
+        (t[14] = n),
+        (t[15] = r),
+        (t[16] = m),
+        (t[17] = v),
+        (t[18] = y))
+      : (y = t[18]),
+    y
+  );
+}
+var C, w;
+function T() {
+  return (T = e(() => {
+    ((C = t()), s(), l(), v(), d(), (w = a()));
+  }))();
+}
+function E(e) {
+  let t = (0, D.c)(21),
+    { props: r, tab: i } = e,
+    { browserConversationId: a, browserTabId: o } = r,
+    s;
+  t[0] !== a || t[1] !== o
+    ? ((s = { conversationId: a, browserTabId: o }), (t[0] = a), (t[1] = o), (t[2] = s))
+    : (s = t[2]);
+  let l = n(p, s),
+    u;
+  t[3] !== a || t[4] !== o
+    ? ((u = { conversationId: a, browserTabId: o }), (t[3] = a), (t[4] = o), (t[5] = u))
+    : (u = t[5]);
+  let { data: d, isError: f, isSuccess: m } = n(g, u),
+    _ = l?.canCapture === !0,
+    v;
+  t[6] !== a || t[7] !== o || t[8] !== r.fallbackRestoreUrl || t[9] !== l?.url
+    ? ((v = l?.url ?? h(a, o) ?? r.fallbackRestoreUrl ?? ``),
+      (t[6] = a),
+      (t[7] = o),
+      (t[8] = r.fallbackRestoreUrl),
+      (t[9] = l?.url),
+      (t[10] = v))
+    : (v = t[10]);
+  let y = v,
+    b;
+  t[11] !== l?.isNewTab || t[12] !== y
+    ? ((b = l?.isNewTab ?? c(y).length === 0), (t[11] = l?.isNewTab), (t[12] = y), (t[13] = b))
+    : (b = t[13]);
+  let C = b;
+  if (!C && l?.isLoading !== !0 && (x?.browserHost == null || !_ || f || (m && d == null)))
+    return null;
+  let w = _ ? (d?.dataUrl ?? null) : null,
+    T;
+  return (
+    t[14] !== C ||
+    t[15] !== w ||
+    t[16] !== i.icon ||
+    t[17] !== i.statusContent ||
+    t[18] !== i.title ||
+    t[19] !== y
+      ? ((T = (0, O.jsx)(S, {
+          icon: i.icon,
+          status: i.statusContent,
+          title: i.title,
+          url: y,
+          imageDataUrl: w,
+          isNewTab: C,
+        })),
+        (t[14] = C),
+        (t[15] = w),
+        (t[16] = i.icon),
+        (t[17] = i.statusContent),
+        (t[18] = i.title),
+        (t[19] = y),
+        (t[20] = T))
+      : (T = t[20]),
+    T
+  );
+}
+var D, O;
+function k() {
+  return (k = e(() => {
+    ((D = t()), r(), f(), m(), b(), T(), y(), (O = a()));
+  }))();
+}
+k();
+export { E as RegisteredBrowserThumbnail };

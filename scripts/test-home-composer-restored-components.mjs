@@ -258,44 +258,7 @@ assertReleaseOwner("home-composer-announcement-candidates");
 
 assertReleaseOwner("composer-banners");
 
-const provider = await bundle("composer-provider", {
-  "app-shared": `
-    export const I3=()=>globalThis.__homeComposerRestored.jsx; export const ZI="app-scope";
-    export const e6=()=>({
-      useContext:()=>null, useRef:value=>({current:value}), useState:value=>[typeof value==="function"?value():value,()=>{}],
-      useEffect:effect=>{globalThis.__homeComposerRestored.providerCleanup=effect()}, useLayoutEffect:()=>{},
-    });
-    export const LX=()=>globalThis.__homeComposerRestored.providerScope;
-  `,
-  "app-initial": `
-    export const vW="ResponseSpacerContext"; export const yW=()=>{}; export const pht=()=>({mutate:id=>globalThis.__homeComposerRestored.events.push({mutated:id})});
-    export const SHt=(scope,id,watching)=>globalThis.__homeComposerRestored.events.push({watching,id});
-    export const wVt="response"; export const NSt="complete"; export const Z1t=id=>"key:"+id; export const LSt="source";
-    export const K1t=(scope,key,value)=>globalThis.__homeComposerRestored.events.push({copied:[key,value]});
-  `,
-  "thread-scroll-controller-context-value": `export const n=()=>{}; export const r=()=>({});`,
-});
-let providerWatcher;
-globalThis.__homeComposerRestored.providerScope = {
-  get: (signal,key) => signal === "source" ? "source-value" : null,
-  watch: callback => { providerWatcher = callback; return () => state.events.push({unwatched:true}); },
-};
-const providerTree = provider.t({ children: "ComposerChildren" });
-assert.equal(providerTree.type, "ResponseSpacerContext");
-assert.equal(providerTree.props.children, "ComposerChildren");
-let storeUpdates = 0;
-providerTree.props.value.subscribe(() => storeUpdates++);
-const unregisterSpacer = providerTree.props.value.register({ id: "spacer" });
-assert.equal(providerTree.props.value.getSnapshot().id, "spacer");
-unregisterSpacer();
-assert.equal(providerTree.props.value.getSnapshot(), null);
-assert.equal(storeUpdates, 2);
-assert.equal(provider.r({ conversationId: "conversation-2" }), null);
-providerWatcher({ get: (signal,key) => signal === "response" ? "response-1" : signal === "complete" ? true : null });
-assert.equal(state.events.some(event => event.mutated === "response-1"), true);
-assert.deepEqual(state.events.find(event => event.copied)?.copied, ["key:response-1", "source-value"]);
-globalThis.__homeComposerRestored.providerCleanup();
-assert.equal(state.events.some(event => event.watching === false && event.id === "conversation-2"), true);
+assertReleaseOwner("composer-provider");
 
 globalThis.__homeComposerRestored.scrollController = null;
 const scrollContext = await bundle("thread-scroll-controller-context-value", {

@@ -1,5 +1,29 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Route/thumbnail/workflow release-owner convergence：按剩余正向行数缺口一次性恢复
+`learning-model-acid-base-titration`、`thread-goal-side-panel-content`、
+`registered-browser-thumbnail`、`drawing-frame-geometry`、
+`plugin-mcp-app-deep-link-page`、`ansi-block`、`artifact-tab-content-shell`、
+`mcp-view-surface`、`learning-model-hydrocarbon-structures`、
+`learning-model-double-entry-transaction-effects`、`workspace-layout-step-handler`、
+`open-source-licenses-page`、`schedule-draft`、`conversation-thumbnail-ui`、
+`registered-goal-thumbnail`、`hidden-background-webview-host`、`gpt-chat-page`、
+`thumbnail-worker-font-faces`、`diff-preview-content`、`create-file-tab-thumbnail`、
+`composer-provider`、`portable-thumbnail-font-face-source-runtime`、`cme-state`、
+`feedback-upload`、`text-file-thumbnail`、`learning-model-food-web`、
+`plan-summary-page`、`departments`、`epic-launch-page` 与
+`conversation-diff-comments` 三十个发布 owner，净恢复 4,391 行发布 TypeScript。
+旧缩减 ABI/mock 回归已迁移为发布一致性验证，并保留相邻 spreadsheet、MCP primitive、
+thread tab、portable thumbnail、Git review、composer、account、feedback、basename 与 route
+行为覆盖。30 组关联测试、12,448/12,448 transform check、1,888/1,888 renderer
+build/verify、2,247/2,247 app-code coverage、0 semantic tail、typecheck 与
+1,912-script test-index 通过。严格 hub 消费为 app-shared 1,803/3,185、
+app-initial 5,867/8,204、app-primary 772/917，仍为 0 unreviewed、0 invalid consumers。
+按发布源码正向行数缺口口径，剩余由 27,051 行降至 22,660 行，覆盖率约 97.82%；
+可比对 owner 中已有 503 个与发布证据一致，仍有 1,359 个不完全一致，另有 454 个
+缺少双方可比资产。425 个 preserved 边界、三个聚合 hub 的剩余耦合导出与最终真实
+Electron E2E 尚未完成，因此本批仍不构成“完整反编译完成”。
+
 2026-11-02 Voice/subscription/thumbnail release-owner convergence：继续按正向行数缺口
 一次性恢复 `workspace-seat-banner`、`settings-command-menu-section-items`、
 `work-mode-upsell-modal`、`learning-model-action-potential-neuron`、

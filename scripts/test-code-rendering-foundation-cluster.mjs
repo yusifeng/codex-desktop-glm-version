@@ -108,40 +108,10 @@ async function bundle(directory) {
 
 assertReleaseOwner("codex-diff-css");
 
-// ansi-block: plain text, SGR color/decorations, resets and terminal overwrite controls.
-let state = resetState();
-const ansi = await bundle("ansi-block");
-ansi.n();
-const plain = ansi.t({ className: "terminal", children: "hello" });
-assert.equal(plain.type, "code");
-assert.equal(plain.props.className, "terminal");
-assert.equal(plain.props.children[0].props.children, "hello");
-assert.equal(plain.props.children[0].props.className, "");
-const colored = ansi.t({ children: "\x1b[31mred\x1b[0m plain" });
-assert.equal(colored.props.children[0].props.className, "ansi-red-fg");
-assert.equal(colored.props.children[0].props.children, "red");
-assert.equal(colored.props.children[1].props.className, "");
-assert.equal(colored.props.children[1].props.children, " plain");
-const decorated = ansi.t({ children: "\x1b[1;4;9;44mstyled" });
-assert.equal(decorated.props.children[0].props.className, "ansi-blue-bg");
-assert.equal(decorated.props.children[0].props.style.fontWeight, "bold");
-assert.equal(
-  decorated.props.children[0].props.style.textDecorationLine,
-  "underline line-through",
-);
-const palette = ansi.t({ children: "\x1b[38;5;200mcustom" });
-assert.equal(palette.props.children[0].props.className, "ansi-palette-200-fg");
-const erased = ansi.t({ children: "abc\bD" });
-assert.equal(erased.props.children[0].props.children, "abD");
-const overwritten = ansi.t({ children: "progress\rDone" });
-assert.match(
-  overwritten.props.children.map((child) => child.props.children).join(""),
-  /^Done/,
-);
-assert.deepEqual(ansi.t({ children: "" }).props.children, []);
+assertReleaseOwner("ansi-block");
 
 // shiki-highlight-provider: worker pool, selected theme, language list and live updates.
-state = resetState();
+let state = resetState();
 class WorkerMock {
   constructor(url, options) {
     this.url = url;

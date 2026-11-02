@@ -1,41 +1,179 @@
-import { I3 as getJsxRuntime, e6 as getReactRuntime, type JsxRuntime, type ReactRuntime } from "@rchunk/app-shared";
-import { B6t as AuthContext } from "@rchunk/app-initial";
-import "@rchunk/epic-launch-contracts";
-import "@rchunk/page-layout";
-import "@rchunk/rolldown-runtime";
-
-interface EpicLaunchBridge {
-  destination(): string | null;
-  get(): string | null;
-  workspace(): string | null;
-}
-interface EpicAuthState { accountId?: string | null; authMethod?: string; isLoading?: boolean; userId?: string | null; }
-
-declare global { interface Window { __oaiEpicNativeLaunch?: EpicLaunchBridge; } }
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-
-function EpicLaunchPage(): unknown {
-  const auth = React.useContext<EpicAuthState | null>(AuthContext);
-  const bridge = typeof window === "undefined" ? undefined : window.__oaiEpicNativeLaunch;
-  const launch = React.useSyncExternalStore(
-    (listener) => { window.addEventListener("oai-epic-native-launch", listener); return () => window.removeEventListener("oai-epic-native-launch", listener); },
-    () => bridge?.get() ?? null,
-    () => null,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, K2 as r, Y2 as i, e6 as a } from "@rchunk/app-shared";
+import {
+  B6t as o,
+  Kun as s,
+  Nx as c,
+  Qgn as l,
+  Run as u,
+  V6t as d,
+  Ygn as f,
+  ifn as p,
+  iht as m,
+  jx as h,
+  lfn as g,
+  rht as _,
+} from "@rchunk/app-initial";
+import { n as v, t as y } from "@rchunk/page-layout";
+import { r as b, t as x } from "@rchunk/epic-launch-contracts";
+function S() {
+  let e = (0, A.c)(10),
+    t = (0, j.useContext)(o),
+    n = (0, j.useSyncExternalStore)(k, O, w),
+    r;
+  e[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((r = typeof window > `u` ? null : window.__oaiEpicNativeLaunch?.workspace()), (e[0] = r))
+    : (r = e[0]);
+  let a = r,
+    s;
+  if (t?.isLoading) {
+    let t;
+    (e[1] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, M.jsx)(E, {})), (e[1] = t))
+      : (t = e[1]),
+      (s = t));
+  } else if (n == null) {
+    let t;
+    (e[2] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, M.jsx)(D, {})), (e[2] = t))
+      : (t = e[2]),
+      (s = t));
+  } else if (t?.authMethod !== `chatgpt`) {
+    let t;
+    return (
+      e[3] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, M.jsx)(`div`, { ref: C })), (e[3] = t))
+        : (t = e[3]),
+      t
+    );
+  } else if (t.userId == null || t.accountId == null) {
+    let t;
+    (e[4] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, M.jsx)(E, {})), (e[4] = t))
+      : (t = e[4]),
+      (s = t));
+  } else if (a != null && a !== t.accountId) {
+    let t;
+    (e[5] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, M.jsx)(T, { workspaceId: a }, a)), (e[5] = t))
+      : (t = e[5]),
+      (s = t));
+  } else {
+    let t;
+    return (
+      e[6] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, M.jsx)(f, {
+            to: window.__oaiEpicNativeLaunch?.destination() ?? `/epic/launch`,
+            replace: !0,
+          })),
+          (e[6] = t))
+        : (t = e[6]),
+      t
+    );
+  }
+  let c;
+  e[7] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((c = (0, M.jsx)(i, {
+        id: `epic.launch.title`,
+        defaultMessage: `Open Epic chart`,
+        description: `Heading while a clinician opens an Epic chart in ChatGPT`,
+      })),
+      (e[7] = c))
+    : (c = e[7]);
+  let l;
+  return (
+    e[8] === s
+      ? (l = e[9])
+      : ((l = (0, M.jsx)(y, { showFooter: !1, title: c, children: s })), (e[8] = s), (e[9] = l)),
+    l
   );
-  if (auth?.isLoading || auth?.userId == null || auth.accountId == null)
-    return jsx.jsx("p", { role: "status", children: "Opening chart…" });
-  if (launch == null)
-    return jsx.jsx("p", { role: "alert", children: "This chart could not be opened. Reopen ChatGPT from the patient’s chart in Epic." });
-  if (auth.authMethod !== "chatgpt")
-    return jsx.jsx("div", { "data-action": "request-chatgpt-login" });
-  const workspace = bridge?.workspace();
-  if (workspace != null && workspace !== auth.accountId)
-    return jsx.jsx("p", { role: "alert", children: `Switch to workspace ${workspace} to open this chart.` });
-  return jsx.jsx("a", { href: bridge?.destination() ?? "/epic/launch", "data-replace": true, children: "Continue" });
 }
-
-function initializeEpicLaunchPage(): void { React = getReactRuntime(); jsx = getJsxRuntime(); }
-initializeEpicLaunchPage();
-export { EpicLaunchPage };
+function C(e) {
+  e != null && s();
+}
+function w() {
+  return null;
+}
+function T(e) {
+  let t = (0, A.c)(10),
+    { workspaceId: n } = e,
+    { data: r, error: i } = m(`always`),
+    a = g(),
+    o = (0, j.useRef)(!1),
+    [s, l] = (0, j.useState)(!1),
+    u;
+  t[0] !== r || t[1] !== a || t[2] !== n
+    ? ((u = () => {
+        r != null && !o.current && ((o.current = !0), c(r, n, a).catch(() => l(!0)));
+      }),
+      (t[0] = r),
+      (t[1] = a),
+      (t[2] = n),
+      (t[3] = u))
+    : (u = t[3]);
+  let d;
+  t[4] !== i || t[5] !== s
+    ? ((d = s || i != null ? (0, M.jsx)(D, {}) : (0, M.jsx)(E, {})),
+      (t[4] = i),
+      (t[5] = s),
+      (t[6] = d))
+    : (d = t[6]);
+  let f;
+  return (
+    t[7] !== u || t[8] !== d
+      ? ((f = (0, M.jsx)(`div`, { ref: u, children: d })), (t[7] = u), (t[8] = d), (t[9] = f))
+      : (f = t[9]),
+    f
+  );
+}
+function E() {
+  let e = (0, A.c)(1),
+    t;
+  return (
+    e[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, M.jsx)(`p`, {
+          role: `status`,
+          children: (0, M.jsx)(i, {
+            id: `epic.launch.opening`,
+            defaultMessage: `Opening chart…`,
+            description: `Status while the clinician's chart is being opened`,
+          }),
+        })),
+        (e[0] = t))
+      : (t = e[0]),
+    t
+  );
+}
+function D() {
+  let e = (0, A.c)(1),
+    t;
+  return (
+    e[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, M.jsx)(`p`, {
+          role: `alert`,
+          children: (0, M.jsx)(i, {
+            id: `epic.launch.unavailable`,
+            defaultMessage: `This chart could not be opened. Check that you’re signed in to the correct workspace, or reopen ChatGPT from the patient’s chart in Epic`,
+            description: `Recovery guidance after a clinician's Epic chart handoff fails`,
+          }),
+        })),
+        (e[0] = t))
+      : (t = e[0]),
+    t
+  );
+}
+function O() {
+  return window.__oaiEpicNativeLaunch?.get() ?? null;
+}
+function k(e) {
+  return (window.addEventListener(x, e), () => window.removeEventListener(x, e));
+}
+var A, j, M;
+function N() {
+  return (N = e(() => {
+    ((A = t()), (j = a()), r(), l(), d(), u(), _(), v(), h(), p(), b(), (M = n()));
+  }))();
+}
+N();
+export { S as EpicLaunchPage };

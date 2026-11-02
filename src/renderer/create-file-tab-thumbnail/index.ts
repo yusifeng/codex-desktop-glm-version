@@ -1,16 +1,160 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as fileThumbnailChunk from "@rchunk/thumbnail-7c714f359bb7";
-import { n as initializeRegisteredTextThumbnail, t as RegisteredTextThumbnail } from "@rchunk/registered-text-file-thumbnail-core";
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>): unknown } interface ReactRuntime { useState<T>(initial: () => T): [T, (value: T) => void] } interface QueryClient { getQueryData(key: unknown): unknown; getQueriesData(input: Record<string, unknown>): Array<[unknown, { sizeBytes?: number } | undefined]> }
-const { $3: initializeRuntime, FX: initializeSignals, I3: getJsxRuntime, LX: useScope, aJ: contentSampleMaxFileBytes, e6: getReactRuntime, lW: contentSampleByteLimit, wL: initializeLinks } = appSharedChunk as unknown as { $3(): void; FX(): void; I3(): JsxRuntime; LX(signal: unknown): { queryClient: QueryClient }; aJ: number; e6(): ReactRuntime; lW: number; wL(): void };
-const { $ln: queryKey, JUt: inferFileFormat, XUt: initializeFileKinds, Y9t: initializeImageKinds, cet: appScope, let: initializeAppScope, nun: initializeQueries, q9t: imageExtensionKind } = appInitialChunk as unknown as { $ln(name: string, input?: Record<string, unknown>): unknown[]; JUt(path: string): string | undefined; XUt(): void; Y9t(): void; cet: unknown; let(): void; nun(): void; q9t(path: string): string };
-const { i: initializeFileThumbnailHelpers, n: initializeFileThumbnail, r: FileThumbnail, t: ImageThumbnail } = fileThumbnailChunk as unknown as { i(): void; n(): void; r: unknown; t: unknown };
-interface Props { hostId?: string; icon?: unknown; path?: string | null; readState?(): unknown; title: string }
-let jsx: JsxRuntime;
-function readMetadata(queryClient: QueryClient, hostId: string | undefined, path: string): { contentKind?: string; sizeBytes: number | null } { const key = queryKey("read-file-metadata", { hostId, path, contentSampleByteLimit, contentSampleMaxFileBytes }); const metadata = queryClient.getQueryData(key) as { contentKind?: string; sizeBytes?: number } | undefined; const identity = JSON.stringify({ hostId, path }); const fallback = queryClient.getQueriesData({ queryKey: queryKey("read-file-metadata"), predicate: (query: { queryKey: unknown[] }) => query.queryKey.at(-1) === identity }).find((entry) => entry[1]?.sizeBytes != null)?.[1]?.sizeBytes; return { contentKind: metadata?.contentKind, sizeBytes: metadata?.sizeBytes ?? fallback ?? null }; }
-function resolveFormat(path: string, contentKind?: string): string | undefined { if (["image", "pdf", "audio", "video"].includes(contentKind ?? "")) return contentKind; return inferFileFormat(path) ?? contentKind ?? (imageExtensionKind(path) === "none" ? undefined : "image"); }
-function CreateFileTabThumbnail({ hostId, icon, path, readState, title }: Props): unknown { const { queryClient } = useScope(appScope); const [snapshot] = getReactRuntime().useState(() => { if (path == null) return null; const metadata = readMetadata(queryClient, hostId, path); return { ...metadata, format: resolveFormat(path, metadata.contentKind), editor: readState?.() ?? null }; }); if (snapshot == null || path == null) return null; if (snapshot.format === "image") return jsx.jsx(ImageThumbnail, { icon, hostId, title, path, sources: [path], sizeBytes: snapshot.sizeBytes }); if (snapshot.contentKind === "text" || snapshot.contentKind == null && snapshot.editor != null) return jsx.jsx(RegisteredTextThumbnail, { icon, hostId, title, path, readState: () => snapshot.editor }); return jsx.jsx(FileThumbnail, { icon, path, title, format: snapshot.format, sizeBytes: snapshot.sizeBytes }); }
-let initialized = false; function initializeCreateFileTabThumbnail(): void { if (initialized) return; initialized = true; initializeRuntime(); initializeSignals(); initializeAppScope(); initializeFileThumbnail(); initializeRegisteredTextThumbnail(); initializeLinks(); initializeQueries(); initializeFileKinds(); initializeImageKinds(); initializeFileThumbnailHelpers(); jsx = getJsxRuntime(); }
-initializeCreateFileTabThumbnail(); export { CreateFileTabThumbnail };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  I3 as r,
+  LX as i,
+  aJ as a,
+  e6 as o,
+  lW as s,
+  wL as c,
+} from "@rchunk/app-shared";
+import {
+  $ln as l,
+  JUt as u,
+  XUt as d,
+  Y9t as f,
+  cet as p,
+  let as m,
+  nun as h,
+  q9t as g,
+} from "@rchunk/app-initial";
+import { i as _, n as v, r as y, t as b } from "@rchunk/file-image-thumbnail";
+import { n as x, t as S } from "@rchunk/registered-text-file-thumbnail-core";
+function C(e, t, n) {
+  let r = e.getQueryData(
+      l(`read-file-metadata`, {
+        hostId: t,
+        path: n,
+        contentSampleByteLimit: s,
+        contentSampleMaxFileBytes: a,
+      }),
+    ),
+    i = JSON.stringify({ hostId: t, path: n });
+  return {
+    contentKind: r?.contentKind,
+    sizeBytes:
+      r?.sizeBytes ??
+      e
+        .getQueriesData({
+          queryKey: l(`read-file-metadata`),
+          predicate: (e) => e.queryKey.at(-1) === i,
+        })
+        .find(([, e]) => e?.sizeBytes != null)?.[1]?.sizeBytes ??
+      null,
+  };
+}
+function w() {
+  return (w = e(() => {
+    (c(), h());
+  }))();
+}
+function T({ path: e, contentKind: t }) {
+  switch (t) {
+    case `image`:
+    case `pdf`:
+    case `audio`:
+    case `video`:
+      return t;
+    case `archive`:
+    case `binary`:
+    case `text`:
+    case void 0:
+      return u(e) ?? t ?? (g(e) === `none` ? void 0 : `image`);
+  }
+}
+function E() {
+  return (E = e(() => {
+    (d(), f());
+  }))();
+}
+function D(e) {
+  let t = (0, O.c)(28),
+    { hostId: n, icon: r, path: a, readState: o, title: s } = e,
+    c = i(p),
+    l;
+  t[0] !== n || t[1] !== a || t[2] !== o || t[3] !== c
+    ? ((l = () => {
+        if (a == null) return null;
+        let e = C(c.queryClient, n, a);
+        return { ...e, format: T({ path: a, contentKind: e.contentKind }), editor: o?.() ?? null };
+      }),
+      (t[0] = n),
+      (t[1] = a),
+      (t[2] = o),
+      (t[3] = c),
+      (t[4] = l))
+    : (l = t[4]);
+  let [u] = (0, k.useState)(l);
+  if (u == null || a == null) return null;
+  if (u.format === `image`) {
+    let e;
+    t[5] === a ? (e = t[6]) : ((e = [a]), (t[5] = a), (t[6] = e));
+    let i;
+    return (
+      t[7] !== n || t[8] !== r || t[9] !== a || t[10] !== u.sizeBytes || t[11] !== e || t[12] !== s
+        ? ((i = (0, A.jsx)(b, {
+            icon: r,
+            hostId: n,
+            title: s,
+            path: a,
+            sources: e,
+            sizeBytes: u.sizeBytes,
+          })),
+          (t[7] = n),
+          (t[8] = r),
+          (t[9] = a),
+          (t[10] = u.sizeBytes),
+          (t[11] = e),
+          (t[12] = s),
+          (t[13] = i))
+        : (i = t[13]),
+      i
+    );
+  }
+  if (u.contentKind === `text` || (u.contentKind == null && u.editor != null)) {
+    let e;
+    t[14] === u.editor ? (e = t[15]) : ((e = () => u.editor), (t[14] = u.editor), (t[15] = e));
+    let i;
+    return (
+      t[16] !== n || t[17] !== r || t[18] !== a || t[19] !== e || t[20] !== s
+        ? ((i = (0, A.jsx)(S, { icon: r, hostId: n, title: s, path: a, readState: e })),
+          (t[16] = n),
+          (t[17] = r),
+          (t[18] = a),
+          (t[19] = e),
+          (t[20] = s),
+          (t[21] = i))
+        : (i = t[21]),
+      i
+    );
+  }
+  let d;
+  return (
+    t[22] !== r || t[23] !== a || t[24] !== u.format || t[25] !== u.sizeBytes || t[26] !== s
+      ? ((d = (0, A.jsx)(y, {
+          icon: r,
+          path: a,
+          title: s,
+          format: u.format,
+          sizeBytes: u.sizeBytes,
+        })),
+        (t[22] = r),
+        (t[23] = a),
+        (t[24] = u.format),
+        (t[25] = u.sizeBytes),
+        (t[26] = s),
+        (t[27] = d))
+      : (d = t[27]),
+    d
+  );
+}
+var O, k, A;
+function j() {
+  return (j = e(() => {
+    ((O = t()), n(), (k = o()), m(), v(), x(), w(), E(), _(), (A = r()));
+  }))();
+}
+j();
+export { D as CreateFileTabThumbnail };

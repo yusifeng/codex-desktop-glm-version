@@ -1,7 +1,148 @@
-import "@rchunk/app-shared";import "@rchunk/app-initial";
-export type FeedbackUploadStatus="uploading"|"uploaded"|"incomplete"|"disabled"|"failed"|"unconfirmed";
-export interface FeedbackUploadUpdate { correlationId?:string;status:FeedbackUploadStatus;onDismiss():void;onRetry?():void; }
-export interface StartFeedbackUploadOptions { scope?:unknown;hostId?:string;initialCorrelationId?:string;internalSlackMessage?:string;submit():Promise<string|undefined>;onStatusChange?(update:FeedbackUploadUpdate):void;onUploadError?(error:unknown):void; }
-function classifyUploadError(error:unknown):FeedbackUploadStatus{const message=error instanceof Error?error.message:String(error);if(message.includes("feedback report was accepted, but some attachments failed to upload"))return"incomplete";if(message.includes("sending feedback is disabled by configuration"))return"disabled";if(message.includes("feedback uploads are already in progress"))return"failed";return"unconfirmed";}
-function startFeedbackUpload(options:StartFeedbackUploadOptions):{dismiss():void;completion:Promise<FeedbackUploadStatus>}{let visible=true,status:FeedbackUploadStatus="uploading",correlationId=options.initialCorrelationId;let retry:()=>void=()=>{};const publish=()=>{if(visible)options.onStatusChange?.({correlationId,status,onDismiss:()=>{visible=false;},onRetry:status==="failed"?retry:undefined});};const run=async():Promise<FeedbackUploadStatus>=>{status="uploading";publish();try{correlationId=await options.submit();status="uploaded";}catch(error){status=classifyUploadError(error);options.onUploadError?.(error);}publish();return status;};let completion=run();retry=()=>{completion=run();};return{dismiss(){visible=false;},get completion(){return completion;}};}
-export { startFeedbackUpload };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { I3 as t, Q3 as n, Z3 as r, lk as i, pk as a, wL as o } from "@rchunk/app-shared";
+import {
+  HZt as s,
+  Uzt as c,
+  Vzt as l,
+  _l as u,
+  fgn as d,
+  gl as f,
+  mpn as p,
+  ppn as m,
+  ugn as h,
+  vZt as g,
+  zzt as _,
+} from "@rchunk/app-initial";
+function v() {
+  return function (e) {
+    return (0, y.jsx)(f, { ...e });
+  };
+}
+var y;
+function b() {
+  return (b = e(() => {
+    (u(), (y = t()));
+  }))();
+}
+async function x({
+  initialCorrelationId: e,
+  onStatusChange: t,
+  onUploadDismissed: n,
+  onUploadError: r,
+  submit: i,
+}) {
+  let a = !0,
+    o = e,
+    s = `uploading`,
+    c = () => {
+      ((a = !1), n(l, s));
+    };
+  function l() {
+    ((a = !0),
+      t({
+        correlationId: o,
+        onDismiss: c,
+        onRetry:
+          s === `failed`
+            ? () => {
+                s === `failed` && u();
+              }
+            : void 0,
+        status: s,
+      }));
+  }
+  async function u() {
+    ((s = `uploading`), l());
+    try {
+      ((o = await i()), (s = `uploaded`));
+    } catch (e) {
+      let t = e instanceof Error ? e.message : String(e);
+      ((s = t.includes(`feedback report was accepted, but some attachments failed to upload`)
+        ? `incomplete`
+        : t.includes(`sending feedback is disabled by configuration`)
+          ? `disabled`
+          : t.includes(`feedback uploads are already in progress`)
+            ? `failed`
+            : `unconfirmed`),
+        r(e));
+    }
+    a && l();
+  }
+  await u();
+}
+function S({ scope: e, hostId: t, initialCorrelationId: r, internalSlackMessage: i, submit: o }) {
+  let s = v(),
+    l = e.get(p),
+    u = !0,
+    d,
+    f = e
+      .get(g, t === `durable` ? h : t)
+      ?.addNotificationCallback([`account/updated`, `account/login/completed`], m);
+  function m() {
+    u && ((u = !1), f?.(), d?.close(), _(e, s));
+  }
+  x({
+    initialCorrelationId: r,
+    onStatusChange: ({ correlationId: t, onDismiss: n, onRetry: r, status: a }) => {
+      u &&
+        c(e, s, {
+          correlationId: t,
+          internalSlackMessage: i,
+          onClose: n,
+          onRetry: r,
+          uploadStatus: a,
+        });
+    },
+    onUploadDismissed: (t, n) => {
+      if (n === `uploaded` || n === `incomplete` || n === `disabled`) {
+        m();
+        return;
+      }
+      if (!u) return;
+      let r = e
+        .get(a)
+        .info(
+          l.formatMessage({
+            id: `feedback.reports.uploadToast`,
+            defaultMessage: `Feedback upload`,
+            description: `Toast for a dismissed feedback upload that may need attention`,
+          }),
+          {
+            duration: 0,
+            onRemove: () => {
+              d === r && ((d = void 0), m());
+            },
+            primaryAction: {
+              label: l.formatMessage({
+                id: `feedback.reports.viewUpload`,
+                defaultMessage: `View upload`,
+                description: `Button to reopen details for a feedback upload`,
+              }),
+              onClick: () => {
+                u && ((d = void 0), r.close(), t());
+              },
+            },
+          },
+        );
+      d = r;
+    },
+    onUploadError: (e) => {
+      n.error(`Failed to submit feedback`, { safe: {}, sensitive: { error: e } });
+    },
+    submit: o,
+  }).catch((e) => {
+    (m(),
+      n.error(`Unexpected feedback upload workflow failure`, {
+        safe: {},
+        sensitive: { error: e },
+      }));
+  });
+}
+function C() {
+  return (C = e(() => {
+    (o(), s(), l(), i(), m(), d(), r(), b());
+  }))();
+}
+C();
+export { S as startFeedbackUpload };

@@ -31,7 +31,6 @@ const modules = [
     "learning-model-distance-between-points-template",
     ["n", "r", "t"],
   ],
-  ["thumbnail-386f09e9e7b3.js", "text-file-thumbnail", ["n", "t"]],
   ["thumbnail-7c714f359bb7.js", "file-image-thumbnail", ["i", "n", "r", "t"]],
 ];
 const deps = (s, r) => [...s.matchAll(r)].map((m) => m[1]);
@@ -55,6 +54,7 @@ for (const [a, d] of modules) {
 }
 sourceAssertions += assertReleaseOwner("sort-bar-visualization");
 sourceAssertions += assertReleaseOwner("svg-arrow");
+sourceAssertions += assertReleaseOwner("text-file-thumbnail");
 globalThis.__na = {
   cache: Array(100).fill(Symbol.for("react.memo_cache_sentinel")),
   agents: [],
@@ -177,16 +177,6 @@ assert.equal(
 );
 runtimeAssertions++;
 sourceAssertions += assertReleaseOwner("conversation-beacon-surfaces");
-const text = L.get("text-file-thumbnail");
-text.n();
-const card = text.t({
-  title: "R",
-  path: "R.md",
-  isMarkdown: true,
-  content: "# One\n## Two",
-});
-assert.equal(card.props.sections[1].content, "One\n  Two");
-runtimeAssertions++;
 const file = L.get("file-image-thumbnail");
 file.n();
 assert.deepEqual(

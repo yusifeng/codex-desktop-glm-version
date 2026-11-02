@@ -1,41 +1,182 @@
-import "@rchunk/rolldown-runtime";
-import * as Shared from "@rchunk/app-shared";
-import * as Initial from "@rchunk/app-initial";
-import { getPathBasename } from "../app-shared/runtime/get-path-basename";
-
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>): unknown; jsxs(type: unknown, props: Record<string, unknown>): unknown }
-interface ThumbnailProps { title: string; path?: string | null; isMarkdown?: boolean; icon?: unknown; hideFilePath?: boolean; hasUnsavedChanges?: boolean; content?: string | null }
-type IconComponent = (props: Record<string, unknown>) => unknown;
-const shared = Shared as unknown as { $3(): { c(n: number): unknown[] }; I3(): JsxRuntime; K2(): void; RI(): void; Y2: unknown; gg(): void; hg(path: string): string; pg: Record<string, IconComponent> };
-const initial = Initial as unknown as { J9t(path: string): string | null; Jxn(): void; X9t(path: string): boolean; Xd: unknown; Y9t(): void; Zd(): void; qxn: Array<{ id: string; aliases?: string[]; name: string }> };
-let compiler: { c(n: number): unknown[] }, jsx: JsxRuntime;
-
-function markdownOutline(content: string): string | null {
-  const headings: string[] = []; let fence: string | null = null;
-  for (const line of content.match(/[^\r\n]+/g) ?? []) {
-    const fenceMatch = /^ {0,3}(\x60{3,}|~{3,})(.*)$/.exec(line);
-    if (fence != null) { if (fenceMatch != null && fenceMatch[1][0] === fence[0] && fenceMatch[1].length >= fence.length && fenceMatch[2].trim() === "") fence = null; continue; }
-    if (fenceMatch != null) { fence = fenceMatch[1]; continue; }
-    const heading = /^ {0,3}(#{1,6})[\t ]+(.+?)\s*$/.exec(line); if (heading == null) continue;
-    const text = heading[2].replace(/[\t ]+#+[\t ]*$/, "").trim(); if (text) headings.push("  ".repeat(heading[1].length - 1) + text.slice(0, 160)); if (headings.length === 8) break;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  I3 as n,
+  II as r,
+  K2 as i,
+  RI as a,
+  Y2 as o,
+  gg as s,
+  hg as c,
+  pg as l,
+} from "@rchunk/app-shared";
+import {
+  J9t as u,
+  Jxn as d,
+  X9t as f,
+  Xd as p,
+  Y9t as m,
+  Zd as h,
+  qxn as g,
+} from "@rchunk/app-initial";
+function _(e) {
+  let t = [],
+    n = null;
+  for (let [r] of e.matchAll(/[^\r\n]+/g)) {
+    let e = /^ {0,3}(`{3,}|~{3,})(.*)$/.exec(r);
+    if (n != null) {
+      e != null && e[1][0] === n[0] && e[1].length >= n.length && e[2].trim() === `` && (n = null);
+      continue;
+    }
+    if (e != null) {
+      n = e[1];
+      continue;
+    }
+    let i = /^ {0,3}(#{1,6})[\t ]+(.+?)\s*$/.exec(r);
+    if (i == null) continue;
+    let a = i[2].replace(/[\t ]+#+[\t ]*$/, ``).trim();
+    if ((a && t.push(`${`  `.repeat(i[1].length - 1)}${a.slice(0, 160)}`), t.length === 8)) break;
   }
-  return headings.length ? headings.join("\n") : null;
+  return t.length
+    ? t.join(`
+`)
+    : null;
 }
-
-function TextFileThumbnail({ title, path, isMarkdown, icon, hideFilePath = false, hasUnsavedChanges, content }: ThumbnailProps): unknown {
-  compiler.c(31);
-  let languageId: string | null = isMarkdown ? "markdown" : null; if (path != null) languageId = initial.J9t(path) ?? getPathBasename(path).toLowerCase();
-  const language = initial.qxn.find(item => item.id === languageId || languageId != null && item.aliases?.includes(languageId))?.name;
-  if ((path == null || path === title) && content == null && !hasUnsavedChanges && language == null) return null;
-  const lineCount = content != null && content.length <= 65536 ? 1 + (content.match(/\r\n|\r|\n/g)?.length ?? 0) : null;
-  const outline = content != null && (isMarkdown ?? (path != null && initial.X9t(path))) ? markdownOutline(content.slice(0, 65536)) : null;
-  const Icon = path == null ? null : shared.pg[shared.hg(path)]; const resolvedIcon = icon ?? (Icon ? jsx.jsx(Icon, { className: "icon-sm" }) : null);
-  const subtitle = hideFilePath || path === title ? null : path ?? null;
-  const titleNode = jsx.jsxs("span", { className: "flex min-w-0 items-start gap-2", children: [jsx.jsx("span", { className: "line-clamp-2 min-w-0", children: title }), hasUnsavedChanges ? jsx.jsxs("span", { className: "flex h-5 shrink-0 items-center text-codex-description", children: [jsx.jsx("span", { "aria-hidden": true, className: "h-1 w-1 rounded-full bg-text-secondary" }), jsx.jsx("span", { className: "sr-only", children: jsx.jsx(shared.Y2, { id: "tabThumbnail.file.unsaved", defaultMessage: "Unsaved changes", description: "Status of a file with an unsaved draft in a tab thumbnail" }) })] }) : null] });
-  const metadata = language != null || lineCount != null ? { kind: "text", lines: 1, variant: "caption", content: lineCount == null ? language : jsx.jsx(shared.Y2, { id: "tabThumbnail.file.metadata", defaultMessage: "{hasLanguage, select, true {{language} · } other {}}{lineCount, plural, one {# line} other {# lines}}", description: "File language when known, followed by the number of lines in its full cached text or unsaved draft", values: { hasLanguage: language != null, language, lineCount } }) } : null;
-  const preview = content ? { kind: "text", content: outline ?? content.slice(0, 600), lines: 8, variant: outline ? "body" : "code" } : null;
-  return jsx.jsx(initial.Xd, { icon: resolvedIcon, subtitle, title: titleNode, sections: [metadata, preview] });
+function v(e) {
+  let t = (0, y.c)(31),
+    {
+      title: n,
+      path: i,
+      isMarkdown: a,
+      icon: s,
+      hideFilePath: d,
+      hasUnsavedChanges: m,
+      content: h,
+    } = e,
+    v = d !== void 0 && d,
+    S;
+  if (t[0] !== a || t[1] !== i) {
+    let e = a ? `markdown` : null;
+    (i != null && (e = u(i) ?? r(i).toLowerCase()),
+      (S = g.find((t) => {
+        let { id: n, aliases: r } = t;
+        return n === e || (e != null && r?.includes(e));
+      })?.name),
+      (t[0] = a),
+      (t[1] = i),
+      (t[2] = S));
+  } else S = t[2];
+  let C = S;
+  if ((i == null || i === n) && h == null && !m && C == null) return null;
+  let w = h != null && h.length <= x ? 1 : null;
+  if (h != null && w != null) for (let e of h.matchAll(/\r\n|\r|\n/g)) w += 1;
+  let T;
+  t[3] !== h || t[4] !== a || t[5] !== i
+    ? ((T = h != null && (a ?? (i != null && f(i))) ? _(h.slice(0, x)) : null),
+      (t[3] = h),
+      (t[4] = a),
+      (t[5] = i),
+      (t[6] = T))
+    : (T = t[6]);
+  let E = T,
+    D = i == null ? null : l[c(i)],
+    O;
+  t[7] !== D || t[8] !== s
+    ? ((O = s ?? (D ? (0, b.jsx)(D, { className: `icon-sm` }) : null)),
+      (t[7] = D),
+      (t[8] = s),
+      (t[9] = O))
+    : (O = t[9]);
+  let k = v || i === n ? null : i,
+    A;
+  t[10] === n
+    ? (A = t[11])
+    : ((A = (0, b.jsx)(`span`, { className: `line-clamp-2 min-w-0`, children: n })),
+      (t[10] = n),
+      (t[11] = A));
+  let j;
+  t[12] === m
+    ? (j = t[13])
+    : ((j =
+        m &&
+        (0, b.jsxs)(`span`, {
+          className: `flex h-5 shrink-0 items-center text-codex-description`,
+          children: [
+            (0, b.jsx)(`span`, {
+              "aria-hidden": !0,
+              className: `h-1 w-1 rounded-full bg-text-secondary`,
+            }),
+            (0, b.jsx)(`span`, {
+              className: `sr-only`,
+              children: (0, b.jsx)(o, {
+                id: `tabThumbnail.file.unsaved`,
+                defaultMessage: `Unsaved changes`,
+                description: `Status of a file with an unsaved draft in a tab thumbnail`,
+              }),
+            }),
+          ],
+        })),
+      (t[12] = m),
+      (t[13] = j));
+  let M;
+  t[14] !== A || t[15] !== j
+    ? ((M = (0, b.jsxs)(`span`, { className: `flex min-w-0 items-start gap-2`, children: [A, j] })),
+      (t[14] = A),
+      (t[15] = j),
+      (t[16] = M))
+    : (M = t[16]);
+  let N;
+  t[17] !== C || t[18] !== w
+    ? ((N = (C != null || w != null) && {
+        kind: `text`,
+        lines: 1,
+        variant: `caption`,
+        content:
+          w == null
+            ? C
+            : (0, b.jsx)(o, {
+                id: `tabThumbnail.file.metadata`,
+                defaultMessage: `{hasLanguage, select, true {{language} · } other {}}{lineCount, plural, one {# line} other {# lines}}`,
+                description: `File language when known, followed by the number of lines in its full cached text or unsaved draft`,
+                values: { hasLanguage: C != null, language: C, lineCount: w },
+              }),
+      }),
+      (t[17] = C),
+      (t[18] = w),
+      (t[19] = N))
+    : (N = t[19]);
+  let P;
+  t[20] !== h || t[21] !== E
+    ? ((P = !!h && {
+        kind: `text`,
+        content: E ?? h.slice(0, 600),
+        lines: 8,
+        variant: E ? `body` : `code`,
+      }),
+      (t[20] = h),
+      (t[21] = E),
+      (t[22] = P))
+    : (P = t[22]);
+  let F;
+  t[23] !== P || t[24] !== N ? ((F = [N, P]), (t[23] = P), (t[24] = N), (t[25] = F)) : (F = t[25]);
+  let I;
+  return (
+    t[26] !== F || t[27] !== O || t[28] !== k || t[29] !== M
+      ? ((I = (0, b.jsx)(p, { icon: O, subtitle: k, title: M, sections: F })),
+        (t[26] = F),
+        (t[27] = O),
+        (t[28] = k),
+        (t[29] = M),
+        (t[30] = I))
+      : (I = t[30]),
+    I
+  );
 }
-
-function initialize(): void { compiler = shared.$3(); shared.K2(); initial.Jxn(); initial.Zd(); initial.Y9t(); shared.gg(); shared.RI(); jsx = shared.I3(); }
-export { initialize as n, TextFileThumbnail as t };
+var y, b, x;
+function S() {
+  return (S = e(() => {
+    ((y = t()), i(), d(), h(), m(), s(), a(), (b = n()), (x = 65536));
+  }))();
+}
+export { S as n, v as t };

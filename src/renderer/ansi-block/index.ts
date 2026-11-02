@@ -1,205 +1,358 @@
-import { n as onceExport } from "@rchunk/rolldown-runtime";
-import {
-  $3 as initializeCompilerRuntime,
-  I3 as getJsxRuntime,
-  h4 as initializeClassNames,
-  m4 as classNames,
-} from "@rchunk/app-shared";
-
-interface AnsiBlockProps {
-  children?: string | null;
-  className?: string;
-}
-interface AnsiSegment {
-  background?: string;
-  content: string;
-  decorations: string[];
-  foreground?: string;
-}
-
-const once = onceExport as (initializer: () => void) => () => void;
-
-const jsx = getJsxRuntime();
-const basicColors = [
-  "black",
-  "red",
-  "green",
-  "yellow",
-  "blue",
-  "magenta",
-  "cyan",
-  "white",
-];
-
-function stripAnsi(value: string): string {
-  let previous: string;
-  let current = value;
-  do {
-    previous = current;
-    current = current
-      .replace(/\x1b\[[0-?]*[ -\/]*[@-~]/g, "")
-      .replace(/[^\n]\x08/g, "");
-  } while (current.length < previous.length);
-  return current;
-}
-
-function eraseCarriageReturnUpdates(value: string): string {
-  let output = value.replace(/\r+\n/g, "\n");
-  while (/\r./.test(output)) {
-    output = output.replace(
-      /^([^\r\n]*)\r+([^\r\n]+)/gm,
-      (_match, previous: string, replacement: string) => {
-        let visibleLength = stripAnsi(replacement).length;
-        const leadingStyles = previous.match(/\x1b\[[\d;]*m/g)?.join("") ?? "";
-        const suffix = previous.replace(
-          /\x1b\[[\d;]*[A-Za-z]|./g,
-          (character) =>
-            character.startsWith("\x1b") || visibleLength-- <= 0
-              ? character
-              : "",
-        );
-        return (
-          leadingStyles +
-          replacement +
-          (suffix && /\x1b\[[\d;]*m/.test(replacement) ? "\x1b[0m" : "") +
-          suffix
-        );
-      },
-    );
-  }
-  return output;
-}
-
-function parseAnsi(value: string): AnsiSegment[] {
-  const segments: AnsiSegment[] = [];
-  const state: Omit<AnsiSegment, "content"> = { decorations: [] };
-  let cursor = 0;
-  const expression = /\x1b\[([\d;]*)m/g;
-  for (const match of value.matchAll(expression)) {
-    if (match.index > cursor)
-      segments.push({
-        ...state,
-        decorations: [...state.decorations],
-        content: value.slice(cursor, match.index),
-      });
-    applySgr(state, match[1]?.split(";").filter(Boolean).map(Number) ?? [0]);
-    cursor = match.index + match[0].length;
-  }
-  if (cursor < value.length || segments.length === 0)
-    segments.push({
-      ...state,
-      decorations: [...state.decorations],
-      content: value.slice(cursor),
-    });
-  return segments.filter(({ content }) => content.length > 0);
-}
-
-function applySgr(state: Omit<AnsiSegment, "content">, codes: number[]): void {
-  if (codes.length === 0) codes = [0];
-  for (let index = 0; index < codes.length; index++) {
-    const code = codes[index] ?? 0;
-    if (code === 0) {
-      state.foreground = undefined;
-      state.background = undefined;
-      state.decorations = [];
-    } else if (code >= 30 && code <= 37)
-      state.foreground = `ansi-${basicColors[code - 30]}`;
-    else if (code >= 90 && code <= 97)
-      state.foreground = `ansi-bright-${basicColors[code - 90]}`;
-    else if (code >= 40 && code <= 47)
-      state.background = `ansi-${basicColors[code - 40]}`;
-    else if (code >= 100 && code <= 107)
-      state.background = `ansi-bright-${basicColors[code - 100]}`;
-    else if (code === 39) state.foreground = undefined;
-    else if (code === 49) state.background = undefined;
-    else if ([1, 2, 3, 4, 8, 9].includes(code)) {
-      const decoration = (
-        {
-          1: "bold",
-          2: "dim",
-          3: "italic",
-          4: "underline",
-          8: "hidden",
-          9: "strikethrough",
-        } as Record<number, string>
-      )[code];
-      if (decoration != null && !state.decorations.includes(decoration))
-        state.decorations.push(decoration);
-    } else if (code === 22)
-      state.decorations = state.decorations.filter(
-        (item) => item !== "bold" && item !== "dim",
-      );
-    else if (code >= 23 && code <= 29) {
-      const decoration = (
-        {
-          23: "italic",
-          24: "underline",
-          28: "hidden",
-          29: "strikethrough",
-        } as Record<number, string>
-      )[code];
-      if (decoration != null)
-        state.decorations = state.decorations.filter(
-          (item) => item !== decoration,
-        );
-    } else if ((code === 38 || code === 48) && codes[index + 1] === 5) {
-      const paletteIndex = codes[index + 2];
-      if (paletteIndex != null) {
-        const color =
-          paletteIndex < 8
-            ? `ansi-${basicColors[paletteIndex]}`
-            : paletteIndex < 16
-              ? `ansi-bright-${basicColors[paletteIndex - 8]}`
-              : `ansi-palette-${paletteIndex}`;
-        if (code === 38) state.foreground = color;
-        else state.background = color;
-      }
-      index += 2;
+// @ts-nocheck
+import { n as e, o as t, t as n } from "@rchunk/rolldown-runtime";
+import { $3 as r, I3 as i, h4 as a, m4 as o } from "@rchunk/app-shared";
+var s = n((e, t) => {
+  var n = [
+      [
+        { color: `0, 0, 0`, class: `ansi-black` },
+        { color: `187, 0, 0`, class: `ansi-red` },
+        { color: `0, 187, 0`, class: `ansi-green` },
+        { color: `187, 187, 0`, class: `ansi-yellow` },
+        { color: `0, 0, 187`, class: `ansi-blue` },
+        { color: `187, 0, 187`, class: `ansi-magenta` },
+        { color: `0, 187, 187`, class: `ansi-cyan` },
+        { color: `255,255,255`, class: `ansi-white` },
+      ],
+      [
+        { color: `85, 85, 85`, class: `ansi-bright-black` },
+        { color: `255, 85, 85`, class: `ansi-bright-red` },
+        { color: `0, 255, 0`, class: `ansi-bright-green` },
+        { color: `255, 255, 85`, class: `ansi-bright-yellow` },
+        { color: `85, 85, 255`, class: `ansi-bright-blue` },
+        { color: `255, 85, 255`, class: `ansi-bright-magenta` },
+        { color: `85, 255, 255`, class: `ansi-bright-cyan` },
+        { color: `255, 255, 255`, class: `ansi-bright-white` },
+      ],
+    ],
+    r = /(https?:\/\/(?:[A-Za-z0-9#;/?:@=+$',_.!~*()[\]-]|&amp;|%[A-Fa-f0-9]{2})+)/gm;
+  t.exports = class e {
+    static escapeForHtml(t) {
+      return new e().escapeForHtml(t);
     }
-  }
-}
-
-function segmentStyle(
-  segment: AnsiSegment,
-): Record<string, string> | undefined {
-  const style: Record<string, string> = {};
-  if (segment.decorations.includes("bold")) style.fontWeight = "bold";
-  if (segment.decorations.includes("dim")) style.opacity = "0.5";
-  if (segment.decorations.includes("italic")) style.fontStyle = "italic";
-  if (segment.decorations.includes("hidden")) style.visibility = "hidden";
-  const lines = [
-    segment.decorations.includes("underline") ? "underline" : null,
-    segment.decorations.includes("strikethrough") ? "line-through" : null,
-  ].filter((item): item is string => item != null);
-  if (lines.length > 0) style.textDecorationLine = lines.join(" ");
-  return Object.keys(style).length === 0 ? undefined : style;
-}
-
-function AnsiBlock({ children, className }: AnsiBlockProps): unknown {
-  const normalized = eraseCarriageReturnUpdates(children ?? "");
-  const segments = parseAnsi(normalized);
-  return jsx.jsx("code", {
-    className,
-    children: segments.map((segment, index) =>
-      jsx.jsx(
-        "span",
-        {
-          className: classNames(
-            segment.foreground != null && `${segment.foreground}-fg`,
-            segment.background != null && `${segment.background}-bg`,
-          ),
-          style: segmentStyle(segment),
-          children: stripAnsi(segment.content),
+    static linkify(t) {
+      return new e().linkify(t);
+    }
+    static ansiToHtml(t, n) {
+      return new e().ansiToHtml(t, n);
+    }
+    static ansiToJson(t, n) {
+      return new e().ansiToJson(t, n);
+    }
+    static ansiToText(t) {
+      return new e().ansiToText(t);
+    }
+    constructor() {
+      ((this.fg = this.bg = this.fg_truecolor = this.bg_truecolor = null),
+        (this.bright = 0),
+        (this.decorations = []));
+    }
+    setupPalette() {
+      this.PALETTE_COLORS = [];
+      for (let e = 0; e < 2; ++e)
+        for (let t = 0; t < 8; ++t) this.PALETTE_COLORS.push(n[e][t].color);
+      let e = [0, 95, 135, 175, 215, 255],
+        t = (t, n, r) => e[t] + `, ` + e[n] + `, ` + e[r];
+      for (let e = 0; e < 6; ++e)
+        for (let n = 0; n < 6; ++n)
+          for (let r = 0; r < 6; ++r) this.PALETTE_COLORS.push(t(e, n, r));
+      let r = 8;
+      for (let e = 0; e < 24; ++e, r += 10) this.PALETTE_COLORS.push(r + `, ` + r + `, ` + r);
+    }
+    escapeForHtml(e) {
+      return e.replace(/[&<>\"]/gm, (e) =>
+        e == `&` ? `&amp;` : e == `"` ? `&quot;` : e == `<` ? `&lt;` : e == `>` ? `&gt;` : ``,
+      );
+    }
+    linkify(e) {
+      return e.replace(r, (e) => `<a href="${e}">${e}</a>`);
+    }
+    ansiToHtml(e, t) {
+      return this.process(e, t, !0);
+    }
+    ansiToJson(e, t) {
+      return ((t ||= {}), (t.json = !0), (t.clearLine = !1), this.process(e, t, !0));
+    }
+    ansiToText(e) {
+      return this.process(e, {}, !1);
+    }
+    process(e, t, n) {
+      let r = this,
+        i = e.split(/\033\[/),
+        a = i.shift();
+      ((t ??= {}), (t.clearLine = /\r/.test(e)));
+      let o = i.map((e) => this.processChunk(e, t, n));
+      if (t && t.json) {
+        let e = r.processChunkJson(``);
+        return (
+          (e.content = a),
+          (e.clearLine = t.clearLine),
+          o.unshift(e),
+          t.remove_empty && (o = o.filter((e) => !e.isEmpty())),
+          o
+        );
+      }
+      return (o.unshift(a), o.join(``));
+    }
+    processChunkJson(e, t, r) {
+      t = t === void 0 ? {} : t;
+      let i = (t.use_classes = t.use_classes !== void 0 && t.use_classes),
+        a = (t.key = i ? `class` : `color`),
+        o = {
+          content: e,
+          fg: null,
+          bg: null,
+          fg_truecolor: null,
+          bg_truecolor: null,
+          isInverted: !1,
+          clearLine: t.clearLine,
+          decoration: null,
+          decorations: [],
+          was_processed: !1,
+          isEmpty: () => !o.content,
         },
-        index,
-      ),
-    ),
-  });
-}
-
-const initializeAnsiBlock = once((): void => {
-  initializeCompilerRuntime();
-  initializeClassNames();
+        s = e.match(/^([!\x3c-\x3f]*)([\d;]*)([\x20-\x2c]*[\x40-\x7e])([\s\S]*)/m);
+      if (!s) return o;
+      o.content = s[4];
+      let c = s[2].split(`;`);
+      if (s[1] !== `` || s[3] !== `m` || !r) return o;
+      let l = this;
+      for (; c.length > 0;) {
+        let e = c.shift(),
+          t = parseInt(e);
+        if (isNaN(t) || t === 0) ((l.fg = l.bg = null), (l.decorations = []));
+        else if (t === 1) l.decorations.push(`bold`);
+        else if (t === 2) l.decorations.push(`dim`);
+        else if (t === 3) l.decorations.push(`italic`);
+        else if (t === 4) l.decorations.push(`underline`);
+        else if (t === 5) l.decorations.push(`blink`);
+        else if (t === 7) l.decorations.push(`reverse`);
+        else if (t === 8) l.decorations.push(`hidden`);
+        else if (t === 9) l.decorations.push(`strikethrough`);
+        else if (t === 21) l.removeDecoration(`bold`);
+        else if (t === 22) (l.removeDecoration(`bold`), l.removeDecoration(`dim`));
+        else if (t === 23) l.removeDecoration(`italic`);
+        else if (t === 24) l.removeDecoration(`underline`);
+        else if (t === 25) l.removeDecoration(`blink`);
+        else if (t === 27) l.removeDecoration(`reverse`);
+        else if (t === 28) l.removeDecoration(`hidden`);
+        else if (t === 29) l.removeDecoration(`strikethrough`);
+        else if (t === 39) l.fg = null;
+        else if (t === 49) l.bg = null;
+        else if (t >= 30 && t < 38) l.fg = n[0][t % 10][a];
+        else if (t >= 90 && t < 98) l.fg = n[1][t % 10][a];
+        else if (t >= 40 && t < 48) l.bg = n[0][t % 10][a];
+        else if (t >= 100 && t < 108) l.bg = n[1][t % 10][a];
+        else if (t === 38 || t === 48) {
+          let e = t === 38;
+          if (c.length >= 1) {
+            let t = c.shift();
+            if (t === `5` && c.length >= 1) {
+              let t = parseInt(c.shift());
+              if (t >= 0 && t <= 255) {
+                if (!i)
+                  (this.PALETTE_COLORS || l.setupPalette(),
+                    e ? (l.fg = this.PALETTE_COLORS[t]) : (l.bg = this.PALETTE_COLORS[t]));
+                else {
+                  let r = t >= 16 ? `ansi-palette-` + t : n[+(t > 7)][t % 8].class;
+                  e ? (l.fg = r) : (l.bg = r);
+                }
+              }
+            } else if (t === `2` && c.length >= 3) {
+              let t = parseInt(c.shift()),
+                n = parseInt(c.shift()),
+                r = parseInt(c.shift());
+              if (t >= 0 && t <= 255 && n >= 0 && n <= 255 && r >= 0 && r <= 255) {
+                let a = t + `, ` + n + `, ` + r;
+                i
+                  ? e
+                    ? ((l.fg = `ansi-truecolor`), (l.fg_truecolor = a))
+                    : ((l.bg = `ansi-truecolor`), (l.bg_truecolor = a))
+                  : e
+                    ? (l.fg = a)
+                    : (l.bg = a);
+              }
+            }
+          }
+        }
+      }
+      return l.fg === null && l.bg === null && l.decorations.length === 0
+        ? o
+        : ((o.fg = l.fg),
+          (o.bg = l.bg),
+          (o.fg_truecolor = l.fg_truecolor),
+          (o.bg_truecolor = l.bg_truecolor),
+          (o.decorations = l.decorations),
+          (o.decoration = l.decorations.slice(-1).pop() || null),
+          (o.was_processed = !0),
+          o);
+    }
+    processChunk(e, t, r) {
+      t ||= {};
+      let i = this.processChunkJson(e, t, r),
+        a = t.use_classes;
+      if (
+        ((i.decorations = i.decorations.filter((e) => {
+          if (e === `reverse`) {
+            ((i.fg ||= n[0][7][a ? `class` : `color`]), (i.bg ||= n[0][0][a ? `class` : `color`]));
+            let e = i.fg;
+            ((i.fg = i.bg), (i.bg = e));
+            let t = i.fg_truecolor;
+            return (
+              (i.fg_truecolor = i.bg_truecolor),
+              (i.bg_truecolor = t),
+              (i.isInverted = !0),
+              !1
+            );
+          }
+          return !0;
+        })),
+        t.json)
+      )
+        return i;
+      if (i.isEmpty()) return ``;
+      if (!i.was_processed) return i.content;
+      let o = [],
+        s = [],
+        c = [],
+        l = {},
+        u = (e) => {
+          let t = [],
+            n;
+          for (n in e)
+            e.hasOwnProperty(n) && t.push(`data-` + n + `="` + this.escapeForHtml(e[n]) + `"`);
+          return t.length > 0 ? ` ` + t.join(` `) : ``;
+        };
+      return (
+        i.isInverted && (l[`ansi-is-inverted`] = `true`),
+        i.fg &&
+          (a
+            ? (o.push(i.fg + `-fg`),
+              i.fg_truecolor !== null &&
+                ((l[`ansi-truecolor-fg`] = i.fg_truecolor), (i.fg_truecolor = null)))
+            : o.push(`color:rgb(` + i.fg + `)`)),
+        i.bg &&
+          (a
+            ? (o.push(i.bg + `-bg`),
+              i.bg_truecolor !== null &&
+                ((l[`ansi-truecolor-bg`] = i.bg_truecolor), (i.bg_truecolor = null)))
+            : o.push(`background-color:rgb(` + i.bg + `)`)),
+        i.decorations.forEach((e) => {
+          if (a) {
+            s.push(`ansi-` + e);
+            return;
+          }
+          e === `bold`
+            ? s.push(`font-weight:bold`)
+            : e === `dim`
+              ? s.push(`opacity:0.5`)
+              : e === `italic`
+                ? s.push(`font-style:italic`)
+                : e === `hidden`
+                  ? s.push(`visibility:hidden`)
+                  : e === `strikethrough`
+                    ? c.push(`line-through`)
+                    : c.push(e);
+        }),
+        c.length && s.push(`text-decoration:` + c.join(` `)),
+        a
+          ? `<span class="` + o.concat(s).join(` `) + `"` + u(l) + `>` + i.content + `</span>`
+          : `<span style="` + o.concat(s).join(`;`) + `"` + u(l) + `>` + i.content + `</span>`
+      );
+    }
+    removeDecoration(e) {
+      let t = this.decorations.indexOf(e);
+      t >= 0 && this.decorations.splice(t, 1);
+    }
+  };
 });
-
-export { initializeAnsiBlock as n, AnsiBlock as t };
+function c(e) {
+  if (!e) return ``;
+  if (!/\r/.test(e)) return e;
+  let t = e.replace(
+    /\r+\n/gm,
+    `
+`,
+  );
+  for (; /\r./.test(t);)
+    t = t.replace(/^([^\r\n]*)\r+([^\r\n]+)/gm, (e, t, n) => {
+      let r = n.replace(l, ``).length,
+        i = t.match(u)?.join(``) ?? ``,
+        a = 0,
+        o = d.test(n)
+          ? ``
+          : t.replace(RegExp(`${l.source}|.`, `g`), (e) =>
+              e.startsWith(`\x1B`) || a++ >= r ? e : ``,
+            );
+      return i + n + (o && n.match(u) ? `\x1B[0m` : ``) + o;
+    });
+  return t;
+}
+var l, u, d;
+function f() {
+  return (f = e(() => {
+    ((l = RegExp(`\x1B\\[[\\d;]*[A-Za-z]`, `g`)),
+      (u = RegExp(`\x1B\\[[\\d;]*m`, `g`)),
+      (d = RegExp(`\x1B\\[(?:0|2)?K`)));
+  }))();
+}
+function p(e) {
+  let t = (0, _.c)(7),
+    { children: n, className: r } = e,
+    i,
+    a;
+  if (t[0] !== n || t[1] !== r) {
+    let e = v.default.ansiToJson(c(g(n)), { json: !0, remove_empty: !0, use_classes: !0 });
+    ((i = r), (a = e.map(m)), (t[0] = n), (t[1] = r), (t[2] = i), (t[3] = a));
+  } else ((i = t[2]), (a = t[3]));
+  let o;
+  return (
+    t[4] !== i || t[5] !== a
+      ? ((o = (0, y.jsx)(`code`, { className: i, children: a })),
+        (t[4] = i),
+        (t[5] = a),
+        (t[6] = o))
+      : (o = t[6]),
+    o
+  );
+}
+function m(e, t) {
+  return (0, y.jsx)(
+    `span`,
+    {
+      className: o(e.fg != null && `${e.fg}-fg`, e.bg != null && `${e.bg}-bg`),
+      style: h(e),
+      children: e.content,
+    },
+    t,
+  );
+}
+function h(e) {
+  let t = e.decoration == null ? [] : [e.decoration];
+  if (t.length === 0) return;
+  let n = {},
+    r = [];
+  return (
+    t.includes(`bold`) && (n.fontWeight = `bold`),
+    t.includes(`dim`) && (n.opacity = `0.5`),
+    t.includes(`italic`) && (n.fontStyle = `italic`),
+    t.includes(`hidden`) && (n.visibility = `hidden`),
+    t.includes(`underline`) && r.push(`underline`),
+    t.includes(`strikethrough`) && r.push(`line-through`),
+    r.length > 0 && (n.textDecorationLine = r.join(` `)),
+    n
+  );
+}
+function g(e) {
+  let t = e,
+    n = t;
+  do ((t = n), (n = t.replace(b, ``)));
+  while (n.length < t.length);
+  return t;
+}
+var _, v, y, b;
+function x() {
+  return (x = e(() => {
+    ((_ = r()), (v = t(s(), 1)), a(), f(), (y = i()), (b = RegExp(`[^\\n]\b`, `gm`)));
+  }))();
+}
+export { x as n, p as t };

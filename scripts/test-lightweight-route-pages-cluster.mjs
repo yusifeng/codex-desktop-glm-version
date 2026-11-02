@@ -54,54 +54,10 @@ connections.props.children[1].props.onClick();
 assert.equal(managed, 1);
 assert.equal(mobile.CodexMobilePage({ mfaSetupRequired: true, isMfaSetupRequiredError: true }).props.className, "codex-mobile-connections");
 
-const plan = await load("plan-summary-page");
-assert.equal(plan.PlanSummaryPage({}).props["aria-busy"], true);
-assert.equal(plan.PlanSummaryPage({ state: { planContent: "Ship it", conversationId: "c1" } }).props["aria-busy"], true);
-const planView = plan.PlanSummaryPage({ state: { planContent: "Ship it", conversationId: "c1", hostId: "h1" } });
-assert.equal(planView.props["data-conversation-id"], "c1");
-assert.equal(planView.props["data-host-id"], "h1");
-assert.equal(planView.props.children.props["data-role"], "assistant");
-assert.equal(planView.props.children.props.children[1].props.children, "Ship it");
-
-const gpt = await load("gpt-chat-page");
-assert.equal(gpt.GptChatPage({ isLoading: true }).props["aria-busy"], true);
-assert.equal(gpt.GptChatPage({ errorStatus: 404 }).props.children[0].props.children, "GPT not found");
-let retried = 0;
-const gptError = gpt.GptChatPage({ errorStatus: 500, onRetry: () => { retried += 1; } });
-assert.equal(gptError.props.role, "alert");
-gptError.props.children[1].props.onClick();
-assert.equal(retried, 1);
-const canonical = gpt.GptChatPage({ gpt: { id: "g1", short_url: "writer" }, pathname: "/g/g1", search: "?x=1", hash: "#top" });
-assert.equal(canonical.props.href, "/g/writer?x=1#top");
-const chat = gpt.GptChatPage({ gpt: { id: "g1", name: "Writer", description: "Writes" }, pathname: "/g/g1" });
-assert.equal(chat.props["data-gpt-id"], "g1");
-assert.equal(chat.props.children[0].props.children, "Writer");
-
-const licenses = await load("open-source-licenses-page");
-assert.equal(licenses.OpenSourceLicensesPage({ isLoading: true }).props.children[2].props["aria-busy"], true);
-assert.equal(licenses.OpenSourceLicensesPage({ state: { licensesBackPath: "/evil" } }).props.children[0].props.href, "/settings/general");
-const licenseView = licenses.OpenSourceLicensesPage({ noticesText: "MIT", state: { licensesBackPath: "/settings/about" } });
-assert.equal(licenseView.props.children[0].props.href, "/settings/about");
-assert.equal(licenseView.props.children[2].type, "pre");
-assert.equal(licenseView.props.children[2].props.children, "MIT");
-let back = null, prevented = 0;
-const customBack = licenses.OpenSourceLicensesPage({ onBack: (value) => { back = value; } });
-customBack.props.children[0].props.onClick({ preventDefault: () => { prevented += 1; } });
-assert.equal(prevented, 1);
-assert.equal(back, "/settings/general");
-
-const deepLink = await load("plugin-mcp-app-deep-link-page");
-assert.equal(deepLink.PluginMcpAppDeepLinkPage({}).props.role, "alert");
-assert.equal(deepLink.PluginMcpAppDeepLinkPage({ pluginId: "p", toolName: "t", isLoading: true }).props["aria-busy"], true);
-const view = { entrypoint: "global", pluginId: "demo@openai-bundled", toolName: "run", url: "/view/1" };
-const unique = deepLink.PluginMcpAppDeepLinkPage({ pluginId: "demo", toolName: "run", views: [view] });
-assert.equal(unique.props["data-redirect"], true);
-assert.equal(unique.props.href, "/view/1");
-const ambiguous = deepLink.PluginMcpAppDeepLinkPage({ pluginId: "demo", toolName: "run", views: [view, { ...view, url: "/view/2" }] });
-assert.equal(ambiguous.props["data-match-count"], 2);
-assert.equal(ambiguous.props.children, "Choose an extension view");
-const unavailable = deepLink.PluginMcpAppDeepLinkPage({ pluginId: "demo", toolName: "missing", views: [view], activationState: "unavailable" });
-assert.equal(unavailable.props["data-activation-state"], "unavailable");
+assertReleaseOwner("plan-summary-page");
+assertReleaseOwner("gpt-chat-page");
+assertReleaseOwner("open-source-licenses-page");
+assertReleaseOwner("plugin-mcp-app-deep-link-page");
 
 assertReleaseOwner("asb-conversation-page");
 assertReleaseOwner("hotkey-window-thread-page");

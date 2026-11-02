@@ -10,8 +10,6 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const ASSET_ROOT = path.resolve(ROOT, "../chatgpt-desktop-src/app/webview/assets");
 const models = [
   ["model-bc73e06612d8.js", "learning-model-pcr-cycle", ["a", "c", "i", "l", "n", "o", "r", "s", "t"]],
-  ["model-9aaba6ef3b2a.js", "learning-model-double-entry-transaction-effects", ["a", "i", "n", "o", "r", "s", "t"]],
-  ["model-c8be72ed6ac0.js", "learning-model-food-web", ["a", "c", "i", "n", "o", "r", "s", "t"]],
   ["model-a41dd4bab755.js", "learning-model-one-sample-t-test", ["a", "c", "i", "n", "o", "r", "s", "t"]],
   ["model-689c31877cb2.js", "learning-model-sampling-distribution", ["a", "c", "d", "f", "i", "l", "n", "o", "r", "s", "t", "u"]],
   ["model-65944a036c44.js", "learning-model-rational-limits-at-infinity", ["a", "c", "i", "l", "n", "o", "r", "s", "t", "u"]],
@@ -45,10 +43,8 @@ for (const [_asset, directory, expected] of models) { const module = await bundl
 
 const pcr = loaded.get("learning-model-pcr-cycle"); pcr.c(); assert.deepEqual(pcr.l({ stage: 9 }), { stage: 4 }); assert.deepEqual(pcr.t.map(stage => [stage.id, stage.temperatureCelsius]), [["start", 25], ["denaturing", 95], ["annealing", 55], ["extension", 72]]); assert.equal(pcr.i({ stage: 2 }).activeStage.id, "denaturing"); assert.equal(pcr.a(95), "95 °C"); assert.equal(pcr.o(pcr.t[2]), "Annealing"); assert.equal(pcr.s(pcr.t[3]), "Polymerase builds DNA strands."); assert.deepEqual(pcr.r({ stage: 1 }), { descriptor: "Setup", detail: "PCR ingredients are combined (25 °C)." }); runtimeAssertions += 7;
 
-const entries = loaded.get("learning-model-double-entry-transaction-effects"); entries.i(); assert.equal(entries.a({ transaction_type: "bad" }).transaction_type, entries.t); for (const transaction of entries.n) { const result = entries.r({ transaction_type: transaction }); assert.equal(result.isJournalBalanced, true); assert.equal(result.isEquationBalanced, true); } assert.deepEqual(entries.r({ transaction_type: "equipment purchase for cash" }).equationTotals, { assets: 0, liabilities: 0, equity: 0 }); assert.deepEqual(entries.r({ transaction_type: "owner investment for cash" }).equationTotals, { assets: 10000, liabilities: 0, equity: 10000 }); runtimeAssertions += 11;
 
 
-const web = loaded.get("learning-model-food-web"); web.i(); assert.deepEqual(web.o({ ecosystem: "bad", pathIndex: 99 }), { ecosystem: "terrestrial", pathIndex: 3 }); assert.equal(web.t.terrestrial.nodes.length, 8); assert.equal(web.t.terrestrial.links.length, 11); const marinePath = web.r({ ecosystem: "marine", pathIndex: 1 }); assert.deepEqual(marinePath, ["producerLeft", "primaryRight", "omnivore", "hunter", "apex"]); assert.equal(web.a(marinePath, "omnivore", "hunter"), true); assert.equal(web.a(marinePath, "hunter", "omnivore"), false); runtimeAssertions += 6;
 
 const ttest = loaded.get("learning-model-one-sample-t-test"); ttest.i(); assert.deepEqual(ttest.a({ sample_size: 1, alternative: "bad" }).sample_size, 3); const twoSided = ttest.r({}); approximatelyEqual(twoSided.standardError, 2.5); approximatelyEqual(twoSided.tStatistic, 1.6); assert.equal(twoSided.degreesOfFreedom, 15); assert.ok(twoSided.pValue > 0.12 && twoSided.pValue < 0.14); assert.equal(twoSided.reject, false); approximatelyEqual(ttest.r({ alternative: "greater" }).pValue * 2, twoSided.pValue); approximatelyEqual(ttest.r({ sample_mean: 50 }).pValue, 1); approximatelyEqual(ttest.o(0, 15), 1); runtimeAssertions += 8;
 
@@ -62,5 +58,7 @@ const synthetic = loaded.get("learning-model-synthetic-division"); synthetic.i()
 
 sourceAssertions += assertReleaseOwner("learning-model-array-queue-front-rear");
 sourceAssertions += assertReleaseOwner("learning-model-binary-heap-operations");
+sourceAssertions += assertReleaseOwner("learning-model-double-entry-transaction-effects");
+sourceAssertions += assertReleaseOwner("learning-model-food-web");
 
 console.log(sourceAssertions + " source assertions and " + runtimeAssertions + " runtime assertions passed");

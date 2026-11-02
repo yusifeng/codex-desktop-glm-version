@@ -1,14 +1,161 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>): unknown; jsxs(type: unknown, props: Record<string, unknown>): unknown }
-const { $3: initializeRuntime, BX: useSignalFamilyValue, FX: initializeSignals, I3: getJsxRuntime, K2: initializeCompiler, Vx: PauseIcon, Y2: FormattedMessage, ey: CheckIcon, fS: ActivityIcon, lw: initializeIcons, mb: StopIcon, n4: useIntl, oZ: createSignalFamily } = appSharedChunk as unknown as { $3(): void; BX(signal: unknown, key: unknown): unknown; FX(): void; I3(): JsxRuntime; K2(): void; Vx: unknown; Y2: unknown; ey: unknown; fS: unknown; lw(): void; mb: unknown; n4(): { formatNumber(value: number, options: Record<string, unknown>): string }; oZ(scope: unknown, factory: (key: { conversationId: string; hostId: string }, context: { scope: { get(signal: unknown, key: string): unknown } }) => unknown): unknown };
-const { HZt: initializeConversationModel, Xd: TabThumbnail, Xit: formatDuration, Zd: initializeTabThumbnail, Zit: initializeDuration, cet: appScope, let: initializeAppScope, vZt: hostRegistrySignal } = appInitialChunk as unknown as { HZt(): void; Xd: unknown; Xit(value: number): string; Zd(): void; Zit(): void; cet: unknown; let(): void; vZt: unknown };
-const { $r: GoalStatusLabel, ei: initializeGoalStatus } = appPrimaryChunk as unknown as { $r: unknown; ei(): void };
-interface Goal { status: "active" | "paused" | "blocked" | "usageLimited" | "budgetLimited" | "complete"; timeUsedSeconds: number; updatedAt: number; tokenBudget?: number | null; tokensUsed: number } interface Props { props: { conversationId: string; hostId: string }; title: string }
-let jsx: JsxRuntime; let goalSignal: unknown; const statusIcons: Record<Goal["status"], unknown> = {} as Record<Goal["status"], unknown>;
-function GoalThumbnailView({ goal, nowMs, title }: { goal: Goal; nowMs: number; title: string }): unknown { const intl = useIntl(); const elapsed = Math.max(goal.timeUsedSeconds * 1000 + (goal.status === "active" ? nowMs - goal.updatedAt * 1000 : 0), 0); const time = { kind: "text", variant: "caption", lines: 1, content: jsx.jsx(FormattedMessage, { id: "tabThumbnail.goal.timeSpent", defaultMessage: "{duration} spent", values: { duration: formatDuration(elapsed) } }) }; const tokens = goal.tokenBudget == null ? false : { kind: "text", variant: "caption", lines: 1, content: jsx.jsx(FormattedMessage, { id: "tabThumbnail.goal.tokens", defaultMessage: "{used} / {budget} tokens", values: { used: intl.formatNumber(goal.tokensUsed, { notation: "compact", maximumFractionDigits: 1 }), budget: intl.formatNumber(goal.tokenBudget, { notation: "compact", maximumFractionDigits: 1 }) } }) }; return jsx.jsx(TabThumbnail, { icon: jsx.jsx(StopIcon, {}), title, subtitle: jsx.jsxs("span", { className: "inline-flex items-center gap-1.5", children: [statusIcons[goal.status], jsx.jsx(GoalStatusLabel, { status: goal.status })] }), sections: [time, tokens] }); }
-function RegisteredGoalThumbnail({ props, title }: Props): unknown { const preview = useSignalFamilyValue(goalSignal, props) as { goal: Goal; nowMs: number } | null; return preview == null ? null : jsx.jsx(GoalThumbnailView, { title, ...preview }); }
-let initialized = false; function initializeRegisteredGoalThumbnail(): void { if (initialized) return; initialized = true; initializeRuntime(); initializeCompiler(); initializeTabThumbnail(); initializeIcons(); initializeDuration(); initializeGoalStatus(); jsx = getJsxRuntime(); statusIcons.active = jsx.jsx(ActivityIcon, { className: "text-info" }); statusIcons.paused = jsx.jsx(PauseIcon, {}); statusIcons.blocked = jsx.jsx(StopIcon, { className: "text-warning" }); statusIcons.usageLimited = jsx.jsx(PauseIcon, { className: "text-warning" }); statusIcons.budgetLimited = jsx.jsx(PauseIcon, { className: "text-warning" }); statusIcons.complete = jsx.jsx(CheckIcon, { className: "text-success" }); initializeSignals(); initializeConversationModel(); initializeAppScope(); goalSignal = createSignalFamily(appScope, ({ conversationId, hostId }, { scope }) => { const host = scope.get(hostRegistrySignal, hostId) as { getConversation(id: string): { threadGoal?: Goal } | null } | null; const goal = host?.getConversation(conversationId)?.threadGoal; return goal == null ? null : { goal, nowMs: Date.now() }; }); }
-initializeRegisteredGoalThumbnail(); export { RegisteredGoalThumbnail };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  I3 as i,
+  K2 as a,
+  Vx as o,
+  Y2 as s,
+  ey as c,
+  fS as l,
+  lw as u,
+  mb as d,
+  n4 as f,
+  oZ as p,
+} from "@rchunk/app-shared";
+import {
+  HZt as m,
+  Xd as h,
+  Xit as g,
+  Zd as _,
+  Zit as v,
+  cet as y,
+  let as b,
+  vZt as x,
+} from "@rchunk/app-initial";
+import { $r as S, ei as C } from "@rchunk/app-primary";
+function w(e) {
+  let t = (0, T.c)(21),
+    { goal: n, nowMs: r, title: i } = e,
+    a = f(),
+    o = n.timeUsedSeconds * 1e3 + (n.status === `active` ? r - n.updatedAt * 1e3 : 0),
+    c;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((c = (0, E.jsx)(d, {})), (t[0] = c))
+    : (c = t[0]);
+  let l = D[n.status],
+    u;
+  t[1] === n.status
+    ? (u = t[2])
+    : ((u = (0, E.jsx)(S, { status: n.status })), (t[1] = n.status), (t[2] = u));
+  let p;
+  t[3] !== l || t[4] !== u
+    ? ((p = (0, E.jsxs)(`span`, {
+        className: `inline-flex items-center gap-1.5`,
+        children: [l, u],
+      })),
+      (t[3] = l),
+      (t[4] = u),
+      (t[5] = p))
+    : (p = t[5]);
+  let m = Math.max(o, 0),
+    _;
+  t[6] === m ? (_ = t[7]) : ((_ = g(m)), (t[6] = m), (t[7] = _));
+  let v;
+  t[8] === _
+    ? (v = t[9])
+    : ((v = {
+        kind: `text`,
+        variant: `caption`,
+        lines: 1,
+        content: (0, E.jsx)(s, {
+          id: `tabThumbnail.goal.timeSpent`,
+          defaultMessage: `{duration} spent`,
+          description: `Time spent pursuing a goal, excluding paused time, in a tab preview`,
+          values: { duration: _ },
+        }),
+      }),
+      (t[8] = _),
+      (t[9] = v));
+  let y;
+  t[10] !== n.tokenBudget || t[11] !== n.tokensUsed || t[12] !== a
+    ? ((y = n.tokenBudget != null && {
+        kind: `text`,
+        variant: `caption`,
+        lines: 1,
+        content: (0, E.jsx)(s, {
+          id: `tabThumbnail.goal.tokens`,
+          defaultMessage: `{used} / {budget} tokens`,
+          description: `Tokens used and token budget for a goal in a tab preview`,
+          values: {
+            used: a.formatNumber(n.tokensUsed, { notation: `compact`, maximumFractionDigits: 1 }),
+            budget: a.formatNumber(n.tokenBudget, {
+              notation: `compact`,
+              maximumFractionDigits: 1,
+            }),
+          },
+        }),
+      }),
+      (t[10] = n.tokenBudget),
+      (t[11] = n.tokensUsed),
+      (t[12] = a),
+      (t[13] = y))
+    : (y = t[13]);
+  let b;
+  t[14] !== v || t[15] !== y ? ((b = [v, y]), (t[14] = v), (t[15] = y), (t[16] = b)) : (b = t[16]);
+  let x;
+  return (
+    t[17] !== p || t[18] !== b || t[19] !== i
+      ? ((x = (0, E.jsx)(h, { icon: c, title: i, subtitle: p, sections: b })),
+        (t[17] = p),
+        (t[18] = b),
+        (t[19] = i),
+        (t[20] = x))
+      : (x = t[20]),
+    x
+  );
+}
+var T, E, D;
+function O() {
+  return (O = e(() => {
+    ((T = t()),
+      a(),
+      _(),
+      u(),
+      v(),
+      C(),
+      (E = i()),
+      (D = {
+        active: (0, E.jsx)(l, { className: `text-info` }),
+        paused: (0, E.jsx)(o, {}),
+        blocked: (0, E.jsx)(d, { className: `text-warning` }),
+        usageLimited: (0, E.jsx)(o, { className: `text-warning` }),
+        budgetLimited: (0, E.jsx)(o, { className: `text-warning` }),
+        complete: (0, E.jsx)(c, { className: `text-success` }),
+      }));
+  }))();
+}
+function k(e) {
+  let t = (0, A.c)(3),
+    { props: r, title: i } = e,
+    a = n(M, r),
+    o;
+  return (
+    t[0] !== a || t[1] !== i
+      ? ((o = a == null ? null : (0, j.jsx)(w, { title: i, ...a })),
+        (t[0] = a),
+        (t[1] = i),
+        (t[2] = o))
+      : (o = t[2]),
+    o
+  );
+}
+var A, j, M;
+function N() {
+  return (N = e(() => {
+    ((A = t()),
+      r(),
+      m(),
+      b(),
+      O(),
+      (j = i()),
+      (M = p(y, ({ conversationId: e, hostId: t }, { scope: n }) => {
+        let r = n.get(x, t)?.getConversation(e)?.threadGoal;
+        return r == null ? null : { goal: r, nowMs: Date.now() };
+      })));
+  }))();
+}
+N();
+export { k as RegisteredGoalThumbnail };

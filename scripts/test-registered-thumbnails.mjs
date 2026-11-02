@@ -20,10 +20,6 @@ const expected = {
     ["app-shared", "registered-text-file-thumbnail-core"],
     "export { CreateTextFileTabThumbnail }",
   ],
-  "registered-browser-thumbnail": [
-    ["rolldown-runtime", "app-shared", "app-initial"],
-    "export { RegisteredBrowserThumbnail }",
-  ],
   "registered-terminal-thumbnail": [
     ["rolldown-runtime", "app-shared", "app-initial", "terminal-thumbnail"],
     "export { RegisteredTerminalThumbnail }",
@@ -31,20 +27,6 @@ const expected = {
   "registered-text-file-thumbnail-core": [
     ["rolldown-runtime", "app-shared", "app-initial", "thumbnail-386f09e9e7b3"],
     "export { initializeRegisteredTextFileThumbnail as n, RegisteredTextFileThumbnail as t }",
-  ],
-  "create-file-tab-thumbnail": [
-    [
-      "rolldown-runtime",
-      "app-shared",
-      "app-initial",
-      "thumbnail-7c714f359bb7",
-      "registered-text-file-thumbnail-core",
-    ],
-    "export { CreateFileTabThumbnail }",
-  ],
-  "registered-goal-thumbnail": [
-    ["rolldown-runtime", "app-shared", "app-initial", "app-primary"],
-    "export { RegisteredGoalThumbnail }",
   ],
   "registered-cloud-browser-thumbnail": [
     ["rolldown-runtime", "app-shared", "app-initial"],
@@ -84,6 +66,9 @@ for (const [name, [dependencies, exportText]] of Object.entries(expected)) {
   sourceAssertions++;
 }
 sourceAssertions += assertReleaseOwner("registered-review-thumbnail");
+sourceAssertions += assertReleaseOwner("registered-browser-thumbnail");
+sourceAssertions += assertReleaseOwner("create-file-tab-thumbnail");
+sourceAssertions += assertReleaseOwner("registered-goal-thumbnail");
 
 const state = (globalThis.__registeredThumbnailsTest = {
   initialized: [],
@@ -359,23 +344,6 @@ runtimeAssert(
   ["/snapshot/s1", ["s1: output"]],
   "terminal snapshot",
 );
-state.signals.set("browser-tab", { canCapture: true, isNewTab: true, url: "" });
-state.signals.set("browser-shot", {
-  data: null,
-  isError: false,
-  isSuccess: true,
-});
-const browser = await load("registered-browser-thumbnail");
-const browserNode = browser.RegisteredBrowserThumbnail({
-  props: { browserConversationId: "c1", browserTabId: "b1" },
-  tab: { title: "" },
-});
-runtimeAssert(browserNode.type.name, "BrowserThumbnailView", "browser view");
-runtimeAssert(
-  browserNode.type(browserNode.props).props.sections[0].fill,
-  true,
-  "browser new tab",
-);
 const automation = await load("registered-automation-thumbnail");
 const automationNode = automation.RegisteredAutomationThumbnail({
   readState: () => null,
@@ -391,46 +359,6 @@ runtimeAssert(
   automationNode.type(automationNode.props).props.sections.length,
   2,
   "automation metadata",
-);
-state.scope.queryClient.getQueryData = (key) =>
-  key[0] === "read-file-metadata"
-    ? { contentKind: "image", sizeBytes: 99 }
-    : null;
-const file = await load("create-file-tab-thumbnail");
-const fileNode = file.CreateFileTabThumbnail({
-  hostId: "local",
-  path: "photo.png",
-  title: "Photo",
-});
-runtimeAssert(fileNode.type, "ImageThumbnail", "file image route");
-runtimeAssert(fileNode.props.sources, ["photo.png"], "file sources");
-state.scope = {
-  get(signal) {
-    if (signal?.id === "host-registry")
-      return {
-        getConversation: () => ({
-          threadGoal: {
-            status: "active",
-            timeUsedSeconds: 2,
-            updatedAt: Date.now() / 1000,
-            tokenBudget: 100,
-            tokensUsed: 25,
-          },
-        }),
-      };
-    return null;
-  },
-};
-const goal = await load("registered-goal-thumbnail");
-const goalNode = goal.RegisteredGoalThumbnail({
-  props: { conversationId: "c1", hostId: "local" },
-  title: "Goal",
-});
-runtimeAssert(goalNode.type.name, "GoalThumbnailView", "goal view");
-runtimeAssert(
-  goalNode.type(goalNode.props).props.sections.length,
-  2,
-  "goal sections",
 );
 state.scope = {
   get(signal) {

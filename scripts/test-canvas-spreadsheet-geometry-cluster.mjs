@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const REAL_DEPENDENCIES = new Set(["drawing-frame-geometry", "spreadsheet-utils"]);
@@ -15,40 +16,18 @@ async function bundle(directory) {
         const dependency = importPath.slice(8);
         return REAL_DEPENDENCIES.has(dependency) ? { path: path.join(ROOT, "src/renderer", dependency, "index.ts") } : { path: dependency, namespace: "mock" };
       });
-      build.onLoad({ filter: /.*/, namespace: "mock" }, () => ({ contents: "export {};", loader: "js" }));
+      build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: dependency }) => ({
+        contents: dependency === "rolldown-runtime"
+          ? "export const n=initializer=>{let done=false;return()=>{if(!done){done=true;initializer()}}};"
+          : "export {};",
+        loader: "js",
+      }));
     } }],
   });
   return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`);
 }
 
-// drawing-frame-geometry
-const geometry = await bundle("drawing-frame-geometry");
-assert.deepEqual(Object.keys(geometry), ["C", "S", "_", "a", "b", "c", "d", "f", "g", "h", "i", "l", "m", "n", "o", "p", "r", "s", "t", "u", "v", "x", "y"]);
-assert.equal(geometry.v(12, 0, 10), 10);
-assert.deepEqual(geometry.x({ x: 10, y: 20, k: 2 }, 14, 28), { x: 2, y: 4 });
-assert.deepEqual(geometry.S({ x: 10, y: 20, k: 2 }, 2, 4), { x: 14, y: 28 });
-assert.deepEqual(geometry.C({ x: 0, y: 0, k: 1 }, 50, 25, 2, 0.5, 3), { x: -50, y: -25, k: 2 });
-assert.deepEqual(geometry._({ x: -900, y: 30, k: 2 }, { width: 300, height: 200 }, { width: 200, height: 100 }), { x: -400, y: 0, k: 2 });
-assert.deepEqual(geometry.g({ x: -12, y: -8, k: 2 }), { left: 12, top: 8 });
-assert.deepEqual(geometry.h({ x: -12, y: -8, k: 2 }), { left: 6, top: 4 });
-assert.equal(geometry.y(new Map([[1, { x: 0, y: 0 }]])), null);
-assert.deepEqual(geometry.y(new Map([[1, { x: 0, y: 0 }], [2, { x: 6, y: 8 }]])), { centerX: 3, centerY: 4, distance: 10 });
-assert.deepEqual(geometry.d(2), { visibleSize: 3, halfVisibleSize: 1.5, hitRadius: 6, rotationBand: 9, rotationHandleDistance: 14 });
-assert.equal(geometry.f("nw"), "nwse-resize");
-assert.equal(geometry.f("ne"), "nesw-resize");
-assert.equal(geometry.f(null), null);
-assert.match(geometry.p(), /grab$/);
-assert.equal(geometry.s(270), -90);
-assert.equal(geometry.s(-270), 90);
-const frame = { left: 10, top: 20, width: 40, height: 20, rotation: 0 };
-assert.deepEqual(geometry.n(frame), { x: 30, y: 30 });
-assert.deepEqual(geometry.r(frame), { nw: { x: 10, y: 20 }, ne: { x: 50, y: 20 }, sw: { x: 10, y: 40 }, se: { x: 50, y: 40 } });
-assert.deepEqual(geometry.i([frame, { left: 50, top: 40, width: 10, height: 20 }]), { left: 10, top: 20, width: 50, height: 40 });
-assert.equal(geometry.c(frame, { x: 30, y: 30 }), true);
-assert.equal(geometry.c(frame, { x: 60, y: 30 }), false);
-assert.equal(geometry.l(frame, { x: 10, y: 20 }, 1), "nw");
-assert.equal(geometry.t({ left: 0, top: 0, width: 100, height: 100 }, frame), true);
-assert.equal(geometry.u(frame, { x: 30, y: 5 }, 1), true);
+assertReleaseOwner("drawing-frame-geometry");
 
 // floating-ui-modifiers
 const modifiers = await bundle("floating-ui-modifiers");

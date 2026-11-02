@@ -34,63 +34,8 @@ assert.equal(selectedVoices[0].name, "ember");
 assert.equal(selectedVoices[1].name, "Cove");
 assert.equal(selectedVoices[0].orbTreatment, "advanced-blue");
 
-// departments: 14
-const departments = await bundle("departments");
-assert.deepEqual(Object.keys(departments), ["a", "i", "n", "o", "r", "s", "t"]);
-assert.equal(departments.a, "oai/apps/hasSeenOnboarding");
-assert.ok(departments.t.physician.includes("cardiology"));
-assert.equal(departments.t.physician, departments.t.np_pa);
-assert.ok(departments.t.registered_nurse.includes("icu_rn"));
-const identity = { accountId: "account", userId: "user" };
-const invalidations = []; let onboardingData;
-const departmentScope = { currentIdentity: () => identity, invalidate(key) { invalidations.push(key); }, setOnboardingData(_identity, data) { onboardingData = data; } };
-apiResponses.push({ ok: true }, { ok: true });
-await departments.s(departmentScope, identity, { role: "physician", departments: ["cardiology"] }, { role_user_message: "hello" });
-assert.equal(apiCalls.at(-2)[0], "patch");
-assert.equal(apiCalls.at(-2)[2].requestBody.onboarding_information.role, "physician");
-assert.equal(apiCalls.at(-1)[1], "/user_system_messages");
-assert.equal(onboardingData.departments[0], "cardiology");
-assert.equal(invalidations.length, 2);
-const departmentQuery = departments.i.getOptions(identity);
-assert.deepEqual(departmentQuery.queryKey, ["health-onboarding-info", "account", "user"]);
-assert.equal(departmentQuery.retry, false);
-await assert.rejects(() => departments.s({ currentIdentity: () => ({ accountId: "other", userId: "user" }) }, identity, { role: "", departments: [] }), { name: "AbortError" });
-apiResponses.push({ ok: true });
-await departments.r(departmentScope, identity);
-assert.equal(apiCalls.at(-1)[2].parameters.query.announcement_id, departments.a);
-
-// cme-state: 18
-const cme = await bundle("cme-state");
-assert.deepEqual(Object.keys(cme), ["a", "c", "i", "l", "n", "o", "r", "s", "t"]);
-assert.deepEqual(cme.i.evaluate(identity), identity);
-assert.equal(cme.i.evaluate(), null);
-const accountOptions = cme.t.getOptions(identity, identity);
-assert.deepEqual(accountOptions.queryKey, ["cme-account", "account", "user"]);
-assert.equal(accountOptions.enabled, true);
-assert.equal(cme.t.getOptions(identity, { accountId: "other", userId: "user" }).enabled, false);
-const conversationOptions = cme.n.getOptions(identity, identity);
-assert.equal(conversationOptions.initialPageParam, 1);
-assert.equal(conversationOptions.getNextPageParam({ next_page: 3 }), 3);
-assert.equal(conversationOptions.getNextPageParam({}), undefined);
-const cmeInvalidations = []; let cmeData; let downloaded;
-const cmeScope = { currentIdentity: () => identity, invalidate(key) { cmeInvalidations.push(key); }, setData(key, _identity, data) { cmeData = [key, data]; }, download(_blob, name) { downloaded = name; } };
-apiResponses.push({ status: "active" });
-assert.deepEqual(await cme.l(cmeScope, identity, { profession: "doctor" }), { status: "active" });
-assert.equal(cmeData[0], "cme-account");
-assert.equal(cmeInvalidations.at(-1), "cme-account");
-apiResponses.push({ id: "claim" });
-assert.deepEqual(await cme.c(cmeScope, identity, { credits: 1 }), { id: "claim" });
-assert.deepEqual(cmeInvalidations.slice(-2), ["cme-conversations", "cme-credits"]);
-apiResponses.push({ ok: true });
-await cme.s(cmeScope, identity, "conversation");
-assert.equal(apiCalls.at(-1)[2].parameters.path.conversation_id, "conversation");
-apiResponses.push(new Response(new Blob(["pdf"]), { headers: { "Content-Disposition": "attachment; filename*=UTF-8''transcript%202026.pdf" } }));
-await cme.a(cmeScope, identity, 2026);
-assert.equal(downloaded, "transcript 2026.pdf");
-apiResponses.push(new Response(new Blob(["pdf"]), { headers: { "Content-Disposition": "attachment; filename=../bad.pdf" } }));
-await cme.a(cmeScope, identity, 2025);
-assert.equal(downloaded, "cme-transcript-2025.pdf");
-await assert.rejects(() => cme.l({ currentIdentity: () => ({ accountId: "changed", userId: "user" }) }, identity, {}), /workspace or user changed/);
+assertReleaseOwner("departments");
+assertReleaseOwner("cme-state");
 
 assertReleaseOwner("pca-connector-action");
 

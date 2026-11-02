@@ -1,22 +1,175 @@
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/plugin-detail-page-core";
-import "@rchunk/mcp-extension-view-page-core";
-
-export interface McpExtensionView { entrypoint?: string; pluginId?: string; plugin_id?: string; serverName?: string; toolName?: string; tool_name?: string; url?: string; }
-export interface PluginMcpAppDeepLinkPageProps { entrypoint?: string; pluginId?: string; toolName?: string; views?: readonly McpExtensionView[]; isLoading?: boolean; activationState?: "active" | "inactive" | "unavailable"; }
-let jsx: JsxRuntime;
-function ensureJsx(): JsxRuntime { if (jsx == null) jsx = getJsxRuntime(); return jsx; }
-function basePluginId(value?: string): string | undefined { return value?.replace(/@(openai-bundled|openai-primary-runtime)$/, ""); }
-
-function PluginMcpAppDeepLinkPage(props: PluginMcpAppDeepLinkPageProps): unknown {
-  const runtime = ensureJsx();
-  if (!props.pluginId || !props.toolName) return runtime.jsx("main", { role: "alert", children: "Extension view not found" });
-  if (props.isLoading) return runtime.jsx("main", { "aria-busy": true, children: "Loading extension…" });
-  const matches = (props.views ?? []).filter((view) => (view.entrypoint ?? "global") === (props.entrypoint ?? "global") && basePluginId(view.pluginId ?? view.plugin_id) === basePluginId(props.pluginId) && (view.toolName ?? view.tool_name) === props.toolName);
-  if (matches.length === 1) return runtime.jsx("a", { "data-redirect": true, href: matches[0].url ?? `/plugins/${encodeURIComponent(props.pluginId)}/apps/${encodeURIComponent(props.toolName)}`, children: "Open app" });
-  if (matches.length > 1) return runtime.jsx("main", { role: "status", "data-match-count": matches.length, children: "Choose an extension view" });
-  return runtime.jsxs("main", { className: "plugin-deep-link-fallback", "data-activation-state": props.activationState ?? "inactive", children: [runtime.jsx("h1", { children: "Plugin app unavailable" }), runtime.jsx("p", { children: props.pluginId })] });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  KB as o,
+  e6 as s,
+  eV as c,
+  qB as l,
+  sV as u,
+  wL as d,
+} from "@rchunk/app-shared";
+import {
+  $sn as f,
+  Bfn as p,
+  Edt as m,
+  Let as h,
+  Mdt as g,
+  Qgn as _,
+  Ret as v,
+  Ygn as y,
+  dXt as b,
+  i_n as x,
+  l_n as S,
+  mXt as C,
+  ncn as w,
+  o_n as T,
+  pXt as E,
+  ugn as D,
+  wdt as O,
+} from "@rchunk/app-initial";
+import { n as k, r as A } from "@rchunk/plugin-detail-page-core";
+import { i as j, r as M } from "@rchunk/mcp-extension-view-page-core";
+function N({ entrypoint: e = `global`, pluginId: t, toolName: n, views: r }) {
+  let i = c(t),
+    a = i == null ? t : t.slice(0, -(i.length + 1)),
+    o = r.filter((r) =>
+      r.entrypoint.type !== e || r.tool.name !== n
+        ? !1
+        : C(r.server)
+          ? b(r) === a
+          : r.pluginId == null
+            ? r.server === a
+            : r.pluginId === t,
+    );
+  return o.length === 1
+    ? { kind: `found`, view: o[0] }
+    : o.length === 0
+      ? { kind: `not-found` }
+      : { kind: `ambiguous` };
 }
-
-export { PluginMcpAppDeepLinkPage };
+function P() {
+  return (P = e(() => {
+    (d(), E());
+  }))();
+}
+function F() {
+  let e = (0, L.c)(22),
+    t = x(),
+    r = T(),
+    { pluginId: a, toolName: s } = S(),
+    c = i(g),
+    d = i(m),
+    f = n(d ? w : null, D),
+    [p, _] = (0, R.useState)(null),
+    v = p != null && p.pluginId === a && p.toolName === s ? p.state : `idle`,
+    b,
+    C;
+  if (e[0] !== d || e[1] !== t.state || e[2] !== a || e[3] !== f || e[4] !== s || e[5] !== c) {
+    C = Symbol.for(`react.early_return_sentinel`);
+    bb0: {
+      let n = (u.safeParse(t.state).data ?? null)?.entrypoint ?? `global`;
+      if (!d || f == null || a == null || s == null) {
+        let t;
+        (e[8] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((t = (0, z.jsx)(M, {})), (e[8] = t))
+          : (t = e[8]),
+          (C = t));
+        break bb0;
+      }
+      if (!f.isError && !f.isSuccess) {
+        let t;
+        (e[9] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((t = (0, z.jsx)(h, { debugName: `PluginMcpAppDeepLink`, fillParent: !0 })), (e[9] = t))
+          : (t = e[9]),
+          (C = t));
+        break bb0;
+      }
+      if (((b = N({ entrypoint: n, pluginId: a, toolName: s, views: c })), b.kind === `found`)) {
+        C = (0, z.jsx)(y, {
+          replace: !0,
+          to: (n === `settings` ? l : o)(b.view.server, b.view.tool.name),
+          state: t.state,
+        });
+        break bb0;
+      }
+    }
+    ((e[0] = d),
+      (e[1] = t.state),
+      (e[2] = a),
+      (e[3] = f),
+      (e[4] = s),
+      (e[5] = c),
+      (e[6] = b),
+      (e[7] = C));
+  } else ((b = e[6]), (C = e[7]));
+  if (C !== Symbol.for(`react.early_return_sentinel`)) return C;
+  if (b.kind === `ambiguous` || v === `complete`) {
+    let t;
+    return (
+      e[10] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, z.jsx)(M, {})), (e[10] = t))
+        : (t = e[10]),
+      t
+    );
+  }
+  if (v === `loading`) {
+    let t;
+    return (
+      e[11] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, z.jsx)(h, { debugName: `PluginMcpAppDeepLinkRetry`, fillParent: !0 })),
+          (e[11] = t))
+        : (t = e[11]),
+      t
+    );
+  }
+  let E;
+  e[12] !== t.state || e[13] !== r
+    ? ((E = () => {
+        r(`/skills`, { state: { ...t.state, initialHostId: D, initialTab: `plugins` } });
+      }),
+      (e[12] = t.state),
+      (e[13] = r),
+      (e[14] = E))
+    : (E = e[14]);
+  let O;
+  e[15] !== a || e[16] !== f || e[17] !== s
+    ? ((O = async () => {
+        (_({ pluginId: a, state: `loading`, toolName: s }),
+          await f.refetch().catch(I),
+          _({ pluginId: a, state: `complete`, toolName: s }));
+      }),
+      (e[15] = a),
+      (e[16] = f),
+      (e[17] = s),
+      (e[18] = O))
+    : (O = e[18]);
+  let A;
+  return (
+    e[19] !== E || e[20] !== O
+      ? ((A = (0, z.jsx)(k, {
+          allowUniqueNameFallback: !0,
+          hostId: D,
+          onBack: E,
+          onPluginActivationComplete: O,
+        })),
+        (e[19] = E),
+        (e[20] = O),
+        (e[21] = A))
+      : (A = e[21]),
+    A
+  );
+}
+function I() {}
+var L, R, z;
+function B() {
+  return (B = e(() => {
+    ((L = t()), r(), d(), (R = s()), _(), v(), A(), f(), p(), P(), O(), j(), (z = a()));
+  }))();
+}
+B();
+export { F as PluginMcpAppDeepLinkPage };

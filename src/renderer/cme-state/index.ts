@@ -1,21 +1,163 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import { rJt as chatGptApi } from "@rchunk/app-initial";
-
-interface CmeIdentity { accountId: string; userId: string }
-interface CmeScope { currentIdentity?(): CmeIdentity | null; invalidate?(key: string, identity: CmeIdentity): Promise<unknown> | unknown; setData?(key: string, identity: CmeIdentity, data: unknown): void; download?(blob: Blob, filename: string): void }
-function sameIdentity(expected: CmeIdentity, current?: CmeIdentity | null): boolean { return current != null && expected.accountId === current.accountId && expected.userId === current.userId; }
-function assertIdentity(scope: CmeScope, identity: CmeIdentity): void { const current = scope.currentIdentity?.(); if (current != null && !sameIdentity(identity, current)) throw new Error("CME workspace or user changed during the request."); }
-function filename(disposition: string | null): string | null { if (!disposition) return null; const values = new Map<string, string>(); for (const match of disposition.matchAll(/(?:^|;)\s*([^=\s;]+)\s*=\s*(?:"((?:\\.|[^"\\])*)"|([^;]*))/g)) { const key = match[1]?.toLowerCase(); if (key !== "filename" && key !== "filename*") continue; values.set(key, match[2] === undefined ? (match[3]?.trim() ?? "") : match[2].replace(/\\"/g, '"')); } const encoded = values.get("filename*")?.match(/^utf-8'[^']*'(.*)$/i)?.[1]; if (encoded) try { const decoded = decodeURIComponent(encoded); if (isSafeFilename(decoded)) return decoded; } catch {} const plain = values.get("filename"); return plain != null && isSafeFilename(plain) ? plain : null; }
-function isSafeFilename(value: string): boolean { if (value.trim() === "" || value === "." || value === ".." || value.includes("/") || value.includes("\\")) return false; return [...value].every(character => { const code = character.charCodeAt(0); return code > 31 && code !== 127; }); }
-const i = { evaluate(identity?: CmeIdentity | null): CmeIdentity | null { return identity ?? null; } };
-const t = { getOptions(identity: CmeIdentity, current?: CmeIdentity | null) { return { queryKey: ["cme-account", identity.accountId, identity.userId], enabled: sameIdentity(identity, current), staleTime: 300_000, queryFn: ({ signal }: { signal?: AbortSignal }) => chatGptApi.safeGet("/cme/account", { additionalHeaders: { "ChatGPT-Account-Id": identity.accountId }, signal }) }; } };
-function paginated(key: string) { return { getOptions(identity: CmeIdentity, current?: CmeIdentity | null) { return { queryKey: [key, identity.accountId, identity.userId], enabled: sameIdentity(identity, current), staleTime: 0, gcTime: 0, initialPageParam: 1, getNextPageParam: (page: { next_page?: number }) => page.next_page, queryFn: ({ pageParam = 1, signal }: { pageParam?: number; signal?: AbortSignal }) => chatGptApi.safeGet(`/cme/${key === "cme-conversations" ? "conversations" : "credits"}`, { parameters: { query: { page: pageParam, page_size: 25 } }, additionalHeaders: { "ChatGPT-Account-Id": identity.accountId }, signal }) }; } }; }
-const n = paginated("cme-conversations");
-const r = paginated("cme-credits");
-async function l(scope: CmeScope, identity: CmeIdentity, request: Record<string, unknown>): Promise<unknown> { assertIdentity(scope, identity); const result = await chatGptApi.safePatch("/cme/account", { requestBody: request, additionalHeaders: { "ChatGPT-Account-Id": identity.accountId } }); assertIdentity(scope, identity); scope.setData?.("cme-account", identity, result); await scope.invalidate?.("cme-account", identity); return result; }
-async function c(scope: CmeScope, identity: CmeIdentity, request: Record<string, unknown>): Promise<unknown> { assertIdentity(scope, identity); const result = await chatGptApi.safePost("/cme/claims", { requestBody: request, additionalHeaders: { "ChatGPT-Account-Id": identity.accountId } }); await Promise.all([scope.invalidate?.("cme-conversations", identity), scope.invalidate?.("cme-credits", identity)]); assertIdentity(scope, identity); return result; }
-async function s(scope: CmeScope, identity: CmeIdentity, conversationId: string): Promise<void> { assertIdentity(scope, identity); await chatGptApi.safePost(`/cme/conversations/{conversation_id}/remove`, { parameters: { path: { conversation_id: conversationId } }, additionalHeaders: { "ChatGPT-Account-Id": identity.accountId } }); assertIdentity(scope, identity); await scope.invalidate?.("cme-conversations", identity); }
-async function a(scope: CmeScope, identity: CmeIdentity, calendarYear: number): Promise<void> { assertIdentity(scope, identity); const response = await chatGptApi.getResponse(`/cme/credits/{calendar_year}/artifact`, { parameters: { path: { calendar_year: calendarYear } }, additionalHeaders: { "ChatGPT-Account-Id": identity.accountId } }); const blob = await response.blob(); assertIdentity(scope, identity); scope.download?.(blob, filename(response.headers.get("Content-Disposition")) ?? `cme-transcript-${calendarYear}.pdf`); }
-function o(): void {}
-export { a, c, i, l, n, o, r, s, t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $O as t,
+  FX as n,
+  QI as r,
+  QX as i,
+  XX as a,
+  ZI as o,
+  ek as s,
+  sZ as c,
+} from "@rchunk/app-shared";
+import {
+  LGt as l,
+  Sun as u,
+  Xet as d,
+  Zet as f,
+  cJt as p,
+  rJt as m,
+  vun as h,
+  yun as g,
+} from "@rchunk/app-initial";
+function _(e) {
+  if (!e) return null;
+  let t = new Map();
+  for (let n of e.matchAll(/(?:^|;)\s*([^=\s;]+)\s*=\s*(?:"((?:\\.|[^"\\])*)"|([^;]*))/g)) {
+    let e = n[1]?.toLowerCase();
+    if (e !== `filename` && e !== `filename*`) continue;
+    let r = n[2],
+      i = r === void 0 ? (n[3]?.trim() ?? ``) : r.replace(/\\"/g, `"`);
+    t.has(e) || t.set(e, i);
+  }
+  let n = t.get(`filename*`)?.match(/^utf-8'[^']*'(.*)$/i)?.[1];
+  if (n)
+    try {
+      let e = decodeURIComponent(n);
+      if (v(e)) return e;
+    } catch {}
+  let r = t.get(`filename`);
+  return r && v(r) ? r : null;
+}
+function v(e) {
+  if (e.trim().length === 0 || e === `.` || e === `..` || e.includes(`/`) || e.includes(`\\`))
+    return !1;
+  for (let t of e) {
+    let e = t.charCodeAt(0);
+    if (e <= 31 || e === 127) return !1;
+  }
+  return !0;
+}
+async function y(e, t, n) {
+  w(e, t);
+  let r = await m.safePatch(`/cme/account`, {
+    requestBody: n,
+    additionalHeaders: { "ChatGPT-Account-Id": t.accountId },
+  });
+  return (w(e, t), e.query.setData(E, t, r), await e.query.invalidate(E, t), w(e, t), r);
+}
+async function b(e, t, n) {
+  w(e, t);
+  let r = await m.safePost(`/cme/claims`, {
+    requestBody: n,
+    additionalHeaders: { "ChatGPT-Account-Id": t.accountId },
+  });
+  return (
+    w(e, t),
+    await Promise.all([e.query.invalidate(D, t), e.query.invalidate(O, t)]),
+    w(e, t),
+    r
+  );
+}
+async function x(e, t, n) {
+  (w(e, t),
+    await m.safePost(`/cme/conversations/{conversation_id}/remove`, {
+      parameters: { path: { conversation_id: n } },
+      additionalHeaders: { "ChatGPT-Account-Id": t.accountId },
+    }),
+    w(e, t),
+    await e.query.invalidate(D, t),
+    w(e, t));
+}
+async function S(e, t, n) {
+  w(e, t);
+  let r = await m.getResponse(`/cme/credits/{calendar_year}/artifact`, {
+      parameters: { path: { calendar_year: n } },
+      additionalHeaders: { "ChatGPT-Account-Id": t.accountId },
+    }),
+    i = await r.blob();
+  (w(e, t), l(i, _(r.headers.get(`Content-Disposition`)) ?? `cme-transcript-${n}.pdf`));
+}
+function C(e, t) {
+  return e.accountId === t?.accountId && e.userId === t.userId;
+}
+function w(e, t) {
+  if (!C(t, e.get(T))) throw Error(`CME workspace or user changed during the request.`);
+}
+var T, E, D, O;
+function k() {
+  return (k = e(() => {
+    (n(),
+      f(),
+      u(),
+      p(),
+      r(),
+      s(),
+      (T = c(o, ({ get: e }) => {
+        if (!e(d, { name: `chatgpt.cme` }).isCapable) return null;
+        let t = e(h),
+          { userId: n } = e(g);
+        return t.status === `allowed` && `accountId` in t && t.accountId != null && n != null
+          ? { accountId: t.accountId, userId: n }
+          : null;
+      })),
+      (E = i(o, (e, { get: n, scope: r }) => ({
+        queryKey: [`cme-account`, e.accountId, e.userId],
+        enabled: C(e, n(T)),
+        staleTime: t.FIVE_MINUTES,
+        queryFn: async ({ signal: t }) => {
+          w(r, e);
+          let n = await m.safeGet(`/cme/account`, {
+            additionalHeaders: { "ChatGPT-Account-Id": e.accountId },
+            signal: t,
+          });
+          return (w(r, e), n);
+        },
+      }))),
+      (D = a(o, (e, { get: t, scope: n }) => ({
+        queryKey: [`cme-conversations`, e.accountId, e.userId],
+        enabled: C(e, t(T)),
+        staleTime: 0,
+        gcTime: 0,
+        initialPageParam: 1,
+        getNextPageParam: (e) => e.next_page ?? void 0,
+        queryFn: async ({ pageParam: t, signal: r }) => {
+          w(n, e);
+          let i = await m.safeGet(`/cme/conversations`, {
+            parameters: { query: { page: t, page_size: 25 } },
+            additionalHeaders: { "ChatGPT-Account-Id": e.accountId },
+            signal: r,
+          });
+          return (w(n, e), i);
+        },
+      }))),
+      (O = a(o, (e, { get: t, scope: n }) => ({
+        queryKey: [`cme-credits`, e.accountId, e.userId],
+        enabled: C(e, t(T)),
+        staleTime: 0,
+        gcTime: 0,
+        initialPageParam: 1,
+        getNextPageParam: (e) => e.next_page ?? void 0,
+        queryFn: async ({ pageParam: t, signal: r }) => {
+          w(n, e);
+          let i = await m.safeGet(`/cme/credits`, {
+            parameters: { query: { page: t, page_size: 25 } },
+            additionalHeaders: { "ChatGPT-Account-Id": e.accountId },
+            signal: r,
+          });
+          return (w(n, e), i);
+        },
+      }))));
+  }))();
+}
+export { S as a, b as c, T as i, y as l, D as n, k as o, O as r, x as s, E as t };
