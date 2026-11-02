@@ -16,25 +16,8 @@ assert.deepEqual(Object.keys(writing), ["LibraryWritingBlock"]);
 assert.equal(writing.LibraryWritingBlock({ id: "w1" }).type, "writing-block");
 assert.equal(writing.LibraryWritingBlock({ id: "w1" }).props.id, "w1");
 
-// chatgpt-subagents-panel: 11
-const panelModule = await bundle("chatgpt-subagents-panel");
-assert.deepEqual(Object.keys(panelModule), ["ChatGptSubagentsPanelTab"]);
 const subagents = [{ threadId: "active", status: "working", displayName: "Researcher", prompt: "Search" }, { threadId: "done", status: "done", displayName: "Writer", statusMessage: "Finished" }];
-let selected;
-const panel = panelModule.ChatGptSubagentsPanelTab({ conversationId: "c1", onSelect(value) { selected = value; }, subagents });
-assert.equal(panel.type, "section");
-assert.equal(panel.props["data-conversation-id"], "c1");
-assert.equal(children(panel)[0].props.children[0].props.children, "Active");
-assert.equal(children(panel)[1].props.children[0].props.children, "Done");
-children(panel)[0].props.children[1][0].props.onClick();
-assert.equal(selected, "active");
-const detail = panelModule.ChatGptSubagentsPanelTab({ conversationId: "c1", onSelect(value) { selected = value; }, selectedThreadId: "done", subagents });
-assert.equal(detail.props["data-selected-subagent"], "done");
-assert.equal(children(detail)[1].props.children, "Writer");
-assert.equal(children(detail)[2].props.children, "Finished");
-children(detail)[0].props.onClick();
-assert.equal(selected, null);
-assert.equal(children(panelModule.ChatGptSubagentsPanelTab({ conversationId: "c", onSelect() {}, subagents: [] }))[0].props.children[1].props.children, "No active subagents");
+const subagentsReleaseAssertions = assertReleaseOwner("chatgpt-subagents-panel");
 
 // registered-chatgpt-subagents-thumbnail: 10
 const thumbnailModule = await bundle("registered-chatgpt-subagents-thumbnail");
@@ -75,4 +58,4 @@ const expired = petModule.WorkModePetContent({ accessoryId: "pet_old", builtInAs
 assert.equal(expired.props.src, "fallback.png");
 assert.equal(petModule.WorkModePetContent({ accessoryId: "default", alt: "Buddy", builtInAssets: { default: "d.png" } }).props.alt, "Buddy");
 
-console.log(`lazy conversation surface cluster assertions passed with ${beaconAssertions + imageGameAssertions} release assertions`);
+console.log(`lazy conversation surface cluster assertions passed with ${subagentsReleaseAssertions + beaconAssertions + imageGameAssertions} release assertions`);

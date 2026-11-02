@@ -1,528 +1,1125 @@
-import "@rchunk/rolldown-runtime";
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import * as primaryChunk from "@rchunk/app-primary";
-import * as contextChunk from "@rchunk/thread-scroll-controller-context-value";
-
-type Direction = "away" | "toward";
-type Origin = "bottom" | "top";
-type Behavior = "instant" | "smooth";
-interface Ref<T> { current: T }
-interface ContentX { get(): number; on?(event: "change", listener: () => void): (() => void) | undefined }
-interface ResponseSpacer { getHeightPx(): number; scrollToBottom(): void }
-interface Controller {
-  addScrollListener(listener: (distance: number) => void): () => void;
-  addUserScrollListener(listener: (current: number, previous: number) => void): () => void;
-  compensateScrollToDistanceFromBottomPx(distance: number): void;
-  getLastScrollDistanceFromBottomPx(): number;
-  getUnroundedScrollDistanceFromBottomPx(distanceFromBottomPx: number): number;
-  getScrollElement(): HTMLElement | null;
-  isScrolledFromBottom: boolean;
-  preserveScrollPositionForNextLayout(): void;
-  scrollToBottom(): void;
-  scrollToDistanceFromBottomPx(distance: number, behavior: Behavior, source?: "system" | "user"): void;
-  setFooterResizeViewportPreserveDisabled(disabled: boolean): void;
-}
-export interface ThreadScrollLayoutProps {
-  active?: boolean; autoLoadHistory?: boolean; contentX?: ContentX | null; children?: unknown;
-  footer?: unknown; hideScrollbar?: boolean; initialOffset?: number; loadPastHiddenHistoryPages?: boolean;
-  onScroll?(distanceFromBottomPx: number, atBottom: boolean): void;
-  onUserScrollToTop?(): Promise<"stop" | unknown> | "stop" | unknown;
-  preserveViewportOnContentGrowth?: boolean; presentation?: "compact" | "default";
-  remoteHostedPIPAnchorHostId?: string;
-  renderLayout?(parts: { content: unknown; footer: unknown }): unknown;
-  responseSpacer?: ResponseSpacer | null; scrollOrigin?: Origin;
-  scrollToBottomButton?: { isWorking?: boolean } | null; threadEndContent?: unknown;
-}
-
-const shared = sharedChunk as unknown as Record<string, any>;
-const initial = initialChunk as unknown as Record<string, any>;
-const primary = primaryChunk as unknown as Record<string, any>;
-const scrollContext = contextChunk as unknown as Record<string, any>;
-let React: any;
-let jsx: any;
-let initialized = false;
-const HEADER_SELECTOR = "[data-app-shell-header-obstacle], [data-app-shell-header-toolbar] > *, [data-app-shell-page-header] > :not([data-app-shell-header-toolbar])";
-const ANIMATION_MS = 260;
-const HISTORY_THRESHOLD = 64;
-const TOUCH_THRESHOLD = 8;
-const DIRECTION_TIMEOUT = 1000;
-const styles = {
-  Probe: "_Probe_3b6sy_1", transcriptBody: "_transcriptBody_w5y6n_1",
-  scrollContent: "_scrollContent_w5y6n_5", compactHeaderScrollFade: "_compactHeaderScrollFade_w5y6n_13",
-  compactScrollMask: "_compactScrollMask_w5y6n_28",
-};
-function call(value: unknown): void { if (typeof value === "function") value(); }
-function stable<T extends (...args: any[]) => any>(callback: T): T { return (shared.__ as (value: T) => T)(callback); }
-function classes(...values: unknown[]): string { return (shared.m4 as (...items: unknown[]) => string)(...values); }
-function fromBottom(element: HTMLElement): number { return Math.max(0, -(element.scrollTop || 0)); }
-function fromTop(element: HTMLElement): number { return element.scrollHeight - element.clientHeight - fromBottom(element); }
-function setFromBottom(element: HTMLElement, distance: number): void { element.scrollTop = -Math.max(0, distance); }
-function atBottom(element: HTMLElement): boolean { return fromBottom(element) <= 24; }
-function nearTop(element: HTMLElement, hiddenPages: boolean): boolean {
-  return fromTop(element) <= (hiddenPages ? Math.max(element.clientHeight, HISTORY_THRESHOLD) : HISTORY_THRESHOLD);
-}
-
-function observeHeaderOverlap(probe: HTMLElement, onChange: (value: boolean) => void) {
-  const main = probe.closest<HTMLElement>("[data-app-shell-main-content-layout]");
-  const header = main?.closest<HTMLElement>("[data-app-shell-main-surface]")?.querySelector<HTMLElement>("header[data-app-shell-header-layout]");
-  if (main == null || header == null || typeof ResizeObserver === "undefined") return;
-  let frame: number | null = null;
-  let refresh = true;
-  let obstacles = new Set<Element>();
-  const update = () => {
-    frame = null;
-    if (refresh) {
-      refresh = false;
-      const next = new Set(header.querySelectorAll(HEADER_SELECTOR));
-      for (const item of obstacles) if (!next.has(item)) observer.unobserve(item);
-      for (const item of next) if (!obstacles.has(item)) observer.observe(item);
-      obstacles = next;
-    }
-    const probeBounds = probe.getBoundingClientRect();
-    let clear = probeBounds.width > 0 && !header.hasAttribute("data-app-shell-tab-row");
-    if (clear) for (const obstacle of obstacles) {
-      const bounds = obstacle.getBoundingClientRect();
-      if (!obstacle.hasAttribute("data-app-shell-thread-content-overlap") && bounds.width > 0 && bounds.height > 0 &&
-          getComputedStyle(obstacle).visibility !== "hidden" && bounds.right > probeBounds.left && bounds.left < probeBounds.right) {
-        clear = false; break;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $Q as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  K2 as o,
+  LX as s,
+  __ as c,
+  a$ as l,
+  e$ as ee,
+  e6 as u,
+  g_ as d,
+  h4 as f,
+  m4 as p,
+  n4 as te,
+  o$ as ne,
+} from "@rchunk/app-shared";
+import {
+  $en as re,
+  Agn as ie,
+  Bbt as m,
+  E7 as h,
+  Gbt as ae,
+  H7 as oe,
+  Hbt as se,
+  Ign as ce,
+  JH as le,
+  Kbt as ue,
+  Ngn as g,
+  Pgn as _,
+  Qa as v,
+  Sat as de,
+  Slt as fe,
+  T7 as y,
+  U7 as pe,
+  Wbt as b,
+  YH as me,
+  Ybt as he,
+  Za as x,
+  itn as S,
+  jat as ge,
+  nxt as _e,
+  qbt as ve,
+  wat as ye,
+  xlt as be,
+} from "@rchunk/app-initial";
+import { et as xe, rt as C, tt as Se } from "@rchunk/app-primary";
+import {
+  n as Ce,
+  r as we,
+  t as Te,
+} from "@rchunk/thread-scroll-controller-context-value";
+function Ee(e, t) {
+  let n = e.closest(`[data-app-shell-main-content-layout]`),
+    r = n
+      ?.closest(`[data-app-shell-main-surface]`)
+      ?.querySelector(`header[data-app-shell-header-layout]`);
+  if (n == null || r == null) return;
+  let i = null,
+    a = !0,
+    o = new Set(),
+    s = () => {
+      if (((i = null), a)) {
+        a = !1;
+        let e = new Set(r.querySelectorAll(w));
+        for (let t of o) e.has(t) || l.unobserve(t);
+        for (let t of e) o.has(t) || l.observe(t);
+        o = e;
       }
-    }
-    onChange(clear);
-  };
-  const schedule = () => { frame ??= requestAnimationFrame(update); };
-  const observer = new ResizeObserver(entries => {
-    if (entries.some(({ target }) => !target.isConnected)) refresh = true;
-    schedule();
-  });
-  for (const item of [main, probe, header]) observer.observe(item);
-  schedule();
-  return {
-    schedule,
-    updateHeader() { refresh = true; schedule(); },
-    dispose() { observer.disconnect(); if (frame != null) cancelAnimationFrame(frame); onChange(false); },
-  };
-}
-function HeaderOverlapProbe({ contentX }: { contentX?: ContentX | null }): unknown {
-  const mode = React.useContext(initial.T7);
-  return mode == null ? null : jsx.jsx(HeaderOverlapProbeElement, { contentX });
-}
-function HeaderOverlapProbeElement({ contentX }: { contentX?: ContentX | null }): unknown {
-  const scope = (shared.LX as (signal: unknown) => any)(initial.$en);
-  const mode = (shared.HX as (signal: unknown) => unknown)(initial.Ybt);
-  const ref = stable((element: HTMLElement | null) => {
-    if (element == null) return;
-    const observation = observeHeaderOverlap(element, value => scope.set(initial.Bbt, value));
-    if (observation == null) return;
-    const unwatch = scope.watch(({ get }: any) => {
-      for (const signal of [initial.Hbt, initial.Wbt, initial.Gbt, initial.Kbt, initial.nxt]) get(signal);
-      observation.updateHeader();
-    });
-    const unlisten = contentX?.on?.("change", observation.schedule);
-    return () => { unwatch(); unlisten?.(); observation.dispose(); };
-  });
-  return mode === "thread-edge-scroll" ? jsx.jsx("div", { ref, className: styles.Probe, "aria-hidden": true }) : null;
-}
-function ScrollToBottomButton({ isWorking = false, responseSpacer }: { isWorking?: boolean; responseSpacer?: ResponseSpacer | null }): unknown {
-  const intl = (shared.n4 as () => { formatMessage(input: Record<string, string>): string })();
-  const controller = (scrollContext.r as () => Controller)();
-  const snapshot = stable(() => {
-    const height = responseSpacer?.getHeightPx();
-    return height == null ? controller.isScrolledFromBottom : controller.getLastScrollDistanceFromBottomPx() > height + 24;
-  });
-  const show = React.useSyncExternalStore(controller.addScrollListener, snapshot, snapshot);
-  const label = intl.formatMessage({
-    id: "localConversation.scrollToBottomButton", defaultMessage: "Scroll to bottom",
-    description: "Accessible label for the button that scrolls a conversation to its latest message",
-  });
-  return jsx.jsx("div", { className: "relative h-0", children: jsx.jsx(initial.Za, {
-    className: "bottom-[calc(100%+6*var(--spacing))]", label,
-    onClick: responseSpacer?.scrollToBottom ?? controller.scrollToBottom, show, showWorkingDots: show && isWorking,
-  }) });
-}
-function keyDirection(event: KeyboardEvent, element: HTMLElement): Direction | null {
-  if (event.defaultPrevented || event.repeat) return null;
-  const target = event.target;
-  if (target instanceof HTMLElement && target !== element && (target.isContentEditable || target.closest("input, select, textarea") != null ||
-      ((event.key === " " || event.key === "Spacebar") && target.closest("button, [role=\"button\"]") != null))) return null;
-  if (["ArrowUp", "Home", "PageUp"].includes(event.key)) return "away";
-  if (event.key === " " || event.key === "Spacebar") return event.shiftKey ? "away" : "toward";
-  if (["ArrowDown", "End", "PageDown"].includes(event.key)) return "toward";
-  return null;
-}
-
-function ThreadScrollLayout(props: ThreadScrollLayoutProps): unknown {
-  initializeThreadScrollLayout();
-  const {
-    active = true, autoLoadHistory = true, contentX, children, footer, hideScrollbar = false,
-    loadPastHiddenHistoryPages = false, onScroll, onUserScrollToTop, initialOffset = 0,
-    presentation = "default", preserveViewportOnContentGrowth = false, renderLayout,
-    responseSpacer, remoteHostedPIPAnchorHostId, scrollToBottomButton, scrollOrigin = "bottom", threadEndContent,
-  } = props;
-  const initialDistance = initialOffset > 24 ? initialOffset : 0;
-  const reducedMotion = (initial.Slt as () => boolean)();
-  const contentShift = (shared.e$ as (factory: () => string) => unknown)(() => `${Math.abs(contentX?.get() ?? 0)}px`);
-  const elementRef = React.useRef(null) as Ref<HTMLElement | null>;
-  const [isScrolledFromBottom, setIsScrolledFromBottom] = React.useState(false);
-  const footerHeight = React.useRef(null) as Ref<number | null>;
-  const lastDistance = React.useRef(initialDistance) as Ref<number>;
-  const requested = React.useRef(null) as Ref<{ requestedDistanceFromBottomPx: number; actualDistanceFromBottomPx: number } | null>;
-  const lastBottomDistance = React.useRef(null) as Ref<number | null>;
-  const activity = React.useRef(null) as Ref<{ direction: Direction; lastAtMs: number } | null>;
-  const listeners = React.useRef(new Set<(distance: number) => void>()) as Ref<Set<(distance: number) => void>>;
-  const userListeners = React.useRef(new Set<(current: number, previous: number) => void>()) as Ref<Set<(current: number, previous: number) => void>>;
-  const animationFrame = React.useRef(null) as Ref<number | null>;
-  const historyLoading = React.useRef(false) as Ref<boolean>;
-  const historyGeneration = React.useRef(null) as Ref<(() => void) | null>;
-  const animationActive = React.useRef(false) as Ref<boolean>;
-  const contentPinned = React.useRef(true) as Ref<boolean>;
-  const preserveSnapshot = React.useRef(null) as Ref<{ distanceFromBottomPx: number; scrollHeightPx: number } | null>;
-  const preserveFrame = React.useRef(null) as Ref<number | null>;
-  const footerPreserveDisabled = React.useRef(false) as Ref<boolean>;
-  const previousActivation = React.useRef(null) as Ref<{ active: boolean; scrollOrigin: Origin } | null>;
-  const topOffsetRegistration = React.useContext(initial.H7);
-
-  const setElement = stable((element: HTMLElement | null) => {
-    elementRef.current = element; requested.current = null;
-    if (presentation !== "compact" && element != null && topOffsetRegistration != null) {
-      return topOffsetRegistration((offset: number) => {
-        if (!animationActive.current && !atBottom(element)) setFromBottom(element, fromBottom(element) + offset);
-      });
-    }
-  });
-  const getElement = stable(() => elementRef.current);
-  const getLastDistance = stable(() => lastDistance.current);
-  const addListener = stable((listener: (distance: number) => void) => {
-    listeners.current.add(listener); listener(lastDistance.current); return () => listeners.current.delete(listener);
-  });
-  const addUserListener = stable((listener: (current: number, previous: number) => void) => {
-    userListeners.current.add(listener); return () => userListeners.current.delete(listener);
-  });
-  const reportDistance = stable((distance: number) => {
-    if (!active) return;
-    if (requested.current?.actualDistanceFromBottomPx !== distance) requested.current = null;
-    lastDistance.current = distance;
-    if (scrollOrigin === "bottom") lastBottomDistance.current = Math.max(0, distance - (responseSpacer?.getHeightPx() ?? 0));
-    const bottom = distance <= 24;
-    onScroll?.(distance, bottom);
-    for (const listener of listeners.current) listener(distance);
-    setIsScrolledFromBottom(!bottom);
-  });
-  const cancelAnimation = stable(() => {
-    animationActive.current = false;
-    if (animationFrame.current != null) window.cancelAnimationFrame(animationFrame.current);
-    animationFrame.current = null;
-  });
-  const beginAnimation = stable(() => {
-    activity.current = null; requested.current = null; animationActive.current = true;
-    if (animationFrame.current != null) window.cancelAnimationFrame(animationFrame.current);
-    animationFrame.current = null;
-  });
-  const clearPreserve = stable(() => {
-    preserveSnapshot.current = null;
-    if (preserveFrame.current != null) window.cancelAnimationFrame(preserveFrame.current);
-    preserveFrame.current = null;
-  });
-  const applyPreserve = stable(() => {
-    const element = elementRef.current, snapshot = preserveSnapshot.current;
-    if (element == null || snapshot == null) return null;
-    const distance = fromBottom(element), growth = element.scrollHeight - snapshot.scrollHeightPx;
-    if (growth === 0 || distance === snapshot.distanceFromBottomPx) return null;
-    clearPreserve(); setFromBottom(element, distance - growth); return fromBottom(element);
-  });
-  const scrollComputed = stable((behavior: Behavior, compute: (element: HTMLElement) => number) => {
-    const element = elementRef.current; if (element == null) return;
-    clearPreserve();
-    const target = Math.max(0, compute(element));
-    if (target !== fromBottom(element)) activity.current = null;
-    element.scrollTo({ behavior: behavior as globalThis.ScrollBehavior, top: target === 0 ? 0 : -target });
-    const actual = fromBottom(element);
-    requested.current = behavior === "instant" && actual !== target && target > 0 && target < element.scrollHeight - element.clientHeight
-      ? { requestedDistanceFromBottomPx: target, actualDistanceFromBottomPx: actual } : null;
-    reportDistance(actual);
-  });
-  const scrollToDistance = stable((distance: number, behavior: Behavior, source: "system" | "user" = "system") => {
-    const previous = lastDistance.current, next = Math.max(0, distance);
-    if (next > 24) cancelAnimation();
-    scrollComputed(behavior, () => next);
-    const current = lastDistance.current;
-    if (source === "user" && current !== previous) for (const listener of userListeners.current) listener(current, previous);
-  });
-  const compensate = stable((distance: number) => { if (!animationActive.current) scrollComputed("instant", () => distance); });
-  const setFooterPreserveDisabled = stable((disabled: boolean) => { footerPreserveDisabled.current = disabled; });
-  const preserveNextLayout = stable(() => {
-    const element = elementRef.current;
-    if (animationActive.current || element == null || preserveSnapshot.current != null) return;
-    const snapshot = { distanceFromBottomPx: fromBottom(element), scrollHeightPx: element.scrollHeight };
-    preserveSnapshot.current = snapshot;
-    queueMicrotask(() => {
-      if (preserveSnapshot.current !== snapshot) return;
-      if (element.scrollHeight === snapshot.scrollHeightPx) { clearPreserve(); return; }
-      const next = applyPreserve(); if (next != null) reportDistance(next);
-    });
-    preserveFrame.current = window.requestAnimationFrame(() => {
-      const next = applyPreserve(); clearPreserve(); if (next != null) reportDistance(next);
-    });
-  });
-  const loadHistory = stable(async () => {
-    if (historyLoading.current || onUserScrollToTop == null) return;
-    const generation = historyGeneration.current; historyLoading.current = true;
-    try {
-      while (historyGeneration.current === generation && elementRef.current != null && nearTop(elementRef.current, loadPastHiddenHistoryPages)) {
-        const before = elementRef.current.scrollHeight;
-        if (await onUserScrollToTop() === "stop" || !autoLoadHistory) break;
-        const element = elementRef.current;
-        if (element != null && element.scrollHeight - element.clientHeight > HISTORY_THRESHOLD &&
-            (!loadPastHiddenHistoryPages || element.scrollHeight > before)) break;
-      }
-    } catch {
-      // The owning route surfaces history failures.
-    } finally {
-      historyLoading.current = false;
-      if (historyGeneration.current !== generation) historyGeneration.current?.();
-    }
-  });
-
-  React.useEffect(() => {
-    const element = elementRef.current;
-    if (!active || !autoLoadHistory || element == null || onUserScrollToTop == null || typeof ResizeObserver === "undefined") return;
-    let height: number | undefined, scrollHeight: number | undefined;
-    const check = () => {
-      const nextHeight = element.clientHeight, nextScrollHeight = element.scrollHeight;
-      if (historyGeneration.current === check && elementRef.current === element && nextHeight > 0 &&
-          nextScrollHeight - nextHeight <= HISTORY_THRESHOLD && !historyLoading.current &&
-          (height !== nextHeight || scrollHeight !== nextScrollHeight)) {
-        height = nextHeight; scrollHeight = nextScrollHeight; void loadHistory();
-      }
-    };
-    historyGeneration.current = check;
-    const observer = new ResizeObserver(check);
-    observer.observe(element); if (element.firstElementChild != null) observer.observe(element.firstElementChild);
-    const frame = window.requestAnimationFrame(check);
-    return () => { if (historyGeneration.current === check) historyGeneration.current = null; window.cancelAnimationFrame(frame); observer.disconnect(); };
-  }, [active, autoLoadHistory, loadHistory, onUserScrollToTop]);
-
-  const scrollToBottom = stable(() => {
-    const element = elementRef.current; if (element == null) return;
-    clearPreserve();
-    const start = fromBottom(element);
-    if (reducedMotion || start <= 24) { scrollComputed("instant", () => 0); cancelAnimation(); return; }
-    beginAnimation();
-    const startedAt = performance.now();
-    const animate = (now: number) => {
-      const current = elementRef.current; if (current == null) { cancelAnimation(); return; }
-      const progress = Math.min(1, (now - startedAt) / ANIMATION_MS);
-      setFromBottom(current, start * (1 - (1 - (1 - progress) ** 3)));
-      if (progress < 1 && !atBottom(current)) { animationFrame.current = window.requestAnimationFrame(animate); return; }
-      scrollComputed("instant", () => 0); cancelAnimation();
-    };
-    animationFrame.current = window.requestAnimationFrame(animate);
-  });
-
-  React.useLayoutEffect(() => {
-    const previous = previousActivation.current;
-    previousActivation.current = { active, scrollOrigin };
-    const element = elementRef.current;
-    if (!active || element == null) { cancelAnimation(); return; }
-    if (previous == null || previous.active !== active || previous.scrollOrigin !== scrollOrigin) {
-      cancelAnimation(); requested.current = null;
-      const restored = previous != null && (!previous.active || previous.scrollOrigin === "top");
-      let distance = initialDistance;
-      if (scrollOrigin === "top") distance = Math.max(0, element.scrollHeight - element.clientHeight);
-      else if (restored) distance = lastBottomDistance.current == null ? initialDistance : lastBottomDistance.current + (responseSpacer?.getHeightPx() ?? 0);
-      setFromBottom(element, distance); reportDistance(fromBottom(element));
-      contentPinned.current = scrollOrigin === "top" || fromBottom(element) - (responseSpacer?.getHeightPx() ?? 0) <= 24;
-    }
-  }, [active, cancelAnimation, initialDistance, reportDistance, responseSpacer, scrollOrigin]);
-
-  React.useLayoutEffect(() => {
-    const element = elementRef.current;
-    if (!active || (scrollOrigin === "bottom" && !preserveViewportOnContentGrowth) || element == null || typeof ResizeObserver === "undefined") return;
-    const content = element.querySelector<HTMLElement>("[data-thread-user-message-navigation-content]");
-    if (content == null) return;
-    let contentHeight = Math.max(0, content.scrollHeight - (responseSpacer?.getHeightPx() ?? 0));
-    const remove = addUserListener(distance => {
-      contentPinned.current = scrollOrigin === "top" ? element.scrollHeight - element.clientHeight - distance <= 24 : distance <= 24;
-    });
-    const observer = new ResizeObserver(() => {
-      const spacerHeight = responseSpacer?.getHeightPx() ?? 0;
-      const nextHeight = Math.max(0, content.scrollHeight - spacerHeight), growth = nextHeight - contentHeight;
-      contentHeight = nextHeight;
-      const distance = fromBottom(element);
-      if (scrollOrigin === "bottom" && distance <= 24) contentPinned.current = true;
-      if (scrollOrigin === "top" && contentPinned.current) { scrollToDistance(Math.max(0, element.scrollHeight - element.clientHeight), "instant"); return; }
-      if (growth <= 0) return;
-      compensate(contentPinned.current ? Math.min(distance + growth, spacerHeight) : distance + growth);
-    });
-    observer.observe(content); if (scrollOrigin === "top") observer.observe(element);
-    return () => { remove(); observer.disconnect(); };
-  }, [active, addUserListener, compensate, preserveViewportOnContentGrowth, responseSpacer, scrollOrigin, scrollToDistance]);
-
-  React.useEffect(() => {
-    const element = elementRef.current; if (!active || element == null) return;
-    const abort = new AbortController(), options = { passive: true, signal: abort.signal };
-    let touch: Touch | null = null;
-    let dragStart: { scrollHeightPx: number; scrollTopPx: number } | null = null;
-    const mark = (direction: Direction) => {
-      cancelAnimation(); requested.current = null;
-      const moving = direction === "away" ? fromTop(element) > 0 : fromBottom(element) > 0;
-      activity.current = moving ? { direction, lastAtMs: performance.now() } : null;
-    };
-    const report = () => { const value = fromBottom(element); if (value <= 24) cancelAnimation(); reportDistance(value); };
-    const onScrollEvent = () => {
-      applyPreserve();
-      const previous = lastDistance.current;
-      if (dragStart != null) {
-        const start = dragStart; dragStart = null; const current = fromBottom(element);
-        if (element.scrollHeight === start.scrollHeightPx && element.scrollTop !== start.scrollTopPx && current !== previous)
-          activity.current = { direction: current > previous ? "away" : "toward", lastAtMs: performance.now() };
-      }
-      const currentActivity = activity.current;
-      if (currentActivity == null || performance.now() - currentActivity.lastAtMs > DIRECTION_TIMEOUT) { activity.current = null; report(); return; }
-      report();
-      const current = fromBottom(element);
-      const direction = current > previous ? "away" : current < previous ? "toward" : null;
-      if (direction === currentActivity.direction) {
-        currentActivity.lastAtMs = performance.now();
-        if (current > previous && nearTop(element, loadPastHiddenHistoryPages)) void loadHistory();
-        for (const listener of userListeners.current) listener(current, previous);
-        if (current <= 24) activity.current = null;
-      }
-    };
-    const onWheel = (event: WheelEvent) => {
-      if (event.deltaY < 0 && fromTop(element) <= 0) void loadHistory();
-      if (event.deltaY !== 0) mark(event.deltaY < 0 ? "away" : "toward");
-    };
-    const onKey = (event: KeyboardEvent) => {
-      const direction = keyDirection(event, element);
-      if (direction != null) { clearPreserve(); mark(direction); if (direction === "away" && fromTop(element) <= 0) void loadHistory(); }
-    };
-    const onPointerDown = (event: PointerEvent) => {
-      dragStart = null; activity.current = null;
-      if (event.pointerType === "mouse" && event.target === element) {
-        clearPreserve(); cancelAnimation(); requested.current = null;
-        dragStart = { scrollHeightPx: element.scrollHeight, scrollTopPx: element.scrollTop };
-      }
-    };
-    const clearDrag = () => { dragStart = null; };
-    const onTouchStart = (event: TouchEvent) => { touch = event.touches.length === 1 ? event.touches[0] : null; };
-    const onTouchMove = (event: TouchEvent) => {
-      const next = event.touches.length === 1 ? event.touches[0] : null;
-      if (touch == null || next == null || next.identifier !== touch.identifier) { touch = null; return; }
-      const dx = next.clientX - touch.clientX, dy = next.clientY - touch.clientY;
-      if (Math.max(Math.abs(dx), Math.abs(dy)) < TOUCH_THRESHOLD) return;
-      touch = null;
-      if (Math.abs(dy) > Math.abs(dx)) { clearPreserve(); mark(dy > 0 ? "away" : "toward"); }
-      if (dy > Math.abs(dx) && fromTop(element) <= 0) void loadHistory();
-    };
-    const clearTouch = () => { touch = null; };
-    element.addEventListener("pointerdown", onPointerDown, options); element.addEventListener("pointerup", clearDrag, options);
-    element.addEventListener("pointercancel", clearDrag, options); element.addEventListener("keydown", onKey, options);
-    element.addEventListener("touchstart", onTouchStart, options); element.addEventListener("touchmove", onTouchMove, options);
-    element.addEventListener("touchend", clearTouch, options); element.addEventListener("touchcancel", clearTouch, options);
-    element.addEventListener("wheel", onWheel, options); element.addEventListener("scroll", onScrollEvent, options);
-    return () => abort.abort();
-  }, [active, applyPreserve, cancelAnimation, clearPreserve, loadHistory, loadPastHiddenHistoryPages, reportDistance]);
-  React.useEffect(() => () => { clearPreserve(); cancelAnimation(); }, [cancelAnimation, clearPreserve]);
-
-  const controller: Controller = React.useMemo(() => ({
-    addScrollListener: addListener, addUserScrollListener: addUserListener,
-    compensateScrollToDistanceFromBottomPx: compensate, getLastScrollDistanceFromBottomPx: getLastDistance,
-    getScrollElement: getElement,
-    getUnroundedScrollDistanceFromBottomPx(distanceFromBottomPx: number) {
-      const value = requested.current;
-      return value?.actualDistanceFromBottomPx === distanceFromBottomPx ? value.requestedDistanceFromBottomPx : distanceFromBottomPx;
+      let n = e.getBoundingClientRect(),
+        s = n.width > 0 && !r.hasAttribute(`data-app-shell-tab-row`);
+      if (s)
+        for (let e of o) {
+          let t = e.getBoundingClientRect();
+          if (
+            !e.hasAttribute(`data-app-shell-thread-content-overlap`) &&
+            t.width > 0 &&
+            t.height > 0 &&
+            getComputedStyle(e).visibility !== `hidden` &&
+            t.right > n.left &&
+            t.left < n.right
+          ) {
+            s = !1;
+            break;
+          }
+        }
+      t(s);
     },
-    isScrolledFromBottom, preserveScrollPositionForNextLayout: preserveNextLayout, scrollToBottom,
-    scrollToDistanceFromBottomPx: scrollToDistance, setFooterResizeViewportPreserveDisabled: setFooterPreserveDisabled,
-  }), [addListener, addUserListener, compensate, getElement, getLastDistance, isScrolledFromBottom, preserveNextLayout, scrollToBottom, scrollToDistance, setFooterPreserveDisabled]);
-
-  const onFooterResize = stable((entry: unknown) => {
-    const height = (initial.jat as (entry: unknown) => { height: number })(entry).height;
-    const element = elementRef.current; if (element == null) return;
-    const previous = footerHeight.current;
-    if (previous === height) return;
-    element.style.setProperty("--thread-scroll-padding-bottom", `${height + (presentation === "compact" ? 0 : 16)}px`);
-    footerHeight.current = height;
-    if (!animationActive.current && !footerPreserveDisabled.current && previous != null && !atBottom(element))
-      scrollComputed("instant", current => fromBottom(current) + height - previous);
-  });
-  const footerRef = (initial.wat as (callback: (entry: unknown) => void) => unknown)(onFooterResize);
-  const shiftStyle = contentX == null ? undefined : { x: contentX, "--thread-wide-block-inline-shift": contentShift };
-  const button = !active || scrollOrigin === "top" || scrollToBottomButton == null ? null
-    : jsx.jsx(ScrollToBottomButton, { ...scrollToBottomButton, responseSpacer });
-  const hasDefaultFooter = renderLayout == null && !!footer;
-  const motion = shared.o$;
-  const footerNode = hasDefaultFooter ? jsx.jsx(motion.div, {
-    ref: footerRef,
-    className: classes("pointer-events-none absolute inset-x-0 bottom-0 z-10", presentation === "compact" ? "w-full shrink-0" : "pb-4 browser:pb-6"),
-    "data-thread-scroll-footer": "true", style: shiftStyle,
-    children: jsx.jsxs("div", {
-      "data-pip-obstacle": "thread-footer",
-      className: classes("relative z-10 flex flex-col *:pointer-events-auto", presentation === "compact" ? undefined : [primary.et, "extension:px-2"]),
-      children: [button, footer],
-    }),
-  }) : null;
-  const renderContent = () => jsx.jsxs("div", {
-    "data-request-input-activity-root": true,
-    className: classes("group/thread-scroll-layout has-[[data-composer-expand-toggle]]:[container-type:size]",
-      presentation === "compact" ? "relative flex min-h-0 flex-1 flex-col" : "relative h-full flex-1", "[content-visibility:auto]"),
-    children: [
-      jsx.jsxs("div", {
-        ref: setElement, "data-pip-anchor-host": remoteHostedPIPAnchorHostId,
-        ...(presentation === "compact" ? undefined : initial.Agn.timelineScroll),
-        className: classes(
-          "thread-scroll-container overflow-x-hidden overflow-y-auto group-has-[[data-expanded-composer]]/thread-scroll-layout:overflow-y-hidden [overflow-anchor:none] [scroll-padding-bottom:var(--thread-scroll-padding-bottom,0px)] focus:outline-none",
-          presentation === "compact" ? "flex min-h-0 flex-1 flex-col-reverse"
-            : "h-full electron:[scrollbar-gutter:stable_both-edges] pt-(--thread-content-top-inset) [--thread-sticky-header-top:calc(var(--spacing)*8)] browser:[--thread-sticky-header-top:var(--thread-content-top-inset,0px)] [&:has([data-thread-scroll-footer='true']:focus-within)]:[scroll-padding-bottom:0px] flex flex-col-reverse",
-          presentation === "compact" && (hasDefaultFooter ? styles.compactScrollMask : styles.compactHeaderScrollFade),
-          hideScrollbar && "hide-scrollbar",
-        ),
-        children: [
-          jsx.jsxs(motion.div, {
-            style: shiftStyle,
-            className: classes(styles.scrollContent, "flex min-h-full shrink-0 flex-col justify-start overflow-x-clip [container-name:thread-content] [container-type:inline-size]"),
-            children: [
-              presentation === "compact" ? null : jsx.jsx(HeaderOverlapProbe, { contentX }),
-              jsx.jsx("div", {
-                "data-mcp-app-portal-target": "true", ref: initial.YH,
-                "data-thread-user-message-navigation-content": true,
-                className: classes("relative flex flex-1 shrink-0 flex-col", presentation === "compact" ? undefined
-                  : [primary.et, styles.transcriptBody, "has-[[data-compact-status-slot-clearance]]:pb-0"]),
-                children,
-              }),
-              threadEndContent ? jsx.jsx("div", { className: "mt-auto grid",
-                children: jsx.jsx("div", { className: "sticky bottom-0 self-end", children: threadEndContent }) }) : null,
-              hasDefaultFooter ? jsx.jsx("div", {
-                "aria-hidden": true,
-                className: classes("sticky bottom-0 z-10 mt-auto w-full shrink-0",
-                  presentation === "compact" ? "h-(--thread-scroll-padding-bottom)" : "h-[calc(var(--thread-scroll-padding-bottom)-var(--spacing)*4)]"),
-                children: presentation === "compact" ? null : jsx.jsx(primary.tt, {}),
-              }) : null,
-            ],
+    c = () => {
+      i ??= requestAnimationFrame(s);
+    },
+    l = new ResizeObserver((e) => {
+      (e.some(({ target: e }) => !e.isConnected) && (a = !0), c());
+    });
+  for (let t of [n, e, r]) l.observe(t);
+  return (
+    c(),
+    {
+      schedule: c,
+      updateHeader: () => {
+        ((a = !0), c());
+      },
+      dispose: () => {
+        (l.disconnect(), i != null && cancelAnimationFrame(i), t(!1));
+      },
+    }
+  );
+}
+var w;
+function T() {
+  return (T = e(() => {
+    w = `[data-app-shell-header-obstacle], [data-app-shell-header-toolbar] > *, [data-app-shell-page-header] > :not([data-app-shell-header-toolbar])`;
+  }))();
+}
+var De, Oe;
+function E() {
+  return (E = e(() => {
+    ((De = `_Probe_3b6sy_1`), (Oe = { Probe: De }));
+  }))();
+}
+function ke(e) {
+  let t = (0, D.c)(3),
+    { contentX: n } = e,
+    r = (0, O.useContext)(y),
+    i;
+  return (
+    t[0] !== n || t[1] !== r
+      ? ((i = r == null ? null : (0, k.jsx)(Ae, { contentX: n })),
+        (t[0] = n),
+        (t[1] = r),
+        (t[2] = i))
+      : (i = t[2]),
+    i
+  );
+}
+function Ae(e) {
+  let t = (0, D.c)(6),
+    { contentX: n } = e,
+    r = s(re),
+    a = i(he),
+    o;
+  t[0] !== n || t[1] !== r
+    ? ((o = (e) => {
+        if (e == null) return;
+        let t = Ee(e, (e) => {
+          r.set(m, e);
+        });
+        if (t == null) return;
+        let i = r.watch((e) => {
+            let { get: n } = e;
+            (n(se), n(b), n(ae), n(ue), n(_e), t.updateHeader());
           }),
-          presentation === "compact" ? null : footerNode,
-        ],
+          a = n?.on(`change`, t.schedule);
+        return () => {
+          (i(), a?.(), t.dispose());
+        };
       }),
-      presentation === "compact" ? footerNode : null,
-    ],
-  });
-  const layout = renderLayout == null ? renderContent()
-    : renderLayout({ content: renderContent(), footer: footer ? jsx.jsxs(jsx.Fragment, { children: [button, footer] }) : null });
-  return jsx.jsx(scrollContext.t, { value: controller, children: layout });
+      (t[0] = n),
+      (t[1] = r),
+      (t[2] = o))
+    : (o = t[2]);
+  let c = o,
+    l;
+  return (
+    t[3] !== a || t[4] !== c
+      ? ((l =
+          a === `thread-edge-scroll`
+            ? (0, k.jsx)(`div`, { ref: c, className: Oe.Probe, "aria-hidden": !0 })
+            : null),
+        (t[3] = a),
+        (t[4] = c),
+        (t[5] = l))
+      : (l = t[5]),
+    l
+  );
 }
-
-function initializeThreadScrollLayout(): void {
-  if (initialized) return;
-  initialized = true;
-  for (const candidate of [shared.$3, shared.h4, shared.a$, shared.$Q]) call(candidate);
-  React = (shared.e6 as () => any)();
-  for (const candidate of [
-    initial.Ngn, initial.U7, shared.FX, initial.itn, initial.E7, initial.qbt,
-    initial.xlt, initial.JH, initial.Sat, shared.g_, primary.rt, scrollContext.n,
-    shared.K2, initial.Qa,
-  ]) call(candidate);
-  jsx = (shared.I3 as () => any)();
+var D, O, k;
+function A() {
+  return (A = e(() => {
+    ((D = t()), r(), (O = u()), S(), h(), ve(), T(), E(), (k = a()));
+  }))();
 }
-initializeThreadScrollLayout();
-export { initializeThreadScrollLayout as n, ThreadScrollLayout as t };
+function je(e) {
+  let t = (0, j.c)(10),
+    { isWorking: n, responseSpacer: r } = e,
+    i = n !== void 0 && n,
+    a = te(),
+    o = we(),
+    s;
+  t[0] !== r || t[1] !== o
+    ? ((s = () => {
+        let e = r?.getHeightPx();
+        return e == null ? o.isScrolledFromBottom : o.getLastScrollDistanceFromBottomPx() > e + 24;
+      }),
+      (t[0] = r),
+      (t[1] = o),
+      (t[2] = s))
+    : (s = t[2]);
+  let c = s,
+    l = (0, M.useSyncExternalStore)(o.addScrollListener, c, c),
+    ee = r?.scrollToBottom ?? o.scrollToBottom,
+    u;
+  t[3] === a
+    ? (u = t[4])
+    : ((u = a.formatMessage({
+        id: `localConversation.scrollToBottomButton`,
+        defaultMessage: `Scroll to bottom`,
+        description: `Accessible label for the button that scrolls a conversation to its latest message`,
+      })),
+      (t[3] = a),
+      (t[4] = u));
+  let d = l && i,
+    f;
+  return (
+    t[5] !== ee || t[6] !== l || t[7] !== u || t[8] !== d
+      ? ((f = (0, N.jsx)(`div`, {
+          className: `relative h-0`,
+          children: (0, N.jsx)(x, {
+            className: `bottom-[calc(100%+6*var(--spacing))]`,
+            label: u,
+            onClick: ee,
+            show: l,
+            showWorkingDots: d,
+          }),
+        })),
+        (t[5] = ee),
+        (t[6] = l),
+        (t[7] = u),
+        (t[8] = d),
+        (t[9] = f))
+      : (f = t[9]),
+    f
+  );
+}
+var j, M, N;
+function Me() {
+  return (Me = e(() => {
+    ((j = t()), (M = u()), o(), v(), Ce(), (N = a()));
+  }))();
+}
+var P, F, I, L, Ne;
+function R() {
+  return (R = e(() => {
+    ((P = `_transcriptBody_w5y6n_1`),
+      (F = `_scrollContent_w5y6n_5`),
+      (I = `_compactHeaderScrollFade_w5y6n_13`),
+      (L = `_compactScrollMask_w5y6n_28`),
+      (Ne = {
+        transcriptBody: P,
+        scrollContent: F,
+        compactHeaderScrollFade: I,
+        compactScrollMask: L,
+      }));
+  }))();
+}
+function Pe(e) {
+  let t = (0, Ve.c)(127),
+    {
+      active: n,
+      autoLoadHistory: r,
+      contentX: i,
+      children: a,
+      footer: o,
+      hideScrollbar: s,
+      loadPastHiddenHistoryPages: l,
+      onScroll: u,
+      onUserScrollToTop: d,
+      initialOffset: f,
+      presentation: te,
+      preserveViewportOnContentGrowth: re,
+      renderLayout: m,
+      responseSpacer: h,
+      remoteHostedPIPAnchorHostId: ae,
+      scrollToBottomButton: se,
+      scrollOrigin: le,
+      threadEndContent: ue,
+    } = e,
+    g = n === void 0 || n,
+    v = r === void 0 || r,
+    de = s !== void 0 && s,
+    y = l !== void 0 && l,
+    pe = f === void 0 ? 0 : f,
+    b = te === void 0 ? `default` : te,
+    he = re !== void 0 && re,
+    x = le === void 0 ? `bottom` : le,
+    S = pe != null && pe > 24 ? pe : 0,
+    _e = fe(),
+    ve;
+  t[0] === i ? (ve = t[1]) : ((ve = () => `${Math.abs(i?.get() ?? 0)}px`), (t[0] = i), (t[1] = ve));
+  let be = ee(ve),
+    C = (0, z.useRef)(null),
+    [Ce, we] = (0, z.useState)(!1),
+    Ee = (0, z.useRef)(null),
+    w = (0, z.useRef)(S),
+    T = (0, z.useRef)(null),
+    De = (0, z.useRef)(null),
+    Oe = (0, z.useRef)(null),
+    E;
+  t[2] === Symbol.for(`react.memo_cache_sentinel`) ? ((E = new Set()), (t[2] = E)) : (E = t[2]);
+  let Ae = (0, z.useRef)(E),
+    D;
+  t[3] === Symbol.for(`react.memo_cache_sentinel`) ? ((D = new Set()), (t[3] = D)) : (D = t[3]);
+  let O = (0, z.useRef)(D),
+    k = (0, z.useRef)(null),
+    A = (0, z.useRef)(!0),
+    j = (0, z.useRef)(!1),
+    M = (0, z.useRef)(null),
+    N = (0, z.useRef)(!1),
+    Me = (0, z.useRef)(!1),
+    P = (0, z.useRef)(null),
+    F = (0, z.useRef)(null),
+    I = (0, z.useRef)(null),
+    L = (0, z.useContext)(oe),
+    R;
+  t[4] !== b || t[5] !== L
+    ? ((R = (e) => {
+        if (((C.current = e), (T.current = null), b !== `compact` && e != null && L != null))
+          return L((t) => {
+            N.current || Re(e) || ce(e, _(e) + t);
+          });
+      }),
+      (t[4] = b),
+      (t[5] = L),
+      (t[6] = R))
+    : (R = t[6]);
+  let Pe = R,
+    V;
+  t[7] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((V = () => C.current), (t[7] = V))
+    : (V = t[7]);
+  let Ke = c(V),
+    qe;
+  t[8] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((qe = () => w.current), (t[8] = qe))
+    : (qe = t[8]);
+  let Je = qe,
+    Ye;
+  t[9] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((Ye = (e) => (
+        Ae.current.add(e),
+        e(w.current),
+        () => {
+          Ae.current.delete(e);
+        }
+      )),
+      (t[9] = Ye))
+    : (Ye = t[9]);
+  let Xe = c(Ye),
+    Ze;
+  t[10] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((Ze = (e) => (
+        O.current.add(e),
+        () => {
+          O.current.delete(e);
+        }
+      )),
+      (t[10] = Ze))
+    : (Ze = t[10]);
+  let H = c(Ze),
+    Qe;
+  t[11] !== g || t[12] !== u || t[13] !== h || t[14] !== x
+    ? ((Qe = (e) => {
+        if (!g) return;
+        (T.current?.actualDistanceFromBottomPx !== e && (T.current = null),
+          (w.current = e),
+          x === `bottom` && (De.current = Math.max(0, e - (h?.getHeightPx() ?? 0))));
+        let t = e <= 24;
+        u?.(e, t);
+        for (let t of Ae.current) t(e);
+        we(!t);
+      }),
+      (t[11] = g),
+      (t[12] = u),
+      (t[13] = h),
+      (t[14] = x),
+      (t[15] = Qe))
+    : (Qe = t[15]);
+  let U = c(Qe),
+    $e;
+  t[16] === Symbol.for(`react.memo_cache_sentinel`)
+    ? (($e = () => {
+        ((N.current = !1),
+          I.current != null && (window.cancelAnimationFrame(I.current), (I.current = null)));
+      }),
+      (t[16] = $e))
+    : ($e = t[16]);
+  let W = c($e),
+    et;
+  t[17] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((et = () => {
+        ((k.current = null),
+          (T.current = null),
+          (N.current = !0),
+          I.current != null && (window.cancelAnimationFrame(I.current), (I.current = null)));
+      }),
+      (t[17] = et))
+    : (et = t[17]);
+  let tt = c(et),
+    nt;
+  t[18] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((nt = () => {
+        ((P.current = null),
+          F.current != null && (window.cancelAnimationFrame(F.current), (F.current = null)));
+      }),
+      (t[18] = nt))
+    : (nt = t[18]);
+  let G = c(nt),
+    rt;
+  t[19] === G
+    ? (rt = t[20])
+    : ((rt = () => {
+        let e = C.current,
+          t = P.current;
+        if (e == null || t == null) return null;
+        let n = _(e),
+          r = e.scrollHeight - t.scrollHeightPx;
+        return r === 0 || n === t.distanceFromBottomPx ? null : (G(), ce(e, n - r), _(e));
+      }),
+      (t[19] = G),
+      (t[20] = rt));
+  let K = c(rt),
+    it;
+  t[21] !== G || t[22] !== U
+    ? ((it = (e, t) => {
+        let n = C.current;
+        if (n == null) return;
+        G();
+        let r = Math.max(0, t(n));
+        (r !== _(n) && (k.current = null), n.scrollTo({ behavior: e, top: r === 0 ? 0 : -r }));
+        let i = _(n);
+        ((T.current =
+          e === `instant` && i !== r && r > 0 && r < n.scrollHeight - n.clientHeight
+            ? { requestedDistanceFromBottomPx: r, actualDistanceFromBottomPx: i }
+            : null),
+          U(i));
+      }),
+      (t[21] = G),
+      (t[22] = U),
+      (t[23] = it))
+    : (it = t[23]);
+  let q = c(it),
+    at;
+  t[24] !== W || t[25] !== q
+    ? ((at = (e, t, n) => {
+        let r = n === void 0 ? `system` : n,
+          i = w.current,
+          a = Math.max(0, e);
+        (a > 24 && W(), q(t, () => a));
+        let o = w.current;
+        if (r === `user` && o !== i) for (let e of O.current) e(o, i);
+      }),
+      (t[24] = W),
+      (t[25] = q),
+      (t[26] = at))
+    : (at = t[26]);
+  let J = c(at),
+    ot;
+  t[27] === q
+    ? (ot = t[28])
+    : ((ot = (e) => {
+        N.current || q(`instant`, () => e);
+      }),
+      (t[27] = q),
+      (t[28] = ot));
+  let Y = c(ot),
+    st;
+  t[29] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((st = (e) => {
+        Me.current = e;
+      }),
+      (t[29] = st))
+    : (st = t[29]);
+  let ct = c(st),
+    lt;
+  t[30] !== G || t[31] !== U || t[32] !== K
+    ? ((lt = () => {
+        let e = C.current;
+        if (N.current || e == null || P.current != null) return;
+        let t = { distanceFromBottomPx: _(e), scrollHeightPx: e.scrollHeight };
+        ((P.current = t),
+          queueMicrotask(() => {
+            if (P.current !== t) return;
+            if (e.scrollHeight === t.scrollHeightPx) {
+              G();
+              return;
+            }
+            let n = K();
+            n != null && U(n);
+          }),
+          (F.current = window.requestAnimationFrame(() => {
+            let e = K();
+            (G(), e != null && U(e));
+          })));
+      }),
+      (t[30] = G),
+      (t[31] = U),
+      (t[32] = K),
+      (t[33] = lt))
+    : (lt = t[33]);
+  let ut = c(lt),
+    dt;
+  t[34] !== v || t[35] !== y || t[36] !== d
+    ? ((dt = async () => {
+        if (j.current || d == null) return;
+        let e = M.current;
+        ((j.current = !0),
+          await (async () => {
+            try {
+              for (; M.current === e && C.current != null && ze(C.current, y);) {
+                let e = C.current.scrollHeight;
+                if ((await d()) === `stop` || !v) break;
+                let t = C.current;
+                if (t != null && t.scrollHeight - t.clientHeight > Ue && (!y || t.scrollHeight > e))
+                  break;
+              }
+            } catch {}
+          })().finally(() => {
+            ((j.current = !1), M.current !== e && M.current?.());
+          }));
+      }),
+      (t[34] = v),
+      (t[35] = y),
+      (t[36] = d),
+      (t[37] = dt))
+    : (dt = t[37]);
+  let X = c(dt),
+    ft,
+    pt;
+  (t[38] !== g || t[39] !== v || t[40] !== X || t[41] !== d
+    ? ((ft = () => {
+        let e = C.current;
+        if (!g || !v || e == null || d == null) return;
+        let t,
+          n,
+          r = () => {
+            let i = e.clientHeight,
+              a = e.scrollHeight;
+            M.current !== r ||
+              C.current !== e ||
+              i <= 0 ||
+              a - i > Ue ||
+              j.current ||
+              ((t !== i || n !== a) && ((t = i), (n = a), X()));
+          };
+        M.current = r;
+        let i = new ResizeObserver(r);
+        i.observe(e);
+        let a = e.firstElementChild;
+        a != null && i.observe(a);
+        let o = window.requestAnimationFrame(r);
+        return () => {
+          (M.current === r && (M.current = null), window.cancelAnimationFrame(o), i.disconnect());
+        };
+      }),
+      (pt = [g, v, X, d]),
+      (t[38] = g),
+      (t[39] = v),
+      (t[40] = X),
+      (t[41] = d),
+      (t[42] = ft),
+      (t[43] = pt))
+    : ((ft = t[42]), (pt = t[43])),
+    (0, z.useEffect)(ft, pt));
+  let mt;
+  t[44] !== G || t[45] !== W || t[46] !== _e || t[47] !== q || t[48] !== tt
+    ? ((mt = () => {
+        let e = C.current;
+        if (e == null) return;
+        G();
+        let t = _(e);
+        if (_e || t <= 24) {
+          (q(`instant`, Ie), W());
+          return;
+        }
+        tt();
+        let n = performance.now(),
+          r = (e) => {
+            let i = C.current;
+            if (i == null) {
+              W();
+              return;
+            }
+            let a = Math.min(1, (e - n) / He),
+              o = 1 - (1 - a) ** 3;
+            if ((ce(i, t * (1 - o)), a < 1 && !Re(i))) {
+              I.current = window.requestAnimationFrame(r);
+              return;
+            }
+            (q(`instant`, Fe), W());
+          };
+        I.current = window.requestAnimationFrame(r);
+      }),
+      (t[44] = G),
+      (t[45] = W),
+      (t[46] = _e),
+      (t[47] = q),
+      (t[48] = tt),
+      (t[49] = mt))
+    : (mt = t[49]);
+  let ht = c(mt),
+    gt,
+    _t;
+  (t[50] !== g || t[51] !== W || t[52] !== U || t[53] !== h || t[54] !== S || t[55] !== x
+    ? ((gt = () => {
+        let e = Oe.current;
+        Oe.current = { active: g, scrollOrigin: x };
+        let t = C.current;
+        if (!g || t == null) {
+          W();
+          return;
+        }
+        if (e == null || e.active !== g || e.scrollOrigin !== x) {
+          (W(), (T.current = null));
+          let n = e != null && (!e.active || e.scrollOrigin === `top`),
+            r = S;
+          if (x === `top`) r = Math.max(0, t.scrollHeight - t.clientHeight);
+          else if (n) {
+            let e = De.current;
+            r = e == null ? S : e + (h?.getHeightPx() ?? 0);
+          }
+          (ce(t, r), U(_(t)), (A.current = x === `top` || _(t) - (h?.getHeightPx() ?? 0) <= 24));
+        }
+      }),
+      (_t = [g, W, U, h, S, x]),
+      (t[50] = g),
+      (t[51] = W),
+      (t[52] = U),
+      (t[53] = h),
+      (t[54] = S),
+      (t[55] = x),
+      (t[56] = gt),
+      (t[57] = _t))
+    : ((gt = t[56]), (_t = t[57])),
+    (0, z.useLayoutEffect)(gt, _t));
+  let vt, yt;
+  (t[58] !== g ||
+  t[59] !== H ||
+  t[60] !== Y ||
+  t[61] !== he ||
+  t[62] !== h ||
+  t[63] !== x ||
+  t[64] !== J
+    ? ((vt = () => {
+        let e = C.current;
+        if (!g || (x === `bottom` && !he) || e == null) return;
+        let t = e.querySelector(`[data-thread-user-message-navigation-content]`);
+        if (t == null) return;
+        let n = Math.max(0, t.scrollHeight - (h?.getHeightPx() ?? 0)),
+          r = H((t) => {
+            if (x === `top`) {
+              A.current = e.scrollHeight - e.clientHeight - t <= 24;
+              return;
+            }
+            A.current = t <= 24;
+          }),
+          i = new ResizeObserver(() => {
+            let r = h?.getHeightPx() ?? 0,
+              i = Math.max(0, t.scrollHeight - r),
+              a = i - n;
+            n = i;
+            let o = _(e);
+            if ((x === `bottom` && o <= 24 && (A.current = !0), x === `top` && A.current)) {
+              J(Math.max(0, e.scrollHeight - e.clientHeight), `instant`);
+              return;
+            }
+            if (a <= 0) return;
+            let s = o + a;
+            (A.current && (s = Math.min(s, r)), Y(s));
+          });
+        return (
+          i.observe(t),
+          x === `top` && i.observe(e),
+          () => {
+            (r(), i.disconnect());
+          }
+        );
+      }),
+      (yt = [g, H, Y, he, h, x, J]),
+      (t[58] = g),
+      (t[59] = H),
+      (t[60] = Y),
+      (t[61] = he),
+      (t[62] = h),
+      (t[63] = x),
+      (t[64] = J),
+      (t[65] = vt),
+      (t[66] = yt))
+    : ((vt = t[65]), (yt = t[66])),
+    (0, z.useLayoutEffect)(vt, yt));
+  let bt, xt;
+  (t[67] !== g ||
+  t[68] !== G ||
+  t[69] !== W ||
+  t[70] !== X ||
+  t[71] !== y ||
+  t[72] !== U ||
+  t[73] !== K
+    ? ((bt = () => {
+        let e = C.current;
+        if (!g || e == null) return;
+        let t = new AbortController(),
+          n = { passive: !0, signal: t.signal },
+          r = null,
+          i = null,
+          a = (t) => {
+            (W(), (T.current = null));
+            let n = t === `away` ? Be(e) > 0 : _(e) > 0;
+            k.current = n ? { direction: t, lastAtMs: performance.now() } : null;
+          },
+          o = () => {
+            let t = _(e);
+            (t <= 24 && W(), U(t));
+          },
+          s = () => {
+            K();
+            let t = w.current,
+              n = i;
+            if (n != null) {
+              i = null;
+              let r = _(e);
+              e.scrollHeight === n.scrollHeightPx &&
+                e.scrollTop !== n.scrollTopPx &&
+                r !== t &&
+                (k.current = { direction: r > t ? `away` : `toward`, lastAtMs: performance.now() });
+            }
+            let r = k.current;
+            if (r == null) {
+              o();
+              return;
+            }
+            let a = performance.now();
+            if (a - r.lastAtMs > Ge) {
+              ((k.current = null), o());
+              return;
+            }
+            o();
+            let s = _(e);
+            if ((s > t ? `away` : s < t ? `toward` : null) === r.direction) {
+              ((r.lastAtMs = a), s > t && ze(e, y) && X());
+              for (let e of O.current) e(s, t);
+              s <= 24 && (k.current = null);
+            }
+          },
+          c = (t) => {
+            (t.deltaY < 0 && Be(e) <= 0 && X(),
+              t.deltaY !== 0 && a(t.deltaY < 0 ? `away` : `toward`));
+          },
+          l = (t) => {
+            let n = Le(t, e);
+            n != null && (G(), a(n), n === `away` && Be(e) <= 0 && X());
+          },
+          ee = (t) => {
+            ((i = null),
+              (k.current = null),
+              t.pointerType === `mouse` &&
+                t.target === e &&
+                (G(),
+                W(),
+                (T.current = null),
+                (i = { scrollHeightPx: e.scrollHeight, scrollTopPx: e.scrollTop })));
+          },
+          u = () => {
+            i = null;
+          },
+          d = (e) => {
+            r = e.touches.length === 1 ? e.touches[0] : null;
+          },
+          f = (t) => {
+            let n = t.touches.length === 1 ? t.touches[0] : null;
+            if (r == null || n == null || n.identifier !== r.identifier) {
+              r = null;
+              return;
+            }
+            let i = n.clientX - r.clientX,
+              o = n.clientY - r.clientY;
+            Math.max(Math.abs(i), Math.abs(o)) < We ||
+              ((r = null),
+              Math.abs(o) > Math.abs(i) && (G(), a(o > 0 ? `away` : `toward`)),
+              o > Math.abs(i) && Be(e) <= 0 && X());
+          },
+          p = () => {
+            r = null;
+          };
+        return (
+          e.addEventListener(`pointerdown`, ee, n),
+          e.addEventListener(`pointerup`, u, n),
+          e.addEventListener(`pointercancel`, u, n),
+          e.addEventListener(`keydown`, l, n),
+          e.addEventListener(`touchstart`, d, n),
+          e.addEventListener(`touchmove`, f, n),
+          e.addEventListener(`touchend`, p, n),
+          e.addEventListener(`touchcancel`, p, n),
+          e.addEventListener(`wheel`, c, n),
+          e.addEventListener(`scroll`, s, n),
+          () => {
+            t.abort();
+          }
+        );
+      }),
+      (xt = [g, G, W, y, X, U, K]),
+      (t[67] = g),
+      (t[68] = G),
+      (t[69] = W),
+      (t[70] = X),
+      (t[71] = y),
+      (t[72] = U),
+      (t[73] = K),
+      (t[74] = bt),
+      (t[75] = xt))
+    : ((bt = t[74]), (xt = t[75])),
+    (0, z.useEffect)(bt, xt));
+  let St, Ct;
+  (t[76] !== G || t[77] !== W
+    ? ((St = () => () => {
+        (G(), W());
+      }),
+      (Ct = [G, W]),
+      (t[76] = G),
+      (t[77] = W),
+      (t[78] = St),
+      (t[79] = Ct))
+    : ((St = t[78]), (Ct = t[79])),
+    (0, z.useEffect)(St, Ct));
+  let wt;
+  t[80] !== Xe ||
+  t[81] !== H ||
+  t[82] !== Y ||
+  t[83] !== Ke ||
+  t[84] !== Ce ||
+  t[85] !== ut ||
+  t[86] !== ht ||
+  t[87] !== J ||
+  t[88] !== ct
+    ? ((wt = {
+        addScrollListener: Xe,
+        addUserScrollListener: H,
+        compensateScrollToDistanceFromBottomPx: Y,
+        getLastScrollDistanceFromBottomPx: Je,
+        getUnroundedScrollDistanceFromBottomPx(e) {
+          let t = T.current;
+          return t?.actualDistanceFromBottomPx === e ? t.requestedDistanceFromBottomPx : e;
+        },
+        getScrollElement: Ke,
+        isScrolledFromBottom: Ce,
+        preserveScrollPositionForNextLayout: ut,
+        scrollToBottom: ht,
+        scrollToDistanceFromBottomPx: J,
+        setFooterResizeViewportPreserveDisabled: ct,
+      }),
+      (t[80] = Xe),
+      (t[81] = H),
+      (t[82] = Y),
+      (t[83] = Ke),
+      (t[84] = Ce),
+      (t[85] = ut),
+      (t[86] = ht),
+      (t[87] = J),
+      (t[88] = ct),
+      (t[89] = wt))
+    : (wt = t[89]);
+  let Tt = wt,
+    Et;
+  t[90] !== b || t[91] !== q
+    ? ((Et = (e) => {
+        let { height: t } = ge(e),
+          n = C.current;
+        if (n == null) return;
+        let r = Ee.current;
+        r !== t &&
+          (n.style.setProperty(
+            `--thread-scroll-padding-bottom`,
+            `${t + (b === `compact` ? 0 : 16)}px`,
+          ),
+          (Ee.current = t),
+          !(N.current || Me.current) && (r == null || Re(n) || q(`instant`, (e) => _(e) + t - r)));
+      }),
+      (t[90] = b),
+      (t[91] = q),
+      (t[92] = Et))
+    : (Et = t[92]);
+  let Dt = ye(Et),
+    Ot;
+  t[93] !== i || t[94] !== be
+    ? ((Ot = i == null ? void 0 : { x: i, "--thread-wide-block-inline-shift": be }),
+      (t[93] = i),
+      (t[94] = be),
+      (t[95] = Ot))
+    : (Ot = t[95]);
+  let Z = Ot,
+    kt;
+  t[96] !== g || t[97] !== h || t[98] !== x || t[99] !== se
+    ? ((kt = !g || x === `top` || se == null ? null : (0, B.jsx)(je, { ...se, responseSpacer: h })),
+      (t[96] = g),
+      (t[97] = h),
+      (t[98] = x),
+      (t[99] = se),
+      (t[100] = kt))
+    : (kt = t[100]);
+  let Q = kt,
+    $ = m == null && !!o,
+    At;
+  t[101] !== Z || t[102] !== o || t[103] !== Dt || t[104] !== $ || t[105] !== b || t[106] !== Q
+    ? ((At = $
+        ? (0, B.jsx)(ne.div, {
+            ref: Dt,
+            className: p(
+              `pointer-events-none absolute inset-x-0 bottom-0 z-10`,
+              b === `compact` ? `w-full shrink-0` : `pb-4 browser:pb-6`,
+            ),
+            "data-thread-scroll-footer": `true`,
+            style: Z,
+            children: (0, B.jsxs)(`div`, {
+              "data-pip-obstacle": `thread-footer`,
+              className: p(
+                `relative z-10 flex flex-col *:pointer-events-auto`,
+                b === `compact` ? void 0 : [xe, `extension:px-2`],
+              ),
+              children: [Q, o],
+            }),
+          })
+        : null),
+      (t[101] = Z),
+      (t[102] = o),
+      (t[103] = Dt),
+      (t[104] = $),
+      (t[105] = b),
+      (t[106] = Q),
+      (t[107] = At))
+    : (At = t[107]);
+  let jt = At,
+    Mt;
+  t[108] !== a ||
+  t[109] !== Z ||
+  t[110] !== i ||
+  t[111] !== jt ||
+  t[112] !== de ||
+  t[113] !== $ ||
+  t[114] !== b ||
+  t[115] !== ae ||
+  t[116] !== Pe ||
+  t[117] !== ue
+    ? ((Mt = function () {
+        return (0, B.jsxs)(`div`, {
+          "data-request-input-activity-root": !0,
+          className: p(
+            `group/thread-scroll-layout has-[[data-composer-expand-toggle]]:[container-type:size]`,
+            b === `compact` ? `relative flex min-h-0 flex-1 flex-col` : `relative h-full flex-1`,
+            `[content-visibility:auto]`,
+          ),
+          children: [
+            (0, B.jsxs)(`div`, {
+              ref: Pe,
+              "data-pip-anchor-host": ae,
+              ...(b === `compact` ? void 0 : ie.timelineScroll),
+              className: p(
+                `thread-scroll-container overflow-x-hidden overflow-y-auto group-has-[[data-expanded-composer]]/thread-scroll-layout:overflow-y-hidden [overflow-anchor:none] [scroll-padding-bottom:var(--thread-scroll-padding-bottom,0px)] focus:outline-none`,
+                b === `compact`
+                  ? `flex min-h-0 flex-1 flex-col-reverse`
+                  : `h-full electron:[scrollbar-gutter:stable_both-edges] pt-(--thread-content-top-inset) [--thread-sticky-header-top:calc(var(--spacing)*8)] browser:[--thread-sticky-header-top:var(--thread-content-top-inset,0px)] [&:has([data-thread-scroll-footer='true']:focus-within)]:[scroll-padding-bottom:0px] flex flex-col-reverse`,
+                b === `compact` && ($ ? Ne.compactScrollMask : Ne.compactHeaderScrollFade),
+                de && `hide-scrollbar`,
+              ),
+              children: [
+                (0, B.jsxs)(ne.div, {
+                  style: Z,
+                  className: p(
+                    Ne.scrollContent,
+                    `flex min-h-full shrink-0 flex-col justify-start overflow-x-clip [container-name:thread-content] [container-type:inline-size]`,
+                  ),
+                  children: [
+                    b === `compact` ? null : (0, B.jsx)(ke, { contentX: i }),
+                    (0, B.jsx)(`div`, {
+                      "data-mcp-app-portal-target": `true`,
+                      ref: me,
+                      "data-thread-user-message-navigation-content": !0,
+                      className: p(
+                        `relative flex flex-1 shrink-0 flex-col`,
+                        b === `compact`
+                          ? void 0
+                          : [
+                              xe,
+                              Ne.transcriptBody,
+                              `has-[[data-compact-status-slot-clearance]]:pb-0`,
+                            ],
+                      ),
+                      children: a,
+                    }),
+                    ue
+                      ? (0, B.jsx)(`div`, {
+                          className: `mt-auto grid`,
+                          children: (0, B.jsx)(`div`, {
+                            className: `sticky bottom-0 self-end`,
+                            children: ue,
+                          }),
+                        })
+                      : null,
+                    $
+                      ? (0, B.jsx)(`div`, {
+                          "aria-hidden": !0,
+                          className: p(
+                            `sticky bottom-0 z-10 mt-auto w-full shrink-0`,
+                            b === `compact`
+                              ? `h-(--thread-scroll-padding-bottom)`
+                              : `h-[calc(var(--thread-scroll-padding-bottom)-var(--spacing)*4)]`,
+                          ),
+                          children: b === `compact` ? null : (0, B.jsx)(Se, {}),
+                        })
+                      : null,
+                  ],
+                }),
+                b === `compact` ? null : jt,
+              ],
+            }),
+            b === `compact` ? jt : null,
+          ],
+        });
+      }),
+      (t[108] = a),
+      (t[109] = Z),
+      (t[110] = i),
+      (t[111] = jt),
+      (t[112] = de),
+      (t[113] = $),
+      (t[114] = b),
+      (t[115] = ae),
+      (t[116] = Pe),
+      (t[117] = ue),
+      (t[118] = Mt))
+    : (Mt = t[118]);
+  let Nt = Mt,
+    Pt;
+  t[119] !== o || t[120] !== Nt || t[121] !== m || t[122] !== Q
+    ? ((Pt =
+        m == null
+          ? Nt()
+          : m({ content: Nt(), footer: o ? (0, B.jsxs)(B.Fragment, { children: [Q, o] }) : null })),
+      (t[119] = o),
+      (t[120] = Nt),
+      (t[121] = m),
+      (t[122] = Q),
+      (t[123] = Pt))
+    : (Pt = t[123]);
+  let Ft;
+  return (
+    t[124] !== Tt || t[125] !== Pt
+      ? ((Ft = (0, B.jsx)(Te, { value: Tt, children: Pt })),
+        (t[124] = Tt),
+        (t[125] = Pt),
+        (t[126] = Ft))
+      : (Ft = t[126]),
+    Ft
+  );
+}
+function Fe() {
+  return 0;
+}
+function Ie() {
+  return 0;
+}
+function Le(e, t) {
+  if (e.defaultPrevented || e.repeat) return null;
+  let n = e.target;
+  if (
+    n instanceof HTMLElement &&
+    n !== t &&
+    (n.isContentEditable ||
+      n.closest(`input, select, textarea`) != null ||
+      ((e.key === ` ` || e.key === `Spacebar`) && n.closest(`button, [role="button"]`) != null))
+  )
+    return null;
+  switch (e.key) {
+    case `ArrowUp`:
+    case `Home`:
+    case `PageUp`:
+      return `away`;
+    case ` `:
+    case `Spacebar`:
+      return e.shiftKey ? `away` : `toward`;
+    case `ArrowDown`:
+    case `End`:
+    case `PageDown`:
+      return `toward`;
+    default:
+      return null;
+  }
+}
+function Re(e) {
+  return _(e) <= 24;
+}
+function ze(e, t) {
+  return Be(e) <= (t ? Math.max(e.clientHeight, Ue) : Ue);
+}
+function Be(e) {
+  return e.scrollHeight - e.clientHeight - _(e);
+}
+var Ve, z, B, He, Ue, We, Ge;
+function V() {
+  return (V = e(() => {
+    ((Ve = t()),
+      f(),
+      l(),
+      n(),
+      (z = u()),
+      g(),
+      pe(),
+      A(),
+      be(),
+      le(),
+      de(),
+      d(),
+      C(),
+      Ce(),
+      Me(),
+      R(),
+      (B = a()),
+      (He = 260),
+      (Ue = 64),
+      (We = 8),
+      (Ge = 1e3));
+  }))();
+}
+export { V as n, Pe as t };

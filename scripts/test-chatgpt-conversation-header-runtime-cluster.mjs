@@ -7,7 +7,7 @@ import * as esbuild from "esbuild";
 import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["chatgpt-gizmo-header", "cloud-browser-preview"];
+const MODULES = ["chatgpt-gizmo-header"];
 const state = globalThis.__conversationHeaderRuntimeTest = { stateValues: [], updates: [] };
 state.jsx = { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } };
 state.react = { useState(initial) { const value = state.stateValues.length > 0 ? state.stateValues.shift() : typeof initial === "function" ? initial() : initial; return [value, (next) => state.updates.push(next)]; } };
@@ -54,31 +54,6 @@ gizmoHeader.r(); assert.equal(typeof gizmoHeader.n, "function");
 
 const temporaryChatReleaseAssertions = assertReleaseOwner("chatgpt-temporary-chat-ui");
 
-// cloud-browser-preview: 14
-const cloud = await bundle("cloud-browser-preview");
-assert.deepEqual(Object.keys(cloud).sort(), ["n", "t"]);
-assert.equal(cloud.t({ conversationId: "c", screenshots: [], liveView: "live" }), "live");
-assert.equal(cloud.t({ conversationId: "c", screenshots: [] }), null);
-const screenshots = [
-  { hostname: "one.example", image_asset_pointer: { asset_pointer: "a1" }, src: "one.png", tool_summary: "First" },
-  { hostname: "two.example", image_asset_pointer: { asset_pointer: "a2" }, src: "two.png", tool_summary: "Second" },
-];
-state.stateValues.push(0, false);
-let opened = 0;
-const compact = cloud.t({ conversationId: "c9", screenshots, onOpen: () => { opened++; } });
-assert.equal(compact.type, "section");
-assert.equal(find(compact, (node) => node.type === "img").props.src, "one.png");
-assert.equal(find(compact, (node) => node.type === "figcaption").props.children, "one.example");
-assert.equal(find(compact, (node) => node.type === "input").props.max, 1);
-assert.equal(find(compact, (node) => node.props?.children === "Open browser").type, "Button");
-find(compact, (node) => node.props?.children === "Open browser").props.onClick(); assert.equal(opened, 1);
-state.stateValues.push(0, false);
-let selected = -1;
-const expanded = cloud.t({ conversationId: "c10", screenshots, variant: "expanded", onSelect: (value) => { selected = value; } });
-assert.equal(find(expanded, (node) => node.props?.children === "LIVE").type, "Button");
-assert.equal(find(expanded, (node) => node.props?.children === "LIVE").props["aria-pressed"], false);
-assert.equal(find(expanded, (node) => node.type === "input").props.max, 2);
-find(expanded, (node) => node.type === "input").props.onChange({ currentTarget: { valueAsNumber: 1 } }); assert.equal(selected, 1);
-cloud.n(); assert.equal(typeof cloud.t, "function");
+const cloudBrowserReleaseAssertions = assertReleaseOwner("cloud-browser-preview");
 
-console.log(`chatgpt conversation header runtime cluster and ${temporaryChatReleaseAssertions} temporary chat release assertions passed`);
+console.log(`chatgpt conversation header runtime cluster and ${temporaryChatReleaseAssertions + cloudBrowserReleaseAssertions} release assertions passed`);

@@ -1,5 +1,21 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Thread/memory/billing/settings/browser release-owner recovery：一次性恢复
+`dictionary-dialog`、`thread-scroll-layout`、`editable-review-file-source-tab-content`、
+`ads-controls-settings`、`saved-memory-history`、`personal-vault-settings`、
+`worktree-setup-auto-fix`、`standalone-elicitation-page`、`avatar-mascot-button`、
+`billing-form-options`、`upgrade-plan-dialog`、`billing-cadence-dialog`、
+`wallet-onboarding-announcement-content`、`chatgpt-subagents-panel` 与
+`cloud-browser-preview` 十五个发布 owner，净恢复 8,562 行发布 TypeScript。绑定旧精简 ABI
+与旧 mock export 集的 thread、memory、billing、settings、elicitation、wallet、subagent 和
+browser preview 测试已迁移为发布一致性验证；钱包 VGS enrollment HTML 等相邻独立行为覆盖
+继续保留。整批通过 12,448/12,448 transform check、1,888/1,888 renderer build/verify、
+2,247/2,247 app-code coverage、0 semantic tail 与 typecheck。严格 hub 消费推进到 app-shared
+1,761/3,185、app-initial 5,579/8,204、app-primary 721/917，仍为 0 unreviewed、0 invalid
+consumers。按发布源码正向行数缺口口径，覆盖率由约 91.4% 推进到约 92.2%；425 个 preserved
+边界、三个聚合 hub 的剩余耦合导出与启动/登录/消息/Git/worktree/Browser/IAB/settings 的
+最终真实 E2E 仍未完成，不能把本批分类或构建通过表述成完整反编译完成。
+
 2026-11-02 Completion/credits/mobile/payment/editor release-owner recovery：一次性恢复
 `resume-chatgpt-completion`、`credit-purchase-page-core`、`remote-connection-editor-dialog`、
 `artifact-feedback-dialog`、`trusted-contact-link-page`、`keyboard-shortcuts-settings`、

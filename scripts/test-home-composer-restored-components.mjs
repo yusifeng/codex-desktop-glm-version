@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const state = globalThis.__homeComposerRestored = {
@@ -400,64 +401,6 @@ assert.throws(() => scrollContext.r(), /must be used within ThreadScrollLayout/)
 globalThis.__homeComposerRestored.scrollController = { scrollToBottom() {} };
 assert.equal(scrollContext.r(), globalThis.__homeComposerRestored.scrollController);
 
-let capturedThreadLayout;
-const threadScrollLayout = await bundle("thread-scroll-layout", {
-  "app-shared": `
-    export const $3=()=>{}; export const h4=()=>{}; export const a$=()=>{}; export const $Q=()=>{};
-    export const FX=()=>{}; export const K2=()=>{}; export const g_=()=>{};
-    export const e6=()=>({
-      useContext:()=>null, useEffect:()=>{}, useLayoutEffect:()=>{}, useMemo:factory=>factory(),
-      useRef:value=>({current:value}), useState:value=>[typeof value==="function"?value():value,()=>{}],
-      useSyncExternalStore:(subscribe,getSnapshot)=>getSnapshot(),
-    });
-    export const I3=()=>globalThis.__homeComposerRestored.jsx;
-    export const __=callback=>callback; export const e$=factory=>factory();
-    export const m4=(...items)=>items.flat(8).filter(Boolean).join(" "); export const o$={div:"MotionDiv"};
-    export const HX=()=>null; export const LX=()=>({set(){},watch(){return()=>{}}});
-    export const n4=()=>({formatMessage:message=>message.defaultMessage});
-  `,
-  "app-initial": `
-    export const Ngn=()=>{}; export const U7=()=>{}; export const itn=()=>{}; export const E7=()=>{};
-    export const qbt=()=>{}; export const xlt=()=>{}; export const JH=()=>{}; export const Sat=()=>{};
-    export const Qa=()=>{}; export const Slt=()=>true; export const Agn={timelineScroll:{tabIndex:0}};
-    export const H7={}; export const wat=callback=>callback; export const jat=()=>({height:48});
-    export const YH={current:null}; export const Za="ScrollToBottomButton";
-  `,
-  "app-primary": `export const rt=()=>{}; export const et="wide"; export const tt="FooterShadow";`,
-  "thread-scroll-controller-context-value": `export const n=()=>{}; export const t="ThreadScrollControllerProvider"; export const r=()=>({});`,
-});
-const threadLayoutTree = threadScrollLayout.t({
-  active: true,
-  children: "Transcript",
-  footer: "Composer",
-  hideScrollbar: true,
-  presentation: "default",
-  remoteHostedPIPAnchorHostId: "pip-host",
-  renderLayout(parts) { capturedThreadLayout = parts; return { type: "CustomLayout", props: parts }; },
-  scrollToBottomButton: { isWorking: true },
-  threadEndContent: "ThreadEnd",
-});
-assert.equal(threadLayoutTree.type, "ThreadScrollControllerProvider");
-assert.equal(threadLayoutTree.props.children.type, "CustomLayout");
-assert.equal(capturedThreadLayout.footer.type, "Fragment");
-const threadController = threadLayoutTree.props.value;
-assert.deepEqual(Object.keys(threadController).sort(), [
-  "addScrollListener", "addUserScrollListener", "compensateScrollToDistanceFromBottomPx",
-  "getLastScrollDistanceFromBottomPx", "getScrollElement", "getUnroundedScrollDistanceFromBottomPx",
-  "isScrolledFromBottom", "preserveScrollPositionForNextLayout", "scrollToBottom",
-  "scrollToDistanceFromBottomPx", "setFooterResizeViewportPreserveDisabled",
-].sort());
-assert.equal(typeof threadController.scrollToBottom, "function");
-assert.equal(threadController.getUnroundedScrollDistanceFromBottomPx(37.5), 37.5);
-assert.equal(capturedThreadLayout.content.props["data-request-input-activity-root"], true);
-const scrollContainer = capturedThreadLayout.content.props.children[0];
-assert.equal(scrollContainer.props["data-pip-anchor-host"], "pip-host");
-assert.equal(scrollContainer.props.className.includes("thread-scroll-container"), true);
-assert.equal(scrollContainer.props.className.includes("hide-scrollbar"), true);
-const scrollContent = scrollContainer.props.children[0];
-assert.equal(scrollContent.type, "MotionDiv");
-assert.equal(scrollContent.props.children[1].props["data-thread-user-message-navigation-content"], true);
-assert.equal(scrollContent.props.children[1].props.children, "Transcript");
-assert.equal(scrollContent.props.children[2].props.children.props.children, "ThreadEnd");
+assertReleaseOwner("thread-scroll-layout");
 
 console.log("home composer restored component tests passed");

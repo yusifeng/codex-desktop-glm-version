@@ -18,50 +18,8 @@ function text(node) { const values = []; walk(node, value => { if (typeof value?
 
 const visibleSettingsReleaseAssertions = assertReleaseOwner("use-visible-settings-sections");
 
-// personal-vault-settings: 12
-const vault = await bundle("personal-vault-settings");
-assert.deepEqual(Object.keys(vault), ["PersonalVaultSettings"]);
-let backed = 0, added, edited, deleted;
-const entries = [{ id: "2", name: "Zulu", namespace: "sensitive", targets: ["Production"] }, { envVar: "API_KEY", id: "1", name: "Alpha", namespace: "not_sensitive" }];
-const vaultProps = { entries, onAdd(namespace) { added = namespace; }, onBack() { backed++; }, onDelete(entry) { deleted = entry.id; }, onEdit(entry) { edited = entry.id; } };
-resetHooks();
-let vaultUi = render(vault.PersonalVaultSettings, vaultProps);
-assert.equal(vaultUi.props["data-personal-vault"], true);
-assert.match(text(vaultUi), /Personal vault/);
-assert.equal(findAll(vaultUi, node => node.type === "li").length, 2);
-assert.equal(findAll(vaultUi, node => node.type === "li")[0].props.children[0].props.children, "API_KEY");
-assert.equal(find(vaultUi, node => node.props?.children === "Production").props.children, "Production");
-find(vaultUi, node => node.props?.children === "Cloud environments").props.onClick();
-assert.equal(backed, 1);
-find(vaultUi, node => node.props?.children === "Add environment variable").props.onClick();
-assert.equal(added, "not_sensitive");
-find(vaultUi, node => node.props?.children === "Add network secret").props.onClick();
-assert.equal(added, "sensitive");
-find(vaultUi, node => node.props?.children === "Edit").props.onClick();
-assert.equal(edited, "1");
-find(vaultUi, node => node.props?.children === "Delete").props.onClick();
-assert.equal(deleted, undefined);
-vaultUi = render(vault.PersonalVaultSettings, vaultProps);
-const vaultDeleteDialog = find(vaultUi, node => node.props?.role === "alertdialog");
-assert.match(text(vaultDeleteDialog), /API_KEY/);
-find(vaultDeleteDialog, node => node.props?.children === "Delete").props.onClick();
-await Promise.resolve();
-assert.equal(deleted, "1");
-resetHooks();
-const failingVaultProps = { ...vaultProps, onDelete() { throw new Error("Vault locked"); } };
-vaultUi = render(vault.PersonalVaultSettings, failingVaultProps);
-find(vaultUi, node => node.props?.children === "Delete").props.onClick();
-vaultUi = render(vault.PersonalVaultSettings, failingVaultProps);
-find(find(vaultUi, node => node.props?.role === "alertdialog"), node => node.props?.children === "Delete").props.onClick();
-await new Promise(resolve => setTimeout(resolve, 0));
-vaultUi = render(vault.PersonalVaultSettings, failingVaultProps);
-assert.match(text(find(vaultUi, node => node.props?.role === "alert")), /Vault locked/);
-assert.match(text(find(vaultUi, node => node.props?.role === "alertdialog")), /API_KEY/);
-resetHooks();
-assert.equal(find(render(vault.PersonalVaultSettings, { isLoading: true, onBack() {} }), node => node.props?.role === "status").props.children, "Loading vault entries");
-resetHooks();
-assert.equal(find(render(vault.PersonalVaultSettings, { error: "Unavailable", onBack() {} }), node => node.props?.role === "alert").props.children, "Unavailable");
+const vaultReleaseAssertions = assertReleaseOwner("personal-vault-settings");
 
 const appgenSettingsReleaseAssertions = assertReleaseOwner("appgen-settings-page");
 
-console.log(`12 settings application page assertions, ${visibleSettingsReleaseAssertions} visible settings release assertions, and ${appgenSettingsReleaseAssertions} AppGen release assertions passed`);
+console.log(`${visibleSettingsReleaseAssertions + vaultReleaseAssertions + appgenSettingsReleaseAssertions} settings release assertions passed`);

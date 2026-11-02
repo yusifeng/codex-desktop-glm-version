@@ -15,27 +15,11 @@ function find(node, predicate) { let result; walk(node, value => { if (result ==
 function all(node, predicate) { const result = []; walk(node, value => { if (predicate(value)) result.push(value); }); return result; }
 function text(node) { const parts = []; const collect = value => { if (typeof value === "string" || typeof value === "number") { parts.push(String(value)); return; } if (value == null || typeof value !== "object") return; const children = value.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(collect); else collect(children); }; collect(node); return parts.join(" "); }
 
-const cadence = await bundle("billing-cadence-dialog");
-assert.deepEqual(Object.keys(cadence), ["BillingCadenceDialog"]);
-const cadenceState = { annualPrice: { amount: 10 }, monthlyPrice: { amount: 12 }, billingCurrency: "USD", effectiveNextCadence: "monthly", renewalDate: "2026-11-02T00:00:00Z" };
-let updatedCadence, cadenceClosed = 0;
-const cadenceMount = mount(cadence.BillingCadenceDialog, { accountId: "a", entryPoint: "manage_billing_schedule", state: cadenceState, onClose() { cadenceClosed++; }, onUpdate(value) { updatedCadence = value; } });
-let cadenceUi = cadenceMount.render();
-assert.match(text(cadenceUi), /Manage billing schedule/);
-assert.equal(all(cadenceUi, node => node.type === "input" && node.props?.name === "cadence").length, 2);
-all(cadenceUi, node => node.type === "input" && node.props?.name === "cadence")[1].props.onChange();
-cadenceUi = cadenceMount.render();
-find(cadenceUi, node => node.type === "form").props.onSubmit({ preventDefault() {} });
-await Promise.resolve();
-assert.equal(updatedCadence, "yearly");
-assert.equal(cadenceClosed, 1);
-assert.match(text(cadenceUi), /November 2, 2026/);
-assert.equal(find(mount(cadence.BillingCadenceDialog, { accountId: "a", entryPoint: "manage_billing_schedule", state: cadenceState, isLoading: true, onClose() {} }).render(), node => node.props?.role === "status").props.children, "Checking your billing details…");
-assert.equal(find(mount(cadence.BillingCadenceDialog, { accountId: "a", entryPoint: "annual_offer", state: cadenceState, error: "stale", onClose() {} }).render(), node => node.props?.role === "alert").type, "div");
+const cadenceAssertions = assertReleaseOwner("billing-cadence-dialog");
 
 const recoveryAssertions = assertReleaseOwner("subscription-recovery-dialog");
 
 assertReleaseOwner("subscription-cancellation-dialog", [/^\/\/ @ts-nocheck/m, /export \{/]);
 assertReleaseOwner("credit-reload-dialog-host", [/^\/\/ @ts-nocheck/m, /export \{/]);
 
-console.log(`subscription billing lifecycle cluster tests passed with ${recoveryAssertions + 6} release assertions`);
+console.log(`subscription billing lifecycle cluster tests passed with ${cadenceAssertions + recoveryAssertions + 6} release assertions`);

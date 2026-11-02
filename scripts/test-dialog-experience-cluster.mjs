@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 let activeHooks = [], hookCursor = 0;
@@ -140,31 +141,7 @@ const failedRenewal = renewal.SubscriptionRenewalDialog({ accountId: "acct", acc
 assert.match(text(find(failedRenewal, node => node.props?.role === "alert")), /Couldn’t load/);
 assert.equal(find(failedRenewal, node => node.type === "button" && node.props?.children === "Renew subscription").props.disabled, true);
 
-const upgrade = await bundle("upgrade-plan-dialog");
-assert.deepEqual(Object.keys(upgrade).sort(), ["UpgradePlanDialog", "UpgradePlanDialogModal"]);
-assert.equal(upgrade.UpgradePlanDialog({ currentPlan: "free", open: false, onOpenChange() {} }), null);
-let upgradeOpen = true;
-let upgradeTarget;
-const plans = [{ id: "free", name: "Free" }, { id: "pro", name: "Pro", description: "More capacity", price: "$20" }];
-const upgradeUi = upgrade.UpgradePlanDialog({ currentPlan: "free", open: true, plans, onOpenChange(open) { upgradeOpen = open; }, onCtaClick(plan) { upgradeTarget = plan.id; } });
-assert.equal(upgradeUi.props["data-tab"], "personal");
-assert.equal(all(upgradeUi, node => node.type === "article").length, 2);
-assert.equal(find(upgradeUi, node => node.props?.children === "Current plan").props.disabled, true);
-const proButton = find(upgradeUi, node => node.props?.children === "Upgrade");
-assert.equal(proButton.props.disabled, false);
-proButton.props.onClick();
-assert.equal(upgradeTarget, "pro");
-find(upgradeUi, node => node.props?.["aria-label"] === "Close").props.onClick();
-assert.equal(upgradeOpen, false);
-const pricingError = upgrade.UpgradePlanDialog({ currentPlan: "free", open: true, pricingUnavailable: true, onOpenChange() {} });
-assert.equal(find(pricingError, node => node.props?.role === "alert").type, "div");
-let modalClosed = 0;
-let modalUpgrade;
-const modal = upgrade.UpgradePlanDialogModal({ currentPlan: "free", plans, source: "settings", onClose() { modalClosed++; }, onUpgrade(plan, source) { modalUpgrade = `${plan.id}:${source}`; } });
-find(modal, node => node.props?.children === "Upgrade").props.onClick();
-assert.equal(modalUpgrade, "pro:settings");
-find(modal, node => node.props?.["aria-label"] === "Close").props.onClick();
-assert.equal(modalClosed, 1);
+assertReleaseOwner("upgrade-plan-dialog");
 
 const voice = await bundle("voice-personalization-dialog");
 assert.deepEqual(Object.keys(voice), ["VoicePersonalizationDialog"]);

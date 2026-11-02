@@ -41,22 +41,7 @@ assert.equal(presentation.o({ className: "icon" }).props["data-agent-mode-icon"]
 assert.equal(presentation.r({ namespace: "codex_app", tool: "read_thread" }).message.defaultMessage, "Reading chat");
 assert.equal(presentation.t({ serverName: "codex_app", toolName: "read_thread" }), "read_thread");
 
-// saved-memory-history: 9
-const history = await bundle("saved-memory-history");
-assert.deepEqual(Object.keys(history), ["SavedMemoryHistoryDialog"]);
-assert.equal(find(history.SavedMemoryHistoryDialog({ isLoading: true, onClose() {} }), node => node.props?.role === "status").props.children, "Loading history…");
-assert.equal(find(history.SavedMemoryHistoryDialog({ error: "Offline", onClose() {} }), node => node.props?.role === "alert").props.children, "Offline");
-assert.match(text(history.SavedMemoryHistoryDialog({ onClose() {} })), /No saved versions/);
-const memoryEvents = [];
-const historyUi = history.SavedMemoryHistoryDialog({ onClose() { memoryEvents.push("close"); }, onDelete(version) { memoryEvents.push(["delete", version.id]); }, onRestore(version) { memoryEvents.push(["restore", version.id]); }, versions: [{ id: "old", content: "Earlier", createdAt: "2026-01-01" }, { id: "current", content: "Now", isCurrent: true }] });
-assert.equal(all(historyUi, node => node.type === "li").length, 2);
-assert.match(text(historyUi), /Current version/);
-find(historyUi, node => node.props?.children === "Restore this version").props.onClick();
-assert.deepEqual(memoryEvents[0], ["restore", "old"]);
-find(historyUi, node => node.props?.children === "Delete version").props.onClick();
-assert.deepEqual(memoryEvents[1], ["delete", "old"]);
-find(historyUi, node => node.props?.children === "Close").props.onClick();
-assert.equal(memoryEvents[2], "close");
+assertReleaseOwner("saved-memory-history");
 
 assertReleaseOwner("artifact-preview-header");
 

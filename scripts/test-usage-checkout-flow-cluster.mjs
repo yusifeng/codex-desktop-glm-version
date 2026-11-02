@@ -47,24 +47,7 @@ assert.equal(usage.t(), undefined);
 // pricing plan: release-faithful owner
 assertReleaseOwner("pricing-plan-comparison", [/^\/\/ @ts-nocheck/m, /export \{/]);
 
-// billing-form-options: 12
-const billing = await bundle("billing-form-options");
-assert.deepEqual(Object.keys(billing), ["n", "r", "t"]);
-const layers = { "1461259566": { payment_method_order: ["card", 2, "paypal"] }, "2160290604": { pe_layout_mode: "accordion", is_google_pay_pe_enabled: true }, "4224149292": { hide_payment_element_name: true } };
-const experiments = { getLayer(id) { return { get(key, fallback) { return layers[id]?.[key] ?? fallback; } }; }, getDynamicConfig() { return { get(_key, fallback) { return fallback; } }; } };
-const options = billing.t(experiments, { checkoutSessionId: "session", email: "a@example.test", isNewStripeCustomer: true, useMinimalBillingAddress: true });
-assert.deepEqual(options.paymentMethodOrder, ["card", "paypal"]);
-assert.equal(options.paymentElementLayoutMode, "accordion");
-assert.equal(options.shouldHidePaymentElementName, true);
-assert.equal(options.isGooglePayEnabled, true);
-assert.equal(options.checkoutSessionId, "session");
-assert.equal(options.defaultValues.billingDetails.email, "a@example.test");
-assert.equal(options.useMinimalBillingAddress, true);
-assert.equal(billing.r.PaymentElement, "PaymentElement");
-assert.equal(billing.r.Elements, "Elements");
-assert.equal(billing.n(), undefined);
-const fallbackOptions = billing.t({ getLayer() { return { get(_key, fallback) { return fallback; } }; }, getDynamicConfig() { return { get(_key, fallback) { return fallback; } }; } });
-assert.equal(fallbackOptions.paymentElementLayoutMode, "tabs");
+assertReleaseOwner("billing-form-options");
 
 // checkout page: release-faithful owner
 assertReleaseOwner("checkout-page-core", [/^\/\/ @ts-nocheck/m, /export \{/]);

@@ -1,13 +1,11 @@
 import assert from "node:assert/strict";
-import fs from "node:fs";
 import esbuild from "esbuild";
-const consumerSource = fs.readFileSync(new URL("../src/renderer/wallet-onboarding-announcement-content/index.ts", import.meta.url), "utf8");
-assert.match(consumerSource, /app-shared\/runtime\/stable-json-stringify/);
-assert.doesNotMatch(consumerSource, /\bAZ\s*:\s*serializeQueryKey/);
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
+assertReleaseOwner("wallet-onboarding-announcement-content");
 const sourcePath = new URL("../src/renderer/app-shared/runtime/stable-json-stringify.ts", import.meta.url).pathname;
 const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
 const mod = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
 assert.equal(mod.stableJsonStringify({ b: 2, a: 1 }), '{"a":1,"b":2}');
 assert.equal(mod.stableJsonStringify({ outer: { z: 1, y: 2 } }), '{"outer":{"y":2,"z":1}}');
 assert.equal(mod.stableJsonStringify({ when: new Date("2020-01-01T00:00:00.000Z") }), '{"when":"2020-01-01T00:00:00.000Z"}');
-console.log("app-shared stable json stringify: 5 assertions passed");
+console.log("app-shared stable json stringify runtime and wallet release owner assertions passed");

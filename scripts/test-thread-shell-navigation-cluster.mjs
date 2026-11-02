@@ -96,51 +96,7 @@ async function load(name) {
   );
 }
 
-const scroll = await load("thread-scroll-layout");
-scroll.n();
-const layout = scroll.t({
-  children: "turns",
-  footer: "composer",
-  threadEndContent: "end",
-});
-assert.equal(layout.type, "section");
-assert.equal(typeof layout.props.value.scrollToBottom, "function");
-const root = layout.props.children;
-assert.equal(root.type, "div");
-const scroller = root.props.children[0];
-assert.equal(scroller.props["data-pip-anchor-host"], undefined);
-assert.match(scroller.props.className, /thread-scroll-container/);
-assert.match(scroller.props.className, /overflow-y-auto/);
-const motionContent = scroller.props.children[0];
-assert.equal(
-  motionContent.props.children[1].props[
-    "data-thread-user-message-navigation-content"
-  ],
-  true,
-);
-assert.equal(motionContent.props.children[1].props.children, "turns");
-assert.equal(
-  motionContent.props.children[2].props.children.props.children,
-  "end",
-);
-assert.equal(
-  scroller.props.children[1].props.children.props.children[1],
-  "composer",
-);
-const compact = scroll.t({
-  presentation: "compact",
-  hideScrollbar: true,
-  children: "compact",
-}).props.children.props.children[0];
-assert.match(compact.props.className, /hide-scrollbar/);
-assert.match(compact.props.className, /flex-col-reverse/);
-const custom = scroll.t({
-  children: "x",
-  footer: "y",
-  renderLayout: (parts) => parts,
-}).props.children;
-assert.equal(custom.content.type, "div");
-assert.equal(custom.footer.props.children[1], "y");
+assertReleaseOwner("thread-scroll-layout");
 
 assertReleaseOwner("thread-app-shell-chrome");
 
