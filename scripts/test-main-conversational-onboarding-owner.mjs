@@ -24,6 +24,7 @@ equal(classNode.body.body.length, 25);
 
 const classSource = transpiled.code.slice(classNode.start, classNode.end);
 const ConversationalOnboardingService = Function(
+  "RpcTarget",
   "createTaggedLogger",
   "threadDeletedParamsSchema",
   "conversationalOnboardingResultSchema",
@@ -39,6 +40,7 @@ const ConversationalOnboardingService = Function(
   "checkLocalFilesAccess",
   `${classSource}; return ConversationalOnboardingService;`,
 )(
+  class {},
   () => ({ warning() {} }),
   { safeParse: (value) => ({ success: typeof value?.threadId === "string", data: value }) },
   { safeParse: (value) => ({ success: value?.kind === "done", data: value }) },

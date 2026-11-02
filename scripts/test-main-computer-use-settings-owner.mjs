@@ -38,8 +38,13 @@ equal(await service.openChromeExtensionInstallPage(), "openChromeExtensionSettin
 equal(calls.at(-1), ["openChromeExtensionSettings", {}]);
 
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
-equal(main.includes('const { ComputerUseSettingsService, setCuaAppshotSoundEnabled: tje } = require("./main-app/computer-use/approvals.js");'), true);
-equal(main.includes("var nje = ComputerUseSettingsService,"), true);
+equal(
+  main.includes(
+    'const { ComputerUseSettingsService, macAppIconPng: VAe, setCuaAppshotSoundEnabled: tje } = require("./main-app/computer-use/approvals.js");',
+  ),
+  true,
+);
+equal(main.includes("var nje = ComputerUseSettingsService;"), true);
 equal(main.includes("nje = class"), false);
 equal(main.includes("var bM ="), false);
 equal(main.includes("async function tje("), false);
