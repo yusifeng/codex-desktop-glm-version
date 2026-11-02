@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { gitSettings as c } from "../app-shared/runtime/git-settings";
 import { rankProjectsByQuery as He } from "../app-primary/runtime/rank-projects-by-query";
 import { selectHandoffBranch as X } from "../app-primary/runtime/select-handoff-branch";
 import { selectHandoffDirection as Xe } from "../app-primary/runtime/select-handoff-direction";
@@ -12,7 +13,6 @@ import {
   BX as a,
   C_ as o,
   Cl as s,
-  EU as c,
   FX as l,
   HX as u,
   I3 as d,

@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { gitSettings as o } from "../app-shared/runtime/git-settings";
+import { parseGitRemoteUrl as ie } from "../app-shared/runtime/parse-git-remote-url";
 import { createCommandQueryKey as _e } from "../app-initial/runtime/create-command-query-key";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -6,7 +8,6 @@ import {
   $O as r,
   BI as i,
   Dj as a,
-  EU as o,
   FX as s,
   G2 as c,
   H4 as l,
@@ -25,7 +26,6 @@ import {
   Y2 as y,
   Ym as re,
   ZI as b,
-  _H as ie,
   dX as ae,
   ek as oe,
   fI as se,

@@ -19,6 +19,7 @@ const __vite__mapDeps = (
       "@rchunk/requested-plugin-connection",
     ]),
 ) => i.map((i) => d[i]);
+import { ATTACH_AUTH_HEADER as O } from "../app-shared/runtime/request-protocol";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -48,7 +49,6 @@ import {
   e6 as T,
   eL as E,
   ek as D,
-  fW as O,
   gL as k,
   jf as A,
   lw as j,

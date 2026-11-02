@@ -1,11 +1,11 @@
 // @ts-nocheck
+import { parseGitRemoteUrl as o } from "../app-shared/runtime/parse-git-remote-url";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
   BX as r,
   FX as i,
   I3 as a,
-  _H as o,
   l3 as s,
   rZ as c,
   wL as l,

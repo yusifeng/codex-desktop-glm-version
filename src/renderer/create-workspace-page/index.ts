@@ -12,6 +12,7 @@ const __vite__mapDeps = (
       "./app-initial-e8ceb32eb626.css",
     ]),
 ) => i.map((i) => d[i]);
+import { EXPECTED_ACCOUNT_ID_HEADER as w } from "../app-shared/runtime/request-protocol";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -38,7 +39,6 @@ import {
   lw as S,
   n4 as C,
   sw as ee,
-  vW as w,
   wL as T,
 } from "@rchunk/app-shared";
 import {

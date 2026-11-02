@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { CODEX_WEB_URL as f } from "../app-shared/runtime/codex-links";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -14,7 +15,6 @@ import {
   LX as ee,
   LZ as d,
   Lh as te,
-  NX as f,
   Oh as ne,
   Ph as p,
   QI as m,
@@ -59,7 +59,12 @@ import {
   udn as ue,
   ugn as W,
 } from "@rchunk/app-initial";
-import { bc as G, dc as de, uc as fe, yc as pe } from "@rchunk/app-primary";
+import {
+  bc as G,
+  dc as de,
+  uc as fe,
+  yc as pe,
+} from "@rchunk/app-primary";
 function me(e) {
   let t = e?.account;
   return t?.structure !== `workspace` ||

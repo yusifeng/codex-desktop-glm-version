@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { gitSettings as l } from "../app-shared/runtime/git-settings";
+import { worktreeSettings as A } from "../app-shared/runtime/worktree-settings";
 import { formatErrorMessage as m } from "../app-shared/runtime/format-error-message";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -9,7 +11,6 @@ import {
   BK as o,
   BX as s,
   C_ as c,
-  EU as l,
   FX as u,
   HK as d,
   HX as f,
@@ -29,7 +30,6 @@ import {
   Rf as D,
   Rh as O,
   S_ as k,
-  TU as A,
   UK as j,
   Y2 as M,
   Yh as N,

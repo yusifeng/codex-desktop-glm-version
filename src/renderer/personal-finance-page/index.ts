@@ -21,6 +21,7 @@ const __vite__mapDeps = (
       "@rchunk/valdi-finance-accounts-bundle",
     ]),
 ) => i.map((i) => d[i]);
+import { CODEX_WEB_URL as y } from "../app-shared/runtime/codex-links";
 import { classNames as ue, initializeClassNames as I } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -42,7 +43,6 @@ import {
   K2 as g,
   LX as _,
   Lh as v,
-  NX as y,
   Oh as b,
   Ph as x,
   QI as S,

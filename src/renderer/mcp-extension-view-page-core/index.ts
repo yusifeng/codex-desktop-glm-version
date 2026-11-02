@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { CODEX_WEB_URL as g } from "../app-shared/runtime/codex-links";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -16,7 +17,6 @@ import {
   K2 as p,
   LX as m,
   Lf as h,
-  NX as g,
   QI as _,
   Qc as v,
   R4 as y,

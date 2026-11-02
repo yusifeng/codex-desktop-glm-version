@@ -1,9 +1,9 @@
 // @ts-nocheck
+import { getCodexMicroIdleTimeoutMs as r } from "../app-shared/runtime/codex-micro-config";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   FX as t,
   QI as n,
-  TX as r,
   ZI as i,
   gz as a,
   lY as o,

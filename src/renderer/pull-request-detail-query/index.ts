@@ -45,6 +45,8 @@ const __vite__mapDeps = (
       "@rchunk/layout",
     ]),
 ) => i.map((i) => d[i]);
+import { gitSettings as m } from "../app-shared/runtime/git-settings";
+import { parseGitRemoteUrl as ve } from "../app-shared/runtime/parse-git-remote-url";
 import { createCommandQueryKey as pt } from "../app-initial/runtime/create-command-query-key";
 import { classNames as We, initializeClassNames as je } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
@@ -61,7 +63,6 @@ import {
   CL as d,
   C_ as f,
   Cf as p,
-  EU as m,
   Ef as h,
   FT as g,
   FX as _,
@@ -109,7 +110,6 @@ import {
   Yo as he,
   ZI as ge,
   Zh as _e,
-  _H as ve,
   a$ as ye,
   ag as be,
   ap as xe,

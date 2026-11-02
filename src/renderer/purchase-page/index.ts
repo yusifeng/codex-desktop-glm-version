@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { EXPECTED_ACCOUNT_ID_HEADER as ie } from "../app-shared/runtime/request-protocol";
 import { hasQueryParamValue as Re } from "../app-primary/runtime/has-query-param-value";
 import { selectHandoffReturnTarget as Pe } from "../app-primary/runtime/select-handoff-return-target";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -26,7 +27,6 @@ import {
   gL as v,
   n4 as re,
   q4 as y,
-  vW as ie,
   wL as b,
 } from "@rchunk/app-shared";
 import {

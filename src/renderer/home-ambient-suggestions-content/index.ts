@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { ambientSuggestionSettings as ie } from "../app-shared/runtime/ambient-suggestion-settings";
+import { getSuggestionTarget as ee, isScienceSuggestionModel as ae } from "../app-shared/runtime/suggestion-targeting";
 import { createCommandQueryKey as ye } from "../app-initial/runtime/create-command-query-key";
 import { deriveCloudUnavailableReason as Nn } from "../app-primary/runtime/derive-cloud-unavailable-reason";
 import { isPathWithinRoots as i } from "../app-shared/runtime/is-path-within-roots";
@@ -16,7 +18,6 @@ import {
   I3 as f,
   Iu as p,
   JD as m,
-  JY as ee,
   K2 as h,
   LX as g,
   MM as _,
@@ -32,9 +33,7 @@ import {
   QX as te,
   S_ as ne,
   Sk as re,
-  Tz as ie,
   W2 as D,
-  XY as ae,
   Y2 as oe,
   YD as O,
   ZI as se,

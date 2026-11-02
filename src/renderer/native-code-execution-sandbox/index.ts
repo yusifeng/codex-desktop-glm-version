@@ -1,7 +1,12 @@
 // @ts-nocheck
+import { createSandboxPartition as t, initializeSandboxUrls as n } from "../app-shared/runtime/sandbox-url";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { KH as t, YH as n } from "@rchunk/app-shared";
-import { Mnt as r, Pnt as i, jon as a } from "@rchunk/app-initial";
+
+import {
+  Mnt as r,
+  Pnt as i,
+  jon as a,
+} from "@rchunk/app-initial";
 import { n as o, t as s } from "@rchunk/code-execution-sandbox-connection";
 async function c({ webview: e, sourceUrl: n, host: i, signal: o }) {
   let c = new URL(n),

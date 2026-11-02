@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { worktreeSettings as l } from "../app-shared/runtime/worktree-settings";
 import { classNames as _, initializeClassNames as h } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -10,7 +11,6 @@ import {
   K2 as o,
   Qp as s,
   S_ as c,
-  TU as l,
   Y2 as u,
   Yh as d,
   Zh as f,

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { gitSettings as c } from "../app-shared/runtime/git-settings";
 import { isPathWithinRoots as i } from "../app-shared/runtime/is-path-within-roots";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -7,7 +8,6 @@ import {
   BI as a,
   BX as o,
   C_ as s,
-  EU as c,
   FX as l,
   HX as u,
   I3 as d,

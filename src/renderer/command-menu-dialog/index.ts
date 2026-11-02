@@ -24,6 +24,7 @@ const __vite__mapDeps = (
       "@rchunk/import-settings-gate",
     ]),
 ) => i.map((i) => d[i]);
+import { hasRequiredCommandAccess as Ge } from "../app-shared/runtime/command-visibility-predicates";
 import { isElectronCommandEnabled as Nn } from "../app-initial/runtime/electron-command-policy";
 import { deriveBranchSearchPreview as ur } from "../app-primary/runtime/derive-branch-search-preview";
 import { classNames as Te, initializeClassNames as xe } from "../app-shared/ui/class-names";
@@ -121,7 +122,6 @@ import {
   zh as He,
   zm as Ue,
   zo as We,
-  zp as Ge,
 } from "@rchunk/app-shared";
 import {
   $U as Ke,

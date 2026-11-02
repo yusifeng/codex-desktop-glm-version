@@ -1,8 +1,8 @@
 // @ts-nocheck
+import { isWebMcpServer as t } from "../app-shared/runtime/is-web-mcp-server";
 import { flattenConversationItems as r } from "../app-initial/runtime/flatten-conversation-items";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  hq as t,
   wL as n,
 } from "@rchunk/app-shared";
 

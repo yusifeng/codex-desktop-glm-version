@@ -1,7 +1,13 @@
 // @ts-nocheck
+import { EXPECTED_ACCOUNT_ID_HEADER as t } from "../app-shared/runtime/request-protocol";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { vW as t, wL as n } from "@rchunk/app-shared";
-import { cJt as r, rJt as i } from "@rchunk/app-initial";
+import {
+  wL as n,
+} from "@rchunk/app-shared";
+import {
+  cJt as r,
+  rJt as i,
+} from "@rchunk/app-initial";
 function a(e) {
   return { "ChatGPT-Account-ID": e, [t]: e };
 }

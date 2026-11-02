@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { CODEX_WEB_URL as E } from "../app-shared/runtime/codex-links";
+import { gitSettings as l } from "../app-shared/runtime/git-settings";
 import { classNames as _e, initializeClassNames as le } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -9,7 +11,6 @@ import {
   CL as o,
   C_ as s,
   Df as c,
-  EU as l,
   Ep as u,
   FX as d,
   G2 as f,
@@ -26,7 +27,6 @@ import {
   MD as C,
   N as w,
   ND as T,
-  NX as E,
   Of as D,
   Oh as O,
   P as k,

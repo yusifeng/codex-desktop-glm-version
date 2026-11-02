@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { gitSettings as c } from "../app-shared/runtime/git-settings";
+import { parseGitRemoteUrl as M } from "../app-shared/runtime/parse-git-remote-url";
 import { stripTerminalCommandToken as Xe } from "../app-primary/runtime/strip-terminal-command-token";
 import { getPathBasename as f } from "../app-shared/runtime/get-path-basename";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -10,7 +12,6 @@ import {
   Ah as a,
   BX as o,
   CL as s,
-  EU as c,
   FX as l,
   HX as u,
   I3 as d,
@@ -34,7 +35,6 @@ import {
   Yh as k,
   ZI as A,
   Zh as j,
-  _H as M,
   bD as N,
   c_ as P,
   e6 as F,

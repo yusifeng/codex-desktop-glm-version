@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { ATTACH_AUTH_HEADER as D } from "../app-shared/runtime/request-protocol";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -26,7 +27,6 @@ import {
   e6 as w,
   eL as T,
   ek as E,
-  fW as D,
   gL as O,
   jZ as k,
   jf as A,

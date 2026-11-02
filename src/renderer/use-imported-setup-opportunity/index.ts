@@ -31,6 +31,7 @@ const __vite__mapDeps = (
       "@rchunk/canonical-plugin-query",
     ]),
 ) => i.map((i) => d[i]);
+import { isWebMcpServer as be } from "../app-shared/runtime/is-web-mcp-server";
 import { getPathBasename as h } from "../app-shared/runtime/get-path-basename";
 import { classNames as Te, initializeClassNames as ye } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
@@ -93,7 +94,6 @@ import {
   g4 as ge,
   gL as _e,
   gg as ve,
-  hq as be,
   iW as xe,
   jZ as Se,
   k4 as Ce,

@@ -4,8 +4,15 @@ const __vite__mapDeps = (
   m = __vite__mapDeps,
   d = m.f || (m.f = ["@rchunk/persona-runtime", "@rchunk/rolldown-runtime"]),
 ) => i.map((i) => d[i]);
+import { EXPECTED_ACCOUNT_ID_HEADER as o } from "../app-shared/runtime/request-protocol";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
-import { $3 as n, H3 as r, I3 as i, V3 as a, vW as o, wL as s } from "@rchunk/app-shared";
+import {
+  $3 as n,
+  H3 as r,
+  I3 as i,
+  V3 as a,
+  wL as s,
+} from "@rchunk/app-shared";
 import { r as c } from "@rchunk/datadog-rum-browser";
 import {
   Aun as l,

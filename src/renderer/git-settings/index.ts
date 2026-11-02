@@ -1,9 +1,9 @@
 // @ts-nocheck
+import { gitSettings as n } from "../app-shared/runtime/git-settings";
 import { createCommandQueryKey as ne } from "../app-initial/runtime/create-command-query-key";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
-  EU as n,
   FX as r,
   G2 as i,
   I3 as a,

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { hasRequiredCommandAccess as o } from "../app-shared/runtime/command-visibility-predicates";
 import { isRealtimeVoiceCommand as r } from "../app-shared/runtime/is-realtime-voice-command";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -6,7 +7,6 @@ import {
   Ep as n,
   Np as i,
   kp as a,
-  zp as o,
 } from "@rchunk/app-shared";
 function s(
   e,

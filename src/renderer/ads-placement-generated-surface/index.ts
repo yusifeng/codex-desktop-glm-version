@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { ATTACH_AUTH_HEADER as ee, EXPECTED_ACCOUNT_ID_HEADER as Ee } from "../app-shared/runtime/request-protocol";
 import { classNames as J, initializeClassNames as oe } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -49,7 +50,6 @@ import {
   dg as G,
   e6 as K,
   ek as q,
-  fW as ee,
   fg as te,
   g4 as ne,
   gL as re,
@@ -74,7 +74,6 @@ import {
   rx as Ce,
   tb as we,
   ub as Te,
-  vW as Ee,
   wL as De,
   zh as Oe,
 } from "@rchunk/app-shared";

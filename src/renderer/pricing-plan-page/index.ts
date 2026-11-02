@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { EXPECTED_ACCOUNT_ID_HEADER as ie } from "../app-shared/runtime/request-protocol";
 import { hasQueryParamValue as ct } from "../app-primary/runtime/has-query-param-value";
 import { stripBeaconQueryParams as at } from "../app-primary/runtime/strip-beacon-query-params";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -21,7 +22,6 @@ import {
   n4 as ne,
   pk as re,
   qm as m,
-  vW as ie,
   wL as ae,
 } from "@rchunk/app-shared";
 import {

@@ -4,9 +4,17 @@ const __vite__mapDeps = (
   m = __vite__mapDeps,
   d = m.f || (m.f = ["@rchunk/persona-runtime", "@rchunk/rolldown-runtime"]),
 ) => i.map((i) => d[i]);
+import { EXPECTED_ACCOUNT_ID_HEADER as i } from "../app-shared/runtime/request-protocol";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
-import { H3 as n, V3 as r, vW as i, wL as a } from "@rchunk/app-shared";
-import { cJt as o, rJt as s } from "@rchunk/app-initial";
+import {
+  H3 as n,
+  V3 as r,
+  wL as a,
+} from "@rchunk/app-shared";
+import {
+  cJt as o,
+  rJt as s,
+} from "@rchunk/app-initial";
 function c({ accountId: e, kind: n = `age`, onLoad: a, onComplete: o, onCancel: c, onError: l }) {
   let u = new AbortController(),
     d = !1,

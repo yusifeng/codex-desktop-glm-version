@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { EXPECTED_ACCOUNT_ID_HEADER as ce } from "../app-shared/runtime/request-protocol";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -28,7 +29,6 @@ import {
   lk as v,
   n4 as se,
   pk as y,
-  vW as ce,
   wL as b,
   zh as le,
 } from "@rchunk/app-shared";

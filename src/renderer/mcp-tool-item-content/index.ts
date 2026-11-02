@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isWebMcpServer as _e } from "../app-shared/runtime/is-web-mcp-server";
 import { classNames as E, initializeClassNames as T } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -43,7 +44,6 @@ import {
   eU as me,
   ef as he,
   gL as ge,
-  hq as _e,
   jh as ve,
   lT as ye,
   n4 as be,

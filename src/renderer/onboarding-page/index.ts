@@ -12,6 +12,7 @@ const __vite__mapDeps = (
       "@rchunk/three.module",
     ]),
 ) => i.map((i) => d[i]);
+import { ambientSuggestionSettings as ie } from "../app-shared/runtime/ambient-suggestion-settings";
 import { createCommandQueryKey as st } from "../app-initial/runtime/create-command-query-key";
 import { classNames as Le, initializeClassNames as Oe } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -61,7 +62,6 @@ import {
   SL as B,
   S_ as V,
   Tc as re,
-  Tz as ie,
   UX as ae,
   V3 as oe,
   W2 as H,

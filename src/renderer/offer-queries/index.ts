@@ -1,7 +1,16 @@
 // @ts-nocheck
+import { EXPECTED_ACCOUNT_ID_HEADER as n } from "../app-shared/runtime/request-protocol";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { pL as t, vW as n, wL as r } from "@rchunk/app-shared";
-import { aI as i, cJt as a, eI as o, rJt as s } from "@rchunk/app-initial";
+import {
+  pL as t,
+  wL as r,
+} from "@rchunk/app-shared";
+import {
+  aI as i,
+  cJt as a,
+  eI as o,
+  rJt as s,
+} from "@rchunk/app-initial";
 function c({ accountId: e, promoCode: t, planName: n, promotion: r, isLoading: i, error: a }) {
   let s = !!t && (n === `chatgptpro` || n === `chatgptprolite`),
     c = o(s && r?.is_eligible ? r.metadata : null),

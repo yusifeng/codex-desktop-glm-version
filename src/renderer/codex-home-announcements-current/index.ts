@@ -17,6 +17,8 @@ const __vite__mapDeps = (
       "@rchunk/use-codex-worktrees",
     ]),
 ) => i.map((i) => d[i]);
+import { FAST_MODE_BANNER_CTA_CLICKED as h, FAST_MODE_BANNER_DISMISSED as T, FAST_MODE_BANNER_VIEWED as E } from "../app-shared/runtime/fast-mode-analytics-events";
+import { findFastServiceTier as x } from "../app-shared/runtime/service-tiers";
 import { classNames as S, initializeClassNames as y } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -34,16 +36,12 @@ import {
   V3 as f,
   Y2 as p,
   ZI as m,
-  _j as h,
   ag as g,
   e6 as _,
   fI as v,
   ig as b,
-  kz as x,
   n4 as C,
   qm as w,
-  vj as T,
-  yj as E,
 } from "@rchunk/app-shared";
 import {
   $yt as D,

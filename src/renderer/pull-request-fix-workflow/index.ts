@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { gitSettings as c } from "../app-shared/runtime/git-settings";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -7,7 +8,6 @@ import {
   BX as a,
   C_ as o,
   ES as s,
-  EU as c,
   FX as l,
   GN as u,
   I3 as d,

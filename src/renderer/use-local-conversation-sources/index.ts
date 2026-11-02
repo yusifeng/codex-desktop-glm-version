@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isWebMcpServer as o } from "../app-shared/runtime/is-web-mcp-server";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -6,7 +7,6 @@ import {
   FX as r,
   HX as i,
   K2 as a,
-  hq as o,
   n4 as s,
   wL as c,
   zX as l,

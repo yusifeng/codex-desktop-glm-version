@@ -126,6 +126,7 @@ const __vite__mapDeps = (
       "./image-preview-16f4d2bd26ed.css",
     ]),
 ) => i.map((i) => d[i]);
+import { isLibraryFileId as it } from "../app-shared/runtime/file-predicates";
 import { lookupConnectorId as js } from "../app-primary/runtime/lookup-connector-id";
 import { stableJsonStringify as o } from "../app-shared/runtime/stable-json-stringify";
 import { classNames as B, initializeClassNames as nt } from "../app-shared/ui/class-names";
@@ -225,7 +226,6 @@ import {
   gp as et,
   gt as tt,
   hO as rt,
-  hU as it,
   hp as at,
   ht as ot,
   iZ as st,

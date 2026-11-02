@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { CODEX_WEB_URL as u } from "../app-shared/runtime/codex-links";
 import { classNames as x, initializeClassNames as b } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -11,7 +12,6 @@ import {
   HX as s,
   I3 as c,
   LX as l,
-  NX as u,
   Q4 as d,
   QI as f,
   SG as p,

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { parseGitRemoteUrl as o } from "../app-shared/runtime/parse-git-remote-url";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $O as t,
@@ -6,7 +7,6 @@ import {
   QI as r,
   QX as i,
   ZI as a,
-  _H as o,
   ek as s,
   wL as c,
 } from "@rchunk/app-shared";

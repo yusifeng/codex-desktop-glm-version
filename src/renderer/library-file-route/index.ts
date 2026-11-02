@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isLibraryFileId as m } from "../app-shared/runtime/file-predicates";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -14,7 +15,6 @@ import {
   Zh as d,
   _L as f,
   gL as p,
-  hU as m,
   jZ as h,
   wL as g,
 } from "@rchunk/app-shared";

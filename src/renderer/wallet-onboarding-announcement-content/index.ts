@@ -13,6 +13,7 @@ const __vite__mapDeps = (
       "./wallet-onboarding-announcement-modal-8f48697b05eb.css",
     ]),
 ) => i.map((i) => d[i]);
+import { createSandboxPartition as g, getTrustedSandboxOrigin as se, initializeSandboxUrls as T } from "../app-shared/runtime/sandbox-url";
 import { stableJsonStringify as n } from "../app-shared/runtime/stable-json-stringify";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -30,7 +31,6 @@ import {
   Ih as p,
   Jm as m,
   K2 as h,
-  KH as g,
   LX as _,
   Ph as v,
   Q3 as y,
@@ -41,7 +41,6 @@ import {
   V3 as ee,
   V4 as te,
   Y2 as w,
-  YH as T,
   Yh as ne,
   Z3 as E,
   ZI as re,
@@ -53,7 +52,6 @@ import {
   n4 as oe,
   o$ as A,
   q4 as j,
-  qH as se,
   qm as ce,
   vD as M,
   wL as le,

@@ -47,6 +47,7 @@ const __vite__mapDeps = (
       "@rchunk/usage-code-review-settings",
     ]),
 ) => i.map((i) => d[i]);
+import { CODEX_WEB_URL as C } from "../app-shared/runtime/codex-links";
 import { buildRateLimitBuckets as dn } from "../app-initial/runtime/build-rate-limit-buckets";
 import { classNames as ge, initializeClassNames as ce } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -73,7 +74,6 @@ import {
   K2 as b,
   LX as x,
   Lf as S,
-  NX as C,
   Oh as w,
   Ph as T,
   QI as E,
