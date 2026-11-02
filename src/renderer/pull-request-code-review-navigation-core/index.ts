@@ -1,9 +1,9 @@
 // @ts-nocheck
+import { normalizePathSeparators as i } from "../app-shared/runtime/path-key-policy";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   FX as n,
   RI as r,
-  VI as i,
   l3 as a,
   oZ as o,
   pZ as s,

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createLocalConversationRoute as c } from "../app-shared/runtime/navigation-route-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -8,7 +9,6 @@ import {
   HX as a,
   LX as o,
   QI as s,
-  WB as c,
   ZI as l,
   _L as u,
   gL as d,
@@ -54,7 +54,9 @@ import {
   rJt as K,
   vln as q,
 } from "@rchunk/app-initial";
-import { df as J } from "@rchunk/app-primary";
+import {
+  df as J,
+} from "@rchunk/app-primary";
 async function Y(
   e,
   { projectId: t, latestEditContext: n, projectTitle: r, mode: i, workRunLocation: a, signal: o },

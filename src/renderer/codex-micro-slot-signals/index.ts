@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isClientNewThreadId as c } from "../app-shared/runtime/runtime-identifier-policy";
 import { getCodexMicroIdleTimeoutMs as r } from "../app-shared/runtime/codex-micro-config";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -8,7 +9,6 @@ import {
   gz as a,
   lY as o,
   pZ as s,
-  rJ as c,
   sZ as l,
   vX as u,
   wL as d,

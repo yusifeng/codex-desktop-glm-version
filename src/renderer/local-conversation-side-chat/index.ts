@@ -15,6 +15,7 @@ const __vite__mapDeps = (
       "@rchunk/conversation-thumbnail-ui",
     ]),
 ) => i.map((i) => d[i]);
+import { createClientNewThreadId as y } from "../app-shared/runtime/runtime-identifier-policy";
 import { createWorkspaceWritePermissionState as ie } from "../app-shared/runtime/permission-profiles";
 import { formatErrorMessage as l } from "../app-shared/runtime/format-error-message";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -36,7 +37,6 @@ import {
   Q3 as g,
   QI as _,
   Qh as v,
-  Qq as y,
   Rh as b,
   V3 as x,
   Y2 as S,

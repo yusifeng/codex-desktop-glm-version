@@ -1,10 +1,10 @@
 // @ts-nocheck
+import { isAbsolutePath as i } from "../app-shared/runtime/path-key-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
   $O as n,
   $h as r,
-  BK as i,
   BX as a,
   FX as o,
   FZ as s,

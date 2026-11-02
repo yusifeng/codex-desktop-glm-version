@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { resolvePath as u } from "../app-shared/runtime/path-key-policy";
+import { createRuntimeUuid as le } from "../app-shared/runtime/runtime-identifier-policy";
 import { classNames as G, initializeClassNames as L } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -11,7 +13,6 @@ import {
   Cs as s,
   Cz as c,
   FX as l,
-  HI as u,
   HX as d,
   I3 as f,
   If as p,
@@ -54,7 +55,6 @@ import {
   sJ as oe,
   sZ as se,
   sy as ce,
-  tU as le,
   tf as ue,
   vT as de,
   vw as K,

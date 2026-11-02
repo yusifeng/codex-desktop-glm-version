@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isClientNewThreadId as me } from "../app-shared/runtime/runtime-identifier-policy";
 import { extractSkillKindFromPrompt as Vn } from "../app-primary/runtime/extract-skill-kind";
 import { ambientSuggestionSettings as ie } from "../app-shared/runtime/ambient-suggestion-settings";
 import { getSuggestionTarget as ee, isScienceSuggestionModel as ae } from "../app-shared/runtime/suggestion-targeting";
@@ -47,7 +48,6 @@ import {
   lw as de,
   n4 as fe,
   pk as pe,
-  rJ as me,
   rZ as he,
   sZ as M,
   wL as N,

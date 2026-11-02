@@ -28,6 +28,7 @@ const __vite__mapDeps = (
       "@rchunk/outbound-identity-error",
     ]),
 ) => i.map((i) => d[i]);
+import { isClientNewThreadId as d } from "../app-shared/runtime/runtime-identifier-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   FX as t,
@@ -40,7 +41,6 @@ import {
   oZ as c,
   pZ as l,
   qm as u,
-  rJ as d,
   sZ as f,
   wL as p,
 } from "@rchunk/app-shared";

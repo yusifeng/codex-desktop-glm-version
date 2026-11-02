@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isClientNewThreadId as Mt } from "../app-shared/runtime/runtime-identifier-policy";
 import { isWebMcpServer as ot } from "../app-shared/runtime/is-web-mcp-server";
 import { worktreeSettings as ye } from "../app-shared/runtime/worktree-settings";
 import { createCommandQueryKey as $t } from "../app-initial/runtime/create-command-query-key";
@@ -128,7 +129,6 @@ import {
   q4 as kt,
   qS as At,
   qo as jt,
-  rJ as Mt,
   rL as Nt,
   sZ as Pt,
   tf as Ft,

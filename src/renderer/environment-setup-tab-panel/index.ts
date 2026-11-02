@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isClientNewThreadId as y } from "../app-shared/runtime/runtime-identifier-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -24,7 +25,6 @@ import {
   lw as re,
   n4 as ie,
   o_ as v,
-  rJ as y,
   rZ as b,
   rl as x,
   sw as ae,

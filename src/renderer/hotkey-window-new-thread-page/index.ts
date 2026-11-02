@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createHotkeyThreadRoute as o } from "../app-shared/runtime/navigation-route-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -6,11 +7,15 @@ import {
   HX as r,
   I3 as i,
   K2 as a,
-  UB as o,
   Y2 as s,
   wL as c,
 } from "@rchunk/app-shared";
-import { Dht as l, Oht as u, mnt as d, pnt as f } from "@rchunk/app-initial";
+import {
+  Dht as l,
+  Oht as u,
+  mnt as d,
+  pnt as f,
+} from "@rchunk/app-initial";
 import {
   Oo as p,
   c as m,

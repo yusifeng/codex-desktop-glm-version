@@ -1,9 +1,9 @@
 // @ts-nocheck
+import { resolvePath as n } from "../app-shared/runtime/path-key-policy";
 import { findNextMarkdownLink as d, unescapeMarkdownPunctuation as h } from "../app-initial/runtime/markdown-links";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   G2 as t,
-  HI as n,
   K2 as r,
   NB as i,
   PB as a,

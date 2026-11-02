@@ -1,5 +1,19 @@
 # Renderer 尾部资产审计
 
+2026-11-02 App-shared navigation/identifier batch：一次迁移 14 个公开压缩别名、84 个
+renderer 调用绑定，覆盖 extended Win32/UNC separator normalization、POSIX/drive/UNC absolute
+path、absolute-aware path resolution、Windows/WSL/`/mnt` 等价比较、hotkey/local/MCP/plugin
+settings 四类 route builder、client-new-thread ID、runtime UUID、plugin package source suffix 与
+nullable first-item projection。新增 3 个具名 TypeScript owner并扩展既有 path/collection owner，
+36 条聚合断言锁定 Windows、WSL、UNC、route encoding 与 ID 边界，test-index 增至 1,921。
+app-shared 直接 hub 消费由 1,843 降至 1,829，三 hub 保持 0 unreviewed、0 invalid
+consumers，迁移检查为 0 个遗漏绑定。typecheck、严格 ABI 与全量 `npm run check`
+（12,464 transform、11 main roots、1,916 renderer chunks、33 preserved vendor/generated route
+sources）均通过；当前构建随后通过真实登录态 `npm run e2e:critical`，覆盖 settings、Git、
+worktrees、Browser/IAB、conversation history/add-context，并实际发送
+`E2E_REPLY_20261102082454`、收到 assistant 同 marker。该批是聚合 hub 的继续收口，不把
+关键矩阵通过单独解释为整个长期目标完成。
+
 2026-11-02 App-shared path/command policy batch：一次迁移 12 个公开压缩别名、20 个 renderer
 调用绑定，恢复 SVG data URL、command metadata narrowing、平台主修饰键、鼠标导航键、
 webview command menu、跨平台 path join/extended-prefix/final segments、project appearance、

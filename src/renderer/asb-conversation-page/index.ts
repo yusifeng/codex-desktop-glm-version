@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isClientNewThreadId as s } from "../app-shared/runtime/runtime-identifier-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -7,7 +8,6 @@ import {
   HX as i,
   I3 as a,
   LX as o,
-  rJ as s,
   wL as c,
 } from "@rchunk/app-shared";
 import {
@@ -28,7 +28,10 @@ import {
   vlt as C,
   wtn as w,
 } from "@rchunk/app-initial";
-import { Mn as T, jn as E } from "@rchunk/app-primary";
+import {
+  Mn as T,
+  jn as E,
+} from "@rchunk/app-primary";
 import { l as D, u as O } from "@rchunk/latest-turn-preview";
 import { a as k, i as A, r as j, t as M } from "@rchunk/local-conversation-page";
 import { n as N, t as ee } from "@rchunk/thread-emoji";

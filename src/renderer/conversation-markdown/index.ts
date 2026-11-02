@@ -20,10 +20,10 @@
 // 预算系统：budget {limit, remainingChars, truncated}——assistant 内容
 // 先占位扣减（用户内容优先），超限走 CenterTruncator / S（JSON 流式截断）。
 
+import { normalizePathSeparators as normalizeSeparatorsImport } from "../app-shared/runtime/path-key-policy";
 import { createCaseInsensitivePathKey as comparePaths } from "../app-shared/runtime/path-key-policy";
 import {
   RI as splitAgentItems,
-  VI as normalizeSeparatorsImport,
   iW as processOutputs,
   wL as initializeRuntime,
   zI as isAbsolutePathLikeImport,

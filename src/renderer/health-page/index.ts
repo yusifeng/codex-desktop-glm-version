@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createRuntimeUuid as ge } from "../app-shared/runtime/runtime-identifier-policy";
 import { classNames as ue, initializeClassNames as oe } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -50,7 +51,6 @@ import {
   q4 as F,
   rZ as me,
   sw as he,
-  tU as ge,
   tb as I,
   wL as _e,
   x4 as L,

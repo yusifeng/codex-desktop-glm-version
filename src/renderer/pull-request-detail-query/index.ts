@@ -45,6 +45,7 @@ const __vite__mapDeps = (
       "@rchunk/layout",
     ]),
 ) => i.map((i) => d[i]);
+import { createLocalConversationRoute as ce } from "../app-shared/runtime/navigation-route-policy";
 import { initializeMountedState as et, useIsMounted as Ne } from "../app-shared/runtime/mounted-state";
 import { gitSettings as m } from "../app-shared/runtime/git-settings";
 import { parseGitRemoteUrl as ve } from "../app-shared/runtime/parse-git-remote-url";
@@ -99,7 +100,6 @@ import {
   V3 as ae,
   Vc as oe,
   Vd as se,
-  WB as ce,
   Xd as le,
   Xf as ue,
   Xm as de,

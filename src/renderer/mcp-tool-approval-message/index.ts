@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getPackageSourceSuffix as y } from "../app-shared/runtime/runtime-identifier-policy";
 import { classNames as C, initializeClassNames as b } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -24,7 +25,6 @@ import {
   ZI as re,
   Zh as _,
   e6 as v,
-  eV as y,
   h_ as x,
   lk as S,
   m_ as w,

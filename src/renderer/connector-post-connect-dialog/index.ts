@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createRuntimeUuid as g } from "../app-shared/runtime/runtime-identifier-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -16,7 +17,6 @@ import {
   e6 as p,
   lY as m,
   n4 as h,
-  tU as g,
   wL as _,
   zh as v,
 } from "@rchunk/app-shared";

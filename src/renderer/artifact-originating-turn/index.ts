@@ -1,9 +1,8 @@
 // @ts-nocheck
+import { areEquivalentPaths as n, resolvePath as t } from "../app-shared/runtime/path-key-policy";
 import { getCanonicalHistoryEntries as i } from "../app-initial/runtime/canonical-history";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  HI as t,
-  IK as n,
   RI as r,
 } from "@rchunk/app-shared";
 import {

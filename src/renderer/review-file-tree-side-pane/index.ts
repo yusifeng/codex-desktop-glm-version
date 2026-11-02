@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { resolvePath as o } from "../app-shared/runtime/path-key-policy";
 import { getPathBasename as l } from "../app-shared/runtime/get-path-basename";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -7,7 +8,6 @@ import {
   BX as r,
   FX as i,
   H2 as a,
-  HI as o,
   HX as s,
   I3 as c,
   If as u,

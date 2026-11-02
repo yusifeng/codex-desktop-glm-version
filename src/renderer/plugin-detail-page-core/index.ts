@@ -1,4 +1,7 @@
 // @ts-nocheck
+import { createMcpAppRoute as m, createPluginSettingsRoute as _e } from "../app-shared/runtime/navigation-route-policy";
+import { firstOrNull as Ce } from "../app-shared/runtime/non-empty-collection";
+import { getPackageSourceSuffix as P } from "../app-shared/runtime/runtime-identifier-policy";
 import { getFirstPrompt as ri } from "../app-primary/runtime/prompt-and-markdown-policy";
 import { CODEX_WEB_URL as _ } from "../app-shared/runtime/codex-links";
 import { createCommandQueryKey as Oe } from "../app-initial/runtime/create-command-query-key";
@@ -18,7 +21,6 @@ import {
   I3 as u,
   K2 as f,
   K3 as p,
-  KB as m,
   LX as h,
   Lf as g,
   Q3 as v,
@@ -41,7 +43,6 @@ import {
   c_ as M,
   e6 as N,
   eH as re,
-  eV as P,
   ek as ie,
   fI as ae,
   fO as oe,
@@ -55,13 +56,11 @@ import {
   o_ as he,
   pO as I,
   pk as ge,
-  qB as _e,
   rL as ve,
   tY as ye,
   wD as be,
   wL as xe,
   wl as Se,
-  yH as Ce,
 } from "@rchunk/app-shared";
 import {
   $$ as we,

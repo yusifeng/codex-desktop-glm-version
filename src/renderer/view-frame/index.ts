@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { createMcpAppRoute as ee } from "../app-shared/runtime/navigation-route-policy";
+import { getPackageSourceSuffix as ie } from "../app-shared/runtime/runtime-identifier-policy";
 import { classNames as ue, initializeClassNames as se } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -9,13 +11,11 @@ import {
   G4 as a,
   I3 as o,
   I4 as s,
-  KB as ee,
   LX as te,
   P3 as ne,
   __ as re,
   a$ as c,
   e6 as l,
-  eV as ie,
   g4 as ae,
   g_ as oe,
   lV as ce,

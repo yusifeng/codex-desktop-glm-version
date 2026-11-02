@@ -18,6 +18,7 @@ const __vite__mapDeps = (
       "./terminal-panel-e74d48fceaac.css",
     ]),
 ) => i.map((i) => d[i]);
+import { areEquivalentPaths as c } from "../app-shared/runtime/path-key-policy";
 import { getPathBasename as s } from "../app-shared/runtime/get-path-basename";
 import { classNames as T, initializeClassNames as C } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -28,7 +29,6 @@ import {
   H3 as i,
   HX as a,
   I3 as o,
-  IK as c,
   Jm as l,
   K2 as u,
   LX as d,

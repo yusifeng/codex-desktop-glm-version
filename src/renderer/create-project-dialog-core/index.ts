@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isAbsolutePath as a } from "../app-shared/runtime/path-key-policy";
 import { updateProjectAppearance as g } from "../app-shared/runtime/project-appearance-policy";
 import { getPathBasename as m } from "../app-shared/runtime/get-path-basename";
 import { isManagedHostSource as d } from "../app-shared/runtime/is-managed-host-source";
@@ -9,7 +10,6 @@ import {
   $3 as t,
   AE as n,
   Ah as i,
-  BK as a,
   CH as o,
   C_ as s,
   FP as c,

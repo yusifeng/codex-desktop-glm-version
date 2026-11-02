@@ -1,6 +1,12 @@
 // @ts-nocheck
+import { createLocalConversationRoute as r } from "../app-shared/runtime/navigation-route-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { $3 as t, I3 as n, WB as r, kB as i, wL as a } from "@rchunk/app-shared";
+import {
+  $3 as t,
+  I3 as n,
+  kB as i,
+  wL as a,
+} from "@rchunk/app-shared";
 import {
   CY as o,
   Met as s,

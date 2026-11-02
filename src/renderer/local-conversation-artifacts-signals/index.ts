@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { resolvePath as i } from "../app-shared/runtime/path-key-policy";
 import { createCaseInsensitivePathKey as n } from "../app-shared/runtime/path-key-policy";
 import { isWebMcpServer as d } from "../app-shared/runtime/is-web-mcp-server";
 import { flattenConversationItems as w } from "../app-initial/runtime/flatten-conversation-items";
@@ -6,7 +7,6 @@ import { getPathBasename as a } from "../app-shared/runtime/get-path-basename";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   FX as r,
-  HI as i,
   OK as o,
   PK as s,
   QI as c,

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createLocalConversationRoute as I } from "../app-shared/runtime/navigation-route-policy";
 import { classNames as le, initializeClassNames as re } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -37,7 +38,6 @@ import {
   Rf as N,
   Rh as P,
   V2 as F,
-  WB as I,
   Y2 as L,
   Yh as ee,
   Yx as R,

@@ -15,6 +15,7 @@ const __vite__mapDeps = (
       "@rchunk/entry-type",
     ]),
 ) => i.map((i) => d[i]);
+import { areEquivalentPaths as b, normalizePathSeparators as F } from "../app-shared/runtime/path-key-policy";
 import { getPathBasename as y } from "../app-shared/runtime/get-path-basename";
 import { classNames as we, initializeClassNames as pe } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
@@ -36,7 +37,6 @@ import {
   H3 as g,
   HX as _,
   I3 as v,
-  IK as b,
   If as x,
   Ih as S,
   Jm as C,
@@ -56,7 +56,6 @@ import {
   SL as N,
   S_ as ie,
   V3 as P,
-  VI as F,
   Y2 as I,
   Yh as L,
   ZI as ae,

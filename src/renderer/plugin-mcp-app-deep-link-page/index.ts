@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { createMcpAppRoute as o, createPluginSettingsRoute as l } from "../app-shared/runtime/navigation-route-policy";
+import { getPackageSourceSuffix as c } from "../app-shared/runtime/runtime-identifier-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -6,10 +8,7 @@ import {
   FX as r,
   HX as i,
   I3 as a,
-  KB as o,
   e6 as s,
-  eV as c,
-  qB as l,
   sV as u,
   wL as d,
 } from "@rchunk/app-shared";

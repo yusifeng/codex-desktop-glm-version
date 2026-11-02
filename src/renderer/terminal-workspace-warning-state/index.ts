@@ -1,7 +1,15 @@
 // @ts-nocheck
+import { areEquivalentPaths as n } from "../app-shared/runtime/path-key-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { FX as t, IK as n, RI as r, oZ as i } from "@rchunk/app-shared";
-import { Ftn as a, wtn as o } from "@rchunk/app-initial";
+import {
+  FX as t,
+  RI as r,
+  oZ as i,
+} from "@rchunk/app-shared";
+import {
+  Ftn as a,
+  wtn as o,
+} from "@rchunk/app-initial";
 function s({ binding: e, currentTarget: t, currentWorkspaceRoots: n, dismissedTarget: r }) {
   return (
     e != null &&

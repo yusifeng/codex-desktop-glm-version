@@ -24,12 +24,12 @@
 // 依赖（28 个文件，保持与原版一致的 import 集合）：app-shared/app-initial/
 // app-primary + conversation-blocks（turn 渲染体 rl）+ 25 个功能 chunk。
 
+import { isAbsolutePath as agentActivityApi } from "../app-shared/runtime/path-key-policy";
 import { appgenInteractionActions as appgenAccessApi } from "../app-shared/runtime/appgen-interaction-action";
 import {
   $3 as runtimeLazy,
   $h as resourceIconHelpers,
   $r as appgenHelpers,
-  BK as agentActivityApi,
   I3 as getJsxRuntime,
   e6 as getReact,
 } from "@rchunk/app-shared";

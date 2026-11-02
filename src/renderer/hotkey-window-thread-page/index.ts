@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { createHotkeyThreadRoute as l, createLocalConversationRoute as u } from "../app-shared/runtime/navigation-route-policy";
+import { isClientNewThreadId as m } from "../app-shared/runtime/runtime-identifier-policy";
 import { selectModeDescriptor as n } from "../app-shared/runtime/select-mode-descriptor";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -9,12 +11,9 @@ import {
   I3 as o,
   K2 as s,
   LX as c,
-  UB as l,
-  WB as u,
   e6 as d,
   iW as f,
   n4 as p,
-  rJ as m,
   wL as h,
 } from "@rchunk/app-shared";
 import {

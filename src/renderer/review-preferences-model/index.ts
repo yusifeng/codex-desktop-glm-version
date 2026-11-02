@@ -2,9 +2,17 @@
 // The release bundled these three owners together; the nineteen short exports
 // below remain the cross-chunk ABI and therefore must not be renamed.
 
+import { normalizePathSeparators as normalizePath } from "../app-shared/runtime/path-key-policy";
 import { n as onceExport } from "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, VI as normalizePath, e6 as getReactRuntime, type ScopedSignal } from "@rchunk/app-shared";
-import { dun as createPersistedPreference, rgn as initializePreferenceRuntime } from "@rchunk/app-initial";
+import {
+  I3 as getJsxRuntime,
+  e6 as getReactRuntime,
+  type ScopedSignal,
+} from "@rchunk/app-shared";
+import {
+  dun as createPersistedPreference,
+  rgn as initializePreferenceRuntime,
+} from "@rchunk/app-initial";
 import * as appPrimaryChunk from "@rchunk/app-primary";
 import * as diffCommentCardChunk from "@rchunk/diff-comment-card";
 import * as readonlyCommentChunk from "@rchunk/pull-request-readonly-comment";

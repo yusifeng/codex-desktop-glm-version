@@ -54,6 +54,7 @@ const __vite__mapDeps = (
       "./chatgpt-code-block-highlighting-a44c30b43d60.css",
     ]),
 ) => i.map((i) => d[i]);
+import { createLocalConversationRoute as S } from "../app-shared/runtime/navigation-route-policy";
 import { resolveBoxFilePreview as yt } from "../app-primary/runtime/resolve-box-file-preview";
 import { getPathBasename as d } from "../app-shared/runtime/get-path-basename";
 import { classNames as se, initializeClassNames as re } from "../app-shared/ui/class-names";
@@ -79,7 +80,6 @@ import {
   TO as y,
   UX as b,
   V3 as x,
-  WB as S,
   WD as C,
   Y2 as w,
   Yh as T,

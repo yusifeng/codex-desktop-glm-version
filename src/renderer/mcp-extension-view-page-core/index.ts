@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createRuntimeUuid as pe } from "../app-shared/runtime/runtime-identifier-policy";
 import { CODEX_WEB_URL as g } from "../app-shared/runtime/codex-links";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -51,7 +52,6 @@ import {
   rl as ue,
   sV as de,
   sW as fe,
-  tU as pe,
   wL as me,
   x4 as he,
 } from "@rchunk/app-shared";

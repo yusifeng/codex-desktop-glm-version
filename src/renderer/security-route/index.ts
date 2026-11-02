@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { areEquivalentPaths as T } from "../app-shared/runtime/path-key-policy";
 import { selectModelReasoningEfforts as Jr } from "../app-primary/runtime/select-model-reasoning-efforts";
 import { getPathBasename as w } from "../app-shared/runtime/get-path-basename";
 import { classNames as ot, initializeClassNames as We } from "../app-shared/ui/class-names";
@@ -26,7 +27,6 @@ import {
   HX as x,
   I$ as S,
   I3 as C,
-  IK as T,
   If as E,
   Ih as D,
   JX as O,

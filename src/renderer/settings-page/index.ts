@@ -8,6 +8,7 @@ const __vite__mapDeps = (
       "@rchunk/rolldown-runtime",
     ]),
 ) => i.map((i) => d[i]);
+import { createPluginSettingsRoute as E } from "../app-shared/runtime/navigation-route-policy";
 import { classNames as oe, initializeClassNames as ie } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -42,7 +43,6 @@ import {
   lw as T,
   n4 as se,
   o_ as ce,
-  qB as E,
   ug as D,
   wL as le,
 } from "@rchunk/app-shared";

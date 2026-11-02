@@ -1,6 +1,9 @@
 // @ts-nocheck
+import { normalizePathSeparators as n } from "../app-shared/runtime/path-key-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { RI as t, VI as n } from "@rchunk/app-shared";
+import {
+  RI as t,
+} from "@rchunk/app-shared";
 function r(e, t) {
   return t?.trim() || a(e);
 }

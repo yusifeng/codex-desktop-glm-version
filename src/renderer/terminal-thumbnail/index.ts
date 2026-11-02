@@ -1,16 +1,18 @@
 // @ts-nocheck
+import { areEquivalentPaths as r, normalizePathSeparators as a } from "../app-shared/runtime/path-key-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
   I3 as n,
-  IK as r,
   RI as i,
-  VI as a,
   WK as o,
   kC as s,
   lw as c,
 } from "@rchunk/app-shared";
-import { Xd as l, Zd as u } from "@rchunk/app-initial";
+import {
+  Xd as l,
+  Zd as u,
+} from "@rchunk/app-initial";
 import "@rchunk/terminal-panel-bootstrap";
 function d(e) {
   let t = (0, m.c)(13),

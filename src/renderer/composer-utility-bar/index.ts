@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { normalizePathSeparators as te } from "../app-shared/runtime/path-key-policy";
 import { getLastTwoPathSegments as w } from "../app-shared/runtime/path-key-policy";
 import { deriveCloudUnavailableReason as ia } from "../app-primary/runtime/derive-cloud-unavailable-reason";
 import { isStandardWindowLayout as sa } from "../app-primary/runtime/is-compact-window-enabled";
@@ -46,7 +47,6 @@ import {
   S_ as L,
   U_ as R,
   Ut as ee,
-  VI as te,
   Vi as z,
   Wt as ne,
   Y2 as B,

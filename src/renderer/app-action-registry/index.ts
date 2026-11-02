@@ -4,6 +4,7 @@ const __vite__mapDeps = (
   m = __vite__mapDeps,
   d = m.f || (m.f = ["@rchunk/cannon", "@rchunk/rolldown-runtime"]),
 ) => i.map((i) => d[i]);
+import { createLocalConversationRoute as u } from "../app-shared/runtime/navigation-route-policy";
 import { createCommandQueryKey as ee } from "../app-initial/runtime/create-command-query-key";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -16,7 +17,6 @@ import {
   V3 as s,
   V4 as c,
   W3 as l,
-  WB as u,
   g4 as d,
   k4 as f,
   lY as p,

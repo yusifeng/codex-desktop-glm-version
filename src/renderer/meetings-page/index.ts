@@ -12,6 +12,7 @@ const __vite__mapDeps = (
       "./app-initial-e8ceb32eb626.css",
     ]),
 ) => i.map((i) => d[i]);
+import { createMcpAppRoute as g } from "../app-shared/runtime/navigation-route-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -29,7 +30,6 @@ import {
   Ih as p,
   JX as m,
   K2 as h,
-  KB as g,
   LX as _,
   Lf as v,
   Lh as y,
@@ -157,7 +157,10 @@ import {
   y6t as Lt,
   ypn as Rt,
 } from "@rchunk/app-initial";
-import { dc as zt, uc as Bt } from "@rchunk/app-primary";
+import {
+  dc as zt,
+  uc as Bt,
+} from "@rchunk/app-primary";
 import { n as Vt, r as Ht } from "@rchunk/app-connect-modal-by-id";
 function Ut(e) {
   if (!(`date` in e))

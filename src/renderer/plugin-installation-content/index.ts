@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createMcpAppRoute as f } from "../app-shared/runtime/navigation-route-policy";
 import { getFirstPrompt as Dr } from "../app-primary/runtime/prompt-and-markdown-policy";
 import { createPrefilledPluginPrompt as Er } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -14,7 +15,6 @@ import {
   I3 as l,
   Ih as u,
   K2 as d,
-  KB as f,
   Km as p,
   LX as m,
   Lf as h,

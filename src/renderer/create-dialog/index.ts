@@ -1,4 +1,6 @@
 // @ts-nocheck
+import { createLocalConversationRoute as w } from "../app-shared/runtime/navigation-route-policy";
+import { createClientNewThreadId as x } from "../app-shared/runtime/runtime-identifier-policy";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -20,10 +22,8 @@ import {
   Ph as v,
   QI as y,
   Qh as b,
-  Qq as x,
   Rh as S,
   SB as C,
-  WB as w,
   Y2 as T,
   Yh as E,
   ZI as D,

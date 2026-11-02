@@ -1,16 +1,15 @@
 // @ts-nocheck
+import { normalizePathSeparators as s, resolveDisplayPath as i } from "../app-shared/runtime/path-key-policy";
+import { getPackageSourceSuffix as u } from "../app-shared/runtime/runtime-identifier-policy";
 import { createCaseInsensitivePathKey as n } from "../app-shared/runtime/path-key-policy";
 import { unescapeMarkdownPunctuation as F } from "../app-initial/runtime/markdown-links";
 import { getPathBasename as r } from "../app-shared/runtime/get-path-basename";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
-  PI as i,
   Q3 as a,
   RI as o,
-  VI as s,
   Z3 as c,
   eH as l,
-  eV as u,
   vV as d,
   wL as f,
 } from "@rchunk/app-shared";
