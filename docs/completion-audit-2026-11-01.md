@@ -1,3 +1,21 @@
+# Superseding final status — 2026-11-02
+
+This audit is a chronological record. Any later paragraph that says the critical
+E2E matrix, preserved source inventory, conversation compatibility, exact owners,
+or final runtime contract work is still incomplete describes an earlier checkpoint
+and is superseded by this section.
+
+The final source boundary has no original `.js/.cjs/.mjs` runtime fallback,
+conversation compatibility is 0, exact fallback owners are 0, and all 33 intentional
+vendor/generated route dependencies are checked-in TypeScript. The three semantic
+hubs have 0 consumed semantic-business aliases. The managed packaged matrix now
+starts and stops the reconstructed app and passes settings, conversation history and
+add-context, a real Git-worker commit, a real detached worktree, direct IAB navigation
+to `https://example.com/`, and a signed-in send/reply marker
+`E2E_REPLY_20261102093326`. The runtime-only URL parser, Browser tab state-family
+initializer, and local HTTP predicate contracts exposed by that matrix were restored
+from the published implementation and covered by focused tests.
+
 # Semantic classification audit — 2026-11-01
 
 > Historical scope note: this audit established classification coverage, not a fully runnable decompilation. It must not be

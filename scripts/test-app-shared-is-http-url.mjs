@@ -6,4 +6,7 @@ const mod = await import(`data:text/javascript;base64,${Buffer.from(built.output
 assert.equal(mod.isHttpUrl("https://example.com/a", (host) => host === "example.com"), true);
 assert.equal(mod.isHttpUrl("ftp://example.com", () => true), false);
 assert.equal(mod.isHttpUrl("bad", () => true), false);
-console.log("app-shared is http url: 3 assertions passed");
+assert.equal(mod.isHttpUrl("http://localhost:3000/a"), true);
+assert.equal(mod.isHttpUrl("https://preview.localhost/a"), true);
+assert.equal(mod.isHttpUrl("https://example.com/a"), false);
+console.log("app-shared is http url: 6 assertions passed");

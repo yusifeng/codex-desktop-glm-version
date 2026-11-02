@@ -6,8 +6,10 @@
 const endpoint = process.env.CODEX_RENDERER_DEBUG_ENDPOINT ?? "http://127.0.0.1:9223";
 const [mode = "inspect", argument = ""] = process.argv.slice(2);
 const pages = await fetch(`${endpoint}/json/list`).then((response) => response.json());
-const page = pages.find((candidate) => candidate.type === "page" && candidate.url === "app://-/index.html");
-if (page == null) throw new Error(`No app://-/index.html renderer at ${endpoint}`);
+const page = pages.find((candidate) =>
+  candidate.type === "page" && candidate.url.startsWith("app://-/") && !candidate.url.includes("initialRoute="),
+);
+if (page == null) throw new Error(`No primary app renderer at ${endpoint}`);
 
 const socket = new WebSocket(page.webSocketDebuggerUrl);
 await new Promise((resolve, reject) => {
@@ -45,6 +47,7 @@ async function evaluate(expression) {
 }
 
 await command("Runtime.enable");
+await command("Page.bringToFront");
 
 if (mode === "smoke-readonly") {
   const checkpoints = [];
@@ -87,10 +90,7 @@ if (mode === "smoke-readonly") {
     do {
       const ready = await evaluate(`
         document.querySelector('#settings-search') != null ||
-        document.querySelector('[data-codex-composer]') != null ||
-        document.querySelector('[aria-label="打开个人资料菜单"]') != null ||
-        (document.body?.innerText ?? '').includes('设置') ||
-        (document.body?.innerText ?? '').includes('新对话')
+        document.querySelector('[aria-label="打开个人资料菜单"], [aria-label="Open profile menu"]') != null
       `);
       if (ready) return;
       await new Promise((resolve) => setTimeout(resolve, 250));
@@ -114,13 +114,35 @@ if (mode === "smoke-readonly") {
 
   await waitForAppReady();
   if (!(await evaluate(`document.querySelector('#settings-search') != null`))) {
-    if (await evaluate(`document.querySelector('[aria-label="打开个人资料菜单"]') != null`)) {
-      await clickAriaWithMouse('打开个人资料菜单');
-      await waitForBodyText('设置');
-      await clickText('设置');
-    } else {
-      await clickText('设置');
+    const profileMenuLabel = await evaluate(`
+      document.querySelector('[aria-label="打开个人资料菜单"]') != null ? '打开个人资料菜单' : 'Open profile menu'
+    `);
+    const settingsMenuVisible = await evaluate(`
+      [...document.querySelectorAll('[role="menuitem"]')].some((element) =>
+        ['设置', 'Settings'].includes(element.innerText?.trim().split('\\n')[0])
+      )
+    `);
+    if (!settingsMenuVisible) await clickAriaWithMouse(profileMenuLabel);
+    const settingsDeadline = Date.now() + 20_000;
+    let settingsClicked = false;
+    let attempt = 0;
+    while (!settingsClicked && Date.now() < settingsDeadline) {
+      settingsClicked = await evaluate(`(() => {
+        const target = [...document.querySelectorAll('button, a, [role="button"], [role="menuitem"]')].find((element) =>
+          ['设置', 'Settings'].includes(element.innerText?.trim().split('\\n')[0])
+        );
+        if (target == null) return false;
+        target.click();
+        return true;
+      })()`);
+      if (!settingsClicked) {
+        if (++attempt % 8 === 0) {
+          await evaluate(`document.querySelector('[aria-label="打开个人资料菜单"], [aria-label="Open profile menu"]')?.click()`);
+        }
+        await new Promise((resolve) => setTimeout(resolve, 250));
+      }
     }
+    if (!settingsClicked) throw new Error('Settings menu item did not appear');
   }
   await waitForBodyText('搜索设置');
   await clickText('常规');
@@ -301,6 +323,59 @@ if (mode === "smoke-readonly") {
     text: element.innerText?.trim().slice(0, 160) ?? '',
     title: element.getAttribute('title'),
   })).filter((entry) => entry.ariaLabel || entry.text || entry.title))()`), null, 2));
+} else if (mode === "iab-navigation") {
+  const requestedUrl = argument.length > 0 ? argument : "https://example.com/";
+  const selector = '[data-browser-sidebar-address-input="true"]';
+  const appReadyDeadline = Date.now() + 60_000;
+  while (!(await evaluate(`document.querySelector('[data-codex-composer], [contenteditable="true"][aria-label="随心输入"]') != null`)) && Date.now() < appReadyDeadline) {
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  }
+  if (!(await evaluate(`document.querySelector(${JSON.stringify(selector)}) != null`))) {
+    await evaluate(`(async () => {
+      const bridge = window.electronBridge;
+      if (bridge?.sendMessageFromView == null) throw new Error('Electron message bridge is unavailable');
+      await bridge.sendMessageFromView({ type: 'open-browser-tab', source: 'packaged_e2e', initiator: 'side_panel_menu' });
+    })()`);
+  }
+  const openDeadline = Date.now() + 30_000;
+  while (!(await evaluate(`document.querySelector(${JSON.stringify(selector)}) != null`)) && Date.now() < openDeadline) {
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  }
+  if (!(await evaluate(`document.querySelector(${JSON.stringify(selector)}) != null`))) {
+    throw new Error("IAB address input did not appear");
+  }
+  await evaluate(`(() => {
+    const input = document.querySelector(${JSON.stringify(selector)});
+    input.focus();
+    input.select();
+  })()`);
+  await command("Input.insertText", { text: requestedUrl });
+  await command("Input.dispatchKeyEvent", { type: "keyDown", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13 });
+  await command("Input.dispatchKeyEvent", { type: "keyUp", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13 });
+
+  const navigationDeadline = Date.now() + 60_000;
+  let state;
+  do {
+    state = await evaluate(`(() => ({
+      address: document.querySelector(${JSON.stringify(selector)})?.value ?? null,
+      bodyText: document.body?.innerText ?? '',
+    }))()`);
+    if (state.address?.includes("example.com") && !state.bodyText.includes("标签页内容无法显示")) break;
+    await new Promise((resolve) => setTimeout(resolve, 250));
+  } while (Date.now() < navigationDeadline);
+  if (!state.address?.includes("example.com")) throw new Error(`IAB navigation did not commit: ${JSON.stringify(state)}`);
+  if (state.bodyText.includes("标签页内容无法显示")) throw new Error("IAB rendered its error boundary");
+  const targets = await fetch(`${endpoint}/json/list`).then((response) => response.json());
+  const browserTargets = targets
+    .filter((target) => target.type === "page" && target.url === requestedUrl)
+    .map((target) => ({ title: target.title, type: target.type, url: target.url }));
+  if (browserTargets.length === 0) throw new Error(`No browser target committed ${requestedUrl}`);
+  console.log(JSON.stringify({
+    mode,
+    requestedUrl,
+    address: state.address,
+    browserTargets,
+  }, null, 2));
 } else if (mode === "find-text") {
   if (argument.length === 0) throw new Error("find-text requires visible text");
   console.log(JSON.stringify(await evaluate(`(() => [...document.querySelectorAll('button, a, [role="button"], [role="option"], [role="menuitem"]')]

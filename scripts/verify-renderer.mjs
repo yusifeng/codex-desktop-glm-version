@@ -21,9 +21,71 @@ const ORIGINAL_DIR = path.resolve(
   originalArgIndex !== -1 ? args[originalArgIndex + 1] : "../chatgpt-desktop-src",
 );
 
-// Every comparable renderer owner now preserves the published dependency graph.
-// Keep the mechanism so future intentional graph changes remain explicit.
-const EXPECTED_IMPORT_CHANGES = new Map();
+const browserExternal = "./__vite-browser-external-1a803c367e3b.js";
+const appPrimary = "./app-primary-d66705000d76.js";
+const appShared = "./app-shared-7b9edc1bfb7f.js";
+const appInitial = "./app-initial-51da50e6c6e3.js";
+
+function importChanges({ missing = [], extra = [] } = {}) {
+  return { missing: new Set(missing), extra: new Set(extra) };
+}
+
+// Intentional dependency-graph changes introduced by semantic source owners.
+// Keep this list exact: the verifier also fails when a registered delta stops
+// being observed, so stale exceptions cannot silently accumulate.
+const EXPECTED_IMPORT_CHANGES = new Map([
+  ["appshots-settings-69ae88c8d2f5.js", importChanges({ missing: [appPrimary] })],
+  ["queries-75df5b2ce147.js", importChanges({ missing: [appShared] })],
+  ["stripe-client-5cc289885357.js", importChanges({ missing: [appShared] })],
+  ["local-conversation-webmcp-tools-model-933537f85a0f.js", importChanges({ missing: [appInitial] })],
+  ["worktree-onboarding-banner-controller-7e8d2c149cf5.js", importChanges({ missing: [appPrimary] })],
+  [
+    "realtime-voice-home-announcement-1020c8788781.js",
+    importChanges({ missing: [appPrimary], extra: [appInitial] }),
+  ],
+  ["banner-ee99d8ffab06.js", importChanges({ missing: [appPrimary] })],
+  ["banner-content-6fd3d18d582a.js", importChanges({ missing: [appPrimary] })],
+  [
+    "PopcornChartHoverTooltip-2ec4b0b51b3e.js",
+    importChanges({ missing: ["./artifact-source-bootstrap-583ed8de587e.js"] }),
+  ],
+  ["native-code-execution-sandbox-fa3ec5081637.js", importChanges({ missing: [appShared] })],
+  ...[
+    "git-settings-537e4135cecb.js",
+    "chronicle-settings-page-e92cf619a884.js",
+    "onboarding-page-905dd8894724.js",
+    "remote-conversation-page-9acc03bfbb05.js",
+    "worktrees-settings-page-f7e1c38f9bb4.js",
+    "codex-micro-slot-signals-3e4c87c6de7b.js",
+    "worktree-setup-auto-fix-4dc0f12b7219.js",
+    "pull-request-fix-workflow-1561e22a0cbc.js",
+    "git-action-new-branch-field-a2e24da5e504.js",
+    "git-branch-switcher-96861524e333.js",
+    "local-conversation-side-chat-48c6730ec06a.js",
+    "local-conversation-git-actions-f71520dad4b4.js",
+    "thread-handoff-modal-ccac59d04293.js",
+    "automation-dialog-e8ab58185edc.js",
+    "gitlab-merge-request-form-dialog-d0ba270c6b55.js",
+    "pull-request-fix-automation-f8042d3c1af3.js",
+    "use-codex-worktrees-cc7a1f84e042.js",
+    "sidebar-onboarding-checklist-task-config-2c7fbbcf69d8.js",
+    "chronicle-permissions-dialog-cad125ff4c30.js",
+    "cloud-automation-detail-panel-3063b9153870.js",
+    "panel-3f0c2778c5e0.js",
+    "home-ambient-suggestions-content-a1c4fe488b63.js",
+    "home-task-suggestions-e29a02e9b466.js",
+    "computer-history-suggestions-55e8abf166e7.js",
+    "pull-request-detail-query-bec089c5268f.js",
+    "review-slash-command-submenu-registration-8268b8759915.js",
+    "registered-259e95b201a1.js",
+    "automations-page-fb28e6fc19f3.js",
+    "permissions-mode-dropdown-c2d1ab2cace3.js",
+  ].map((file) => [file, importChanges({ extra: [browserExternal] })]),
+]);
+
+const EXPECTED_EXPORT_CHANGES = new Map([
+  ["__vite-browser-external-1a803c367e3b.js", { missing: new Set(), extra: new Set(["z"]) }],
+]);
 
 function importsOf(code) {
   const set = new Set();
@@ -108,10 +170,31 @@ for (const name of REWRITTEN) {
   }
   const exportsA = exportsOfOriginal(originalCode);
   const exportsB = exportsOfRebuilt(rebuiltCode);
-  const exportsMissing = diffSets(exportsA, exportsB);
-  const exportsExtra = diffSets(exportsB, exportsA);
+  const expectedExportChanges = EXPECTED_EXPORT_CHANGES.get(file) ?? {
+    missing: new Set(),
+    extra: new Set(),
+  };
+  const observedExportsMissing = new Set(diffSets(exportsA, exportsB));
+  const observedExportsExtra = new Set(diffSets(exportsB, exportsA));
+  const exportsMissing = [...observedExportsMissing].filter(
+    (exportName) => !expectedExportChanges.missing.has(exportName),
+  );
+  const exportsExtra = [...observedExportsExtra].filter(
+    (exportName) => !expectedExportChanges.extra.has(exportName),
+  );
+  const expectedExportsMissingNotObserved = diffSets(
+    expectedExportChanges.missing,
+    observedExportsMissing,
+  );
+  const expectedExportsExtraNotObserved = diffSets(expectedExportChanges.extra, observedExportsExtra);
   if (exportsMissing.length) problems.push(`缺少 export: ${exportsMissing.join(", ")}`);
   if (exportsExtra.length) problems.push(`多余 export: ${exportsExtra.join(", ")}`);
+  if (expectedExportsMissingNotObserved.length) {
+    problems.push(`预期移除的 export 未发生: ${expectedExportsMissingNotObserved.join(", ")}`);
+  }
+  if (expectedExportsExtraNotObserved.length) {
+    problems.push(`预期新增的 export 未发生: ${expectedExportsExtraNotObserved.join(", ")}`);
+  }
   if (problems.length) {
     failures++;
     console.error(`FAIL ${file} (${name}):`);

@@ -1,5 +1,13 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Packaged runtime closure：在语义 Hub 与源码边界已经归零后，最终真实 IAB 验收又
+发现并修复 3 个仅在延迟路由加载时出现的发布契约：HTTPS URL parser 的二参数 ABI、Browser
+tab URL state family 的原版初始化顺序，以及 local HTTP URL predicate 的可选 hostname policy。
+`npm run e2e:critical` 现在自行启动并关闭 packaged app，一次覆盖 settings、历史会话、add-context、
+真实 Git commit、真实 detached worktree、IAB `https://example.com/` target，以及发送
+`E2E_REPLY_20261102093326` 并收到 assistant 同 marker。该结果补齐此前独立审计指出的启动、
+Git/worktree 与直接 IAB 自动化缺口；下文较早批次中“仍需最终 E2E”的表述均为当时状态。
+
 2026-11-02 Final semantic-hub and runtime-source boundary closure：将最后 7 个仍由 renderer
 直接消费的 `app-primary` 语义 alias 作为两个完整簇移出聚合 Hub，而不是保留兼容转发。
 Home announcement 簇恢复 Banner action placement、beacon dismiss、badge、leading visual、

@@ -35,31 +35,27 @@ The smoke script is intentionally not treated as a substitute for these gates:
 it validates process startup and the packaged module graph, while the static
 checks validate source coverage and renderer/chunk contracts.
 
-## Signed-in renderer matrix
+## Signed-in packaged matrix
 
-The packaged app can also be driven through its Electron DevTools endpoint. Start
-the reconstructed package with a dedicated debug port:
-
-```sh
-CODEX_DESKTOP_STARTUP_DEBUG=1 ./scripts/run.sh --remote-debugging-port=9223
-```
-
-Then run the non-mutating matrix:
-
-```sh
-npm run e2e:readonly
-```
-
-Run the complete critical matrix, including a signed-in mutation and assistant
-reply assertion, with:
+The complete critical matrix starts the reconstructed package with the signed-in
+`Codex (local-src)` profile, waits for the renderer, runs the checks, and closes
+the whole test process group:
 
 ```sh
 npm run e2e:critical
 ```
 
-The driver is state-independent: it can start on the home page, a conversation,
-or an already-open settings page. It currently checks all of the following in one
-run and rejects the renderer recovery boundary at every checkpoint:
+To inspect an app that is already running on port 9223, use the attached/read-only
+drivers instead:
+
+```sh
+npm run e2e:readonly
+npm run e2e:critical:attached
+```
+
+The managed driver is state-independent after startup. It checks all of the
+following in one run and rejects the renderer recovery boundary at every
+checkpoint:
 
 - General settings and the default-permissions surface
 - Git settings
@@ -67,6 +63,9 @@ run and rejects the renderer recovery boundary at every checkpoint:
 - Browser Use settings
 - A hydrated historical conversation containing both a user turn and an assistant reply
 - The conversation add-context menu, including the in-app browser action
+- A real Git-worker commit and detached worktree in an isolated temporary repository
+- Direct in-app-browser navigation to `https://example.com/` with a real browser target
+- A fresh signed-in prompt whose assistant response contains the unique requested marker
 
 `npm run e2e:inspect` records the current renderer title, body, editable controls,
 conversation virtualizer nodes, and new console exceptions without changing app
@@ -74,10 +73,8 @@ state. The lower-level driver also has explicit `fill`, `send`, and `wait` modes
 Only `send` submits through the signed-in account; keep it a separate, intentional
 mutation step rather than hiding it inside inspection or navigation checks.
 
-The 2026-11-01 signed-in package run passed all six read-only checkpoints. On
-2026-11-02 the mutation matrix also passed. After the renderer source-owner
-convergence, the complete `e2e:critical` command was rerun against a freshly
-packed application and passed with zero local `@rchunk` asset failures:
+The 2026-11-02 final managed run passed startup and the full matrix with marker
+`E2E_REPLY_20261102093326`, with zero local `@rchunk` asset failures:
 
 - `fill` + `send` + `wait` submitted a fresh turn through the signed-in account and
   observed the assistant response marker.
@@ -90,7 +87,7 @@ packed application and passed with zero local `@rchunk` asset failures:
   an isolated temporary root; `git worktree list` and the checked-out file verified
   the result.
 
-The Git fixtures lived under `/private/tmp` and did not modify the recovery
-repository. Together these checks cover fresh conversation mutation, IAB
-attachment/navigation, Git mutation, and worktree creation rather than only
-read-only rendering.
+The Git fixtures use `mkdtemp` under the operating-system temporary directory and
+are removed after the run; they do not modify the recovery repository. Together
+these checks cover packaged startup, settings, conversation mutation, IAB
+attachment/navigation, Git mutation, and worktree creation.

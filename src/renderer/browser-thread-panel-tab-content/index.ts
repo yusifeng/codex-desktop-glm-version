@@ -32,7 +32,10 @@ import { getBrowserSidebarSubmitAvailability as Gr, getBrowserSidebarSubmitStart
 import { getPrimaryModifierPressed as ne } from "../app-shared/runtime/command-metadata-policy";
 import { hasItems as f } from "../app-shared/runtime/non-empty-collection";
 import { sitesSharingSources as l } from "../app-shared/runtime/sites-sharing-source";
-import { setBrowserTabUrlState as Fr } from "../app-primary-browser-comment-runtime/index";
+import {
+  initializeBrowserTabUrlState,
+  setBrowserTabUrlState as Fr,
+} from "../app-primary-browser-comment-runtime/index";
 import { isBrowserCommentForTab as Lr } from "../app-primary/runtime/is-browser-comment-for-tab";
 import { parseUrlOrFallback as Vr } from "../app-primary/runtime/parse-url-or-fallback";
 import { hasQueuedDesignChange as u } from "../app-shared/runtime/has-queued-design-change";
@@ -127,6 +130,7 @@ import {
   mK as qe,
   n4 as Je,
   nc as Ye,
+  oZ as browserCreateStateFamily,
   o_ as Xe,
   oc as Ze,
   pk as Qe,
@@ -7121,6 +7125,7 @@ function ol() {
       De(),
       Pe(),
       m(),
+      initializeBrowserTabUrlState(browserCreateStateFamily, fe),
       ut(),
       D(),
       (Q = Te()),
