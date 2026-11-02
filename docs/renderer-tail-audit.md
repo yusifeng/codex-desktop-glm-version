@@ -1,5 +1,18 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Git/home/plugin/artifact release-owner recovery：一次性恢复
+`draw-presence-label`、`shopping-browse-tab-open`、`register-pierre-themes`、
+`family-notification-surface`、`artifact-preview-header`、`hotkey-window-home-page`、
+`hosted-plugin-creation-actions`、`git-settings`、`pull-request-readonly-comment`、
+`lighthouse-work-home-page`、`workspace-discovery` 与 `ascii-engine` 十二个发布 owner，
+净恢复 13,119 行发布 TypeScript。绑定旧手写 ABI 的 presence、preview、Git、home、plugin、
+terminal 与 workspace 测试已迁移为发布一致性验证，同时保留同簇其余行为覆盖。整批通过
+12,448/12,448 transform check、1,888/1,888 renderer build/verify、2,247/2,247 app-code
+coverage、0 semantic tail 与 typecheck。严格 hub 消费推进到 app-shared 1,613/3,185、
+app-initial 5,102/8,204、app-primary 650/917，仍为 0 unreviewed、0 invalid consumers。
+按发布源码正向行数缺口口径，覆盖率由约 84.0% 推进到 85.3%；preserved 边界、聚合 hub
+耦合导出与最终真实登录态 E2E 仍未完成。
+
 2026-11-02 Conversation/artifact/scheduling/settings release-owner recovery：一次性恢复
 `chatgpt-shared-post-page`、`notebook-preview-panel`、`codex-micro-bridge`、
 `model-picker-power-slider-impl`、`use-external-agent-import-setup-actions`、

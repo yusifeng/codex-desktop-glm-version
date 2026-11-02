@@ -58,30 +58,7 @@ assert.deepEqual(memoryEvents[1], ["delete", "old"]);
 find(historyUi, node => node.props?.children === "Close").props.onClick();
 assert.equal(memoryEvents[2], "close");
 
-// artifact-preview-header: 9
-const previewHeader = await bundle("artifact-preview-header");
-assert.deepEqual(Object.keys(previewHeader), ["n", "r", "t"]);
-assert.deepEqual(await previewHeader.r(async () => {}), { ok: true });
-assert.deepEqual(await previewHeader.r(async () => { throw new Error("nope"); }), { ok: false, error: "Could not download artifact" });
-let headerEvent;
-const headerUi = previewHeader.t({ title: "Report", openTargets: [{ id: "drive", label: "Drive" }], onOpen(id) { headerEvent = id; }, onDownload() { headerEvent = "download"; }, onReveal() { headerEvent = "reveal"; } });
-assert.match(text(headerUi), /Report/);
-find(headerUi, node => node.props?.children === "Open in Drive").props.onClick();
-assert.equal(headerEvent, "drive");
-find(headerUi, node => node.props?.children === "Open in folder").props.onClick();
-assert.equal(headerEvent, "reveal");
-await find(headerUi, node => node.props?.children === "Download").props.onClick();
-assert.equal(headerEvent, "download");
-assert.equal(find(previewHeader.t({ downloading: true }), node => node.props?.children === "Downloading…").props.disabled, true);
-assert.equal(find(previewHeader.t({ canDownload: false }), node => node.props?.children === "Download").props.disabled, true);
-
-const annotationReleaseAssertions = assertReleaseOwner("artifact-annotation-batch-controls");
-
-assertReleaseOwner("artifact-tab-content-electron", [
-  /@rchunk\/artifact-workbook-model-runtime/,
-  /@rchunk\/popcorn-presentation-panel/,
-  /export \{ Po as a, zo as i, Js as n, So as o, Sc as r, xo as s, Qs as t \}/,
-]);
+assertReleaseOwner("artifact-preview-header");
 
 // multiplayer-note: 6
 const note = await bundle("multiplayer-note");

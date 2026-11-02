@@ -71,34 +71,9 @@ const selected = categoryQuery.select({ pages: [{ pagination: {}, plugins: [{ id
 assert.deepEqual(selected.map((plugin) => plugin.id), ["two", "three"]);
 assert.deepEqual(category.t({ categorySlug: "all", hostId: "remote" }).queryKey, ["plugins", "category", "remote", "all"]);
 
-const actions = await load("hosted-plugin-creation-actions");
-actions.n();
-let createdMode = null;
-const menu = actions.a({ canCreatePlugin: true, canCreateSkill: false, onCreatePlugin() {}, hostedCreateAction: { canCreateMcpApp: true, canUploadArchive: true, onCreate: (mode) => { createdMode = mode; } }, onAddMarketplace() {} });
-assert.equal(menu.props.role, "menu");
-assert.equal(menu.props.children.length, 5);
-assert.equal(menu.props.children[0].props.children, "Create plugin");
-assert.equal(menu.props.children[0].props.disabled, false);
-assert.equal(menu.props.children[1].props.disabled, true);
-assert.equal(menu.props.children[2].props.children, "Upload plugin archive");
-menu.props.children[2].props.onClick();
-assert.equal(createdMode, "archive");
-menu.props.children[3].props.onClick();
-assert.equal(createdMode, "mcp");
-const toolbar = actions.o({ mode: "manage", canCreatePlugin: true });
-assert.equal(toolbar.type, "header");
-assert.equal(toolbar.props.children[0].props.children, "Manage");
-assert.equal(toolbar.props.children[2].type.name, "CreationMenu");
-const creatorBoundary = actions.r({ canCreatePlugin: true, children: (state) => state });
-assert.equal(creatorBoundary.canCreatePlugin, true);
-assert.equal(creatorBoundary.isCreatingPlugin, false);
-assert.equal(creatorBoundary.isPluginCreatorDisabledByAdmin, false);
-const workspaceBoundary = actions.t({ enabled: false, children: (state) => state, onCreateSkill() {} });
-assert.equal(workspaceBoundary.canCreatePlugin, false);
-assert.equal(workspaceBoundary.canCreateSkill, false);
-assert.equal(workspaceBoundary.onCreateSkill, undefined);
+const hostedActionsReleaseAssertions = assertReleaseOwner("hosted-plugin-creation-actions");
 
-const restoredOwnerAssertions =
+const restoredOwnerAssertions = hostedActionsReleaseAssertions +
   assertReleaseOwner("hosted-plugin-create-dialog") +
   assertReleaseOwner("create-dialog");
 

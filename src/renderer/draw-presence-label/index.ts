@@ -1,33 +1,1193 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, e6 as getReact, m4 as cn } from "@rchunk/app-shared";
-import "@rchunk/popcorn-icons";
-
-const React = getReact(), jsxRuntime = getJsxRuntime();
-const useIsomorphicLayoutEffect = typeof window === "undefined" ? React.useEffect : React.useLayoutEffect;
-export interface Point { x: number; y: number }
-export interface CommentAuthor { avatarUrl?: string | null; displayName: string; id?: string; initials?: string; providerId?: string; userId?: string }
-export interface ArtifactComment { author: CommentAuthor; createdAt: string; editedAt?: string | null; id: string; isDeleted?: boolean; reactions: Array<{ authorIds: string[]; authors?: Array<{ providerId?: string; userId?: string }>; count: number; type: string }>; text: string }
-export interface ArtifactCommentThread { comments: ArtifactComment[]; status: "open" | "resolved"; threadId: string; viewerAuthorId?: string }
-export interface PresenceLabelStyle { borderRadius: number; color: string; fontFamily: string; fontSize: number; fontWeight: number | string; lineHeight: number; maxWidth: number; paddingX: number; paddingY: number }
-
-function relativeTimestamp(value: string, now = new Date()): string { const date = new Date(value); if (Number.isNaN(date.getTime())) return ""; const minutes = Math.max(1, Math.floor((now.getTime() - date.getTime()) / 60_000)); if (minutes < 60) return `${minutes}m`; const hours = Math.floor(minutes / 60); if (hours < 24) return `${hours}h`; const today = new Date(now.getFullYear(), now.getMonth(), now.getDate()), day = new Date(date.getFullYear(), date.getMonth(), date.getDate()), days = Math.max(1, Math.round((today.getTime() - day.getTime()) / 86_400_000)); return days < 7 ? `${days}d` : days < 30 ? `${Math.floor(days / 7)}w` : days < 365 ? `${Math.floor(days / 30)}mo` : `${Math.floor(days / 365)}y`; }
-function useMinuteNow(enabled = true): Date { const [now, setNow] = React.useState(() => new Date()); React.useEffect(() => { if (!enabled) return undefined; const timer = globalThis.setInterval(() => setNow(new Date()), 60_000); return () => globalThis.clearInterval(timer); }, [enabled]); return now; }
-const isChatGptAuthor = (author: CommentAuthor): boolean => author.userId === "chatgpt" && author.providerId === "openai" || author.displayName === "ChatGPT";
-
-export interface CommentComposerProps { assignedToChatGpt?: boolean; initialAssignedToChatGpt?: boolean; initialValue?: string; labels?: { assignment?: string; heading?: unknown; input?: string; placeholder?: string; recipient?: string; submit?: string }; mode: "create" | "reply"; onAssignmentChange?(assigned: boolean): void; onCancel?(): void; onChange?(value: string): void; onSubmit(input: { assignedToChatGpt: boolean; body: string; submitSource: "button" | "keyboard" }): boolean | void; value?: string }
-function ArtifactCommentComposer(props: CommentComposerProps): unknown { const [localValue, setLocalValue] = React.useState(props.initialValue ?? ""), [localAssigned, setLocalAssigned] = React.useState(props.initialAssignedToChatGpt ?? false), value = props.value ?? localValue, assigned = props.assignedToChatGpt ?? localAssigned, updateValue = (next: string) => { if (props.value === undefined) setLocalValue(next); props.onChange?.(next); }, updateAssigned = (next: boolean) => { if (props.assignedToChatGpt === undefined) setLocalAssigned(next); props.onAssignmentChange?.(next); }, submit = (source: "button" | "keyboard") => { const body = value.trim(); if (body && props.onSubmit({ body, assignedToChatGpt: assigned, submitSource: source }) && props.mode === "reply") updateValue(""); }; return jsxRuntime.jsx("form", { onSubmit: (event: { preventDefault(): void }) => { event.preventDefault(); submit("button"); }, onKeyDown: (event: { altKey?: boolean; ctrlKey?: boolean; key: string; metaKey?: boolean; preventDefault(): void; shiftKey?: boolean; stopPropagation(): void }) => { if (event.key === "Escape" && props.onCancel) { event.preventDefault(); event.stopPropagation(); props.onCancel(); } else if (event.key === "Enter" && !event.shiftKey && !event.altKey && (event.metaKey || event.ctrlKey)) { event.preventDefault(); event.stopPropagation(); submit("keyboard"); } }, children: jsxRuntime.jsxs("div", { className: cn("flex min-w-0 flex-col text-default", props.mode === "reply" ? "rounded-md" : "rounded-2xl"), children: [props.labels?.heading, jsxRuntime.jsx("textarea", { "aria-label": props.labels?.input ?? (props.mode === "reply" ? "Reply to comment" : "Comment"), placeholder: props.labels?.placeholder ?? (props.mode === "reply" ? "Add a reply" : "Add a comment"), value, onChange: (event: { target: { value: string } }) => updateValue(event.target.value) }), jsxRuntime.jsx("button", { type: "button", "aria-label": props.labels?.assignment ?? "Assign to ChatGPT", "aria-pressed": assigned, onClick: () => updateAssigned(!assigned), children: props.labels?.recipient ?? "@ChatGPT" }), jsxRuntime.jsx("button", { type: "submit", disabled: value.trim().length === 0, children: props.labels?.submit ?? "Send" })] }) }); }
-
-export interface CommentsSidebarProps { closeButton?: unknown; embedded?: boolean; labels: { empty?: string; filteredEmpty?: string; showOpen: string; showResolved: string }; onClose?(): void; onDeleteAll?(threads: ArtifactCommentThread[]): void; renderChangeFilterButton?(props: { children: string; onClick(): void }): unknown; renderDeleteAllButton?(props: { onClick(): void }): unknown; renderFilter?(state: string): unknown; renderThread(thread: ArtifactCommentThread): unknown; testId?: string; threads: ArtifactCommentThread[] }
-function ArtifactCommentsSidebar(props: CommentsSidebarProps): unknown { const [filter, setFilter] = React.useState<"open" | "resolved">("open"), [confirmDelete, setConfirmDelete] = React.useState(false), nonEmpty = [...props.threads].filter(thread => thread.comments.some(comment => !comment.isDeleted)).sort((left, right) => Date.parse(right.comments[0]?.createdAt ?? "") - Date.parse(left.comments[0]?.createdAt ?? "")), visible = nonEmpty.filter(thread => filter === "resolved" ? thread.status === "resolved" : thread.status !== "resolved"), toggle = { children: filter === "resolved" ? props.labels.showOpen : props.labels.showResolved, onClick: () => setFilter(filter === "resolved" ? "open" : "resolved") }; return jsxRuntime.jsxs("aside", { "data-testid": props.testId ?? "artifact-comments-sidebar", "data-embedded": props.embedded, children: [jsxRuntime.jsxs("header", { children: [props.closeButton ?? (props.onClose ? jsxRuntime.jsx("button", { type: "button", onClick: props.onClose, children: "Close" }) : null), props.renderFilter?.(filter), props.renderChangeFilterButton?.(toggle) ?? jsxRuntime.jsx("button", { type: "button", onClick: toggle.onClick, children: toggle.children }), props.onDeleteAll ? props.renderDeleteAllButton?.({ onClick: () => setConfirmDelete(true) }) ?? jsxRuntime.jsx("button", { type: "button", onClick: () => setConfirmDelete(true), children: "Delete all" }) : null] }), visible.length ? jsxRuntime.jsx("div", { children: visible.map(props.renderThread) }) : jsxRuntime.jsx("div", { children: nonEmpty.length ? props.labels.filteredEmpty ?? "No matching comments" : props.labels.empty ?? "No comments" }), confirmDelete ? jsxRuntime.jsxs("div", { role: "alertdialog", children: [jsxRuntime.jsx("button", { type: "button", onClick: () => { props.onDeleteAll?.(visible); setConfirmDelete(false); }, children: "Confirm" }), jsxRuntime.jsx("button", { type: "button", onClick: () => setConfirmDelete(false), children: "Cancel" })] }) : null] }); }
-
-export interface CommentThreadProps { borderless?: boolean; formatTimestamp?(value: string, now: Date): string; isPending?: boolean; isSelected?: boolean; isUnread?: boolean; labels?: Record<string, string>; onDelete?(): void; onDeleteComment?(id: string): void; onHover?(threadId: string | null): void; onReply?(body: string): void; onReopen?(): void; onResolve?(): void; onSelect(threadId: string | null): void; onToggleReaction?(commentId: string, reaction: string): void; preview?: boolean; sourceLabel?: string; thread: ArtifactCommentThread; timestampNow?: Date }
-function ArtifactCommentThreadCard(props: CommentThreadProps): unknown { const now = props.timestampNow ?? useMinuteNow(props.timestampNow == null), resolved = props.thread.status === "resolved"; return jsxRuntime.jsxs("article", { "data-testid": `artifact-comment-thread-${props.thread.threadId}`, className: cn("group relative rounded-2xl", props.isSelected && !props.borderless && "bg-background-secondary-soft"), onMouseEnter: () => props.onHover?.(props.thread.threadId), onMouseLeave: () => props.onHover?.(null), children: [props.sourceLabel ? jsxRuntime.jsx("span", { className: "sr-only", children: props.sourceLabel }) : null, props.thread.comments.map((comment, index) => jsxRuntime.jsxs("button", { type: "button", "aria-pressed": props.isSelected, onClick: () => props.onSelect(props.isSelected ? null : props.thread.threadId), children: [jsxRuntime.jsx("span", { className: "font-medium", children: comment.author.displayName }), jsxRuntime.jsx("time", { dateTime: comment.editedAt ?? comment.createdAt, children: props.formatTimestamp?.(comment.editedAt ?? comment.createdAt, now) ?? relativeTimestamp(comment.editedAt ?? comment.createdAt, now) }), jsxRuntime.jsx("p", { children: comment.isDeleted ? props.labels?.deletedComment ?? "Comment deleted." : comment.text }), props.isUnread && index === props.thread.comments.length - 1 ? jsxRuntime.jsx("span", { "data-testid": `artifact-comment-unread-${props.thread.threadId}` }) : null] }, comment.id)), props.isPending ? jsxRuntime.jsx("span", { role: "status", children: props.labels?.thinking ?? "Thinking" }) : null, props.preview ? null : jsxRuntime.jsxs("div", { children: [props.onReply ? jsxRuntime.jsx("button", { type: "button", onClick: () => props.onReply?.(""), children: "Reply" }) : null, resolved && props.onReopen ? jsxRuntime.jsx("button", { type: "button", onClick: props.onReopen, children: props.labels?.reopen ?? "Reopen thread" }) : !resolved && props.onResolve ? jsxRuntime.jsx("button", { type: "button", onClick: props.onResolve, children: props.labels?.resolve ?? "Resolve thread" }) : null] })] }); }
-
-function drawPresenceLabel(context: CanvasRenderingContext2D, input: { color: string; label: string; point: Point; scale: number; style: PresenceLabelStyle }): void { const { point, label, color, scale, style } = input; context.save(); context.translate(point.x, point.y); context.scale(1 / scale, 1 / scale); context.font = `${style.fontWeight} ${style.fontSize}px ${style.fontFamily}`; context.textAlign = "left"; context.textBaseline = "middle"; const available = Math.max(0, style.maxWidth - style.paddingX * 2); let visible = label; if (context.measureText(visible).width > available) { const characters = Array.from(visible); let low = 0, high = characters.length; while (low < high) { const middle = Math.ceil((low + high) / 2); context.measureText(characters.slice(0, middle).join("") + "…").width <= available ? low = middle : high = middle - 1; } visible = characters.slice(0, low).join("") + "…"; } const width = Math.min(style.maxWidth, context.measureText(visible).width + style.paddingX * 2), height = style.lineHeight + style.paddingY * 2; context.fillStyle = color; context.beginPath(); context.roundRect(0, 0, width, height, style.borderRadius); context.fill(); context.clip(); context.fillStyle = style.color; context.fillText(visible, style.paddingX, height / 2); context.restore(); }
-function initializeReactTiming(): void {}
-function initializeCommentUtilities(): void {}
-function initializeCommentComposer(): void {}
-function initializeArtifactCommentThread(): void {}
-function initializePresenceLabel(): void {}
-function initializeCommentsSidebar(): void {}
-export { ArtifactCommentComposer as a, isChatGptAuthor as c, initializeReactTiming as d, useMinuteNow as f, initializeArtifactCommentThread as i, ArtifactCommentsSidebar as l, useIsomorphicLayoutEffect as m, initializePresenceLabel as n, initializeCommentComposer as o, initializeReactTiming as p, ArtifactCommentThreadCard as r, initializeCommentUtilities as s, drawPresenceLabel as t, initializeCommentsSidebar as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  C$ as t,
+  D$ as n,
+  E$ as r,
+  I3 as i,
+  O$ as a,
+  P3 as o,
+  T$ as s,
+  d1 as c,
+  e6 as l,
+  h4 as u,
+  l1 as d,
+  m1 as f,
+  m4 as p,
+  p1 as m,
+  s1 as h,
+  u1 as g,
+  w$ as _,
+} from "@rchunk/app-shared";
+import {
+  F as v,
+  I as y,
+  N as b,
+  T as x,
+  _ as S,
+  c as C,
+  o as w,
+  r as T,
+  u as E,
+  v as D,
+  w as O,
+} from "@rchunk/popcorn-icons";
+var k, A;
+function j() {
+  return (j = e(() => {
+    ((k = l()), (A = typeof window > `u` ? k.useEffect : k.useLayoutEffect));
+  }))();
+}
+function M(e, t = new Date()) {
+  let n = new Date(e);
+  if (Number.isNaN(n.getTime())) return ``;
+  let r = Math.max(1, Math.floor((t.getTime() - n.getTime()) / 6e4));
+  if (r < 60) return `${r}m`;
+  let i = Math.floor(r / 60);
+  if (i < 24) return `${i}h`;
+  let a = new Date(t.getFullYear(), t.getMonth(), t.getDate()),
+    o = new Date(n.getFullYear(), n.getMonth(), n.getDate()),
+    s = Math.max(1, Math.round((a.getTime() - o.getTime()) / 864e5));
+  return s < 7
+    ? `${s}d`
+    : s < 30
+      ? `${Math.floor(s / 7)}w`
+      : s < 365
+        ? `${Math.floor(s / 30)}mo`
+        : `${Math.floor(s / 365)}y`;
+}
+function N(e = !0) {
+  let [t, n] = (0, P.useState)(() => new Date());
+  return (
+    (0, P.useEffect)(() => {
+      if (!e) return;
+      let t = globalThis.setInterval(() => {
+        n(new Date());
+      }, 6e4);
+      return () => {
+        globalThis.clearInterval(t);
+      };
+    }, [e]),
+    t
+  );
+}
+var P;
+function F() {
+  return (F = e(() => {
+    P = l();
+  }))();
+}
+function I({
+  threads: e,
+  embedded: t = !1,
+  labels: i,
+  testId: a = `artifact-comments-sidebar`,
+  renderThread: o,
+  onClose: c,
+  onDeleteAll: l,
+  closeButton: u,
+  emptyIcon: d,
+  filteredEmptyIcon: f,
+  renderFilter: m,
+  renderDeleteAllButton: h,
+  renderChangeFilterButton: g,
+  renderScrollContainer: y,
+}) {
+  let b = (0, L.useId)(),
+    [S, w] = (0, L.useState)(`open`),
+    [T, D] = (0, L.useState)(!1),
+    k = e
+      .filter((e) => e.comments.some((e) => !e.isDeleted))
+      .sort((e, t) => {
+        let n = Date.parse(e.comments[0]?.createdAt ?? ``);
+        return Date.parse(t.comments[0]?.createdAt ?? ``) - n;
+      }),
+    A = k.filter((e) => (S === `resolved` ? e.status === `resolved` : e.status !== `resolved`)),
+    j = {
+      children: S === `resolved` ? i.showOpen : i.showResolved,
+      onClick: () => w(S === `resolved` ? `open` : `resolved`),
+    },
+    M = () => l?.(A),
+    N = {
+      className: p(`min-h-0 flex-1 overflow-y-auto px-2 pb-4`, A.length > 0 && `pt-2`),
+      children: (0, R.jsxs)(R.Fragment, {
+        children: [
+          (0, R.jsx)(`div`, {
+            className: `flex flex-col`,
+            hidden: A.length === 0,
+            children: k.map((e) =>
+              (0, R.jsxs)(
+                `div`,
+                {
+                  hidden: S === `resolved` ? e.status !== `resolved` : e.status === `resolved`,
+                  children: [
+                    e.threadId !== A[0]?.threadId &&
+                      (0, R.jsx)(`div`, {
+                        "aria-hidden": !0,
+                        className: `mx-2 my-3 h-px shrink-0 bg-border-subtle`,
+                      }),
+                    o(e),
+                  ],
+                },
+                e.threadId,
+              ),
+            ),
+          }),
+          A.length === 0 &&
+            (0, R.jsxs)(`div`, {
+              className: p(
+                `flex flex-col items-center gap-4 pt-40 text-center text-secondary select-none`,
+                k.length === 0 && `px-8`,
+              ),
+              children: [
+                (0, R.jsx)(`div`, {
+                  "aria-hidden": !0,
+                  className: `flex size-7 items-center justify-center`,
+                  children: k.length === 0 ? (d ?? (0, R.jsx)(C, {})) : (f ?? (0, R.jsx)(x, {})),
+                }),
+                (0, R.jsxs)(`div`, {
+                  className: `flex flex-col gap-2`,
+                  children: [
+                    (0, R.jsx)(`p`, {
+                      className: `text-base leading-4 font-medium`,
+                      children: k.length === 0 ? i.empty : i.filteredEmpty,
+                    }),
+                    k.length === 0 &&
+                      (0, R.jsx)(`p`, {
+                        className: `text-base leading-5`,
+                        children: i.emptyDescription,
+                      }),
+                  ],
+                }),
+                k.length > 0 &&
+                  (g == null
+                    ? (0, R.jsx)(`button`, {
+                        type: `button`,
+                        className: `flex min-h-9 cursor-interaction items-center justify-center rounded-full border border-default px-3 text-base leading-5 font-medium text-default hover:bg-primary-ghost-hover focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring`,
+                        ...j,
+                      })
+                    : g(j)),
+              ],
+            }),
+        ],
+      }),
+    };
+  return (0, R.jsxs)(`aside`, {
+    "aria-label": i.sidebar,
+    className: p(
+      `flex h-full min-h-0 max-w-full shrink-0 flex-col overflow-hidden text-default`,
+      t ? `w-full` : `w-74 rounded-2xl bg-surface shadow-card ring-1 ring-border ring-inset`,
+    ),
+    "data-testid": a,
+    children: [
+      (0, R.jsxs)(`header`, {
+        className: `flex h-11 shrink-0 items-center justify-between gap-2 py-1 ps-4 pe-2`,
+        children: [
+          (0, R.jsx)(`h2`, {
+            className: `text-base leading-5 font-medium text-secondary select-none`,
+            children: i.heading,
+          }),
+          (0, R.jsxs)(`div`, {
+            className: `flex items-center gap-2`,
+            children: [
+              k.length > 0 &&
+                (m == null
+                  ? (0, R.jsxs)(r, {
+                      open: T,
+                      onOpenChange: D,
+                      children: [
+                        (0, R.jsx)(n, {
+                          asChild: !0,
+                          children: (0, R.jsx)(`button`, {
+                            type: `button`,
+                            "aria-label": i.filter,
+                            className: `flex min-h-7 min-w-7 cursor-interaction items-center justify-center rounded-lg px-1 text-secondary hover:bg-primary-ghost-hover focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring`,
+                            children: (0, R.jsx)(O, {}),
+                          }),
+                        }),
+                        (0, R.jsx)(s, {
+                          children: (0, R.jsx)(_, {
+                            align: `end`,
+                            sideOffset: 4,
+                            className: `z-50 min-w-40 rounded-2xl border border-default bg-surface-elevated-secondary p-1.5 text-default shadow-lg`,
+                            children: (0, R.jsx)(`fieldset`, {
+                              "aria-label": i.filter,
+                              children: [`open`, `resolved`].map((e) =>
+                                (0, R.jsxs)(
+                                  `label`,
+                                  {
+                                    className: `flex h-9 cursor-interaction items-center gap-1.5 rounded-md px-2 text-base leading-5 focus-within:bg-primary-ghost-hover hover:bg-primary-ghost-hover`,
+                                    children: [
+                                      (0, R.jsx)(`input`, {
+                                        type: `radio`,
+                                        autoFocus: S === e,
+                                        className: `sr-only`,
+                                        name: b,
+                                        value: e,
+                                        checked: S === e,
+                                        onChange: () => w(e),
+                                        onClick: () => D(!1),
+                                      }),
+                                      (0, R.jsx)(`span`, { className: `flex-1`, children: i[e] }),
+                                      S === e && (0, R.jsx)(E, {}),
+                                    ],
+                                  },
+                                  e,
+                                ),
+                              ),
+                            }),
+                          }),
+                        }),
+                      ],
+                    })
+                  : m({ value: S, onChange: w })),
+              u ??
+                (0, R.jsx)(`button`, {
+                  type: `button`,
+                  "aria-label": i.close,
+                  className: `flex size-7 cursor-interaction items-center justify-center rounded-lg text-secondary hover:bg-primary-ghost-hover focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring`,
+                  onClick: c,
+                  children: (0, R.jsx)(v, {}),
+                }),
+            ],
+          }),
+        ],
+      }),
+      k.length === 0
+        ? (0, R.jsx)(`div`, { "aria-hidden": !0, className: `h-12 shrink-0` })
+        : S === `resolved` && A.length > 0
+          ? (0, R.jsx)(`div`, {
+              className: `px-2 pb-2`,
+              children: (0, R.jsxs)(`div`, {
+                className: `flex h-10 items-center justify-between gap-2 rounded-lg bg-background-secondary-soft px-3 text-base leading-4`,
+                children: [
+                  (0, R.jsx)(`div`, {
+                    className: `select-none`,
+                    children: i.resolvedCount({
+                      count: A.length,
+                      label: (e) =>
+                        (0, R.jsx)(`span`, { className: `font-medium`, children: e }, `label`),
+                    }),
+                  }),
+                  l != null &&
+                    (h == null
+                      ? (0, R.jsx)(`button`, {
+                          type: `button`,
+                          className: `cursor-interaction rounded-md text-base text-default hover:bg-primary-ghost-hover focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring`,
+                          onClick: M,
+                          children: i.deleteAll,
+                        })
+                      : h(M)),
+                ],
+              }),
+            })
+          : null,
+      y == null ? (0, R.jsx)(`div`, { ...N }) : y(N),
+    ],
+  });
+}
+var L, R;
+function z() {
+  return (z = e(() => {
+    (a(), u(), (L = l()), y(), (R = i()));
+  }))();
+}
+function ee(e) {
+  return (e.userId === `chatgpt` && e.providerId === `openai`) || e.displayName === `ChatGPT`;
+}
+function B() {
+  return (B = e(() => {}))();
+}
+function te({ children: e, label: t }) {
+  let n = (0, V.useId)(),
+    [r, i] = (0, V.useState)(!1),
+    a = (0, V.useRef)(null),
+    {
+      refs: o,
+      elements: s,
+      floatingStyles: l,
+    } = m({
+      open: r,
+      placement: `top`,
+      middleware: [g(2), h({ padding: 8 }), c({ padding: 8 })],
+      whileElementsMounted: f,
+    });
+  (0, V.useEffect)(() => () => clearTimeout(a.current ?? void 0), []);
+  function u() {
+    (clearTimeout(a.current ?? void 0), (a.current = null), i(!1));
+  }
+  let d = s.reference,
+    p = d instanceof Element ? (d.closest(`[data-theme]`) ?? d.ownerDocument.body) : null;
+  return (0, U.jsxs)(U.Fragment, {
+    children: [
+      (0, U.jsx)(`span`, {
+        ref: o.setReference,
+        className: `inline-flex`,
+        onPointerEnter: () => {
+          (clearTimeout(a.current ?? void 0), (a.current = setTimeout(() => i(!0), 700)));
+        },
+        onPointerLeave: u,
+        onFocus: (e) => {
+          e.target.matches(`:focus-visible`) && i(!0);
+        },
+        onBlur: u,
+        onPointerDown: u,
+        onKeyDown: (e) => {
+          e.key === `Escape` && u();
+        },
+        children: (0, V.cloneElement)(e, { "aria-describedby": r ? n : void 0 }),
+      }),
+      r &&
+        p != null &&
+        (0, H.createPortal)(
+          (0, U.jsx)(`div`, {
+            id: n,
+            ref: o.setFloating,
+            role: `tooltip`,
+            className: `pointer-events-none z-50 w-fit max-w-80 rounded-2xl border border-default bg-surface-elevated-secondary px-2 py-1.5 text-sm whitespace-normal text-default select-none`,
+            style: l,
+            children: t,
+          }),
+          p,
+        ),
+    ],
+  });
+}
+var V, H, U;
+function W() {
+  return (W = e(() => {
+    (d(), (V = l()), (H = o()), (U = i()));
+  }))();
+}
+function G({ renderInput: e, recipient: t, ...n }) {
+  let r = {
+    ...n,
+    recipient: (0, q.jsx)(`span`, {
+      className: `me-1 font-medium text-tip select-none`,
+      children: t,
+    }),
+    recipientPlaceholder: (0, q.jsx)(`span`, {
+      className: `pointer-events-none text-tertiary select-none`,
+      children: n.placeholder,
+    }),
+  };
+  return (0, q.jsx)(`div`, {
+    className: `min-w-0`,
+    children: e == null ? (0, q.jsx)(ne, { ...r }) : e(r),
+  });
+}
+function ne({
+  value: e,
+  onChange: t,
+  placeholder: n,
+  ariaLabel: r = n,
+  assignedToChatGpt: i,
+  recipient: a,
+  inputRef: o,
+  autoFocus: s = !0,
+  onRemoveRecipient: c,
+  onSubmit: l,
+}) {
+  let [u, d] = (0, K.useState)(null),
+    [f, p] = (0, K.useState)(0);
+  return (
+    A(() => {
+      if (u == null) return;
+      let e = () => p(u.offsetWidth);
+      if ((e(), typeof ResizeObserver > `u`)) return;
+      let t = new ResizeObserver(e);
+      return (t.observe(u), () => t.disconnect());
+    }, [u]),
+    (0, q.jsx)(`div`, {
+      className: `max-h-[25dvh] overflow-y-auto`,
+      children: (0, q.jsxs)(`div`, {
+        className: `relative min-w-0 text-sm leading-5`,
+        children: [
+          i &&
+            (0, q.jsx)(`span`, {
+              ref: d,
+              className: `pointer-events-none absolute start-0 top-0 inline-flex whitespace-nowrap`,
+              children: a,
+            }),
+          (0, q.jsx)(`textarea`, {
+            ref: (e) => {
+              if (typeof o == `function`) return o(e);
+              o != null && (o.current = e);
+            },
+            "aria-label": r,
+            autoFocus: s,
+            className: `block field-sizing-content min-h-5 w-full resize-none border-0 bg-transparent p-0 text-sm leading-5 shadow-none outline-none placeholder:text-tertiary focus:ring-0`,
+            style: { textIndent: i ? f : 0 },
+            rows: 1,
+            placeholder: n,
+            value: e,
+            onChange: (e) => t(e.target.value),
+            onKeyDown: (e) => {
+              e.nativeEvent.isComposing ||
+                (e.key === `Backspace` &&
+                i &&
+                c != null &&
+                e.currentTarget.selectionStart === 0 &&
+                e.currentTarget.selectionEnd === 0
+                  ? (e.preventDefault(), e.stopPropagation(), c())
+                  : e.key === `Enter` &&
+                    !e.shiftKey &&
+                    !e.altKey &&
+                    (e.preventDefault(), e.stopPropagation(), l()));
+            },
+          }),
+        ],
+      }),
+    })
+  );
+}
+var K, q;
+function re() {
+  return (re = e(() => {
+    ((K = l()), j(), (q = i()));
+  }))();
+}
+function ie({
+  value: e,
+  initialValue: t = ``,
+  mode: n,
+  assignedToChatGpt: r,
+  initialAssignedToChatGpt: i = !1,
+  labels: a,
+  assignmentIcon: o,
+  submitIcon: s,
+  renderInput: c,
+  wrapSurface: l,
+  wrapAssignmentControl: u,
+  onCancel: d,
+  onChange: f,
+  onAssignmentChange: m,
+  onSubmit: h,
+}) {
+  let [g, _] = (0, J.useState)(t),
+    v = e ?? g,
+    [y, b] = (0, J.useState)(i),
+    x = r ?? y,
+    [S, C] = (0, J.useState)(!1),
+    E = (0, J.useRef)(null),
+    D = v.trim().length > 0,
+    O = v.length > 0 || x || S,
+    k = a?.placeholder ?? (n === `reply` ? `Add a reply` : `Add a comment`),
+    A = a?.input ?? (n === `reply` ? `Reply to comment` : `Comment`),
+    j = a?.assignment ?? `Assign to ChatGPT`;
+  function M(e) {
+    let t = v.trim();
+    t && h({ body: t, assignedToChatGpt: x, submitSource: e }) && n === `reply` && N(``);
+  }
+  function N(t) {
+    (e ?? _(t), f?.(t));
+  }
+  function P(e) {
+    (r ?? b(e), m?.(e));
+  }
+  let F = (0, Y.jsx)(G, {
+      value: v,
+      onChange: N,
+      placeholder: k,
+      ariaLabel: A,
+      assignedToChatGpt: x,
+      recipient: a?.recipient ?? `@ChatGPT`,
+      inputRef: E,
+      autoFocus: n === `create`,
+      onRemoveRecipient: () => P(!1),
+      onSubmit: () => M(`keyboard`),
+      renderInput: c,
+    }),
+    I = (0, Y.jsx)(`button`, {
+      type: `button`,
+      "aria-label": j,
+      "aria-pressed": x,
+      className: `flex size-7 shrink-0 cursor-interaction items-center justify-center rounded-full border-0 p-0 text-secondary select-none no-drag focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 enabled:hover:bg-primary-ghost-hover aria-pressed:bg-primary-ghost-hover`,
+      onClick: () => {
+        (P(!x), E.current?.focus());
+      },
+      children: o ?? (0, Y.jsx)(w, { "aria-hidden": !0 }),
+    }),
+    L = u == null ? (0, Y.jsx)(te, { label: j, children: I }) : u(I),
+    R =
+      n !== `reply` || D
+        ? (0, Y.jsxs)(`button`, {
+            type: `submit`,
+            disabled: !D,
+            "aria-keyshortcuts": `Enter`,
+            className: `flex size-7 shrink-0 cursor-interaction items-center justify-center rounded-full border-0 bg-primary-solid p-0 text-primary-solid select-none no-drag focus:outline-hidden focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0 enabled:hover:bg-text/80 disabled:cursor-default disabled:opacity-50`,
+            children: [
+              (0, Y.jsx)(`span`, { className: `sr-only`, children: a?.submit ?? `Send` }),
+              s ?? (0, Y.jsx)(T, { "aria-hidden": !0 }),
+            ],
+          })
+        : null,
+    z = (0, Y.jsxs)(`div`, {
+      className: `relative flex min-h-0 min-w-0 flex-1 flex-col`,
+      children: [
+        a?.heading != null &&
+          (0, Y.jsx)(`div`, {
+            className: `px-3 pt-2 text-sm text-secondary select-none`,
+            children: a.heading,
+          }),
+        (0, Y.jsxs)(`div`, {
+          className: p(
+            `flex min-w-0 items-center gap-2 ps-3`,
+            O || n === `reply` ? `pe-3` : `pe-2`,
+            O && n === `create` ? `py-3` : `py-2`,
+          ),
+          children: [
+            (0, Y.jsx)(`div`, { className: p(`min-w-0 grow`, O && `min-h-10`), children: F }),
+            !O &&
+              n === `create` &&
+              (0, Y.jsxs)(`div`, {
+                className: `flex shrink-0 items-center gap-1 select-none`,
+                children: [L, R],
+              }),
+          ],
+        }),
+        O &&
+          (0, Y.jsxs)(`div`, {
+            className: `flex items-center justify-between gap-2 p-1.5 select-none`,
+            children: [L, R],
+          }),
+      ],
+    });
+  return (0, Y.jsx)(`form`, {
+    onFocusCapture: () => {
+      n === `reply` && C(!0);
+    },
+    onBlurCapture: (e) => {
+      n === `reply` && !e.currentTarget.contains(e.relatedTarget) && C(!1);
+    },
+    onSubmit: (e) => {
+      (e.preventDefault(), M(`button`));
+    },
+    onKeyDownCapture: (e) => {
+      e.nativeEvent.isComposing ||
+        (e.key === `Escape` && d != null
+          ? (e.preventDefault(), e.stopPropagation(), d())
+          : e.key === `Enter` &&
+            !e.shiftKey &&
+            !e.altKey &&
+            (e.metaKey || e.ctrlKey) &&
+            (e.preventDefault(), e.stopPropagation(), M(`keyboard`)));
+    },
+    children: (0, Y.jsx)(`div`, {
+      onMouseDown: (e) => {
+        e.button === 0 &&
+          !e.defaultPrevented &&
+          e.target instanceof Element &&
+          !e.currentTarget.contains(
+            e.target.closest(
+              `a[href], button, input, select, textarea, [contenteditable], [role='button'], [tabindex]`,
+            ),
+          ) &&
+          (e.preventDefault(), E.current?.focus());
+      },
+      children:
+        l == null
+          ? (0, Y.jsx)(`div`, {
+              className: p(
+                `flex min-w-0 flex-col text-default`,
+                n === `reply`
+                  ? `rounded-md border border-default bg-surface`
+                  : `rounded-2xl bg-background-primary-soft/90 shadow-lg-stronger ring-1 ring-border-subtle ring-inset backdrop-blur-lg dark:bg-surface-elevated-secondary`,
+              ),
+              children: z,
+            })
+          : l(z),
+    }),
+  });
+}
+var J, Y;
+function ae() {
+  return (ae = e(() => {
+    (u(), (J = l()), y(), W(), re(), (Y = i()));
+  }))();
+}
+function oe({ avatar: e, header: t, children: n, hasConnector: r, hasPrevious: i = !1, ...a }) {
+  return (0, X.jsxs)(`div`, {
+    ...a,
+    className: `group/message relative flex items-start gap-2.5 ps-3 pe-2 outline-none`,
+    children: [
+      (0, X.jsxs)(`div`, {
+        className: `relative shrink-0 self-stretch pt-3`,
+        children: [
+          i &&
+            (0, X.jsx)(`span`, {
+              "aria-hidden": !0,
+              className: `pointer-events-none absolute start-1/2 top-0 h-1.5 w-px -translate-x-1/2 bg-border-subtle`,
+            }),
+          e,
+          r &&
+            (0, X.jsx)(`span`, {
+              "aria-hidden": !0,
+              className: `pointer-events-none absolute start-1/2 top-10.5 bottom-0 w-px -translate-x-1/2 bg-border-subtle`,
+            }),
+        ],
+      }),
+      (0, X.jsxs)(`div`, { className: `flex min-w-0 flex-1 flex-col py-2`, children: [t, n] }),
+    ],
+  });
+}
+var X;
+function se() {
+  return (se = e(() => {
+    X = i();
+  }))();
+}
+function ce({ trigger: e, children: t }) {
+  return (0, Z.jsxs)(r, {
+    children: [
+      (0, Z.jsx)(n, { asChild: !0, children: e }),
+      (0, Z.jsx)(s, {
+        children: (0, Z.jsx)(_, {
+          side: `bottom`,
+          align: `end`,
+          sideOffset: 4,
+          collisionPadding: 8,
+          className: `z-50 rounded-2xl border border-default bg-surface p-1.5 text-default shadow-lg`,
+          onCloseAutoFocus: (e) => e.preventDefault(),
+          onPointerDown: (e) => e.stopPropagation(),
+          children: t,
+        }),
+      }),
+    ],
+  });
+}
+function le({ author: e, authorRole: t, icons: n }) {
+  let r = t === `assistant`;
+  return (0, Z.jsx)(`span`, {
+    "aria-hidden": !0,
+    className: p(
+      `flex size-6 shrink-0 items-center justify-center overflow-hidden rounded-full text-xs font-medium select-none`,
+      r && `border border-subtle bg-surface`,
+      !r && `bg-primary-solid text-primary-solid`,
+    ),
+    children:
+      !r && e?.avatarUrl != null
+        ? (0, Z.jsx)(`img`, { alt: ``, className: `size-full object-cover`, src: e.avatarUrl })
+        : ((r ? n?.assistant : t === `viewer` ? n?.viewer : null) ??
+          e?.initials ??
+          e?.displayName.slice(0, 1)),
+  });
+}
+function ue({
+  comment: e,
+  presentation: t,
+  threadId: n,
+  timestampNow: r,
+  isUnread: i,
+  hasConnector: a,
+  hasPrevious: o = !1,
+  isSelected: s,
+  selectLabel: c,
+  sourceLabelId: l,
+  onSelect: u,
+  viewerAuthor: d,
+  viewerAuthorId: f,
+  isResolved: m = !1,
+  onToggleResolved: h,
+  onDelete: g,
+  onToggleReaction: _,
+}) {
+  let { icons: v, labels: y, renderMetadata: b, formatTimestamp: x, renderDeleteMenu: S } = t,
+    C = g != null || _ != null || h != null,
+    w = C && s && !o,
+    T = C && s && o,
+    E = /^@ChatGPT(?=\s|$)/u.exec(e.text),
+    D = ee(e.author) ? `assistant` : `other`,
+    O = e.editedAt ?? e.createdAt,
+    k = x?.(O, r) ?? M(O, r),
+    A = (e) =>
+      (0, Z.jsx)(`span`, { className: `truncate font-medium text-default`, children: e }, `author`),
+    j = (t) =>
+      (0, Z.jsxs)(
+        `time`,
+        {
+          className: p(
+            `truncate text-sm leading-3.5 text-secondary`,
+            C && `group-focus-within/comment:hidden`,
+            w && `hidden`,
+            T && `group-hover/comment:hidden`,
+          ),
+          dateTime: O,
+          children: [t, e.editedAt != null && ` · ${y?.edited ?? `edited`}`],
+        },
+        `timestamp`,
+      ),
+    N = (0, Z.jsx)(oe, {
+      avatar: (0, Z.jsx)(le, { author: e.author, authorRole: D, icons: v }),
+      hasPrevious: o,
+      hasConnector: !1,
+      header: (0, Z.jsxs)(`span`, {
+        className: p(
+          `flex h-6 min-w-0 items-end gap-1.5 pb-1 text-base leading-4 select-none`,
+          C && `group-focus-within/comment:pe-20`,
+          w && `pe-20`,
+          T && `group-hover/comment:pe-20`,
+        ),
+        children: [
+          b?.({ authorName: e.author.displayName, relativeTime: k, author: A, timestamp: j }) ??
+            (0, Z.jsxs)(Z.Fragment, { children: [A(e.author.displayName), j(k)] }),
+          i &&
+            (0, Z.jsx)(`span`, {
+              "aria-label": y?.unread ?? `New ChatGPT reply`,
+              className: `ms-auto size-2 shrink-0 self-center rounded-full bg-text-info`,
+              "data-testid": `artifact-comment-unread-${n}`,
+            }),
+        ],
+      }),
+      children: (0, Z.jsx)(`p`, {
+        className: p(
+          `text-base leading-5 break-words whitespace-pre-wrap select-text`,
+          e.isDeleted ? `text-secondary italic` : `text-default`,
+        ),
+        children: e.isDeleted
+          ? (y?.deletedComment ?? `Comment deleted.`)
+          : E == null
+            ? e.text
+            : (0, Z.jsxs)(Z.Fragment, {
+                children: [
+                  (0, Z.jsx)(`span`, { className: `font-medium text-info`, children: E[0] }),
+                  e.text.slice(E[0].length),
+                ],
+              }),
+      }),
+    });
+  return (0, Z.jsxs)(`div`, {
+    className: `group/comment relative`,
+    children: [
+      a &&
+        (0, Z.jsx)(`span`, {
+          "aria-hidden": !0,
+          className: `pointer-events-none absolute start-6 top-10.5 bottom-0 w-px bg-border-subtle`,
+        }),
+      (0, Z.jsx)(`button`, {
+        type: `button`,
+        "aria-describedby": l,
+        "aria-label": c,
+        "aria-pressed": s,
+        className: `relative flex w-full cursor-interaction flex-col rounded-2xl text-start focus-visible:outline-2 focus-visible:outline-ring`,
+        onClick: u,
+        children: N,
+      }),
+      C &&
+        (0, Z.jsx)(fe, {
+          isSelected: w,
+          showOnHover: T,
+          isResolved: m,
+          onToggleResolved: h,
+          onDelete: g,
+          onToggleReaction: _,
+          icons: v,
+          labels: y,
+          menuLabel: o ? (y?.commentActions ?? `Comment actions`) : (y?.menu ?? `Thread actions`),
+          deleteLabel: o ? (y?.deleteComment ?? `Delete`) : (y?.delete ?? `Delete`),
+          renderDeleteMenu: S,
+        }),
+      !e.isDeleted &&
+        e.reactions.length > 0 &&
+        (0, Z.jsx)(`div`, {
+          className: `flex flex-wrap items-center gap-1.5 ps-11.5 pe-3 pb-2`,
+          children: e.reactions.map((e) => {
+            let t =
+                d?.id == null
+                  ? d?.userId != null && d.providerId != null
+                    ? (e.authors?.some(
+                        (e) => e.userId === d.userId && e.providerId === d.providerId,
+                      ) ?? !1)
+                    : f != null && e.authorIds.includes(f)
+                  : e.authorIds.includes(d.id),
+              n = p(
+                `inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs leading-4`,
+                t
+                  ? `bg-background-secondary-soft text-info`
+                  : `bg-primary-ghost-hover text-secondary`,
+              );
+            return _ == null
+              ? (0, Z.jsx)(`span`, { className: n, children: `${e.type} ${e.count}` }, e.type)
+              : (0, Z.jsx)(
+                  `button`,
+                  {
+                    type: `button`,
+                    className: n,
+                    "aria-pressed": t,
+                    onClick: () => _(e.type),
+                    children: `${e.type} ${e.count}`,
+                  },
+                  e.type,
+                );
+          }),
+        }),
+    ],
+  });
+}
+function de({ threadId: e, icons: t, labels: n, hasConnector: r = !1 }) {
+  return (0, Z.jsxs)(`div`, {
+    className: `flex items-start gap-2.5 ps-3 pe-2`,
+    "data-testid": `artifact-comment-thinking-${e}`,
+    children: [
+      (0, Z.jsxs)(`div`, {
+        className: `relative self-stretch pt-3`,
+        children: [
+          (0, Z.jsx)(`span`, {
+            "aria-hidden": !0,
+            className: `pointer-events-none absolute start-1/2 top-0 h-1.5 w-px -translate-x-1/2 bg-border-subtle`,
+          }),
+          (0, Z.jsx)(le, { authorRole: `assistant`, icons: t }),
+          r &&
+            (0, Z.jsx)(`span`, {
+              "aria-hidden": !0,
+              className: `pointer-events-none absolute start-1/2 top-10.5 bottom-0 w-px -translate-x-1/2 bg-border-subtle`,
+            }),
+        ],
+      }),
+      (0, Z.jsxs)(`div`, {
+        className: `flex min-w-0 flex-1 flex-col py-2`,
+        children: [
+          (0, Z.jsx)(`span`, {
+            className: `flex h-6 items-end pb-1 text-base leading-4 font-medium select-none`,
+            children: n?.assistantName ?? `ChatGPT`,
+          }),
+          (0, Z.jsx)(`span`, {
+            className: `loading-shimmer-pure-text self-start text-base leading-5 select-none`,
+            role: `status`,
+            children: n?.thinking ?? `Thinking`,
+          }),
+        ],
+      }),
+    ],
+  });
+}
+function fe({
+  isSelected: e,
+  showOnHover: n,
+  isResolved: r,
+  onToggleResolved: i,
+  onDelete: a,
+  onToggleReaction: o,
+  menuLabel: s,
+  deleteLabel: c,
+  icons: l,
+  labels: u,
+  renderDeleteMenu: d,
+}) {
+  let f = r ? (u?.reopen ?? `Reopen thread`) : (u?.resolve ?? `Resolve thread`),
+    m = (0, Z.jsx)(`button`, {
+      type: `button`,
+      "aria-label": s,
+      className: `flex size-6 cursor-interaction items-center justify-center rounded-full text-secondary select-none no-drag hover:bg-primary-ghost-hover focus-visible:outline-2 focus-visible:outline-ring`,
+      children: l?.menu ?? (0, Z.jsx)(S, {}),
+    });
+  return (0, Z.jsxs)(`div`, {
+    className: p(
+      `absolute end-2 top-2 flex gap-0.5`,
+      !e &&
+        `pointer-events-none opacity-0 group-focus-within/comment:pointer-events-auto group-focus-within/comment:opacity-100`,
+      n && `group-hover/comment:pointer-events-auto group-hover/comment:opacity-100`,
+    ),
+    children: [
+      a != null &&
+        (d == null
+          ? (0, Z.jsx)(ce, {
+              trigger: m,
+              children: (0, Z.jsx)(t, {
+                asChild: !0,
+                children: (0, Z.jsxs)(`button`, {
+                  type: `button`,
+                  className: `flex h-9 min-w-40 cursor-interaction items-center gap-1.5 rounded-md px-2 text-start text-base select-none hover:bg-primary-ghost-hover`,
+                  onClick: a,
+                  children: [l?.delete ?? (0, Z.jsx)(b, {}), c],
+                }),
+              }),
+            })
+          : d({ trigger: m, onDelete: a, label: c })),
+      o != null &&
+        (0, Z.jsx)(ce, {
+          trigger: (0, Z.jsx)(`button`, {
+            type: `button`,
+            "aria-label": u?.addReaction ?? `Add reaction`,
+            className: `flex size-6 cursor-interaction items-center justify-center rounded-full text-secondary select-none no-drag hover:bg-primary-ghost-hover focus-visible:outline-2 focus-visible:outline-ring`,
+            children: l?.addReaction ?? (0, Z.jsx)(D, {}),
+          }),
+          children: (0, Z.jsx)(`div`, {
+            className: `flex items-center gap-1`,
+            children: pe.map((e) =>
+              (0, Z.jsx)(
+                t,
+                {
+                  asChild: !0,
+                  children: (0, Z.jsx)(`button`, {
+                    type: `button`,
+                    className: `flex size-8 cursor-interaction items-center justify-center rounded-lg text-lg hover:bg-primary-ghost-hover`,
+                    onClick: () => o(e),
+                    children: e,
+                  }),
+                },
+                e,
+              ),
+            ),
+          }),
+        }),
+      i != null &&
+        (0, Z.jsx)(`button`, {
+          type: `button`,
+          "aria-label": f,
+          title: f,
+          className: `flex size-6 cursor-interaction items-center justify-center rounded-full text-secondary select-none no-drag hover:bg-primary-ghost-hover focus-visible:outline-2 focus-visible:outline-ring`,
+          onClick: i,
+          children: l?.resolve ?? (0, Z.jsx)(E, {}),
+        }),
+    ],
+  });
+}
+var Z, pe;
+function me() {
+  return (me = e(() => {
+    (a(), u(), y(), F(), se(), (Z = i()), (pe = [`👍`, `❤️`, `👀`, `✅`]));
+  }))();
+}
+function he({
+  thread: e,
+  borderless: t = !1,
+  preview: n = !1,
+  isSelected: r = !1,
+  isUnread: i = !1,
+  isPending: a = !1,
+  icons: o,
+  labels: s,
+  renderMetadata: c,
+  formatTimestamp: l,
+  repliesToggleLabel: u,
+  renderDeleteMenu: d,
+  viewerAuthor: f,
+  viewerAuthorId: m = e.viewerAuthorId,
+  sourceLabel: h,
+  selectLabel: g,
+  selectRepliesLabel: _,
+  timestampNow: v,
+  onReply: y,
+  onResolve: b,
+  onReopen: x,
+  onDelete: S,
+  onDeleteComment: C,
+  onToggleReaction: w,
+  replyComposer: T,
+  onHover: E,
+  onSelect: D,
+}) {
+  let O = (0, Q.useId)(),
+    [k, A] = (0, Q.useState)(!1),
+    [j, M] = (0, Q.useState)(``),
+    [P, F] = (0, Q.useState)(),
+    I = N(l == null && v == null),
+    L = e.comments,
+    R = e.status === `resolved`,
+    z = R ? x : b,
+    B = L[0],
+    te = B != null && (/^@ChatGPT(?=\s|$)/u.test(B.text) || ee(B.author)),
+    V = { icons: o, labels: s, renderMetadata: c, formatTimestamp: l, renderDeleteMenu: d },
+    H = v ?? I,
+    U =
+      T === void 0 && y != null
+        ? (0, $.jsx)(ie, {
+            mode: `reply`,
+            value: j,
+            onChange: M,
+            assignedToChatGpt: P ?? te,
+            onAssignmentChange: F,
+            onSubmit: ({ body: e, assignedToChatGpt: t }) =>
+              y(t && !/^@ChatGPT(?:\s|$)/u.test(e) ? `@ChatGPT ${e}` : e),
+          })
+        : T,
+    W = L.slice(1),
+    G = a ? W.length : Math.max(0, W.length - 1),
+    ne = k ? W : a ? [] : W.slice(-1),
+    K = r && !n && !R && U != null,
+    q = () => {
+      if (r) {
+        (E?.(null), D(null));
+        return;
+      }
+      D(e.threadId);
+    },
+    re = (e) => {
+      let t;
+      return (
+        n || (e === B && S != null ? (t = S) : !e.isDeleted && C != null && (t = () => C(e.id))),
+        {
+          viewerAuthor: f,
+          viewerAuthorId: m,
+          onDelete: t,
+          onToggleReaction: !n && !e.isDeleted && w != null ? (t) => w(e.id, t) : void 0,
+        }
+      );
+    };
+  return (0, $.jsxs)(`article`, {
+    "aria-describedby": O,
+    className: p(
+      `group relative`,
+      `rounded-2xl`,
+      !t && r && `bg-background-secondary-soft ring-1 ring-inset ring-border-subtle`,
+      !r && `hover:bg-primary-ghost-hover focus-within:bg-primary-ghost-hover`,
+    ),
+    "data-testid": `artifact-comment-thread-${e.threadId}`,
+    onMouseEnter: () => E?.(e.threadId),
+    onMouseLeave: () => E?.(null),
+    onFocus: () => E?.(e.threadId),
+    onBlur: (e) => {
+      e.currentTarget.contains(e.relatedTarget) || E?.(null);
+    },
+    children: [
+      (0, $.jsx)(`span`, { id: O, className: `sr-only`, children: h }),
+      (0, $.jsxs)(`div`, {
+        className: `relative`,
+        children: [
+          B != null &&
+            (0, $.jsx)(ue, {
+              comment: B,
+              presentation: V,
+              threadId: e.threadId,
+              timestampNow: H,
+              isUnread: i && L.length === 1,
+              isResolved: R,
+              onToggleResolved: n ? void 0 : z,
+              hasConnector: L.length > 1 || a || K,
+              isSelected: r,
+              selectLabel: g,
+              sourceLabelId: O,
+              onSelect: q,
+              ...re(B),
+            }),
+          G > 0 &&
+            !n &&
+            (0, $.jsxs)(`div`, {
+              className: `relative flex h-9 items-center ps-11.5 pe-2`,
+              children: [
+                (0, $.jsx)(`span`, {
+                  "aria-hidden": !0,
+                  className: `pointer-events-none absolute start-6 top-0 bottom-0 w-px bg-border-subtle`,
+                }),
+                (0, $.jsx)(`button`, {
+                  type: `button`,
+                  "aria-expanded": k,
+                  className: `flex h-8 cursor-interaction items-center rounded-md px-2 text-base leading-5 text-secondary select-none no-drag hover:bg-primary-ghost-hover focus-visible:outline-2 focus-visible:outline-ring`,
+                  onClick: () => A((e) => !e),
+                  children:
+                    u?.(k, G) ??
+                    (k ? `Hide replies` : `Show ${G} ${G === 1 ? `reply` : `replies`}`),
+                }),
+              ],
+            }),
+          ne.map((t, n) =>
+            (0, $.jsx)(
+              ue,
+              {
+                comment: t,
+                presentation: V,
+                threadId: e.threadId,
+                timestampNow: H,
+                isUnread: i && n === ne.length - 1,
+                hasConnector: n < ne.length - 1 || a || K,
+                hasPrevious: !0,
+                isSelected: r,
+                selectLabel: _,
+                sourceLabelId: O,
+                onSelect: q,
+                ...re(t),
+              },
+              t.id,
+            ),
+          ),
+          a &&
+            (0, $.jsx)(`button`, {
+              type: `button`,
+              "aria-describedby": O,
+              "aria-label": _,
+              "aria-pressed": r,
+              className: `relative flex w-full cursor-interaction flex-col rounded-2xl text-start focus-visible:outline-2 focus-visible:outline-ring`,
+              onClick: q,
+              children: (0, $.jsx)(de, {
+                threadId: e.threadId,
+                icons: o,
+                labels: s,
+                hasConnector: K,
+              }),
+            }),
+        ],
+      }),
+      K &&
+        (0, $.jsxs)(`div`, {
+          className: `relative flex items-start gap-2.5 px-3 pt-2 pb-3`,
+          children: [
+            (0, $.jsx)(`span`, {
+              "aria-hidden": !0,
+              className: `pointer-events-none absolute start-6 top-0 h-2.5 w-px bg-border-subtle`,
+            }),
+            (0, $.jsx)(`div`, {
+              className: `pt-1.5`,
+              children: (0, $.jsx)(le, { author: f, authorRole: `viewer`, icons: o }),
+            }),
+            (0, $.jsx)(`div`, { className: `min-w-0 flex-1`, children: U }),
+          ],
+        }),
+    ],
+  });
+}
+var Q, $;
+function ge() {
+  return (ge = e(() => {
+    (u(), (Q = l()), F(), ae(), me(), ($ = i()));
+  }))();
+}
+function _e(e, { point: t, label: n, color: r, scale: i, style: a }) {
+  (e.save(),
+    e.translate(t.x, t.y),
+    e.scale(1 / i, 1 / i),
+    (e.font = `${a.fontWeight} ${a.fontSize}px ${a.fontFamily}`),
+    (e.textAlign = `left`),
+    (e.textBaseline = `middle`));
+  let o = Math.max(0, a.maxWidth - a.paddingX * 2),
+    s = n;
+  if (e.measureText(s).width > o) {
+    let t = Array.from(s),
+      n = 0,
+      r = t.length;
+    for (; n < r;) {
+      let i = Math.ceil((n + r) / 2);
+      e.measureText(t.slice(0, i).join(``) + `…`).width <= o ? (n = i) : (r = i - 1);
+    }
+    s = t.slice(0, n).join(``) + `…`;
+  }
+  let c = Math.min(a.maxWidth, e.measureText(s).width + a.paddingX * 2),
+    l = a.lineHeight + a.paddingY * 2;
+  ((e.fillStyle = r),
+    e.beginPath(),
+    e.roundRect(0, 0, c, l, a.borderRadius),
+    e.fill(),
+    e.clip(),
+    (e.fillStyle = a.color),
+    e.fillText(s, a.paddingX, l / 2),
+    e.restore());
+}
+function ve() {
+  return (ve = e(() => {}))();
+}
+export {
+  ie as a,
+  ee as c,
+  F as d,
+  N as f,
+  ge as i,
+  I as l,
+  A as m,
+  ve as n,
+  ae as o,
+  j as p,
+  he as r,
+  B as s,
+  _e as t,
+  z as u,
+};

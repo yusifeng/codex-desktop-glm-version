@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const apiCalls = [];
@@ -133,90 +134,7 @@ function text(node) {
   return values.join(" ");
 }
 
-// workspace-discovery: 19
-const discovery = await bundle("workspace-discovery");
-assert.deepEqual(Object.keys(discovery), [
-  "a",
-  "c",
-  "i",
-  "l",
-  "n",
-  "o",
-  "r",
-  "s",
-  "t",
-  "u",
-]);
-assert.equal(discovery.s, "oai/apps/hasSeenWorkspaceDiscoveryFirstLogin");
-assert.equal(
-  discovery.r.$type,
-  "protobuf_analytics_events.v1.ChatgptWorkspaceDiscoveryModalShown",
-);
-assert.equal(
-  discovery.c({ email: "ada@example.com", email_domain_type: "company" }),
-  true,
-);
-assert.equal(
-  discovery.c({ email: "ada@example.com", email_domain_type: "social" }),
-  false,
-);
-assert.equal(discovery.c({ email: "ada@example.com" }), false);
-assert.equal(
-  discovery.c({ email: "not-an-email", email_domain_type: "company" }),
-  false,
-);
-const discoveryOptions = discovery.a.getOptions("user-1");
-assert.deepEqual(discoveryOptions.queryKey, ["workspace-discovery", "user-1"]);
-assert.equal(discovery.a.getOptions(null).enabled, false);
-apiResponses.push({ workspaces: [{ id: "w", name: "Workspace" }] });
-assert.equal((await discoveryOptions.queryFn({})).workspaces[0].id, "w");
-assert.equal(apiCalls.at(-1)[1], "/accounts/discoverable-workspaces");
-const now = Date.now();
-assert.equal(
-  discovery.u(
-    JSON.stringify({ pwd_auth_time: Math.floor((now - 5_000) / 1_000) }),
-    now,
-  ),
-  true,
-);
-assert.equal(
-  discovery.u(JSON.stringify({ pwd_auth_time: now - 5_000 }), now),
-  true,
-);
-assert.equal(
-  discovery.u(
-    JSON.stringify({ pwd_auth_time: Math.floor((now - 20_000) / 1_000) }),
-    now,
-  ),
-  false,
-);
-assert.equal(discovery.u("invalid", now), false);
-let requested,
-  discoveryClosed = 0;
-const discoveryUi = discovery.t({
-  accessibleWorkspaces: [{ id: "a", name: "Acme" }],
-  discoverableWorkspaces: [{ id: "b", name: "Beta" }],
-  email: "ada@example.com",
-  mode: "dismissible",
-  onClose() {
-    discoveryClosed++;
-  },
-  onRequest(workspace) {
-    requested = workspace.id;
-  },
-});
-assert.equal(
-  discoveryUi.props["aria-label"],
-  "Join and launch your workspaces",
-);
-assert.equal(
-  all(discoveryUi, (node) => node.props?.role === "listitem").length,
-  2,
-);
-find(discoveryUi, (node) => node.props?.children === "Request").props.onClick();
-assert.equal(requested, "b");
-find(discoveryUi, (node) => node.props?.children === "Close").props.onClick();
-assert.equal(discoveryClosed, 1);
+assertReleaseOwner("workspace-discovery");
 
 // workspace-agent-detail-query: 27
 const details = await bundle("workspace-agent-detail-query");

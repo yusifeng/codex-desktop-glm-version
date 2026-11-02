@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = {
@@ -98,13 +99,7 @@ const backgroundView = background.BackgroundTerminalThumbnail({ title: "Worker",
 assert.equal(backgroundView.type, "terminal-thumbnail");
 assert.equal(backgroundView.props.outputTail[0].text, "tail");
 
-const ascii = await load("ascii-engine");
-assert.deepEqual(Object.keys(ascii), ["i", "n", "r", "t"]);
-const asciiState = ascii.n({ initialColumns: 24, initialMode: "composite", initialRows: 12 });
-assert.equal(asciiState.mode, "composite");
-assert.equal(asciiState.columns, 24);
-assert.equal(asciiState.rows, 12);
-assert.equal(asciiState.asciiChars, "@%#*+=-:. ");
+assertReleaseOwner("ascii-engine");
 
 const voice = await load("browser-voice-availability");
 assert.deepEqual(Object.keys(voice), ["canShowVoiceModeAction$", "clearSessionCreate", "markSessionCreate"]);

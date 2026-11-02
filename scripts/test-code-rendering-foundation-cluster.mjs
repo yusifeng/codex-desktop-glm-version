@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -216,5 +217,6 @@ assert.equal(
   "light:light-setting",
 );
 assert.equal(lightProvider.props.highlighterOptions.lineDiffType, "none");
+assertReleaseOwner("register-pierre-themes");
 
 console.log("49 code rendering foundation cluster assertions passed");

@@ -4,13 +4,12 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as esbuild from 'esbuild';
+import { assertReleaseOwner } from './release-owner-test-helpers.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const modules = [
-  ['open-ba3f56946b08.ts', 'shopping-browse-tab-open', ['openShoppingBrowseTab']],
   ['open-handler-391752d0848c.ts', 'browser-open-handler', ['BrowserOpenHandler']],
   ['shelf-364dc403e149.ts', 'conversation-followup-shelf', ['ConversationFollowupShelf']],
-  ['surface-7956345c70dd.ts', 'family-notification-surface', ['FamilyNotification']],
 ];
 const dependencyAliases = new Map([['pepper-persona', 'persona'], ['settings-parental-presentation', 'presentation']]);
 const dependencies = (source, expression) => [...source.matchAll(expression)].map((match) => dependencyAliases.get(match[1]) ?? match[1]);
@@ -48,21 +47,7 @@ for (const [, semantic, exports] of modules) {
   runtimeAssertions++;
 }
 
-const shopping = loaded.get('shopping-browse-tab-open');
-const values = new Map([['tabs|shopping-browse:%5B%22a%22%2C%22c%22%2C%22m%22%5D', { tabId: 'existing' }], ['context|existing', null]]);
-const writes = [];
-const scope = { value: { routeKind: 'chatgpt-thread', conversationId: 'c' }, get(key, parameter) { if (key === 'intl') return { formatMessage: () => 'Browse more' }; return values.get(String(key) + '|' + String(parameter)) ?? null; }, set(...args) { writes.push(args); } };
-shopping.openShoppingBrowseTab(scope, { accountId: 'a', rootMessageId: 'm', turn: { conversationId: 'c' } });
-assert.equal(globalThis.__md.activated, 'existing');
-assert.equal(globalThis.__md.visible, true);
-assert.equal(writes[0][1], 'existing');
-runtimeAssertions += 3;
-
-values.clear(); values.set('resolved|shopping-browse:%5B%22a%22%2C%22c%22%2C%22m%22%5D', { accountId: 'a', rootMessageId: 'm', turn: { conversationId: 'c' } });
-shopping.openShoppingBrowseTab(scope, { accountId: 'a', rootMessageId: 'm', turn: { conversationId: 'c' } });
-assert.equal(globalThis.__md.opened.id.startsWith('shopping-browse:'), true);
-assert.deepEqual(globalThis.__md.opened.defaultState(), { contextKey: '["a","c","m",null]', selectedFilters: null, scrollTop: 0 });
-runtimeAssertions += 2;
+sourceAssertions += assertReleaseOwner('shopping-browse-tab-open');
 
 const browser = loaded.get('browser-open-handler');
 browser.BrowserOpenHandler();
@@ -104,15 +89,7 @@ assert.equal(submittedFollowup.body, 'Continue remotely');
 assert.equal(submittedFollowup.options.chosenSuggestion.originating_assistant_message_id, 'assistant-message');
 runtimeAssertions += 9;
 
-const family = loaded.get('family-notification-surface');
-let pathValue = '';
-const notice = family.FamilyNotification({ notification: { type: 'setting-updated', item: { id: 'n', payload: { familyEnabled: true } } }, account: { userId: 'u', accountId: 'a' }, initialSurface: 'banner', onClose() {}, onViewSettings(path) { pathValue = path; } });
-assert.equal(notice.props['data-family-notification'], 'setting-updated');
-notice.props.children[2].props.onClick();
-assert.equal(pathValue, '/family?view=manage&member=u');
-const defaulted = family.FamilyNotification({ notification: { type: 'setting-defaulted', item: { id: 'd' } }, account: { userId: 'u', accountId: 'a' }, initialSurface: 'banner', onClose() {} });
-assert.equal(defaulted.props.children, 'ChatGPT includes safeguards for teens');
-runtimeAssertions += 3;
+sourceAssertions += assertReleaseOwner('family-notification-surface');
 
 delete globalThis.__md;
 console.log(sourceAssertions + ' source assertions and ' + runtimeAssertions + ' runtime assertions passed');

@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MODULES = ["pull-request-actions", "pull-request-revision-tab", "registered-pull-request-thumbnail", "pull-request-readonly-comment", "bookmarked-thread-user-message-navigation", "artifact-file-preview-icon"];
@@ -68,23 +69,7 @@ assert.equal(nodes(thumbnailTree).find(node => node.props.children === "2 checks
 assert.match(nodeOfType(thumbnailTree, "code").props.children, /"number":4/);
 assert.equal(thumbnail.RegisteredPullRequestThumbnail({}).props.children[0].props.children, "Pull request");
 
-// pull-request-readonly-comment
-const readonly = await bundle("pull-request-readonly-comment"); readonly.a(); readonly.s(); readonly.r();
-assert.equal(readonly.o("octocat", 48), "https://github.com/octocat.png?size=48");
-assert.equal(readonly.o("bad login", 48), null);
-assert.equal(readonly.o("gitlab-user", 24, "gitlab.com"), "https://gitlab.com/gitlab-user.png?size=24");
-const avatarSlot = readonly.i({ children: "A" });
-assert.equal(avatarSlot.type, "span");
-assert.equal(avatarSlot.props.children, "A");
-const commentTree = readonly.t({ authorLogin: "octocat", body: "Looks good", createdAt: "today", url: "https://example.test/comment" });
-assert.equal(nodeOfType(commentTree, "strong").props.children, "octocat");
-assert.equal(nodeOfType(commentTree, "img").props.src, "https://github.com/octocat.png?size=48");
-assert.equal(nodeOfType(commentTree, "p").props.children, "Looks good");
-assert.equal(nodeOfType(commentTree, "a").props.href, "https://example.test/comment");
-const readonlyTree = readonly.n({ comment: { authorLogin: "reviewer", body: "Change this" }, filePath: "src/app.ts", line: 12, side: "left" });
-assert.equal(readonlyTree.props["data-readonly-review-comment"], true);
-assert.equal(nodeOfType(readonlyTree, "header").props.children, "src/app.ts · L12");
-assert.equal(readonlyTree.props.children[1].type, readonly.t);
+assertReleaseOwner("pull-request-readonly-comment");
 
 // bookmarked-thread-user-message-navigation
 const bookmarks = await bundle("bookmarked-thread-user-message-navigation"); bookmarks.n();
