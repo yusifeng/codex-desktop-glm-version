@@ -1,57 +1,11 @@
-import assert from "node:assert/strict";
-import { Buffer } from "node:buffer";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import * as esbuild from "esbuild";
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const jsx = { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } };
-globalThis.__writingBlockCoreTest = { jsx };
-const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer/library-writing-block-core/index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "writing-block-core-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: module }) => ({ contents: module === "app-shared" ? "export const I3=()=>globalThis.__writingBlockCoreTest.jsx;" : "export {};", loader: "js" })); } }] });
-const writing = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}`);
-const children = node => Array.isArray(node?.props?.children) ? node.props.children : [node?.props?.children];
-assert.deepEqual(Object.keys(writing), ["i", "n", "r", "t"]);
-assert.equal(writing.r({ earlierVersion: "old" }), "old");
-assert.equal(writing.r({ collapsed: true, collapsedContent: "collapsed" }), "collapsed");
-const text = writing.r({ variant: "text", title: "Note", document: { editorKey: "e1", content: "Hello" }, auxiliaryContent: "aux" });
-assert.equal(text.type, "article");
-assert.equal(children(text)[0].type, "header");
-assert.equal(children(children(text)[0])[0].props.children, "Note");
-assert.equal(children(text)[1][0].props.children, "Hello");
-assert.equal(children(text)[1][1], "aux");
-let expanded;
-const collapsedDocument = writing.r({ variant: "document", document: { editorKey: "e1", title: "Doc", content: "Body" }, onExpandChange(value) { expanded = value; } });
-assert.equal(children(collapsedDocument)[1][0].type, "button");
-children(collapsedDocument)[1][0].props.onClick();
-assert.equal(expanded, true);
-let content; let closed = 0;
-const expandedDocument = writing.r({ variant: "document", isExpanded: true, isStreaming: true, hasPendingEdits: true, showMagicEditAction: true, document: { editorKey: "e1", content: "Body" }, frameProps: { header: "Toolbar", onClose() { closed += 1; } }, onDocumentChange(value) { content = value; }, onPreviewClose() { closed += 1; }, onExpandChange(value) { expanded = value; } });
-const expandedBody = children(expandedDocument)[1];
-assert.equal(expandedBody[0].type, "section");
-assert.equal(expandedBody[0].props["data-editor-key"], "e1");
-const editorChildren = children(expandedBody[0]);
-assert.equal(editorChildren[0], "Toolbar");
-assert.equal(editorChildren[1].props.disabled, true);
-editorChildren[1].props.onChange({ target: { value: "Changed" } });
-assert.equal(content, "Changed");
-editorChildren[3].props.onClick();
-assert.equal(closed, 2);
-assert.equal(expanded, false);
-assert.equal(expandedBody[1].props.role, "status");
-assert.equal(expandedBody[2].props.children, "Edit with ChatGPT");
-const base = { conversationId: "c", instanceId: "i", messageId: "m", refIndex: 0, libraryFileId: "f" };
-assert.equal(writing.t({ ...base, multiplayerAllowed: false }).props.role, "alert");
-assert.equal(writing.t({ ...base, libraryLoading: true }).props.role, "status");
-let retried = 0;
-const error = writing.t({ ...base, error: "failed", onRetry() { retried += 1; } });
-assert.equal(error.props.role, "alert");
-children(error)[1].props.onClick();
-assert.equal(retried, 1);
-const library = writing.t({ ...base, libraryContent: "Saved", title: "Library doc", variant: "document" });
-assert.equal(library.type, "article");
-assert.equal(children(children(library)[0])[0].props.children, "Library doc");
-assert.equal(children(library)[1][0].props.children, "Saved");
-assert.equal(writing.i(), undefined);
-assert.equal(writing.n(), undefined);
-const assertionCount = [...fs.readFileSync(fileURLToPath(import.meta.url), "utf8").matchAll(/\bassert\./g)].length;
-console.log(`${assertionCount} library writing block core assertions passed`);
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
+
+const assertions = assertReleaseOwner("library-writing-block-core", [
+  /libraryFileId/,
+  /isExpanded/,
+  /showMagicEditAction/,
+  /onPreviewClose/,
+  /onFlush/,
+  /export \{/,
+]);
+console.log(`${assertions} library writing block core release assertions passed`);

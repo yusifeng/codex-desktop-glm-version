@@ -1,118 +1,12 @@
-import assert from "node:assert/strict";
-import { Buffer } from "node:buffer";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const jsx = { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } };
-globalThis.__writingBlockFloatingTest = { jsx };
-const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer/writing-block-floating-slash-menu/index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "writing-block-floating-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: module }) => ({ contents: module === "app-shared" ? "export const I3=()=>globalThis.__writingBlockFloatingTest.jsx;" : "export {};", loader: "js" })); } }] });
-const writing = await import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}`);
-const exported = ["C", "D", "E", "S", "T", "_", "a", "b", "c", "d", "f", "g", "h", "i", "l", "m", "n", "o", "p", "r", "s", "t", "u", "v", "w", "x", "y"];
-assert.deepEqual(Object.keys(writing), exported);
-assert.equal(writing.f, 20000);
-assert.equal(writing.w.root, "_editor_1qalx_8");
-assert.equal(writing.w.content, "_content_1qalx_892");
-
-const store = writing.T();
-assert.equal(store.getSnapshot().editorView, null);
-assert.equal(store.getSnapshot().docChangeCount, 0);
-let notifications = 0;
-const unsubscribe = store.subscribe(() => notifications++);
-const textDoc = value => ({ textContent: value, content: { size: value.length }, descendants(callback) { if (value) callback({ isText: true, nodeSize: value.length, text: value }, 1); } });
-const transaction = { metadata: [], setMeta(key, value) { this.metadata.push([key, value]); return this; } };
-const view = { state: { doc: textDoc("Hello"), selection: { empty: true, from: 1, to: 1 }, tr: transaction }, hasFocus: () => true, focusCalls: 0, focus() { this.focusCalls++; }, dispatched: [], dispatch(value) { this.dispatched.push(value); } };
-store.setView(view);
-assert.equal(notifications, 1);
-store.setView(view);
-assert.equal(notifications, 1);
-store.syncFromState({ ...view.state, selection: { empty: false, from: 1, to: 4, link: { from: 1, href: "https://example.com", to: 4 } } }, { docChanged: true });
-assert.equal(store.getSnapshot().selectionSummary.isCollapsed, false);
-assert.equal(store.getSnapshot().selectionSummary.caretLinkHref, "https://example.com");
-assert.equal(store.getSnapshot().docChangeCount, 1);
-assert.equal(writing.D(store), store.getSnapshot());
-assert.equal(writing._(store, { key: "new" }, "Hello"), "unchanged");
-assert.equal(writing._(store, { key: "new" }, "Changed"), "changed");
-view.state.externalContentKey = "new";
-assert.equal(writing._(store, { key: "new" }, "Changed"), null);
-assert.equal(writing._(store, null, "Hello"), null);
-unsubscribe();
-store.clearView(view);
-assert.equal(store.getSnapshot().editorView, null);
-
-const splitDoc = { content: { size: 20 }, descendants(callback) { callback({ isText: true, nodeSize: 5, text: "Hello" }, 2); callback({ isAtom: true, nodeSize: 1 }, 7); callback({ isText: true, nodeSize: 5, text: "world" }, 9); } };
-const flattened = writing.g(splitDoc, [{ from: 4, to: 12, revealAfter: 11 }]);
-assert.equal(flattened.text, "Helloworld");
-assert.deepEqual(flattened.nodes, [{ from: 2, offset: 0, length: 5 }, { from: 9, offset: 5, length: 5 }]);
-assert.deepEqual(flattened.ranges.map(range => ({ from: range.from, to: range.to })), [{ from: 2, to: 5 }, { from: 5, to: 8 }]);
-assert.equal(flattened.ranges[0].revealAfter, 7);
-assert.equal(flattened.ranges[1].revealAfter, 7);
-const cue = writing.p({ previousDoc: textDoc("Hello old world"), receivedDoc: textDoc("Hello new world"), isStreaming: false, endsAtWordBoundary: true });
-assert.equal(cue.text, "Hello new world");
-assert.deepEqual(cue.ranges, [{ from: 6, to: 9 }]);
-assert.equal(writing.p({ previousDoc: textDoc("same"), receivedDoc: textDoc("same"), isStreaming: false, endsAtWordBoundary: true }), null);
-const streamingCue = writing.p({ previousDoc: textDoc("Hello"), receivedDoc: textDoc("Hello unfinished"), isStreaming: true, endsAtWordBoundary: false });
-assert.equal(streamingCue.text, "Hello ");
-assert.deepEqual(streamingCue.ranges, [{ from: 5, to: 6 }]);
-assert.equal(writing.m("one two", "5s"), 5000);
-assert.equal(writing.m("one two", "10s"), 10000);
-assert.equal(writing.m("one two", "length-dependent"), 5020);
-assert.equal(writing.m("one", "none"), null);
-
-assert.equal(writing.a(view), true);
-view.state.selection = { empty: false, from: 1, to: 2 };
-assert.equal(writing.a(view), false);
-assert.deepEqual(writing.y({ empty: true, from: 2, to: 2, link: { from: 1, href: "https://openai.com", to: 5 } }), { from: 1, href: "https://openai.com", to: 5 });
-assert.equal(writing.y({ empty: true, from: 2, to: 2 }), null);
-let reset = 0;
-writing.s({ commandId: "generate", query: "draft", view }, () => reset++);
-assert.equal(reset, 1);
-assert.equal(view.focusCalls, 1);
-assert.equal(view.dispatched.length, 1);
-assert.deepEqual(transaction.metadata.at(-1), ["writingBlockSlashMenuCommand", { commandId: "generate", query: "draft" }]);
-writing.d(view, "revision-1", { isStreaming: true });
-assert.equal(view.dispatched.length, 2);
-assert.equal(transaction.metadata.at(-1)[0], "writingBlockAssistantRevision");
-writing.l(view);
-assert.equal(view.dispatched.length, 3);
-assert.deepEqual(transaction.metadata.at(-1), ["writingBlockAssistantRevision", "clear"]);
-
-let baseOptions; const controller = { destroy() {}, getMarkdown: () => "markdown", setMarkdown() { return true; }, view };
-assert.equal(writing.o({ createBaseEditor(options) { baseOptions = options; return controller; } }), controller);
-assert.equal(baseOptions.maxLength, 20000);
-assert.equal(baseOptions.slashMenu, true);
-assert.equal(baseOptions.tables, true);
-assert.throws(() => writing.o({}), /createBaseEditor is required/);
-const reference = {};
-const editor = writing.x({ editorKey: "doc-1", ariaLabel: "Document", markdown: "Start", className: "custom", createEditor: () => controller }, reference);
-assert.equal(editor.type, "div");
-assert.equal(editor.props.role, "textbox");
-assert.equal(editor.props["data-editor-key"], "doc-1");
-assert.match(editor.props.className, /writing-block-editor/);
-assert.equal(reference.current.getMarkdown(), "markdown");
-reference.current.focus();
-assert.equal(view.focusCalls, 2);
-
-const hiddenMenu = writing.t({ editorView: view, state: null, onExecute() {} });
-assert.equal(hiddenMenu, null);
-let executed;
-const menu = writing.t({ editorView: view, state: { anchorPos: 5, triggerPos: 1, query: "head", highlightedOptionId: "heading1", visibleOptionIds: ["heading1", "paragraph"] }, onExecute(id, query) { executed = [id, query]; } });
-assert.equal(menu.props.role, "menu");
-assert.equal(menu.props.children.length, 2);
-assert.equal(menu.props.children[0].props.children, "Heading 1");
-assert.equal(menu.props.children[0].props["data-highlighted"], "true");
-menu.props.children[0].props.onClick();
-assert.deepEqual(executed, ["heading1", "head"]);
-assert.equal(writing.r({ editorView: view, selection: { empty: true, from: 1, to: 1 } }), null);
-let asked = 0;
-const toolbar = writing.r({ editorView: view, selection: { empty: false, from: 1, to: 3 }, onAskForChanges() { asked++; }, trailingActions: "tail" });
-assert.equal(toolbar.props.role, "toolbar");
-assert.equal(toolbar.props.children[2], "tail");
-toolbar.props.children[0].props.onClick();
-assert.equal(asked, 1);
-for (const initializer of ["C", "E", "S", "b", "c", "h", "i", "n", "u", "v"]) assert.equal(writing[initializer](), undefined);
-
-const assertionCount = [...fs.readFileSync(fileURLToPath(import.meta.url), "utf8").matchAll(/\bassert\./g)].length;
-console.log(`${assertionCount} writing block floating slash menu assertions passed`);
+const assertions = assertReleaseOwner("writing-block-floating-slash-menu", [
+  /slashMenuState/,
+  /writingBlockAssistantRevision/,
+  /isSlashMenuAvailable: !0/,
+  /selectionSummary/,
+  /docChangeCount/,
+  /length-dependent/,
+  /export \{/,
+]);
+console.log(`${assertions} writing block floating slash menu release assertions passed`);

@@ -1,4 +1,5 @@
+// @ts-nocheck
 import "@rchunk/app-shared";
-import { n as initializeLibraryWritingBlock, t as LibraryWritingBlock } from "@rchunk/library-writing-block-core";
-initializeLibraryWritingBlock();
-export { LibraryWritingBlock };
+import { n as e, t } from "@rchunk/library-writing-block-core";
+e();
+export { t as LibraryWritingBlock };

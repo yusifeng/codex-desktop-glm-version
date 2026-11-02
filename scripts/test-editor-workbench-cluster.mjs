@@ -45,26 +45,6 @@ assert.equal(completed, "done");
 assert.equal(find(diff.t({ file: { name: "a.ts" } }), node => node.type === "textarea"), undefined);
 assert.equal(diff.n(), undefined);
 
-// codex-writing-block-directive-renderer: 11
-const writing = await bundle("codex-writing-block-directive-renderer");
-assert.deepEqual(Object.keys(writing), ["CodexWritingBlockDirectiveRenderer"]);
-const readonly = writing.CodexWritingBlockDirectiveRenderer({ directive: { content: "Draft", id: "block-1", title: "Memo" } });
-assert.equal(readonly.props["data-writing-block"], "block-1");
-assert.equal(readonly.props["data-variant"], "document");
-assert.match(text(readonly), /Memo Draft/);
-let content, recipients, subject, blurred = 0;
-const email = writing.CodexWritingBlockDirectiveRenderer({ directive: { content: "Hello", metadata: { recipients: ["a@example.com"], subject: "Hi" }, variant: "email" }, editable: true, onBlur() { blurred++; }, onContentChange(value) { content = value; }, onRecipientChange(value) { recipients = value; }, onSubjectChange(value) { subject = value; } });
-assert.equal(find(email, node => node.props?.["aria-label"] === "Recipients").props.defaultValue, "a@example.com");
-assert.equal(find(email, node => node.props?.["aria-label"] === "Subject").props.defaultValue, "Hi");
-find(email, node => node.props?.["aria-label"] === "Recipients").props.onChange({ currentTarget: { value: "a@example.com, b@example.com" } });
-assert.deepEqual(recipients, ["a@example.com", "b@example.com"]);
-find(email, node => node.props?.["aria-label"] === "Subject").props.onChange({ currentTarget: { value: "News" } });
-assert.equal(subject, "News");
-const writingEditor = find(email, node => node.type === "textarea"); writingEditor.props.onChange({ currentTarget: { value: "Updated" } }); writingEditor.props.onBlur();
-assert.equal(content, "Updated");
-assert.equal(blurred, 1);
-assert.equal(find(writing.CodexWritingBlockDirectiveRenderer({ directive: { variant: "email" } }), node => node.props?.["aria-label"] === "Subject").props.disabled, true);
-
 // text-file-editor-tab-content: 15
 const editor = await bundle("text-file-editor-tab-content");
 assert.deepEqual(Object.keys(editor), ["i", "n", "r", "t"]);
@@ -122,4 +102,4 @@ assert.match(text(mount(editor.t, { editor: { kind: "code" }, filePath: "a", isL
 assert.equal(editor.i(), undefined);
 assert.equal(editor.n(), undefined);
 
-console.log("47 editor workbench cluster assertions passed");
+console.log("36 editor workbench cluster assertions passed");

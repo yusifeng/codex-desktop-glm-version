@@ -1,61 +1,164 @@
-// Converts a DIL content reference into a writing-block directive.
-
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as directiveRendererChunk from "@rchunk/writing-block-directive-renderer";
-import * as quickChatAdapterChunk from "@rchunk/quick-chat-writing-block-adapter";
-
-interface JsxRuntime { jsx(type: unknown, props: object, key?: string): unknown }
-interface ParseResult { success: boolean; data?: DilData }
-interface DilData { id?: string; content?: string; metadata?: Record<string, unknown>; options?: unknown; bcc?: string; cc?: string; recipient?: string; subject?: string; title?: string; variant?: string }
-interface TurnContext { messageId?: string; contentReferenceMessageIds?: Array<string | undefined>; contentReferenceMessageStatuses?: Array<string | undefined>; isStreaming: boolean; [key: string]: unknown }
-interface ToneSection { content?: string; [key: string]: unknown }
-
-const shared = appSharedChunk as unknown as { $3?: () => void; I3: () => JsxRuntime };
-const initial = appInitialChunk as unknown as { CJt?: { safeParse(value: unknown): ParseResult }; WJt?: () => void; _it?: () => TurnContext | null; git?: () => void; wJt?: () => void; zJt?: (metadata: Record<string, unknown>) => Array<{ content?: string }> };
-const directive = directiveRendererChunk as unknown as { c?: (input: { content: string; metadata: Record<string, unknown>; preserveEmptySections: boolean }) => ToneSection[] | null; l?: () => void };
-const adapter = quickChatAdapterChunk as unknown as { r?: () => void; t?: unknown };
-const { $3: initializeSharedRuntime, I3: getJsxRuntime } = shared;
-const { CJt: dilSchema, WJt: initializeDilSchema, _it: useTurnContext, git: initializeDilRuntime, wJt: initializeContentReferences, zJt: extractMetadataContent } = initial;
-const { c: parseToneSections, l: initializeDirectiveRenderer } = directive;
-const { r: initializeQuickChatAdapter, t: QuickChatWritingBlock } = adapter;
-
-let jsx: JsxRuntime;
-let initialized = false;
-
-function initializeDilWritingBlock(): void {
-  if (initialized) return;
-  initializeSharedRuntime?.();
-  initializeDilSchema?.();
-  initializeContentReferences?.();
-  initializeDilRuntime?.();
-  initializeQuickChatAdapter?.();
-  initializeDirectiveRenderer?.();
-  jsx = getJsxRuntime();
-  initialized = true;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n } from "@rchunk/app-shared";
+import {
+  CJt as r,
+  WJt as i,
+  _it as a,
+  git as o,
+  wJt as s,
+  zJt as c,
+} from "@rchunk/app-initial";
+import { c as l, l as u } from "@rchunk/writing-block-directive-renderer";
+import { r as d, t as f } from "@rchunk/quick-chat-writing-block-adapter";
+function p(e) {
+  let t = (0, m.c)(41),
+    { contentReferenceIndex: n, data: i, isStreaming: o, readOnly: s } = e,
+    u = s !== void 0 && s,
+    d = a(),
+    p,
+    g,
+    _,
+    v,
+    y,
+    b,
+    x,
+    S,
+    C;
+  if (t[0] !== n || t[1] !== i || t[2] !== o || t[3] !== d) {
+    C = Symbol.for(`react.early_return_sentinel`);
+    bb0: {
+      let e = r.safeParse(i);
+      if (d == null || !e.success) {
+        C = null;
+        break bb0;
+      }
+      ((p = e.data), (v = { ...p.metadata }), p.options != null && (v.options = p.options));
+      let a = d.contentReferenceMessageIds;
+      y = a?.[n] ?? d.messageId;
+      let s;
+      (t[13] !== n || t[14] !== a || t[15] !== y
+        ? ((s = a == null ? n : a.slice(0, n).filter((e) => e === y).length),
+          (t[13] = n),
+          (t[14] = a),
+          (t[15] = y),
+          (t[16] = s))
+        : (s = t[16]),
+        (b = s));
+      let u = d.contentReferenceMessageStatuses?.[n];
+      if (
+        ((x = o ?? (u == null ? d.isStreaming : u === `in_progress`)),
+        (_ = p.id ?? (y == null ? void 0 : `${y}:${b}`)),
+        _ == null)
+      ) {
+        C = null;
+        break bb0;
+      }
+      ((g = c(v)[0]?.content ?? p.content ?? ``),
+        (S = l({ content: g, metadata: v, preserveEmptySections: !x })));
+    }
+    ((t[0] = n),
+      (t[1] = i),
+      (t[2] = o),
+      (t[3] = d),
+      (t[4] = p),
+      (t[5] = g),
+      (t[6] = _),
+      (t[7] = v),
+      (t[8] = y),
+      (t[9] = b),
+      (t[10] = x),
+      (t[11] = S),
+      (t[12] = C));
+  } else
+    ((p = t[4]),
+      (g = t[5]),
+      (_ = t[6]),
+      (v = t[7]),
+      (y = t[8]),
+      (b = t[9]),
+      (x = t[10]),
+      (S = t[11]),
+      (C = t[12]));
+  if (C !== Symbol.for(`react.early_return_sentinel`)) return C;
+  let w = S,
+    T = w?.[0]?.content ?? g,
+    E = p.bcc ?? void 0,
+    D = p.cc ?? void 0,
+    O = p.recipient ?? void 0,
+    k = p.subject ?? void 0,
+    A;
+  t[17] !== E || t[18] !== D || t[19] !== O || t[20] !== k
+    ? ((A = { bcc: E, cc: D, recipient: O, subject: k }),
+      (t[17] = E),
+      (t[18] = D),
+      (t[19] = O),
+      (t[20] = k),
+      (t[21] = A))
+    : (A = t[21]);
+  let j = p.title ?? void 0,
+    M = p.variant ?? `standard`,
+    N;
+  t[22] !== g ||
+  t[23] !== _ ||
+  t[24] !== v ||
+  t[25] !== j ||
+  t[26] !== M ||
+  t[27] !== T ||
+  t[28] !== A ||
+  t[29] !== w
+    ? ((N = {
+        id: _,
+        bodyContent: g,
+        content: T,
+        emailMetadata: A,
+        metadata: v,
+        title: j,
+        toneSections: w,
+        variant: M,
+      }),
+      (t[22] = g),
+      (t[23] = _),
+      (t[24] = v),
+      (t[25] = j),
+      (t[26] = M),
+      (t[27] = T),
+      (t[28] = A),
+      (t[29] = w),
+      (t[30] = N))
+    : (N = t[30]);
+  let P;
+  t[31] !== x || t[32] !== d
+    ? ((P = { ...d, isStreaming: x }), (t[31] = x), (t[32] = d), (t[33] = P))
+    : (P = t[33]);
+  let F;
+  return (
+    t[34] !== _ || t[35] !== u || t[36] !== y || t[37] !== b || t[38] !== N || t[39] !== P
+      ? ((F = (0, h.jsx)(f, {
+          id: _,
+          directive: N,
+          index: b,
+          isLastNodeInMessage: !1,
+          readOnly: u,
+          sourceMessageId: y,
+          turnContext: P,
+        })),
+        (t[34] = _),
+        (t[35] = u),
+        (t[36] = y),
+        (t[37] = b),
+        (t[38] = N),
+        (t[39] = P),
+        (t[40] = F))
+      : (F = t[40]),
+    F
+  );
 }
-
-function DilWritingBlock({ contentReferenceIndex, data, isStreaming, readOnly = false }: { contentReferenceIndex: number; data: unknown; isStreaming?: boolean; readOnly?: boolean }): unknown {
-  initializeDilWritingBlock();
-  const turnContext = useTurnContext?.();
-  const parsed = dilSchema?.safeParse(data);
-  if (turnContext == null || parsed?.success !== true || parsed.data == null) return null;
-  const source = parsed.data;
-  const metadata = { ...(source.metadata ?? {}) };
-  if (source.options != null) metadata.options = source.options;
-  const messageIds = turnContext.contentReferenceMessageIds;
-  const sourceMessageId = messageIds?.[contentReferenceIndex] ?? turnContext.messageId;
-  const index = messageIds == null ? contentReferenceIndex : messageIds.slice(0, contentReferenceIndex).filter((messageId) => messageId === sourceMessageId).length;
-  const status = turnContext.contentReferenceMessageStatuses?.[contentReferenceIndex];
-  const streaming = isStreaming ?? (status == null ? turnContext.isStreaming : status === "in_progress");
-  const id = source.id ?? (sourceMessageId == null ? undefined : sourceMessageId + ":" + index);
-  if (id == null) return null;
-  const bodyContent = extractMetadataContent?.(metadata)[0]?.content ?? source.content ?? "";
-  const toneSections = parseToneSections?.({ content: bodyContent, metadata, preserveEmptySections: !streaming }) ?? null;
-  const directiveValue = { id, bodyContent, content: toneSections?.[0]?.content ?? bodyContent, emailMetadata: { bcc: source.bcc, cc: source.cc, recipient: source.recipient, subject: source.subject }, metadata, title: source.title, toneSections, variant: source.variant ?? "standard" };
-  return jsx.jsx(QuickChatWritingBlock ?? "div", { id, directive: directiveValue, index, isLastNodeInMessage: false, readOnly, sourceMessageId, turnContext: { ...turnContext, isStreaming: streaming } });
+var m, h;
+function g() {
+  return (g = e(() => {
+    ((m = t()), i(), s(), o(), d(), u(), (h = n()));
+  }))();
 }
-
-initializeDilWritingBlock();
-export { DilWritingBlock };
+g();
+export { p as DilWritingBlock };

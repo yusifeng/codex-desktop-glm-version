@@ -1,126 +1,1131 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as floatingSlashMenuChunk from "@rchunk/writing-block-floating-slash-menu";
-import * as writingBlockSurfaceChunk from "@rchunk/writing-block-surface";
-import * as editableWritingBlockChunk from "@rchunk/editable-writing-block";
-import * as appCapabilitiesChunk from "@rchunk/writing-block-app-capabilities";
-import * as writingBlockChunk from "@rchunk/writing-block";
-import * as contentUpdateChunk from "@rchunk/writing-block-content-update";
-import * as directiveRendererChunk from "@rchunk/writing-block-directive-renderer";
-
-type StateUpdater<Value> = Value | ((current: Value) => Value);
-interface JsxRuntime { jsx(type: unknown, props: object, key?: string): unknown }
-interface ReactRuntime { useCallback<Callback extends (...arguments_: never[]) => unknown>(callback: Callback, dependencies: readonly unknown[]): Callback; useEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void; useState<Value>(initialValue: Value | (() => Value)): [Value, (next: StateUpdater<Value>) => void] }
-interface StoreScope { get<Value>(signal: unknown, key?: unknown): Value; set?(signal: unknown, key: unknown, value: unknown): void }
-interface IntlShape { formatMessage(descriptor: Record<string, unknown>): string }
-interface ToneSection { content: string; id: string; tone: string; [key: string]: unknown }
-interface EmailMetadata { bcc?: string | null; cc?: string | null; recipient?: string | null; subject?: string | null }
-interface WritingBlockData { content: string; edited?: boolean; id?: string; index?: number; library_file_id?: string; locallyEdited?: boolean; metadata?: Record<string, unknown>; title?: string; variant?: string; [key: string]: unknown }
-interface Directive { bodyContent: string; content: string; emailMetadata: EmailMetadata; id?: string; metadata?: Record<string, unknown>; title?: string; toneSections?: ToneSection[] | null; variant?: string }
-interface TurnContext { contentReferences?: readonly unknown[]; conversationId: string; conversationOrigin?: string; isStreaming: boolean; isTemporaryChat?: boolean; mapping?: unknown; messageId?: string; turnId?: string; writingBlockIndexes?: Record<string, number>; writingBlockMessageIds?: Record<string, string>; writingBlockSources?: Record<string, { index?: number; messageId?: string }>; [key: string]: unknown }
-interface QuickChatProps { directive: Directive; id: string; index: number; isLastNodeInMessage?: boolean; readOnly?: boolean; sourceMessageId?: string; turnContext: TurnContext }
-interface DirectiveRendererProps { isLastBlock?: boolean; [key: string]: unknown }
-interface ToneController { activeToneSectionId?: string; displayedToneSections: readonly ToneSection[]; selectToneSection(id: string): void }
-interface MessageRecord { message?: { metadata?: unknown } }
-interface PersistUpdate { content?: string; locallyEdited?: boolean; metadata?: Record<string, unknown> }
-
-const shared = appSharedChunk as unknown as { $3?: () => void; BX: <Value>(signal: unknown, key?: unknown) => Value; FX?: () => void; HX: <Value>(signal: unknown) => Value; I3: () => JsxRuntime; K2?: () => void; LX: (scope: unknown) => StoreScope; QI?: () => void; Y2?: unknown; ZI: unknown; __?: <Callback extends (...arguments_: never[]) => unknown>(callback: Callback) => Callback; cy?: unknown; e6: () => ReactRuntime; g_?: () => void; h4?: () => void; lk?: () => void; lw?: () => void; m4?: (...values: Array<string | false | null | undefined | string[]>) => string; n4: () => IntlShape; oZ?: (scope: unknown, initializer: (value: unknown) => boolean) => unknown; pk?: unknown };
-const initial = appInitialChunk as unknown as { AJt?: (sections: readonly ToneSection[] | null | undefined) => Record<string, unknown>; APt?: (input: { scope: StoreScope; blockId: string; conversationId: string; fallbackWritingBlock: WritingBlockData; messageId: string; update: PersistUpdate }) => WritingBlockData | null; EHt?: () => void; FYt?: (block: WritingBlockData, context: TurnContext) => WritingBlockData; Lat?: unknown; MJt?: () => void; OJt?: () => void; OPt?: unknown; PJt?: string; RIt?: () => void; RVt?: unknown; Rat?: () => void; Sdn?: new (...arguments_: never[]) => Error; WJt?: () => void; _it?: () => TurnContext | null; cJt?: () => void; eIt?: unknown; git?: () => void; jIt?: unknown; jPt?: () => void; jVt?: unknown; kJt?: (metadata: unknown) => Record<string, WritingBlockData>; kPt?: unknown; pIt?: () => void; qJt?: (metadata: Record<string, unknown> | undefined, selection: { id: string; index: number }, content: string) => Record<string, unknown>; rJt?: { safePost(path: string, input: unknown): Promise<unknown>; safeGet?(path: string, input: unknown): Promise<unknown> }; uHt?: () => void; wVt?: unknown; wdn?: () => void; xpn?: (scope: StoreScope, key: unknown, value: unknown) => void; ypn?: () => void };
-const primary = appPrimaryChunk as unknown as { $l?: () => void; Bd?: () => void; Cs?: unknown; Gd?: (scope: StoreScope, conversationId: string) => Promise<unknown>; Kd?: () => void; Ld?: (metadata: Record<string, unknown>, key: string) => string | undefined; Ou?: (input: Record<string, unknown>) => string | null; Rd?: (input: { metadata?: Record<string, unknown>; title?: string }, active?: ToneSection) => string; Ss?: () => void; bs?: unknown; bu?: (content: string) => string; eu?: (scope: StoreScope, input: Record<string, unknown>) => unknown; qd?: (...arguments_: unknown[]) => void; vu?: () => void; xs?: () => void; xu?: () => void; yu?: (...arguments_: unknown[]) => unknown; zd?: (metadata: Record<string, unknown>, active: ToneSection | undefined, subject: string) => Record<string, unknown> };
-const floatingSlashMenu = floatingSlashMenuChunk as unknown as { C?: () => void; E?: () => void; T?: () => unknown; w?: { root: string } };
-const writingBlockSurface = writingBlockSurfaceChunk as unknown as { i?: () => void; n?: unknown };
-const editable = editableWritingBlockChunk as unknown as { a?: { get(key: string): { dismiss(reason: string): void } }; i?: () => void; n?: () => void; r?: (scope: StoreScope, key: string) => void; t?: unknown };
-const capabilities = appCapabilitiesChunk as unknown as { n?: () => void; t?: unknown };
-const writingBlock = writingBlockChunk as unknown as { i?: () => void; n?: () => void; r?: unknown; t?: unknown };
-const contentUpdate = contentUpdateChunk as unknown as { a?: () => void; i?: () => void; n?: (metadata: Record<string, unknown>, sections: readonly ToneSection[] | null | undefined) => Record<string, unknown>; o: (input: { isPersistenceReady: boolean; isStreaming: boolean; metadata?: Record<string, unknown>; onPersistSelection?(id: string): void; toneSections?: readonly ToneSection[] | null }) => ToneController; r?: (sections: readonly ToneSection[], id?: string) => ToneSection | undefined; t: (input: { nextContent: string; toneSectionId?: string; toneSections?: readonly ToneSection[] | null }) => { activeToneSectionId?: string; content: string; toneSections?: readonly ToneSection[] | null } };
-const directiveRenderer = directiveRendererChunk as unknown as { a: <Value extends WritingBlockData>(block: Value, context: { contentReferences?: readonly unknown[]; isStreaming?: boolean }) => Value; c: (input: { content: string; metadata?: Record<string, unknown>; preserveEmptySections?: boolean }) => ToneSection[] | undefined; i: (metadata: Record<string, unknown> | undefined, context: { contentReferences?: readonly unknown[]; isStreaming?: boolean }) => Record<string, unknown> | undefined; l?: () => void; n?: () => void; o?: () => void; r?: (content: string, context: { contentReferences?: readonly unknown[]; isStreaming?: boolean }) => string; t?: unknown };
-
-const { $3: initializeSharedRuntime, BX: useStoreValue, FX: initializeSharedFeatures, HX: useSignal, I3: getJsxRuntime, K2: initializeReactCompilerRuntime, LX: useStoreScope, QI: initializeSharedState, ZI: appScope, e6: getReactRuntime, g_: initializeSharedToast, h4: initializeSharedEditor, lk: initializeSharedPersistence, lw: initializeSharedAnalytics, n4: useIntl } = shared;
-const { AJt: serializeToneSections, APt: updateLocalWritingBlock, FYt: transformStoredWritingBlock, MJt: initializeWritingBlockRuntime, OJt: initializeWritingBlockQueries, OPt: revisionFeatureSignal, PJt: selectedToneMetadataKey, RIt: initializeWritingBlockStore, RVt: conversationMessagesSignal, Rat: initializeWritingBlockPersistence, WJt: initializeWritingBlockSchema, _it: useTurnContext, cJt: initializeWritingBlockDirectives, eIt: editorKeySignal, git: initializeWritingBlockMessages, jIt: selectedModelSignal, jPt: initializeWritingBlockFollowups, jVt: currentMessageIdSignal, kJt: extractWritingBlocks, kPt: changeFeatureSignal, pIt: initializeEarlierVersion, qJt: attachToneSelection, uHt: initializeWritingBlockApi, wVt: serverConversationIdSignal, wdn: initializeConversationMessages, ypn: initializeWritingBlockTracking } = initial;
-const { $l: initializePrimaryWritingBlocks, Bd: initializePrimaryLibrary, Gd: flushConversation, Kd: initializePrimaryState, Ld: getMetadataString, Ou: getSuggestedFollowupIneligibility, Rd: createEmailSubject, Ss: initializePrimarySuggestions, bu: createWritingBlockTitle, eu: submitSuggestedFollowup, vu: initializePrimaryEditor, xs: initializePrimaryRevisions, xu: initializePrimaryCopy, zd: updateEmailSubjectMetadata } = primary;
-const { C: initializeFloatingStyles, E: initializeFloatingSlashMenu, T: createEditorStore } = floatingSlashMenu;
-const { i: initializeWritingBlockSurface } = writingBlockSurface;
-const { a: writingBlockChangeState, i: initializeEditableChangeState, n: initializeEditableWritingBlock, r: dismissTransientChanges, t: EditableWritingBlock } = editable;
-const { n: initializeAppCapabilities, t: WritingBlockAppCapabilities } = capabilities;
-const { i: initializeWritingBlock, n: initializeInlineWritingBlock, r: WritingBlockFrame, t: InlineWritingBlock } = writingBlock;
-const { a: initializeContentUpdate, i: initializeContentMetadata, n: attachToneSections, o: createToneSectionController, r: getToneSection, t: applyContentUpdate } = contentUpdate;
-const { a: transformWritingBlockReferences, c: parseToneSections, i: transformMetadataReferences, l: initializeWritingBlockParsing, n: initializeDirectiveRenderer, o: initializeWritingBlockDirectiveSchema, r: applyContentReferences, t: WritingBlockDirectiveRenderer } = directiveRenderer;
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let initialized = false;
-function initializeQuickChatWritingBlockAdapter(): void {
-  if (initialized) return;
-  initializeSharedRuntime?.(); initializeWritingBlockRuntime?.(); initializePrimaryLibrary?.(); initializeWritingBlockSchema?.(); initializeWritingBlockQueries?.(); initializeFloatingSlashMenu?.(); initializeSharedFeatures?.();
-  React = getReactRuntime(); initializeReactCompilerRuntime?.(); initializeWritingBlockStore?.(); initializePrimaryWritingBlocks?.(); initializeWritingBlockApi?.(); initializeWritingBlockMessages?.(); initializeSharedPersistence?.(); initializeWritingBlockPersistence?.(); initializeSharedState?.(); initializeSharedToast?.(); initializeConversationMessages?.();
-  initializeEditableWritingBlock?.(); initializeWritingBlock?.(); initializeContentUpdate?.(); initializeContentMetadata?.(); initializeWritingBlockParsing?.(); initializeDirectiveRenderer?.(); initializePrimaryState?.(); initializeWritingBlockDirectiveSchema?.(); initializePrimarySuggestions?.(); initializePrimaryCopy?.(); initializeWritingBlockDirectives?.(); initializeWritingBlockSurface?.(); initializeFloatingStyles?.(); initializeWritingBlockTracking?.(); initializeInlineWritingBlock?.(); initializePrimaryRevisions?.();
-  initializeEarlierVersion?.(); initializePrimaryEditor?.(); initializeEditableChangeState?.(); initializeAppCapabilities?.(); jsx = getJsxRuntime(); initialized = true;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  K2 as o,
+  LX as s,
+  QI as c,
+  Y2 as ee,
+  ZI as te,
+  __ as l,
+  cy as ne,
+  e6 as u,
+  g_ as d,
+  h4 as f,
+  lk as p,
+  lw as m,
+  m4 as h,
+  n4 as re,
+  oZ as g,
+  pk as _,
+} from "@rchunk/app-shared";
+import {
+  AJt as v,
+  APt as ie,
+  EHt as ae,
+  FYt as oe,
+  Lat as se,
+  MJt as y,
+  OJt as b,
+  OPt as ce,
+  PJt as le,
+  RIt as ue,
+  RVt as de,
+  Rat as x,
+  Sdn as fe,
+  WJt as pe,
+  _it as me,
+  cJt as S,
+  eIt as C,
+  git as he,
+  jIt as ge,
+  jPt as w,
+  jVt as _e,
+  kJt as ve,
+  kPt as ye,
+  pIt as T,
+  qJt as be,
+  rJt as E,
+  uHt as D,
+  wVt as xe,
+  wdn as Se,
+  xpn as Ce,
+  ypn as we,
+} from "@rchunk/app-initial";
+import {
+  $l as O,
+  Bd as Te,
+  Cs as Ee,
+  Gd as k,
+  Kd as A,
+  Ld as De,
+  Ou as Oe,
+  Rd as ke,
+  Ss as j,
+  bs as Ae,
+  bu as M,
+  eu as je,
+  qd as Me,
+  vu as Ne,
+  xs as Pe,
+  xu as N,
+  yu as Fe,
+  zd as Ie,
+} from "@rchunk/app-primary";
+import {
+  C as P,
+  E as Le,
+  T as Re,
+  w as F,
+} from "@rchunk/writing-block-floating-slash-menu";
+import { i as ze, n as I } from "@rchunk/writing-block-surface";
+import {
+  a as Be,
+  i as Ve,
+  n as L,
+  r as He,
+  t as Ue,
+} from "@rchunk/editable-writing-block";
+import { n as We, t as R } from "@rchunk/writing-block-app-capabilities";
+import { i as Ge, n as z, r as Ke, t as qe } from "@rchunk/library-writing-block-core";
+import {
+  a as Je,
+  i as Ye,
+  n as Xe,
+  o as Ze,
+  r as Qe,
+  t as $e,
+} from "@rchunk/writing-block-content-update";
+import {
+  a as et,
+  c as B,
+  i as tt,
+  l as nt,
+  n as V,
+  o as rt,
+  r as it,
+  t as at,
+} from "@rchunk/writing-block-directive-renderer";
+async function ot(
+  e,
+  { blockId: t, conversationId: n, messageId: r, serverConversationId: i, writingBlock: a },
+) {
+  await k(e, n);
+  let o = await E.safePost(`/writing-blocks/library`, {
+    requestBody: {
+      conversation_id: i,
+      message_id: r,
+      id: t,
+      index: String(a.index),
+      writing_block: {
+        content: a.content,
+        id: t,
+        index: String(a.index),
+        metadata: a.metadata,
+        title: a.title ?? M(a.content),
+        variant: a.variant,
+      },
+    },
+  });
+  return o.library_file_id?.trim()
+    ? (ae({
+        scope: e,
+        blockId: t,
+        conversationId: n,
+        messageId: r,
+        fallbackWritingBlock: a,
+        update: { content: a.content, library_file_id: o.library_file_id },
+      }),
+      await H(e),
+      st(e, o.library_file_id, o.library_file_name).catch(() => void 0),
+      !0)
+    : !1;
 }
-
-function emailMetadata(directive: Directive): EmailMetadata & { writingBlockMetadata?: Record<string, unknown> } { return { ...directive.emailMetadata, writingBlockMetadata: directive.metadata }; }
-
-function QuickChatWritingBlockDirectiveRenderer(props: DirectiveRendererProps): unknown {
-  initializeQuickChatWritingBlockAdapter();
-  const turnContext = useTurnContext?.();
-  const renderExtension = (directive: Directive) => (context: Record<string, unknown>) => jsx.jsx(WritingBlockFrame ?? "div", { context, emailMetadata: emailMetadata(directive), editorKey: undefined, isStreaming: turnContext?.isStreaming ?? false, title: directive.title, variant: directive.variant });
-  const renderPersisted = (directive: Directive): unknown => {
-    const id = directive.id;
-    let index = id == null ? undefined : turnContext?.writingBlockIndexes?.[id];
-    if (id != null && turnContext?.writingBlockMessageIds?.[id] == null) index = turnContext?.writingBlockSources?.[id]?.index ?? index;
-    return turnContext == null || id == null || index == null ? null : jsx.jsx(QuickChatWritingBlock, { directive, id, index, isLastNodeInMessage: props.isLastBlock ?? true, turnContext });
-  };
-  return jsx.jsx(WritingBlockDirectiveRenderer ?? "div", { ...props, contentReferences: turnContext?.contentReferences, isStreaming: turnContext?.isStreaming ?? false, renderExtension, renderPersisted, testId: "chatgpt-writing-block" });
+async function st(e, t, n) {
+  let r;
+  for (let i = 0; i < 60; i += 1) {
+    let i = await E.safeGet(`/files/library/nodes`, { parameters: { query: { q: n, cursor: r } } }),
+      a = i.items.find((e) => e.id === t);
+    if (a?.state === `ready`) {
+      await H(e);
+      return;
+    }
+    if (a?.state === `failed`) return;
+    ((r = a == null ? (i.cursor ?? void 0) : void 0),
+      r ?? (await new Promise((e) => setTimeout(e, 2e3))));
+  }
 }
-
-function QuickChatWritingBlock({ directive, id, index, isLastNodeInMessage = true, readOnly = false, sourceMessageId, turnContext }: QuickChatProps): unknown {
-  initializeQuickChatWritingBlockAdapter();
-  const scope = useStoreScope(appScope);
-  const intl = useIntl();
-  const [editorStore] = React.useState(() => createEditorStore?.() ?? {});
-  const revisionFeature = useSignal<boolean>(revisionFeatureSignal);
-  const changeFeature = useSignal<boolean>(changeFeatureSignal);
-  const serverConversationId = useStoreValue<string | null>(serverConversationIdSignal, turnContext.conversationId);
-  const messages = useStoreValue<Record<string, MessageRecord> | null>(conversationMessagesSignal, turnContext.conversationId);
-  const currentMessageId = useStoreValue<string | null>(currentMessageIdSignal, turnContext.conversationId);
-  const messageId = sourceMessageId ?? turnContext.writingBlockMessageIds?.[id] ?? turnContext.writingBlockSources?.[id]?.messageId ?? turnContext.messageId;
-  const storedRaw = messageId == null ? undefined : extractWritingBlocks?.(messages?.[messageId]?.message?.metadata)[id];
-  const stored = storedRaw == null ? undefined : transformStoredWritingBlock?.(storedRaw, turnContext) ?? storedRaw;
-  const referenceContext = { contentReferences: turnContext.contentReferences, isStreaming: turnContext.isStreaming };
-  const metadata = stored?.metadata ?? transformMetadataReferences(directive.metadata, referenceContext);
-  const content = stored?.content ?? applyContentReferences?.(directive.content, referenceContext) ?? directive.content;
-  const toneSections = stored == null ? directive.toneSections?.map(section => ({ ...section, content: applyContentReferences?.(section.content, referenceContext) ?? section.content })) ?? null : parseToneSections({ content, metadata, preserveEmptySections: true }) ?? null;
-  const mergedEmail = { ...emailMetadata(directive), ...directive.metadata, ...stored?.metadata };
-  const editableKey = readOnly || serverConversationId == null || messageId == null ? undefined : editorKeySignal;
-  const persistenceReady = !readOnly && serverConversationId != null && messageId != null && messages?.[messageId]?.message != null;
-  const persist = React.useCallback((update: PersistUpdate | ((current: WritingBlockData) => PersistUpdate)): void => {
-    if (!persistenceReady || messageId == null || serverConversationId == null) return;
-    const fallback: WritingBlockData = { content, id, index, metadata: { ...metadata, ...(directive.variant === "email" ? { bcc: directive.emailMetadata.bcc ?? null, cc: directive.emailMetadata.cc ?? null, recipient: directive.emailMetadata.recipient ?? null, subject: directive.emailMetadata.subject ?? null } : {}), ...(serializeToneSections?.(toneSections) ?? {}) }, title: directive.title, variant: directive.variant ?? "unknown" };
-    const current = stored ?? fallback;
-    const next = typeof update === "function" ? update(current) : update;
-    const result = updateLocalWritingBlock?.({ scope, blockId: id, conversationId: turnContext.conversationId, fallbackWritingBlock: fallback, messageId, update: { ...next, content: next.content ?? current.content, locallyEdited: Boolean(current.locallyEdited || next.content != null || next.locallyEdited), metadata: { ...current.metadata, ...next.metadata } } });
-    if (result != null) void flushConversation?.(scope, turnContext.conversationId);
-  }, [content, directive, id, index, messageId, metadata, persistenceReady, scope, serverConversationId, stored, toneSections, turnContext.conversationId]);
-  const controller = createToneSectionController({ isPersistenceReady: persistenceReady, isStreaming: turnContext.isStreaming, metadata, toneSections, onPersistSelection: selectedId => persist({ metadata: { [selectedToneMetadataKey ?? "active_option_id"]: selectedId } }) });
-  const selectedTone = getToneSection?.(controller.displayedToneSections, controller.activeToneSectionId) ?? controller.displayedToneSections.find(section => section.id === controller.activeToneSectionId);
-  const updateContent = React.useCallback((nextContent: string, toneSectionId?: string): void => {
-    persist(current => {
-      const update = applyContentUpdate({ nextContent, toneSectionId, toneSections: parseToneSections({ content: current.content, metadata: current.metadata, preserveEmptySections: true }) });
-      if (update.activeToneSectionId == null || update.toneSections == null) return { ...current, content: update.content };
-      const selectedIndex = update.toneSections.findIndex(section => section.id === update.activeToneSectionId);
-      return { ...current, content: update.content, metadata: { ...(attachToneSections?.(current.metadata ?? {}, update.toneSections) ?? current.metadata), ...(attachToneSelection?.(current.metadata, { id: update.activeToneSectionId, index: selectedIndex }, nextContent) ?? {}), [selectedToneMetadataKey ?? "active_option_id"]: update.activeToneSectionId } };
-    });
-  }, [persist]);
-  const subject = createEmailSubject?.({ metadata: mergedEmail, title: stored?.title ?? directive.title }, selectedTone) ?? directive.emailMetadata.subject ?? "";
-  const resolvedEmail = { bcc: getMetadataString?.(mergedEmail, "bcc"), cc: getMetadataString?.(mergedEmail, "cc"), recipient: getMetadataString?.(mergedEmail, "recipient"), subject, writingBlockMetadata: mergedEmail };
-  const suggestedFollowup = (prompt: string): unknown => submitSuggestedFollowup?.(scope, { conversationId: turnContext.conversationId, conversationOrigin: turnContext.conversationOrigin, messageMetadata: { followups_v2_followup_clicked: true, followups_v2_followup_source: "writing_block_suggested_followup", suggestion_type: "suggested_followup" }, preserveDraft: true, prompt, selectedModel: scope.get(selectedModelSignal, turnContext.conversationId), submitErrorFallback: intl.formatMessage({ id: "chatgptConversations.writingBlock.followup.error", defaultMessage: "Couldn't send follow-up" }) });
-  const capabilities = (context: Record<string, unknown>) => jsx.jsx(WritingBlockAppCapabilities ?? "div", { context, conversationId: turnContext.conversationId, document: readOnly || serverConversationId == null || messageId == null ? null : { conversationId: turnContext.conversationId, editorKey: editableKey, libraryFileId: stored?.library_file_id, messageId, serverConversationId, title: stored?.title ?? directive.title, turnId: turnContext.turnId, writingBlockId: stored?.id ?? id, writingBlockIndex: index }, editorKey: editableKey, emailMetadata: resolvedEmail, isReadOnly: readOnly, isStreaming: turnContext.isStreaming, messageId, onBeforeDocumentExport: () => flushConversation?.(scope, turnContext.conversationId), onSuggestedFollowup: suggestedFollowup, serverConversationId, showMagicEditAction: !readOnly && messageId != null && !turnContext.isStreaming, suggestedFollowupIneligibilityReason: getSuggestedFollowupIneligibility?.({ currentMessageId, isLastNodeInMessage, mapping: messages, messageId: turnContext.messageId, writingBlockIndex: index }), title: directive.title, userEditedWritingBlock: stored != null && stored.edited !== false, variant: directive.variant, writingBlockId: editableKey == null ? undefined : id, writingBlockIndex: index });
-  const base = jsx.jsx(EditableWritingBlock ?? "div", { activeToneSectionId: controller.activeToneSectionId, content, editorKey: editableKey, emailMetadata: resolvedEmail, isEditable: editableKey != null && !turnContext.isStreaming, onBlur: editableKey == null ? undefined : () => void flushConversation?.(scope, turnContext.conversationId), onContentChange: editableKey == null ? undefined : (value: string) => { if (changeFeature && writingBlockChangeState != null) writingBlockChangeState.get(`${turnContext.conversationId}\n${messageId ?? ""}\n${id}\n${controller.activeToneSectionId ?? ""}`).dismiss("edit"); updateContent(value, controller.activeToneSectionId); }, onCopySuccess: () => dismissTransientChanges?.(scope, `${turnContext.conversationId}\n${messageId ?? ""}\n${id}\n${controller.activeToneSectionId ?? ""}`), onSubjectChange: editableKey == null ? undefined : (value: string) => persist(current => ({ ...current, metadata: updateEmailSubjectMetadata?.({ ...current, metadata: attachToneSections?.(current.metadata ?? {}, parseToneSections({ content: current.content, metadata: current.metadata, preserveEmptySections: true })) }, selectedTone, value) ?? current.metadata })), onToneSectionSelect: controller.selectToneSection, proseMirrorStore: editorStore, render: capabilities, testId: "chatgpt-writing-block", title: directive.title, toneSections: controller.displayedToneSections, variant: directive.variant });
-  if (!readOnly && (directive.variant === "document" || typeof stored?.library_file_id === "string") && messageId != null) return jsx.jsx(InlineWritingBlock ?? "div", { conversationId: turnContext.conversationId, editorKey: editableKey, fallback: base, initialContent: content, initialEditorStore: editorStore, instanceId: stored?.id ?? id, isStreaming: turnContext.isStreaming, messageId, onSuggestedFollowup: suggestedFollowup, refIndex: index, suggestedFollowupIneligibilityReason: null, title: stored?.title ?? directive.title, turnId: turnContext.turnId });
-  void revisionFeature; void createWritingBlockTitle;
-  return base;
+async function H(e) {
+  await Promise.all([
+    e.queryClient.invalidateQueries({ queryKey: [`library-api`] }),
+    e.queryClient.invalidateQueries({ queryKey: [`appgen-library-cloud-files`] }),
+  ]);
 }
-
-initializeQuickChatWritingBlockAdapter();
-export { QuickChatWritingBlockDirectiveRenderer as n, initializeQuickChatWritingBlockAdapter as r, QuickChatWritingBlock as t };
+function ct() {
+  return (ct = e(() => {
+    (N(), S(), D(), A());
+  }))();
+}
+var lt, ut, U;
+function W() {
+  return (W = e(() => {
+    ((lt = `_collapsedFrame_1bcfb_1`),
+      (ut = `_collapsed_1bcfb_1`),
+      (U = { collapsedFrame: lt, collapsed: ut }));
+  }))();
+}
+function dt(e) {
+  let t = (0, mt.c)(23),
+    {
+      context: n,
+      messageId: r,
+      serverConversationId: i,
+      variant: a,
+      writingBlockId: o,
+      writingBlockIndex: c,
+    } = e,
+    l = s(te),
+    [u, d] = (0, K.useState)(!1),
+    [f, p] = (0, K.useState)(!1),
+    m = (0, K.useId)(),
+    re = (0, K.useRef)(null),
+    g = (0, K.useRef)(null),
+    _;
+  t[0] === u
+    ? (_ = t[1])
+    : ((_ = () => {
+        let e = re.current,
+          t = g.current;
+        if (e == null || t == null || u) return;
+        let n = () => {
+          e.scrollTop = 0;
+          let n = t.querySelector(`.${F.root}`),
+            r = n == null ? 0 : Number.parseFloat(getComputedStyle(n).paddingBottom);
+          p(e.scrollHeight - r > e.clientHeight + 1);
+        };
+        n();
+        let r = new ResizeObserver(n);
+        return (r.observe(e), r.observe(t), () => r.disconnect());
+      }),
+      (t[0] = u),
+      (t[1] = _));
+  let v;
+  (t[2] !== n.state.displayedContent || t[3] !== u
+    ? ((v = [n.state.displayedContent, u]),
+      (t[2] = n.state.displayedContent),
+      (t[3] = u),
+      (t[4] = v))
+    : (v = t[4]),
+    (0, K.useLayoutEffect)(_, v));
+  let ie;
+  if (
+    t[5] !== n ||
+    t[6] !== f ||
+    t[7] !== u ||
+    t[8] !== r ||
+    t[9] !== m ||
+    t[10] !== l ||
+    t[11] !== i ||
+    t[12] !== a ||
+    t[13] !== o ||
+    t[14] !== c
+  ) {
+    let e;
+    (t[16] !== r || t[17] !== l || t[18] !== i || t[19] !== a || t[20] !== o || t[21] !== c
+      ? ((e = (e) => {
+          (Ce(l, C, {
+            conversationId: i,
+            messageId: r,
+            variant: a,
+            writingBlockId: o,
+            writingBlockIndex: String(c),
+          }),
+            E.safePost(`/conversation/implicit_message_feedback`, {
+              requestBody: {
+                conversation_id: i,
+                message_id: r,
+                source: `mouse`,
+                location: `writing-block`,
+                feedback: { feedback_type: `copy`, selected_text_length: e.length },
+              },
+            }).catch(G));
+        }),
+        (t[16] = r),
+        (t[17] = l),
+        (t[18] = i),
+        (t[19] = a),
+        (t[20] = o),
+        (t[21] = c),
+        (t[22] = e))
+      : (e = t[22]),
+      (ie = n.renderView({
+        hideFormatToolbar: !0,
+        hideSlashMenu: !0,
+        historyInteractionDisabled: !0,
+        isEditable: !1,
+        metadataInteractionDisabled: !0,
+        onCopy: e,
+        renderFrame: (e) =>
+          (0, q.jsxs)(I, {
+            ...e,
+            actions: u ? e.actions : null,
+            className: h(!u && U.collapsedFrame, (u || f) && `cursor-interaction`),
+            headerClassName: h(e.headerClassName, `min-h-13 !py-2`),
+            inlineContent: void 0,
+            onClick:
+              u || f
+                ? (e) => {
+                    (e.target instanceof Element && e.target.closest(`button, a`) != null) || d(pt);
+                  }
+                : void 0,
+            title: (0, q.jsx)(`span`, {
+              className: `font-normal text-tertiary`,
+              children: e.title,
+            }),
+            children: [
+              (0, q.jsx)(`div`, {
+                id: m,
+                ref: re,
+                className: h(
+                  !u && [U.collapsed, `max-h-24 overflow-hidden`],
+                  !u && f && `mask-b-from-50% mask-b-to-100%`,
+                ),
+                inert: (!u && f) || void 0,
+                "aria-hidden": (!u && f) || void 0,
+                children: (0, q.jsx)(`div`, { ref: g, children: e.children }),
+              }),
+              u || f
+                ? (0, q.jsxs)(`button`, {
+                    type: `button`,
+                    "aria-controls": m,
+                    "aria-expanded": u,
+                    className: `flex min-h-9 w-full cursor-interaction items-center justify-center gap-1 text-sm text-secondary opacity-0 select-none group-hover/writing-block-surface:opacity-100 focus-visible:opacity-100 focus-visible:ring-2 focus-visible:ring-ring focus-visible:outline-none`,
+                    onClick: (e) => {
+                      (e.stopPropagation(), d(ft));
+                    },
+                    children: [
+                      u
+                        ? (0, q.jsx)(ee, {
+                            id: `codex.writingBlock.showLessEarlierVersion`,
+                            defaultMessage: `Show less`,
+                            description: `Button label that collapses an expanded earlier writing-block draft back to its read-only preview`,
+                          })
+                        : (0, q.jsx)(ee, {
+                            id: `codex.writingBlock.showMoreEarlierVersion`,
+                            defaultMessage: `Show more`,
+                            description: `Button label that expands a truncated earlier writing-block draft inline`,
+                          }),
+                      (0, q.jsx)(ne, { className: u ? `rotate-180` : void 0 }),
+                    ],
+                  })
+                : null,
+            ],
+          }),
+      })),
+      (t[5] = n),
+      (t[6] = f),
+      (t[7] = u),
+      (t[8] = r),
+      (t[9] = m),
+      (t[10] = l),
+      (t[11] = i),
+      (t[12] = a),
+      (t[13] = o),
+      (t[14] = c),
+      (t[15] = ie));
+  } else ie = t[15];
+  return ie;
+}
+function ft(e) {
+  return !e;
+}
+function pt(e) {
+  return !e;
+}
+function G() {}
+var mt, K, q;
+function J() {
+  return (J = e(() => {
+    ((mt = t()), T(), P(), f(), r(), (K = u()), o(), S(), m(), we(), c(), ze(), W(), (q = a()));
+  }))();
+}
+function ht(e) {
+  let t = (0, yt.c)(11),
+    n = me(),
+    r = n?.contentReferences,
+    i = n?.isStreaming ?? !1,
+    a;
+  t[0] === n?.isStreaming
+    ? (a = t[1])
+    : ((a = (e) => (t) =>
+        (0, Z.jsx)(R, {
+          context: t,
+          emailMetadata: vt(e),
+          editorKey: void 0,
+          isStreaming: n?.isStreaming ?? !1,
+          title: e.title,
+          variant: e.variant,
+        })),
+      (t[0] = n?.isStreaming),
+      (t[1] = a));
+  let o;
+  t[2] !== e.isLastBlock || t[3] !== n
+    ? ((o = (t) => {
+        let r = t.id,
+          i = r == null ? void 0 : n?.writingBlockIndexes?.[r];
+        return (
+          r != null &&
+            n?.writingBlockMessageIds?.[r] == null &&
+            (i = n?.writingBlockSources?.[r]?.index ?? i),
+          n == null || r == null || i == null
+            ? null
+            : (0, Z.jsx)(Y, {
+                directive: t,
+                id: r,
+                index: i,
+                isLastNodeInMessage: e.isLastBlock ?? !0,
+                turnContext: n,
+              })
+        );
+      }),
+      (t[2] = e.isLastBlock),
+      (t[3] = n),
+      (t[4] = o))
+    : (o = t[4]);
+  let s;
+  return (
+    t[5] !== e || t[6] !== r || t[7] !== i || t[8] !== a || t[9] !== o
+      ? ((s = (0, Z.jsx)(at, {
+          ...e,
+          contentReferences: r,
+          isStreaming: i,
+          renderExtension: a,
+          renderPersisted: o,
+          testId: `chatgpt-writing-block`,
+        })),
+        (t[5] = e),
+        (t[6] = r),
+        (t[7] = i),
+        (t[8] = a),
+        (t[9] = o),
+        (t[10] = s))
+      : (s = t[10]),
+    s
+  );
+}
+function Y(e) {
+  let t = (0, yt.c)(106),
+    {
+      directive: r,
+      id: a,
+      index: o,
+      isLastNodeInMessage: c,
+      readOnly: ne,
+      sourceMessageId: u,
+      turnContext: d,
+    } = e,
+    f = ne !== void 0 && ne,
+    p = s(te),
+    m = re(),
+    [h] = (0, X.useState)(Re),
+    g = i(ce),
+    y = i(ye),
+    [b, ue] = (0, X.useState)(!1),
+    [x, pe] = (0, X.useState)(null),
+    me,
+    S;
+  (t[0] === x
+    ? ((me = t[1]), (S = t[2]))
+    : ((me = () => {
+        if (x == null) return;
+        let e = setTimeout(() => pe(null), 2500);
+        return () => clearTimeout(e);
+      }),
+      (S = [x]),
+      (t[0] = x),
+      (t[1] = me),
+      (t[2] = S)),
+    (0, X.useEffect)(me, S));
+  let C = `${d.conversationId}\n${d.turnId ?? ``}\n${a}`,
+    he = n(bt, C),
+    w = n(xe, d.conversationId),
+    T = n(de, d.conversationId),
+    E = n(_e, d.conversationId),
+    D = u ?? d.writingBlockMessageIds?.[a] ?? d.writingBlockSources?.[a]?.messageId ?? d.messageId,
+    Se = D ?? ``,
+    Ce = r.id ?? ``,
+    we;
+  t[3] !== Se || t[4] !== Ce || t[5] !== d.conversationId
+    ? ((we = { conversationId: d.conversationId, messageId: Se, writingBlockId: Ce }),
+      (t[3] = Se),
+      (t[4] = Ce),
+      (t[5] = d.conversationId),
+      (t[6] = we))
+    : (we = t[6]);
+  let O = n(Ae, we),
+    Te = D ?? null,
+    A;
+  t[7] !== a || t[8] !== o || t[9] !== Te || t[10] !== d.conversationId
+    ? ((A = { conversationId: d.conversationId, messageId: Te, instanceId: a, refIndex: o }),
+      (t[7] = a),
+      (t[8] = o),
+      (t[9] = Te),
+      (t[10] = d.conversationId),
+      (t[11] = A))
+    : (A = t[11]);
+  let j = n(Ee, A),
+    M;
+  t[12] !== y || t[13] !== j || t[14] !== O?.isLiveRevision || t[15] !== p || t[16] !== w
+    ? ((M = () => {
+        y && w != null && j == null && O?.isLiveRevision && ie(p);
+      }),
+      (t[12] = y),
+      (t[13] = j),
+      (t[14] = O?.isLiveRevision),
+      (t[15] = p),
+      (t[16] = w),
+      (t[17] = M))
+    : (M = t[17]);
+  let Ne = O?.isLiveRevision,
+    Pe;
+  (t[18] !== y || t[19] !== j || t[20] !== p || t[21] !== w || t[22] !== Ne
+    ? ((Pe = [y, j, Ne, p, w]),
+      (t[18] = y),
+      (t[19] = j),
+      (t[20] = p),
+      (t[21] = w),
+      (t[22] = Ne),
+      (t[23] = Pe))
+    : (Pe = t[23]),
+    (0, X.useEffect)(M, Pe));
+  let N = D == null ? void 0 : ve(T?.[D]?.message?.metadata)[a];
+  if (
+    N != null &&
+    d.writingBlockMessageIds?.[a] != null &&
+    !he &&
+    N.content.trimEnd() !== r.bodyContent.trimEnd()
+  ) {
+    N = { ...N, content: r.bodyContent };
+    let e = B({ content: N.content, metadata: N.metadata }),
+      t = Math.max(0, e?.findIndex((e) => e.id === N?.metadata?.active_option_id) ?? -1),
+      n = e?.[t];
+    n != null &&
+      (N = {
+        ...N,
+        metadata: { ...N.metadata, ...be(N.metadata, { id: n.id, index: t }, r.bodyContent) },
+      });
+  }
+  N = et(N, d);
+  let P = N?.metadata ?? tt(r.metadata, d),
+    Le = N?.content ?? it(r.content, d),
+    F =
+      N == null
+        ? (r.toneSections?.map((e) => ({ ...e, content: it(e.content, d) })) ?? null)
+        : B({ content: Le, metadata: P }),
+    ze = vt(r),
+    I = { bcc: ze.bcc, cc: ze.cc, recipient: ze.recipient, ...r.metadata, ...N?.metadata },
+    Ve = D != null && T?.[D]?.message != null,
+    L = l((e) => {
+      if (f || w == null || D == null) return;
+      let t = {
+          content: Le,
+          id: a,
+          index: o,
+          metadata: {
+            ...P,
+            ...(r.variant === `email`
+              ? {
+                  bcc: r.emailMetadata.bcc ?? null,
+                  cc: r.emailMetadata.cc ?? null,
+                  recipient: r.emailMetadata.recipient ?? null,
+                  subject: r.emailMetadata.subject ?? null,
+                }
+              : {}),
+            ...v(F),
+          },
+          title: r.title,
+          variant: r.variant ?? `unknown`,
+        },
+        n = et(ve(p.get(de, d.conversationId)?.[D]?.message?.metadata)[a], d),
+        i = d.writingBlockMessageIds?.[a] != null && !p.get(bt, C) ? (N ?? t) : (n ?? t),
+        s = typeof e == `function` ? e(i) : e,
+        c = ae({
+          scope: p,
+          blockId: a,
+          conversationId: d.conversationId,
+          fallbackWritingBlock: t,
+          messageId: D,
+          update: {
+            ...s,
+            content: s.content ?? i.content,
+            locallyEdited: !!i.locallyEdited || s.content != null || s.locallyEdited,
+            metadata: { ...i.metadata, ...s.metadata },
+          },
+        });
+      c != null &&
+        (d.writingBlockMessageIds?.[a] != null && p.set(bt, C, !0),
+        Me(p, {
+          blockId: a,
+          conversationId: d.conversationId,
+          messageId: D,
+          serverConversationId: w,
+          writingBlock: c,
+        }));
+    }),
+    We = !f && w != null && D != null && Ve,
+    R;
+  t[24] === L
+    ? (R = t[25])
+    : ((R = (e) => {
+        L({ metadata: { [le]: e } });
+      }),
+      (t[24] = L),
+      (t[25] = R));
+  let Ge;
+  t[26] !== F || t[27] !== P || t[28] !== We || t[29] !== R || t[30] !== d.isStreaming
+    ? ((Ge = {
+        isPersistenceReady: We,
+        isStreaming: d.isStreaming,
+        metadata: P,
+        onPersistSelection: R,
+        toneSections: F,
+      }),
+      (t[26] = F),
+      (t[27] = P),
+      (t[28] = We),
+      (t[29] = R),
+      (t[30] = d.isStreaming),
+      (t[31] = Ge))
+    : (Ge = t[31]);
+  let z = Ze(Ge),
+    Je = Qe(z.displayedToneSections, z.activeToneSectionId),
+    Ye;
+  t[32] !== z.activeToneSectionId || t[33] !== z.displayedToneSections
+    ? ((Ye = z.displayedToneSections?.find((e) => e.id === z.activeToneSectionId)?.tone),
+      (t[32] = z.activeToneSectionId),
+      (t[33] = z.displayedToneSections),
+      (t[34] = Ye))
+    : (Ye = t[34]);
+  let nt = Ye,
+    V = `${d.conversationId}\n${D}\n${a}\n${z.activeToneSectionId ?? ``}`,
+    rt = {
+      metadata: Xe({ ...I, subject: P?.subject ?? ze.subject }, F),
+      title: N?.title ?? r.title,
+    },
+    at = ke(rt, Je),
+    st = `${C}\n${z.activeToneSectionId ?? ``}`,
+    [H, ct] = (0, X.useState)({ key: st, value: at }),
+    lt = z.activeToneSectionId == null || F?.some((e) => e.id === z.activeToneSectionId) === !0;
+  lt && (H.key !== st || H.value !== at) && ct({ key: st, value: at });
+  let ut = {
+      bcc: De(I, `bcc`),
+      cc: De(I, `cc`),
+      recipient: De(I, `recipient`),
+      subject: d.isStreaming && !lt && H.key === st ? H.value : at,
+      writingBlockMetadata: I,
+    },
+    U;
+  t[35] === L
+    ? (U = t[36])
+    : ((U = (e, t) => {
+        L((n) => {
+          let r = $e({
+            nextContent: e,
+            toneSectionId: t,
+            toneSections: B({ content: n.content, metadata: n.metadata }),
+          });
+          if (r.activeToneSectionId == null || r.toneSections == null)
+            return { content: r.content };
+          let i = r.toneSections.findIndex((e) => e.id === r.activeToneSectionId),
+            a = be(n.metadata, { id: r.activeToneSectionId, index: i }, e);
+          return {
+            content: r.content,
+            metadata: { ...v(r.toneSections), ...a, [le]: r.activeToneSectionId },
+          };
+        });
+      }),
+      (t[35] = L),
+      (t[36] = U));
+  let W = l(U),
+    ft;
+  t[37] !== Je || t[38] !== L
+    ? ((ft = (e) => {
+        L((t) => ({
+          metadata: Ie(
+            { ...t, metadata: Xe(t.metadata, B({ content: t.content, metadata: t.metadata })) },
+            Je,
+            e,
+          ),
+        }));
+      }),
+      (t[37] = Je),
+      (t[38] = L),
+      (t[39] = ft))
+    : (ft = t[39]);
+  let pt = l(ft),
+    G;
+  t[40] === L
+    ? (G = t[41])
+    : ((G = (e, t) => {
+        L({ metadata: { [e]: t } });
+      }),
+      (t[40] = L),
+      (t[41] = G));
+  let mt = l(G),
+    K;
+  t[42] !== L || t[43] !== p || t[44] !== d.conversationId
+    ? ((K = (e) => {
+        (L({ metadata: e }), k(p, d.conversationId).catch(_t));
+      }),
+      (t[42] = L),
+      (t[43] = p),
+      (t[44] = d.conversationId),
+      (t[45] = K))
+    : (K = t[45]);
+  let q = l(K),
+    J;
+  t[46] !== p || t[47] !== d.conversationId
+    ? ((J = () => {
+        k(p, d.conversationId).catch(gt);
+      }),
+      (t[46] = p),
+      (t[47] = d.conversationId),
+      (t[48] = J))
+    : (J = t[48]);
+  let ht = l(J),
+    Y = f || w == null || D == null ? void 0 : C,
+    Q = N?.library_file_id,
+    xt = N == null ? a : (N.id ?? String(N.index)),
+    St;
+  t[49] !== m || t[50] !== p || t[51] !== d.conversationId || t[52] !== d.conversationOrigin
+    ? ((St = (e) =>
+        je(p, {
+          conversationId: d.conversationId,
+          conversationOrigin: d.conversationOrigin,
+          messageMetadata: {
+            followups_v2_followup_clicked: !0,
+            followups_v2_followup_source: `writing_block_suggested_followup`,
+            suggestion_type: `suggested_followup`,
+          },
+          preserveDraft: !0,
+          prompt: e,
+          selectedModel: p.get(ge, d.conversationId),
+          submitErrorFallback: m.formatMessage({
+            id: `chatgptConversations.writingBlock.followup.error`,
+            defaultMessage: `Couldn't send follow-up`,
+            description: `Error message shown when submitting a suggested follow-up from a ChatGPT writing block in Codex Apps fails.`,
+          }),
+        })),
+      (t[49] = m),
+      (t[50] = p),
+      (t[51] = d.conversationId),
+      (t[52] = d.conversationOrigin),
+      (t[53] = St))
+    : (St = t[53]);
+  let Ct = St,
+    wt;
+  t[54] !== E || t[55] !== o || t[56] !== c || t[57] !== T || t[58] !== d.messageId
+    ? ((wt = Oe({
+        currentMessageId: E,
+        isLastNodeInMessage: c,
+        mapping: T,
+        messageId: d.messageId,
+        writingBlockIndex: o,
+      })),
+      (t[54] = E),
+      (t[55] = o),
+      (t[56] = c),
+      (t[57] = T),
+      (t[58] = d.messageId),
+      (t[59] = wt))
+    : (wt = t[59]);
+  let Tt = wt,
+    Et;
+  t[60] !== N || t[61] !== r.title || t[62] !== a || t[63] !== d.writingBlockMessageIds
+    ? ((Et =
+        d.writingBlockMessageIds?.[a] == null && oe(N?.presentation_display)?.mode === `collapsed`
+          ? (0, Z.jsx)(se, {
+              padding: `offset`,
+              children:
+                r.title == null
+                  ? (0, Z.jsx)(ee, {
+                      id: `chatgptConversations.libraryWritingBlock.created`,
+                      defaultMessage: `Created document`,
+                      description: `Compact transcript status shown where a writing block was originally created after its editable document has moved to a later update`,
+                    })
+                  : (0, Z.jsx)(ee, {
+                      id: `chatgptConversations.libraryWritingBlock.createdFile`,
+                      defaultMessage: `Created {fileName}`,
+                      description: `Compact transcript status shown where a writing block was originally created after its editable document has moved to a later update. fileName is the document name`,
+                      values: { fileName: r.title },
+                    }),
+            })
+          : void 0),
+      (t[60] = N),
+      (t[61] = r.title),
+      (t[62] = a),
+      (t[63] = d.writingBlockMessageIds),
+      (t[64] = Et))
+    : (Et = t[64]);
+  let Dt = Et,
+    Ot = typeof Q == `string` ? Q : void 0,
+    $;
+  t[65] !== N ||
+  t[66] !== r.metadata ||
+  t[67] !== r.title ||
+  t[68] !== r.variant ||
+  t[69] !== Y ||
+  t[70] !== a ||
+  t[71] !== o ||
+  t[72] !== m ||
+  t[73] !== b ||
+  t[74] !== Q ||
+  t[75] !== D ||
+  t[76] !== p ||
+  t[77] !== w ||
+  t[78] !== d.conversationId ||
+  t[79] !== d.isStreaming ||
+  t[80] !== d.isTemporaryChat
+    ? (($ =
+        Y == null || w == null || D == null || d.isTemporaryChat
+          ? void 0
+          : (e, t) => {
+              let n = t !== void 0 && t;
+              if (b || Q || d.isStreaming || e.trim() === ``) return Promise.resolve(!1);
+              ue(!0);
+              let i = (e) => (
+                ue(!1),
+                p
+                  .get(_)
+                  .danger(
+                    e instanceof fe && e.errorCode === `library_storage_limit_exceeded`
+                      ? m.formatMessage({
+                          id: `codex.writingBlock.inlineLibrary.storageFull`,
+                          defaultMessage: `Your Library is full. Free up space and try again`,
+                          description: `Error toast after saving an inline document to Library fails because the user's Library storage limit has been reached.`,
+                        })
+                      : m.formatMessage({
+                          id: `codex.writingBlock.inlineLibrary.saveFailed`,
+                          defaultMessage: `Couldn't save to Library. Try again`,
+                          description: `Error toast after saving an inline document to Library fails. The document remains in the conversation and the save button can be retried.`,
+                        }),
+                    {
+                      errorAnalytics: {
+                        toastId:
+                          e instanceof fe && e.errorCode === `library_storage_limit_exceeded`
+                            ? `codex.writingBlock.inlineLibrary.storageFull`
+                            : `codex.writingBlock.inlineLibrary.saveFailed`,
+                      },
+                    },
+                  ),
+                !1
+              );
+              return ot(p, {
+                blockId: a,
+                conversationId: d.conversationId,
+                messageId: D,
+                serverConversationId: w,
+                writingBlock: {
+                  ...N,
+                  content: e,
+                  id: a,
+                  index: o,
+                  title: N?.title ?? r.title,
+                  metadata: N?.metadata ?? r.metadata,
+                  variant: r.variant ?? `document`,
+                },
+              })
+                .then((e) =>
+                  e
+                    ? (ue(!1),
+                      pe(n ? `keyboard` : `pointer`),
+                      p
+                        .get(_)
+                        .success(
+                          m.formatMessage({
+                            id: `codex.writingBlock.inlineLibrary.saved`,
+                            defaultMessage: `Saved to your library`,
+                            description: `Success toast confirming that an inline writing block has been saved to the user's Library.`,
+                          }),
+                        ),
+                      !0)
+                    : i(),
+                )
+                .catch(i);
+            }),
+      (t[65] = N),
+      (t[66] = r.metadata),
+      (t[67] = r.title),
+      (t[68] = r.variant),
+      (t[69] = Y),
+      (t[70] = a),
+      (t[71] = o),
+      (t[72] = m),
+      (t[73] = b),
+      (t[74] = Q),
+      (t[75] = D),
+      (t[76] = p),
+      (t[77] = w),
+      (t[78] = d.conversationId),
+      (t[79] = d.isStreaming),
+      (t[80] = d.isTemporaryChat),
+      (t[81] = $))
+    : ($ = t[81]);
+  let kt;
+  t[82] !== b || t[83] !== x || t[84] !== Ot || t[85] !== $
+    ? ((kt = { libraryFileId: Ot, isSaving: b, saveConfirmation: x, onSave: $ }),
+      (t[82] = b),
+      (t[83] = x),
+      (t[84] = Ot),
+      (t[85] = $),
+      (t[86] = kt))
+    : (kt = t[86]);
+  let At = kt,
+    jt;
+  t[87] !== g ||
+  t[88] !== P ||
+  t[89] !== a ||
+  t[90] !== j ||
+  t[91] !== O ||
+  t[92] !== V ||
+  t[93] !== nt ||
+  t[94] !== T
+    ? ((jt =
+        g && j == null && O?.hasSessionRevision && !O.isSuperseded && O.previousMarkdown != null
+          ? {
+              id: V,
+              previousMarkdown:
+                B({
+                  content: O.previousMarkdown,
+                  metadata:
+                    O.previousMessageId == null
+                      ? void 0
+                      : ve(T?.[O.previousMessageId]?.message?.metadata)[a]?.metadata,
+                  preserveEmptySections: !0,
+                })?.find((e) => e.tone === nt)?.content ?? O.previousMarkdown,
+              receivedMarkdown:
+                B({ content: O.receivedMarkdown, metadata: P, preserveEmptySections: !0 })?.find(
+                  (e) => e.tone === nt,
+                )?.content ?? O.receivedMarkdown,
+              isStreaming: O.isStreaming,
+              isComplete: O.isComplete,
+            }
+          : void 0),
+      (t[87] = g),
+      (t[88] = P),
+      (t[89] = a),
+      (t[90] = j),
+      (t[91] = O),
+      (t[92] = V),
+      (t[93] = nt),
+      (t[94] = T),
+      (t[95] = jt))
+    : (jt = t[95]);
+  let Mt;
+  t[96] !== g ||
+  t[97] !== Y ||
+  t[98] !== W ||
+  t[99] !== O?.hasSessionRevision ||
+  t[100] !== V ||
+  t[101] !== p
+    ? ((Mt =
+        Y == null
+          ? void 0
+          : (e, t) => {
+              (g && O?.hasSessionRevision && p.get(Be, V).dismiss(`edit`), W(e, t));
+            }),
+      (t[96] = g),
+      (t[97] = Y),
+      (t[98] = W),
+      (t[99] = O?.hasSessionRevision),
+      (t[100] = V),
+      (t[101] = p),
+      (t[102] = Mt))
+    : (Mt = t[102]);
+  let Nt;
+  t[103] !== V || t[104] !== p
+    ? ((Nt = () => He(p, V)), (t[103] = V), (t[104] = p), (t[105] = Nt))
+    : (Nt = t[105]);
+  let Pt = (0, Z.jsx)(Ue, {
+    activeToneSectionId: z.activeToneSectionId,
+    assistantRevision: jt,
+    content: Le,
+    editorKey: Y,
+    emailMetadata: ut,
+    isEditable: Y != null && !d.isStreaming && !(g && O?.isSuperseded),
+    libraryFileId: typeof Q == `string` ? Q : void 0,
+    onBlur: Y == null ? void 0 : ht,
+    onContentChange: Mt,
+    onCopySuccess: Nt,
+    onRecipientChange: Y == null ? void 0 : mt,
+    onSubjectChange: Y == null ? void 0 : pt,
+    onToneSectionSelect: z.selectToneSection,
+    proseMirrorStore: h,
+    render: (e) =>
+      (0, Z.jsx)(Ke, {
+        collapsedContent: Dt,
+        librarySaveControls: At,
+        context: e,
+        document:
+          f || w == null || D == null
+            ? null
+            : {
+                conversationId: d.conversationId,
+                editorKey: C,
+                libraryFileId: typeof Q == `string` ? Q : void 0,
+                messageId: D,
+                serverConversationId: w,
+                title: N?.title ?? r.title,
+                turnId: d.turnId,
+                writingBlockId: xt,
+                writingBlockIndex: o,
+              },
+        editorKey: Y,
+        earlierVersion:
+          g && j == null && O?.isSuperseded && D != null && w != null
+            ? (0, Z.jsx)(dt, {
+                context: e,
+                messageId: D,
+                serverConversationId: w,
+                variant: r.variant,
+                writingBlockId: a,
+                writingBlockIndex: o,
+              })
+            : void 0,
+        emailMetadata: ut,
+        isReadOnly: g && O?.isSuperseded,
+        isStreaming: d.isStreaming,
+        messageId: D ?? void 0,
+        onBeforeDocumentExport: () => k(p, d.conversationId),
+        onAskForChanges:
+          g && j == null && O != null && !O.isSuperseded && D != null && !d.isStreaming
+            ? (e, t) => {
+                let n = O.receivedMarkdown;
+                return Fe(p, {
+                  conversationId: d.conversationId,
+                  messageId: D,
+                  writingBlockId: a,
+                  editorView: e,
+                  onCleared: t,
+                  prepareSubmission: async (e) => (
+                    W(e, z.activeToneSectionId),
+                    (n =
+                      p.get(Ae, {
+                        conversationId: d.conversationId,
+                        messageId: D,
+                        writingBlockId: a,
+                      })?.receivedMarkdown ?? n),
+                    await k(p, d.conversationId),
+                    !0
+                  ),
+                  isCurrent: (e) => {
+                    let t = e.get(Ae, {
+                        conversationId: d.conversationId,
+                        messageId: D,
+                        writingBlockId: a,
+                      }),
+                      r = ve(e.get(de, d.conversationId)?.[D]?.message?.metadata)[a];
+                    if (
+                      t == null ||
+                      t.isSuperseded ||
+                      !t.isComplete ||
+                      t.receivedMarkdown !== n ||
+                      r?.library_file_id != null
+                    )
+                      return !1;
+                    let i = B({ content: r?.content ?? t.receivedMarkdown, metadata: r?.metadata });
+                    return (
+                      (i?.find((e) => e.id === r?.metadata?.active_option_id)?.id ?? i?.[0]?.id) ===
+                      z.activeToneSectionId
+                    );
+                  },
+                });
+              }
+            : void 0,
+        onEmailMetadataChange: Y == null ? void 0 : q,
+        onSuggestedFollowup: Ct,
+        serverConversationId: Y == null ? void 0 : (w ?? void 0),
+        suggestedFollowupIneligibilityReason: Tt,
+        showMagicEditAction: !f && D != null && !d.isStreaming,
+        title: r.title,
+        userEditedWritingBlock: N != null && N.edited !== !1,
+        variant: r.variant,
+        writingBlockId: Y == null ? void 0 : a,
+        writingBlockIndex: o,
+      }),
+    testId: `chatgpt-writing-block`,
+    title: r.title,
+    toneSections: z.displayedToneSections,
+    variant: r.variant,
+  });
+  return !f && (r.variant === `document` || typeof Q == `string`) && D != null
+    ? (0, Z.jsx)(qe, {
+        conversationId: d.conversationId,
+        editorKey: C,
+        fallback: Pt,
+        initialContent: Le,
+        inlineLibraryControls: At,
+        initialEditorStore: h,
+        instanceId: xt,
+        isStreaming: d.isStreaming,
+        messageId: D,
+        onSuggestedFollowup: Ct,
+        refIndex: o,
+        suggestedFollowupIneligibilityReason: Tt,
+        title: N?.title ?? r.title,
+        turnId: d.turnId,
+      })
+    : Pt;
+}
+function gt() {}
+function _t() {}
+function vt(e) {
+  return { ...e.emailMetadata, writingBlockMetadata: e.metadata };
+}
+var yt, X, Z, bt;
+function Q() {
+  return (Q = e(() => {
+    ((yt = t()),
+      y(),
+      Te(),
+      pe(),
+      b(),
+      Le(),
+      r(),
+      (X = u()),
+      o(),
+      ue(),
+      O(),
+      D(),
+      he(),
+      p(),
+      x(),
+      c(),
+      d(),
+      Se(),
+      L(),
+      Ge(),
+      Je(),
+      Ye(),
+      nt(),
+      V(),
+      A(),
+      rt(),
+      j(),
+      ct(),
+      z(),
+      Pe(),
+      J(),
+      w(),
+      Ne(),
+      Ve(),
+      We(),
+      (Z = a()),
+      (bt = g(te, (e) => !1)));
+  }))();
+}
+export { ht as n, Q as r, Y as t };

@@ -1,23 +1,203 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import { t as EditableWritingBlock } from "@rchunk/editable-writing-block";
-
-export interface ContentReference { id?: string; replacement?: string; text?: string }
-export interface ToneSection { content: string; id: string; tone: string; [key: string]: unknown }
-export interface ParsedWritingBlock { bodyContent: string; content: string; emailMetadata: { bcc?: string; cc?: string; recipient?: string; subject?: string }; id?: string; metadata?: Record<string, unknown>; title?: string; toneSections?: ToneSection[]; variant?: string }
-export interface WritingBlockDirectiveProps { attributes?: Record<string, unknown>; contentReferences?: readonly ContentReference[]; isStreaming?: boolean; rawText?: string | null; renderExtension?(block: ParsedWritingBlock): unknown; renderPersisted?(block: ParsedWritingBlock): unknown; testId?: string }
-let runtime: JsxRuntime | undefined;
-function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function stringAttribute(attributes: Record<string, unknown> | undefined, key: string): string | undefined { const value = attributes?.[key]; return typeof value === "string" ? value : undefined; }
-function parseWritingBlockMetadata(value: unknown): Record<string, unknown> | undefined { if (value == null) return undefined; if (typeof value === "object" && !Array.isArray(value)) return value as Record<string, unknown>; if (typeof value !== "string") return undefined; try { const parsed: unknown = JSON.parse(value); return typeof parsed === "object" && parsed != null && !Array.isArray(parsed) ? parsed as Record<string, unknown> : undefined; } catch { return undefined; } }
-function normalizeToneSections({ content, metadata, preserveEmptySections = false }: { content: string; metadata?: Record<string, unknown>; preserveEmptySections?: boolean }): ToneSection[] | undefined { const candidates = metadata?.options ?? metadata?.style_variants; if (!Array.isArray(candidates)) return undefined; const sections = candidates.flatMap((candidate, index) => { if (candidate == null || typeof candidate !== "object") return []; const value = candidate as Record<string, unknown>; const sectionContent = typeof value.content === "string" ? value.content : index === 0 ? content : ""; if (!preserveEmptySections && sectionContent.length === 0) return []; return [{ ...value, content: sectionContent, id: typeof value.id === "string" ? value.id : `tone-${index}`, tone: typeof value.tone === "string" ? value.tone : typeof value.label === "string" ? value.label : "default" } as ToneSection]; }); return sections.length ? sections : undefined; }
-function parseWritingBlock({ attributes, isStreaming, rawText }: Pick<WritingBlockDirectiveProps, "attributes" | "isStreaming" | "rawText">): ParsedWritingBlock { const bodyContent = (rawText ?? "").replace(/^\r?\n/, "").replace(/\r?\n$/, ""); const metadata = parseWritingBlockMetadata(attributes?.metadata); const toneSections = normalizeToneSections({ content: bodyContent, metadata, preserveEmptySections: !isStreaming }); return { bodyContent, content: toneSections?.[0]?.content ?? bodyContent, emailMetadata: { bcc: stringAttribute(attributes, "bcc"), cc: stringAttribute(attributes, "cc"), recipient: stringAttribute(attributes, "recipient"), subject: stringAttribute(attributes, "subject") }, id: stringAttribute(attributes, "id"), metadata, title: stringAttribute(attributes, "title"), toneSections, variant: stringAttribute(attributes, "variant") }; }
-function applyContentReferences(content: string, { contentReferences = [] }: { contentReferences?: readonly ContentReference[]; isStreaming?: boolean }): string { return contentReferences.reduce((result, reference) => { if (!reference.id) return result; const replacement = reference.replacement ?? reference.text ?? reference.id; return result.replaceAll(`【${reference.id}】`, replacement).replaceAll(`{{${reference.id}}}`, replacement); }, content); }
-function transformMetadataReferences(metadata: Record<string, unknown> | undefined, context: { contentReferences?: readonly ContentReference[]; isStreaming?: boolean }): Record<string, unknown> | undefined { if (!metadata) return metadata; let next = metadata; for (const key of ["options", "style_variants"] as const) { const candidates = metadata[key]; if (Array.isArray(candidates)) next = { ...next, [key]: candidates.map(candidate => candidate != null && typeof candidate === "object" ? { ...candidate, content: applyContentReferences(String((candidate as Record<string, unknown>).content ?? ""), context) } : candidate) }; } return next; }
-function transformWritingBlockReferences<T extends { content: string; edited?: boolean; locallyEdited?: boolean; metadata?: Record<string, unknown> }>(block: T, context: { contentReferences?: readonly ContentReference[]; isStreaming?: boolean }): T { return block.edited !== false || block.locallyEdited ? block : { ...block, content: applyContentReferences(block.content, context), metadata: transformMetadataReferences(block.metadata, context) }; }
-function WritingBlockDirectiveRenderer(props: WritingBlockDirectiveProps): unknown { const parsed = parseWritingBlock(props); const persisted = props.renderPersisted?.(parsed); if (persisted != null) return jsx().jsx(jsx().Fragment, { children: persisted }); const content = applyContentReferences(parsed.content, props); const toneSections = parsed.toneSections?.map(section => ({ ...section, content: applyContentReferences(section.content, props) })) ?? null; return jsx().jsx(EditableWritingBlock, { content, emailMetadata: parsed.emailMetadata, isEditable: false, render: props.renderExtension?.(parsed), testId: props.testId, title: parsed.title, toneSections, variant: parsed.variant }); }
-function initializeWritingBlockParsing(): void {}
-function initializeWritingBlockDirectiveRenderer(): void { void jsx(); }
-function initializeWritingBlockSchema(): void {}
-export { transformWritingBlockReferences as a, normalizeToneSections as c, transformMetadataReferences as i, initializeWritingBlockParsing as l, initializeWritingBlockDirectiveRenderer as n, initializeWritingBlockSchema as o, applyContentReferences as r, parseWritingBlockMetadata as s, WritingBlockDirectiveRenderer as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, E4 as n, I3 as r, g4 as i, q4 as a, z4 as o } from "@rchunk/app-shared";
+import {
+  Ant as s,
+  Dmn as c,
+  Emn as l,
+  MJt as u,
+  Omn as d,
+  SJt as f,
+  jJt as p,
+  yJt as m,
+} from "@rchunk/app-initial";
+import { n as h, t as g } from "@rchunk/editable-writing-block";
+function _({ attributes: e, isStreaming: t, rawText: n }) {
+  let r = (n ?? ``).replace(/^\r?\n/, ``).replace(/\r?\n$/, ``),
+    i = d(s(e, `metadata`)),
+    a = y({ content: r, metadata: i, preserveEmptySections: !t });
+  return {
+    bodyContent: r,
+    content: a?.[0]?.content ?? r,
+    emailMetadata: {
+      bcc: s(e, `bcc`),
+      cc: s(e, `cc`),
+      recipient: s(e, `recipient`),
+      subject: s(e, `subject`),
+    },
+    id: s(e, `id`),
+    metadata: i,
+    title: s(e, `title`),
+    toneSections: a,
+    variant: s(e, `variant`),
+  };
+}
+function v(e) {
+  return l(e);
+}
+function y({ content: e, metadata: t, preserveEmptySections: n = !1 }) {
+  let r = p({ content: e, metadata: t, preserveEmptySections: n }),
+    i = p({ content: ``, metadata: t });
+  return r == null || i == null
+    ? r
+    : r.map((e, t) => {
+        let n = i[t];
+        return n == null || n.tone !== e.tone || n.id === e.id ? e : { ...e, id: n.id };
+      });
+}
+function b() {
+  return (b = e(() => {
+    (u(), c());
+  }))();
+}
+function x(e, { contentReferences: t, isStreaming: n }) {
+  return f(e, { content_references: t }, { isStreaming: n });
+}
+function S(e, t) {
+  let n = e;
+  for (let r of [`options`, `style_variants`]) {
+    let i = w.safeParse(e?.[r]);
+    i.success && (n = { ...n, [r]: i.data.map((e) => ({ ...e, content: x(e.content, t) })) });
+  }
+  return n;
+}
+function C(e, t) {
+  return e?.edited !== !1 || e.locallyEdited
+    ? e
+    : { ...e, content: x(e.content, t), metadata: S(e.metadata, t) };
+}
+var w;
+function T() {
+  return (T = e(() => {
+    (m(), i(), (w = n(o({ content: a() }))));
+  }))();
+}
+function E(e) {
+  let t = (0, D.c)(29),
+    {
+      attributes: n,
+      contentReferences: r,
+      isStreaming: i,
+      rawText: a,
+      renderExtension: o,
+      renderPersisted: s,
+      testId: c,
+    } = e,
+    l,
+    u,
+    d,
+    f,
+    p,
+    m,
+    h,
+    v,
+    y,
+    b,
+    S;
+  if (
+    t[0] !== n ||
+    t[1] !== r ||
+    t[2] !== i ||
+    t[3] !== a ||
+    t[4] !== o ||
+    t[5] !== s ||
+    t[6] !== c
+  ) {
+    S = Symbol.for(`react.early_return_sentinel`);
+    bb0: {
+      u = _({ attributes: n, isStreaming: i, rawText: a });
+      let e = s?.(u);
+      if (e != null) {
+        S = (0, O.jsx)(O.Fragment, { children: e });
+        break bb0;
+      }
+      ((l = g),
+        (d = x(u.content, { contentReferences: r, isStreaming: i })),
+        (f = void 0),
+        (p = u.emailMetadata),
+        (m = !1),
+        (h = o?.(u)),
+        (v = c),
+        (y = u.title),
+        (b =
+          u.toneSections?.map((e) => ({
+            ...e,
+            content: x(e.content, { contentReferences: r, isStreaming: i }),
+          })) ?? null));
+    }
+    ((t[0] = n),
+      (t[1] = r),
+      (t[2] = i),
+      (t[3] = a),
+      (t[4] = o),
+      (t[5] = s),
+      (t[6] = c),
+      (t[7] = l),
+      (t[8] = u),
+      (t[9] = d),
+      (t[10] = f),
+      (t[11] = p),
+      (t[12] = m),
+      (t[13] = h),
+      (t[14] = v),
+      (t[15] = y),
+      (t[16] = b),
+      (t[17] = S));
+  } else
+    ((l = t[7]),
+      (u = t[8]),
+      (d = t[9]),
+      (f = t[10]),
+      (p = t[11]),
+      (m = t[12]),
+      (h = t[13]),
+      (v = t[14]),
+      (y = t[15]),
+      (b = t[16]),
+      (S = t[17]));
+  if (S !== Symbol.for(`react.early_return_sentinel`)) return S;
+  let C;
+  return (
+    t[18] !== l ||
+    t[19] !== u.variant ||
+    t[20] !== d ||
+    t[21] !== f ||
+    t[22] !== p ||
+    t[23] !== m ||
+    t[24] !== h ||
+    t[25] !== v ||
+    t[26] !== y ||
+    t[27] !== b
+      ? ((C = (0, O.jsx)(l, {
+          content: d,
+          editorKey: f,
+          emailMetadata: p,
+          isEditable: m,
+          render: h,
+          testId: v,
+          title: y,
+          toneSections: b,
+          variant: u.variant,
+        })),
+        (t[18] = l),
+        (t[19] = u.variant),
+        (t[20] = d),
+        (t[21] = f),
+        (t[22] = p),
+        (t[23] = m),
+        (t[24] = h),
+        (t[25] = v),
+        (t[26] = y),
+        (t[27] = b),
+        (t[28] = C))
+      : (C = t[28]),
+    C
+  );
+}
+var D, O;
+function k() {
+  return (k = e(() => {
+    ((D = t()), T(), h(), b(), (O = r()));
+  }))();
+}
+export { C as a, y as c, S as i, b as l, k as n, T as o, x as r, v as s, E as t };

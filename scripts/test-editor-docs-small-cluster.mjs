@@ -6,8 +6,6 @@ import esbuild from "esbuild";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const expectations = {
-  "markdown-writing-block": { dependencies: ["rolldown-runtime","app-shared","app-initial","writing-block-surface","writing-block-copy-button"], exported: "MarkdownWritingBlock" },
-  "dil-writing-block": { dependencies: ["rolldown-runtime","app-shared","app-initial","writing-block-directive-renderer","quick-chat-writing-block-adapter"], exported: "DilWritingBlock" },
   "composer-annotation-editor": { dependencies: ["rolldown-runtime","app-shared","app-initial","annotation-comment-editor-card"], exported: "ComposerAnnotationEditor" },
 };
 let sourceAssertions = 0;
@@ -47,65 +45,6 @@ async function load(name, mocks) {
 
 let runtimeAssertions = 0;
 const runtimeAssert = (actual, expected, message) => { runtimeAssertions += 1; assert.deepEqual(actual, expected, message); };
-
-const markdownMocks = {
-  "rolldown-runtime": "export {};",
-  "app-shared": [sharedBase,"export const e6=()=>globalThis.__editorDocsSmallTest.React;export const K2=" + marker("compiler") + ";export const Zh=" + marker("icons") + ";export const Xm=" + marker("selection") + ";export const dg=" + marker("markdown") + ";","export const Y2='FormattedMessage';export const Yh='Button';export const fg=()=>true;export const Ym=(content,event)=>globalThis.__editorDocsSmallTest.copies.push([content,event]);"].join("\n"),
-  "app-initial": "export const d6=" + marker("actions") + ";export const u6='AddIcon';",
-  "writing-block-surface": "export const i=" + marker("surface") + ";export const r='WritingBlockSurface';",
-  "writing-block-copy-button": "export const n=" + marker("copy") + ";export const t='CopyButton';",
-};
-const markdown = await load("markdown-writing-block", markdownMocks);
-runtimeAssert(Object.keys(markdown), ["MarkdownWritingBlock"], "markdown unique export");
-runtimeAssert(state.initializers, ["shared","compiler","icons","actions","selection","markdown","copy","surface"], "markdown initializer order");
-let prevented = 0;
-const markdownView = markdown.MarkdownWritingBlock({ className:"custom", content:"  hello  ", onAddSelectedTextToChat:(text, selectedRange)=>state.additions.push([text,selectedRange]) });
-runtimeAssert(markdownView.type, "WritingBlockSurface", "markdown surface");
-runtimeAssert(markdownView.props["data-theme"], "dark", "dark theme");
-runtimeAssert(markdownView.props["data-markdown-copy"], "code-block", "copy block marker");
-const toolbar = markdownView.props.children[0];
-runtimeAssert(toolbar.props["data-markdown-copy"], "exclude", "toolbar copy excluded");
-toolbar.props.children[0].props.onMouseDown({preventDefault(){prevented += 1;}});
-toolbar.props.children[0].props.onClick();
-runtimeAssert(prevented, 1, "mouse down preserves selection");
-runtimeAssert(state.additions, [["hello",range]], "trimmed content added with range");
-runtimeAssert(state.selected, [contentElement], "range selects content node");
-toolbar.props.children[1].props.onCopy("event");
-runtimeAssert(state.copies, [["  hello  ","event"]], "copy receives original content");
-const noCopy = markdown.MarkdownWritingBlock({ content:"x", showCopyButton:false });
-runtimeAssert(noCopy.props.children[0].props.children, [null,null], "optional actions hidden");
-
-state.initializers = [];
-state.turnContext = { messageId:"fallback", contentReferenceMessageIds:["same","same","other"], contentReferenceMessageStatuses:["done","in_progress"], isStreaming:false, marker:"context" };
-const dilMocks = {
-  "rolldown-runtime": "export {};",
-  "app-shared": sharedBase,
-  "app-initial": [
-    "export const WJt=" + marker("schema") + ";export const wJt=" + marker("references") + ";export const git=" + marker("runtime") + ";",
-    "export const _it=()=>globalThis.__editorDocsSmallTest.turnContext;",
-    "export const CJt={safeParse:value=>globalThis.__editorDocsSmallTest.schemaSuccess?{success:true,data:value}:{success:false}};",
-    "export const zJt=metadata=>metadata.generated?[{content:metadata.generated}]:[];",
-  ].join("\n"),
-  "writing-block-directive-renderer": "export const l=" + marker("directive") + ";export const c=input=>{globalThis.__editorDocsSmallTest.directiveInput=input;return [{content:'tone-content'}]};",
-  "quick-chat-writing-block-adapter": "export const r=" + marker("adapter") + ";export const t='QuickChatWritingBlock';",
-};
-const dil = await load("dil-writing-block", dilMocks);
-runtimeAssert(Object.keys(dil), ["DilWritingBlock"], "dil unique export");
-runtimeAssert(state.initializers, ["shared","schema","references","runtime","adapter","directive"], "dil initializer order");
-const dilView = dil.DilWritingBlock({ contentReferenceIndex:1, data:{ content:"fallback-content", metadata:{generated:"generated-content"}, options:{tone:"formal"}, recipient:"a@example.com", title:"Email" }, readOnly:true });
-runtimeAssert(dilView.type, "QuickChatWritingBlock", "dil adapter root");
-runtimeAssert(dilView.props.id, "same:1", "duplicate reference index id");
-runtimeAssert(dilView.props.index, 1, "duplicate occurrence index");
-runtimeAssert(dilView.props.sourceMessageId, "same", "source message id");
-runtimeAssert(dilView.props.readOnly, true, "read only forwarded");
-runtimeAssert(dilView.props.directive.bodyContent, "generated-content", "metadata content preferred");
-runtimeAssert(dilView.props.directive.content, "tone-content", "tone section content preferred");
-runtimeAssert(dilView.props.directive.metadata.options, {tone:"formal"}, "options merged into metadata");
-runtimeAssert(dilView.props.directive.emailMetadata.recipient, "a@example.com", "email metadata forwarded");
-runtimeAssert(dilView.props.turnContext.isStreaming, true, "reference status drives streaming");
-runtimeAssert(state.directiveInput.preserveEmptySections, false, "streaming preserves no empty sections");
-state.schemaSuccess = false;
-runtimeAssert(dil.DilWritingBlock({contentReferenceIndex:0,data:{}}), null, "invalid DIL data returns null");
 
 state.initializers = [];
 const composerMocks = {

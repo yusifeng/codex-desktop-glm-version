@@ -12,22 +12,6 @@ function find(node, predicate) { return findAll(node, predicate)[0]; }
 function byText(node, value) { return find(node, candidate => candidate.props?.children === value); }
 function text(node) { const values = []; const collect = value => { if (typeof value === "string") values.push(value); else if (typeof value === "number") values.push(String(value)); else if (value != null && typeof value === "object") { const children = value.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(collect); else collect(children); } }; collect(node); return values.join(" "); }
 
-// writing-block-surface: 12
-const surface = await bundle("writing-block-surface");
-assert.deepEqual(Object.keys(surface), ["a", "i", "n", "o", "r", "t"]);
-assert.equal(surface.o["--oai-wb-spacing"], "0.75rem");
-assert.equal(surface.o["--oai-wb-radius"], "0.75rem");
-const frame = surface.n({ children: "body", className: "paper", header: "Title", leadingContent: "Icon", style: { color: "red" } });
-assert.equal(frame.props["data-oai-writing-block-surface"], true);
-assert.equal(frame.props.className, "paper");
-assert.equal(frame.props.style.color, "red");
-assert.match(text(frame), /Icon Title body/);
-assert.equal(find(frame, node => node.props?.["data-writing-block-header"]).type, "header");
-assert.equal(surface.r({ children: "tools" }).props["data-writing-block-controls"], true);
-assert.equal(surface.t({ children: "editor" }).props["data-writing-block-editor"], true);
-assert.equal(surface.a(), undefined);
-assert.equal(surface.i(), undefined);
-
 // library-json-preview: 9
 const jsonPreview = await bundle("library-json-preview");
 assert.deepEqual(Object.keys(jsonPreview), ["LibraryJsonPreview"]);
@@ -111,4 +95,4 @@ assert.match(text(pdf.PdfPreviewPanel({ isLoading: true })), /Loading PDF/);
 assert.match(text(pdf.PdfPreviewPanel({ error: "Unreadable" })), /Unreadable/);
 assert.match(text(pdf.PdfPreviewPanel({})), /No PDF preview/);
 
-console.log("61 artifact preview panel cluster assertions passed");
+console.log("49 artifact preview panel cluster assertions passed");

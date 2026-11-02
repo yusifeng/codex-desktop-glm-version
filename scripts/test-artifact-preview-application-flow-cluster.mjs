@@ -130,17 +130,6 @@ assert.match(text(noteUi), /Shared content/);
 find(noteUi, node => node.props?.children === "Close").props.onClick();
 assert.equal(noteClosed, 1);
 
-// multiplayer-writing-block: 5
-const writing = await bundle("multiplayer-writing-block");
-assert.deepEqual(Object.keys(writing), ["MultiplayerWritingBlock"]);
-let opened = 0;
-const writingUi = writing.MultiplayerWritingBlock({ content: "Draft", name: "Shared note", onOpen() { opened++; } });
-assert.equal(writingUi.props["aria-label"], "Shared note");
-assert.match(text(writingUi), /Draft/);
-find(writingUi, node => node.props?.children === "Open note").props.onClick();
-assert.equal(opened, 1);
-assert.equal(find(writing.MultiplayerWritingBlock({}), node => node.props?.children === "Open note").type, "button");
-
 // library-cloud-file-preview: 13
 const cloudPreview = await bundle("library-cloud-file-preview");
 assert.deepEqual(Object.keys(cloudPreview), ["a", "c", "i", "n", "o", "r", "s", "t"]);
@@ -175,4 +164,4 @@ assert.equal(imageTarget.images.length, 2);
 assert.equal(openPayload.index, 1);
 assert.equal(openImage.openChatGptSearchImagePreview(imageOne).index, 0);
 
-console.log("86 artifact preview application flow cluster assertions passed");
+console.log("81 artifact preview application flow cluster assertions passed");

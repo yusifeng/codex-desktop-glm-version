@@ -1,61 +1,129 @@
-// Plain markdown writing block with copy and add-to-chat actions.
-
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as writingBlockSurfaceChunk from "@rchunk/writing-block-surface";
-import * as writingBlockCopyButtonChunk from "@rchunk/writing-block-copy-button";
-
-interface JsxRuntime { jsx(type: unknown, props: object, key?: string): unknown; jsxs(type: unknown, props: object, key?: string): unknown }
-interface Ref<Value> { current: Value }
-interface ReactRuntime { useRef<Value>(initialValue: Value): Ref<Value> }
-interface MarkdownWritingBlockProps { className?: string; content: string; onAddSelectedTextToChat?(text: string, range: Range): void; showCopyButton?: boolean }
-
-const shared = appSharedChunk as unknown as { $3?: () => void; I3: () => JsxRuntime; K2?: () => void; Xm?: () => void; Y2?: unknown; Yh?: unknown; Ym?: (content: string, event: unknown) => void; Zh?: () => void; dg?: () => void; e6: () => ReactRuntime; fg?: () => boolean };
-const initial = appInitialChunk as unknown as { d6?: () => void; u6?: unknown };
-const surface = writingBlockSurfaceChunk as unknown as { i?: () => void; r?: unknown };
-const copyButton = writingBlockCopyButtonChunk as unknown as { n?: () => void; t?: unknown };
-const { $3: initializeSharedRuntime, I3: getJsxRuntime, K2: initializeReactCompilerRuntime, Xm: initializeSelectionOverlay, Y2: FormattedMessage, Yh: Button, Ym: copyMarkdownContent, Zh: initializeIcons, dg: initializeMarkdownRuntime, e6: getReactRuntime, fg: useDarkMode } = shared;
-const { d6: initializeWritingBlockActions, u6: AddIcon } = initial;
-const { i: initializeWritingBlockSurface, r: WritingBlockSurface } = surface;
-const { n: initializeCopyButton, t: WritingBlockCopyButton } = copyButton;
-
-let jsx: JsxRuntime;
-let React: ReactRuntime;
-let initialized = false;
-
-function initializeMarkdownWritingBlock(): void {
-  if (initialized) return;
-  initializeSharedRuntime?.();
-  React = getReactRuntime();
-  initializeReactCompilerRuntime?.();
-  initializeIcons?.();
-  initializeWritingBlockActions?.();
-  initializeSelectionOverlay?.();
-  initializeMarkdownRuntime?.();
-  initializeCopyButton?.();
-  initializeWritingBlockSurface?.();
-  jsx = getJsxRuntime();
-  initialized = true;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  I3 as n,
+  K2 as r,
+  Xm as i,
+  Y2 as a,
+  Yh as o,
+  Ym as s,
+  Zh as c,
+  dg as l,
+  e6 as u,
+  fg as d,
+} from "@rchunk/app-shared";
+import { d6 as f, u6 as p } from "@rchunk/app-initial";
+import { i as m, r as h } from "@rchunk/writing-block-surface";
+import { n as g, t as _ } from "@rchunk/writing-block-copy-button";
+function v(e) {
+  let t = (0, b.c)(21),
+    { className: n, content: r, onAddSelectedTextToChat: i, showCopyButton: c } = e,
+    l = c === void 0 || c,
+    u = (0, x.useRef)(null),
+    f = d(),
+    m;
+  t[0] !== r || t[1] !== i
+    ? ((m = () => {
+        let e = r.trim(),
+          t = u.current;
+        if (e.length === 0 || t == null) return;
+        let n = t.ownerDocument.createRange();
+        (n.selectNodeContents(t), i?.(e, n));
+      }),
+      (t[0] = r),
+      (t[1] = i),
+      (t[2] = m))
+    : (m = t[2]);
+  let g = m,
+    v;
+  t[3] === r
+    ? (v = t[4])
+    : ((v = (e) => {
+        s(r, e);
+      }),
+      (t[3] = r),
+      (t[4] = v));
+  let C = v,
+    w = f ? `dark` : `light`,
+    T;
+  t[5] !== g || t[6] !== i
+    ? ((T =
+        i == null
+          ? null
+          : (0, S.jsxs)(o, {
+              color: `outline`,
+              size: `composer`,
+              onMouseDown: y,
+              onClick: g,
+              children: [
+                (0, S.jsx)(p, { "aria-hidden": `true`, className: `icon-2xs` }),
+                (0, S.jsx)(a, {
+                  id: `selectedTextOverlay.addToCodex`,
+                  defaultMessage: `Add to chat`,
+                  description: `Button label for adding currently selected text from an overlay anchored to that selection to the chat`,
+                }),
+              ],
+            })),
+      (t[5] = g),
+      (t[6] = i),
+      (t[7] = T))
+    : (T = t[7]);
+  let E;
+  t[8] !== C || t[9] !== l
+    ? ((E = l ? (0, S.jsx)(_, { className: `ms-auto`, onCopy: C }) : null),
+      (t[8] = C),
+      (t[9] = l),
+      (t[10] = E))
+    : (E = t[10]);
+  let D;
+  t[11] !== T || t[12] !== E
+    ? ((D = (0, S.jsxs)(`div`, {
+        "data-markdown-copy": `exclude`,
+        className: `flex items-center px-2 pt-2 pb-2 font-sans text-sm text-codex-description select-none`,
+        children: [T, E],
+      })),
+      (t[11] = T),
+      (t[12] = E),
+      (t[13] = D))
+    : (D = t[13]);
+  let O;
+  t[14] === r
+    ? (O = t[15])
+    : ((O = (0, S.jsx)(`div`, {
+        ref: u,
+        className: `overflow-auto px-4 pt-2 pb-4 text-size-chat whitespace-pre-wrap [unicode-bidi:plaintext]`,
+        dir: `auto`,
+        children: r,
+      })),
+      (t[14] = r),
+      (t[15] = O));
+  let k;
+  return (
+    t[16] !== n || t[17] !== w || t[18] !== D || t[19] !== O
+      ? ((k = (0, S.jsxs)(h, {
+          "data-markdown-copy": `code-block`,
+          className: n,
+          "data-theme": w,
+          children: [D, O],
+        })),
+        (t[16] = n),
+        (t[17] = w),
+        (t[18] = D),
+        (t[19] = O),
+        (t[20] = k))
+      : (k = t[20]),
+    k
+  );
 }
-
-function MarkdownWritingBlock({ className, content, onAddSelectedTextToChat, showCopyButton = true }: MarkdownWritingBlockProps): unknown {
-  initializeMarkdownWritingBlock();
-  const contentRef = React.useRef<HTMLDivElement | null>(null);
-  const addToChat = () => {
-    const text = content.trim();
-    const element = contentRef.current;
-    if (text.length === 0 || element == null) return;
-    const range = element.ownerDocument.createRange();
-    range.selectNodeContents(element);
-    onAddSelectedTextToChat?.(text, range);
-  };
-  const toolbar = jsx.jsxs("div", { "data-markdown-copy": "exclude", className: "flex items-center px-2 pt-2 pb-2 font-sans text-sm text-codex-description select-none", children: [onAddSelectedTextToChat == null ? null : jsx.jsxs(Button ?? "button", { color: "outline", size: "composer", onMouseDown: preventDefault, onClick: addToChat, children: [jsx.jsx(AddIcon ?? "span", { "aria-hidden": true, className: "icon-2xs" }), jsx.jsx(FormattedMessage ?? "span", { id: "selectedTextOverlay.addToCodex", defaultMessage: "Add to chat" })] }), showCopyButton ? jsx.jsx(WritingBlockCopyButton ?? "button", { className: "ms-auto", onCopy: (event: unknown) => copyMarkdownContent?.(content, event) }) : null] });
-  const body = jsx.jsx("div", { ref: contentRef, className: "overflow-auto px-4 pt-2 pb-4 text-size-chat whitespace-pre-wrap [unicode-bidi:plaintext]", dir: "auto", children: content });
-  return jsx.jsxs(WritingBlockSurface ?? "div", { "data-markdown-copy": "code-block", className, "data-theme": useDarkMode?.() ? "dark" : "light", children: [toolbar, body] });
+function y(e) {
+  e.preventDefault();
 }
-
-function preventDefault(event: { preventDefault(): void }): void { event.preventDefault(); }
-
-initializeMarkdownWritingBlock();
-export { MarkdownWritingBlock };
+var b, x, S;
+function C() {
+  return (C = e(() => {
+    ((b = t()), (x = u()), r(), c(), f(), i(), l(), g(), m(), (S = n()));
+  }))();
+}
+C();
+export { v as MarkdownWritingBlock };
