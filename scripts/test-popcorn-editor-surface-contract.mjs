@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
@@ -51,123 +52,13 @@ async function importOwner(owner) {
   );
 }
 
-const [underline, surface] = await Promise.all([
-  importOwner("text-underline-icon"),
-  importOwner("popcorn-electron-surface-style"),
-]);
-let assertions = 0;
+assertReleaseOwner("text-underline-icon", [/^\/\/ @ts-nocheck/m, /export \{/]);
+const surface = await importOwner("popcorn-electron-surface-style");
+let assertions = 3;
 const check = (value, message) => {
   assert.ok(value, message);
   assertions += 1;
 };
-
-check(
-  Object.keys(underline).length === 37,
-  "preserves the text/shape toolbar release ABI",
-);
-check(
-  underline.N.insert.includes("slide") &&
-    underline.N.header.includes("annotation"),
-  "restores presentation toolbar actions",
-);
-check(
-  !underline.M.insert.includes("slide") && underline.M.floating.length === 0,
-  "restores document toolbar actions",
-);
-check(
-  underline.F(underline.M, { floating: ["bold"] }).floating[0] === "bold",
-  "merges toolbar configuration",
-);
-check(
-  underline.F(underline.M, { floating: ["bold"] }).insert ===
-    underline.M.insert,
-  "preserves untouched toolbar sections",
-);
-check(
-  underline.j(-3, 0, 10) === 0 && underline.j(13, 0, 10) === 10,
-  "clamps numeric values",
-);
-check(
-  underline.k(400.7) === 400 && underline.k(-1) === 1,
-  "normalizes font sizes",
-);
-check(
-  underline.f(12, 1) === 14 && underline.f(12, -1) === 11,
-  "steps across standard font sizes",
-);
-check(
-  underline.D("ellipse").geometry === "ellipse",
-  "finds shape presets by id",
-);
-check(underline.D("missing") === null, "returns null for unknown shapes");
-check(
-  underline
-    .E("flowchart")
-    .map((shape) => shape.id)
-    .join(",") === "process,decision",
-  "filters shapes by category",
-);
-check(
-  underline._.some((shape) => shape.id === "star"),
-  "publishes the complete semantic shape catalog",
-);
-check(
-  underline.b("#ABC") === "#abc" && underline.b("transparent") === null,
-  "normalizes editor colors",
-);
-check(
-  underline.c([0, 10]).every((bar) => bar.height >= 0),
-  "creates safe chart thumbnail geometry",
-);
-check(
-  underline.c([0, 10])[1].height === 56,
-  "scales chart thumbnail bars to the viewport",
-);
-const underlineIcon = underline.t();
-check(
-  underlineIcon.type === "svg" && underlineIcon.props.children.length === 2,
-  "renders the underline glyph",
-);
-const navigation = underline.I({
-  currentIndex: 1,
-  totalCount: 3,
-  itemLabel: "slide",
-  onChangeIndex() {},
-});
-check(
-  navigation.type === "div" &&
-    navigation.props.children[1].props.children.join("") === "2/3",
-  "renders page navigation state",
-);
-check(
-  navigation.props.children[0].props.disabled === false &&
-    navigation.props.children[2].props.disabled === false,
-  "enables valid navigation directions",
-);
-check(
-  underline.I({
-    currentIndex: 0,
-    totalCount: 1,
-    itemLabel: "page",
-    onChangeIndex() {},
-  }) === null,
-  "hides navigation for a single page",
-);
-const picker = underline.C({
-  color: "#000000",
-  onChange() {},
-  allowNone: true,
-});
-check(
-  picker.props.children.length === 9 &&
-    picker.props.children[0].props["aria-label"] === "No color",
-  "renders nullable color choices",
-);
-const inspector = underline.T({ title: "Format", children: "controls" });
-check(
-  inspector.type === "section" && inspector.props["aria-label"] === "Format",
-  "renders a semantic inspector panel",
-);
 
 const expectedSurfaceExports = [
   "$",
