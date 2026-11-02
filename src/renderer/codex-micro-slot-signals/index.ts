@@ -1,204 +1,410 @@
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  FX as initializeSignalRuntime,
-  TX as getIdleTimeoutMilliseconds,
-  ZI as appScope,
-  pZ as createScopedSignal,
-  rJ as isClientThreadId,
-  sZ as createDerivedSignal,
-  vX as agentKeyIds,
-  wL as initializeSharedConfig,
-  type CodexMicroStatus,
-  type MaitaiScopeApi,
-  type ScopedDerivedSignal,
-  type ScopedSignal,
+  FX as t,
+  QI as n,
+  TX as r,
+  ZI as i,
+  gz as a,
+  lY as o,
+  pZ as s,
+  rJ as c,
+  sZ as l,
+  vX as u,
+  wL as d,
 } from "@rchunk/app-shared";
-import { dun as createPersistedSignal } from "@rchunk/app-initial";
-import { i as initializeCodexMicroCommands } from "@rchunk/codex-micro-commands";
-
-export type AgentKeyId = (typeof agentKeyIds)[number];
-export interface ThreadAssignment { hostId: string; threadKey: string; title?: string | null }
-export interface CommandAssignment { commandId: string; type: "command" }
-export interface SkillAssignment { keycapId: string; skillName: string; type: "skill" }
-export type AgentAssignment = ThreadAssignment | CommandAssignment | SkillAssignment | null;
-export type AgentAssignments = Record<AgentKeyId, AgentAssignment>;
-export interface PendingAssignment { agentKeyId: AgentKeyId; clientThreadId: string }
-export interface AgentSlot {
-  id: number;
-  selected: boolean;
-  status: CodexMicroStatus;
-  threadKey: string | null;
-  title: string | null;
-}
-export interface ThreadDisplayState {
-  localStatus?: { pendingChip?: "approval" | "response" | null; status?: string | null; unread?: boolean };
-  remoteStatus?: { latestTurnStatus?: "failed" | "in_progress" | "pending" | null; unread?: boolean };
-  threadKey: string;
-  title?: string | null;
-}
-export interface DeviceState {
-  brightness: number;
-  inactivityTimeoutMs: number | null;
-  preserveSelectionLighting?: boolean;
-  slots: AgentSlot[];
-  snakingAmbientStatus?: unknown;
-  suspendDeviceStatusRefresh?: boolean;
-  voiceState: unknown;
-}
-
-const emptyAssignments: AgentAssignments = {
-  AG00: null, AG01: null, AG02: null, AG03: null, AG04: null, AG05: null,
-};
-let customAssignmentsSignal: ScopedSignal<Record<string, unknown>, AgentAssignments>;
-let pendingAssignmentSignal: ScopedSignal<Record<string, unknown>, PendingAssignment | null>;
-let agentSlotsSignal: ScopedDerivedSignal<Record<string, unknown>, AgentSlot[]>;
-let deviceStateSignal: ScopedDerivedSignal<Record<string, unknown>, DeviceState>;
-
-function setAssignment(assignments: AgentAssignments, agentKeyId: AgentKeyId, assignment: AgentAssignment): AgentAssignments {
-  const next = { ...assignments };
-  if (assignment != null && "threadKey" in assignment) {
-    for (const key of agentKeyIds) {
-      const current = next[key];
-      if (current != null && "threadKey" in current
-        && current.threadKey === assignment.threadKey && current.hostId === assignment.hostId) next[key] = null;
+import {
+  Axt as ee,
+  B0t as f,
+  Bcn as p,
+  Bfn as m,
+  ESt as te,
+  Ext as h,
+  G1t as g,
+  GPt as ne,
+  G_t as re,
+  Gxt as ie,
+  H1t as _,
+  HCt as v,
+  HZt as y,
+  KC as ae,
+  KPt as oe,
+  K_t as se,
+  Kxt as ce,
+  LCt as le,
+  MSt as ue,
+  Mxt as de,
+  Om as fe,
+  Oxt as b,
+  Q1t as pe,
+  QQt as me,
+  RCt as x,
+  RSt as S,
+  Sxt as C,
+  TSt as w,
+  UQt as T,
+  VCt as E,
+  VZt as D,
+  Vcn as O,
+  WCt as k,
+  X1t as A,
+  aw as j,
+  awt as M,
+  dun as N,
+  iw as P,
+  iwt as F,
+  jxt as I,
+  kQt as L,
+  km as R,
+  kxt as z,
+  nwt as he,
+  qC as B,
+  rwt as ge,
+  t0t as _e,
+  uun as ve,
+  wQt as ye,
+  wSt as be,
+  xxt as xe,
+  z0t as V,
+} from "@rchunk/app-initial";
+import { i as Se, r as H } from "@rchunk/codex-micro-commands";
+function U(e, t, n) {
+  let r = { ...e };
+  if (n != null && `threadKey` in n)
+    for (let e of u) {
+      let t = r[e];
+      t != null &&
+        `threadKey` in t &&
+        t.threadKey === n.threadKey &&
+        t.hostId === n.hostId &&
+        (r[e] = null);
     }
-  }
-  next[agentKeyId] = assignment;
-  return next;
+  return ((r[t] = n), r);
 }
-
-function promotePendingAssignment(input: {
-  assignments: AgentAssignments;
-  clientThreadId: string;
-  conversationId: string;
-  hostId: string;
-  pending: PendingAssignment | null;
-  title?: string | null;
-}): AgentAssignments | null {
-  if (input.pending?.clientThreadId !== input.clientThreadId) return null;
-  return setAssignment(input.assignments, input.pending.agentKeyId, {
-    hostId: input.hostId,
-    threadKey: input.conversationId,
-    title: input.title,
-  });
+function Ce({
+  assignments: e,
+  clientThreadId: t,
+  conversationId: n,
+  hostId: r,
+  pending: i,
+  title: a,
+}) {
+  return i?.clientThreadId === t
+    ? U(e, i.agentKeyId, { hostId: r, threadKey: A(n), title: a })
+    : null;
 }
-
-function rememberPendingAssignment(scope: MaitaiScopeApi<unknown>, agentKeyId: AgentKeyId, clientThreadId: string): boolean {
-  if (!isClientThreadId(clientThreadId)) return false;
-  scope.set(pendingAssignmentSignal, { agentKeyId, clientThreadId });
-  return true;
+function we(e, t, n) {
+  return c(n) ? (e.set(J, { agentKeyId: t, clientThreadId: n }), !0) : !1;
 }
-
-function updateCustomAssignment(scope: MaitaiScopeApi<unknown>, agentKeyId: AgentKeyId, assignment: AgentAssignment): void {
-  const current = scope.get(customAssignmentsSignal) ?? emptyAssignments;
-  scope.set(customAssignmentsSignal, setAssignment(current, agentKeyId, assignment));
-  if (scope.get(pendingAssignmentSignal)?.agentKeyId === agentKeyId) scope.set(pendingAssignmentSignal, null);
+function Te(e, t, n) {
+  (e.set(q, U(e.get(q) ?? K, t, n)), e.get(J)?.agentKeyId === t && e.set(J, null));
 }
-
-function getAgentKeyId(index: number): AgentKeyId | null {
-  return agentKeyIds[index] ?? null;
+function Ee(e, t, n) {
+  if (!c(t) || p(e.get, a.agentSource) !== `custom`) return !1;
+  let r = e.get(J),
+    i = Ce({
+      assignments: e.get(q) ?? K,
+      clientThreadId: t,
+      conversationId: n,
+      hostId: e.get(D, n) ?? `local`,
+      pending: r,
+      title: e.get(x, n),
+    });
+  return i != null && (e.set(q, i), e.get(J) === r && e.set(J, null), !0);
 }
-
-function serializeDeviceState(state: DeviceState): string {
+function De(e, t, n) {
+  if (p(e.get, a.agentSource) !== `custom`) return;
+  let r = W(t),
+    i = r == null ? null : (e.get(q) ?? K)[r];
+  if (i == null || !(`threadKey` in i) || i.threadKey !== n || i.hostId == null) return;
+  let s = pe(i.threadKey);
+  s != null && L(e, o(s), i.hostId);
+}
+function W(e) {
+  return u[e] ?? null;
+}
+var G, K, q, J;
+function Y() {
+  return (Y = e(() => {
+    (t(),
+      d(),
+      y(),
+      le(),
+      n(),
+      O(),
+      m(),
+      _e(),
+      ve(),
+      (G = `codex-micro-custom-agent-assignments`),
+      (K = { AG00: null, AG01: null, AG02: null, AG03: null, AG04: null, AG05: null }),
+      (q = N(G, K)),
+      (J = s(i, null)));
+  }))();
+}
+function Oe(e) {
   return JSON.stringify({
-    brightness: state.brightness,
-    inactivityTimeoutMs: state.inactivityTimeoutMs,
-    preserveSelectionLighting: Boolean(state.preserveSelectionLighting),
-    snakingAmbientStatus: state.snakingAmbientStatus,
-    suspendDeviceStatusRefresh: Boolean(state.suspendDeviceStatusRefresh),
-    slots: state.slots.map(({ id, selected, status, threadKey, ...slot }) => ({
-      id, pulsing: Boolean((slot as { pulsing?: boolean }).pulsing), selected, status, threadKey,
+    brightness: e.brightness,
+    inactivityTimeoutMs: e.inactivityTimeoutMs,
+    preserveSelectionLighting: !!e.preserveSelectionLighting,
+    snakingAmbientStatus: e.snakingAmbientStatus,
+    suspendDeviceStatusRefresh: !!e.suspendDeviceStatusRefresh,
+    slots: e.slots.map(({ id: e, pulsing: t, selected: n, status: r, threadKey: i }) => ({
+      id: e,
+      pulsing: !!t,
+      selected: n,
+      status: r,
+      threadKey: i,
     })),
-    voiceState: state.voiceState,
+    voiceState: e.voiceState,
   });
 }
-
-function getThreadStatus(thread: ThreadDisplayState): CodexMicroStatus {
-  if (thread.localStatus != null) {
-    const { pendingChip, status, unread } = thread.localStatus;
-    if (status === "error") return "error";
-    if (pendingChip === "approval") return "awaiting-approval";
-    if (pendingChip === "response") return "awaiting-response";
-    if (status === "loading") return "working";
-    return unread ? "unread" : "idle";
-  }
-  const remote = thread.remoteStatus;
-  if (remote?.latestTurnStatus === "failed") return "error";
-  if (remote?.latestTurnStatus === "pending" || remote?.latestTurnStatus === "in_progress") return "working";
-  return remote?.unread ? "unread" : "idle";
-}
-
-function buildAgentSlots(input: {
-  isAppWindowFocused: boolean;
-  selectedThreadKey: string | null;
-  threadKeys: Array<string | null>;
-  threads: ThreadDisplayState[];
-}): AgentSlot[] {
-  return Array.from({ length: 6 }, (_, id) => {
-    const threadKey = input.threadKeys[id];
-    if (threadKey == null) return { id, threadKey: null, title: null, status: "off", selected: false };
-    const thread = input.threads.find((candidate) => candidate.threadKey === threadKey)
-      ?? { threadKey, title: null };
-    const selected = threadKey === input.selectedThreadKey;
-    const status = getThreadStatus(thread);
-    return { id, threadKey, title: thread.title ?? null, selected,
-      status: selected && input.isAppWindowFocused && status === "unread" ? "idle" : status };
+function ke({ isAppWindowFocused: e, threadKeys: t, threads: n, selectedThreadKey: r }) {
+  return Array.from({ length: 6 }, (i, a) => {
+    let o = t[a];
+    if (o == null) return { id: a, threadKey: null, title: null, status: `off`, selected: !1 };
+    let s = n.find((e) => e.threadKey === o) ?? { threadKey: o, title: null },
+      c = o === r,
+      l = Me(s);
+    return {
+      id: a,
+      threadKey: o,
+      title: s.title,
+      status: c && e && l === `unread` ? `idle` : l,
+      selected: c,
+    };
   });
 }
-
-function selectThreadKeys(input: {
-  customAgentThreadKeys: Array<string | null>;
-  pinnedProjectThreadKeys: string[];
-  pinnedThreadKeys: string[];
-  priorityThreadKeys: string[];
-  recentlyUpdatedThreadKeys: string[];
-  source: "custom" | "pinned" | "priority" | "recent";
-}): Array<string | null> {
-  switch (input.source) {
-    case "pinned": return [...input.pinnedThreadKeys, ...input.pinnedProjectThreadKeys].slice(0, 6);
-    case "recent": return input.recentlyUpdatedThreadKeys.slice(0, 6);
-    case "priority": return input.priorityThreadKeys.slice(0, 6);
-    case "custom": return input.customAgentThreadKeys.slice(0, 6);
+function Ae({
+  source: e,
+  pinnedThreadKeys: t,
+  pinnedProjectThreadKeys: n,
+  recentlyUpdatedThreadKeys: r,
+  priorityThreadKeys: i,
+  customAgentThreadKeys: a,
+}) {
+  switch (e) {
+    case `pinned`:
+      return [...t, ...n].slice(0, 6);
+    case `recent`:
+      return r.slice(0, 6);
+    case `priority`:
+      return i.slice(0, 6);
+    case `custom`:
+      return a.slice(0, 6);
   }
 }
-
-function initializeAssignmentSignals(): void {
-  initializeSignalRuntime();
-  initializeSharedConfig();
-  customAssignmentsSignal = createPersistedSignal("codex-micro-custom-agent-assignments", emptyAssignments);
-  pendingAssignmentSignal = createScopedSignal(appScope, null);
+function je({ threadKeys: e, attentionStateByThreadKey: t, recencyAtByThreadKey: n }) {
+  return F(
+    e.map((e) => ({ threadKey: e, attentionState: t.get(e) ?? `idle`, recencyAt: n.get(e) ?? 0 })),
+  ).map(({ threadKey: e }) => e);
 }
-
-function initializeStatusHelpers(): void {}
-
-function initializeCodexMicroSlotSignals(): void {
-  initializeAssignmentSignals();
-  initializeCodexMicroCommands();
-  agentSlotsSignal = createDerivedSignal(appScope, () => buildAgentSlots({
-    isAppWindowFocused: false, selectedThreadKey: null, threadKeys: [], threads: [],
-  }));
-  deviceStateSignal = createDerivedSignal(appScope, () => ({
-    brightness: 1,
-    inactivityTimeoutMs: getIdleTimeoutMilliseconds("off"),
-    slots: [],
-    voiceState: null,
-  }));
+function Me(e) {
+  if (e.localStatus != null) {
+    let { pendingChip: t, status: n, unread: r } = e.localStatus;
+    return n === `error`
+      ? `error`
+      : t === `approval`
+        ? `awaiting-approval`
+        : t === `response`
+          ? `awaiting-response`
+          : n === `loading`
+            ? `working`
+            : r
+              ? `unread`
+              : `idle`;
+  }
+  let t = e.remoteStatus;
+  return t == null
+    ? `idle`
+    : t.latestTurnStatus === `failed`
+      ? `error`
+      : t.latestTurnStatus === `pending` || t.latestTurnStatus === `in_progress`
+        ? `working`
+        : t.unread
+          ? `unread`
+          : `idle`;
 }
-
-function promotePendingConversation(): boolean { return false; }
-function activateAssignedThread(): void {}
-
+function X() {
+  return (X = e(() => {
+    M();
+  }))();
+}
+var Z, Q;
+function $() {
+  return ($ = e(() => {
+    (t(),
+      d(),
+      y(),
+      oe(),
+      X(),
+      j(),
+      E(),
+      n(),
+      O(),
+      h(),
+      re(),
+      fe(),
+      w(),
+      z(),
+      ce(),
+      ae(),
+      g(),
+      ue(),
+      I(),
+      ge(),
+      xe(),
+      Se(),
+      Y(),
+      (Z = l(i, ({ get: e }) => {
+        let { pinnedThreadKeys: t } = e(de),
+          n = p(e, a.agentSource),
+          r = e(q) ?? K,
+          i = e(be),
+          o = e(te),
+          s = e(se, {
+            canStartProjectlessChat: i,
+            localProjectActionsEnabled: o,
+            sidebarMode: `codex`,
+          }),
+          c = t,
+          l = [];
+        if (n === `recent`) l = e(B);
+        else if (n === `pinned`) {
+          let t = e(s),
+            n = ie(t.pinnedProjectGroups, e(b, `codex`).pinnedProjectThreadKeys),
+            r = new Map(t.pinnedThreadKeys.map((e) => [f(e), e])),
+            i = new Map(n.map((e) => [V(e.projectId), e.threadKeys]));
+          c = he({
+            entries: [
+              ...t.pinnedThreadKeys.map((e) => ({ key: f(e) })),
+              ...n.map((e) => ({ key: V(e.projectId) })),
+            ],
+            pinnedOrder: e(C),
+            pinnedSortMode: e(ee),
+          }).flatMap((e) => {
+            let t = r.get(e);
+            return t == null ? (i.get(e) ?? []) : [t];
+          });
+        }
+        let d = [];
+        if (n === `priority`) {
+          let t = e(b, `codex`);
+          d = je({
+            threadKeys: t.threadKeys,
+            attentionStateByThreadKey: t.threadAttentionStateByKey,
+            recencyAtByThreadKey: t.threadRecencyAtByKey,
+          });
+        }
+        let m = Ae({
+            source: n,
+            pinnedThreadKeys: c,
+            pinnedProjectThreadKeys: [],
+            recentlyUpdatedThreadKeys: l,
+            priorityThreadKeys: d,
+            customAgentThreadKeys: u.map((t) => {
+              let i = r[t];
+              if (i == null) return null;
+              if (`threadKey` in i) return i.threadKey;
+              let a = n === `custom` && i.type === `command` ? H(i.commandId) : null;
+              return a == null ? null : (e(B)[a] ?? null);
+            }),
+          }),
+          h = m.flatMap((t) => {
+            if (t == null) return [];
+            let n = e(S, t);
+            if (n == null) return [];
+            switch (n.kind) {
+              case `local`: {
+                if (n.conversation == null)
+                  return [
+                    {
+                      threadKey: t,
+                      title: n.pendingThreadStart?.title ?? n.pendingWorktree?.label ?? ``,
+                    },
+                  ];
+                let r = n.conversation.hostId ?? e(ye, n.conversation.id),
+                  i = { hostId: r, threadId: n.conversation.id },
+                  a = e(T, i)?.summary ?? e(me, { hostId: r, conversationId: n.conversation.id });
+                return [
+                  {
+                    threadKey: t,
+                    title: e(R, i),
+                    localStatus: {
+                      status: e(k, { hostId: r, conversationId: n.conversation.id }),
+                      pendingChip: e(v, { conversationId: n.conversation.id, hostId: r }),
+                      unread: a?.hasUnreadTurn === !0,
+                    },
+                  },
+                ];
+              }
+              case `remote`: {
+                let e = n.task.task_status_display?.latest_turn_status_display?.turn_status,
+                  r = e === `pending` || e === `in_progress` || e === `failed` ? e : null;
+                return [
+                  {
+                    threadKey: t,
+                    title: n.task.title ?? null,
+                    remoteStatus: { latestTurnStatus: r, unread: n.task.has_unread_turn === !0 },
+                  },
+                ];
+              }
+            }
+          });
+        if (n === `custom`) {
+          let e = new Set(h.map((e) => e.threadKey));
+          for (let t of Object.values(r))
+            t != null &&
+              `threadKey` in t &&
+              !e.has(t.threadKey) &&
+              h.push({ threadKey: t.threadKey, title: t.title });
+        }
+        let g = ke({
+          isAppWindowFocused: e(ne) === !0,
+          threadKeys: m,
+          threads: h,
+          selectedThreadKey: e(_),
+        });
+        return n === `custom`
+          ? g.map((e) => {
+              let t = u[e.id],
+                n = t == null ? null : r[t];
+              return n == null ||
+                `threadKey` in n ||
+                (n.type === `command` && H(n.commandId) != null)
+                ? e
+                : {
+                    ...e,
+                    title:
+                      n.type === `command`
+                        ? n.commandId
+                        : n.type === `skill`
+                          ? `$${n.skillName}`
+                          : n.keycapId,
+                    status: `idle`,
+                  };
+            })
+          : g;
+      })),
+      (Q = l(i, ({ get: e }) => ({
+        brightness: p(e, a.lightingBrightness) / 100,
+        inactivityTimeoutMs: r(p(e, a.lightingAutoOff)),
+        slots: e(Z),
+        voiceState: e(P),
+      }))));
+  }))();
+}
 export {
-  initializeStatusHelpers as a,
-  updateCustomAssignment as c,
-  getAgentKeyId as d,
-  initializeAssignmentSignals as f,
-  serializeDeviceState as i,
-  promotePendingConversation as l,
-  agentSlotsSignal as n,
-  emptyAssignments as o,
-  activateAssignedThread as p,
-  initializeCodexMicroSlotSignals as r,
-  rememberPendingAssignment as s,
-  deviceStateSignal as t,
-  customAssignmentsSignal as u,
+  X as a,
+  Te as c,
+  W as d,
+  Y as f,
+  Oe as i,
+  Ee as l,
+  Z as n,
+  K as o,
+  De as p,
+  $ as r,
+  we as s,
+  Q as t,
+  q as u,
 };

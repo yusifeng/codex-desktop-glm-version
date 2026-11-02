@@ -1,260 +1,576 @@
-import "@rchunk/rolldown-runtime";
-import * as appShared from "@rchunk/app-shared";
-import * as appInitial from "@rchunk/app-initial";
-import * as appPrimary from "@rchunk/app-primary";
-import { accountSpendKey } from "../app-primary/runtime/account-spend-key";
-
-type HostId = string;
-type ModelSlug = string;
-
-interface RateLimitUpsell {
-  banner_type: string;
-  blocked_model_slug?: string | null;
-  dismissal_policy?: { scope: "account" | "thread" } | null;
-  fallback_model_slugs?: string[];
-  model_slug?: string | null;
-  presentation?: "dismissible" | "inline";
-  priority?: number;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  LX as o,
+  QI as s,
+  ZI as c,
+  e6 as l,
+} from "@rchunk/app-shared";
+import {
+  F8 as u,
+  Fht as d,
+  HZt as f,
+  Iin as p,
+  L8 as m,
+  LN as h,
+  M6t as g,
+  Min as _,
+  N6t as v,
+  O5 as y,
+  P8 as b,
+  R8 as x,
+  RN as S,
+  Rht as C,
+  S8 as w,
+  X8 as T,
+  Xrn as E,
+  Z8 as D,
+  Zrn as O,
+  _0t as k,
+  d0t as A,
+  fgn as j,
+  g0t as M,
+  k5 as N,
+  kht as P,
+  rht as F,
+  u0t as ee,
+  ugn as te,
+  uht as I,
+  v0t as L,
+  vZt as R,
+  w8 as z,
+  y0t as B,
+} from "@rchunk/app-initial";
+import {
+  Dm as V,
+  Em as ne,
+  Fm as H,
+  Im as re,
+  Om as U,
+  Pm as ie,
+  Tm as W,
+  wm as G,
+} from "@rchunk/app-primary";
+function K(e) {
+  let t = (0, q.c)(7),
+    { accountId: n, userId: r } = v(),
+    { data: i, isError: a, isLoading: o } = I(),
+    s;
+  return (
+    t[0] !== i || t[1] !== n || t[2] !== r || t[3] !== a || t[4] !== o || t[5] !== e
+      ? ((s =
+          e != null &&
+          N({
+            authAccountId: n,
+            authUserId: r,
+            currentAccountId: i?.id === n ? i.id : null,
+            isCurrentAccountError: a,
+            isCurrentAccountLoading: o,
+            rateLimitStatus: e,
+          })),
+        (t[0] = i),
+        (t[1] = n),
+        (t[2] = r),
+        (t[3] = a),
+        (t[4] = o),
+        (t[5] = e),
+        (t[6] = s))
+      : (s = t[6]),
+    s
+  );
 }
-
-interface RateLimitStatus {
-  account_id?: string | null;
-  rate_limit_upsell?: RateLimitUpsell | null;
-  user_id?: string | null;
-  [key: string]: unknown;
+var q;
+function J() {
+  return (J = e(() => {
+    ((q = t()), g(), F(), y());
+  }))();
 }
-
-interface ConversationUsageState {
-  dataUpdatedAt: number;
-  notice?: { dismissed: boolean; key: string } | null;
-  usageKey: string;
-  [key: string]: unknown;
+function ae(e) {
+  let t = (0, Y.c)(36),
+    {
+      banner: r,
+      bannerKey: i,
+      blockedModel: a,
+      children: s,
+      fallbackContent: c,
+      hostId: l,
+      rateLimitStatus: f,
+      selectedModel: p,
+    } = e,
+    m = o(P),
+    g;
+  t[0] === m ? (g = t[1]) : ((g = d(m)), (t[0] = m), (t[1] = g));
+  let v = g,
+    y = n(x, v),
+    S = n(R, l),
+    C;
+  t[2] !== v || t[3] !== l ? ((C = [v, l]), (t[2] = v), (t[3] = l), (t[4] = C)) : (C = t[4]);
+  let w = n(b, C),
+    T;
+  t[5] === l ? (T = t[6]) : ((T = { enabled: !1, hostId: l }), (t[5] = l), (t[6] = T));
+  let { data: E } = z(T),
+    D;
+  t[7] !== w || t[8] !== E?.models || t[9] !== p
+    ? ((D = p != null && w === p && E?.models.some((e) => e.model === p && e.hidden !== !0) === !0),
+      (t[7] = w),
+      (t[8] = E?.models),
+      (t[9] = p),
+      (t[10] = D))
+    : (D = t[10]);
+  let O = D,
+    k,
+    A;
+  if (
+    (t[11] !== i ||
+    t[12] !== a ||
+    t[13] !== O ||
+    t[14] !== v ||
+    t[15] !== y ||
+    t[16] !== S ||
+    t[17] !== m
+      ? ((k = () => {
+          if (O && v != null && y?.notice != null && y.notice.key === i && !y.notice.dismissed)
+            return S?.addNotificationCallback(`turn/started`, (e) => {
+              let { params: t } = e;
+              if (t.threadId !== v) return;
+              let n = S.getConversation(v),
+                r = n == null ? null : _(n),
+                i = r?.params.collaborationMode?.settings.model ?? r?.params.model;
+              r?.turnId === t.turn.id &&
+                r.params.turnTrigger === `composer` &&
+                i != null &&
+                i !== a &&
+                u(m, v, y);
+            });
+        }),
+        (A = [i, a, O, v, S, y, m]),
+        (t[11] = i),
+        (t[12] = a),
+        (t[13] = O),
+        (t[14] = v),
+        (t[15] = y),
+        (t[16] = S),
+        (t[17] = m),
+        (t[18] = k),
+        (t[19] = A))
+      : ((k = t[18]), (A = t[19])),
+    (0, X.useEffect)(k, A),
+    !O || y == null)
+  )
+    return c;
+  if (i == null) return s;
+  if (y.notice?.key === i && y.notice.dismissed) return c;
+  let j;
+  t[20] !== v || t[21] !== y || t[22] !== m
+    ? ((j = () => {
+        u(m, v, y);
+      }),
+      (t[20] = v),
+      (t[21] = y),
+      (t[22] = m),
+      (t[23] = j))
+    : (j = t[23]);
+  let M;
+  t[24] !== i || t[25] !== v || t[26] !== y || t[27] !== m
+    ? ((M = () => {
+        y.notice?.key !== i && m.set(x, v, { ...y, notice: { key: i, dismissed: !1 } });
+      }),
+      (t[24] = i),
+      (t[25] = v),
+      (t[26] = y),
+      (t[27] = m),
+      (t[28] = M))
+    : (M = t[28]);
+  let N = `${v}:${y.usageKey}:${y.dataUpdatedAt}:${i}`,
+    F;
+  return (
+    t[29] !== r || t[30] !== c || t[31] !== f || t[32] !== j || t[33] !== M || t[34] !== N
+      ? ((F = (0, Z.jsx)(h, {
+          banner: r,
+          fallbackContent: c,
+          onDismiss: j,
+          onShown: M,
+          presentationKey: N,
+          rateLimitStatus: f,
+        })),
+        (t[29] = r),
+        (t[30] = c),
+        (t[31] = f),
+        (t[32] = j),
+        (t[33] = M),
+        (t[34] = N),
+        (t[35] = F))
+      : (F = t[35]),
+    F
+  );
 }
-
-interface ConversationRecord { [key: string]: unknown }
-interface TurnRecord {
-  params: { collaborationMode?: { settings: { model?: string | null } } | null; model?: string | null; turnTrigger?: string | null };
-  turnId?: string | null;
+var Y, X, Z;
+function oe() {
+  return (oe = e(() => {
+    ((Y = t()), r(), (X = l()), f(), p(), m(), S(), w(), C(), (Z = a()));
+  }))();
 }
-
-interface UsageBannerProps {
-  canShowUsageBanners?: boolean;
-  hostId?: HostId;
-  imageGenerationLimit?: unknown;
-  modelName?: string;
-  onDismissImageGenerationLimit?(): void;
-  rateLimit?: RateLimitStatus | null;
-  rateLimitWarningThreshold?: number | null;
-  resetAt?: string | number | Date | null;
-  selectedModel?: ModelSlug | null;
-  showBackendRateLimitUpsell?: boolean;
-  showLunaReserveNotice?: boolean;
-  showModelLimit?: boolean;
-  showUpsell?: boolean;
-  showWorkspaceUsageLimit?: boolean;
-}
-
-interface ScopeApi { set(signal: unknown, parameter: unknown, value: unknown): void }
-interface ConversationService {
-  addNotificationCallback(event: string, callback: (event: { params: { threadId: string; turn: { id?: string } } }) => void): (() => void) | void;
-  getConversation(id: string): ConversationRecord | null | undefined;
-}
-
-interface UsageRuntime {
-  AppScope: unknown;
-  ComposerScope: unknown;
-  UsageBannerPresentation: unknown;
-  ModelLimitBanner: unknown;
-  RateLimitBanner: unknown;
-  conversationServiceSignal: unknown;
-  conversationUsageFamily: unknown;
-  dismissedBannerFamily: unknown;
-  imageGenerationContextFamily: unknown;
-  imageRateLimitQuery(input: Record<string, unknown>, options: { enabled: boolean }): { data?: RateLimitStatus };
-  localHostId: string;
-  modelListQuery(options: { enabled: boolean; hostId: string }): { data?: { models?: Array<{ hidden?: boolean; model: string }> } };
-  modelSelectionFamily: unknown;
-  usagePresentationContextSignal: unknown;
-  useAuth(): { accountId?: string | null; userId?: string | null };
-  useCurrentAccount(): { data?: { id?: string | null }; isError: boolean; isLoading: boolean };
-  useFamilyValue<Value>(family: unknown, parameter: unknown): Value;
-  useScope(scope: unknown): ScopeApi;
-  useSignalValue<Value>(signal: unknown): Value;
-  createDismissalKey(scope: ScopeApi, status: RateLimitStatus, context: string | null): string | null;
-  dismissConversationNotice(scope: ScopeApi, conversationId: string | null, state: ConversationUsageState): void;
-  getConversationId(scope: ScopeApi): string | null;
-  getLatestTurn(conversation: ConversationRecord): TurnRecord | null;
-  getRateLimitWarningKey(status: RateLimitStatus): string | null;
-  isIdentityCurrent(input: Record<string, unknown>): boolean;
-  isLunaReserveAvailable: unknown;
-  markBannerShown(scope: ScopeApi, key: string | null): void;
-  markWarningDismissed(scope: ScopeApi, warningKey: string, threshold: number): void;
-}
-
-const shared = appShared as unknown as {
-  BX<Value>(family: unknown, parameter: unknown): Value;
-  HX<Value>(signal: unknown): Value;
-  I3(): appShared.JsxRuntime;
-  LX(scope: unknown): ScopeApi;
-  ZI: unknown;
-  e6(): appShared.ReactRuntime;
-};
-const initial = appInitial as unknown as {
-  F8(scope: ScopeApi, conversationId: string | null, state: ConversationUsageState): void;
-  Fht(scope: ScopeApi): string | null;
-  LN: unknown;
-  Min(conversation: ConversationRecord): TurnRecord | null;
-  N6t(): { accountId?: string | null; userId?: string | null };
-  P8: unknown; R8: unknown; X8: unknown; Z8: unknown; g0t: unknown; kht: unknown; vZt: unknown;
-  _0t(scope: ScopeApi, status: RateLimitStatus, context: string | null): string | null;
-  fgn(scope: ScopeApi, percent: number, threshold: number): void;
-  k5(input: Record<string, unknown>): boolean;
-  u0t(input: Record<string, unknown>, options: { enabled: boolean }): { data?: RateLimitStatus };
-  ugn: string;
-  uht(): { data?: { id?: string | null }; isError: boolean; isLoading: boolean };
-  w8(options: { enabled: boolean; hostId: string }): { data?: { models?: Array<{ hidden?: boolean; model: string }> } };
-  y0t(scope: ScopeApi, key: string | null): void;
-  [key: string]: unknown;
-};
-const primary = appPrimary as unknown as {
-  Dm: unknown; Em: unknown; wm: unknown;
-  Im(scope: ScopeApi, warningKey: string, threshold: number): void;
-  [key: string]: unknown;
-};
-
-const runtime: UsageRuntime = {
-  AppScope: shared.ZI,
-  ComposerScope: initial.kht,
-  UsageBannerPresentation: initial.LN,
-  ModelLimitBanner: primary.Em,
-  RateLimitBanner: primary.Dm,
-  conversationServiceSignal: initial.vZt,
-  conversationUsageFamily: initial.R8,
-  dismissedBannerFamily: initial.g0t,
-  imageGenerationContextFamily: initial.X8,
-  imageRateLimitQuery: initial.u0t,
-  localHostId: initial.ugn,
-  modelListQuery: initial.w8,
-  modelSelectionFamily: initial.P8,
-  usagePresentationContextSignal: primary.wm,
-  useAuth: initial.N6t,
-  useCurrentAccount: initial.uht,
-  useFamilyValue: shared.BX,
-  useScope: shared.LX,
-  useSignalValue: shared.HX,
-  createDismissalKey: initial._0t,
-  dismissConversationNotice: initial.F8,
-  getConversationId: initial.Fht,
-  getLatestTurn: initial.Min,
-  getRateLimitWarningKey: accountSpendKey,
-  isIdentityCurrent: initial.k5,
-  isLunaReserveAvailable: initial.Z8,
-  markBannerShown: initial.y0t,
-  markWarningDismissed: primary.Im,
-};
-
-let React: appShared.ReactRuntime;
-let jsx: appShared.JsxRuntime;
-let initialized = false;
-
-function initializeUsageBanner(): void {
-  if (initialized) return;
-  const initializers = [appShared.FX, appShared.QI, initial.M6t, initial.rht, initial.O5, initial.HZt, initial.Iin, initial.L8, initial.RN, initial.S8, initial.d0t, initial.v0t, initial.Zrn, primary.Fm, primary.Om, primary.Tm];
-  for (const initialize of initializers) if (typeof initialize === "function") initialize();
-  React = shared.e6();
-  jsx = shared.I3();
-  initialized = true;
-}
-
-function chooseBannerKind(props: UsageBannerProps): "blocking-limit" | "image-generation-limit" | "model-limit" | "warning" {
-  if (props.showUpsell || props.showWorkspaceUsageLimit) return "blocking-limit";
-  if (props.imageGenerationLimit != null) return "image-generation-limit";
-  if (props.showModelLimit) return "model-limit";
-  return "warning";
-}
-
-function isCurrentRateLimitIdentity(rateLimitStatus: RateLimitStatus | null | undefined): boolean {
-  if (rateLimitStatus == null) return false;
-  const { accountId, userId } = runtime.useAuth();
-  const currentAccount = runtime.useCurrentAccount();
-  return runtime.isIdentityCurrent({ authAccountId: accountId, authUserId: userId, currentAccountId: currentAccount.data?.id === accountId ? currentAccount.data.id : null, isCurrentAccountError: currentAccount.isError, isCurrentAccountLoading: currentAccount.isLoading, rateLimitStatus });
-}
-
-function BackendUpsellForFallbackModel(props: { banner: RateLimitUpsell; bannerKey: string | null; blockedModel: string; children: unknown; fallbackContent: unknown; hostId: string; rateLimitStatus: RateLimitStatus; selectedModel?: string | null }): unknown {
-  const scope = runtime.useScope(runtime.ComposerScope);
-  const conversationId = runtime.getConversationId(scope);
-  const usageState = runtime.useFamilyValue<ConversationUsageState | null>(runtime.conversationUsageFamily, conversationId);
-  const conversationService = runtime.useFamilyValue<ConversationService | null>(runtime.conversationServiceSignal, props.hostId);
-  const selectedModel = runtime.useFamilyValue<string | null>(runtime.modelSelectionFamily, [conversationId, props.hostId]);
-  const models = runtime.modelListQuery({ enabled: false, hostId: props.hostId }).data?.models;
-  const canPresent = props.selectedModel != null && selectedModel === props.selectedModel && models?.some((model) => model.model === props.selectedModel && model.hidden !== true) === true;
-  React.useEffect(() => {
-    if (!canPresent || conversationId == null || usageState?.notice?.key !== props.bannerKey || usageState.notice.dismissed || conversationService == null) return;
-    return conversationService.addNotificationCallback("turn/started", ({ params }) => {
-      if (params.threadId !== conversationId) return;
-      const conversation = conversationService.getConversation(conversationId);
-      const turn = conversation == null ? null : runtime.getLatestTurn(conversation);
-      const model = turn?.params.collaborationMode?.settings.model ?? turn?.params.model;
-      if (turn?.turnId === params.turn.id && turn.params.turnTrigger === "composer" && model != null && model !== props.blockedModel) runtime.dismissConversationNotice(scope, conversationId, usageState);
-    });
-  }, [canPresent, conversationId, conversationService, props.bannerKey, props.blockedModel, scope, usageState]);
-  if (!canPresent || usageState == null) return props.fallbackContent;
-  if (props.bannerKey == null) return props.children;
-  if (usageState.notice?.key === props.bannerKey && usageState.notice.dismissed) return props.fallbackContent;
-  const presentationKey = `${conversationId}:${usageState.usageKey}:${usageState.dataUpdatedAt}:${props.bannerKey}`;
-  return jsx.jsx(runtime.UsageBannerPresentation, { banner: props.banner, fallbackContent: props.fallbackContent, onDismiss: () => runtime.dismissConversationNotice(scope, conversationId, usageState), onShown: () => { if (usageState.notice?.key !== props.bannerKey) scope.set(runtime.conversationUsageFamily, conversationId, { ...usageState, notice: { key: props.bannerKey, dismissed: false } }); }, presentationKey, rateLimitStatus: props.rateLimitStatus });
-}
-
-function BackendRateLimitUpsell(props: { banner?: RateLimitUpsell | null; fallbackContent: unknown; hostId: string; rateLimitStatus?: RateLimitStatus | null; selectedModel?: string | null }): unknown {
-  const scope = runtime.useScope(runtime.ComposerScope);
-  const presentationContext = runtime.useSignalValue<unknown>(runtime.usagePresentationContextSignal);
-  const dismissalKey = props.rateLimitStatus == null ? null : runtime.createDismissalKey(scope, props.rateLimitStatus, presentationContext == null ? null : JSON.stringify([props.hostId, presentationContext]));
-  const dismissed = runtime.useFamilyValue<boolean>(runtime.dismissedBannerFamily, dismissalKey);
-  const conversationId = runtime.getConversationId(scope);
-  const usageState = runtime.useFamilyValue<ConversationUsageState | null>(runtime.conversationUsageFamily, conversationId);
-  const selectedModel = runtime.useFamilyValue<string | null>(runtime.modelSelectionFamily, [conversationId, props.hostId]);
-  const models = runtime.modelListQuery({ enabled: false, hostId: props.hostId }).data?.models;
-  const banner = props.banner;
-  const status = props.rateLimitStatus;
-  if (banner == null || status == null || !isCurrentRateLimitIdentity(status) || (banner.presentation === "dismissible" && banner.dismissal_policy?.scope === "thread" && dismissalKey == null)) return props.fallbackContent;
-  const presented = dismissed ? props.fallbackContent : jsx.jsx(runtime.UsageBannerPresentation, { banner, fallbackContent: props.fallbackContent, onDismiss: dismissalKey == null ? undefined : () => scope.set(runtime.dismissedBannerFamily, dismissalKey, true), onShown: () => runtime.markBannerShown(scope, dismissalKey), presentationKey: dismissalKey, rateLimitStatus: status });
-  const modelMatched = banner.model_slug == null || banner.model_slug === props.selectedModel ? presented : props.fallbackContent;
-  if (banner.blocked_model_slug == null) return modelMatched;
-  const isFallbackModel = props.selectedModel != null && props.selectedModel !== banner.blocked_model_slug && banner.fallback_model_slugs?.includes(props.selectedModel) === true && selectedModel === props.selectedModel && models?.some((model) => model.model === props.selectedModel && model.hidden !== true) === true && usageState != null && !(dismissalKey != null && usageState.notice?.key === dismissalKey && usageState.notice.dismissed);
-  return isFallbackModel ? jsx.jsx(BackendUpsellForFallbackModel, { banner, bannerKey: dismissalKey, blockedModel: banner.blocked_model_slug, fallbackContent: props.fallbackContent, hostId: props.hostId, rateLimitStatus: status, selectedModel: props.selectedModel, children: presented }) : props.fallbackContent;
-}
-
-function UsageBanner(props: UsageBannerProps): unknown {
-  initializeUsageBanner();
-  const hostId = props.hostId ?? runtime.localHostId;
-  const scope = runtime.useScope(runtime.AppScope);
-  const { accountId, userId } = runtime.useAuth();
-  const imageContext = runtime.useFamilyValue<{ completedAtMs?: number; threadId?: string; turnId?: string } | null>(runtime.imageGenerationContextFamily, accountId);
-  const lastImageGenerationImpressionKeyRef = React.useRef<string | null>(null);
-  const imageGenerationPresentationKey = props.imageGenerationLimit != null && imageContext != null ? JSON.stringify([accountId, userId, imageContext.threadId, imageContext.turnId, imageContext.completedAtMs]) : undefined;
-  const imageRateLimit = runtime.imageRateLimitQuery({ accountId, userId, selectedModel: props.selectedModel }, { enabled: props.canShowUsageBanners === true && props.imageGenerationLimit != null }).data;
-  const rateLimitStatus = props.imageGenerationLimit != null && !props.showUpsell && !props.showWorkspaceUsageLimit ? (imageRateLimit ?? props.rateLimit) : props.rateLimit;
-  const imageBackendUpsell = rateLimitStatus?.rate_limit_upsell?.banner_type === "image_generation_limit_reached";
-  const lunaReserveAvailable = runtime.useFamilyValue<boolean>(runtime.isLunaReserveAvailable, hostId);
-  const kind = chooseBannerKind(props);
-  let fallbackContent: unknown = null;
-  if (kind === "blocking-limit" && props.rateLimit != null) fallbackContent = jsx.jsx(runtime.RateLimitBanner, { rateLimitStatus: props.rateLimit, showWorkspaceUsageLimit: props.showWorkspaceUsageLimit });
-  else if (kind === "image-generation-limit" && props.imageGenerationLimit != null) fallbackContent = jsx.jsx(runtime.RateLimitBanner, { imageGenerationLimit: props.imageGenerationLimit, imageGenerationPresentationKey, lastImageGenerationImpressionKeyRef, rateLimitStatus: props.rateLimit, onDismissImageGenerationLimit: props.onDismissImageGenerationLimit });
-  else if (kind === "model-limit") fallbackContent = jsx.jsx(runtime.ModelLimitBanner, { modelName: props.modelName, resetAt: props.resetAt });
-  else if (kind === "warning" && props.rateLimit != null) {
-    const warningKey = runtime.getRateLimitWarningKey(props.rateLimit);
-    if (props.rateLimitWarningThreshold != null && warningKey != null) fallbackContent = jsx.jsx(runtime.RateLimitBanner, { rateLimitStatus: props.rateLimit, rateLimitWarningThreshold: props.rateLimitWarningThreshold, showWorkspaceUsageLimit: props.showWorkspaceUsageLimit, onDismissWarning: () => runtime.markWarningDismissed(scope, warningKey, props.rateLimitWarningThreshold as number) }, `${warningKey}:${props.rateLimitWarningThreshold}`);
+function se(e) {
+  let t = (0, Q.c)(50),
+    {
+      canShowUsageBanners: r,
+      hostId: i,
+      imageGenerationLimit: a,
+      modelName: s,
+      onDismissImageGenerationLimit: l,
+      resetAt: u,
+      rateLimit: d,
+      rateLimitWarningThreshold: f,
+      selectedModel: p,
+      showModelLimit: m,
+      showBackendRateLimitUpsell: g,
+      showLunaReserveNotice: _,
+      showWorkspaceUsageLimit: y,
+      showUpsell: b,
+    } = e,
+    x = i === void 0 ? te : i,
+    S = g !== void 0 && g,
+    C = _ === void 0 || _,
+    w = o(c),
+    { accountId: T, userId: O } = v(),
+    k = n(E, T),
+    A = (0, ue.useRef)(null),
+    j;
+  t[0] !== T || t[1] !== a || t[2] !== k || t[3] !== O
+    ? ((j =
+        a != null && k != null
+          ? JSON.stringify([T, O, k.threadId, k.turnId, k.completedAtMs])
+          : void 0),
+      (t[0] = T),
+      (t[1] = a),
+      (t[2] = k),
+      (t[3] = O),
+      (t[4] = j))
+    : (j = t[4]);
+  let M = j,
+    N;
+  t[5] !== T || t[6] !== p || t[7] !== O
+    ? ((N = { accountId: T, userId: O, selectedModel: p }),
+      (t[5] = T),
+      (t[6] = p),
+      (t[7] = O),
+      (t[8] = N))
+    : (N = t[8]);
+  let P = r && a != null,
+    F;
+  t[9] === P ? (F = t[10]) : ((F = { enabled: P }), (t[9] = P), (t[10] = F));
+  let { data: I } = n(ee, N, F),
+    L = a != null && !b && !y ? (I ?? d) : d,
+    R = L?.rate_limit_upsell?.banner_type === `image_generation_limit_reached`,
+    z = n(D, x),
+    B = le({
+      hasImageGenerationLimit: a != null,
+      showModelLimit: m,
+      showUpsell: b,
+      showWorkspaceUsageLimit: y,
+    }),
+    H = null;
+  if (B === `blocking-limit` && d != null) {
+    let e;
+    (t[11] !== d || t[12] !== y
+      ? ((e = (0, $.jsx)(V, { rateLimitStatus: d, showWorkspaceUsageLimit: y })),
+        (t[11] = d),
+        (t[12] = y),
+        (t[13] = e))
+      : (e = t[13]),
+      (H = e));
+  } else if (B === `image-generation-limit` && a != null) {
+    let e = l ?? void 0,
+      n;
+    (t[14] !== a || t[15] !== M || t[16] !== d || t[17] !== e
+      ? ((n = (0, $.jsx)(V, {
+          imageGenerationLimit: a,
+          imageGenerationPresentationKey: M,
+          lastImageGenerationImpressionKeyRef: A,
+          rateLimitStatus: d,
+          onDismissImageGenerationLimit: e,
+        })),
+        (t[14] = a),
+        (t[15] = M),
+        (t[16] = d),
+        (t[17] = e),
+        (t[18] = n))
+      : (n = t[18]),
+      (H = n));
+  } else if (B === `model-limit`) {
+    let e;
+    (t[19] !== s || t[20] !== u
+      ? ((e = (0, $.jsx)(ne, { modelName: s, resetAt: u })), (t[19] = s), (t[20] = u), (t[21] = e))
+      : (e = t[21]),
+      (H = e));
+  } else if (B === `warning` && d != null) {
+    let e;
+    t[22] === d ? (e = t[23]) : ((e = ie(d)), (t[22] = d), (t[23] = e));
+    let n = e;
+    if (f != null && n != null) {
+      let e = `${n}:${f}`,
+        r;
+      t[24] !== f || t[25] !== w || t[26] !== n
+        ? ((r = () => {
+            re(w, n, f);
+          }),
+          (t[24] = f),
+          (t[25] = w),
+          (t[26] = n),
+          (t[27] = r))
+        : (r = t[27]);
+      let i;
+      (t[28] !== d || t[29] !== f || t[30] !== y || t[31] !== r || t[32] !== e
+        ? ((i = (0, $.jsx)(
+            V,
+            {
+              rateLimitStatus: d,
+              rateLimitWarningThreshold: f,
+              showWorkspaceUsageLimit: y,
+              onDismissWarning: r,
+            },
+            e,
+          )),
+          (t[28] = d),
+          (t[29] = f),
+          (t[30] = y),
+          (t[31] = r),
+          (t[32] = e),
+          (t[33] = i))
+        : (i = t[33]),
+        (H = i));
+    }
   }
-  const backendUpsell = BackendRateLimitUpsell({ banner: rateLimitStatus?.rate_limit_upsell, fallbackContent, hostId, rateLimitStatus, selectedModel: props.selectedModel });
-  if (!props.canShowUsageBanners) return null;
-  const banner = rateLimitStatus?.rate_limit_upsell;
-  if (rateLimitStatus != null && (props.showBackendRateLimitUpsell === true || (props.imageGenerationLimit != null && imageRateLimit?.rate_limit_upsell != null)) && banner != null && (!imageBackendUpsell || (props.imageGenerationLimit != null && kind !== "blocking-limit")) && (banner.banner_type !== "luna_reserve" || (props.showLunaReserveNotice !== false && lunaReserveAvailable))) {
-    if ((banner.priority ?? 0) > 0 && fallbackContent != null) return fallbackContent;
-    if (backendUpsell == null) return fallbackContent;
-    const content = imageBackendUpsell ? jsx.jsx(runtime.UsageBannerPresentation, { banner, fallbackContent, lastImpressionKeyRef: lastImageGenerationImpressionKeyRef, onDismiss: props.onDismissImageGenerationLimit, presentationKey: imageGenerationPresentationKey, rateLimitStatus }, imageGenerationPresentationKey) : backendUpsell;
-    return jsx.jsx("div", { className: "empty:hidden [[data-composer-placement=home]>&]:pb-2", children: content });
+  let U = H,
+    W = L?.rate_limit_upsell,
+    G;
+  t[34] !== L || t[35] !== W || t[36] !== U || t[37] !== x || t[38] !== p
+    ? ((G = { banner: W, fallbackContent: U, hostId: x, rateLimitStatus: L, selectedModel: p }),
+      (t[34] = L),
+      (t[35] = W),
+      (t[36] = U),
+      (t[37] = x),
+      (t[38] = p),
+      (t[39] = G))
+    : (G = t[39]);
+  let K = ce(G);
+  if (!r) return null;
+  if (
+    L != null &&
+    (S || (a != null && I?.rate_limit_upsell != null)) &&
+    W != null &&
+    (!R || (a != null && B !== `blocking-limit`)) &&
+    (W.banner_type !== `luna_reserve` || (C && z))
+  ) {
+    if ((W.priority ?? 0) > 0 && H != null) return H;
+    if (K == null) return U;
+    let e;
+    t[40] !== K ||
+    t[41] !== L ||
+    t[42] !== W ||
+    t[43] !== U ||
+    t[44] !== M ||
+    t[45] !== R ||
+    t[46] !== l
+      ? ((e = R
+          ? (0, $.jsx)(
+              h,
+              {
+                banner: W,
+                fallbackContent: U,
+                lastImpressionKeyRef: A,
+                onDismiss: l ?? void 0,
+                presentationKey: M,
+                rateLimitStatus: L,
+              },
+              M,
+            )
+          : K),
+        (t[40] = K),
+        (t[41] = L),
+        (t[42] = W),
+        (t[43] = U),
+        (t[44] = M),
+        (t[45] = R),
+        (t[46] = l),
+        (t[47] = e))
+      : (e = t[47]);
+    let n;
+    return (
+      t[48] === e
+        ? (n = t[49])
+        : ((n = (0, $.jsx)(`div`, {
+            className: `empty:hidden [[data-composer-placement=home]>&]:pb-2`,
+            children: e,
+          })),
+          (t[48] = e),
+          (t[49] = n)),
+      n
+    );
   }
-  return fallbackContent;
+  return U;
 }
-
-export { UsageBanner as n, initializeUsageBanner as t };
+function ce(e) {
+  let t = (0, Q.c)(36),
+    { banner: r, fallbackContent: a, hostId: s, rateLimitStatus: c, selectedModel: l } = e,
+    u = o(P),
+    f = i(G),
+    p;
+  t[0] !== s || t[1] !== c || t[2] !== u || t[3] !== f
+    ? ((p = c == null ? null : k(u, c, f == null ? null : JSON.stringify([s, f]))),
+      (t[0] = s),
+      (t[1] = c),
+      (t[2] = u),
+      (t[3] = f),
+      (t[4] = p))
+    : (p = t[4]);
+  let m = p,
+    g = n(M, m),
+    _;
+  t[5] === u ? (_ = t[6]) : ((_ = d(u)), (t[5] = u), (t[6] = _));
+  let v = _,
+    y = n(x, v),
+    S;
+  t[7] !== v || t[8] !== s ? ((S = [v, s]), (t[7] = v), (t[8] = s), (t[9] = S)) : (S = t[9]);
+  let C = n(b, S),
+    w;
+  t[10] === s ? (w = t[11]) : ((w = { enabled: !1, hostId: s }), (t[10] = s), (t[11] = w));
+  let { data: T } = z(w),
+    E = K(c);
+  if (
+    r == null ||
+    c == null ||
+    !E ||
+    (r.presentation === `dismissible` && r.dismissal_policy?.scope === `thread` && m == null)
+  )
+    return a;
+  let D;
+  t[12] !== r || t[13] !== m || t[14] !== a || t[15] !== g || t[16] !== c || t[17] !== u
+    ? ((D = g
+        ? a
+        : (0, $.jsx)(h, {
+            banner: r,
+            fallbackContent: a,
+            onDismiss:
+              m == null
+                ? void 0
+                : () => {
+                    u.set(M, m, !0);
+                  },
+            onShown: () => {
+              B(u, m);
+            },
+            presentationKey: m,
+            rateLimitStatus: c,
+          })),
+      (t[12] = r),
+      (t[13] = m),
+      (t[14] = a),
+      (t[15] = g),
+      (t[16] = c),
+      (t[17] = u),
+      (t[18] = D))
+    : (D = t[18]);
+  let O = D,
+    A = r.model_slug == null || r.model_slug === l ? O : a;
+  if (r.blocked_model_slug == null) return A;
+  let j;
+  t[19] !== r.blocked_model_slug ||
+  t[20] !== r.fallback_model_slugs ||
+  t[21] !== C ||
+  t[22] !== m ||
+  t[23] !== y ||
+  t[24] !== T?.models ||
+  t[25] !== l
+    ? ((j =
+        l != null &&
+        l !== r.blocked_model_slug &&
+        r.fallback_model_slugs?.includes(l) &&
+        C === l &&
+        T?.models.some((e) => e.model === l && e.hidden !== !0) === !0 &&
+        y != null &&
+        !(m != null && y.notice?.key === m && y.notice.dismissed)),
+      (t[19] = r.blocked_model_slug),
+      (t[20] = r.fallback_model_slugs),
+      (t[21] = C),
+      (t[22] = m),
+      (t[23] = y),
+      (t[24] = T?.models),
+      (t[25] = l),
+      (t[26] = j))
+    : (j = t[26]);
+  let N = j,
+    F;
+  return (
+    t[27] !== r ||
+    t[28] !== N ||
+    t[29] !== O ||
+    t[30] !== m ||
+    t[31] !== a ||
+    t[32] !== s ||
+    t[33] !== c ||
+    t[34] !== l
+      ? ((F = N
+          ? (0, $.jsx)(ae, {
+              banner: r,
+              bannerKey: m,
+              blockedModel: r.blocked_model_slug,
+              fallbackContent: a,
+              hostId: s,
+              rateLimitStatus: c,
+              selectedModel: l,
+              children: O,
+            })
+          : a),
+        (t[27] = r),
+        (t[28] = N),
+        (t[29] = O),
+        (t[30] = m),
+        (t[31] = a),
+        (t[32] = s),
+        (t[33] = c),
+        (t[34] = l),
+        (t[35] = F))
+      : (F = t[35]),
+    F
+  );
+}
+function le({
+  hasImageGenerationLimit: e,
+  showModelLimit: t,
+  showWorkspaceUsageLimit: n,
+  showUpsell: r,
+}) {
+  return r || n ? `blocking-limit` : e ? `image-generation-limit` : t ? `model-limit` : `warning`;
+}
+var Q, ue, $;
+function de() {
+  return (de = e(() => {
+    ((Q = t()),
+      r(),
+      (ue = l()),
+      J(),
+      oe(),
+      g(),
+      H(),
+      O(),
+      T(),
+      m(),
+      A(),
+      S(),
+      U(),
+      L(),
+      W(),
+      w(),
+      s(),
+      C(),
+      j(),
+      ($ = a()));
+  }))();
+}
+export { se as n, de as t };

@@ -52,21 +52,6 @@ assert.deepEqual(browserExternal.default, { browser: true });
 
 assertReleaseOwner("portable-thumbnail-font-metrics");
 
-// thumbnail-worker-font-metrics: 9
-const workerFonts = await bundle("thumbnail-worker-font-metrics");
-assert.deepEqual(Object.keys(workerFonts), ["a", "i", "n", "o", "r", "s", "t"]);
-assert.equal(workerFonts.o(2.75), -0.25);
-assert.equal(workerFonts.t({ family: "Aptos", stretch: "condensed" }, 10), "condensed 10px Aptos");
-assert.deepEqual(workerFonts.a({ actualBoundingBoxAscent: 8 }, { actualBoundingBoxDescent: 2 }, 10), { ascentEm: .8, descentEm: .2, lineGapEm: 0, measuredAtPx: 10 });
-assert.equal(workerFonts.n.getFontKey({ family: "Aptos", weight: "BOLD" }), "normal|bold|normal|Aptos");
-let workerNotifications = 0;
-const unsubscribeWorker = workerFonts.i(() => workerNotifications++);
-workerFonts.s();
-assert.equal(workerNotifications, 1);
-unsubscribeWorker(); workerFonts.s();
-assert.equal(workerNotifications, 1);
-workerFonts.n.reset();
-assert.equal(workerFonts.n.dispose(), undefined);
-assert.throws(() => workerFonts.r(), /OffscreenCanvas/);
+assertReleaseOwner("thumbnail-worker-font-metrics");
 
 console.log("47 runtime payment and font foundation cluster assertions passed");

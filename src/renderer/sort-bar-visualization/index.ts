@@ -1,40 +1,258 @@
-import "@rchunk/rolldown-runtime";
-import * as Shared from "@rchunk/app-shared";
-import * as InputSelector from "@rchunk/input-selector-group";
-import * as Buttons from "@rchunk/button";
-import * as Motion from "@rchunk/proxy";
-import * as ReducedMotion from "@rchunk/use-reduced-motion";
-
-type Role = "candidate" | "comparison" | "sorted" | "remaining";
-interface Item { id: string; value: number; label: unknown; positionLabel: unknown; role: Role }
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown; jsxs(type: unknown, props: Record<string, unknown>, key?: string): unknown }
-const shared = Shared as unknown as { I3(): JsxRuntime; K2(): void; Y2: (p: Record<string, unknown>) => unknown; h4(): void; m4(...v: unknown[]): string };
-const inputs = InputSelector as unknown as { r(): void; t: (p: Record<string, unknown>) => unknown };
-const buttons = Buttons as unknown as { n: (p: Record<string, unknown>) => unknown; r(): void; t: (p: Record<string, unknown>) => unknown };
-const motion = Motion as unknown as { n(): void; t: { div: unknown } };
-const reduced = ReducedMotion as unknown as { n: () => boolean; t(): void };
-let jsx: JsxRuntime;
-
-function SortControls(props: Record<string, unknown>): unknown {
-  const message = (id: string, defaultMessage: string) => jsx.jsx(shared.Y2, { id, defaultMessage });
-  return jsx.jsxs(buttons.n, { columns: 2, role: "group", "aria-label": props.ariaLabel, children: [
-    jsx.jsx(buttons.t, { onClick: props.onShuffle, children: message("learningBlock.sortControls.shuffle", "Shuffle") }),
-    jsx.jsx(buttons.t, { onClick: props.onPlayPause, disabled: props.playDisabled, "aria-pressed": props.isPlaying, children: props.isPlaying ? message("learningBlock.sortControls.pause", "Pause") : message("learningBlock.sortControls.play", "Play") }),
-    jsx.jsx(buttons.t, { onClick: props.onStep, disabled: props.stepDisabled, children: message("learningBlock.sortControls.step", "Step") }),
-    jsx.jsx(buttons.t, { onClick: props.onFinishPass, disabled: props.finishPassDisabled, "aria-busy": props.isFinishingPass || undefined, children: props.isFinishingPass ? message("learningBlock.sortControls.finishingPass", "Finishing pass…") : message("learningBlock.sortControls.finishPass", "Finish pass") }),
-  ] });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { I3 as t, K2 as n, Y2 as r, h4 as i, m4 as a } from "@rchunk/app-shared";
+import { r as o, t as s } from "@rchunk/input-selector-group";
+import { n as c, r as l, t as u } from "@rchunk/button";
+import { n as d, t as f } from "@rchunk/motion-proxy-runtime";
+import { n as p, t as m } from "@rchunk/use-reduced-motion";
+var h, g;
+function _() {
+  return (_ = e(() => {
+    (n(),
+      l(),
+      (h = t()),
+      (g = ({
+        ariaLabel: e,
+        finishPassDisabled: t,
+        isFinishingPass: n = !1,
+        isPlaying: i,
+        onFinishPass: a,
+        onPlayPause: o,
+        onShuffle: s,
+        onStep: l,
+        playDisabled: d,
+        stepDisabled: f,
+      }) =>
+        (0, h.jsxs)(c, {
+          columns: 2,
+          role: `group`,
+          "aria-label": e,
+          children: [
+            (0, h.jsx)(u, {
+              onClick: s,
+              children: (0, h.jsx)(r, {
+                id: `learningBlock.sortControls.shuffle`,
+                defaultMessage: `Shuffle`,
+              }),
+            }),
+            (0, h.jsx)(u, {
+              onClick: o,
+              disabled: d,
+              "aria-pressed": i,
+              children: i
+                ? (0, h.jsx)(r, { id: `learningBlock.sortControls.pause`, defaultMessage: `Pause` })
+                : (0, h.jsx)(r, { id: `learningBlock.sortControls.play`, defaultMessage: `Play` }),
+            }),
+            (0, h.jsx)(u, {
+              onClick: l,
+              disabled: f,
+              children: (0, h.jsx)(r, {
+                id: `learningBlock.sortControls.step`,
+                defaultMessage: `Step`,
+              }),
+            }),
+            (0, h.jsx)(u, {
+              onClick: a,
+              disabled: t,
+              "aria-busy": n || void 0,
+              children: n
+                ? (0, h.jsx)(r, {
+                    id: `learningBlock.sortControls.finishingPass`,
+                    defaultMessage: `Finishing pass…`,
+                  })
+                : (0, h.jsx)(r, {
+                    id: `learningBlock.sortControls.finishPass`,
+                    defaultMessage: `Finish pass`,
+                  }),
+            }),
+          ],
+        })));
+  }))();
 }
-function SortIndexSelector({ ariaValueText, label, max, onChange, onInteractionStart, value }: { ariaValueText?: string; label: string; max: number; onChange(v: number): void; onInteractionStart?: () => void; value: number }): unknown {
-  return jsx.jsx(inputs.t, { inputs: [{ ariaLabel: label, ariaValueText, min: 1, max: max + 1, step: 1, value: value + 1, variable: label, variableFormat: "text", formatValueForInput: (v: number) => String(Math.round(v)), onChange: (v: number) => { onInteractionStart?.(); onChange(v - 1); } }] });
+var v, y;
+function b() {
+  return (b = e(() => {
+    (o(),
+      (v = t()),
+      (y = ({ ariaValueText: e, label: t, max: n, onChange: r, onInteractionStart: i, value: a }) =>
+        (0, v.jsx)(s, {
+          inputs: [
+            {
+              ariaLabel: t,
+              ariaValueText: e,
+              min: 1,
+              max: n + 1,
+              step: 1,
+              value: a + 1,
+              variable: t,
+              variableFormat: `text`,
+              formatValueForInput: (e) => String(Math.round(e)),
+              onChange: (e) => {
+                (i?.(), r(e - 1));
+              },
+            },
+          ],
+        })));
+  }))();
 }
-const barHeight = (value: number, max: number) => max > 0 ? Math.max(0, value) / max * 168 : 0;
-const color = (role: Role, sortedColor: "primary" | "companion") => role === "candidate" ? "var(--learning-block-accent-surface)" : role === "comparison" ? "var(--learning-block-color-primary)" : role === "sorted" ? (sortedColor === "primary" ? "var(--learning-block-color-primary)" : "var(--learning-block-color-companion)") : "var(--text-tertiary)";
-function SortBarVisualization({ ariaLabel, details, heading, headerMinHeightPx, items, maxValue, presentationMode = "standard", sortedColor = "companion" }: { ariaLabel: string; details?: unknown; heading: unknown; headerMinHeightPx?: number; items: Item[]; maxValue: number; presentationMode?: string; sortedColor?: "primary" | "companion" }): unknown {
-  const reduceMotion = reduced.n();
-  if (presentationMode === "thumbnail") return jsx.jsx("div", { "aria-label": ariaLabel, role: "img", "data-sort-bar-thumbnail": true, children: items.map((item) => jsx.jsx(motion.t.div, { layout: !reduceMotion && "position", children: jsx.jsx("div", { "data-sort-bar-id": item.id, "data-sort-bar-role": item.role, style: { backgroundColor: color(item.role, sortedColor), height: (maxValue > 0 ? Math.max(0, item.value) / maxValue * 100 : 0) + "%" } }) }, item.id)) });
-  return jsx.jsx("div", { "data-sort-bar-visualization": true, "aria-label": ariaLabel, role: "img", children: jsx.jsxs("div", { children: [jsx.jsxs("div", { style: headerMinHeightPx === undefined ? undefined : { minHeight: headerMinHeightPx }, children: [heading, details || null] }), jsx.jsx("div", { children: items.map((item) => jsx.jsx(motion.t.div, { layout: !reduceMotion && "position", children: jsx.jsx("div", { "data-sort-bar-id": item.id, "data-sort-bar-role": item.role, style: { height: barHeight(item.value, maxValue) + "px" }, children: item.label }) }, item.id)) })] }) });
+var x, S, C, w, T, E;
+function D() {
+  return (D = e(() => {
+    (i(),
+      f(),
+      m(),
+      (x = t()),
+      (S = 168),
+      (C = (e, t) => (t > 0 ? (Math.max(0, e) / t) * S : 0)),
+      (w = (e, t) => {
+        switch (e) {
+          case `candidate`:
+            return `var(--learning-block-accent-surface)`;
+          case `comparison`:
+            return `var(--learning-block-color-primary)`;
+          case `sorted`:
+            return t === `primary`
+              ? `var(--learning-block-color-primary)`
+              : `var(--learning-block-color-companion)`;
+          case `remaining`:
+            return `var(--text-tertiary)`;
+        }
+      }),
+      (T = (e, t) => {
+        switch (e) {
+          case `candidate`:
+            return `border-2 border-[var(--learning-block-color-primary)] bg-[var(--learning-block-accent-surface)]`;
+          case `comparison`:
+            return `border-2 border-[var(--learning-block-color-primary)]`;
+          case `sorted`:
+            return t === `primary`
+              ? `border-[var(--learning-block-color-primary)]`
+              : `border-[var(--learning-block-color-companion)]`;
+          case `remaining`:
+            return `border-token-border-heavy`;
+        }
+      }),
+      (E = ({
+        ariaLabel: e,
+        details: t,
+        heading: n,
+        headerMinHeightPx: r,
+        items: i,
+        maxValue: o,
+        presentationMode: s = `standard`,
+        sortedColor: c = `companion`,
+      }) => {
+        "use forget";
+        let l = p();
+        return s === `thumbnail`
+          ? (0, x.jsx)(`div`, {
+              "aria-label": e,
+              className: `flex h-full w-full items-end justify-center gap-2 overflow-hidden p-6`,
+              "data-sort-bar-thumbnail": !0,
+              role: `img`,
+              children: i.map((e) =>
+                (0, x.jsx)(
+                  d.div,
+                  {
+                    className: `flex h-full min-w-0 flex-1 items-end justify-center`,
+                    layout: !l && `position`,
+                    transition: { duration: l ? 0 : 0.3 },
+                    children: (0, x.jsx)(`div`, {
+                      className: a(
+                        `w-full max-w-3 rounded-t-sm border border-transparent transition-[height,background-color,border-color] duration-300 motion-reduce:transition-none`,
+                        e.role === `candidate` && `border-[var(--learning-block-color-primary)]`,
+                      ),
+                      "data-sort-bar-id": e.id,
+                      "data-sort-bar-role": e.role,
+                      style: {
+                        backgroundColor: w(e.role, c),
+                        height: `${o > 0 ? (Math.max(0, e.value) / o) * 100 : 0}%`,
+                      },
+                    }),
+                  },
+                  e.id,
+                ),
+              ),
+            })
+          : (0, x.jsx)(`div`, {
+              className: `h-full w-full overflow-y-auto`,
+              children: (0, x.jsx)(`div`, {
+                className: `learning-block-wide-safe-spacing flex min-h-full items-center justify-center p-6`,
+                children: (0, x.jsxs)(`div`, {
+                  "aria-label": e,
+                  className: `w-full max-w-[560px]`,
+                  "data-sort-bar-visualization": !0,
+                  role: `img`,
+                  children: [
+                    (0, x.jsxs)(`div`, {
+                      className: `flex min-h-20 w-full min-w-0 flex-col items-center px-10 text-center`,
+                      "data-sort-bar-header": ``,
+                      style: r === void 0 ? void 0 : { minHeight: r },
+                      children: [
+                        (0, x.jsx)(`div`, {
+                          className: `text-token-text-primary max-w-full min-w-0 self-stretch text-xs leading-5 font-semibold [overflow-wrap:anywhere] hyphens-auto`,
+                          children: n,
+                        }),
+                        t
+                          ? (0, x.jsx)(`div`, {
+                              className: `text-token-text-secondary mt-2 max-w-full min-w-0 self-stretch text-xs leading-4 [overflow-wrap:anywhere] hyphens-auto`,
+                              children: t,
+                            })
+                          : null,
+                      ],
+                    }),
+                    (0, x.jsxs)(`div`, {
+                      className: `px-4 pt-4`,
+                      dir: `ltr`,
+                      children: [
+                        (0, x.jsx)(`div`, {
+                          className: `border-token-border-heavy grid h-48 items-end gap-2 border-b sm:gap-4`,
+                          style: { gridTemplateColumns: `repeat(${i.length}, minmax(0, 1fr))` },
+                          children: i.map((e) =>
+                            (0, x.jsx)(
+                              d.div,
+                              {
+                                className: `relative flex h-full min-w-0 items-end justify-center`,
+                                layout: !l && `position`,
+                                transition: { duration: l ? 0 : 0.3 },
+                                children: (0, x.jsx)(`div`, {
+                                  className: a(
+                                    `text-token-text-primary relative z-10 flex w-full max-w-12 items-start justify-center rounded-t-md border pt-1 text-xs font-semibold transition-[height,background-color,border-color] duration-300 motion-reduce:transition-none`,
+                                    T(e.role, c),
+                                  ),
+                                  "data-sort-bar-id": e.id,
+                                  "data-sort-bar-role": e.role,
+                                  "data-sort-bar-value": e.value,
+                                  style: { height: `${C(e.value, o)}px` },
+                                  children: e.label,
+                                }),
+                              },
+                              e.id,
+                            ),
+                          ),
+                        }),
+                        (0, x.jsx)(`div`, {
+                          className: `mt-2 grid gap-2 sm:gap-4`,
+                          style: { gridTemplateColumns: `repeat(${i.length}, minmax(0, 1fr))` },
+                          children: i.map((e) =>
+                            (0, x.jsx)(
+                              `div`,
+                              {
+                                className: `text-token-text-tertiary text-center text-xs`,
+                                "data-sort-bar-position": !0,
+                                children: e.positionLabel,
+                              },
+                              `position-${e.id}`,
+                            ),
+                          ),
+                        }),
+                      ],
+                    }),
+                  ],
+                }),
+              }),
+            });
+      }));
+  }))();
 }
-function initializeSortControls(): void { shared.K2(); buttons.r(); jsx = shared.I3(); }
-function initializeSortIndexSelector(): void { inputs.r(); jsx = shared.I3(); }
-function initializeSortBarVisualization(): void { shared.h4(); motion.n(); reduced.t(); jsx = shared.I3(); }
-export { SortControls as a, initializeSortIndexSelector as i, initializeSortBarVisualization as n, initializeSortControls as o, SortIndexSelector as r, SortBarVisualization as t };
+export { g as a, b as i, D as n, _ as o, y as r, E as t };

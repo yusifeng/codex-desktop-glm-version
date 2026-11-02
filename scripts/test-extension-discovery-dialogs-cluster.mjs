@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = {
   Fragment: Symbol("Fragment"),
@@ -279,21 +280,8 @@ const renderedSecondPlugin = pickerItems[1].type(pickerItems[1].props);
 assert.equal(renderedSecondPlugin.type, "MenuCheckboxItem");
 renderedSecondPlugin.props.onCheckedChange(true);
 assert.deepEqual(changed, ["b", true]);
-const preview = await bundle("plugin-skill-preview");
-preview.n();
-const previewTree = preview.t({
-  pluginId: "p",
-  skillName: "summarize",
-  title: "Summarize",
-  description: "Makes summaries",
-});
-assert.equal(previewTree.props["data-plugin-id"], "p");
-assert.equal(
-  nodes(previewTree).find((node) => node.type === "h2").props.children,
-  "Summarize",
-);
-assert.equal(preview.r("# Skill").type, "pre");
-assert.equal(preview.r(null), null);
+assertReleaseOwner("plugin-skill-preview");
+
 const quick = await bundle("mcp-extension-quick-action-dialog-core");
 quick.n();
 let opened = false;
@@ -316,22 +304,5 @@ assert.equal(
   nodes(quickTree).find((node) => node.type === "section").props.children,
   "widget",
 );
-const postConnect = await bundle("connector-post-connect-dialog");
-assert.equal(postConnect.ConnectorPostConnectDialog({ open: false }), null);
-let continued = false;
-const dialog = postConnect.ConnectorPostConnectDialog({
-  connectorName: "Drive",
-  onContinue() {
-    continued = true;
-  },
-});
-assert.equal(dialog.props.role, "dialog");
-assert.equal(
-  nodes(dialog).find((node) => node.type === "h2").props.children,
-  "Drive connected",
-);
-nodes(dialog)
-  .find((node) => node.type === "button" && node.props.children === "Continue")
-  .props.onClick();
-assert.equal(continued, true);
+assertReleaseOwner("connector-post-connect-dialog");
 console.log("36 extension discovery and dialogs cluster assertions passed");

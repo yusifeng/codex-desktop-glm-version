@@ -1,5 +1,205 @@
-// Reflection-transformation coordinate-plane model. Release chunk: model-ac14e3b51310.js.
-import "@rchunk/rolldown-runtime";
-type ObjectMode="point"|"triangle"; type ReflectionLine="x_axis"|"y_axis"|"y_equals_x"|"y_equals_negative_x"; interface Point{x:number;y:number} interface TriangleSettings{triangleCenterX:number;triangleCenterY:number;triangleWidth:number;triangleHeight:number;triangleRotationDegrees:number} interface Input extends Partial<TriangleSettings>{objectMode?:string;reflectionLine?:string;activePointIndex?:number;ax?:number;ay?:number;bx?:number;by?:number;cx?:number;cy?:number}
-const objectModes={point:"point",triangle:"triangle"} as const; const reflectionLines={xAxis:"x_axis",yAxis:"y_axis",yEqualsX:"y_equals_x",yEqualsNegativeX:"y_equals_negative_x"} as const; const parameters={objectMode:{kind:"enum",defaultValue:"triangle",allowedValues:["point","triangle"]},reflectionLine:{kind:"enum",defaultValue:"y_equals_x",allowedValues:["x_axis","y_axis","y_equals_x","y_equals_negative_x"]},ax:{kind:"number",defaultValue:-3.5,min:-5.5,max:5.5},ay:{kind:"number",defaultValue:.25,min:-5.5,max:5.5},triangleCenterX:{kind:"number",defaultValue:-2,min:-2,max:2},triangleCenterY:{kind:"number",defaultValue:1,min:-2,max:2},triangleWidth:{kind:"number",defaultValue:3,min:1,max:4},triangleHeight:{kind:"number",defaultValue:2.5,min:1,max:4},triangleRotationDegrees:{kind:"number",defaultValue:0,min:-90,max:90}} as const; const specification={type:"REFLECTION_TRANSFORMATION_COORDINATE_PLANE",version:1,thumbnailAssetKey:"reflection-transformation-coordinate-plane-v1",parameters}; const clamp=(v:number,a:number,b:number)=>Math.min(b,Math.max(a,v)); const finite=(v:number|undefined,f:number)=>typeof v==="number"&&Number.isFinite(v)?v:f; const setting=(v:number|undefined,p:{defaultValue:number;min:number;max:number})=>clamp(finite(v,p.defaultValue),p.min,p.max); const triangleSettings=(input:Input):TriangleSettings=>({triangleCenterX:setting(input.triangleCenterX,parameters.triangleCenterX),triangleCenterY:setting(input.triangleCenterY,parameters.triangleCenterY),triangleWidth:setting(input.triangleWidth,parameters.triangleWidth),triangleHeight:setting(input.triangleHeight,parameters.triangleHeight),triangleRotationDegrees:setting(input.triangleRotationDegrees,parameters.triangleRotationDegrees)}); const trianglePoints=(settings:TriangleSettings):[Point,Point,Point]=>{const angle=settings.triangleRotationDegrees*Math.PI/180,c=Math.cos(angle),s=Math.sin(angle),rotate=(p:Point)=>({x:settings.triangleCenterX+p.x*c-p.y*s,y:settings.triangleCenterY+p.x*s+p.y*c});return[rotate({x:-settings.triangleWidth/2,y:-settings.triangleHeight/3}),rotate({x:settings.triangleWidth/2,y:-settings.triangleHeight/3}),rotate({x:-settings.triangleWidth/4,y:2*settings.triangleHeight/3})];}; const distance=(point:Point,line:ReflectionLine)=>line==="x_axis"?Math.abs(point.y):line==="y_axis"?Math.abs(point.x):line==="y_equals_negative_x"?Math.abs(point.x+point.y)/Math.SQRT2:Math.abs(point.y-point.x)/Math.SQRT2; const furthestIndex=(points:Point[],line:ReflectionLine)=>points.reduce((best,point,index)=>distance(point,line)>distance(points[best],line)?index:best,0); const snap=(value:number,min=-5.5,max=5.5)=>Number((Math.round(clamp(value,min,max)/.25)*.25).toFixed(2)); const enumValue=<T extends string>(value:string|undefined,allowed:readonly T[],fallback:T):T=>typeof value==="string"&&allowed.includes(value as T)?value as T:fallback; const normalize=(input:Input)=>{const objectMode=enumValue(input.objectMode,Object.values(objectModes),"triangle"),reflectionLine=enumValue(input.reflectionLine,parameters.reflectionLine.allowedValues,"y_equals_x"),settings=triangleSettings(input),defaults=trianglePoints(settings),points=objectMode==="point"?[{x:clamp(finite(input.ax,defaults[0].x),-5.5,5.5),y:clamp(finite(input.ay,defaults[0].y),-5.5,5.5)}]:[{x:clamp(finite(input.ax,defaults[0].x),-5.5,5.5),y:clamp(finite(input.ay,defaults[0].y),-5.5,5.5)},{x:clamp(finite(input.bx,defaults[1].x),-5.5,5.5),y:clamp(finite(input.by,defaults[1].y),-5.5,5.5)},{x:clamp(finite(input.cx,defaults[2].x),-5.5,5.5),y:clamp(finite(input.cy,defaults[2].y),-5.5,5.5)}],fallback=furthestIndex(points,reflectionLine),activePointIndex=typeof input.activePointIndex==="number"&&Number.isFinite(input.activePointIndex)?clamp(Math.round(input.activePointIndex),0,points.length-1):fallback;return{objectMode,reflectionLine,activePointIndex,...settings,ax:points[0].x,ay:points[0].y,bx:points[1]?.x??defaults[1].x,by:points[1]?.y??defaults[1].y,cx:points[2]?.x??defaults[2].x,cy:points[2]?.y??defaults[2].y};}; const create=(input:Input={})=>{const settings=triangleSettings(input),[a,b,c]=trianglePoints(settings),complete=[input.ax,input.ay,input.bx,input.by,input.cx,input.cy].every(value=>typeof value==="number"&&Number.isFinite(value));return normalize(enumValue(input.objectMode,Object.values(objectModes),"triangle")==="triangle"&&!complete?{...input,...settings,ax:a.x,ay:a.y,bx:b.x,by:b.y,cx:c.x,cy:c.y}:input);}; const reflect=(point:Point,line:ReflectionLine):Point=>line==="x_axis"?{x:point.x,y:-point.y}:line==="y_axis"?{x:-point.x,y:point.y}:line==="y_equals_negative_x"?{x:-point.y,y:-point.x}:{x:point.y,y:point.x}; const midpoint=(a:Point,b:Point):Point=>({x:(a.x+b.x)/2,y:(a.y+b.y)/2}); const liesOnLine=(point:Point,line:ReflectionLine,tolerance=1e-9)=>distance(point,line)<=tolerance; const direction=(line:ReflectionLine):Point=>line==="y_axis"?{x:0,y:1}:line==="y_equals_x"?{x:Math.SQRT1_2,y:Math.SQRT1_2}:line==="y_equals_negative_x"?{x:Math.SQRT1_2,y:-Math.SQRT1_2}:{x:1,y:0}; function initializeSpecification():void{} function initializeModel():void{}
-export{furthestIndex as a,initializeModel as c,normalize as d,snap as f,midpoint as i,liesOnLine as l,specification as m,reflectionLines as n,distance as o,initializeSpecification as p,create as r,direction as s,objectModes as t,reflect as u};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `REFLECTION_TRANSFORMATION_COORDINATE_PLANE`),
+      (n = `reflection-transformation-coordinate-plane-v1`),
+      (r = {
+        objectMode: {
+          kind: `enum`,
+          defaultValue: `triangle`,
+          allowedValues: [`point`, `triangle`],
+        },
+        reflectionLine: {
+          kind: `enum`,
+          defaultValue: `y_equals_x`,
+          allowedValues: [`x_axis`, `y_axis`, `y_equals_x`, `y_equals_negative_x`],
+        },
+        ax: { kind: `number`, defaultValue: -3.5, min: -5.5, max: 5.5 },
+        ay: { kind: `number`, defaultValue: 0.25, min: -5.5, max: 5.5 },
+        triangleCenterX: { kind: `number`, defaultValue: -2, min: -2, max: 2 },
+        triangleCenterY: { kind: `number`, defaultValue: 1, min: -2, max: 2 },
+        triangleWidth: { kind: `number`, defaultValue: 3, min: 1, max: 4 },
+        triangleHeight: { kind: `number`, defaultValue: 2.5, min: 1, max: 4 },
+        triangleRotationDegrees: { kind: `number`, defaultValue: 0, min: -90, max: 90 },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w, T, E, D, O, k, A, j, M;
+function N() {
+  return (N = e(() => {
+    (a(),
+      (o = { point: `point`, triangle: `triangle` }),
+      (s = {
+        xAxis: `x_axis`,
+        yAxis: `y_axis`,
+        yEqualsX: `y_equals_x`,
+        yEqualsNegativeX: `y_equals_negative_x`,
+      }),
+      (c = i.parameters),
+      (l = -5.5),
+      (u = 5.5),
+      (d = 0.25),
+      (f = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (p = (e, t) => (typeof e == `number` && Number.isFinite(e) ? e : t)),
+      (m = (e, t, n) => (typeof e == `number` && Number.isFinite(e) ? f(Math.round(e), 0, t) : n)),
+      (h = (e, t) => f(p(e, t.defaultValue), t.min, t.max)),
+      (g = (e) => ({
+        triangleCenterX: h(e.triangleCenterX, c.triangleCenterX),
+        triangleCenterY: h(e.triangleCenterY, c.triangleCenterY),
+        triangleWidth: h(e.triangleWidth, c.triangleWidth),
+        triangleHeight: h(e.triangleHeight, c.triangleHeight),
+        triangleRotationDegrees: h(e.triangleRotationDegrees, c.triangleRotationDegrees),
+      })),
+      (_ = (e, t) => {
+        switch (t) {
+          case s.xAxis:
+            return Math.abs(e.y);
+          case s.yAxis:
+            return Math.abs(e.x);
+          case s.yEqualsNegativeX:
+            return Math.abs(e.x + e.y) / Math.SQRT2;
+          case s.yEqualsX:
+          default:
+            return Math.abs(e.y - e.x) / Math.SQRT2;
+        }
+      }),
+      (v = ({
+        triangleCenterX: e,
+        triangleCenterY: t,
+        triangleWidth: n,
+        triangleHeight: r,
+        triangleRotationDegrees: i,
+      }) => {
+        let a = (i * Math.PI) / 180,
+          o = Math.cos(a),
+          s = Math.sin(a),
+          c = (n) => ({ x: e + n.x * o - n.y * s, y: t + n.x * s + n.y * o });
+        return [
+          c({ x: -n / 2, y: -r / 3 }),
+          c({ x: n / 2, y: -r / 3 }),
+          c({ x: -n / 4, y: (2 * r) / 3 }),
+        ];
+      }),
+      (y = g({})),
+      (b = v(y)),
+      (x = c.reflectionLine.defaultValue),
+      (S = (e, t) => {
+        let n = 0,
+          r = -1;
+        for (let [i, a] of e.entries()) {
+          let e = _(a, t);
+          e > r && ((n = i), (r = e));
+        }
+        return n;
+      }),
+      (C = {
+        objectMode: o.triangle,
+        reflectionLine: x,
+        activePointIndex: S(b, x),
+        ...y,
+        ax: b[0].x,
+        ay: b[0].y,
+        bx: b[1].x,
+        by: b[1].y,
+        cx: b[2].x,
+        cy: b[2].y,
+      }),
+      (w = (e, t, n) => (typeof e == `string` && t.includes(e) ? e : n)),
+      (T = (e, t = l, n = u) => Number((Math.round(f(e, t, n) / d) * d).toFixed(2))),
+      (E = (e) => {
+        let t = w(e.objectMode, Object.values(o), C.objectMode),
+          n = w(e.reflectionLine, c.reflectionLine.allowedValues, C.reflectionLine),
+          r = g(e),
+          i = v(r),
+          a = (e, t) => f(p(e, t), l, u),
+          s = a(e.ax, i[0].x),
+          d = a(e.ay, i[0].y),
+          h = a(e.bx, i[1].x),
+          _ = a(e.by, i[1].y),
+          y = a(e.cx, i[2].x),
+          b = a(e.cy, i[2].y),
+          x =
+            t === o.point
+              ? [{ x: s, y: d }]
+              : [
+                  { x: s, y: d },
+                  { x: h, y: _ },
+                  { x: y, y: b },
+                ],
+          T = S(x, n);
+        return {
+          objectMode: t,
+          reflectionLine: n,
+          activePointIndex: m(e.activePointIndex, x.length - 1, T),
+          ...r,
+          ax: s,
+          ay: d,
+          bx: h,
+          by: _,
+          cx: y,
+          cy: b,
+        };
+      }),
+      (D = (e = {}) => {
+        let t = w(e.objectMode, Object.values(o), C.objectMode),
+          n = g(e),
+          [r, i, a] = v(n),
+          s = [e.ax, e.ay, e.bx, e.by, e.cx, e.cy].every(
+            (e) => typeof e == `number` && Number.isFinite(e),
+          );
+        return E(
+          t === o.triangle && !s
+            ? { ...e, objectMode: t, ...n, ax: r.x, ay: r.y, bx: i.x, by: i.y, cx: a.x, cy: a.y }
+            : { ...e, objectMode: t, ...n },
+        );
+      }),
+      (O = (e, t) => {
+        switch (t) {
+          case s.xAxis:
+            return { x: e.x, y: -e.y };
+          case s.yAxis:
+            return { x: -e.x, y: e.y };
+          case s.yEqualsNegativeX:
+            return { x: -e.y, y: -e.x };
+          case s.yEqualsX:
+          default:
+            return { x: e.y, y: e.x };
+        }
+      }),
+      (k = (e, t) => ({ x: (e.x + t.x) / 2, y: (e.y + t.y) / 2 })),
+      (A = (e, t) => _(e, t)),
+      (j = (e, t, n = 1e-9) => A(e, t) <= n),
+      (M = (e) => {
+        switch (e) {
+          case s.yAxis:
+            return { x: 0, y: 1 };
+          case s.yEqualsX:
+            return { x: Math.SQRT1_2, y: Math.SQRT1_2 };
+          case s.yEqualsNegativeX:
+            return { x: Math.SQRT1_2, y: -Math.SQRT1_2 };
+          case s.xAxis:
+          default:
+            return { x: 1, y: 0 };
+        }
+      }));
+  }))();
+}
+export {
+  S as a,
+  N as c,
+  E as d,
+  T as f,
+  k as i,
+  j as l,
+  i as m,
+  s as n,
+  A as o,
+  a as p,
+  D as r,
+  M as s,
+  o as t,
+  O as u,
+};

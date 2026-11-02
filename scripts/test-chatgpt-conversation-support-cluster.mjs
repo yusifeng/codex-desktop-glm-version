@@ -56,36 +56,7 @@ const screenAssertions = assertReleaseOwner("conversation-screen", [
   /export \{ J as n, be as r, X as t \}/,
 ]);
 
-// conversation-summary: 18
-const summary = await bundle("conversation-summary");
-assert.deepEqual(Object.keys(summary).sort(), ["a", "i", "n", "o", "r", "t"]);
-const base = { display_schedule: null, is_enabled: true, last_run_time: null, next_run_times: [], schedule_components: { frequency: "once" }, timing_mode: "scheduled" };
-const oldTask = { ...base, id: "one", updated_at: "2026-09-20T00:00:00Z" };
-const newTask = { ...oldTask, updated_at: "2026-09-21T00:00:00Z" };
-const merged = summary.r([oldTask], [newTask, { ...base, id: "two", updated_at: "2026-09-22T00:00:00Z" }]);
-assert.equal(merged.length, 2);
-assert.equal(merged[0].automation.updated_at, "2026-09-21T00:00:00Z");
-assert.deepEqual(merged.map((item) => item.automation.id), ["one", "two"]);
-assert.equal(summary.i(oldTask), "completed");
-assert.equal(summary.i({ ...oldTask, next_run_times: ["2026-09-28T00:00:00Z"] }), "active");
-assert.equal(summary.i({ ...oldTask, is_enabled: false, next_run_times: ["2026-09-28T00:00:00Z"] }), "paused");
-assert.equal(summary.i({ ...oldTask, timing_mode: "condition_watch" }), "active");
-const active = { automation: { ...oldTask, id: "active", next_run_times: ["2026-09-28T00:00:00Z"] } };
-const paused = { automation: { ...oldTask, id: "paused", is_enabled: false, next_run_times: ["2026-09-28T00:00:00Z"], updated_at: "2026-09-27T10:00:00Z" } };
-const completed = { automation: { ...oldTask, id: "done", updated_at: "2026-09-27T09:00:00Z" } };
-const groups = summary.a([active, paused, completed], Date.parse("2026-09-27T12:00:00Z"));
-assert.deepEqual(groups.active.map((item) => item.automation.id), ["active"]);
-assert.deepEqual(groups.paused.map((item) => item.automation.id), ["paused"]);
-assert.deepEqual(groups.completed.map((item) => item.automation.id), ["done"]);
-assert.deepEqual(groups.recent.map((item) => item.automation.id), ["paused", "done"]);
-assert.equal(groups.paused[0].automation.updated_at, "2026-09-27T10:00:00Z");
-const line = summary.t({ item: active, now: new Date("2026-09-27T23:30:00Z") });
-assert.match(line.props.children, /Scheduled/);
-assert.match(summary.t({ item: active, runPhase: "starting" }).props.children, /Starting run/);
-assert.match(summary.t({ item: paused }).props.children, /Paused/);
-assert.equal(summary.t({ item: completed }).props["data-automation-status"], "completed");
-summary.n(); summary.o(); assert.equal(typeof summary.r, "function");
-assert.equal(typeof summary.t, "function");
+assertReleaseOwner("conversation-summary");
 
 // archived-conversation-preview-footer: 10
 const footer = await bundle("archived-conversation-preview-footer");

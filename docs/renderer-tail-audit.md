@@ -1,5 +1,32 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Largest-gap release-owner convergence：按当前正向行数缺口排序，一次性恢复
+`usage`、`file-diff-alt`、`workspace-agent-detail-page`、
+`thumbnail-worker-font-metrics`、`registered-pull-request-thumbnail`、
+`home-composer-announcement-candidates`、`payment-method-display`、
+`connector-post-connect-dialog`、`learning-model-organic-functional-groups`、
+`registered-review-thumbnail`、`profile-settings`、`browser-mfa-enroll-page`、
+`hotkey-window-thread-page`、`learning-model-lewis-structure-builder`、
+`sort-bar-visualization`、`learning-model-quadratic-inequalities`、
+`conversation-summary`、`pca-connector-action`、`learning-model-trapezoidal-rule`、
+`project-folder-consent-dialog`、`feedback-submission-dialog`、
+`codex-micro-slot-signals`、`diff-source`、`plugin-skill-preview`、
+`learning-model-joint-marginal-conditional-table`、`asb-conversation-page`、
+`learning-model-reflection-transformation-coordinate-plane`、
+`home-artifact-template-card`、`learning-model-food-chain` 与 `add-source-menu`
+三十个发布 owner，净恢复 6,510 行发布 TypeScript。旧缩减 ABI/mock 回归已迁移为
+发布一致性验证，同时保留同簇 checkout、Git review、route、composer、billing、
+extension、thumbnail、learning model、conversation、account、menu 与 Codex Micro
+相邻行为覆盖。27 组关联测试、12,448/12,448 transform check、1,888/1,888
+renderer build/verify、2,247/2,247 app-code coverage、0 semantic tail、typecheck 与
+1,912-script test-index 通过。严格 hub 消费推进到 app-shared 1,795/3,185、
+app-initial 5,820/8,204、app-primary 767/917，仍为 0 unreviewed、0 invalid
+consumers。按发布源码正向行数缺口口径，剩余由 38,737 行降至 32,227 行，
+覆盖率约 96.89%；可比对 owner 中已有 443 个与发布证据一致，仍有 1,419 个
+不完全一致，另有 454 个缺少双方可比资产。425 个 preserved 边界、三个聚合 hub
+的剩余耦合导出与最终真实 Electron E2E 尚未完成，因此本批仍不构成
+“完整反编译完成”。
+
 2026-11-02 Browser/voice/environment release-owner convergence：一次性恢复
 `mark-session-create`、`debug-modal`、`parental-control-notifications-runtime`、
 `browser-mfa-disable-page`、`remote-connection-editor-modal`、

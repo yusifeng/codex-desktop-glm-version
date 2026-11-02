@@ -25,24 +25,7 @@ function find(node, predicate) { let result; walk(node, value => { if (result ==
 function all(node, predicate) { const result = []; walk(node, value => { if (predicate(value)) result.push(value); }); return result; }
 function text(node) { const values = []; const collect = value => { if (typeof value === "string") values.push(value); else if (value != null && typeof value === "object") { const children = value.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(collect); else collect(children); } }; collect(node); return values.join(" "); }
 
-// usage: 10
-const usage = await bundle("usage");
-assert.deepEqual(Object.keys(usage), ["n", "t"]);
-assert.equal(usage.n({ canShowUsageBanners: false }), null);
-assert.equal(usage.n({ canShowUsageBanners: true, showUpsell: true, rateLimit: {} }).type, "RateLimitBanner");
-assert.equal(usage.n({ canShowUsageBanners: true, showWorkspaceUsageLimit: true, rateLimit: {} }).props.showWorkspaceUsageLimit, true);
-assert.equal(usage.n({ canShowUsageBanners: true, imageGenerationLimit: { resetAt: 1 } }).type, "RateLimitBanner");
-assert.equal(usage.n({ canShowUsageBanners: true, showModelLimit: true, modelName: "GPT-6" }).type, "ModelLimitBanner");
-const warning = usage.n({ canShowUsageBanners: true, rateLimit: { account_id: "account-1", spend_control: { individual_limit: { limit: 100, reset_at: 0 } } }, rateLimitWarningThreshold: 90 });
-assert.equal(warning.type, "RateLimitBanner");
-warning.props.onDismissWarning();
-assert.deepEqual(usageState.warningDismissals, [{ warningKey: "account-1:100:1970-01-01", threshold: 90 }]);
-usageState.signal.set("presentation-context", "home");
-usageState.family.set('dismissed-banner:"dismiss:[\\"local\\",\\"home\\"]"', false);
-const backend = usage.n({ canShowUsageBanners: true, showBackendRateLimitUpsell: true, selectedModel: "gpt", rateLimit: { rate_limit_upsell: { banner_type: "credits", model_slug: "gpt" } } });
-assert.equal(backend.type, "div");
-assert.equal(backend.props.children.type, "UsageBannerPresentation");
-assert.equal(usage.t(), undefined);
+assertReleaseOwner("usage");
 
 // pricing plan: release-faithful owner
 assertReleaseOwner("pricing-plan-comparison", [/^\/\/ @ts-nocheck/m, /export \{/]);

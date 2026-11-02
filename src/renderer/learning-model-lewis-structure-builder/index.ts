@@ -1,5 +1,223 @@
-// Lewis-structure builder model. Release chunk: model-2bfb73b82959.js.
-import "@rchunk/rolldown-runtime";
-type Molecule="water"|"ammonia"|"carbon dioxide"|"hydrogen cyanide"|"formate ion"|"nitrite ion"; type Pair=readonly[number,number]; interface Atom{element:"H"|"C"|"N"|"O";x:number;y:number;slots:readonly Pair[]} interface Definition{name:Molecule;formula:string;charge:number;valence:number;resonance:boolean;atoms:readonly Atom[];bonds:readonly Pair[];finalOrders:readonly number[]}
-const up=[0,-1] as const,down=[0,1] as const,left=[-1,0] as const,right=[1,0] as const; const definitions:Record<Molecule,Definition>={water:{name:"water",formula:"H₂O",charge:0,valence:8,resonance:false,atoms:[{element:"H",x:76,y:84,slots:[]},{element:"O",x:160,y:84,slots:[up,down]},{element:"H",x:244,y:84,slots:[]}],bonds:[[0,1],[1,2]],finalOrders:[1,1]},ammonia:{name:"ammonia",formula:"NH₃",charge:0,valence:8,resonance:false,atoms:[{element:"N",x:160,y:70,slots:[up]},{element:"H",x:78,y:70,slots:[]},{element:"H",x:242,y:70,slots:[]},{element:"H",x:160,y:138,slots:[]}],bonds:[[0,1],[0,2],[0,3]],finalOrders:[1,1,1]},"carbon dioxide":{name:"carbon dioxide",formula:"CO₂",charge:0,valence:16,resonance:false,atoms:[{element:"O",x:70,y:84,slots:[left,up,down]},{element:"C",x:160,y:84,slots:[]},{element:"O",x:250,y:84,slots:[right,up,down]}],bonds:[[0,1],[1,2]],finalOrders:[2,2]},"hydrogen cyanide":{name:"hydrogen cyanide",formula:"HCN",charge:0,valence:10,resonance:false,atoms:[{element:"H",x:70,y:84,slots:[]},{element:"C",x:160,y:84,slots:[]},{element:"N",x:250,y:84,slots:[right,up,down]}],bonds:[[0,1],[1,2]],finalOrders:[1,3]},"formate ion":{name:"formate ion",formula:"CHO₂⁻",charge:-1,valence:18,resonance:true,atoms:[{element:"O",x:72,y:76,slots:[left,up,down]},{element:"C",x:160,y:76,slots:[]},{element:"O",x:248,y:76,slots:[right,up,down]},{element:"H",x:160,y:142,slots:[]}],bonds:[[0,1],[1,2],[1,3]],finalOrders:[2,1,1]},"nitrite ion":{name:"nitrite ion",formula:"NO₂⁻",charge:-1,valence:18,resonance:true,atoms:[{element:"O",x:72,y:94,slots:[left,up,down]},{element:"N",x:160,y:94,slots:[up]},{element:"O",x:248,y:94,slots:[right,up,down]}],bonds:[[0,1],[1,2]],finalOrders:[2,1]}}; const moleculeParameter={kind:"enum",defaultValue:"carbon dioxide",allowedValues:Object.keys(definitions)}; const specification={type:"LEWIS_STRUCTURE_BUILDER",version:2,thumbnailAssetKey:"lewis-structure-builder-v1",parameters:{molecule:moleculeParameter}}; const molecules=Object.keys(definitions) as Molecule[]; const normalize=(input:{molecule?:string;stage?:number})=>({molecule:molecules.includes(input.molecule as Molecule)?input.molecule as Molecule:"carbon dioxide" as Molecule,stage:typeof input.stage==="number"&&Number.isFinite(input.stage)?Math.min(4,Math.max(0,Math.round(input.stage))):4}); const valence={H:1,C:4,N:5,O:6}; const calculate=(input:{molecule?:string;stage?:number},alternateResonance=false)=>{const safe=normalize(input),definition=definitions[safe.molecule],orders=safe.stage===0?definition.bonds.map(()=>0):safe.stage<4?definition.bonds.map(()=>1):alternateResonance&&definition.resonance?definition.finalOrders.map((order,index)=>index===0?1:index===1?2:order):[...definition.finalOrders],bondElectrons=orders.reduce((sum,order)=>sum+order*2,0),bondOrders=definition.atoms.map((_atom,index)=>definition.bonds.reduce((sum,[a,b],bondIndex)=>sum+(a===index||b===index?orders[bondIndex]:0),0)),centralAtomIndex=definition.atoms.reduce((best,atom,index)=>atom.element==="H"?best:best<0||definition.bonds.filter(([a,b])=>a===index||b===index).length>definition.bonds.filter(([a,b])=>a===best||b===best).length?index:best,-1),lonePairs=definition.atoms.map((atom,index)=>{if(safe.stage<2||atom.element==="H"||index===centralAtomIndex&&safe.stage<3)return 0;const capacity=Math.max(0,4-bondOrders[index]);if(index!==centralAtomIndex)return capacity;const used=bondElectrons+definition.atoms.reduce((sum,other,otherIndex)=>otherIndex===index||other.element==="H"?sum:sum+Math.max(0,4-bondOrders[otherIndex])*2,0);return Math.max(0,Math.min(capacity,Math.floor((definition.valence-used)/2)));}),lonePairElectrons=lonePairs.reduce((sum,count)=>sum+count*2,0),assigned=bondElectrons+lonePairElectrons,centralElectrons=centralAtomIndex<0?0:bondOrders[centralAtomIndex]*2+lonePairs[centralAtomIndex]*2,formalCharges=definition.atoms.map((atom,index)=>valence[atom.element]-lonePairs[index]*2-bondOrders[index]);return{atomicValenceElectrons:definition.atoms.reduce((sum,atom)=>sum+valence[atom.element],0),assigned,bondElectrons,centralAtomIndex,centralElectrons,centralShortfall:centralAtomIndex<0?0:Math.max(0,8-centralElectrons),chargeAdjustment:-definition.charge,definition,formalCharges,lonePairElectrons,lonePairs,orders,remaining:definition.valence-assigned,stage:safe.stage};}; function initializeSpecification():void{} function initializeModel():void{}
-export{initializeSpecification as a,normalize as i,calculate as n,specification as o,initializeModel as r,molecules as t};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `LEWIS_STRUCTURE_BUILDER`),
+      (n = `lewis-structure-builder-v1`),
+      (r = {
+        molecule: {
+          kind: `enum`,
+          defaultValue: `carbon dioxide`,
+          allowedValues: [
+            `water`,
+            `ammonia`,
+            `carbon dioxide`,
+            `hydrogen cyanide`,
+            `formate ion`,
+            `nitrite ion`,
+          ],
+        },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h;
+function g() {
+  return (g = e(() => {
+    (a(),
+      (o = (e) =>
+        e === `water` ||
+        e === `ammonia` ||
+        e === `carbon dioxide` ||
+        e === `hydrogen cyanide` ||
+        e === `formate ion` ||
+        e === `nitrite ion`),
+      (s = i.parameters.molecule.allowedValues.filter(o)),
+      (c = [0, -1]),
+      (l = [0, 1]),
+      (u = [-1, 0]),
+      (d = [1, 0]),
+      (f = {
+        water: {
+          name: `water`,
+          formula: `H₂O`,
+          charge: 0,
+          valence: 8,
+          resonance: !1,
+          atoms: [
+            { element: `H`, x: 76, y: 84, slots: [] },
+            { element: `O`, x: 160, y: 84, slots: [c, l] },
+            { element: `H`, x: 244, y: 84, slots: [] },
+          ],
+          bonds: [
+            [0, 1],
+            [1, 2],
+          ],
+          finalOrders: [1, 1],
+        },
+        ammonia: {
+          name: `ammonia`,
+          formula: `NH₃`,
+          charge: 0,
+          valence: 8,
+          resonance: !1,
+          atoms: [
+            { element: `N`, x: 160, y: 70, slots: [c] },
+            { element: `H`, x: 78, y: 70, slots: [] },
+            { element: `H`, x: 242, y: 70, slots: [] },
+            { element: `H`, x: 160, y: 138, slots: [] },
+          ],
+          bonds: [
+            [0, 1],
+            [0, 2],
+            [0, 3],
+          ],
+          finalOrders: [1, 1, 1],
+        },
+        "carbon dioxide": {
+          name: `carbon dioxide`,
+          formula: `CO₂`,
+          charge: 0,
+          valence: 16,
+          resonance: !1,
+          atoms: [
+            { element: `O`, x: 70, y: 84, slots: [u, c, l] },
+            { element: `C`, x: 160, y: 84, slots: [] },
+            { element: `O`, x: 250, y: 84, slots: [d, c, l] },
+          ],
+          bonds: [
+            [0, 1],
+            [1, 2],
+          ],
+          finalOrders: [2, 2],
+        },
+        "hydrogen cyanide": {
+          name: `hydrogen cyanide`,
+          formula: `HCN`,
+          charge: 0,
+          valence: 10,
+          resonance: !1,
+          atoms: [
+            { element: `H`, x: 70, y: 84, slots: [] },
+            { element: `C`, x: 160, y: 84, slots: [] },
+            { element: `N`, x: 250, y: 84, slots: [d, c, l] },
+          ],
+          bonds: [
+            [0, 1],
+            [1, 2],
+          ],
+          finalOrders: [1, 3],
+        },
+        "formate ion": {
+          name: `formate ion`,
+          formula: `CHO₂⁻`,
+          charge: -1,
+          valence: 18,
+          resonance: !0,
+          atoms: [
+            { element: `O`, x: 72, y: 76, slots: [u, c, l] },
+            { element: `C`, x: 160, y: 76, slots: [] },
+            { element: `O`, x: 248, y: 76, slots: [d, c, l] },
+            { element: `H`, x: 160, y: 142, slots: [] },
+          ],
+          bonds: [
+            [0, 1],
+            [1, 2],
+            [1, 3],
+          ],
+          finalOrders: [2, 1, 1],
+        },
+        "nitrite ion": {
+          name: `nitrite ion`,
+          formula: `NO₂⁻`,
+          charge: -1,
+          valence: 18,
+          resonance: !0,
+          atoms: [
+            { element: `O`, x: 72, y: 94, slots: [u, c, l] },
+            { element: `N`, x: 160, y: 94, slots: [c] },
+            { element: `O`, x: 248, y: 94, slots: [d, c, l] },
+          ],
+          bonds: [
+            [0, 1],
+            [1, 2],
+          ],
+          finalOrders: [2, 1],
+        },
+      }),
+      (p = { H: 1, C: 4, N: 5, O: 6 }),
+      (m = (e) => {
+        let t = i.parameters.molecule.defaultValue,
+          n = o(e.molecule) ? e.molecule : o(t) ? t : `carbon dioxide`,
+          r = e.stage;
+        return {
+          molecule: n,
+          stage:
+            typeof r == `number` && Number.isFinite(r)
+              ? Math.min(4, Math.max(0, Math.round(r)))
+              : 4,
+        };
+      }),
+      (h = (e, t = !1) => {
+        let n = m(e),
+          r = f[n.molecule],
+          i =
+            n.stage === 0
+              ? r.bonds.map(() => 0)
+              : n.stage < 4
+                ? r.bonds.map(() => 1)
+                : t && r.resonance
+                  ? r.finalOrders.map((e, t) => (t === 0 ? 1 : t === 1 ? 2 : e))
+                  : [...r.finalOrders],
+          a = i.reduce((e, t) => e + t * 2, 0),
+          o = r.atoms.map((e, t) =>
+            r.bonds.reduce((e, [n, r], a) => e + (n === t || r === t ? i[a] : 0), 0),
+          ),
+          s = r.atoms.reduce(
+            (e, t, n) =>
+              t.element === `H`
+                ? e
+                : e < 0 ||
+                    r.bonds.filter(([e, t]) => e === n || t === n).length >
+                      r.bonds.filter(([t, n]) => t === e || n === e).length
+                  ? n
+                  : e,
+            -1,
+          ),
+          c = r.atoms.map((e, t) => {
+            if (n.stage < 2 || e.element === `H` || (t === s && n.stage < 3)) return 0;
+            let i = Math.max(0, 4 - o[t]);
+            if (t !== s) return i;
+            let c =
+              a +
+              r.atoms.reduce(
+                (e, n, r) => (r === t || n.element === `H` ? e : e + Math.max(0, 4 - o[r]) * 2),
+                0,
+              );
+            return Math.max(0, Math.min(i, Math.floor((r.valence - c) / 2)));
+          }),
+          l = c.reduce((e, t) => e + t * 2, 0),
+          u = a + l,
+          d = s < 0 ? 0 : o[s] * 2 + c[s] * 2,
+          h = r.atoms.map((e, t) => p[e.element] - c[t] * 2 - o[t]);
+        return {
+          atomicValenceElectrons: r.atoms.reduce((e, t) => e + p[t.element], 0),
+          assigned: u,
+          bondElectrons: a,
+          centralAtomIndex: s,
+          centralElectrons: d,
+          centralShortfall: s < 0 ? 0 : Math.max(0, 8 - d),
+          chargeAdjustment: -r.charge,
+          definition: r,
+          formalCharges: h,
+          lonePairElectrons: l,
+          lonePairs: c,
+          orders: i,
+          remaining: r.valence - u,
+          stage: n.stage,
+        };
+      }));
+  }))();
+}
+export { a, m as i, h as n, i as o, g as r, s as t };

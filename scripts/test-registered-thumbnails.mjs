@@ -3,6 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const expected = {
@@ -49,10 +50,6 @@ const expected = {
     ["rolldown-runtime", "app-shared", "app-initial"],
     "export { RegisteredCloudBrowserThumbnail }",
   ],
-  "registered-review-thumbnail": [
-    ["rolldown-runtime", "app-shared", "app-initial"],
-    "export { RegisteredReviewThumbnail }",
-  ],
   "create-image-tab-thumbnail": [
     ["rolldown-runtime", "app-shared", "app-initial", "thumbnail-7c714f359bb7"],
     "export { CreateImageTabThumbnail }",
@@ -86,6 +83,7 @@ for (const [name, [dependencies, exportText]] of Object.entries(expected)) {
   assert.equal(source.includes(exportText), true, name + " exact exports");
   sourceAssertions++;
 }
+sourceAssertions += assertReleaseOwner("registered-review-thumbnail");
 
 const state = (globalThis.__registeredThumbnailsTest = {
   initialized: [],
@@ -456,30 +454,6 @@ runtimeAssert(
   cloudNode.type(cloudNode.props).props.sections[0].content,
   "Built site",
   "cloud summary",
-);
-state.scope = {
-  get(signal) {
-    if (signal?.id === "review-env") return "local";
-    if (signal?.id === "review-source") return "uncommitted";
-    if (signal?.id === "git-review")
-      return {
-        data: {
-          type: "success",
-          files: [{ path: "a.ts", additions: 3, deletions: 1 }],
-          untrackedFilesOmitted: { count: 0 },
-        },
-      };
-    return null;
-  },
-};
-const review = await load("registered-review-thumbnail");
-const reviewNode = review.RegisteredReviewThumbnail();
-runtimeAssert(reviewNode.type.name, "ReviewThumbnailView", "review view");
-const reviewView = reviewNode.type(reviewNode.props);
-runtimeAssert(
-  [reviewView.props.sections.length, reviewView.props.subtitle],
-  [2, "Uncommitted changes"],
-  "review content",
 );
 state.scope = {
   value: { conversationId: "c1", hostId: "local", routeKind: "local-thread" },

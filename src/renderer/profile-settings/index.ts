@@ -1,256 +1,476 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as cmeStateChunk from "@rchunk/cme-state";
-
-const {
-  $3: initializeRuntimeLazy,
-  BX: useSignalFamilyValue,
-  HX: useSignalValue,
-  I3: getJsxRuntime,
-  LX: useScope,
-  ZI: AppScope,
-  e6: getReactRuntime,
-  iL: useMutation,
-  n4: useIntl,
-  pk: toastManagerSignal,
-} = appSharedChunk;
-const { Xl: initializeSettingsPage, su: initializeSettingsRuntime } = appInitialChunk;
-
-interface CmeIdentity {
-  accountId: string;
-  userId: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Ad as n,
+  BX as r,
+  FX as i,
+  G2 as a,
+  HX as o,
+  I3 as s,
+  K2 as c,
+  LX as l,
+  QI as u,
+  Qc as d,
+  Y2 as f,
+  Yh as p,
+  ZI as m,
+  Zc as h,
+  Zh as g,
+  al as _,
+  e6 as v,
+  iL as ee,
+  jd as y,
+  lk as b,
+  n4 as te,
+  pk as x,
+  rL as S,
+  rl as C,
+} from "@rchunk/app-shared";
+import {
+  Jat as w,
+  Xat as T,
+  Xl as E,
+  Yl as D,
+  aa as O,
+  au as k,
+  oa as A,
+  su as j,
+} from "@rchunk/app-initial";
+import { i as M, l as N, o as P, t as F } from "@rchunk/cme-state";
+function I() {
+  let e = (0, B.c)(1),
+    t;
+  return (
+    e[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, H.jsx)(k, {
+          title: (0, H.jsx)(D, { slug: `account` }),
+          children: (0, H.jsx)(L, {}),
+        })),
+        (e[0] = t))
+      : (t = e[0]),
+    t
+  );
 }
-
-interface CmeProfile {
-  degree?: string | null;
-  is_npi_editable?: boolean;
-  medical_license_number?: string | null;
-  medical_license_state?: string | null;
-  npi?: string | null;
-  physician_eligible_for_cme?: boolean | null;
+function L() {
+  let e = (0, B.c)(2),
+    t = o(M),
+    n;
+  return (
+    e[0] === t
+      ? (n = e[1])
+      : ((n = t == null ? null : (0, H.jsx)(R, { identity: t }, `${t.accountId}:${t.userId}`)),
+        (e[0] = t),
+        (e[1] = n)),
+    n
+  );
 }
-
-interface CmeProfileForm {
-  degree: string;
-  medical_license_number: string;
-  medical_license_state: string;
-  npi: string;
-  physician_eligible_for_cme: boolean;
-}
-
-type ProfileField = Exclude<keyof CmeProfileForm, "physician_eligible_for_cme">;
-type ValidationErrors = Record<keyof CmeProfileForm, boolean>;
-
-interface ProfileQueryResult {
-  data?: CmeProfile;
-  isError: boolean;
-  isPending: boolean;
-  refetch(): Promise<unknown> | unknown;
-}
-
-const cmeRuntime = cmeStateChunk as unknown as {
-  i: import("@rchunk/app-shared").ReadableSignal<CmeIdentity | null>;
-  l: (scope: unknown, identity: CmeIdentity, profile: CmeProfileForm) => Promise<unknown>;
-  o: () => void;
-  t: import("@rchunk/app-shared").SignalFamily<CmeIdentity, ProfileQueryResult>;
-};
-const {
-  i: identitySignal,
-  l: saveCmeProfile,
-  o: initializeCmeState,
-  t: cmeProfileQuery,
-} = cmeRuntime;
-
-const PROFILE_FIELDS: readonly {
-  error: string;
-  field: ProfileField;
-  label: string;
-  maxLength?: number;
-  placeholder: string;
-}[] = [
-  { field: "npi", label: "National Provider Identifier (NPI)", placeholder: "Enter your 10-digit NPI", error: "NPI must be 10 digits", maxLength: 20 },
-  { field: "degree", label: "Degree", placeholder: "Enter your degree (e.g. MD)", error: "Degree is required" },
-  { field: "medical_license_state", label: "Medical license state", placeholder: "Enter a 2-letter state (e.g. DE)", error: "Medical license state must be 2 letters", maxLength: 2 },
-  { field: "medical_license_number", label: "Medical license number", placeholder: "Enter your medical license number", error: "Medical license number is required" },
-] as const;
-
-let React: import("@rchunk/app-shared").ReactRuntime;
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function normalizeProfile(profile: CmeProfileForm): CmeProfileForm {
-  return {
-    npi: profile.npi.replace(/\D/g, ""),
-    degree: profile.degree.trim(),
-    medical_license_state: profile.medical_license_state.trim().toUpperCase(),
-    medical_license_number: profile.medical_license_number.trim(),
-    physician_eligible_for_cme: profile.physician_eligible_for_cme,
-  };
-}
-
-function validationErrors(profile: CmeProfileForm): ValidationErrors {
-  return {
-    npi: profile.npi.length !== 10,
-    degree: profile.degree.length === 0,
-    medical_license_state: !/^[A-Z]{2}$/.test(profile.medical_license_state),
-    medical_license_number: profile.medical_license_number.length === 0,
-    physician_eligible_for_cme: !profile.physician_eligible_for_cme,
-  };
-}
-
-function sameProfile(left: CmeProfileForm, right: CmeProfileForm): boolean {
-  return PROFILE_FIELDS.every(({ field }) => left[field] === right[field])
-    && left.physician_eligible_for_cme === right.physician_eligible_for_cme;
-}
-
-function initialProfile(profile?: CmeProfile): CmeProfileForm {
-  return {
-    npi: profile?.npi ?? "",
-    degree: profile?.degree ?? "",
-    medical_license_state: profile?.medical_license_state ?? "",
-    medical_license_number: profile?.medical_license_number ?? "",
-    physician_eligible_for_cme: profile?.physician_eligible_for_cme ?? false,
-  };
-}
-
-function FieldRow({ description, label, control }: { control: unknown; description?: string | null; label: string }): unknown {
-  return jsx.jsxs("label", {
-    className: "grid gap-2 border-b border-token-border-light px-4 py-3 last:border-b-0",
-    children: [
-      jsx.jsx("span", { className: "text-sm font-medium", children: label }),
-      control,
-      description == null ? null : jsx.jsx("span", { className: "text-sm text-danger", role: "alert", children: description }),
-    ],
-  });
-}
-
-function CmeProfileFormView({ identity }: { identity: CmeIdentity }): unknown {
-  const scope = useScope(AppScope);
-  const intl = useIntl();
-  const query = useSignalFamilyValue(cmeProfileQuery, identity) as ProfileQueryResult;
-  const serverProfile = initialProfile(query.data);
-  const [draft, setDraft] = React.useState<CmeProfileForm | null>(null);
-  const visibleProfile = draft ?? serverProfile;
-  const normalized = normalizeProfile(visibleProfile);
-  const errors = validationErrors(normalized);
-  const edited = draft != null;
-
-  const mutation = useMutation<unknown, Error, void>({
-    mutationFn: () => saveCmeProfile(scope, identity, normalized),
-    onSuccess: () => {
-      setDraft(null);
-      scope.get(toastManagerSignal).success(String(intl.formatMessage({ id: "cme.profile.saved", defaultMessage: "Medical credentials saved" })));
+function R(e) {
+  let t = (0, B.c)(47),
+    { identity: i } = e,
+    a = l(m),
+    o = te(),
+    { data: s, isPending: c, isError: u, refetch: d } = r(F, i),
+    g = {
+      npi: s?.npi ?? ``,
+      degree: s?.degree ?? ``,
+      medical_license_state: s?.medical_license_state ?? ``,
+      medical_license_number: s?.medical_license_number ?? ``,
+      physician_eligible_for_cme: s?.physician_eligible_for_cme ?? !1,
     },
-    onError: () => {
-      const currentIdentity = scope.get(identitySignal) as CmeIdentity | null;
-      if (currentIdentity?.accountId !== identity.accountId || currentIdentity.userId !== identity.userId) return;
-      scope.get(toastManagerSignal).danger(
-        String(intl.formatMessage({ id: "cme.profile.saveFailed", defaultMessage: "Unable to save medical credentials. Please try again." })),
-        { errorAnalytics: { toastId: "cme.profile.saveFailed" } },
-      );
+    [_, v] = (0, V.useState)(null),
+    y = _ ?? g,
+    b = {
+      npi: y.npi.replace(/\D/g, ``),
+      degree: y.degree.trim(),
+      medical_license_state: y.medical_license_state.trim().toUpperCase(),
+      medical_license_number: y.medical_license_number.trim(),
+      physician_eligible_for_cme: y.physician_eligible_for_cme,
     },
-  });
-
-  const canSave = query.data != null
-    && !Object.values(errors).some(Boolean)
-    && !sameProfile(normalized, serverProfile)
-    && !mutation.isPending;
-  const updateField = (field: ProfileField, value: string): void => setDraft({ ...visibleProfile, [field]: value });
-  const submit = (event: { preventDefault(): void }): void => {
-    event.preventDefault();
-    if (canSave) mutation.mutate();
-  };
-  const header = jsx.jsxs("header", {
-    className: "border-b border-token-border-light px-4 py-4",
-    children: [
-      jsx.jsx("h2", { className: "font-semibold", children: "Medical credentials" }),
-      jsx.jsx("p", { className: "mt-1 text-sm text-secondary", children: "Used for CME credits and other clinician features. Confirm physician eligibility to claim CME credits." }),
-    ],
-  });
-
-  if (query.isPending) {
-    return jsx.jsxs("section", { className: "rounded-xl border border-token-border-light", children: [header, jsx.jsx("div", { className: "px-4 py-4 text-sm text-secondary", role: "status", children: "Loading medical credentials…" })] });
-  }
-  if (query.isError && query.data == null) {
-    return jsx.jsxs("section", {
-      className: "rounded-xl border border-token-border-light",
-      children: [header, jsx.jsxs("div", {
-        className: "flex items-center justify-between gap-4 px-4 py-4",
-        role: "alert",
-        children: [jsx.jsx("span", { children: "Unable to load medical credentials" }), jsx.jsx("button", { type: "button", onClick: () => void query.refetch(), children: "Try again" })],
-      })],
-    });
-  }
-  if (query.data == null) return null;
-
-  return jsx.jsx("form", {
-    onSubmit: submit,
-    children: jsx.jsxs("section", {
-      className: "rounded-xl border border-token-border-light",
-      children: [
-        header,
-        jsx.jsxs("div", {
-          children: [
-            ...PROFILE_FIELDS.map(({ error, field, label, maxLength, placeholder }) => jsx.jsx(FieldRow, {
-              label,
-              description: edited && errors[field] ? error : null,
-              control: jsx.jsx("input", {
-                "aria-invalid": edited && errors[field],
-                disabled: mutation.isPending || (field === "npi" && query.data?.is_npi_editable === false),
-                inputMode: field === "npi" ? "numeric" : undefined,
-                maxLength,
-                placeholder,
-                value: visibleProfile[field],
-                onChange: (event: { currentTarget: { value: string } }) => updateField(field, event.currentTarget.value),
+    S = b.npi.length !== 10,
+    T = b.degree.length === 0,
+    E;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`) ? ((E = /^[A-Z]{2}$/), (t[0] = E)) : (E = t[0]);
+  let D = !E.test(b.medical_license_state),
+    k = b.medical_license_number.length === 0,
+    A = !b.physician_eligible_for_cme,
+    j;
+  t[1] !== S || t[2] !== T || t[3] !== D || t[4] !== k || t[5] !== A
+    ? ((j = {
+        npi: S,
+        degree: T,
+        medical_license_state: D,
+        medical_license_number: k,
+        physician_eligible_for_cme: A,
+      }),
+      (t[1] = S),
+      (t[2] = T),
+      (t[3] = D),
+      (t[4] = k),
+      (t[5] = A),
+      (t[6] = j))
+    : (j = t[6]);
+  let P = j,
+    I = () => N(a, i, b),
+    L;
+  t[7] !== o || t[8] !== a || t[9] !== v
+    ? ((L = () => {
+        (v(null),
+          a
+            .get(x)
+            .success(
+              o.formatMessage({
+                id: `cme.profile.saved`,
+                defaultMessage: `Medical credentials saved`,
+                description: `Toast confirming that the clinician's CME medical profile was saved`,
               }),
-            }, field)),
-            jsx.jsx(FieldRow, {
-              label: "I am a physician eligible for CME credits",
-              description: edited && errors.physician_eligible_for_cme ? "Physician eligibility confirmation is required" : null,
-              control: jsx.jsx("input", {
-                type: "checkbox",
-                checked: visibleProfile.physician_eligible_for_cme,
-                disabled: mutation.isPending,
-                onChange: (event: { currentTarget: { checked: boolean } }) => setDraft({ ...visibleProfile, physician_eligible_for_cme: event.currentTarget.checked }),
+            ));
+      }),
+      (t[7] = o),
+      (t[8] = a),
+      (t[9] = v),
+      (t[10] = L))
+    : (L = t[10]);
+  let R;
+  t[11] !== i || t[12] !== o || t[13] !== a
+    ? ((R = () => {
+        let e = a.get(M);
+        e?.accountId === i.accountId &&
+          e.userId === i.userId &&
+          a
+            .get(x)
+            .danger(
+              o.formatMessage({
+                id: `cme.profile.saveFailed`,
+                defaultMessage: `Unable to save medical credentials. Please try again.`,
+                description: `Toast shown when saving the clinician's CME medical profile fails`,
               }),
+              { errorAnalytics: { toastId: `cme.profile.saveFailed` } },
+            );
+      }),
+      (t[11] = i),
+      (t[12] = o),
+      (t[13] = a),
+      (t[14] = R))
+    : (R = t[14]);
+  let W;
+  t[15] !== R || t[16] !== I || t[17] !== L
+    ? ((W = { mutationFn: I, onSuccess: L, onError: R }),
+      (t[15] = R),
+      (t[16] = I),
+      (t[17] = L),
+      (t[18] = W))
+    : (W = t[18]);
+  let G = ee(W),
+    K =
+      s != null &&
+      !Object.values(P).some(z) &&
+      (b.npi !== g.npi ||
+        b.degree !== g.degree ||
+        b.medical_license_state !== g.medical_license_state ||
+        b.medical_license_number !== g.medical_license_number ||
+        b.physician_eligible_for_cme !== g.physician_eligible_for_cme) &&
+      !G.isPending,
+    q;
+  t[19] !== K || t[20] !== G
+    ? ((q = (e) => {
+        (e.preventDefault(), K && G.mutate());
+      }),
+      (t[19] = K),
+      (t[20] = G),
+      (t[21] = q))
+    : (q = t[21]);
+  let J;
+  t[22] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((J = (0, H.jsx)(O.Header, {
+        title: (0, H.jsx)(f, {
+          id: `cme.profile.title`,
+          defaultMessage: `Medical credentials`,
+          description: `Heading for the CME medical credentials form in Account settings`,
+        }),
+        subtitle: (0, H.jsx)(f, {
+          id: `cme.profile.description`,
+          defaultMessage: `Used for CME credits and other clinician features. Confirm physician eligibility to claim CME credits.`,
+          description: `Explains why medical credentials and physician eligibility are collected in Account settings`,
+        }),
+      })),
+      (t[22] = J))
+    : (J = t[22]);
+  let Y;
+  t[23] === c
+    ? (Y = t[24])
+    : ((Y = c
+        ? (0, H.jsx)(O.Footer, {
+            children: (0, H.jsx)(f, {
+              id: `cme.profile.loading`,
+              defaultMessage: `Loading medical credentials…`,
+              description: `Loading state while fetching a clinician's CME medical profile`,
             }),
-          ],
-        }),
-        jsx.jsx("footer", {
-          className: "flex justify-end border-t border-token-border-light px-4 py-3",
-          children: jsx.jsx("button", { type: "submit", disabled: !canSave, "aria-busy": mutation.isPending, children: mutation.isPending ? "Saving…" : "Save" }),
-        }),
-      ],
-    }),
-  });
+          })
+        : null),
+      (t[23] = c),
+      (t[24] = Y));
+  let X;
+  t[25] !== s || t[26] !== u || t[27] !== c || t[28] !== d
+    ? ((X =
+        !c && u && s == null
+          ? (0, H.jsx)(h, {
+              children: (0, H.jsx)(C, {
+                label: (0, H.jsx)(f, {
+                  id: `cme.profile.loadFailed`,
+                  defaultMessage: `Unable to load medical credentials`,
+                  description: `Error when the CME medical profile could not be loaded`,
+                }),
+                control: (0, H.jsx)(p, {
+                  color: `secondary`,
+                  size: `toolbar`,
+                  onClick: () => void d(),
+                  children: (0, H.jsx)(f, {
+                    id: `cme.profile.retry`,
+                    defaultMessage: `Try again`,
+                    description: `Button to retry loading the CME medical profile`,
+                  }),
+                }),
+              }),
+            })
+          : null),
+      (t[25] = s),
+      (t[26] = u),
+      (t[27] = c),
+      (t[28] = d),
+      (t[29] = X))
+    : (X = t[29]);
+  let Z;
+  t[30] !== s ||
+  t[31] !== K ||
+  t[32] !== _ ||
+  t[33] !== P ||
+  t[34] !== o ||
+  t[35] !== c ||
+  t[36] !== G ||
+  t[37] !== v ||
+  t[38] !== y
+    ? ((Z =
+        !c && s != null
+          ? (0, H.jsxs)(H.Fragment, {
+              children: [
+                (0, H.jsxs)(h, {
+                  children: [
+                    [
+                      {
+                        field: `npi`,
+                        label: U.npiLabel,
+                        placeholder: U.npiPlaceholder,
+                        error: U.npiError,
+                        maxLength: 20,
+                      },
+                      {
+                        field: `degree`,
+                        label: U.degreeLabel,
+                        placeholder: U.degreePlaceholder,
+                        error: U.degreeError,
+                      },
+                      {
+                        field: `medical_license_state`,
+                        label: U.stateLabel,
+                        placeholder: U.statePlaceholder,
+                        error: U.stateError,
+                        maxLength: 2,
+                      },
+                      {
+                        field: `medical_license_number`,
+                        label: U.numberLabel,
+                        placeholder: U.numberPlaceholder,
+                        error: U.numberError,
+                      },
+                    ].map((e) => {
+                      let { field: t, label: n, placeholder: r, error: i, ...a } = e;
+                      return (0, H.jsx)(
+                        C,
+                        {
+                          label: (0, H.jsx)(f, { ...n }),
+                          description: _ != null && P[t] ? (0, H.jsx)(f, { ...i }) : null,
+                          variant: `nested`,
+                          control: (e) =>
+                            (0, H.jsx)(w, {
+                              ...e,
+                              ...a,
+                              "aria-invalid": _ != null && P[t],
+                              disabled: G.isPending || (t === `npi` && s?.is_npi_editable === !1),
+                              inputMode: t === `npi` ? `numeric` : void 0,
+                              placeholder: o.formatMessage(r),
+                              value: y[t],
+                              onChange: (e) => v({ ...y, [t]: e.currentTarget.value }),
+                            }),
+                        },
+                        t,
+                      );
+                    }),
+                    (0, H.jsx)(C, {
+                      label: (0, H.jsx)(f, { ...U.eligibilityLabel }),
+                      description:
+                        _ != null && P.physician_eligible_for_cme
+                          ? (0, H.jsx)(f, { ...U.eligibilityError })
+                          : null,
+                      control: (e) =>
+                        (0, H.jsx)(`div`, {
+                          className: `relative`,
+                          children: (0, H.jsx)(n, {
+                            ...e,
+                            checked: y.physician_eligible_for_cme,
+                            disabled: G.isPending,
+                            onCheckedChange: (e) => v({ ...y, physician_eligible_for_cme: e }),
+                          }),
+                        }),
+                    }),
+                  ],
+                }),
+                (0, H.jsx)(O.Footer, {
+                  children: (0, H.jsx)(`div`, {
+                    className: `flex justify-end`,
+                    children: (0, H.jsx)(p, {
+                      color: `secondary`,
+                      size: `toolbar`,
+                      type: `submit`,
+                      disabled: !K,
+                      loading: G.isPending,
+                      children: (0, H.jsx)(f, {
+                        id: `cme.profile.save`,
+                        defaultMessage: `Save`,
+                        description: `Button to save the clinician's CME medical profile`,
+                      }),
+                    }),
+                  }),
+                }),
+              ],
+            })
+          : null),
+      (t[30] = s),
+      (t[31] = K),
+      (t[32] = _),
+      (t[33] = P),
+      (t[34] = o),
+      (t[35] = c),
+      (t[36] = G),
+      (t[37] = v),
+      (t[38] = y),
+      (t[39] = Z))
+    : (Z = t[39]);
+  let Q;
+  t[40] !== Y || t[41] !== X || t[42] !== Z
+    ? ((Q = (0, H.jsxs)(O, { children: [J, (0, H.jsxs)(O.Content, { children: [Y, X, Z] })] })),
+      (t[40] = Y),
+      (t[41] = X),
+      (t[42] = Z),
+      (t[43] = Q))
+    : (Q = t[43]);
+  let $;
+  return (
+    t[44] !== q || t[45] !== Q
+      ? (($ = (0, H.jsx)(`form`, { onSubmit: q, children: Q })),
+        (t[44] = q),
+        (t[45] = Q),
+        (t[46] = $))
+      : ($ = t[46]),
+    $
+  );
 }
-
-function CmeProfileSettings(): unknown {
-  const identity = useSignalValue(identitySignal);
-  return identity == null ? null : jsx.jsx(CmeProfileFormView, { identity }, identity.accountId + ":" + identity.userId);
+function z(e) {
+  return e;
 }
-
-function CmeAccountSettings(): unknown {
-  return jsx.jsxs("div", {
-    className: "flex h-full min-h-0 flex-col",
-    children: [
-      jsx.jsx("header", { className: "border-b border-token-border-light px-5 py-4", children: jsx.jsx("h1", { className: "text-lg font-semibold", children: "Account" }) }),
-      jsx.jsx("main", { className: "flex-1 overflow-auto p-5", children: jsx.jsx("div", { className: "mx-auto max-w-3xl", children: jsx.jsx(CmeProfileSettings, {}) }) }),
-    ],
-  });
+var B, V, H, U;
+function W() {
+  return (W = e(() => {
+    ((B = t()),
+      S(),
+      i(),
+      (V = v()),
+      c(),
+      g(),
+      y(),
+      T(),
+      b(),
+      u(),
+      j(),
+      A(),
+      _(),
+      E(),
+      d(),
+      P(),
+      (H = s()),
+      (U = a({
+        npiLabel: {
+          id: `cme.profile.npiLabel`,
+          defaultMessage: `National Provider Identifier (NPI)`,
+          description: `Label for the clinician's US National Provider Identifier in CME settings`,
+        },
+        npiPlaceholder: {
+          id: `cme.profile.npiPlaceholder`,
+          defaultMessage: `Enter your 10-digit NPI`,
+          description: `Placeholder for the National Provider Identifier in CME settings`,
+        },
+        npiError: {
+          id: `cme.profile.npiError`,
+          defaultMessage: `NPI must be 10 digits`,
+          description: `Validation error for the National Provider Identifier in CME settings`,
+        },
+        degreeLabel: {
+          id: `cme.profile.degreeLabel`,
+          defaultMessage: `Degree`,
+          description: `Label for the clinician's medical degree in CME settings`,
+        },
+        degreePlaceholder: {
+          id: `cme.profile.degreePlaceholder`,
+          defaultMessage: `Enter your degree (e.g. MD)`,
+          description: `Placeholder for the clinician's medical degree in CME settings`,
+        },
+        degreeError: {
+          id: `cme.profile.degreeError`,
+          defaultMessage: `Degree is required`,
+          description: `Validation error for a missing medical degree in CME settings`,
+        },
+        stateLabel: {
+          id: `cme.profile.stateLabel`,
+          defaultMessage: `Medical license state`,
+          description: `Label for the US state that issued the clinician's medical license`,
+        },
+        statePlaceholder: {
+          id: `cme.profile.statePlaceholder`,
+          defaultMessage: `Enter a 2-letter state (e.g. DE)`,
+          description: `Placeholder for the state abbreviation on the clinician's medical license`,
+        },
+        stateError: {
+          id: `cme.profile.stateError`,
+          defaultMessage: `Medical license state must be 2 letters`,
+          description: `Validation error for the state abbreviation on the clinician's medical license`,
+        },
+        numberLabel: {
+          id: `cme.profile.numberLabel`,
+          defaultMessage: `Medical license number`,
+          description: `Label for the clinician's medical license number in CME settings`,
+        },
+        numberPlaceholder: {
+          id: `cme.profile.numberPlaceholder`,
+          defaultMessage: `Enter your medical license number`,
+          description: `Placeholder for the clinician's medical license number in CME settings`,
+        },
+        numberError: {
+          id: `cme.profile.numberError`,
+          defaultMessage: `Medical license number is required`,
+          description: `Validation error for a missing medical license number in CME settings`,
+        },
+        eligibilityLabel: {
+          id: `cme.profile.eligibilityLabel`,
+          defaultMessage: `I am a physician eligible for CME credits`,
+          description: `Checkbox confirming the clinician is a physician eligible to claim continuing medical education credits`,
+        },
+        eligibilityError: {
+          id: `cme.profile.eligibilityError`,
+          defaultMessage: `Physician eligibility confirmation is required`,
+          description: `Validation error when the clinician has not confirmed physician eligibility for CME credits`,
+        },
+      })));
+  }))();
 }
-
-let initialized = false;
-function initializeProfileSettings(): void {
-  if (initialized) return;
-  initializeRuntimeLazy();
-  initializeSettingsPage();
-  initializeSettingsRuntime();
-  initializeCmeState();
-  React = getReactRuntime();
-  jsx = getJsxRuntime();
-  initialized = true;
-}
-
-initializeProfileSettings();
-export { CmeAccountSettings, CmeProfileSettings };
+W();
+export { I as CmeAccountSettings, L as CmeProfileSettings };

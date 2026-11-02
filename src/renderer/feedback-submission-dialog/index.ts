@@ -1,9 +1,216 @@
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/feedback-legal-notice";
-import "@rchunk/feedback-form-dialog";
-export type FeedbackClassification="bug"|"bad-result"|"good-result"|"safety_check"|"research-failure"|"high-ram-usage"|"other";
-export interface FeedbackSubmission { classification:FeedbackClassification;description:string;extraTags:undefined;includeBrowserTabs:boolean;includeLogs:boolean; }
-export interface FeedbackSubmissionDialogProps { additionalOptionsEnabled?:boolean;browserTabsAvailable?:boolean;chatGptConversationAvailable?:boolean;initialDetails?:string;initialExtraTags?:readonly string[];logsAvailable?:boolean;processMemoryDiagnosticsAvailable?:boolean;onClose():void;onSubmit(value:FeedbackSubmission):void; }
-let jsx:JsxRuntime;function ensureJsx():JsxRuntime{if(jsx==null)jsx=getJsxRuntime();return jsx;}
-function FeedbackSubmissionDialog(props:FeedbackSubmissionDialogProps):unknown{const runtime=ensureJsx(),options:FeedbackClassification[]=props.processMemoryDiagnosticsAvailable?["bug","bad-result","good-result","safety_check","research-failure","high-ram-usage","other"]:["bug","bad-result","good-result","safety_check","research-failure","other"];return runtime.jsx("dialog",{open:true,className:"feedback-submission-dialog",children:runtime.jsxs("form",{onSubmit:(event:{preventDefault():void;currentTarget:{elements:{namedItem(name:string):{value?:string;checked?:boolean}|null}}})=>{event.preventDefault();const get=(name:string)=>event.currentTarget.elements.namedItem(name);props.onSubmit({classification:(get("classification")?.value??"other") as FeedbackClassification,description:get("details")?.value??props.initialDetails??"",extraTags:undefined,includeBrowserTabs:get("browser-tabs")?.checked??false,includeLogs:get("logs")?.checked??true});},children:[runtime.jsx("h1",{children:"Share feedback"}),runtime.jsx("select",{name:"classification",children:options.map(option=>runtime.jsx("option",{value:option,children:option},option))}),runtime.jsx("textarea",{name:"details",defaultValue:props.initialDetails??"",required:true}),props.logsAvailable!==false?runtime.jsxs("label",{children:[runtime.jsx("input",{name:"logs",type:"checkbox",defaultChecked:true}),props.chatGptConversationAvailable?"Include this ChatGPT conversation and diagnostic logs":"Include ChatGPT diagnostic logs"]}):null,props.browserTabsAvailable?runtime.jsxs("label",{children:[runtime.jsx("input",{name:"browser-tabs",type:"checkbox"}),"Include all browser tabs and browser logs"]}):null,runtime.jsx("p",{className:"feedback-legal-notice",children:"Feedback may include diagnostic information."}),runtime.jsxs("footer",{children:[runtime.jsx("button",{type:"button",onClick:props.onClose,children:"Cancel"}),runtime.jsx("button",{type:"submit",children:"Submit"})]})]})});}
-export { FeedbackSubmissionDialog };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Ad as n,
+  G2 as r,
+  I3 as i,
+  K2 as a,
+  Nh as o,
+  Ph as s,
+  Y2 as c,
+  e6 as l,
+  jd as u,
+} from "@rchunk/app-shared";
+import { n as d, t as f } from "@rchunk/feedback-legal-notice";
+import { n as p, t as m } from "@rchunk/feedback-form-dialog";
+function h(e) {
+  let t = (0, _.c)(29),
+    {
+      additionalOptionsEnabled: r,
+      browserTabsAvailable: i,
+      chatGptConversationAvailable: a,
+      initialDetails: s,
+      initialExtraTags: l,
+      logsAvailable: u,
+      onClose: d,
+      onSubmit: p,
+      processMemoryDiagnosticsAvailable: h,
+    } = e,
+    b = r !== void 0 && r,
+    S = a !== void 0 && a,
+    C = s === void 0 ? `` : s,
+    w = u === void 0 || u,
+    T = h !== void 0 && h,
+    [E] = (0, v.useState)(l),
+    [D, O] = (0, v.useState)(i),
+    [k, A] = (0, v.useState)(w),
+    j;
+  t[0] !== b || t[1] !== E || t[2] !== D || t[3] !== k || t[4] !== p
+    ? ((j = (e) => {
+        let { details: t, selectedOptionId: n } = e;
+        return p({
+          classification: n,
+          description: t,
+          extraTags: void 0,
+          includeBrowserTabs: D,
+          includeLogs: k,
+        });
+      }),
+      (t[0] = b),
+      (t[1] = E),
+      (t[2] = D),
+      (t[3] = k),
+      (t[4] = p),
+      (t[5] = j))
+    : (j = t[5]);
+  let M;
+  t[6] === T ? (M = t[7]) : ((M = T ? x : x.filter(g)), (t[6] = T), (t[7] = M));
+  let N = T ? `xxwide` : `wide`,
+    P;
+  t[8] !== S || t[9] !== k || t[10] !== w
+    ? ((P = w
+        ? (0, y.jsxs)(o, {
+            className: `relative text-codex-description`,
+            children: [
+              (0, y.jsx)(n, { id: `feedback-include-logs`, checked: k, onCheckedChange: A }),
+              (0, y.jsx)(`label`, {
+                htmlFor: `feedback-include-logs`,
+                children: S
+                  ? (0, y.jsx)(c, {
+                      id: `feedback.dialog.includeChatGptConversationAndDiagnosticLogsLabel`,
+                      defaultMessage: `Include this ChatGPT conversation and diagnostic logs`,
+                      description: `Label for a checkbox in the feedback form opened from a ChatGPT conversation. When selected, the conversation and diagnostic logs are attached to the feedback report.`,
+                    })
+                  : (0, y.jsx)(c, {
+                      id: `feedback.dialog.includeDiagnosticLogsLabel`,
+                      defaultMessage: `Include ChatGPT diagnostic logs`,
+                      description: `Label for the checkbox that toggles including diagnostic logs`,
+                    }),
+              }),
+            ],
+          })
+        : null),
+      (t[8] = S),
+      (t[9] = k),
+      (t[10] = w),
+      (t[11] = P))
+    : (P = t[11]);
+  let F;
+  t[12] !== i || t[13] !== D
+    ? ((F = i
+        ? (0, y.jsxs)(o, {
+            className: `relative text-codex-description`,
+            children: [
+              (0, y.jsx)(n, {
+                id: `feedback-include-browser-tabs`,
+                checked: D,
+                onCheckedChange: O,
+              }),
+              (0, y.jsx)(`label`, {
+                htmlFor: `feedback-include-browser-tabs`,
+                children: (0, y.jsx)(c, {
+                  id: `feedback.dialog.includeBrowserTabsLabel`,
+                  defaultMessage: `Include all browser tabs and browser logs`,
+                  description: `Label for the checkbox that toggles including all browser tabs and browser logs`,
+                }),
+              }),
+            ],
+          })
+        : null),
+      (t[12] = i),
+      (t[13] = D),
+      (t[14] = F))
+    : (F = t[14]);
+  let I;
+  t[15] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((I = (0, y.jsx)(f, {})), (t[15] = I))
+    : (I = t[15]);
+  let L;
+  t[16] === b ? (L = t[17]) : ((L = null), (t[16] = b), (t[17] = L));
+  let R;
+  t[18] !== F || t[19] !== L || t[20] !== P
+    ? ((R = (0, y.jsxs)(y.Fragment, { children: [P, F, I, L] })),
+      (t[18] = F),
+      (t[19] = L),
+      (t[20] = P),
+      (t[21] = R))
+    : (R = t[21]);
+  let z;
+  return (
+    t[22] !== C || t[23] !== d || t[24] !== R || t[25] !== j || t[26] !== M || t[27] !== N
+      ? ((z = (0, y.jsx)(m, {
+          freeformFeedbackRequired: !0,
+          initialDetails: C,
+          onClose: d,
+          onSubmit: j,
+          options: M,
+          size: N,
+          belowFreeformContent: R,
+        })),
+        (t[22] = C),
+        (t[23] = d),
+        (t[24] = R),
+        (t[25] = j),
+        (t[26] = M),
+        (t[27] = N),
+        (t[28] = z))
+      : (z = t[28]),
+    z
+  );
+}
+function g(e) {
+  let { id: t } = e;
+  return t !== `high-ram-usage`;
+}
+var _, v, y, b, x;
+function S() {
+  return (S = e(() => {
+    ((_ = t()),
+      (v = l()),
+      a(),
+      u(),
+      s(),
+      p(),
+      d(),
+      (y = i()),
+      (b = r({
+        bug: {
+          id: `feedback.dialog.category.bug`,
+          defaultMessage: `Bug`,
+          description: `Category label for reporting a bug`,
+        },
+        badResult: {
+          id: `feedback.dialog.category.badResult`,
+          defaultMessage: `Bad result`,
+          description: `Category label for reporting a bad result`,
+        },
+        goodResult: {
+          id: `feedback.dialog.category.goodResult`,
+          defaultMessage: `Good result`,
+          description: `Category label for reporting a good result`,
+        },
+        safetyCheck: {
+          id: `feedback.dialog.category.safetyCheck`,
+          defaultMessage: `Safety check`,
+          description: `Category label for safety-check feedback`,
+        },
+        researchFailure: {
+          id: `feedback.dialog.category.researchFailure`,
+          defaultMessage: `Research failure`,
+          description: `Category label for reporting failures during research tasks, including refusals, noncompliance, or early stopping`,
+        },
+        highRamUsage: {
+          id: `feedback.dialog.category.highRamUsage`,
+          defaultMessage: `High RAM usage`,
+          description: `Category label for reporting excessive RAM usage and attaching a process-memory diagnostic report`,
+        },
+        other: {
+          id: `feedback.dialog.category.other`,
+          defaultMessage: `Other`,
+          description: `Category label for reporting other types of feedback`,
+        },
+      })),
+      (x = [
+        { id: `bug`, label: b.bug },
+        { id: `bad-result`, label: b.badResult },
+        { id: `good-result`, label: b.goodResult },
+        { id: `safety_check`, label: b.safetyCheck },
+        { id: `research-failure`, label: b.researchFailure },
+        { id: `high-ram-usage`, label: b.highRamUsage },
+        { id: `other`, label: b.other },
+      ]));
+  }))();
+}
+S();
+export { h as FeedbackSubmissionDialog };

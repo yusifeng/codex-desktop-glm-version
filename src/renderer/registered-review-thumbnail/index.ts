@@ -1,13 +1,234 @@
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-interface JsxRuntime { createElement(type: unknown, props: Record<string, unknown>): unknown; jsx(type: unknown, props: Record<string, unknown>): unknown; jsxs(type: unknown, props: Record<string, unknown>): unknown }
-const { n: initializeRuntimeLazy, o: interopDefault } = runtimeChunk as unknown as { n(): void; o(value: unknown, count: number): { default: (items: unknown[], mapper: (item: unknown) => number) => number } };
-const { $3: initializeRuntime, CS: ReviewIcon, FX: initializeSignals, HX: useSignalValue, I3: getJsxRuntime, K2: initializeCompiler, Y2: FormattedMessage, e6: getReactRuntime, gg: initializeFileIcons, lw: initializeIcons, mg: getFileIcon, pZ: createSignal } = appSharedChunk as unknown as { $3(): void; CS: unknown; FX(): void; HX(signal: unknown): unknown; I3(): JsxRuntime; K2(): void; Y2: unknown; e6(): { createElement(type: unknown, props: Record<string, unknown>): unknown }; gg(): void; lw(): void; mg(path: string): unknown; pZ(scope: unknown, factory: (context: { scope: { get(signal: unknown): unknown } }) => unknown): unknown };
-const { C$t: cloudDiffSignal, Xd: TabThumbnail, Zd: initializeTabThumbnail, b$t: relativePath, cet: appScope, ck: initializeReviewModel, dO: reviewDataSignal, dat: initializeDiffStats, fO: reviewCwdSignal, gO: reviewEnvironmentSignal, jO: gitReviewSignal, let: initializeAppScope, pO: cloudReviewSignal, uat: DiffStats, uk: reviewSourceSignal, y5t: loadSumBy } = appInitialChunk as unknown as { C$t: unknown; Xd: unknown; Zd(): void; b$t(input: { cwd?: string; path: string }): string; cet: unknown; ck(): void; dO: unknown; dat(): void; fO: unknown; gO: unknown; jO: unknown; let(): void; pO: unknown; uat: unknown; uk: unknown; y5t(): unknown };
-interface ReviewFile { additions?: number | null; deletions?: number | null; path: string } type Source = "branch" | "cloud" | "commit" | "last-turn" | "staged" | "uncommitted" | "unstaged";
-let jsx: JsxRuntime; let reviewSignal: unknown; let sumBy: (items: unknown[], mapper: (item: unknown) => number) => number; const sourceLabels: Record<Source, string> = { branch: "Branch changes", cloud: "Cloud changes", commit: "Commit changes", "last-turn": "Last turn", staged: "Staged changes", uncommitted: "Uncommitted changes", unstaged: "Unstaged changes" };
-function ReviewThumbnailView({ source, files, omittedCount = 0 }: { source: Source; files?: ReviewFile[]; omittedCount?: number }): unknown { const sections: Array<Record<string, unknown>> = []; if (files != null) { const complete = omittedCount === 0 && files.every((file) => file.additions != null && file.deletions != null); sections.push({ kind: "block", content: jsx.jsxs("div", { className: "flex flex-wrap items-center justify-between gap-2 text-xs text-codex-description", children: [omittedCount > 0 ? `${files.length} loaded files` : `${files.length} changed files`, complete && files.length > 0 ? jsx.jsx(DiffStats, { linesAdded: sumBy(files, (item) => (item as ReviewFile).additions ?? 0), linesRemoved: sumBy(files, (item) => (item as ReviewFile).deletions ?? 0) }) : false] }) }); for (const file of files.slice(0, 4)) sections.push({ kind: "block", content: jsx.jsxs("div", { className: "flex min-w-0 items-center gap-1.5 text-sm leading-5", children: [getReactRuntime().createElement(getFileIcon(file.path), { className: "icon-sm shrink-0 text-codex-description" }), jsx.jsx("span", { className: "min-w-0 flex-1 truncate", children: file.path }), file.additions != null && file.deletions != null ? jsx.jsx(DiffStats, { linesAdded: file.additions, linesRemoved: file.deletions }) : false] }) }); } return jsx.jsx(TabThumbnail, { icon: jsx.jsx(ReviewIcon, {}), subtitle: sourceLabels[source], title: jsx.jsx(FormattedMessage, { id: "tabThumbnail.review.title", defaultMessage: "Review" }), sections }); }
-function RegisteredReviewThumbnail(): unknown { return jsx.jsx(ReviewThumbnailView, useSignalValue(reviewSignal) as Record<string, unknown>); }
-let initialized = false; function initializeRegisteredReviewThumbnail(): void { if (initialized) return; initialized = true; initializeRuntime(); initializeRuntimeLazy(); sumBy = interopDefault(loadSumBy(), 1).default; initializeCompiler(); initializeTabThumbnail(); initializeIcons(); initializeDiffStats(); initializeFileIcons(); jsx = getJsxRuntime(); sourceLabels.branch = sourceLabels.branch; initializeSignals(); initializeAppScope(); initializeReviewModel(); reviewSignal = createSignal(appScope, ({ scope }) => { const source = (scope.get(reviewEnvironmentSignal) === "cloud" ? "cloud" : scope.get(reviewSourceSignal)) as Source; if (source === "last-turn" || source === "cloud") { const diff = (scope.get(cloudReviewSignal) as { diff?: Array<{ additions?: number; deletions?: number; metadata: { name: string } }> })?.diff; if (diff == null || diff.length === 0) return { source, files: undefined }; const cwd = scope.get(reviewCwdSignal) as string | undefined; return { source, files: diff.map((file) => ({ path: relativePath({ cwd, path: file.metadata.name }), additions: file.additions, deletions: file.deletions })) }; } const data = (scope.get(gitReviewSignal) as { data?: { type: string; files?: ReviewFile[]; untrackedFilesOmitted?: { count?: number } } })?.data; return data?.type === "success" ? { source, files: data.files, omittedCount: data.untrackedFilesOmitted?.count ?? 0 } : { source, files: undefined }; }); }
-initializeRegisteredReviewThumbnail(); export { RegisteredReviewThumbnail };
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  $3 as n,
+  CS as r,
+  FX as i,
+  HX as a,
+  I3 as o,
+  K2 as s,
+  Y2 as c,
+  e6 as l,
+  gg as u,
+  lw as d,
+  mg as f,
+  pZ as p,
+} from "@rchunk/app-shared";
+import {
+  C$t as m,
+  Xd as h,
+  Zd as g,
+  b$t as _,
+  cet as v,
+  ck as y,
+  dO as b,
+  dat as x,
+  fO as S,
+  gO as C,
+  jO as w,
+  let as T,
+  pO as E,
+  uat as D,
+  uk as O,
+  y5t as k,
+} from "@rchunk/app-initial";
+function A(e) {
+  let t = (0, P.c)(17),
+    { source: n, files: i, omittedCount: a } = e,
+    o = a === void 0 ? 0 : a,
+    s;
+  if (t[0] !== i || t[1] !== o) {
+    if (((s = []), i != null)) {
+      let e = o === 0 && i.every(N),
+        n;
+      t[3] !== i.length || t[4] !== o
+        ? ((n =
+            o > 0
+              ? (0, L.jsx)(c, {
+                  id: `tabThumbnail.review.loadedFiles`,
+                  defaultMessage: `{count, plural, one {# loaded file} other {# loaded files}}`,
+                  description: `Number of files in an incomplete cached Review summary`,
+                  values: { count: i.length },
+                })
+              : (0, L.jsx)(c, {
+                  id: `tabThumbnail.review.changedFiles`,
+                  defaultMessage: `{count, plural, =0 {No changes} one {# changed file} other {# changed files}}`,
+                  description: `Number of changed files in a complete cached Review summary`,
+                  values: { count: i.length },
+                })),
+          (t[3] = i.length),
+          (t[4] = o),
+          (t[5] = n))
+        : (n = t[5]);
+      let r;
+      t[6] !== i || t[7] !== e
+        ? ((r =
+            e &&
+            i.length > 0 &&
+            (0, L.jsx)(D, {
+              linesAdded: (0, F.default)(i, M),
+              linesRemoved: (0, F.default)(i, j),
+            })),
+          (t[6] = i),
+          (t[7] = e),
+          (t[8] = r))
+        : (r = t[8]);
+      let a;
+      (t[9] !== n || t[10] !== r
+        ? ((a = {
+            kind: `block`,
+            content: (0, L.jsxs)(`div`, {
+              className: `flex flex-wrap items-center justify-between gap-2 text-xs text-codex-description`,
+              children: [n, r],
+            }),
+          }),
+          (t[9] = n),
+          (t[10] = r),
+          (t[11] = a))
+        : (a = t[11]),
+        s.push(a));
+      for (let e of i.slice(0, 4))
+        s.push({
+          kind: `block`,
+          content: (0, L.jsxs)(`div`, {
+            className: `flex min-w-0 items-center gap-1.5 text-sm leading-5`,
+            children: [
+              (0, I.createElement)(f(e.path), {
+                className: `icon-sm shrink-0 text-codex-description`,
+              }),
+              (0, L.jsx)(`span`, { className: `min-w-0 flex-1 truncate`, children: e.path }),
+              e.additions != null &&
+                e.deletions != null &&
+                (0, L.jsx)(D, { linesAdded: e.additions, linesRemoved: e.deletions }),
+            ],
+          }),
+        });
+    }
+    ((t[0] = i), (t[1] = o), (t[2] = s));
+  } else s = t[2];
+  let l;
+  t[12] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((l = (0, L.jsx)(r, {})), (t[12] = l))
+    : (l = t[12]);
+  let u = R[n],
+    d;
+  t[13] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = (0, L.jsx)(c, {
+        id: `tabThumbnail.review.title`,
+        defaultMessage: `Review`,
+        description: `Title of a miniature preview of a Review tab`,
+      })),
+      (t[13] = d))
+    : (d = t[13]);
+  let p;
+  return (
+    t[14] !== s || t[15] !== u
+      ? ((p = (0, L.jsx)(h, { icon: l, subtitle: u, title: d, sections: s })),
+        (t[14] = s),
+        (t[15] = u),
+        (t[16] = p))
+      : (p = t[16]),
+    p
+  );
+}
+function j(e) {
+  return e.deletions ?? 0;
+}
+function M(e) {
+  return e.additions ?? 0;
+}
+function N(e) {
+  return e.additions != null && e.deletions != null;
+}
+var P, F, I, L, R;
+function z() {
+  return (z = e(() => {
+    ((P = n()),
+      (F = t(k(), 1)),
+      (I = l()),
+      s(),
+      g(),
+      d(),
+      x(),
+      u(),
+      (L = o()),
+      (R = {
+        branch: (0, L.jsx)(c, {
+          id: `tabThumbnail.review.scope.branch`,
+          defaultMessage: `Branch changes`,
+          description: `Label for branch changes in a Review tab thumbnail`,
+        }),
+        cloud: (0, L.jsx)(c, {
+          id: `tabThumbnail.review.scope.cloud`,
+          defaultMessage: `Cloud changes`,
+          description: `Label for cloud task changes in a Review tab thumbnail`,
+        }),
+        commit: (0, L.jsx)(c, {
+          id: `tabThumbnail.review.scope.commit`,
+          defaultMessage: `Commit changes`,
+          description: `Label for the selected commit's changes in a Review tab thumbnail`,
+        }),
+        "last-turn": (0, L.jsx)(c, {
+          id: `tabThumbnail.review.scope.lastTurn`,
+          defaultMessage: `Last turn`,
+          description: `Label for the most recent assistant turn's changes in a Review tab thumbnail`,
+        }),
+        staged: (0, L.jsx)(c, {
+          id: `tabThumbnail.review.scope.staged`,
+          defaultMessage: `Staged changes`,
+          description: `Label for staged changes in a Review tab thumbnail`,
+        }),
+        uncommitted: (0, L.jsx)(c, {
+          id: `tabThumbnail.review.scope.uncommitted`,
+          defaultMessage: `Uncommitted changes`,
+          description: `Label for all uncommitted changes in a Review tab thumbnail`,
+        }),
+        unstaged: (0, L.jsx)(c, {
+          id: `tabThumbnail.review.scope.unstaged`,
+          defaultMessage: `Unstaged changes`,
+          description: `Label for unstaged changes in a Review tab thumbnail`,
+        }),
+      }));
+  }))();
+}
+function B() {
+  let e = (0, V.c)(2),
+    t = a(U),
+    n;
+  return (e[0] === t ? (n = e[1]) : ((n = (0, H.jsx)(A, { ...t })), (e[0] = t), (e[1] = n)), n);
+}
+var V, H, U;
+function W() {
+  return (W = e(() => {
+    ((V = n()),
+      i(),
+      T(),
+      z(),
+      y(),
+      m(),
+      b(),
+      (H = o()),
+      (U = p(v, ({ scope: e }) => {
+        let t = e.get(C) === `cloud` ? `cloud` : e.get(O);
+        if (t === `last-turn` || t === `cloud`) {
+          let n = e.get(E).diff;
+          if (n == null || n.length === 0) return { source: t, files: void 0 };
+          let r = e.get(S);
+          return {
+            source: t,
+            files: n.map((e) => ({
+              path: _({ cwd: r, path: e.metadata.name }),
+              additions: e.additions,
+              deletions: e.deletions,
+            })),
+          };
+        }
+        let n = e.get(w).data;
+        return n?.type === `success`
+          ? { source: t, files: n.files, omittedCount: n.untrackedFilesOmitted?.count ?? 0 }
+          : { source: t, files: void 0 };
+      })));
+  }))();
+}
+W();
+export { B as RegisteredReviewThumbnail };

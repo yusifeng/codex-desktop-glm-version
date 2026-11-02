@@ -1,17 +1,226 @@
-// Trapezoidal-rule teaching model. Release chunk: model-c9c30b7e8b26.js.
-import "@rchunk/rolldown-runtime";
-import { a as initializeBuildGraphData, n as evaluateExpression } from "@rchunk/build-graph-data";
-import { n as initializeTokenizer, r as parseMath, t as collectVariables } from "@rchunk/tokenize-math-block";
-import { n as initializeNullThrows, t as nullThrows } from "@rchunk/null-throws";
-import { n as parseNumericalIntegral, t as initializeNumericalIntegration } from "@rchunk/numerical-integration";
-interface Input { integrand: string; lowerBound: number; method: "trapezoidal"; subintervalCount: number; upperBound: number }
-type ParsedExpression = ReturnType<typeof parseMath>;
-const methods = ["trapezoidal"] as const; const defaultInput: Input = { integrand: "x", lowerBound: 0, method: "trapezoidal", subintervalCount: 8, upperBound: 5 }; const subintervalControl = { min: 2, max: 20, step: 1 }; const defaultExpression = nullThrows(parseMath("y=x")); const steps = 2_000; const numberPattern = "-?(?:\\d+(?:\\.\\d*)?|\\.\\d+)";
-const clamp = (v:number,a:number,b:number)=>Math.min(Math.max(v,a),b); const finiteOr=(v:number|undefined,f:number)=>Number.isFinite(v)?Number(v):f; const compact=(v:string)=>v.toLowerCase().replace(/\\left|\\right/g,"").replace(/[−–—]/g,"-").replace(/\s+/g,"");
-const validExpression=(v:string):ParsedExpression|null=>{const parsed=parseMath(`y=${v}`),hasFunction=Array.isArray(parsed)&&parsed.some((token:unknown)=>typeof token==="object"&&token!==null&&"type" in token&&token.type==="function");return !parsed||hasFunction||collectVariables(parsed).length>0?null:parsed;}; const safeIntegrand=(v:string)=>{const parsed=parseNumericalIntegral(v);return parsed.hasUnsupportedLetter||!parsed.integrand||!validExpression(parsed.integrand)?"x":parsed.integrand;};
-const parseNumber=(v:string|undefined)=>{if(v==null)return null;const n=Number.parseFloat(v);return Number.isFinite(n)?n:null;};
-const parseIntegral=(source:string)=>{const text=compact(source).replace(/\\,/g,"");const forward=text.match(RegExp(`\\\\int_(?:\\{(?<lowerBraced>${numberPattern})\\}|(?<lowerPlain>${numberPattern}))\\^(?:\\{(?<upperBraced>${numberPattern})\\}|(?<upperPlain>${numberPattern}))(?<integrand>.+?)dx`));if(forward?.groups?.integrand)return{integrand:forward.groups.integrand,lowerBound:parseNumber(forward.groups.lowerBraced??forward.groups.lowerPlain)??0,upperBound:parseNumber(forward.groups.upperBraced??forward.groups.upperPlain)??5};const reverse=text.match(RegExp(`\\\\int\\^(?:\\{(?<upperBraced>${numberPattern})\\}|(?<upperPlain>${numberPattern}))_(?:\\{(?<lowerBraced>${numberPattern})\\}|(?<lowerPlain>${numberPattern}))(?<integrand>.+?)dx`));if(reverse?.groups?.integrand)return{integrand:reverse.groups.integrand,lowerBound:parseNumber(reverse.groups.lowerBraced??reverse.groups.lowerPlain)??0,upperBound:parseNumber(reverse.groups.upperBraced??reverse.groups.upperPlain)??5};return{integrand:source.match(/^\s*f\s*\(\s*x\s*\)\s*=\s*(.+?)\s*$/i)?.[1]??source,lowerBound:0,upperBound:5};};
-const isIntegralNotation=(source:string)=>{const text=compact(source).replace(/\\,/g,"");const bound=`(?:\\{${numberPattern}\\}|${numberPattern})`;return RegExp(`^\\\\int(?:_${bound}\\^${bound}|\\^${bound}_${bound}).+?dx$`).test(text);}; const countFromText=(source:string)=>Number.parseInt(source.match(/\bn\s*=\s*(\d+)/i)?.[1]??source.match(/(?:with|using)\s+(\d+)\s+subintervals?/i)?.[1]??"8",10);
-const normalizeInput=(input:Partial<Input>):Input=>{const lower=finiteOr(input.lowerBound,0),upper=finiteOr(input.upperBound,5),method=input.method==="trapezoidal"?input.method:"trapezoidal";return{integrand:safeIntegrand(input.integrand??"x"),lowerBound:lower,method,subintervalCount:clamp(Math.round(Number.isFinite(input.subintervalCount)?input.subintervalCount??8:0)||8,2,20),upperBound:upper===lower?5:upper};}; const parseInput=(source:string)=>normalizeInput({...parseIntegral(source),method:"trapezoidal",subintervalCount:countFromText(source)}); const bounds=(input:Partial<Input>):[number,number]=>[finiteOr(input.lowerBound,0),finiteOr(input.upperBound,5)]; const domain=(input:Partial<Input>):[number,number]=>{const[a,b]=bounds(input),lo=Math.min(a,b),hi=Math.max(a,b),span=Math.max(hi-lo,1),pad=Math.max(span*.15,.75);return[lo-pad,hi+pad];}; const expression=(input:Partial<Input>):ParsedExpression=>validExpression(normalizeInput(input).integrand)??defaultExpression; const evaluate=(input:Partial<Input>,x:number)=>evaluateExpression(expression(input),x,{}); const formatNumber=(value:number,precision=3)=>{if(!Number.isFinite(value))return"0";const rounded=Number(value.toFixed(precision));return Object.is(rounded,-0)?"0":rounded.toString();}; const integrandLabel=(input:Partial<Input>)=>normalizeInput(input).integrand; const integralLabel=(input:Partial<Input>)=>{const safe=normalizeInput(input),shown=safe.integrand.replace(/pi/g,"\\pi").replace(/\*/g,"\\cdot " );return`\\int_{${formatNumber(safe.lowerBound,4)}}^{${formatNumber(safe.upperBound,4)}} ${shown} \\, dx`;};
-const trapezoidalEstimate=(input:Partial<Input>)=>{const safe=normalizeInput(input),[a,b]=bounds(safe),h=(b-a)/safe.subintervalCount;let total=.5*evaluate(safe,a)+.5*evaluate(safe,b);for(let index=1;index<safe.subintervalCount;index+=1)total+=evaluate(safe,a+index*h);return h*total;}; const exactValue=(input:Partial<Input>)=>{const safe=normalizeInput(input),[a,b]=bounds(safe),h=(b-a)/steps,parsed=expression(safe);let weighted=evaluateExpression(parsed,a,{})+evaluateExpression(parsed,b,{});if(!Number.isFinite(weighted))return Number.NaN;for(let index=1;index<steps;index+=1){const value=evaluateExpression(parsed,a+index*h,{});if(!Number.isFinite(value))return Number.NaN;weighted+=(index%2===0?2:4)*value;}return h/3*weighted;}; const result=(input:Partial<Input>)=>{const safe=normalizeInput(input),estimate=trapezoidalEstimate(safe),exact=exactValue(safe);return{estimate,exactValue:exact,error:estimate-exact};}; function initializeTrapezoidalRuleModel():void{initializeTokenizer();initializeBuildGraphData();initializeNumericalIntegration();initializeNullThrows();}
-export{formatNumber as a,integrandLabel as c,initializeTrapezoidalRuleModel as d,isIntegralNotation as f,evaluate as i,expression as l,parseInput as n,integralLabel as o,normalizeInput as p,result as r,bounds as s,subintervalControl as t,domain as u};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { a as t, n } from "@rchunk/build-graph-data";
+import { n as r, r as i, t as a } from "@rchunk/tokenize-math-block";
+import { n as o, t as s } from "@rchunk/null-throws";
+import { n as c, t as l } from "@rchunk/numerical-integration";
+var u,
+  d,
+  f,
+  p,
+  m,
+  h,
+  g,
+  _,
+  v,
+  y,
+  b,
+  x,
+  S,
+  C,
+  w,
+  T,
+  E,
+  D,
+  O,
+  k,
+  A,
+  j,
+  M,
+  N,
+  P,
+  F,
+  I,
+  L,
+  R,
+  z,
+  B,
+  V,
+  H,
+  U,
+  W,
+  G;
+function K() {
+  return (K = e(() => {
+    (r(),
+      t(),
+      l(),
+      s(),
+      (u = [`trapezoidal`]),
+      (d = [0, 5]),
+      (f = {
+        integrand: `x`,
+        lowerBound: d[0],
+        method: `trapezoidal`,
+        subintervalCount: 8,
+        upperBound: d[1],
+      }),
+      (p = { min: 2, max: 20, step: 1 }),
+      (m = o(i(`y=x`))),
+      (h = 2e3),
+      (g = `-?(?:\\d+(?:\\.\\d*)?|\\.\\d+)`),
+      (_ = (e) => u.includes(e)),
+      (v = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (y = (e) => {
+        if (e == null) return null;
+        let t = Number.parseFloat(e);
+        return Number.isFinite(t) ? t : null;
+      }),
+      (b = (e, t) => (Number.isFinite(e) ? Number(e) : t)),
+      (x = (e) =>
+        e
+          .toLowerCase()
+          .replace(/\\left|\\right/g, ``)
+          .replace(/[−–—]/g, `-`)
+          .replace(/\s+/g, ``)),
+      (S = (e) => {
+        let t = Math.round(Number.isFinite(e) ? (e ?? f.subintervalCount) : 0);
+        return v(t || f.subintervalCount, p.min, p.max);
+      }),
+      (C = (e) => c(e)),
+      (w = (e) => {
+        let t = i(`y=${e}`);
+        return !t || t.some((e) => e.type === `function`) || a(t).length > 0 ? null : t;
+      }),
+      (T = (e) => {
+        let t = C(e);
+        return t.hasUnsupportedLetter || !t.integrand || !w(t.integrand) ? `x` : t.integrand;
+      }),
+      (E = (e) => {
+        let t = x(e).replace(/\\,/g, ``),
+          n = t.match(
+            RegExp(
+              `\\\\int_(?:\\{(?<lowerBraced>${g})\\}|(?<lowerPlain>${g}))\\^(?:\\{(?<upperBraced>${g})\\}|(?<upperPlain>${g}))(?<integrand>.+?)dx`,
+            ),
+          );
+        if (n?.groups?.integrand)
+          return {
+            integrand: n.groups.integrand,
+            lowerBound: y(n.groups.lowerBraced ?? n.groups.lowerPlain) ?? f.lowerBound,
+            upperBound: y(n.groups.upperBraced ?? n.groups.upperPlain) ?? f.upperBound,
+          };
+        let r = t.match(
+          RegExp(
+            `\\\\int\\^(?:\\{(?<upperBraced>${g})\\}|(?<upperPlain>${g}))_(?:\\{(?<lowerBraced>${g})\\}|(?<lowerPlain>${g}))(?<integrand>.+?)dx`,
+          ),
+        );
+        return r?.groups?.integrand
+          ? {
+              integrand: r.groups.integrand,
+              lowerBound: y(r.groups.lowerBraced ?? r.groups.lowerPlain) ?? f.lowerBound,
+              upperBound: y(r.groups.upperBraced ?? r.groups.upperPlain) ?? f.upperBound,
+            }
+          : {
+              integrand: e.match(/^\s*f\s*\(\s*x\s*\)\s*=\s*(.+?)\s*$/i)?.[1] ?? e,
+              lowerBound: f.lowerBound,
+              upperBound: f.upperBound,
+            };
+      }),
+      (D = (e) => {
+        let t = x(e).replace(/\\,/g, ``),
+          n = `(?:\\{${g}\\}|${g})`;
+        return RegExp(`^\\\\int(?:_${n}\\^${n}|\\^${n}_${n}).+?dx$`).test(t);
+      }),
+      (O = (e) => T(e).replace(/pi/g, `\\pi`).replace(/\*/g, `\\cdot `)),
+      (k = (e) => B(e, 4)),
+      (A = (e) => {
+        let {
+          integrand: t,
+          lowerBound: n,
+          upperBound: r,
+        } = typeof e == `string`
+          ? { integrand: e, lowerBound: f.lowerBound, upperBound: f.upperBound }
+          : e;
+        return `\\int_{${k(n)}}^{${k(r)}} ${O(t)} \\, dx`;
+      }),
+      (j = (e) => {
+        let t = e.match(/\bn\s*=\s*(\d+)/i);
+        if (t?.[1]) return Number.parseInt(t[1], 10);
+        let n = e.match(/(?:with|using)\s+(\d+)\s+subintervals?/i);
+        return n?.[1] ? Number.parseInt(n[1], 10) : f.subintervalCount;
+      }),
+      (M = (e) => {
+        let t = _(e.method ?? ``) ? e.method : f.method;
+        return {
+          integrand: T(e.integrand),
+          lowerBound: b(e.lowerBound, f.lowerBound),
+          method: t,
+          subintervalCount: S(e.subintervalCount),
+          upperBound:
+            b(e.upperBound, f.upperBound) === b(e.lowerBound, f.lowerBound)
+              ? f.upperBound
+              : b(e.upperBound, f.upperBound),
+        };
+      }),
+      (N = (e) => M({ ...E(e), method: f.method, subintervalCount: j(e) })),
+      (P = ({ lowerBound: e, upperBound: t }) => [b(e, f.lowerBound), b(t, f.upperBound)]),
+      (F = (e) => {
+        let [t, n] = P(e),
+          r = Math.min(t, n),
+          i = Math.max(t, n),
+          a = Math.max(i - r, 1),
+          o = Math.max(a * 0.15, 0.75);
+        return [r - o, i + o];
+      }),
+      (I = (e) => w(M(e).integrand) ?? m),
+      (L = (e, t) => n(I(e), t, {})),
+      (R = (e) => A(M(e))),
+      (z = (e) => M(e).integrand),
+      (B = (e, t = 3) => {
+        if (!Number.isFinite(e)) return `0`;
+        let n = Number(e.toFixed(t));
+        return Object.is(n, -0) ? `0` : n.toString();
+      }),
+      (V = (e, t) => {
+        let n = 0;
+        for (let r = 0; r < e; r += 1) n += t(r);
+        return n;
+      }),
+      (H = (e) => {
+        let t = M(e),
+          [r, i] = P(t),
+          a = t.subintervalCount,
+          o = (i - r) / a,
+          s = I(t),
+          c = (e) => n(s, e, {});
+        return o * (0.5 * c(r) + V(a - 1, (e) => c(r + (e + 1) * o)) + 0.5 * c(i));
+      }),
+      (U = (e) => {
+        let t = M(e),
+          [r, i] = P(t),
+          a = I(t),
+          o = (i - r) / h,
+          s = n(a, r, {}) + n(a, i, {});
+        if (!Number.isFinite(s)) return NaN;
+        let c = 0;
+        for (let e = 1; e < h; e += 1) {
+          let t = n(a, r + e * o, {});
+          if (!Number.isFinite(t)) return NaN;
+          c += (e % 2 == 0 ? 2 : 4) * t;
+        }
+        return (o / 3) * (s + c);
+      }),
+      (W = (e) => U(M(e))),
+      (G = (e) => {
+        let t = M(e),
+          n = H(t),
+          r = W(t);
+        return { estimate: n, exactValue: r, error: n - r };
+      }));
+  }))();
+}
+export {
+  B as a,
+  z as c,
+  K as d,
+  D as f,
+  L as i,
+  I as l,
+  N as n,
+  R as o,
+  M as p,
+  G as r,
+  P as s,
+  p as t,
+  F as u,
+};

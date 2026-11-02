@@ -218,25 +218,7 @@ const cardRow = reviewRow.t({
 assert.equal(cardRow.type, "article");
 assert.equal(cardRow.props.children[1].props["aria-hidden"], true);
 
-// file-diff-alt
-const fileDiff = await bundle("file-diff-alt");
-fileDiff.i();
-fileDiff.n();
-const provider = fileDiff.r({ children: "diff" });
-assert.equal(provider.props["data-highlight-provider"], true);
-assert.equal(provider.props.children, "diff");
-const fileTree = fileDiff.t({
-  alignCommentGutter: true,
-  fileDiff: "@@ diff",
-  lineDiffType: "word",
-  className: "custom",
-});
-assert.equal(fileTree.type, fileDiff.r);
-const fileBody = fileTree.props.children;
-assert.equal(fileBody.props["data-testid"], "file-diff");
-assert.equal(fileBody.props["data-align-comment-gutter"], true);
-assert.equal(fileBody.props["data-line-diff-type"], "word");
-assert.equal(fileBody.props.children, "@@ diff");
+assertReleaseOwner("file-diff-alt");
 
 // diff-preview-content
 const preview = await bundle("diff-preview-content");

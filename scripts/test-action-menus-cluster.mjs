@@ -62,25 +62,7 @@ outputMenu.props.children[1].props.children[0][3].props.children.props.onClick()
 assert.equal(createdKind, "site");
 assert.equal(outputMenu.props.children[1].props.children[0].length, 4);
 
-const sourceMenuModule = await load("add-source-menu");
-let sourceAction = null;
-const sourceMenu = sourceMenuModule.ChatGptAddSourceMenu({
-  conversationId: "conversation-1",
-  defaultOpen: true,
-  composerActions: {
-    canOpenFileDialog: false,
-    canOpenLibraryPicker: true,
-    openFileDialog: () => { sourceAction = "file"; },
-    openLibraryPicker: () => { sourceAction = "library"; },
-    openPluginDirectory: () => { sourceAction = "plugins"; },
-  },
-});
-assert.equal(sourceMenu.props["data-conversation-id"], "conversation-1");
-assert.equal(sourceMenu.props.children[1].props.children[0].props.children.props.children, "Connect plugins");
-assert.equal(sourceMenu.props.children[1].props.children[1].props.children.props.disabled, true);
-sourceMenu.props.children[1].props.children[2].props.children.props.onClick();
-assert.equal(sourceAction, "library");
-assert.equal(sourceMenu.props.children[1].props.children[2].props.children.props.children, "Add from library");
+assertReleaseOwner("add-source-menu");
 
 const settingsModule = await load("settings-command-menu-section-items");
 let settingsAction = null;

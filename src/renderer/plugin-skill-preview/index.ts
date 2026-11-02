@@ -1,13 +1,217 @@
-import * as appSharedChunk from "@rchunk/app-shared";
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-initial";
-import "@rchunk/plugin-skill-queries";
-import type { JsxRuntime } from "@rchunk/app-shared";
-const { I3: jsxExport } = appSharedChunk as unknown as { I3: JsxRuntime | (() => JsxRuntime) };
-let jsx: JsxRuntime;
-interface Props { description?: string; footer?: unknown; headerActions?: unknown; icon?: unknown; onClose?(): void; pluginId: string; skillName: string; title?: string; }
-function PluginSkillPreview(props: Props): unknown { initializePluginSkillPreview(); return jsx.jsxs("article", { "data-plugin-id": props.pluginId, "data-skill-name": props.skillName, children: [jsx.jsxs("header", { children: [props.icon, jsx.jsx("h2", { children: props.title ?? props.skillName }), props.headerActions] }), jsx.jsx("p", { children: props.description }), props.footer] }); }
-function renderSkillMarkdown(contents: string | null | undefined): unknown { initializePluginSkillPreview(); return contents == null ? null : jsx.jsx("pre", { children: contents }); }
-function initializePluginSkillPreview(): void { if (jsx == null) jsx = typeof jsxExport === "function" ? jsxExport() : jsxExport; }
-initializePluginSkillPreview();
-export { initializePluginSkillPreview as n, renderSkillMarkdown as r, PluginSkillPreview as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $h as n,
+  BX as r,
+  FX as i,
+  I3 as a,
+  K2 as o,
+  Qh as s,
+  Y2 as c,
+  Yh as l,
+  Zh as u,
+} from "@rchunk/app-shared";
+import {
+  QY as d,
+  XY as f,
+  YY as p,
+  a$ as m,
+  i$ as h,
+  n$ as g,
+  nX as _,
+  non as v,
+  r$ as y,
+  ton as b,
+} from "@rchunk/app-initial";
+import { a as x, t as S } from "@rchunk/plugin-skill-queries";
+function C(e) {
+  let t = (0, T.c)(22),
+    {
+      pluginId: n,
+      skillName: i,
+      title: a,
+      description: o,
+      icon: s,
+      headerActions: c,
+      footer: l,
+      onCloseAutoFocus: u,
+      shouldBlockExternalEgress: d,
+      onClose: m,
+    } = e,
+    h;
+  t[0] !== n || t[1] !== i
+    ? ((h = { pluginId: n, skillName: i }), (t[0] = n), (t[1] = i), (t[2] = h))
+    : (h = t[2]);
+  let { data: g, isError: _, isFetching: v, refetch: y } = r(x, h),
+    b = g?.interface?.display_name ?? a,
+    S = g?.description ?? o,
+    C;
+  t[3] === m
+    ? (C = t[4])
+    : ((C = (e) => {
+        e || m();
+      }),
+      (t[3] = m),
+      (t[4] = C));
+  let D = g == null ? void 0 : (g.skill_md_contents ?? null),
+    O;
+  t[5] === y ? (O = t[6]) : ((O = () => void y()), (t[5] = y), (t[6] = O));
+  let k;
+  t[7] !== _ || t[8] !== v || t[9] !== d || t[10] !== D || t[11] !== O
+    ? ((k = (0, E.jsx)(f, {
+        scrollClassName: `p-4`,
+        children: (0, E.jsx)(w, {
+          markdown: D,
+          isError: _,
+          isFetching: v,
+          refetch: O,
+          shouldBlockExternalEgress: d,
+        }),
+      })),
+      (t[7] = _),
+      (t[8] = v),
+      (t[9] = d),
+      (t[10] = D),
+      (t[11] = O),
+      (t[12] = k))
+    : (k = t[12]);
+  let A;
+  return (
+    t[13] !== l ||
+    t[14] !== c ||
+    t[15] !== s ||
+    t[16] !== u ||
+    t[17] !== b ||
+    t[18] !== S ||
+    t[19] !== C ||
+    t[20] !== k
+      ? ((A = (0, E.jsx)(p, {
+          icon: s,
+          title: b,
+          description: S,
+          headerActions: c,
+          footer: l,
+          onCloseAutoFocus: u,
+          isOpen: !0,
+          onOpenChange: C,
+          children: k,
+        })),
+        (t[13] = l),
+        (t[14] = c),
+        (t[15] = s),
+        (t[16] = u),
+        (t[17] = b),
+        (t[18] = S),
+        (t[19] = C),
+        (t[20] = k),
+        (t[21] = A))
+      : (A = t[21]),
+    A
+  );
+}
+function w(e) {
+  let t = (0, T.c)(18),
+    { markdown: n, isError: r, isFetching: i, refetch: a, shouldBlockExternalEgress: o } = e,
+    u = n === void 0,
+    d;
+  t[0] !== r || t[1] !== u
+    ? ((d = u && !r ? (0, E.jsx)(s, {}) : null), (t[0] = r), (t[1] = u), (t[2] = d))
+    : (d = t[2]);
+  let f;
+  t[3] !== r || t[4] !== i || t[5] !== a
+    ? ((f = r
+        ? (0, E.jsxs)(`div`, {
+            role: `alert`,
+            children: [
+              (0, E.jsx)(c, {
+                id: `browserSkills.detailError`,
+                defaultMessage: `This skill couldn't be loaded`,
+                description: `Skill detail request failure`,
+              }),
+              (0, E.jsx)(l, {
+                loading: i,
+                onClick: a,
+                children: (0, E.jsx)(c, {
+                  id: `browserSkills.retry`,
+                  defaultMessage: `Retry`,
+                  description: `Retry a failed skills request`,
+                }),
+              }),
+            ],
+          })
+        : null),
+      (t[3] = r),
+      (t[4] = i),
+      (t[5] = a),
+      (t[6] = f))
+    : (f = t[6]);
+  let p;
+  t[7] !== u || t[8] !== n
+    ? ((p =
+        !u && n == null
+          ? (0, E.jsx)(`div`, {
+              role: `status`,
+              children: (0, E.jsx)(c, {
+                id: `skills.card.contentsError`,
+                defaultMessage: `Unable to load skill contents.`,
+                description: `Error message when a skill file preview fails`,
+              }),
+            })
+          : null),
+      (t[7] = u),
+      (t[8] = n),
+      (t[9] = p))
+    : (p = t[9]);
+  let m;
+  t[10] !== n || t[11] !== o
+    ? ((m =
+        n == null
+          ? null
+          : (0, E.jsx)(g, {
+              components: { a: D },
+              cwd: null,
+              externalResourcePolicy: o ? `restricted` : `allow`,
+              textStyle: { kind: `small` },
+              tokens: v(_(n), void 0),
+            })),
+      (t[10] = n),
+      (t[11] = o),
+      (t[12] = m))
+    : (m = t[12]);
+  let h;
+  return (
+    t[13] !== d || t[14] !== f || t[15] !== p || t[16] !== m
+      ? ((h = (0, E.jsxs)(E.Fragment, { children: [d, f, p, m] })),
+        (t[13] = d),
+        (t[14] = f),
+        (t[15] = p),
+        (t[16] = m),
+        (t[17] = h))
+      : (h = t[17]),
+    h
+  );
+}
+var T, E, D;
+function O() {
+  return (O = e(() => {
+    ((T = t()),
+      i(),
+      o(),
+      u(),
+      n(),
+      y(),
+      m(),
+      b(),
+      S(),
+      d(),
+      (E = a()),
+      (D = h({
+        conversationId: null,
+        isBrowserEnabled: !1,
+        openFileLinksInSidePanel: !1,
+        openTarget: `external-browser`,
+      })));
+  }))();
+}
+export { w as n, O as r, C as t };

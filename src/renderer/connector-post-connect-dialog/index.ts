@@ -1,10 +1,233 @@
-import * as appSharedChunk from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/rolldown-runtime";
-import "@rchunk/ecosystem-widget-queries";
-import type { JsxRuntime } from "@rchunk/app-shared";
-const { I3: jsxExport } = appSharedChunk as unknown as { I3: JsxRuntime | (() => JsxRuntime) };
-let jsx: JsxRuntime;
-interface Props { connectorName?: string; onClose?(): void; onContinue?(): void; open?: boolean; }
-function ConnectorPostConnectDialog({ connectorName = "Connector", onClose, onContinue, open = true }: Props): unknown { if (!open) return null; if (jsx == null) jsx = typeof jsxExport === "function" ? jsxExport() : jsxExport; return jsx.jsxs("section", { role: "dialog", "aria-label": `${connectorName} connected`, children: [jsx.jsx("h2", { children: `${connectorName} connected` }), jsx.jsx("p", { children: "You can now use this connector in ChatGPT." }), jsx.jsx("button", { onClick: onContinue, type: "button", children: "Continue" }), jsx.jsx("button", { onClick: onClose, type: "button", children: "Close" })] }); }
-export { ConnectorPostConnectDialog };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $h as n,
+  BX as r,
+  FX as i,
+  I3 as a,
+  Ih as o,
+  K2 as s,
+  Qh as c,
+  Rh as l,
+  Y2 as u,
+  Yh as d,
+  Zh as f,
+  e6 as p,
+  lY as m,
+  n4 as h,
+  tU as g,
+  wL as _,
+  zh as v,
+} from "@rchunk/app-shared";
+import {
+  AH as y,
+  Bfn as b,
+  CY as x,
+  Cn as S,
+  FH as C,
+  PH as w,
+  SY as T,
+  etn as E,
+  itn as D,
+  kH as O,
+  oqt as k,
+  rqt as A,
+  ugn as j,
+  wn as M,
+} from "@rchunk/app-initial";
+import { n as N, t as P } from "@rchunk/ecosystem-widget-queries";
+function F(e) {
+  let t = (0, L.c)(2),
+    n;
+  return (
+    t[0] === e
+      ? (n = t[1])
+      : ((n = (0, z.jsx)(T, {
+          route: B,
+          children: (0, z.jsx)(S, { children: (0, z.jsx)(I, { ...e }) }),
+        })),
+        (t[0] = e),
+        (t[1] = n)),
+    n
+  );
+}
+function I(e) {
+  let t = (0, L.c)(34),
+    { accountId: n, connectorId: i, widget: a, source: s, signal: f, onClose: p } = e,
+    _ = h(),
+    [v] = (0, R.useState)(A),
+    [y] = (0, R.useState)(g),
+    b = `connectors://${i}`,
+    x;
+  t[0] !== n || t[1] !== i || t[2] !== b || t[3] !== a.template
+    ? ((x = { accountId: n, connectorId: i, hostId: j, appUri: b, template: a.template }),
+      (t[0] = n),
+      (t[1] = i),
+      (t[2] = b),
+      (t[3] = a.template),
+      (t[4] = x))
+    : (x = t[4]);
+  let { data: S, isError: C, refetch: T } = r(P, x),
+    E;
+  t[5] === _
+    ? (E = t[6])
+    : ((E = _.formatMessage({
+        id: `connector.postConnect.widget.title`,
+        defaultMessage: `Set up app`,
+        description: `Accessible title of the optional app setup dialog shown after connecting an app`,
+      })),
+      (t[5] = _),
+      (t[6] = E));
+  let D = E,
+    k;
+  t[7] !== n || t[8] !== i || t[9] !== p || t[10] !== f
+    ? ((k = O({
+        appUri: `connectors://${i}`,
+        chatGptConversationId: null,
+        accountId: n,
+        signal: f,
+        messageId: null,
+        originMetadata: { attribution_id: i },
+      })),
+      (k.onRequestClose = p),
+      (k.displayMode = `modal`),
+      (t[7] = n),
+      (t[8] = i),
+      (t[9] = p),
+      (t[10] = f),
+      (t[11] = k))
+    : (k = t[11]);
+  let M;
+  t[12] !== s || t[13] !== a.viewParams
+    ? ((M = { ...a.viewParams, onboardingSource: s }),
+      (t[12] = s),
+      (t[13] = a.viewParams),
+      (t[14] = M))
+    : (M = t[14]);
+  let N = M,
+    F;
+  t[15] === p
+    ? (F = t[16])
+    : ((F = (e) => {
+        e || p();
+      }),
+      (t[15] = p),
+      (t[16] = F));
+  let I;
+  t[17] !== S || t[18] !== D
+    ? ((I = S == null && (0, z.jsx)(l, { className: `sr-only`, children: D })),
+      (t[17] = S),
+      (t[18] = D),
+      (t[19] = I))
+    : (I = t[19]);
+  let B;
+  t[20] !== k ||
+  t[21] !== i ||
+  t[22] !== v ||
+  t[23] !== S ||
+  t[24] !== C ||
+  t[25] !== y ||
+  t[26] !== N ||
+  t[27] !== T ||
+  t[28] !== a.template
+    ? ((B =
+        S == null
+          ? (0, z.jsx)(`div`, {
+              className: `flex h-full flex-col items-center justify-center gap-3`,
+              role: `status`,
+              children: C
+                ? (0, z.jsxs)(z.Fragment, {
+                    children: [
+                      (0, z.jsx)(u, {
+                        id: `connector.postConnect.loadError`,
+                        defaultMessage: `Couldn’t load app setup`,
+                        description: `Error shown when the optional setup widget fails to load after connecting an app`,
+                      }),
+                      (0, z.jsx)(d, {
+                        color: `secondary`,
+                        onClick: () => void T(),
+                        children: (0, z.jsx)(u, {
+                          id: `connector.postConnect.retry`,
+                          defaultMessage: `Try again`,
+                          description: `Retries loading the optional post-connect setup widget`,
+                        }),
+                      }),
+                    ],
+                  })
+                : (0, z.jsx)(c, {}),
+            })
+          : (0, z.jsx)(w, {
+              inDialog: !0,
+              lifetime: `component`,
+              conversationId: m(v),
+              hostId: j,
+              mcpAppId: y,
+              result: {
+                ...S,
+                toolResult: { content: [], structuredContent: N },
+                mcpAppHostAdapter: k,
+                request: {
+                  appUri: `connectors://${i}`,
+                  chatGptConversationId: v,
+                  template: a.template,
+                  toolName: ``,
+                  toolInput: {},
+                  viewParams: N,
+                },
+              },
+            })),
+      (t[20] = k),
+      (t[21] = i),
+      (t[22] = v),
+      (t[23] = S),
+      (t[24] = C),
+      (t[25] = y),
+      (t[26] = N),
+      (t[27] = T),
+      (t[28] = a.template),
+      (t[29] = B))
+    : (B = t[29]);
+  let V;
+  return (
+    t[30] !== F || t[31] !== I || t[32] !== B
+      ? ((V = (0, z.jsxs)(o, {
+          open: !0,
+          size: `editor`,
+          shouldIgnoreClickOutside: !0,
+          onOpenChange: F,
+          children: [I, B],
+        })),
+        (t[30] = F),
+        (t[31] = I),
+        (t[32] = B),
+        (t[33] = V))
+      : (V = t[33]),
+    V
+  );
+}
+var L, R, z, B;
+function V() {
+  return (V = e(() => {
+    ((L = t()),
+      i(),
+      _(),
+      (R = p()),
+      s(),
+      C(),
+      y(),
+      N(),
+      k(),
+      f(),
+      v(),
+      n(),
+      M(),
+      D(),
+      x(),
+      b(),
+      (z = a()),
+      (B = E({ pathname: `/plugins`, routeTemplate: `/plugins` })));
+  }))();
+}
+V();
+export { F as ConnectorPostConnectDialog };

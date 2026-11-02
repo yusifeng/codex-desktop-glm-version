@@ -1,84 +1,295 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/schedule-draft";
-
-export type AutomationStatus = "active" | "completed" | "paused";
-export interface AutomationSummary {
-  id: string;
-  display_schedule?: string | null;
-  is_enabled: boolean;
-  last_run_time?: string | null;
-  next_run_times: string[];
-  schedule_components: { end_date?: string | null; frequency: string; start_time?: string | null };
-  timing_mode?: string;
-  updated_at: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $h as n,
+  I3 as r,
+  K2 as i,
+  Qh as a,
+  Y2 as o,
+  n4 as s,
+} from "@rchunk/app-shared";
+import { Dtt as c, Ott as l, lP as u, sP as d } from "@rchunk/app-initial";
+import { c as f, n as p, o as m } from "@rchunk/schedule-draft";
+function h(...e) {
+  let t = new Map();
+  for (let n of e)
+    for (let e of n ?? []) {
+      let n = t.get(e.id);
+      (n == null || e.updated_at >= n.updated_at) && t.set(e.id, e);
+    }
+  return Array.from(t.values(), (e) => ({ automation: e }));
 }
-export interface AutomationSummaryItem { automation: AutomationSummary }
-export interface AutomationGroups { active: AutomationSummaryItem[]; recent: AutomationSummaryItem[]; paused: AutomationSummaryItem[]; completed: AutomationSummaryItem[] }
-export interface AutomationSummaryLineProps { item: AutomationSummaryItem; now?: Date; runPhase?: "executing" | "starting" | null; status?: AutomationStatus }
-
-let runtime: JsxRuntime | undefined;
-function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-
-function mergeAutomationSummaries(...groups: Array<readonly AutomationSummary[] | null | undefined>): AutomationSummaryItem[] {
-  const latest = new Map<string, AutomationSummary>();
-  for (const group of groups) for (const automation of group ?? []) {
-    const current = latest.get(automation.id);
-    if (current == null || automation.updated_at >= current.updated_at) latest.set(automation.id, automation);
+function g(e) {
+  return !l(e) && e.next_run_times.length === 0 ? `completed` : e.is_enabled ? `active` : `paused`;
+}
+function _(e, t, n) {
+  let r = { active: [], recent: [], paused: [], completed: [] };
+  for (let i of e) {
+    let e = g(i.automation);
+    (r[e].push(i),
+      e !== `active` && v(i, e === `paused` ? n : void 0) >= t - 864e5 && r.recent.push(i));
   }
-  return [...latest.values()].map((automation) => ({ automation }));
+  for (let e of [r.paused, r.completed]) e.sort((e, t) => v(t) - v(e));
+  return (r.recent.sort((e, t) => v(t, n) - v(e, n)), r);
 }
-
-function getAutomationStatus(automation: AutomationSummary): AutomationStatus {
-  return automation.timing_mode !== "condition_watch" && automation.next_run_times.length === 0
-    ? "completed"
-    : automation.is_enabled ? "active" : "paused";
+function v({ automation: e }, t) {
+  let n = t?.[e.id] ?? Date.parse(e.updated_at);
+  return Number.isNaN(n) ? 0 : n;
 }
-
-function timestamp(item: AutomationSummaryItem, pausedAt?: Record<string, number>): number {
-  const value = pausedAt?.[item.automation.id] ?? Date.parse(item.automation.updated_at);
-  return Number.isNaN(value) ? 0 : value;
+function y() {
+  return (y = e(() => {
+    c();
+  }))();
 }
-
-function groupAutomationSummaries(items: readonly AutomationSummaryItem[], now: number, pausedAt?: Record<string, number>): AutomationGroups {
-  const result: AutomationGroups = { active: [], recent: [], paused: [], completed: [] };
-  for (const item of items) {
-    const status = getAutomationStatus(item.automation);
-    result[status].push(item);
-    if (status !== "active" && timestamp(item, status === "paused" ? pausedAt : undefined) >= now - 86_400_000) result.recent.push(item);
-  }
-  result.paused.sort((left, right) => timestamp(right) - timestamp(left));
-  result.completed.sort((left, right) => timestamp(right) - timestamp(left));
-  result.recent.sort((left, right) => timestamp(right, pausedAt) - timestamp(left, pausedAt));
-  return result;
+function b(e) {
+  let t = (0, S.c)(65),
+    { item: n, runPhase: r, status: i } = e,
+    a = s(),
+    c = u(),
+    { automation: l } = n,
+    d;
+  t[0] !== l || t[1] !== i ? ((d = i ?? g(l)), (t[0] = l), (t[1] = i), (t[2] = d)) : (d = t[2]);
+  let f = d,
+    h = l.schedule_components.frequency,
+    _,
+    v,
+    y,
+    b,
+    w,
+    T,
+    E,
+    D,
+    O,
+    k,
+    A,
+    j,
+    M;
+  if (t[3] !== l || t[4] !== h || t[5] !== a || t[6] !== c || t[7] !== r || t[8] !== f) {
+    let e = h === `once` || l.timing_mode === `condition_watch` ? void 0 : m(l),
+      n = l.schedule_components.start_time,
+      i = n != null && !Number.isNaN(Date.parse(n)) ? n : null,
+      s = h;
+    if (h === `once` && i != null) s = `once`;
+    else if (l.timing_mode === `condition_watch`) s = `monitoring`;
+    else if (h === `once`) s = `scheduled`;
+    else if (h === `custom`) {
+      let { scheduleConfig: e } = p(l);
+      s = l.display_schedule?.toLowerCase().includes(`hour`)
+        ? `hourly`
+        : e.mode === `hourly` || e.oneTimeDate != null
+          ? `scheduled`
+          : `daily`;
+    }
+    let u = l.next_run_times[0],
+      d,
+      g,
+      S;
+    if (
+      t[22] !== l.last_run_time ||
+      t[23] !== h ||
+      t[24] !== a ||
+      t[25] !== u ||
+      t[26] !== c ||
+      t[27] !== r ||
+      t[28] !== f
+    ) {
+      let e = l.last_run_time == null ? null : new Date(l.last_run_time);
+      if (((d = e != null && !Number.isNaN(e.getTime())), (S = `none`), (g = ``), r != null))
+        S = r === `starting` ? `starting` : `executing`;
+      else if (f === `active` && h === `once`) S = `scheduled`;
+      else if (f === `active` && u != null && !Number.isNaN(Date.parse(u))) {
+        let e = Date.parse(u) - c.getTime();
+        if (((S = e <= 6e4 ? `running` : `next`), e < 36e5)) {
+          let n;
+          (t[32] !== a || t[33] !== e
+            ? ((n = a.formatRelativeTime(Math.round(e / 6e4), `minute`)),
+              (t[32] = a),
+              (t[33] = e),
+              (t[34] = n))
+            : (n = t[34]),
+            (g = n));
+        } else if (e < 864e5) {
+          let n;
+          (t[35] !== a || t[36] !== e
+            ? ((n = a.formatRelativeTime(Math.round(e / 36e5), `hour`)),
+              (t[35] = a),
+              (t[36] = e),
+              (t[37] = n))
+            : (n = t[37]),
+            (g = n));
+        } else if (e < 6048e5) {
+          let n;
+          (t[38] !== a || t[39] !== e
+            ? ((n = a.formatRelativeTime(Math.round(e / 864e5), `day`, { numeric: `auto` })),
+              (t[38] = a),
+              (t[39] = e),
+              (t[40] = n))
+            : (n = t[40]),
+            (g = n));
+        } else {
+          let e;
+          (t[41] !== a || t[42] !== u || t[43] !== c
+            ? ((e = a.formatDate(u, {
+                month: `short`,
+                day: `numeric`,
+                year: new Date(u).getFullYear() === c.getFullYear() ? void 0 : `numeric`,
+              })),
+              (t[41] = a),
+              (t[42] = u),
+              (t[43] = c),
+              (t[44] = e))
+            : (e = t[44]),
+            (g = e));
+        }
+      } else if (d) {
+        S = `last`;
+        let t = new Date(c.getFullYear(), c.getMonth(), c.getDate()),
+          n = new Date(e.getFullYear(), e.getMonth(), e.getDate()),
+          r = Math.round((n.getTime() - t.getTime()) / 864e5);
+        r === 0 || r === -1
+          ? (S = r === 0 ? `lastToday` : `lastYesterday`)
+          : (g =
+              r >= -7
+                ? a.formatDate(e, { weekday: `long` })
+                : a.formatDate(e, { month: `short`, day: `numeric`, year: `numeric` }));
+      }
+      ((t[22] = l.last_run_time),
+        (t[23] = h),
+        (t[24] = a),
+        (t[25] = u),
+        (t[26] = c),
+        (t[27] = r),
+        (t[28] = f),
+        (t[29] = d),
+        (t[30] = g),
+        (t[31] = S));
+    } else ((d = t[29]), (g = t[30]), (S = t[31]));
+    let C = r != null || f === `active` || (f === `paused` && !d);
+    ((_ = o),
+      (y = `automations.scheduled.taskSummaryWithRunStatus`),
+      (b = `{status, select, paused {Paused{showCadence, select, yes { · } other {}}} completed {{showCadence, select, no {Completed} other {}}} other {}}{showCadence, select, yes {{cadence, select, monitoring {Monitoring} hourly {Hourly} daily {Daily} weekly {Weekly} monthly {Monthly} yearly {Annually} once {{date}} other {Scheduled}}{hasEndDate, select, yes { until {endDate}} other {}}} other {}}{timing, select, starting { · <run>Starting run…</run>} executing { · <run>Running now</run>} next { · Next run {time}} last { · Last run {time}} lastToday { · Last run Today} lastYesterday { · Last run Yesterday} running { · Running now} scheduled { · Scheduled} other {}}`),
+      (w = `Complete secondary line for a scheduled task. status is active, paused, or completed; cadence is its recurrence or monitoring. showCadence adds its schedule for active tasks, paused tasks that have never run, or a run that is starting or executing. It also hides Completed while a run is active. date is a one-time task date, endDate is the final recurrence date, and time is a locale-formatted relative duration or date. The middle dot separates cadence/status from next or last run information. The run tag adds a spinner beside the status while a requested run is starting or executing.`),
+      (T = f),
+      (E = s),
+      (D = S),
+      (O = g),
+      (k = x),
+      (A = C ? `yes` : `no`),
+      t[45] !== a || t[46] !== c || t[47] !== i
+        ? ((j =
+            i == null
+              ? ``
+              : a.formatDate(i, {
+                  month: `short`,
+                  day: `numeric`,
+                  year: new Date(i).getFullYear() === c.getFullYear() ? void 0 : `numeric`,
+                })),
+          (t[45] = a),
+          (t[46] = c),
+          (t[47] = i),
+          (t[48] = j))
+        : (j = t[48]),
+      (M = C && e != null ? `yes` : `no`),
+      (v =
+        e == null
+          ? ``
+          : a.formatDate(e, {
+              month: `short`,
+              day: `numeric`,
+              year: e.getFullYear() === c.getFullYear() ? void 0 : `numeric`,
+            })),
+      (t[3] = l),
+      (t[4] = h),
+      (t[5] = a),
+      (t[6] = c),
+      (t[7] = r),
+      (t[8] = f),
+      (t[9] = _),
+      (t[10] = v),
+      (t[11] = y),
+      (t[12] = b),
+      (t[13] = w),
+      (t[14] = T),
+      (t[15] = E),
+      (t[16] = D),
+      (t[17] = O),
+      (t[18] = k),
+      (t[19] = A),
+      (t[20] = j),
+      (t[21] = M));
+  } else
+    ((_ = t[9]),
+      (v = t[10]),
+      (y = t[11]),
+      (b = t[12]),
+      (w = t[13]),
+      (T = t[14]),
+      (E = t[15]),
+      (D = t[16]),
+      (O = t[17]),
+      (k = t[18]),
+      (A = t[19]),
+      (j = t[20]),
+      (M = t[21]));
+  let N;
+  t[49] !== v ||
+  t[50] !== T ||
+  t[51] !== E ||
+  t[52] !== D ||
+  t[53] !== O ||
+  t[54] !== k ||
+  t[55] !== A ||
+  t[56] !== j ||
+  t[57] !== M
+    ? ((N = {
+        status: T,
+        cadence: E,
+        timing: D,
+        time: O,
+        run: k,
+        showCadence: A,
+        date: j,
+        hasEndDate: M,
+        endDate: v,
+      }),
+      (t[49] = v),
+      (t[50] = T),
+      (t[51] = E),
+      (t[52] = D),
+      (t[53] = O),
+      (t[54] = k),
+      (t[55] = A),
+      (t[56] = j),
+      (t[57] = M),
+      (t[58] = N))
+    : (N = t[58]);
+  let P;
+  return (
+    t[59] !== _ || t[60] !== y || t[61] !== b || t[62] !== w || t[63] !== N
+      ? ((P = (0, C.jsx)(_, { id: y, defaultMessage: b, description: w, values: N })),
+        (t[59] = _),
+        (t[60] = y),
+        (t[61] = b),
+        (t[62] = w),
+        (t[63] = N),
+        (t[64] = P))
+      : (P = t[64]),
+    P
+  );
 }
-
-function formatRelative(target: string, now: Date): string {
-  const difference = Date.parse(target) - now.getTime();
-  if (!Number.isFinite(difference)) return "";
-  const absolute = Math.abs(difference);
-  if (absolute < 3_600_000) return `${Math.max(1, Math.round(absolute / 60_000))} min`;
-  if (absolute < 86_400_000) return `${Math.round(absolute / 3_600_000)} hr`;
-  return new Date(target).toLocaleDateString(undefined, { month: "short", day: "numeric" });
+function x(e) {
+  return (0, C.jsxs)(`span`, {
+    children: [
+      (0, C.jsx)(a, { as: `span`, className: `icon-xs`, containerClassName: `me-1 align-middle` }),
+      e,
+    ],
+  });
 }
-
-function AutomationSummaryLine({ item, now = new Date(), runPhase, status }: AutomationSummaryLineProps): unknown {
-  const automation = item.automation;
-  const resolvedStatus = status ?? getAutomationStatus(automation);
-  const cadence = automation.timing_mode === "condition_watch"
-    ? "Monitoring"
-    : automation.schedule_components.frequency === "once"
-      ? "Scheduled"
-      : automation.display_schedule ?? automation.schedule_components.frequency;
-  let timing = "";
-  if (runPhase != null) timing = runPhase === "starting" ? "Starting run…" : "Running now";
-  else if (resolvedStatus === "active" && automation.next_run_times[0] != null) timing = `Next run ${formatRelative(automation.next_run_times[0], now)}`;
-  else if (automation.last_run_time != null) timing = `Last run ${formatRelative(automation.last_run_time, now)}`;
-  const statusText = resolvedStatus === "paused" ? "Paused" : resolvedStatus === "completed" ? "Completed" : cadence;
-  return jsx().jsx("span", { "data-automation-status": resolvedStatus, children: [statusText, timing].filter(Boolean).join(" · ") });
+var S, C;
+function w() {
+  return (w = e(() => {
+    ((S = t()), i(), n(), d(), f(), y(), (C = r()));
+  }))();
 }
-
-function initializeScheduleDraft(): void {}
-function initializeConversationSummary(): void { jsx(); }
-export { groupAutomationSummaries as a, getAutomationStatus as i, initializeConversationSummary as n, initializeScheduleDraft as o, mergeAutomationSummaries as r, AutomationSummaryLine as t };
+export { _ as a, g as i, w as n, y as o, h as r, b as t };

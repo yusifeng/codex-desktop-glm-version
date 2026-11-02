@@ -1,28 +1,234 @@
-import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/highlight-selectors";
-import "@rchunk/scroll-to-match";
-
-interface DiffLineSpan { end: number; lineEnd: number; lineStart: number; side?: "left" | "right" | "unified"; start: number }
-interface DiffHunk { hunkId: string; lineEnd: number; lineMapping?: string; lineSpans?: DiffLineSpan[]; lineStart: number; text: string }
-interface DiffFile { hunks: DiffHunk[]; path: string }
-interface DiffSearchRequest { contextId: string; domain: string; query: string }
-interface DiffSearchLocation { contextId: string; domain: "diff"; end: number; hunkId: string; lineEnd: number; lineStart: number; path: string; side?: "left" | "right" | "unified"; start: number }
-interface DiffScrollAdapter { getFileContainer(path: string): Element | null; scrollToFile(path: string, options?: { signal?: AbortSignal }): Promise<void> | void; scrollToLocation?(location: DiffSearchLocation, options?: { signal?: AbortSignal }): Promise<void> | void }
-const MAX_MATCHES = 250;
-
-function countNewlines(value: string): number { let count = 0; for (const character of value) if (character === "\n") count++; return count; }
-function locateMatch(hunk: DiffHunk, start: number, end: number): { lineEnd: number; lineStart: number; side?: "left" | "right" | "unified" } {
-  const first = hunk.lineSpans?.find(span => start >= span.start && start < span.end);
-  if (first != null) { const lastOffset = Math.max(start, end - 1); const last = hunk.lineSpans?.find(span => lastOffset >= span.start && lastOffset < span.end) ?? first; return { lineStart: first.lineStart, lineEnd: last.lineEnd, ...(first.side != null && first.side === last.side ? { side: first.side } : {}) }; }
-  if (hunk.lineMapping !== "contiguous") return { lineStart: hunk.lineStart, lineEnd: hunk.lineEnd };
-  const lineStart = hunk.lineStart + countNewlines(hunk.text.slice(0, start));
-  return { lineStart, lineEnd: lineStart + countNewlines(hunk.text.slice(start, end)) };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, FX as n, HX as r, e6 as i } from "@rchunk/app-shared";
+import {
+  AUt as a,
+  CUt as o,
+  EUt as s,
+  OUt as c,
+  SUt as l,
+  TUt as u,
+  _D as d,
+  bUt as f,
+  hUt as p,
+  iD as m,
+  kUt as h,
+  nD as g,
+  vUt as _,
+  xUt as v,
+} from "@rchunk/app-initial";
+import { n as y, r as b } from "@rchunk/highlight-selectors";
+import { n as x, t as S } from "@rchunk/scroll-to-match";
+function C(e) {
+  let t = (0, E.c)(5),
+    { path: n, skipFindHighlight: i } = e,
+    a = r(g),
+    o = r(m)?.id ?? null,
+    s = (0, D.useRef)(!1),
+    c;
+  return (
+    t[0] !== a || t[1] !== o || t[2] !== n || t[3] !== i
+      ? ((c = (e) => {
+          let t = !i && a != null;
+          (t || s.current) &&
+            ((s.current = t),
+            w({
+              activeDiffResult: a,
+              activeMatchId: o,
+              fileDiffElement: e,
+              path: n,
+              skipFindHighlight: i,
+            }));
+        }),
+        (t[0] = a),
+        (t[1] = o),
+        (t[2] = n),
+        (t[3] = i),
+        (t[4] = c))
+      : (c = t[4]),
+    c
+  );
 }
-function searchFiles(request: DiffSearchRequest, files: DiffFile[]) { const query = request.query.trim(); const matches: Array<{ id: string; location: DiffSearchLocation; ordinal: number; snippet: string }> = []; let totalMatches = 0; if (query !== "") for (const file of files) for (const hunk of file.hunks) { let offset = 0; while ((offset = hunk.text.toLocaleLowerCase().indexOf(query.toLocaleLowerCase(), offset)) !== -1) { totalMatches++; const end = offset + query.length; if (matches.length < MAX_MATCHES) { const lines = locateMatch(hunk, offset, end); matches.push({ id: `diff:${file.path}:${hunk.hunkId}:${offset}`, ordinal: matches.length + 1, location: { domain: "diff", contextId: request.contextId, path: file.path, hunkId: hunk.hunkId, start: offset, end, ...lines }, snippet: hunk.text.slice(Math.max(0, offset - 40), Math.min(hunk.text.length, end + 40)) }); } offset = end || offset + 1; } } return { domain: request.domain, contextId: request.contextId, query, matches, totalMatches, isCapped: totalMatches > matches.length }; }
-function t({ contextId, getFiles, preserveScrollBeforeResultClear, scrollAdapter }: { contextId: string; getFiles(): DiffFile[]; preserveScrollBeforeResultClear?: boolean; scrollAdapter: DiffScrollAdapter }) { return { domain: "diff" as const, contextId, preserveScrollBeforeResultClear, async search(request: DiffSearchRequest) { return searchFiles(request, request.query.trim() === "" ? [] : getFiles()); }, async ensureVisible(location: DiffSearchLocation, options?: { signal?: AbortSignal }) { if (location.domain !== "diff" || location.contextId !== contextId || options?.signal?.aborted) return; let container = scrollAdapter.getFileContainer(location.path); if (container == null) { await scrollAdapter.scrollToFile(location.path, options); if (options?.signal?.aborted) return; await scrollAdapter.scrollToLocation?.(location, options); container = scrollAdapter.getFileContainer(location.path); } container?.querySelector(`[data-line="${location.lineStart}"]`)?.scrollIntoView({ block: "center" }); } }; }
-function i({ path, skipFindHighlight = false }: { path: string; skipFindHighlight?: boolean }): (element: Element | null) => void { return element => { if (element == null) return; element.setAttribute("data-diff-path", path); if (skipFindHighlight) element.setAttribute("data-skip-find-highlight", "true"); }; }
-function n(): void {}
-function r(): void {}
-export { i, n, r, t };
+function w({
+  activeDiffResult: e,
+  activeMatchId: t,
+  fileDiffElement: n,
+  path: r,
+  skipFindHighlight: i,
+}) {
+  if ((p(n, { includeShadowRoots: !0 }), i || e == null)) return;
+  let a = y(e.matches).get(r);
+  a != null &&
+    a.length !== 0 &&
+    (T({ activeMatchId: t, fileDiffElement: n, query: e.query, sourceMatches: a }) ||
+      l({
+        target: n,
+        query: e.query,
+        maxMatches: a.length,
+        includeShadowRoots: !0,
+      }).matches.forEach((e, n) => {
+        let r = a[n];
+        r != null && (s({ element: e, matchId: r.id }), r.id === t && u(e, !0));
+      }));
+}
+function T({ activeMatchId: e, fileDiffElement: t, query: n, sourceMatches: r }) {
+  if (r.some((e) => e.location.domain === `diff` && e.location.hunkId === `path`)) return !1;
+  let i = new Map();
+  for (let e of r) {
+    if (e.location.domain !== `diff` || e.location.lineStart !== e.location.lineEnd) continue;
+    let t = `${e.location.side ?? `unified`}:${e.location.lineStart}`,
+      n = i.get(t) ?? { lineNumber: e.location.lineStart, side: e.location.side, matches: [] };
+    (n.matches.push(e), i.set(t, n));
+  }
+  let a = !1,
+    o = !1;
+  for (let r of i.values()) {
+    a = !0;
+    let i = f({ container: t, lineNumber: r.lineNumber, side: r.side, includeShadowRoots: !0 });
+    i != null &&
+      ((o = !0),
+      l({
+        target: i,
+        query: n,
+        maxMatches: r.matches.length,
+        includeShadowRoots: !1,
+      }).matches.forEach((t, n) => {
+        let i = r.matches[n];
+        i != null && (s({ element: t, matchId: i.id }), i.id === e && u(t, !0));
+      }));
+  }
+  return o || (a && (t.matches(`[data-line]`) || t.querySelector(`[data-line]`) != null));
+}
+var E, D;
+function O() {
+  return (O = e(() => {
+    ((E = t()), n(), (D = i()), o(), b(), d());
+  }))();
+}
+function k({ contextId: e, getFiles: t, preserveScrollBeforeResultClear: n, scrollAdapter: r }) {
+  return {
+    domain: `diff`,
+    contextId: e,
+    preserveScrollBeforeResultClear: n,
+    async search(e) {
+      return e.query.trim().length === 0 ? A(e, []) : A(e, t());
+    },
+    async ensureVisible(t, n) {
+      if (t.domain !== `diff` || t.contextId !== e) return;
+      let i = r.getFileContainer(t.path),
+        a = _(t);
+      if ((i == null ? null : v({ container: i, matchId: a, includeShadowRoots: !0 })) == null) {
+        if (
+          n?.signal?.aborted ||
+          (n?.signal == null
+            ? await r.scrollToFile(t.path)
+            : await r.scrollToFile(t.path, { signal: n.signal }),
+          n?.signal?.aborted) ||
+          (r.scrollToLocation != null &&
+            (n?.signal == null
+              ? await r.scrollToLocation(t)
+              : await r.scrollToLocation(t, { signal: n.signal })),
+          n?.signal?.aborted)
+        )
+          return;
+        i = r.getFileContainer(t.path);
+      }
+      i != null &&
+        (await x({
+          container: i,
+          matchId: a,
+          includeShadowRoots: !0,
+          scrollBehavior: `auto`,
+          signal: n?.signal,
+        }));
+    },
+  };
+}
+function A(e, t) {
+  let n = e.query.trim();
+  if (n.length === 0)
+    return {
+      domain: e.domain,
+      contextId: e.contextId,
+      query: n,
+      matches: [],
+      totalMatches: 0,
+      isCapped: !1,
+    };
+  let r = [],
+    i = 0,
+    a = 0,
+    o = !1;
+  for (let s of t)
+    for (let t of s.hunks) {
+      let l = t.text;
+      if (l.length === 0) continue;
+      let u = P - r.length,
+        { offsets: d, totalMatches: f, isCapped: p } = h(l, n, u);
+      ((i += f), p && (o = !0));
+      let m = { offset: 0, line: t.lineStart };
+      for (let { start: n, end: i } of d) {
+        let o = j(t, n, i, m);
+        ((a += 1),
+          r.push({
+            id: `diff:${s.path}:${t.hunkId}:${n}`,
+            ordinal: a,
+            location: {
+              domain: `diff`,
+              contextId: e.contextId,
+              path: s.path,
+              hunkId: t.hunkId,
+              side: o.side,
+              lineStart: o.lineStart,
+              lineEnd: o.lineEnd,
+              start: n,
+              end: i,
+            },
+            snippet: c(l, n, i),
+          }));
+      }
+    }
+  return {
+    domain: e.domain,
+    contextId: e.contextId,
+    query: n,
+    matches: r,
+    totalMatches: i,
+    isCapped: o,
+  };
+}
+function j(e, t, n, r) {
+  let i = M(e.lineSpans, t, n);
+  if (i != null) return i;
+  if (e.lineMapping !== `contiguous`) return { lineStart: e.lineStart, lineEnd: e.lineEnd };
+  ((r.line += N(e.text.slice(r.offset, t))), (r.offset = t));
+  let a = r.line;
+  return { lineStart: a, lineEnd: a + N(e.text.slice(t, n)) };
+}
+function M(e, t, n) {
+  if (e == null) return null;
+  let r = e.find((e) => t >= e.start && t < e.end);
+  if (r == null) return null;
+  let i = Math.max(t, n - 1),
+    a = e.find((e) => i >= e.start && i < e.end) ?? r;
+  return {
+    lineStart: r.lineStart,
+    lineEnd: a.lineEnd,
+    ...(r.side != null && r.side === a.side ? { side: r.side } : {}),
+  };
+}
+function N(e) {
+  let t = 0;
+  for (let n of e)
+    n ===
+      `
+` && (t += 1);
+  return t;
+}
+var P;
+function F() {
+  return (F = e(() => {
+    (o(), S(), a(), (P = 250));
+  }))();
+}
+export { C as i, F as n, O as r, k as t };

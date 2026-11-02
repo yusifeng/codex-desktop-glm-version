@@ -1,7 +1,202 @@
-// Food-chain teaching model. Release chunk: model-b3392fd69f76.js.
-import "@rchunk/rolldown-runtime";
-type Ecosystem="grassland"|"pond"|"ocean"; interface Input{ecosystem?:string;step?:number} interface IntlLike{formatMessage(descriptor:{id:string;defaultMessage:string}):string}
-const ecosystemParameter={kind:"enum",defaultValue:"grassland",allowedValues:["grassland","pond","ocean"]}; const specification={type:"FOOD_CHAIN",version:4,thumbnailAssetKey:"food-chain-v2",parameters:{ecosystem:ecosystemParameter}}; const isEcosystem=(value:string):value is Ecosystem=>value==="grassland"||value==="pond"||value==="ocean"; const ecosystems=ecosystemParameter.allowedValues.filter(isEcosystem); const defaultEcosystem:Ecosystem=isEcosystem(ecosystemParameter.defaultValue)?ecosystemParameter.defaultValue:"grassland"; const stepControl={min:0,max:4,step:1}; const normalize=(input:Input)=>({ecosystem:isEcosystem(input.ecosystem??"")?input.ecosystem as Ecosystem:defaultEcosystem,step:Number.isFinite(input.step)?Math.min(4,Math.max(0,Math.round(input.step??0))):0});
-const data={grassland:{producer:["grass","Grass"],action:"Grass captures energy from sunlight",items:[["grass","Grass"],["grasshopper","Grasshopper"],["frog","Frog"],["snake","Snake"],["hawk","Hawk"]]},pond:{producer:["algae","Algae"],action:"Algae capture energy from sunlight",items:[["algae","Algae"],["snail","Pond snail"],["fish","Small fish"],["frog","Bullfrog"],["heron","Heron"]]},ocean:{producer:["phytoplankton","Phytoplankton"],action:"Phytoplankton capture energy from sunlight",items:[["plankton","Phytoplankton"],["shrimp","Zooplankton"],["fish","Sardine"],["tuna","Tuna"],["shark","Shark"]]}} as const;
-const localizedData=(intl:IntlLike,ecosystem:Ecosystem)=>{const selected=data[ecosystem];return{ecosystem:intl.formatMessage({id:`learningBlock.foodChain.ecosystem.${ecosystem}`,defaultMessage:ecosystem[0].toUpperCase()+ecosystem.slice(1)}),producerAction:intl.formatMessage({id:`learningBlock.foodChain.producerAction.${selected.producer[0]}`,defaultMessage:selected.action}),organisms:selected.items.map(([icon,name])=>({icon,name:intl.formatMessage({id:`learningBlock.foodChain.organism.${name.replace(/ /g,"").replace(/^./,character=>character.toLowerCase())}`,defaultMessage:name})}))};}; const role=(intl:IntlLike,index:number)=>[["producer","Producer"],["primaryConsumer","Primary consumer"],["secondaryConsumer","Secondary consumer"],["tertiaryConsumer","Tertiary consumer"],["quaternaryConsumer","Top consumer"]][index]?intl.formatMessage({id:`learningBlock.foodChain.role.${[["producer"],["primaryConsumer"],["secondaryConsumer"],["tertiaryConsumer"],["quaternaryConsumer"]][index][0]}`,defaultMessage:[["Producer"],["Primary consumer"],["Secondary consumer"],["Tertiary consumer"],["Top consumer"]][index][0]}):""; function initializeFoodChainSpecification():void{} function initializeFoodChainModel():void{}
-export{role as a,initializeFoodChainSpecification as c,localizedData as i,specification as l,ecosystems as n,initializeFoodChainModel as o,stepControl as r,normalize as s,defaultEcosystem as t};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `FOOD_CHAIN`),
+      (n = `food-chain-v2`),
+      (r = {
+        ecosystem: {
+          kind: `enum`,
+          defaultValue: `grassland`,
+          allowedValues: [`grassland`, `pond`, `ocean`],
+        },
+      }),
+      (i = { type: t, version: 4, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p;
+function m() {
+  return (m = e(() => {
+    (a(),
+      (o = i.parameters.ecosystem),
+      (s = (e) => e === `grassland` || e === `pond` || e === `ocean`),
+      (c = o.allowedValues.filter(s)),
+      (l = s(o.defaultValue) ? o.defaultValue : `grassland`),
+      (u = { min: 0, max: 4, step: 1 }),
+      (d = (e) => ({
+        ecosystem: s(e.ecosystem) ? e.ecosystem : l,
+        step: Number.isFinite(e.step)
+          ? Math.min(u.max, Math.max(u.min, Math.round(e.step)))
+          : u.min,
+      })),
+      (f = (e, t) =>
+        t === `pond`
+          ? {
+              ecosystem: e.formatMessage({
+                id: `learningBlock.foodChain.ecosystem.pond`,
+                defaultMessage: `Pond`,
+              }),
+              producerAction: e.formatMessage({
+                id: `learningBlock.foodChain.producerAction.algae`,
+                defaultMessage: `Algae capture energy from sunlight`,
+              }),
+              organisms: [
+                {
+                  icon: `algae`,
+                  name: e.formatMessage({
+                    id: `learningBlock.foodChain.organism.algae`,
+                    defaultMessage: `Algae`,
+                  }),
+                },
+                {
+                  icon: `snail`,
+                  name: e.formatMessage({
+                    id: `learningBlock.foodChain.organism.pondSnail`,
+                    defaultMessage: `Pond snail`,
+                  }),
+                },
+                {
+                  icon: `fish`,
+                  name: e.formatMessage({
+                    id: `learningBlock.foodChain.organism.smallFish`,
+                    defaultMessage: `Small fish`,
+                  }),
+                },
+                {
+                  icon: `frog`,
+                  name: e.formatMessage({
+                    id: `learningBlock.foodChain.organism.bullfrog`,
+                    defaultMessage: `Bullfrog`,
+                  }),
+                },
+                {
+                  icon: `heron`,
+                  name: e.formatMessage({
+                    id: `learningBlock.foodChain.organism.heron`,
+                    defaultMessage: `Heron`,
+                  }),
+                },
+              ],
+            }
+          : t === `ocean`
+            ? {
+                ecosystem: e.formatMessage({
+                  id: `learningBlock.foodChain.ecosystem.ocean`,
+                  defaultMessage: `Ocean`,
+                }),
+                producerAction: e.formatMessage({
+                  id: `learningBlock.foodChain.producerAction.phytoplankton`,
+                  defaultMessage: `Phytoplankton capture energy from sunlight`,
+                }),
+                organisms: [
+                  {
+                    icon: `plankton`,
+                    name: e.formatMessage({
+                      id: `learningBlock.foodChain.organism.phytoplankton`,
+                      defaultMessage: `Phytoplankton`,
+                    }),
+                  },
+                  {
+                    icon: `shrimp`,
+                    name: e.formatMessage({
+                      id: `learningBlock.foodChain.organism.zooplankton`,
+                      defaultMessage: `Zooplankton`,
+                    }),
+                  },
+                  {
+                    icon: `fish`,
+                    name: e.formatMessage({
+                      id: `learningBlock.foodChain.organism.sardine`,
+                      defaultMessage: `Sardine`,
+                    }),
+                  },
+                  {
+                    icon: `tuna`,
+                    name: e.formatMessage({
+                      id: `learningBlock.foodChain.organism.tuna`,
+                      defaultMessage: `Tuna`,
+                    }),
+                  },
+                  {
+                    icon: `shark`,
+                    name: e.formatMessage({
+                      id: `learningBlock.foodChain.organism.shark`,
+                      defaultMessage: `Shark`,
+                    }),
+                  },
+                ],
+              }
+            : {
+                ecosystem: e.formatMessage({
+                  id: `learningBlock.foodChain.ecosystem.grassland`,
+                  defaultMessage: `Grassland`,
+                }),
+                producerAction: e.formatMessage({
+                  id: `learningBlock.foodChain.producerAction.grass`,
+                  defaultMessage: `Grass captures energy from sunlight`,
+                }),
+                organisms: [
+                  {
+                    icon: `grass`,
+                    name: e.formatMessage({
+                      id: `learningBlock.foodChain.organism.grass`,
+                      defaultMessage: `Grass`,
+                    }),
+                  },
+                  {
+                    icon: `grasshopper`,
+                    name: e.formatMessage({
+                      id: `learningBlock.foodChain.organism.grasshopper`,
+                      defaultMessage: `Grasshopper`,
+                    }),
+                  },
+                  {
+                    icon: `frog`,
+                    name: e.formatMessage({
+                      id: `learningBlock.foodChain.organism.frog`,
+                      defaultMessage: `Frog`,
+                    }),
+                  },
+                  {
+                    icon: `snake`,
+                    name: e.formatMessage({
+                      id: `learningBlock.foodChain.organism.snake`,
+                      defaultMessage: `Snake`,
+                    }),
+                  },
+                  {
+                    icon: `hawk`,
+                    name: e.formatMessage({
+                      id: `learningBlock.foodChain.organism.hawk`,
+                      defaultMessage: `Hawk`,
+                    }),
+                  },
+                ],
+              }),
+      (p = (e, t) =>
+        [
+          e.formatMessage({
+            id: `learningBlock.foodChain.role.producer`,
+            defaultMessage: `Producer`,
+          }),
+          e.formatMessage({
+            id: `learningBlock.foodChain.role.primaryConsumer`,
+            defaultMessage: `Primary consumer`,
+          }),
+          e.formatMessage({
+            id: `learningBlock.foodChain.role.secondaryConsumer`,
+            defaultMessage: `Secondary consumer`,
+          }),
+          e.formatMessage({
+            id: `learningBlock.foodChain.role.tertiaryConsumer`,
+            defaultMessage: `Tertiary consumer`,
+          }),
+          e.formatMessage({
+            id: `learningBlock.foodChain.role.quaternaryConsumer`,
+            defaultMessage: `Top consumer`,
+          }),
+        ][t] ?? ``));
+  }))();
+}
+export { p as a, a as c, f as i, i as l, c as n, m as o, u as r, d as s, l as t };

@@ -25,15 +25,7 @@ assertReleaseOwner("pull-request-actions");
 
 assertReleaseOwner("pull-request-revision-tab");
 
-// registered-pull-request-thumbnail
-const thumbnail = await bundle("registered-pull-request-thumbnail");
-const thumbnailTree = thumbnail.RegisteredPullRequestThumbnail({ props: { request: { number: 4 }, status: "merged", checks: [{ id: 1 }, { id: 2 }] }, title: "Improve tests" });
-assert.equal(thumbnailTree.props["data-testid"], "pull-request-thumbnail");
-assert.equal(nodeOfType(thumbnailTree, "strong").props.children, "Improve tests");
-assert.equal(nodes(thumbnailTree).find(node => node.props.children === "merged").type, "span");
-assert.equal(nodes(thumbnailTree).find(node => node.props.children === "2 checks").type, "span");
-assert.match(nodeOfType(thumbnailTree, "code").props.children, /"number":4/);
-assert.equal(thumbnail.RegisteredPullRequestThumbnail({}).props.children[0].props.children, "Pull request");
+assertReleaseOwner("registered-pull-request-thumbnail");
 
 assertReleaseOwner("pull-request-readonly-comment");
 

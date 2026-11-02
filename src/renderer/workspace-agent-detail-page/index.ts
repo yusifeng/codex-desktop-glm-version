@@ -1,23 +1,255 @@
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/workspace-agent-detail-query";
-
-export interface WorkspaceAgentDetailData { agent: { id: string; name?: string; description?: string }; latest_published_version?: { id?: string; version?: number; [key: string]: unknown } | null; }
-export interface WorkspaceAgentDetailPageProps { agentId?: string; useLegacyRoute?: boolean; data?: WorkspaceAgentDetailData | null; isLoading?: boolean; errorStatus?: number; onRetry?(): void; onOpenLegacy?(): void; }
-let jsx: JsxRuntime;
-function ensureJsx(): JsxRuntime { if (jsx == null) jsx = getJsxRuntime(); return jsx; }
-
-function WorkspaceAgentDetailPage(props: WorkspaceAgentDetailPageProps): unknown {
-  const runtime = ensureJsx();
-  if (!props.agentId) return runtime.jsx("a", { "data-redirect": true, href: "/", children: "Go home" });
-  if (props.useLegacyRoute) return runtime.jsxs("main", { children: [runtime.jsx("h1", { children: "Open this agent in ChatGPT" }), runtime.jsx("button", { type: "button", onClick: props.onOpenLegacy, children: "Open ChatGPT" })] });
-  if (props.isLoading) return runtime.jsx("main", { "aria-busy": true, children: "Loading agent…" });
-  if (props.errorStatus != null) {
-    const message = props.errorStatus === 404 ? "Agent not found" : props.errorStatus === 401 || props.errorStatus === 403 ? "You don't have access to this agent" : "Unable to load agent";
-    return runtime.jsxs("main", { role: "alert", children: [runtime.jsx("h1", { children: message }), props.errorStatus >= 500 ? runtime.jsx("button", { type: "button", onClick: props.onRetry, children: "Try again" }) : null] });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  I3 as i,
+  K2 as a,
+  Y2 as o,
+  Yh as s,
+  Zh as c,
+} from "@rchunk/app-shared";
+import {
+  Aet as l,
+  Dft as u,
+  Let as d,
+  Oft as f,
+  Qgn as p,
+  Ret as m,
+  Sdn as h,
+  Xw as g,
+  Ygn as _,
+  Yw as v,
+  ket as y,
+  l_n as b,
+  ltn as x,
+  ptn as S,
+  utn as C,
+  wdn as w,
+} from "@rchunk/app-initial";
+import { i as T, t as E } from "@rchunk/workspace-agent-detail-query";
+function D(e) {
+  let t = (0, j.c)(5),
+    { useLegacyRoute: n } = e,
+    r = n !== void 0 && n,
+    { agentId: i } = b();
+  if (i == null) {
+    let e;
+    return (
+      t[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, M.jsx)(_, { to: `/`, replace: !0 })), (t[0] = e))
+        : (e = t[0]),
+      e
+    );
   }
-  if (!props.data?.latest_published_version) return runtime.jsx("a", { "data-redirect": true, href: `/agents/${encodeURIComponent(props.agentId)}`, children: "Open agent" });
-  return runtime.jsxs("main", { className: "workspace-agent-detail-page", "data-agent-id": props.data.agent.id, children: [runtime.jsx("h1", { children: props.data.agent.name ?? "Agent" }), runtime.jsx("p", { children: props.data.agent.description }), runtime.jsx("section", { className: "workspace-agent-chat" })] });
+  if (r) {
+    let e;
+    return (
+      t[1] === i ? (e = t[2]) : ((e = (0, M.jsx)(k, { agentId: i })), (t[1] = i), (t[2] = e)),
+      e
+    );
+  }
+  let a;
+  return (
+    t[3] === i ? (a = t[4]) : ((a = (0, M.jsx)(O, { agentId: i })), (t[3] = i), (t[4] = a)),
+    a
+  );
 }
-
-export { WorkspaceAgentDetailPage };
+function O(e) {
+  let t = (0, j.c)(13),
+    { agentId: r } = e,
+    { data: i, error: a, isError: o, isPending: s, refetch: c } = n(T, r);
+  if (s) {
+    let e;
+    return (
+      t[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, M.jsx)(d, { debugName: `WorkspaceAgentDetail`, fillParent: !0 })), (t[0] = e))
+        : (e = t[0]),
+      e
+    );
+  }
+  if (o || i == null) {
+    let e;
+    t[1] === c
+      ? (e = t[2])
+      : ((e = () => {
+          c();
+        }),
+        (t[1] = c),
+        (t[2] = e));
+    let n;
+    return (
+      t[3] !== a || t[4] !== e
+        ? ((n = (0, M.jsx)(A, { error: a, onRetry: e })), (t[3] = a), (t[4] = e), (t[5] = n))
+        : (n = t[5]),
+      n
+    );
+  }
+  let { agent: l, latest_published_version: u } = i;
+  if (u == null) {
+    let e;
+    t[6] === l.id ? (e = t[7]) : ((e = C(l.id)), (t[6] = l.id), (t[7] = e));
+    let n;
+    return (
+      t[8] === e
+        ? (n = t[9])
+        : ((n = (0, M.jsx)(_, { to: e, replace: !0 })), (t[8] = e), (t[9] = n)),
+      n
+    );
+  }
+  let f;
+  return (
+    t[10] !== l.id || t[11] !== u
+      ? ((f = (0, M.jsx)(v, { routeProjectId: null, workspaceAgent: u }, l.id)),
+        (t[10] = l.id),
+        (t[11] = u),
+        (t[12] = f))
+      : (f = t[12]),
+    f
+  );
+}
+function k(e) {
+  let t = (0, j.c)(7),
+    { agentId: n } = e,
+    r,
+    i;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((r = (0, M.jsx)(o, {
+        id: `workspaceAgents.legacyRoute.title`,
+        defaultMessage: `Open this agent in ChatGPT`,
+        description: `Title shown when a Workspace Agent deep link must open in the existing ChatGPT web experience`,
+      })),
+      (i = (0, M.jsx)(o, {
+        id: `workspaceAgents.legacyRoute.description`,
+        defaultMessage: `Workspace Agents isn't available in Codex yet`,
+        description: `Description shown when the native Codex Workspace Agents experience is unavailable`,
+      })),
+      (t[0] = r),
+      (t[1] = i))
+    : ((r = t[0]), (i = t[1]));
+  let a;
+  t[2] === n
+    ? (a = t[3])
+    : ((a = (e) => {
+        f({ event: e, href: x(n), initiator: `open_in_browser_bridge` });
+      }),
+      (t[2] = n),
+      (t[3] = a));
+  let c;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((c = (0, M.jsx)(o, {
+        id: `workspaceAgents.legacyRoute.open`,
+        defaultMessage: `Open in ChatGPT`,
+        description: `Button that opens a Workspace Agent in the existing ChatGPT web experience`,
+      })),
+      (t[4] = c))
+    : (c = t[4]);
+  let l;
+  return (
+    t[5] === a
+      ? (l = t[6])
+      : ((l = (0, M.jsx)(y, {
+          layout: `page`,
+          title: r,
+          description: i,
+          actions: (0, M.jsx)(s, { color: `primary`, size: `medium`, onClick: a, children: c }),
+        })),
+        (t[5] = a),
+        (t[6] = l)),
+    l
+  );
+}
+function A(e) {
+  let t = (0, j.c)(14),
+    { error: n, onRetry: r } = e,
+    i = n instanceof h ? n.status : null,
+    a = i === 404,
+    c = i === 401 || i === 403,
+    l;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((l = (0, M.jsx)(o, {
+        id: `workspaceAgents.detail.error.title`,
+        defaultMessage: `Unable to load agent`,
+        description: `Title shown when a Workspace Agent cannot be loaded because of a temporary error`,
+      })),
+      (t[0] = l))
+    : (l = t[0]);
+  let u = l;
+  if (a) {
+    let e;
+    (t[1] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, M.jsx)(o, {
+          id: `workspaceAgents.detail.notFound.title`,
+          defaultMessage: `Agent not found`,
+          description: `Title shown when a Workspace Agent deep link points to an agent that does not exist`,
+        })),
+        (t[1] = e))
+      : (e = t[1]),
+      (u = e));
+  } else if (c) {
+    let e;
+    (t[2] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, M.jsx)(o, {
+          id: `workspaceAgents.detail.forbidden.title`,
+          defaultMessage: `You don't have access to this agent`,
+          description: `Title shown when the user cannot access a Workspace Agent from a deep link`,
+        })),
+        (t[2] = e))
+      : (e = t[2]),
+      (u = e));
+  }
+  let d;
+  t[3] !== c || t[4] !== a
+    ? ((d =
+        a || c
+          ? void 0
+          : (0, M.jsx)(o, {
+              id: `workspaceAgents.detail.error.description`,
+              defaultMessage: `Check your connection and try again`,
+              description: `Description shown when a Workspace Agent cannot be loaded because of a temporary error`,
+            })),
+      (t[3] = c),
+      (t[4] = a),
+      (t[5] = d))
+    : (d = t[5]);
+  let f;
+  t[6] !== c || t[7] !== a || t[8] !== r
+    ? ((f =
+        a || c
+          ? void 0
+          : (0, M.jsx)(s, {
+              color: `outline`,
+              size: `medium`,
+              onClick: r,
+              children: (0, M.jsx)(o, {
+                id: `workspaceAgents.detail.error.retry`,
+                defaultMessage: `Retry`,
+                description: `Button label that retries loading a Workspace Agent`,
+              }),
+            })),
+      (t[6] = c),
+      (t[7] = a),
+      (t[8] = r),
+      (t[9] = f))
+    : (f = t[9]);
+  let p;
+  return (
+    t[10] !== d || t[11] !== f || t[12] !== u
+      ? ((p = (0, M.jsx)(y, { layout: `page`, title: u, description: d, actions: f })),
+        (t[10] = d),
+        (t[11] = f),
+        (t[12] = u),
+        (t[13] = p))
+      : (p = t[13]),
+    p
+  );
+}
+var j, M;
+function N() {
+  return (N = e(() => {
+    ((j = t()), r(), a(), p(), c(), u(), l(), m(), g(), w(), S(), E(), (M = i()));
+  }))();
+}
+N();
+export { D as WorkspaceAgentDetailPage };

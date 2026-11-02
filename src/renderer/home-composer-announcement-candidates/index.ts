@@ -1,166 +1,390 @@
-import "@rchunk/rolldown-runtime";
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import * as primaryChunk from "@rchunk/app-primary";
-import * as announcementsChunk from "@rchunk/codex-home-announcements";
-import * as worktreeStateChunk from "@rchunk/worktree-onboarding-state";
-import * as entryPointsChunk from "@rchunk/announcement-entry-points";
-
-interface AnnouncementCandidate {
-  content: unknown;
-  id: string;
-  isEligible: boolean;
-  isLoading: boolean;
-}
-
-interface CandidateState {
-  dismiss(): void;
-  isEligible: boolean;
-  isLoading: boolean;
-  markShown?(): void;
-  openGiftCredits?(): void;
-  openImport?(): void;
-  replay?(): void;
-}
-
-export interface HomeComposerAnnouncementCandidatesProps {
-  beaconProduct?: string | null;
-  entryPoint: string;
-  homeRunLocationRemoteProject?: unknown;
-  includeGitCheckoutWarning?: boolean;
-  renderCandidates(candidates: AnnouncementCandidate[]): unknown;
-  shouldHideOnboardingPromos?: boolean;
-}
-
-const shared = sharedChunk as unknown as Record<string, unknown>;
-const initial = initialChunk as unknown as Record<string, unknown>;
-const primary = primaryChunk as unknown as Record<string, unknown>;
-const announcements = announcementsChunk as unknown as Record<string, unknown>;
-const worktreeState = worktreeStateChunk as unknown as Record<string, unknown>;
-const entryPoints = entryPointsChunk as unknown as Record<string, unknown>;
-
-let jsx: {
-  jsx(component: unknown, props: Record<string, unknown>, key?: string): unknown;
-};
-let flushSync: (callback: () => void) => void;
-let RealtimeVoiceAnnouncement: unknown;
-let WorktreeOnboardingController: unknown;
-
-function callInitializer(candidate: unknown): void {
-  if (typeof candidate === "function") candidate();
-}
-
-function HomeComposerAnnouncementCandidates({
-  renderCandidates,
-  beaconProduct,
-  entryPoint,
-  homeRunLocationRemoteProject,
-  includeGitCheckoutWarning,
-  shouldHideOnboardingPromos = false,
-}: HomeComposerAnnouncementCandidatesProps): unknown {
-  initializeHomeComposerAnnouncementCandidates();
-  const useScope = shared.LX as (root: unknown) => { set(signal: unknown, value: unknown): void };
-  const useSignalValue = shared.HX as (signal: unknown) => unknown;
-  const useComposerEditor = initial.HZ as () => {
-    eventEmitter: { emit(event: string): void };
-    setPromptText(text: string): void;
-  };
-  const scope = useScope(shared.ZI);
-  const isLocalModeRemote = homeRunLocationRemoteProject != null;
-  const editor = useComposerEditor();
-  const giftState = (entryPoints.i as (options: { enabled: boolean }) => CandidateState)({
-    enabled: !shouldHideOnboardingPromos,
-  });
-  const computerHistoryStatus = useSignalValue(entryPoints.g) as string | undefined;
-  const startRealtimeVoice = (initial.Fk as (surface: string) => (() => void) | null | undefined)(
-    beaconProduct === "work_tab" ? "work" : entryPoint,
-  );
-  const voiceAvailable = (initial.qk as () => boolean | undefined)();
-  const replayState = (entryPoints.f as (options: { enabled: boolean }) => CandidateState)({ enabled: true });
-  const { showPluginInstallDetails } = (initial.U2 as () => { showPluginInstallDetails: boolean })();
-  const navigateToLocalConversation = (initial.F$ as () => unknown)();
-  const importEnabled = startRealtimeVoice == null || voiceAvailable === false;
-  const importState = (entryPoints.o as (options: { enabled: boolean }) => CandidateState)({ enabled: importEnabled });
-  const worktreeEnabled = !shouldHideOnboardingPromos && !giftState.isEligible && !giftState.isLoading && importEnabled && !importState.isEligible && !importState.isLoading;
-  const worktree = (worktreeState.n as (options: { enabled: boolean; entryPoint: string; isLocalModeRemote: boolean }) => { isEligible: boolean })({ enabled: worktreeEnabled, entryPoint, isLocalModeRemote });
-  const worktreeCandidate: AnnouncementCandidate = {
-    id: "worktree-onboarding",
-    isEligible: worktree.isEligible,
-    isLoading: false,
-    content: worktree.isEligible ? jsx.jsx(WorktreeOnboardingController, {}) : null,
-  };
-  const dismissComputerHistory = () => { scope.set(entryPoints.h, true); };
-  const viewComputerHistoryRecap = (prompt: string) => {
-    scope.set(entryPoints.h, true);
-    flushSync(() => editor.setPromptText(prompt));
-    editor.eventEmitter.emit("submit");
-  };
-  const historyAllowed = !shouldHideOnboardingPromos && !isLocalModeRemote && beaconProduct !== "chatgpt";
-  const computerHistoryCandidate: AnnouncementCandidate = {
-    id: "computer-history",
-    isEligible: historyAllowed && computerHistoryStatus === "eligible",
-    isLoading: historyAllowed && computerHistoryStatus === "loading",
-    content: jsx.jsx(entryPoints.v, { onDismiss: dismissComputerHistory, onViewRecap: viewComputerHistoryRecap }),
-  };
-  const giftCandidate: AnnouncementCandidate = {
-    id: "gift-credits",
-    isEligible: !shouldHideOnboardingPromos && giftState.isEligible,
-    isLoading: !shouldHideOnboardingPromos && giftState.isLoading,
-    content: giftState.isEligible ? jsx.jsx(entryPoints.t, { onDismiss: giftState.dismiss, onOpenGiftCredits: giftState.openGiftCredits }) : null,
-  };
-  const voiceCandidate: AnnouncementCandidate = {
-    id: "realtime-voice",
-    isEligible: startRealtimeVoice != null && voiceAvailable === true,
-    isLoading: startRealtimeVoice != null && voiceAvailable === undefined,
-    content: startRealtimeVoice == null ? null : jsx.jsx(RealtimeVoiceAnnouncement, {
-      entryPoint,
-      onDismiss: () => (initial.Gk as (scope: unknown) => void)(scope),
-      onStart: () => { startRealtimeVoice(); },
-    }),
-  };
-  const importCandidate: AnnouncementCandidate = {
-    id: "external-agent-import",
-    isEligible: importState.isEligible,
-    isLoading: importState.isLoading,
-    content: jsx.jsx(entryPoints.s, { onDismiss: importState.dismiss, onImport: importState.openImport, onShown: importState.markShown }),
-  };
-  const replayCandidate: AnnouncementCandidate = {
-    id: "codex-replay",
-    isEligible: replayState.isEligible,
-    isLoading: replayState.isLoading,
-    content: jsx.jsx(entryPoints.p, {
-      onDismiss: replayState.dismiss,
-      onShown: replayState.markShown,
-      onReplay: () => { void (entryPoints.u as (options: Record<string, unknown>) => Promise<void> | void)({ scope, navigateToLocalConversation, onReplay: replayState.replay, showPluginInstallDetails }); },
-    }),
-  };
-  const entries = [giftCandidate, voiceCandidate, importCandidate, worktreeCandidate, computerHistoryCandidate, replayCandidate];
-  const fallbackContent = jsx.jsx(primary.om, {});
-  if (beaconProduct == null) {
-    return jsx.jsx(announcements.t, { composerEntries: entries, fallbackContent, homeRunLocationRemoteProject, includeGitCheckoutWarning, renderCandidates, shouldHideOnboardingPromos });
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/realtime-voice-home-announcement",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-primary",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "./app-primary-484df789f2f5.css",
+      "@rchunk/worktree-onboarding-banner-controller",
+      "@rchunk/worktree-onboarding-state",
+      "@rchunk/use-codex-worktrees",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  H3 as r,
+  HX as ee,
+  I3 as i,
+  Jm as a,
+  LX as te,
+  P3 as o,
+  QI as s,
+  V3 as c,
+  ZI as ne,
+  qm as l,
+} from "@rchunk/app-shared";
+import {
+  F$ as re,
+  Fk as ie,
+  Gk as ae,
+  HZ as oe,
+  L2 as u,
+  Nk as d,
+  P$ as f,
+  U2 as se,
+  VZ as p,
+  Wk as m,
+  qk as ce,
+} from "@rchunk/app-initial";
+import { om as le, sm as h } from "@rchunk/app-primary";
+import { a as g, i as ue, r as _, t as de } from "@rchunk/codex-home-announcements";
+import { n as fe, t as v } from "@rchunk/worktree-onboarding-state";
+import {
+  _ as y,
+  a as b,
+  c as x,
+  d as S,
+  f as pe,
+  g as me,
+  h as he,
+  i as ge,
+  l as C,
+  m as w,
+  n as T,
+  o as _e,
+  p as ve,
+  r as E,
+  s as ye,
+  t as be,
+  u as xe,
+  v as Se,
+  y as D,
+} from "@rchunk/announcement-entry-points";
+function O(e) {
+  let t = (0, Ce.c)(83),
+    {
+      renderCandidates: n,
+      beaconProduct: r,
+      entryPoint: i,
+      homeRunLocationRemoteProject: a,
+      includeGitCheckoutWarning: o,
+      shouldHideOnboardingPromos: s,
+    } = e,
+    c = te(ne),
+    l = a != null,
+    u = oe(),
+    d = !s,
+    f;
+  t[0] === d ? (f = t[1]) : ((f = { enabled: d }), (t[0] = d), (t[1] = f));
+  let p = ge(f),
+    m = ee(me),
+    h = ie(r === `work_tab` ? `work` : i),
+    g = ce(),
+    _;
+  t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((_ = { enabled: !0 }), (t[2] = _))
+    : (_ = t[2]);
+  let v = pe(_),
+    { showPluginInstallDetails: y } = se(),
+    b = re(),
+    x = h == null || g === !1,
+    S;
+  t[3] === x ? (S = t[4]) : ((S = { enabled: x }), (t[3] = x), (t[4] = S));
+  let C = _e(S),
+    w =
+      !s &&
+      !p.isEligible &&
+      !p.isLoading &&
+      (h == null || g === !1) &&
+      !C.isEligible &&
+      !C.isLoading,
+    T;
+  t[5] !== i || t[6] !== l || t[7] !== w
+    ? ((T = { enabled: w, entryPoint: i, isLocalModeRemote: l }),
+      (t[5] = i),
+      (t[6] = l),
+      (t[7] = w),
+      (t[8] = T))
+    : (T = t[8]);
+  let E = fe(T),
+    D;
+  t[9] === E.isEligible
+    ? (D = t[10])
+    : ((D = E.isEligible ? (0, k.jsx)(Ee, {}) : null), (t[9] = E.isEligible), (t[10] = D));
+  let O;
+  t[11] !== D || t[12] !== E.isEligible
+    ? ((O = { id: `worktree-onboarding`, isEligible: E.isEligible, isLoading: !1, content: D }),
+      (t[11] = D),
+      (t[12] = E.isEligible),
+      (t[13] = O))
+    : (O = t[13]);
+  let A = O,
+    j = !s && !l && r !== `chatgpt` && m === `eligible`,
+    M = !s && !l && r !== `chatgpt` && m === `loading`,
+    N;
+  t[14] === c
+    ? (N = t[15])
+    : ((N = () => {
+        c.set(he, !0);
+      }),
+      (t[14] = c),
+      (t[15] = N));
+  let P;
+  t[16] !== u || t[17] !== c
+    ? ((P = (e) => {
+        (c.set(he, !0),
+          (0, we.flushSync)(() => {
+            u.setPromptText(e);
+          }),
+          u.eventEmitter.emit(`submit`));
+      }),
+      (t[16] = u),
+      (t[17] = c),
+      (t[18] = P))
+    : (P = t[18]);
+  let F;
+  t[19] !== N || t[20] !== P
+    ? ((F = (0, k.jsx)(Se, { onDismiss: N, onViewRecap: P })),
+      (t[19] = N),
+      (t[20] = P),
+      (t[21] = F))
+    : (F = t[21]);
+  let I;
+  t[22] !== j || t[23] !== M || t[24] !== F
+    ? ((I = { id: `computer-history`, isEligible: j, isLoading: M, content: F }),
+      (t[22] = j),
+      (t[23] = M),
+      (t[24] = F),
+      (t[25] = I))
+    : (I = t[25]);
+  let L = I,
+    R = !s && p.isEligible,
+    z = !s && p.isLoading,
+    B;
+  t[26] !== p.dismiss || t[27] !== p.isEligible || t[28] !== p.openGiftCredits
+    ? ((B = p.isEligible
+        ? (0, k.jsx)(be, { onDismiss: p.dismiss, onOpenGiftCredits: p.openGiftCredits })
+        : null),
+      (t[26] = p.dismiss),
+      (t[27] = p.isEligible),
+      (t[28] = p.openGiftCredits),
+      (t[29] = B))
+    : (B = t[29]);
+  let V;
+  t[30] !== R || t[31] !== z || t[32] !== B
+    ? ((V = { id: `gift-credits`, isEligible: R, isLoading: z, content: B }),
+      (t[30] = R),
+      (t[31] = z),
+      (t[32] = B),
+      (t[33] = V))
+    : (V = t[33]);
+  let H = h != null && g === !0,
+    De = h != null && g === void 0,
+    U;
+  t[34] !== i || t[35] !== c || t[36] !== h
+    ? ((U =
+        h == null
+          ? null
+          : (0, k.jsx)(Te, { entryPoint: i, onDismiss: () => ae(c), onStart: () => void h() })),
+      (t[34] = i),
+      (t[35] = c),
+      (t[36] = h),
+      (t[37] = U))
+    : (U = t[37]);
+  let W;
+  t[38] !== H || t[39] !== De || t[40] !== U
+    ? ((W = { id: `realtime-voice`, isEligible: H, isLoading: De, content: U }),
+      (t[38] = H),
+      (t[39] = De),
+      (t[40] = U),
+      (t[41] = W))
+    : (W = t[41]);
+  let G;
+  t[42] !== C.dismiss || t[43] !== C.markShown || t[44] !== C.openImport
+    ? ((G = (0, k.jsx)(ye, { onDismiss: C.dismiss, onImport: C.openImport, onShown: C.markShown })),
+      (t[42] = C.dismiss),
+      (t[43] = C.markShown),
+      (t[44] = C.openImport),
+      (t[45] = G))
+    : (G = t[45]);
+  let K;
+  t[46] !== C.isEligible || t[47] !== C.isLoading || t[48] !== G
+    ? ((K = {
+        id: `external-agent-import`,
+        isEligible: C.isEligible,
+        isLoading: C.isLoading,
+        content: G,
+      }),
+      (t[46] = C.isEligible),
+      (t[47] = C.isLoading),
+      (t[48] = G),
+      (t[49] = K))
+    : (K = t[49]);
+  let q;
+  t[50] !== v.replay || t[51] !== b || t[52] !== c || t[53] !== y
+    ? ((q = () =>
+        void xe({
+          scope: c,
+          navigateToLocalConversation: b,
+          onReplay: v.replay,
+          showPluginInstallDetails: y,
+        })),
+      (t[50] = v.replay),
+      (t[51] = b),
+      (t[52] = c),
+      (t[53] = y),
+      (t[54] = q))
+    : (q = t[54]);
+  let J;
+  t[55] !== v.dismiss || t[56] !== v.markShown || t[57] !== q
+    ? ((J = (0, k.jsx)(ve, { onDismiss: v.dismiss, onReplay: q, onShown: v.markShown })),
+      (t[55] = v.dismiss),
+      (t[56] = v.markShown),
+      (t[57] = q),
+      (t[58] = J))
+    : (J = t[58]);
+  let Y;
+  t[59] !== v.isEligible || t[60] !== v.isLoading || t[61] !== J
+    ? ((Y = { id: `codex-replay`, isEligible: v.isEligible, isLoading: v.isLoading, content: J }),
+      (t[59] = v.isEligible),
+      (t[60] = v.isLoading),
+      (t[61] = J),
+      (t[62] = Y))
+    : (Y = t[62]);
+  let X;
+  t[63] !== L || t[64] !== V || t[65] !== W || t[66] !== K || t[67] !== Y || t[68] !== A
+    ? ((X = [V, W, K, A, L, Y]),
+      (t[63] = L),
+      (t[64] = V),
+      (t[65] = W),
+      (t[66] = K),
+      (t[67] = Y),
+      (t[68] = A),
+      (t[69] = X))
+    : (X = t[69]);
+  let Z = X,
+    Q;
+  t[70] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((Q = (0, k.jsx)(le, {})), (t[70] = Q))
+    : (Q = t[70]);
+  let Oe = Q;
+  if (r == null) {
+    let e;
+    return (
+      t[71] !== Z || t[72] !== a || t[73] !== o || t[74] !== n || t[75] !== s
+        ? ((e = (0, k.jsx)(de, {
+            renderCandidates: n,
+            composerEntries: Z,
+            fallbackContent: Oe,
+            homeRunLocationRemoteProject: a,
+            includeGitCheckoutWarning: o,
+            shouldHideOnboardingPromos: s,
+          })),
+          (t[71] = Z),
+          (t[72] = a),
+          (t[73] = o),
+          (t[74] = n),
+          (t[75] = s),
+          (t[76] = e))
+        : (e = t[76]),
+      e
+    );
   }
-  return jsx.jsx(announcements.i, { entries, fallbackContent, product: beaconProduct, renderCandidates, shouldHideOnboardingPromos, startRealtimeVoice }, beaconProduct);
+  let $;
+  return (
+    t[77] !== r || t[78] !== Z || t[79] !== n || t[80] !== s || t[81] !== h
+      ? (($ = (0, k.jsx)(
+          ue,
+          {
+            renderCandidates: n,
+            entries: Z,
+            fallbackContent: Oe,
+            product: r,
+            shouldHideOnboardingPromos: s,
+            startRealtimeVoice: h,
+          },
+          r,
+        )),
+        (t[77] = r),
+        (t[78] = Z),
+        (t[79] = n),
+        (t[80] = s),
+        (t[81] = h),
+        (t[82] = $))
+      : ($ = t[82]),
+    $
+  );
 }
-
-function initializeHomeComposerAnnouncementCandidates(): void {
-  if (jsx != null) return;
-  callInitializer(shared.$3);
-  callInitializer(shared.FX);
-  const reactDomFactory = shared.P3 as () => { flushSync(callback: () => void): void };
-  flushSync = reactDomFactory().flushSync;
-  for (const candidate of [
-    announcements.a, announcements.r, primary.sm, initial.VZ, worktreeState.t,
-    entryPoints.y, entryPoints._, shared.qm, entryPoints.m, entryPoints.l,
-    entryPoints.d, entryPoints.c, entryPoints.a, entryPoints.n, entryPoints.r,
-    initial.L2, initial.Nk, initial.Wk, shared.QI, initial.P$,
-  ]) callInitializer(candidate);
-  jsx = (shared.I3 as () => typeof jsx)();
-  callInitializer(shared.H3);
-  const lazy = shared.Jm as (loader: () => Promise<unknown>, options: { propagateLoadError: boolean }) => unknown;
-  RealtimeVoiceAnnouncement = lazy(async () => (await import("@rchunk/realtime-voice-home-announcement")).RealtimeVoiceHomeAnnouncementContent, { propagateLoadError: true });
-  WorktreeOnboardingController = lazy(async () => (await import("@rchunk/worktree-onboarding-banner-controller")).WorktreeOnboardingBannerController, { propagateLoadError: true });
+var Ce, we, k, Te, Ee;
+function A() {
+  return (A = e(() => {
+    ((Ce = t()),
+      n(),
+      (we = o()),
+      g(),
+      _(),
+      h(),
+      p(),
+      v(),
+      D(),
+      y(),
+      l(),
+      w(),
+      C(),
+      S(),
+      x(),
+      b(),
+      T(),
+      E(),
+      u(),
+      d(),
+      m(),
+      s(),
+      f(),
+      (k = i()),
+      r(),
+      (Te = a(
+        async () =>
+          (
+            await c(
+              async () => {
+                let { RealtimeVoiceHomeAnnouncementContent: e } = await import(
+                  `@rchunk/realtime-voice-home-announcement`
+                );
+                return { RealtimeVoiceHomeAnnouncementContent: e };
+              },
+              __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7]),
+              import.meta.url,
+            )
+          ).RealtimeVoiceHomeAnnouncementContent,
+        { propagateLoadError: !0 },
+      )),
+      (Ee = a(
+        async () =>
+          (
+            await c(
+              async () => {
+                let { WorktreeOnboardingBannerController: e } = await import(
+                  `@rchunk/worktree-onboarding-banner-controller`
+                );
+                return { WorktreeOnboardingBannerController: e };
+              },
+              __vite__mapDeps([8, 1, 2, 3, 5, 6, 4, 7, 9, 10]),
+              import.meta.url,
+            )
+          ).WorktreeOnboardingBannerController,
+        { propagateLoadError: !0 },
+      )));
+  }))();
 }
-
-initializeHomeComposerAnnouncementCandidates();
-
-export { HomeComposerAnnouncementCandidates };
+A();
+export { O as HomeComposerAnnouncementCandidates };

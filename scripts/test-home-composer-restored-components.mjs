@@ -254,56 +254,7 @@ assert.equal(selectedLocation, "cloud");
 locationTree.props.children[1].props.onClick();
 assert.equal(selectedLocation, "local");
 
-const announcements = await bundle("home-composer-announcement-candidates", {
-  "app-shared": `
-    export const I3=()=>globalThis.__homeComposerRestored.jsx;
-    export const Jm=()=>"LazyAnnouncement"; export const P3=()=>({flushSync:callback=>callback()});
-    export const ZI="app-scope"; export const LX=()=>({set:(signal,value)=>globalThis.__homeComposerRestored.events.push({signal,value})});
-    export const HX=signal=>signal==="history-state"?"eligible":null;
-  `,
-  "app-initial": `
-    export const F$=()=>"navigate"; export const Fk=()=>()=>globalThis.__homeComposerRestored.events.push({voice:true});
-    export const Gk=scope=>globalThis.__homeComposerRestored.events.push({dismissVoice:scope});
-    export const HZ=()=>globalThis.__homeComposerRestored.announcementEditor;
-    export const U2=()=>({showPluginInstallDetails:true}); export const qk=()=>true;
-  `,
-  "app-primary": `export const om="FallbackAnnouncement";`,
-  "codex-home-announcements": `export const i="ProductAnnouncements"; export const t="CodexAnnouncements";`,
-  "worktree-onboarding-state": `export const n=()=>({isEligible:false});`,
-  "announcement-entry-points": `
-    const state={isEligible:false,isLoading:false,dismiss(){},markShown(){},openGiftCredits(){},openImport(){},replay(){}};
-    export const f=()=>state; export const g="history-state"; export const h="history-dismissed"; export const i=()=>state; export const o=()=>state;
-    export const p="ReplayAnnouncement"; export const s="ImportAnnouncement"; export const t="GiftAnnouncement"; export const v="HistoryAnnouncement";
-    export const u=options=>globalThis.__homeComposerRestored.events.push({replay:options});
-  `,
-  "realtime-voice-home-announcement": `export const RealtimeVoiceHomeAnnouncementContent="VoiceAnnouncement";`,
-  "worktree-onboarding-banner-controller": `export const WorktreeOnboardingBannerController="WorktreeAnnouncement";`,
-});
-state.announcementPrompt = [];
-globalThis.__homeComposerRestored.announcementEditor = {
-  eventEmitter: { emit: event => state.events.push({ submitted: event }) },
-  setPromptText: prompt => state.announcementPrompt.push(prompt),
-};
-const announcementTree = announcements.HomeComposerAnnouncementCandidates({
-  entryPoint: "codex",
-  renderCandidates: candidates => candidates,
-});
-assert.equal(announcementTree.type, "CodexAnnouncements");
-assert.deepEqual(announcementTree.props.composerEntries.map(candidate => candidate.id), [
-  "gift-credits", "realtime-voice", "external-agent-import", "worktree-onboarding", "computer-history", "codex-replay",
-]);
-const historyCandidate = announcementTree.props.composerEntries[4];
-assert.equal(historyCandidate.isEligible, true);
-historyCandidate.content.props.onViewRecap("recap prompt");
-assert.deepEqual(state.announcementPrompt, ["recap prompt"]);
-assert.equal(state.events.some(event => event.submitted === "submit"), true);
-const productAnnouncementTree = announcements.HomeComposerAnnouncementCandidates({
-  beaconProduct: "work_tab",
-  entryPoint: "codex",
-  renderCandidates: candidates => candidates,
-});
-assert.equal(productAnnouncementTree.type, "ProductAnnouncements");
-assert.equal(productAnnouncementTree.key, "work_tab");
+assertReleaseOwner("home-composer-announcement-candidates");
 
 assertReleaseOwner("composer-banners");
 

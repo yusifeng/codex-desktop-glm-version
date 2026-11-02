@@ -57,14 +57,7 @@ assert.deepEqual(calls[0], { value: 12.34, options: { style: "currency", currenc
 assert.equal(amount.t(intl, 1234, "JPY"), "JPY:1234");
 assert.equal(calls[1].options.currency, "JPY");
 
-// payment-method-display: 5
-const payment = await bundle("payment-method-display");
-assert.deepEqual(Object.keys(payment), ["n", "t"]);
-const card = payment.t({ type: "card", card: { brand: "visa", last4: "4242" } });
-assert.equal(card.label, "Visa");
-assert.equal(text(card.description), "•••• 4242");
-assert.equal(text(payment.t({ type: "paypal", paypal: { payer_email: "payer@example.com" } }).description), "payer@example.com");
-assert.equal(payment.t({ type: "unknown" }).label, "Payment method");
+assertReleaseOwner("payment-method-display");
 
 // cadence-events: 12
 const cadence = await bundle("cadence-events");

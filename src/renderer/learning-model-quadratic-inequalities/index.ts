@@ -1,18 +1,234 @@
-// Quadratic-inequality solution model. Release chunk: model-82b31c2ac45b.js.
-import "@rchunk/rolldown-runtime";
-type Operator = ">" | "<" | ">=" | "<="; interface Values { a?: unknown; b?: unknown; c?: unknown; operator?: unknown } interface SafeValues { a: number; b: number; c: number; operator: Operator } interface Interval { start: number | null; end: number | null; startIncluded: boolean; endIncluded: boolean }
-interface Manifest { type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string; parameters: { a: { kind: "number"; defaultValue: number; min: number; max: number }; b: { kind: "number"; defaultValue: number; min: number; max: number }; c: { kind: "number"; defaultValue: number; min: number; max: number }; operator: { kind: "enum"; defaultValue: Operator; allowedValues: Operator[] } } }
-interface Result { values: SafeValues; discriminant: number; kind: string; roots: number[]; rootDisplayDecimals: number; rootsAreApproximate: boolean; intervals: Interval[]; solutionDisplay: string; solutionLatex: string; solutionRootLatex: string; solutionText: string }
-let manifest: Manifest; let defaults: SafeValues; let normalizeValues: (values: Values) => SafeValues; let valueAt: (values: SafeValues, x: number) => number; let formatNumber: (value: number, digits?: number) => string; let calculate: (values: Values) => Result; let chartBounds: (result: Result) => { xMin: number; xMax: number; yMin: number; yMax: number }; let polynomialLabel: (values: SafeValues) => string; let operatorLatex: (operator: Operator) => string; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "QUADRATIC_INEQUALITIES", version: 1, thumbnailAssetKey: "quadratic-inequalities-v1", canonicalFormula: "ax^2 + bx + c > 0", parameters: { a: { kind: "number", defaultValue: 1, min: .1, max: 10 }, b: { kind: "number", defaultValue: -1, min: -20, max: 20 }, c: { kind: "number", defaultValue: -6, min: -20, max: 20 }, operator: { kind: "enum", defaultValue: ">", allowedValues: [">", "<", ">=", "<="] } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); defaults = { a: manifest.parameters.a.defaultValue, b: manifest.parameters.b.defaultValue, c: manifest.parameters.c.defaultValue, operator: manifest.parameters.operator.defaultValue }; const epsilon = 1e-8; const number = (value: unknown, fallback: number, min: number, max: number) => Math.min(max, Math.max(min, typeof value === "number" && Number.isFinite(value) ? value : fallback)); const operator = (value: unknown): Operator => manifest.parameters.operator.allowedValues.some(item => item === value) ? value as Operator : defaults.operator; normalizeValues = values => ({ a: number(values.a, defaults.a, manifest.parameters.a.min, manifest.parameters.a.max), b: number(values.b, defaults.b, manifest.parameters.b.min, manifest.parameters.b.max), c: number(values.c, defaults.c, manifest.parameters.c.min, manifest.parameters.c.max), operator: operator(values.operator) }); valueAt = (values, x) => values.a * x * x + values.b * x + values.c; const zero = (value: number) => Math.abs(value) < epsilon ? 0 : value; formatNumber = (value, digits = 3) => zero(value).toFixed(digits).replace(/\.?0+$/, "").replace(/^-0$/, "0");
-  const holds = (value: number, relation: Operator) => relation === ">" ? value > epsilon : relation === "<" ? value < -epsilon : relation === ">=" ? value >= -epsilon : value <= epsilon;
-  const merge = (intervals: Interval[]) => { const sorted = [...intervals].sort((left, right) => left.start === null ? -1 : right.start === null ? 1 : Math.abs(left.start - right.start) > epsilon ? left.start - right.start : left.end === null ? 1 : right.end === null ? -1 : left.end - right.end); const result: Interval[] = []; for (const interval of sorted) { const previous = result.at(-1); if (!previous) { result.push({ ...interval }); continue; } const overlaps = previous.end === null || interval.start === null || previous.end > interval.start + epsilon || (Math.abs(previous.end - interval.start) <= epsilon && (previous.endIncluded || interval.startIncluded)); if (!overlaps) { result.push({ ...interval }); continue; } if (previous.end !== null && (interval.end === null || interval.end > previous.end + epsilon)) { previous.end = interval.end; previous.endIncluded = interval.endIncluded; } else if (interval.end !== null && Math.abs(interval.end - previous.end) <= epsilon) previous.endIncluded ||= interval.endIncluded; } return result; };
-  const solveIntervals = (values: SafeValues, roots: number[]) => { const boundaries: Array<number | null> = [null, ...roots, null]; const intervals: Interval[] = []; const spacing = roots.length === 2 ? Math.max(1, Math.abs((roots[1] ?? 0) - (roots[0] ?? 0))) : 1; for (let index = 0; index < boundaries.length - 1; index += 1) { const start = boundaries[index] ?? null; const end = boundaries[index + 1] ?? null; const sample = start === null && end !== null ? end - spacing : start !== null && end === null ? start + spacing : start !== null && end !== null ? (start + end) / 2 : 0; if (holds(valueAt(values, sample), values.operator)) intervals.push({ start, end, startIncluded: false, endIncluded: false }); } if (values.operator === ">=" || values.operator === "<=") roots.forEach(root => intervals.push({ start: root, end: root, startIncluded: true, endIncluded: true })); return merge(intervals); };
-  const intervalText = (interval: Interval, digits: number, latex: boolean) => { if (interval.start !== null && interval.end !== null && Math.abs(interval.start - interval.end) < epsilon) return latex ? `\\{${formatNumber(interval.start, digits)}\\}` : `{${formatNumber(interval.start, digits)}}`; const left = interval.start === null || !interval.startIncluded ? "(" : "["; const right = interval.end === null || !interval.endIncluded ? ")" : "]"; const negativeInfinity = latex ? "-\\infty" : "-infinity"; const positiveInfinity = latex ? "\\infty" : "infinity"; return `${left}${interval.start === null ? negativeInfinity : formatNumber(interval.start, digits)}, ${interval.end === null ? positiveInfinity : formatNumber(interval.end, digits)}${right}`; };
-  const displays = (intervals: Interval[], roots: number[], digits: number) => { if (intervals.length === 0) return { solutionDisplay: "∅", solutionLatex: "\\varnothing", solutionRootLatex: "\\varnothing", solutionText: "empty set" }; if (intervals.length === 1 && intervals[0]?.start === null && intervals[0]?.end === null) return { solutionDisplay: "ℝ", solutionLatex: "\\mathbb{R}", solutionRootLatex: "\\mathbb{R}", solutionText: "all real numbers" }; const rootName = (value: number) => { const index = roots.findIndex(root => Math.abs(root - value) <= epsilon); return index < 0 ? formatNumber(value, digits) : roots.length === 1 ? "r" : `x_${index + 1}`; }; const rootInterval = (interval: Interval) => { if (interval.start !== null && interval.end !== null && Math.abs(interval.start - interval.end) < epsilon) return `\\{${rootName(interval.start)}\\}`; return `${interval.start === null || !interval.startIncluded ? "(" : "["}${interval.start === null ? "-\\infty" : rootName(interval.start)}, ${interval.end === null ? "\\infty" : rootName(interval.end)}${interval.end === null || !interval.endIncluded ? ")" : "]"}`; }; return { solutionDisplay: intervals.map(value => intervalText(value, digits, false)).join(" ∪ ").replaceAll("infinity", "∞"), solutionLatex: intervals.map(value => intervalText(value, digits, true)).join(" \\cup "), solutionRootLatex: intervals.map(rootInterval).join(" \\cup "), solutionText: intervals.map(value => intervalText(value, digits, false)).join(" union "), }; };
-  calculate = input => { const values = normalizeValues(input); const discriminant = values.b ** 2 - 4 * values.a * values.c; let roots: number[]; let kind: string; if (Math.abs(values.a) < epsilon) { roots = Math.abs(values.b) < epsilon ? [] : [zero(-values.c / values.b)]; kind = "degenerate"; } else if (discriminant > epsilon) { const root = Math.sqrt(discriminant); roots = [(-values.b - root) / (2 * values.a), (-values.b + root) / (2 * values.a)].sort((left, right) => left - right); kind = "two_roots"; } else if (Math.abs(discriminant) <= epsilon) { roots = [zero(-values.b / (2 * values.a))]; kind = "repeated_root"; } else { roots = []; kind = "no_real_roots"; } let digits = 3; while (digits < 6 && new Set(roots.map(root => formatNumber(root, digits))).size < roots.length) digits += 1; const intervals = solveIntervals(values, roots); return { values, discriminant: zero(discriminant), kind, roots, rootDisplayDecimals: digits, rootsAreApproximate: roots.some(root => Math.abs(root - Number(formatNumber(root, digits))) > epsilon), intervals, ...displays(intervals, roots, digits) }; };
-  chartBounds = result => { const center = Math.abs(result.values.a) < epsilon ? 0 : -result.values.b / (2 * result.values.a); const first = result.roots[0]; const last = result.roots.at(-1); const midpoint = first !== undefined && last !== undefined ? (first + last) / 2 : center; const span = first !== undefined && last !== undefined ? Math.abs(last - first) : 0; const width = result.roots.length === 2 ? span + 4 : 8; const xMin = midpoint - width / 2; const xMax = midpoint + width / 2; const values = [valueAt(result.values, xMin), valueAt(result.values, xMax), valueAt(result.values, center), 0]; const yMin = Math.min(...values); const yMax = Math.max(...values); const padding = Math.max(6, yMax - yMin) * .16; return { xMin, xMax, yMin: yMin - padding, yMax: yMax + padding }; };
-  polynomialLabel = values => { const terms: string[] = []; const append = (coefficient: number, variable: string) => { if (Math.abs(coefficient) < epsilon) return; const magnitude = Math.abs(coefficient); const body = `${variable && Math.abs(magnitude - 1) < epsilon ? "" : formatNumber(magnitude)}${variable}`; terms.push(terms.length === 0 ? coefficient < 0 ? `-${body}` : body : coefficient < 0 ? `- ${body}` : `+ ${body}`); }; append(values.a, "x^2"); append(values.b, "x"); append(values.c, ""); return terms.join(" " ) || "0"; }; operatorLatex = value => value === ">=" ? "\\ge" : value === "<=" ? "\\le" : value;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `QUADRATIC_INEQUALITIES`),
+      (n = `quadratic-inequalities-v1`),
+      (r = `ax^2 + bx + c > 0`),
+      (i = {
+        a: { kind: `number`, defaultValue: 1, min: 0.1, max: 10 },
+        b: { kind: `number`, defaultValue: -1, min: -20, max: 20 },
+        c: { kind: `number`, defaultValue: -6, min: -20, max: 20 },
+        operator: { kind: `enum`, defaultValue: `>`, allowedValues: [`>`, `<`, `>=`, `<=`] },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-export { formatNumber as a, initializeModel as c, manifest as d, polynomialLabel as i, normalizeValues as l, calculate as n, operatorLatex as o, valueAt as r, chartBounds as s, defaults as t, initializeManifest as u };
+var s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w, T, E, D, O, k;
+function A() {
+  return (A = e(() => {
+    (o(),
+      (s = {
+        a: a.parameters.a.defaultValue,
+        b: a.parameters.b.defaultValue,
+        c: a.parameters.c.defaultValue,
+        operator: a.parameters.operator.defaultValue,
+      }),
+      (c = 1e-8),
+      (l = a.parameters.operator.allowedValues),
+      (u = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (d = (e, t, n, r) => u(typeof e == `number` && Number.isFinite(e) ? e : t, n, r)),
+      (f = (e) => (l.includes(e) ? e : s.operator)),
+      (p = (e) => ({
+        a: d(e.a, s.a, a.parameters.a.min, a.parameters.a.max),
+        b: d(e.b, s.b, a.parameters.b.min, a.parameters.b.max),
+        c: d(e.c, s.c, a.parameters.c.min, a.parameters.c.max),
+        operator: f(e.operator),
+      })),
+      (m = (e, t) => e.a * t * t + e.b * t + e.c),
+      (h = (e, t) => {
+        switch (t) {
+          case `>`:
+            return e > c;
+          case `<`:
+            return e < -1e-8;
+          case `>=`:
+            return e >= -1e-8;
+          case `<=`:
+            return e <= c;
+        }
+      }),
+      (g = (e) => (Math.abs(e) < c ? 0 : e)),
+      (_ = (e, t = 3) =>
+        g(e)
+          .toFixed(t)
+          .replace(/\.?0+$/, ``)
+          .replace(/^-0$/, `0`)),
+      (v = (e, t) => (e === null ? `\\infty` : _(e, t))),
+      (y = (e, t) => (e === null ? `infinity` : _(e, t))),
+      (b = (e, t) => {
+        if (e.start !== null && e.end !== null && Math.abs(e.start - e.end) < c)
+          return `\\{${_(e.start, t)}\\}`;
+        let n = e.start === null ? `(` : e.startIncluded ? `[` : `(`,
+          r = e.end === null ? `)` : e.endIncluded ? `]` : `)`;
+        return `${n}${e.start === null ? `-${v(null, t)}` : v(e.start, t)}, ${v(e.end, t)}${r}`;
+      }),
+      (x = (e, t) => {
+        if (e.start !== null && e.end !== null && Math.abs(e.start - e.end) < c)
+          return `{${_(e.start, t)}}`;
+        let n = e.start === null ? `(` : e.startIncluded ? `[` : `(`,
+          r = e.end === null ? `)` : e.endIncluded ? `]` : `)`;
+        return `${n}${e.start === null ? `-${y(null, t)}` : y(e.start, t)}, ${y(e.end, t)}${r}`;
+      }),
+      (S = (e, t, n) => {
+        if (e.length === 0)
+          return {
+            solutionDisplay: `∅`,
+            solutionLatex: `\\varnothing`,
+            solutionRootLatex: `\\varnothing`,
+            solutionText: `empty set`,
+          };
+        if (e.length === 1 && e[0].start === null && e[0].end === null)
+          return {
+            solutionDisplay: `ℝ`,
+            solutionLatex: `\\mathbb{R}`,
+            solutionRootLatex: `\\mathbb{R}`,
+            solutionText: `all real numbers`,
+          };
+        let r = (e) => {
+          let r = t.findIndex((t) => Math.abs(t - e) <= c);
+          return r < 0 ? _(e, n) : t.length === 1 ? `r` : `x_${r + 1}`;
+        };
+        return {
+          solutionDisplay: e
+            .map((e) => x(e, n))
+            .join(` ∪ `)
+            .replaceAll(`infinity`, `∞`),
+          solutionLatex: e.map((e) => b(e, n)).join(` \\cup `),
+          solutionRootLatex: e
+            .map((e) => {
+              if (e.start !== null && e.end !== null && Math.abs(e.start - e.end) < c)
+                return `\\{${r(e.start)}\\}`;
+              let t = e.start === null ? `(` : e.startIncluded ? `[` : `(`,
+                n = e.end === null ? `)` : e.endIncluded ? `]` : `)`;
+              return `${t}${e.start === null ? `-\\infty` : r(e.start)}, ${e.end === null ? `\\infty` : r(e.end)}${n}`;
+            })
+            .join(` \\cup `),
+          solutionText: e.map((e) => x(e, n)).join(` union `),
+        };
+      }),
+      (C = (e) => {
+        let t = 3;
+        for (; t < 6 && new Set(e.map((e) => _(e, t))).size < e.length;) t += 1;
+        return t;
+      }),
+      (w = (e) => {
+        let t = [...e].sort((e, t) =>
+            e.start === null
+              ? -1
+              : t.start === null
+                ? 1
+                : Math.abs(e.start - t.start) > c
+                  ? e.start - t.start
+                  : e.end === null
+                    ? 1
+                    : t.end === null
+                      ? -1
+                      : e.end - t.end,
+          ),
+          n = [];
+        for (let e of t) {
+          let t = n.at(-1);
+          if (!t) {
+            n.push({ ...e });
+            continue;
+          }
+          if (!(
+            t.end === null ||
+            e.start === null ||
+            t.end > e.start + c ||
+            (Math.abs(t.end - e.start) <= c && (t.endIncluded || e.startIncluded))
+          )) {
+            n.push({ ...e });
+            continue;
+          }
+          t.end !== null &&
+            (e.end === null || e.end > t.end + c
+              ? ((t.end = e.end), (t.endIncluded = e.endIncluded))
+              : e.end !== null &&
+                Math.abs(e.end - t.end) <= c &&
+                (t.endIncluded = t.endIncluded || e.endIncluded));
+        }
+        return n;
+      }),
+      (T = (e, t) => {
+        let n = [null, ...t, null],
+          r = [],
+          i = t.length === 2 ? Math.max(1, Math.abs(t[1] - t[0])) : 1;
+        for (let t = 0; t < n.length - 1; t += 1) {
+          let a = n[t],
+            o = n[t + 1],
+            s =
+              a === null && o !== null
+                ? o - i
+                : a !== null && o === null
+                  ? a + i
+                  : a !== null && o !== null
+                    ? (a + o) / 2
+                    : 0;
+          h(m(e, s), e.operator) &&
+            r.push({ start: a, end: o, startIncluded: !1, endIncluded: !1 });
+        }
+        if (e.operator === `>=` || e.operator === `<=`)
+          for (let e of t) r.push({ start: e, end: e, startIncluded: !0, endIncluded: !0 });
+        return w(r);
+      }),
+      (E = (e) => {
+        let t = p(e),
+          n = t.b * t.b - 4 * t.a * t.c,
+          r,
+          i;
+        if (Math.abs(t.a) < c) ((i = Math.abs(t.b) < c ? [] : [g(-t.c / t.b)]), (r = `degenerate`));
+        else if (n > c) {
+          let e = Math.sqrt(n);
+          ((i = [(-t.b - e) / (2 * t.a), (-t.b + e) / (2 * t.a)].sort((e, t) => e - t)),
+            (r = `two_roots`));
+        } else
+          Math.abs(n) <= c
+            ? ((i = [g(-t.b / (2 * t.a))]), (r = `repeated_root`))
+            : ((i = []), (r = `no_real_roots`));
+        let a = T(t, i),
+          o = C(i),
+          s = i.some((e) => Math.abs(e - Number(_(e, o))) > c);
+        return {
+          values: t,
+          discriminant: g(n),
+          kind: r,
+          roots: i,
+          rootDisplayDecimals: o,
+          rootsAreApproximate: s,
+          intervals: a,
+          ...S(a, i, o),
+        };
+      }),
+      (D = (e) => {
+        let { a: t, b: n } = e.values,
+          r = Math.abs(t) < c ? 0 : -n / (2 * t),
+          i = e.roots[0],
+          a = e.roots.at(-1),
+          o = i !== void 0 && a !== void 0 ? (i + a) / 2 : r,
+          s = i !== void 0 && a !== void 0 ? Math.abs(a - i) : 0,
+          l = e.roots.length === 2 ? s + 4 : 8,
+          u = o - l / 2,
+          d = o + l / 2,
+          f = [m(e.values, u), m(e.values, d), m(e.values, r), 0],
+          p = Math.min(...f),
+          h = Math.max(...f),
+          g = Math.max(6, h - p) * 0.16;
+        return { xMin: u, xMax: d, yMin: p - g, yMax: h + g };
+      }),
+      (O = (e) => {
+        let t = [],
+          n = (e, n) => {
+            if (Math.abs(e) < c) return;
+            let r = Math.abs(e),
+              i = `${n && Math.abs(r - 1) < c ? `` : _(r)}${n}`;
+            t.length === 0 ? t.push(e < 0 ? `-${i}` : i) : t.push(e < 0 ? `- ${i}` : `+ ${i}`);
+          };
+        return (n(e.a, `x^2`), n(e.b, `x`), n(e.c, ``), t.length > 0 ? t.join(` `) : `0`);
+      }),
+      (k = (e) => (e === `>=` ? `\\ge` : e === `<=` ? `\\le` : e)));
+  }))();
+}
+export { _ as a, A as c, a as d, O as i, p as l, E as n, k as o, m as r, D as s, s as t, o as u };

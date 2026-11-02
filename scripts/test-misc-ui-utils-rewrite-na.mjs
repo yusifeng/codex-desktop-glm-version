@@ -11,11 +11,6 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
 assert.equal(IMPORT_ALIASES.proxy, CHUNKS["motion-proxy-runtime"]);
 const modules = [
   [
-    "sort-bar-visualization-b904625976aa.js",
-    "sort-bar-visualization",
-    ["a", "i", "n", "o", "r", "t"],
-  ],
-  [
     "subagents-f011dd080466.js",
     "registered-subagents-thumbnail",
     ["RegisteredSubagentsThumbnail"],
@@ -59,6 +54,7 @@ for (const [a, d] of modules) {
   assert.equal(/\bany\b|@ts-expect-error|@ts-nocheck/.test(r), false);
   sourceAssertions += 3;
 }
+sourceAssertions += assertReleaseOwner("sort-bar-visualization");
 globalThis.__na = {
   cache: Array(100).fill(Symbol.for("react.memo_cache_sentinel")),
   agents: [],
@@ -186,19 +182,6 @@ assert.equal(
   "g",
 );
 runtimeAssertions += 2;
-const sort = L.get("sort-bar-visualization");
-sort.n();
-const bars = sort.t({
-  ariaLabel: "s",
-  heading: "S",
-  items: [
-    { id: "a", value: 5, label: "5", positionLabel: "1", role: "candidate" },
-  ],
-  maxValue: 10,
-  presentationMode: "thumbnail",
-});
-assert.equal(bars.props.children[0].props.children.props.style.height, "50%");
-runtimeAssertions++;
 const sub = L.get("registered-subagents-thumbnail");
 assert.equal(
   sub.RegisteredSubagentsThumbnail({

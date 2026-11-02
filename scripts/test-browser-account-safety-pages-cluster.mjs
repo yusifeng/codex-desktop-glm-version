@@ -13,8 +13,7 @@ assert.equal(mobileAge.MobileAgeVerificationPage({}).props["data-status"],"loadi
 const handoff=await load("browser-mobile-handoff-page");
 assert.equal(handoff.BrowserMobileHandoffPage({}).props["data-status"],"loading");assert.equal(handoff.BrowserMobileHandoffPage({status:"account_changed"}).props.children[1].props.children,"This browser account changed. Return to the app and try again");assert.match(handoff.BrowserMobileHandoffPage({status:"unavailable"}).props.children[1].props.children,/no longer available/);let continued=null;const ready=handoff.BrowserMobileHandoffPage({status:"ready",redirectTo:"/checkout",onContinue:(url)=>{continued=url}});assert.equal(ready.props["data-redirect"],true);ready.props.onClick();assert.equal(continued,"/checkout");
 
-const enroll=await load("browser-mfa-enroll-page");
-assert.equal(enroll.BrowserMfaEnrollPage({}).props.children[1].props.role,"status");const totp=enroll.BrowserMfaEnrollPage({status:"ready",token:"secret",redirectPath:"/settings/security"});assert.match(totp.props.children[1].props.href,/^\/totp_enroll\?/);assert.match(totp.props.children[1].props.href,/token=secret/);assert.match(totp.props.children[1].props.href,/redirect_path=%2Fsettings%2Fsecurity/);const passkey=enroll.BrowserMfaEnrollPage({status:"ready",token:"t",factor:"passkey",appName:"Codex"});assert.match(passkey.props.children[1].props.href,/^\/passkey-enroll\?/);assert.match(passkey.props.children[1].props.href,/origin_app_name=Codex/);let reauthed=0;const reauth=enroll.BrowserMfaEnrollPage({status:"reauthenticate",onReauthenticate:()=>{reauthed++}});reauth.props.children[1].props.onClick();assert.equal(reauthed,1);assert.match(enroll.BrowserMfaEnrollPage({status:"email_required"}).props.children[1].props.children[0],/email address/);assert.equal(enroll.BrowserMfaEnrollPage({status:"error"}).props.children[1].props.role,"alert");
+const enrollReleaseAssertions=assertReleaseOwner("browser-mfa-enroll-page");
 
 const disableReleaseAssertions=assertReleaseOwner("browser-mfa-disable-page");
 
@@ -22,4 +21,4 @@ const logoutReleaseAssertions=assertReleaseOwner("browser-logout-page");
 
 const releaseAssertions = assertReleaseOwner("verify-guardian-page") + assertReleaseOwner("verify-age-page") + assertReleaseOwner("icloud-hosted-page");
 
-console.log(`browser account safety pages cluster complete (${releaseAssertions + logoutReleaseAssertions + disableReleaseAssertions} release assertions)`);
+console.log(`browser account safety pages cluster complete (${releaseAssertions + logoutReleaseAssertions + disableReleaseAssertions + enrollReleaseAssertions} release assertions)`);
