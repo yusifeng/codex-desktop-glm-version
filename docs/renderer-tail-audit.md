@@ -1,5 +1,17 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Automation/trust/browser/MCP release-owner recovery：一次性恢复
+`cloud-automation-detail-panel`、`trusted-contact-settings`、`mcp-tool-approval-message`、
+`browser-skill-editor`、`flight-search-form`、`pull-request-fix-workflow`、
+`chronicle-permissions-dialog`、`image-gen-loading-games`、`app-card` 与
+`platform-ui-kit-provider` 十个发布 owner，净恢复 14,980 行发布 TypeScript。旧的局部
+mock 行为测试已迁移为逐字发布一致性验证，关联 automation、conversation surface、profile/app、
+privacy、MCP approval 测试簇继续通过。整批通过 12,448/12,448 transform check、
+1,888/1,888 renderer build/verify、2,247/2,247 app-code coverage、0 semantic tail 与
+typecheck。严格 hub 消费推进到 app-shared 1,559/3,185、app-initial 4,830/8,204、
+app-primary 619/917，仍为 0 unreviewed、0 invalid consumers。该批恢复发布控制流和依赖图，
+不把 425 个 preserved 边界、hub 剩余耦合导出或最终真实 E2E 视为完成。
+
 2026-11-02 Project/plugin/compliance dialog release-owner recovery：一次性恢复
 `cme-dialog`、`create-dialog`、`chatgpt-project-add-sources-dialog`、
 `browser-browsing-data-dialog`、`plugins-page-section`、`hosted-plugin-create-dialog`、

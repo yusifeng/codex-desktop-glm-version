@@ -36,60 +36,8 @@ function text(node) { const parts = []; walk(node, candidate => { const children
 const base = { id: "task-1", title: "Daily brief", prompt: "Summarize updates", is_enabled: true, next_run_times: [], schedule: "RRULE:FREQ=DAILY", schedule_components: { frequency: "daily" }, canManage: true, canDelete: true };
 const item = { automation: base, teamId: null };
 
-const releaseAssertions = assertReleaseOwner("automation-editor-dialog");
-
-const cloud = await bundle("cloud-automation-detail-panel");
-assert.deepEqual(Object.keys(cloud).sort(), ["a", "c", "i", "n", "o", "r", "s", "t"]);
-const validDraft = { name: "Cloud task", prompt: "Build report", kind: "cron", projectId: null };
-assert.equal(cloud.a({ draft: validDraft }), null);
-const requirements = cloud.a({ draft: { ...validDraft, name: "", prompt: "", kind: "heartbeat", threadId: null }, allowNewThread: false, executionLocation: "cloud" });
-assert.match(text(requirements), /Add a title/);
-assert.match(text(requirements), /Add a prompt/);
-assert.match(text(requirements), /Select a chat/);
-assert.match(text(requirements), /Choose where to run it/);
-assert.match(text(requirements), /Choose a model/);
-let changed;
-const form = cloud.s({ draft: validDraft, setDraft: updater => { changed = typeof updater === "function" ? updater(validDraft) : updater; }, resolvedProjects: [{ projectId: "empty", title: "Empty", worktreePaths: [] }, { projectId: "repo", title: "Repo", worktreePaths: ["/repo"] }] });
-assert.equal(form.type, "form");
-assert.equal(all(form, node => node.type === "option").length, 4);
-find(form, node => node.type === "input").props.onChange({ currentTarget: { value: "Renamed" } });
-assert.equal(changed.name, "Renamed");
-assert.equal(find(form, node => node.type === "button" && node.props.children === "Save").props.disabled, false);
-const invalidForm = cloud.s({ draft: { ...validDraft, name: "" }, setDraft() {} });
-assert.equal(find(invalidForm, node => node.type === "button" && node.props.children === "Save").props.disabled, true);
-let renamed, panelClosed = 0;
-const panel = cloud.r({ name: "Panel task", statusLabel: "Paused", onNameChange: value => { renamed = value; }, closeAction: { label: "Close", onClose: () => { panelClosed++; } }, children: "Details" });
-assert.equal(panel.type, "section");
-assert.match(text(panel), /Paused/);
-find(panel, node => node.props?.id === "automation-detail-panel-title").props.onChange({ currentTarget: { value: "New" } });
-assert.equal(renamed, "New");
-find(panel, node => node.props?.["aria-label"] === "Close").props.onClick();
-assert.equal(panelClosed, 1);
-let openedChat = 0;
-globalThis.__automationEditorTest.reset();
-const cloudEditor = globalThis.__automationEditorTest.render(cloud.t, { item, onClose: () => {}, onOpenConversation: () => { openedChat++; } });
-assert.equal(find(cloudEditor, node => node.props?.id === "automation-detail-panel-title").props.value, "Daily brief");
-assert.match(text(cloudEditor), /Summarize updates/);
-find(cloudEditor, node => node.type === "button" && node.props.children === "Open chat").props.onClick();
-assert.equal(openedChat, 1);
-globalThis.__automationEditorTest.reset();
-let cloudSaved, cloudClosed = 0, cloudDeleted = 0;
-const cloudProps = { item, onClose: () => { cloudClosed++; }, onSave: async draft => { cloudSaved = draft; return { ...base, title: draft.name, name: draft.name, prompt: draft.prompt }; }, onSaved() {}, onDelete: async () => { cloudDeleted++; } };
-let cloudState = globalThis.__automationEditorTest.render(cloud.t, cloudProps);
-find(cloudState, node => node.type === "button" && node.props.children === "Edit").props.onClick();
-cloudState = globalThis.__automationEditorTest.render(cloud.t, cloudProps);
-find(cloudState, node => node.props?.id === "automation-detail-panel-title").props.onChange({ currentTarget: { value: "Cloud morning brief" } });
-cloudState = globalThis.__automationEditorTest.render(cloud.t, cloudProps);
-await find(cloudState, node => node.type === "form").props.onSubmit({ preventDefault() {} });
-assert.equal(cloudSaved.name, "Cloud morning brief");
-cloudState = globalThis.__automationEditorTest.render(cloud.t, cloudProps);
-find(cloudState, node => node.type === "button" && node.props.children === "Delete").props.onClick();
-cloudState = globalThis.__automationEditorTest.render(cloud.t, cloudProps);
-find(cloudState, node => node.type === "button" && node.props.children === "Delete task").props.onClick();
-await new Promise(resolve => setTimeout(resolve, 0));
-assert.equal(cloudDeleted, 1);
-assert.equal(cloudClosed, 1);
-cloud.c(); cloud.i(); cloud.n(); cloud.o();
-assert.equal(typeof cloud.t, "function");
+const releaseAssertions =
+  assertReleaseOwner("automation-editor-dialog") +
+  assertReleaseOwner("cloud-automation-detail-panel");
 
 console.log("automation editor release owner and cloud detail cluster tests passed (" + releaseAssertions + " release assertions)");

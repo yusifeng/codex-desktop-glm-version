@@ -17,41 +17,6 @@ function text(node) { const parts = []; const collect = value => { if (typeof va
 
 const browsingReleaseAssertions = assertReleaseOwner("browser-browsing-data-dialog");
 
-const chronicle = await bundle("chronicle-permissions-dialog");
-assert.deepEqual(Object.keys(chronicle).sort(), ["S", "_", "a", "b", "c", "d", "f", "g", "h", "i", "l", "m", "n", "o", "p", "r", "s", "t", "u", "v", "x", "y"].sort());
-assert.equal(chronicle.i(), "Computer history");
-assert.equal(chronicle.u(), "Permissions");
-assert.match(chronicle.o(), /without ever recording your screen or audio/);
-assert.equal(chronicle.x(new Error("bad config")), "bad config");
-let memoriesEnabled = 0, memoryWritten = 0;
-await chronicle.g({ id: "identity" }, { setMemoryFeatureEnabled() { memoriesEnabled++; }, writeMemoryConfig() { memoryWritten++; } });
-assert.equal(memoriesEnabled, 1);
-assert.equal(memoryWritten, 1);
-let savedConfig, chronicleClosed = 0;
-const permissionsMount = mount(chronicle.t, { config: { appMode: "exclude", apps: [{ id: "mail", name: "Mail" }], websiteMode: "exclude", websites: [] }, onClose() { chronicleClosed++; }, onSave(config) { savedConfig = config; } });
-let permissionsUi = permissionsMount.render();
-assert.match(text(permissionsUi), /Computer history permissions/);
-assert.match(text(permissionsUi), /Mail/);
-find(permissionsUi, node => node.props?.["aria-label"] === "Website domain").props.onChange({ currentTarget: { value: "Example.COM" } });
-permissionsUi = permissionsMount.render();
-find(permissionsUi, node => node.props?.children === "Add website").props.onClick();
-permissionsUi = permissionsMount.render();
-assert.match(text(permissionsUi), /example.com/);
-find(permissionsUi, node => node.props?.children === "Continue").props.onClick();
-await Promise.resolve();
-assert.deepEqual(savedConfig.websites, ["example.com"]);
-assert.equal(chronicleClosed, 1);
-const loadingPermissions = mount(chronicle.t, { isLoading: true, onClose() {} }).render();
-assert.equal(find(loadingPermissions, node => node.props?.role === "status").props.children, "Loading permissions…");
-const failedPermissions = mount(chronicle.t, { error: { code: "E42", message: "bad" }, onClose() {} }).render();
-assert.match(text(find(failedPermissions, node => node.props?.role === "alert")), /error E42/);
-let enabledFromDialog = 0;
-const memoriesUi = mount(chronicle.y, { onCancel() {}, onEnable() { enabledFromDialog++; } }).render();
-assert.match(text(memoriesUi), /Turn on Memories to use Computer history/);
-find(memoriesUi, node => node.props?.children === "Turn on Memories").props.onClick();
-await Promise.resolve();
-assert.equal(enabledFromDialog, 1);
-assert.equal(await chronicle.v({ enableMemories() {}, getChronicleState() { return { memoriesEnabled: true }; } }), true);
-chronicle.S(); chronicle._(); chronicle.b(); chronicle.f(); chronicle.n();
+const chronicleReleaseAssertions = assertReleaseOwner("chronicle-permissions-dialog");
 
-console.log(`privacy control dialog cluster tests passed with ${browsingReleaseAssertions} release assertions`);
+console.log(`privacy control dialog cluster tests passed with ${browsingReleaseAssertions + chronicleReleaseAssertions} release assertions`);

@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__automationInfrastructureTest = {
   initialized: [],
@@ -91,35 +92,8 @@ blocked.proceed();
 assert.equal(blocked.isCommitting, true);
 assert.equal(blocked.state, "proceeding");
 
-const provider = await bundle("platform-ui-kit-provider");
-assert.deepEqual(Object.keys(provider), ["n", "r", "t"]);
-const providerUi = provider.n({ locale: "zh-CN", timeZone: "Asia/Shanghai", children: "Content" });
-assert.equal(providerUi.props["data-locale"], "zh-CN");
-assert.equal(providerUi.props["data-time-zone"], "Asia/Shanghai");
+const restoredOwnerAssertions =
+  assertReleaseOwner("platform-ui-kit-provider") +
+  assertReleaseOwner("cloud-automation-detail-panel");
 
-const detail = await bundle("cloud-automation-detail-panel");
-assert.deepEqual(Object.keys(detail).sort(), ["a", "c", "i", "n", "o", "r", "s", "t"]);
-let edited = 0, ran = 0, paused = 0, detailDeleted = 0;
-globalThis.__automationInfrastructureTest.resetHooks();
-const detailProps = { automation: { id: "task", name: "Daily report", instructions: "Summarize", schedule: "Daily", destination: "Email", status: "ACTIVE" }, onEdit() { edited++; }, onRunNow() { ran++; }, onPause() { paused++; }, onDelete() { detailDeleted++; } };
-let detailUi = globalThis.__automationInfrastructureTest.render(detail.t, detailProps);
-assert.match(text(detailUi), /Daily report.*Summarize.*Daily.*Email/);
-find(detailUi, node => node.props?.children === "Edit").props.onClick();
-find(detailUi, node => node.props?.children === "Run now").props.onClick();
-find(detailUi, node => node.props?.children === "Pause").props.onClick();
-find(detailUi, node => node.props?.children === "Delete").props.onClick();
-detailUi = globalThis.__automationInfrastructureTest.render(detail.t, detailProps);
-find(detailUi, node => node.props?.children === "Delete task").props.onClick();
-await new Promise(resolve => setTimeout(resolve, 0));
-assert.equal(edited, 1);
-assert.equal(ran, 1);
-assert.equal(paused, 1);
-assert.equal(detailDeleted, 1);
-const pausedDetail = detail.t({ automation: { id: "task", status: "PAUSED" }, onPause() {}, onRunNow() {} });
-assert.equal(find(pausedDetail, node => node.props?.children === "Resume") != null, true);
-assert.equal(find(pausedDetail, node => node.props?.children === "Run now").props.disabled, true);
-assert.equal(find(detail.t({ automation: { id: "task" } }), node => node.props?.children === "Run now"), undefined);
-detail.c(); detail.i(); detail.n(); detail.o();
-assert.equal(typeof detail.r, "function");
-
-console.log("automation infrastructure cluster tests passed");
+console.log(`automation infrastructure cluster tests passed with ${restoredOwnerAssertions} release assertions`);

@@ -51,21 +51,7 @@ assert.equal(children(selectedThumb)[0].props.children, "Writer");
 assert.equal(children(selectedThumb)[1].props.children, "Final answer");
 assert.equal(selectedThumb.props["data-status"], "done");
 
-// image-gen-loading-games: 9
-const games = await bundle("image-gen-loading-games");
-assert.deepEqual(Object.keys(games), ["ImageGenLoadingGames"]);
-let opened; let engaged;
-const game = games.ImageGenLoadingGames({ aspectRatio: 1.5, game: "snake", imageCount: 2, messageId: "m1", onGameEngaged(id) { engaged = id; }, onGameOpened(id) { opened = id; }, startedAtMs: 100 });
-assert.equal(game.props["data-game"], "snake");
-assert.equal(game.props["data-image-count"], 2);
-assert.equal(game.props.style.aspectRatio, 1.5);
-assert.equal(children(game)[0].props.children, "Generating 2 images…");
-assert.match(children(game)[1].props.children, /Snake/);
-children(game)[1].props.onClick();
-assert.equal(opened, "m1:100");
-children(game)[1].props.onKeyDown();
-assert.equal(engaged, "m1:100");
-assert.equal(children(games.ImageGenLoadingGames({ game: "brick-breaker", isGif: true, messageId: "m" }))[0].props.children, "Generating animation…");
+const imageGameAssertions = assertReleaseOwner("image-gen-loading-games");
 
 const beaconAssertions = assertReleaseOwner("chatgpt-conversation-inline-beacon", [
   /@rchunk\/pca-connector-eligibility/,
@@ -89,4 +75,4 @@ const expired = petModule.WorkModePetContent({ accessoryId: "pet_old", builtInAs
 assert.equal(expired.props.src, "fallback.png");
 assert.equal(petModule.WorkModePetContent({ accessoryId: "default", alt: "Buddy", builtInAssets: { default: "d.png" } }).props.alt, "Buddy");
 
-console.log(`lazy conversation surface cluster assertions passed with ${beaconAssertions} beacon release assertions`);
+console.log(`lazy conversation surface cluster assertions passed with ${beaconAssertions + imageGameAssertions} release assertions`);

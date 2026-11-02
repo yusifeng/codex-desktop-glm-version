@@ -40,30 +40,6 @@ assert.equal(avatars.t(), undefined);
 // profile-view: release-faithful owner
 assertReleaseOwner("profile-view", [/^\/\/ @ts-nocheck/m, /export \{/]);
 
-// app-card: 16
-const appCard = await bundle("app-card");
-assert.deepEqual(Object.keys(appCard), ["a", "i", "n", "o", "r", "t"]);
-const projectRestriction = { keyPath: "apps.drive.enabled", kind: "app", origin: { name: { type: "project" } } };
-assert.equal(appCard.r({ restriction: projectRestriction, surface: "card" }), "Disabled by project settings");
-assert.match(appCard.r({ restriction: projectRestriction, surface: "dialog" }), /apps\.drive\.enabled/);
-assert.equal(appCard.r({ restriction: { keyPath: "apps.drive.enabled", isUserEditable: true }, surface: "card" }), "Set apps.drive.enabled to true in your user config.toml");
-assert.equal(appCard.a({ tool: { disabledReason: "disabled_by_admin", name: "write" } }).props.children, "Disabled by admin");
-assert.equal(appCard.a({ isAppDisabledWithoutRestriction: true, tool: { name: "read" } }).props.children, "Unavailable");
-assert.equal(appCard.a({ tool: { isEnabled: true, name: "read" } }), null);
-assert.equal(appCard.i({ children: "control", isControlDisabled: false, tooltipContent: "reason" }), "control");
-assert.equal(appCard.i({ children: "control", isControlDisabled: true, tooltipContent: "reason" }).props.role, "tooltip");
-let connected = 0, disconnected = 0, managed = 0, enabled;
-const cardUi = appCard.t({ app: { description: "Files", id: "drive", name: "Drive", tools: [{ isEnabled: false, name: "read" }] }, connectedAccountEmail: "d@example.com", disabled: true, onConnect() { connected++; }, onDisconnectApp() { disconnected++; }, onOpenAppTools() { managed++; }, onSetAppEnabled(value) { enabled = value; } });
-assert.equal(cardUi.props["data-app-id"], "drive");
-assert.match(text(cardUi), /Connected to d@example\.com/);
-assert.match(text(cardUi), /Unavailable/);
-find(cardUi, node => node.props?.children === "Connect").props.onClick();
-assert.equal(connected, 1);
-find(cardUi, node => node.props?.children === "Disconnect").props.onClick();
-assert.equal(disconnected, 1);
-find(cardUi, node => node.props?.children === "Manage actions").props.onClick();
-assert.equal(managed, 1);
-find(cardUi, node => node.props?.role === "switch").props.onClick();
-assert.equal(enabled, true);
+const appCardAssertions = assertReleaseOwner("app-card");
 
-console.log("52 profile and app card cluster assertions passed");
+console.log(`profile and app card cluster assertions passed with ${appCardAssertions} app-card release assertions`);
