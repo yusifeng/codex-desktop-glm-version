@@ -1,22 +1,279 @@
-import assert from "node:assert/strict"; import {Buffer} from "node:buffer"; import fs from "node:fs"; import path from "node:path"; import {fileURLToPath} from "node:url"; import * as esbuild from "esbuild";
+import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
+import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import * as esbuild from "esbuild";
 import { CHUNKS, IMPORT_ALIASES } from "./renderer-chunk-manifest.mjs";
-const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),".."),ASSET=path.join(ROOT,"src/webview/assets");
-assert.equal(IMPORT_ALIASES.proxy,CHUNKS["motion-proxy-runtime"]);
-const modules=[["sort-bar-visualization-b904625976aa.js","sort-bar-visualization",["a","i","n","o","r","t"]],["subagents-f011dd080466.js","registered-subagents-thumbnail",["RegisteredSubagentsThumbnail"]],["surfaces-b85863b30be8.js","conversation-beacon-surfaces",["ChatGptConversationBeaconSurfaces"]],["svg-arrow-6f79fa010fe2.js","svg-arrow",["n","t"]],["system-of-equations-a765decfc54f.js","system-of-equations",["n","t"]],["template-224b997c2ad7.js","learning-model-inverse-trigonometric-function-template",["a","i","n","r","t"]],["template-9f62da8bf8e9.js","learning-model-rectangular-prism-volume-template",["a","c","d","f","i","l","m","n","o","p","r","s","t","u"]],["template-bf8ec7576e3e.js","learning-model-distance-between-points-template",["n","r","t"]],["thumbnail-386f09e9e7b3.js","text-file-thumbnail",["n","t"]],["thumbnail-7c714f359bb7.js","file-image-thumbnail",["i","n","r","t"]]];
-const deps=(s,r)=>[...s.matchAll(r)].map(m=>m[1]);let sourceAssertions=0;for(const[a,d]of modules){const o=fs.readFileSync(path.join(ASSET,a.replace(/\.js$/,".ts")),"utf8"),r=fs.readFileSync(path.join(ROOT,"src/renderer",d,"index.ts"),"utf8");assert.deepEqual(deps(r,/(?:from\s+|import\s*)["']@rchunk\/([^"']+)/g),deps(o,/from "\.\/([^"/]+)-[a-f0-9]{12}\.js"/g));assert.equal((r.match(/import\(/g)||[]).length,(o.match(/import\(/g)||[]).length);assert.equal(/\bany\b|@ts-expect-error|@ts-nocheck/.test(r),false);sourceAssertions+=3;}
-globalThis.__na={cache:Array(100).fill(Symbol.for("react.memo_cache_sentinel")),agents:[]};
-const jsx=`export const I3=()=>({Fragment:Symbol.for('fragment'),jsx:(c,p,k)=>({kind:typeof c==='string'?c:(c.displayName||c.name),props:p,key:k}),jsxs:(c,p,k)=>({kind:typeof c==='string'?c:(c.displayName||c.name),props:p,key:k})});`;
-function mock(p){if(p==="@rchunk/app-shared")return jsx+`export const $3=()=>({c:()=>globalThis.__na.cache});export const K2=()=>{};export const h4=()=>{};export const m4=(...v)=>v.filter(Boolean).join(' ');export function Y2(){}Y2.displayName='FormattedMessage';export const FX=()=>{};export const QI=()=>{};export const LX=()=>({queryClient:{}});export const ZI={};export const e6=()=>({});export const BX=()=>globalThis.__na.agents;export const oZ=()=>({});export const LS=()=>null;export const lw=()=>{};export const $h=()=>{};export const BO=()=>({});export const II=p=>p.split('.').pop();export const RI=()=>{};export const gg=()=>{};export const hg=p=>p;export const pg={};export const mg=()=>function Icon(){};export const n4=()=> 'en';export function iS(){}iS.displayName='ImageIcon';`;if(p==="@rchunk/app-initial")return `export function Xd(){}Xd.displayName='Thumbnail';export const Zd=()=>{};export const HZt=()=>{};export const cet={};const initLet=()=>{};export {initLet as let};export const vZt={};export const aqt=x=>'route:'+x;export const uHt=()=>{};export const ANt=()=>{};export const dHt=()=>{};export const J9t=p=>p.endsWith('.ts')?'typescript':null;export const Jxn=()=>{};export const X9t=p=>p.endsWith('.md');export const Y9t=()=>{};export const qxn=[{id:'markdown',name:'Markdown'},{id:'typescript',name:'TypeScript'}];export const zGt=(_c,s)=>s.startsWith('resolved:')?s:null;export const H3t=(s,h)=>'host:'+h+':'+s;export const U3t=()=>{};export const HGt=()=>{};`;if(p==="@rchunk/adaptive-slider-field")return `export const n=()=>{};export const i=(v,a)=>typeof v==='number'?Math.min(Math.max(v,a.min),a.max):a.defaultValue;export const t=(v,c)=>({min:Math.min(c.baseMin,v),max:Math.max(c.baseMax,v),step:c.step});export const r=({bounds,control,value})=>bounds&&value>=bounds.min&&value<=bounds.max?bounds:t(value,control);`;if(p==="@rchunk/button")return `export function n(){}n.displayName='ButtonGroup';export function t(){}t.displayName='Button';export const r=()=>{};`;if(p==="@rchunk/input-selector-group")return `export const r=()=>{};export function t(){}t.displayName='InputSelector';`;if(p==="@rchunk/proxy")return `export const n=()=>{};export const t={div:'motion.div'};`;if(p==="@rchunk/use-reduced-motion")return `export const n=()=>false;export const t=()=>{};`;if(p==="@rchunk/subagent-row")return `export const n=()=>{};export function t(){}t.displayName='SubagentRow';`;if(p==="@rchunk/registered")return `export const n=()=>{};export function t(){}t.displayName='RegisteredConversation';`;if(p==="@rchunk/share-conversation-action")return `export const o=x=>({kind:'regenerate',...x});export const s=()=>{};`;if(p==="@rchunk/announcement-modal-source-bridge")return `export const n=()=>{};export function t(){}t.displayName='Announcement';`;if(p==="@rchunk/codex-app-home-beacon-announcement")return `export const r=()=>{};export const t=()=>{};`;if(p==="@rchunk/chatgpt-temporary-chat-ui")return `export const i=()=>{};export function n(){}n.displayName='TemporaryChat';`;if(p==="@rchunk/learning-block-katex")return `export const n=()=>{};export function t(){}t.displayName='Katex';`;if(p==="@rchunk/learning-block-stroke")return `export const i=()=>{};export const n='white';export const s=()=>({x:1,y:2,rotation:0});`;if(p==="@rchunk/format-bytes")return `export const t=(b,l)=>b+' bytes '+l;`;return `export const n=()=>{};export const r=()=>{};export const a=()=>{};export const o=()=>{};`;}
-async function bundle(d){const r=await esbuild.build({entryPoints:[path.join(ROOT,"src/renderer",d,"index.ts")],bundle:true,format:"esm",platform:"node",target:"node22",write:false,logLevel:"silent",plugins:[{name:"m",setup(b){b.onResolve({filter:/^@rchunk\//},x=>({path:x.path,namespace:"m"}));b.onLoad({filter:/.*/,namespace:"m"},x=>({contents:mock(x.path),loader:"js"}));}}]});return import("data:text/javascript;base64,"+Buffer.from(r.outputFiles[0].text).toString("base64")+"#"+d)}
-const L=new Map();let runtimeAssertions=0;for(const[,d,e]of modules){const m=await bundle(d);L.set(d,m);assert.deepEqual(Object.keys(m).sort(),e.slice().sort());runtimeAssertions++;}
-const inv=L.get("learning-model-inverse-trigonometric-function-template");inv.i();assert.deepEqual(inv.a("arccos(0.5)"),{functionName:"arccos",value:.5});assert.equal(inv.n("arctan"),"y/x");runtimeAssertions+=2;
-const dist=L.get("learning-model-distance-between-points-template");dist.n();assert.deepEqual(dist.r("(1,2),(3,4)"),{x1:1,y1:2,x2:3,y2:4});runtimeAssertions++;
-const prism=L.get("learning-model-rectangular-prism-volume-template");prism.d();assert.equal(prism.m.type,"RECTANGULAR_PRISM_VOLUME");assert.equal(prism.f({length:12,width:3,height:2}).length,10);runtimeAssertions+=2;
-const sys=L.get("system-of-equations");sys.n();assert.deepEqual(sys.t("y=x+1\\\\y=2"),["y=x+1","y=2"]);assert.equal(sys.t("y=1\\\\y=2"),null);runtimeAssertions+=2;
-const ar=L.get("svg-arrow");ar.n();assert.equal(ar.t({anchor:{x:0,y:0},toward:{x:0,y:0},size:1}),null);assert.equal(ar.t({anchor:{x:0,y:0},toward:{x:100,y:0},size:1,label:"v"}).kind,"g");runtimeAssertions+=2;
-const sort=L.get("sort-bar-visualization");sort.n();const bars=sort.t({ariaLabel:"s",heading:"S",items:[{id:"a",value:5,label:"5",positionLabel:"1",role:"candidate"}],maxValue:10,presentationMode:"thumbnail"});assert.equal(bars.props.children[0].props.children.props.style.height,"50%");runtimeAssertions++;
-const sub=L.get("registered-subagents-thumbnail");assert.equal(sub.RegisteredSubagentsThumbnail({requestedConversationId:"c",hostId:"h",title:"A"}).kind,"RegisteredConversation");runtimeAssertions++;
-const surf=L.get("conversation-beacon-surfaces");const outer=surf.ChatGptConversationBeaconSurfaces({conversationId:"c",actionOverrides:{copy:1}});assert.equal(outer.kind,"TemporaryChat");assert.equal(outer.props.children().props.actionOverrides.regenerate.kind,"regenerate");runtimeAssertions+=2;
-const text=L.get("text-file-thumbnail");text.n();const card=text.t({title:"R",path:"R.md",isMarkdown:true,content:"# One\n## Two"});assert.equal(card.props.sections[1].content,"One\n  Two");runtimeAssertions++;
-const file=L.get("file-image-thumbnail");file.n();assert.deepEqual(file.t({title:"I",path:"a.png",sources:["data:image/png;base64,x"]}).props.sections,[{kind:"image",src:"data:image/png;base64,x"}]);file.i();assert.equal(file.r({title:"D",path:"a.pdf",format:"pdf",sizeBytes:10}).props.sections[0].content.size,"10 bytes en");runtimeAssertions+=2;
-delete globalThis.__na;console.log(sourceAssertions+" source assertions and "+runtimeAssertions+" runtime assertions passed");
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
+  ASSET = path.join(ROOT, "src/webview/assets");
+assert.equal(IMPORT_ALIASES.proxy, CHUNKS["motion-proxy-runtime"]);
+const modules = [
+  [
+    "sort-bar-visualization-b904625976aa.js",
+    "sort-bar-visualization",
+    ["a", "i", "n", "o", "r", "t"],
+  ],
+  [
+    "subagents-f011dd080466.js",
+    "registered-subagents-thumbnail",
+    ["RegisteredSubagentsThumbnail"],
+  ],
+  [
+    "surfaces-b85863b30be8.js",
+    "conversation-beacon-surfaces",
+    ["ChatGptConversationBeaconSurfaces"],
+  ],
+  ["svg-arrow-6f79fa010fe2.js", "svg-arrow", ["n", "t"]],
+  ["system-of-equations-a765decfc54f.js", "system-of-equations", ["n", "t"]],
+  [
+    "template-224b997c2ad7.js",
+    "learning-model-inverse-trigonometric-function-template",
+    ["a", "i", "n", "r", "t"],
+  ],
+  [
+    "template-9f62da8bf8e9.js",
+    "learning-model-rectangular-prism-volume-template",
+    ["a", "c", "d", "f", "i", "l", "m", "n", "o", "p", "r", "s", "t", "u"],
+  ],
+  [
+    "template-bf8ec7576e3e.js",
+    "learning-model-distance-between-points-template",
+    ["n", "r", "t"],
+  ],
+  ["thumbnail-386f09e9e7b3.js", "text-file-thumbnail", ["n", "t"]],
+  ["thumbnail-7c714f359bb7.js", "file-image-thumbnail", ["i", "n", "r", "t"]],
+];
+const deps = (s, r) => [...s.matchAll(r)].map((m) => m[1]);
+let sourceAssertions = 0;
+for (const [a, d] of modules) {
+  const o = fs.readFileSync(
+      path.join(ASSET, a.replace(/\.js$/, ".ts")),
+      "utf8",
+    ),
+    r = fs.readFileSync(path.join(ROOT, "src/renderer", d, "index.ts"), "utf8");
+  assert.deepEqual(
+    deps(r, /(?:from\s+|import\s*)["']@rchunk\/([^"']+)/g),
+    deps(o, /from "\.\/([^"/]+)-[a-f0-9]{12}\.js"/g),
+  );
+  assert.equal(
+    (r.match(/import\(/g) || []).length,
+    (o.match(/import\(/g) || []).length,
+  );
+  assert.equal(/\bany\b|@ts-expect-error|@ts-nocheck/.test(r), false);
+  sourceAssertions += 3;
+}
+globalThis.__na = {
+  cache: Array(100).fill(Symbol.for("react.memo_cache_sentinel")),
+  agents: [],
+  hooks: [],
+  hookIndex: 0,
+  effects: [],
+  lifecycle: [],
+  beaconState: {
+    beacon: { beacon_id: "beacon", action_items: ["share"] },
+    eventMetadata: { conversationId: "c", messageId: "m" },
+    productExperience: "home",
+  },
+};
+const jsx = `const render=(c,p,k)=>typeof c==='function'&&(c.name==='ConversationBeaconSurface'||c.name==='BeaconPresentationLifecycle')?c(p):({kind:typeof c==='string'?c:(c.displayName||c.name),props:p,key:k});export const I3=()=>({Fragment:Symbol.for('fragment'),jsx:render,jsxs:render});`;
+function mock(p) {
+  if (p === "@rchunk/app-shared")
+    return (
+      jsx +
+      `export const $3=()=>({c:()=>globalThis.__na.cache});export const K2=()=>{};export const h4=()=>{};export const m4=(...v)=>v.filter(Boolean).join(' ');export function Y2(){}Y2.displayName='FormattedMessage';export const FX=()=>{};export const QI=()=>{};export const LX=()=>({queryClient:{}});export const ZI={};const ReactRuntime={Fragment:Symbol.for('fragment'),useRef:value=>({current:value}),useState(value){const i=globalThis.__na.hookIndex++;if(!(i in globalThis.__na.hooks))globalThis.__na.hooks[i]=typeof value==='function'?value():value;return[globalThis.__na.hooks[i],next=>{globalThis.__na.hooks[i]=typeof next==='function'?next(globalThis.__na.hooks[i]):next}]},useEffect(callback,deps){const i=globalThis.__na.hookIndex++;const old=globalThis.__na.effects[i];if(old==null||deps?.some((v,j)=>v!==old[j])){globalThis.__na.effects[i]=deps;callback()}}};export function e6(){return ReactRuntime}Object.assign(e6,ReactRuntime);export const BX=(signal,...parameters)=>signal==='primary'?parameters[0]:signal==='state'?globalThis.__na.beaconState:signal==='message'?'m':signal==='work'?null:signal==='share-eligible'?true:globalThis.__na.agents;export const HX=()=>false;export const oZ=()=>({});export const LS=()=>null;export const lw=()=>{};export const $h=()=>{};export const BO=()=>({});export const II=p=>p.split('.').pop();export const RI=()=>{};export const gg=()=>{};export const hg=p=>p;export const pg={};export const mg=()=>function Icon(){};export const n4=()=> 'en';export function iS(){}iS.displayName='ImageIcon';`
+    );
+  if (p === "@rchunk/app-initial")
+    return `export function Xd(){}Xd.displayName='Thumbnail';export const Zd=()=>{};export const HZt=()=>{};export const cet={};const initLet=()=>{};export {initLet as let};export const vZt={};export const aqt=x=>'route:'+x;export const uHt=()=>{};export const ANt=()=>{};export const Gzt=()=>false;export const JNt=()=>{};export const QNt=()=>false;export const TNt=()=>false;export class UNt{shouldSuppressBeaconUI(){return false}}export const Vzt=()=>{};export const YNt='claims';export const YVt='work';export const ZNt='suppression';export const _Nt=()=>globalThis.__na.lifecycle.push('unsupported');export const dHt=()=>false;export const fNt='state';export const gNt=()=>globalThis.__na.lifecycle.push('complete');export const hNt=()=>{};export const jNt=()=>globalThis.__na.lifecycle.push('closed');export const jVt='message';export const mNt=()=>{globalThis.__na.lifecycle.push('dismiss');return true};export const oqt=()=>{};export const wNt=()=>true;export const wVt='primary';export const J9t=p=>p.endsWith('.ts')?'typescript':null;export const Jxn=()=>{};export const X9t=p=>p.endsWith('.md');export const Y9t=()=>{};export const qxn=[{id:'markdown',name:'Markdown'},{id:'typescript',name:'TypeScript'}];export const zGt=(_c,s)=>s.startsWith('resolved:')?s:null;export const H3t=(s,h)=>'host:'+h+':'+s;export const U3t=()=>{};export const HGt=()=>{};`;
+  if (p === "@rchunk/adaptive-slider-field")
+    return `export const n=()=>{};export const i=(v,a)=>typeof v==='number'?Math.min(Math.max(v,a.min),a.max):a.defaultValue;export const t=(v,c)=>({min:Math.min(c.baseMin,v),max:Math.max(c.baseMax,v),step:c.step});export const r=({bounds,control,value})=>bounds&&value>=bounds.min&&value<=bounds.max?bounds:t(value,control);`;
+  if (p === "@rchunk/button")
+    return `export function n(){}n.displayName='ButtonGroup';export function t(){}t.displayName='Button';export const r=()=>{};`;
+  if (p === "@rchunk/input-selector-group")
+    return `export const r=()=>{};export function t(){}t.displayName='InputSelector';`;
+  if (p === "@rchunk/proxy")
+    return `export const n=()=>{};export const t={div:'motion.div'};`;
+  if (p === "@rchunk/use-reduced-motion")
+    return `export const n=()=>false;export const t=()=>{};`;
+  if (p === "@rchunk/subagent-row")
+    return `export const n=()=>{};export function t(){}t.displayName='SubagentRow';`;
+  if (p === "@rchunk/registered")
+    return `export const n=()=>{};export function t(){}t.displayName='RegisteredConversation';`;
+  if (p === "@rchunk/share-conversation-action")
+    return `export const o=x=>({kind:'regenerate',...x});export const s=()=>{};export const a=()=>{};export const i=value=>Array.isArray(value)&&value.length>0;export const n=input=>({kind:'share',...input});export const r=input=>input;export const t='share-eligible';`;
+  if (p === "@rchunk/announcement-modal-source-bridge")
+    return `export const n=()=>{};export function t(){}t.displayName='Announcement';`;
+  if (p === "@rchunk/codex-app-home-beacon-announcement")
+    return `export const r=()=>{};export function t(){}t.displayName='HomeBeacon';`;
+  if (p === "@rchunk/chatgpt-temporary-chat-ui")
+    return `export const i=()=>{};export function n(){}n.displayName='TemporaryChat';`;
+  if (p === "@rchunk/learning-block-katex")
+    return `export const n=()=>{};export function t(){}t.displayName='Katex';`;
+  if (p === "@rchunk/learning-block-stroke")
+    return `export const i=()=>{};export const n='white';export const s=()=>({x:1,y:2,rotation:0});`;
+  if (p === "@rchunk/format-bytes")
+    return `export const t=(b,l)=>b+' bytes '+l;`;
+  return `export const n=()=>{};export const r=()=>{};export const a=()=>{};export const o=()=>{};`;
+}
+async function bundle(d) {
+  const r = await esbuild.build({
+    entryPoints: [path.join(ROOT, "src/renderer", d, "index.ts")],
+    bundle: true,
+    format: "esm",
+    platform: "node",
+    target: "node22",
+    write: false,
+    logLevel: "silent",
+    plugins: [
+      {
+        name: "m",
+        setup(b) {
+          b.onResolve({ filter: /^@rchunk\// }, (x) => ({
+            path: x.path,
+            namespace: "m",
+          }));
+          b.onLoad({ filter: /.*/, namespace: "m" }, (x) => ({
+            contents: mock(x.path),
+            loader: "js",
+          }));
+        },
+      },
+    ],
+  });
+  return import(
+    "data:text/javascript;base64," +
+      Buffer.from(r.outputFiles[0].text).toString("base64") +
+      "#" +
+      d
+  );
+}
+const L = new Map();
+let runtimeAssertions = 0;
+for (const [, d, e] of modules) {
+  const m = await bundle(d);
+  L.set(d, m);
+  assert.deepEqual(Object.keys(m).sort(), e.slice().sort());
+  runtimeAssertions++;
+}
+const inv = L.get("learning-model-inverse-trigonometric-function-template");
+inv.i();
+assert.deepEqual(inv.a("arccos(0.5)"), { functionName: "arccos", value: 0.5 });
+assert.equal(inv.n("arctan"), "y/x");
+runtimeAssertions += 2;
+const dist = L.get("learning-model-distance-between-points-template");
+dist.n();
+assert.deepEqual(dist.r("(1,2),(3,4)"), { x1: 1, y1: 2, x2: 3, y2: 4 });
+runtimeAssertions++;
+const prism = L.get("learning-model-rectangular-prism-volume-template");
+prism.d();
+assert.equal(prism.m.type, "RECTANGULAR_PRISM_VOLUME");
+assert.equal(prism.f({ length: 12, width: 3, height: 2 }).length, 10);
+runtimeAssertions += 2;
+const sys = L.get("system-of-equations");
+sys.n();
+assert.deepEqual(sys.t("y=x+1\\\\y=2"), ["y=x+1", "y=2"]);
+assert.equal(sys.t("y=1\\\\y=2"), null);
+runtimeAssertions += 2;
+const ar = L.get("svg-arrow");
+ar.n();
+assert.equal(
+  ar.t({ anchor: { x: 0, y: 0 }, toward: { x: 0, y: 0 }, size: 1 }),
+  null,
+);
+assert.equal(
+  ar.t({
+    anchor: { x: 0, y: 0 },
+    toward: { x: 100, y: 0 },
+    size: 1,
+    label: "v",
+  }).kind,
+  "g",
+);
+runtimeAssertions += 2;
+const sort = L.get("sort-bar-visualization");
+sort.n();
+const bars = sort.t({
+  ariaLabel: "s",
+  heading: "S",
+  items: [
+    { id: "a", value: 5, label: "5", positionLabel: "1", role: "candidate" },
+  ],
+  maxValue: 10,
+  presentationMode: "thumbnail",
+});
+assert.equal(bars.props.children[0].props.children.props.style.height, "50%");
+runtimeAssertions++;
+const sub = L.get("registered-subagents-thumbnail");
+assert.equal(
+  sub.RegisteredSubagentsThumbnail({
+    requestedConversationId: "c",
+    hostId: "h",
+    title: "A",
+  }).kind,
+  "RegisteredConversation",
+);
+runtimeAssertions++;
+const surf = L.get("conversation-beacon-surfaces");
+globalThis.__na.hookIndex = 0;
+const outer = surf.ChatGptConversationBeaconSurfaces({
+  conversationId: "c",
+  allowConversationSharing: true,
+  allowExternalActions: true,
+  actionOverrides: { copy: 1 },
+});
+assert.equal(outer.kind, "TemporaryChat");
+const beaconCandidate = outer.props.children();
+assert.equal(beaconCandidate.kind, "Announcement");
+const beaconPresentation = beaconCandidate.props.candidate.render();
+assert.equal(beaconPresentation.kind, "HomeBeacon");
+assert.equal(
+  beaconPresentation.props.actionOverrides.regenerate.kind,
+  "regenerate",
+);
+assert.equal(
+  beaconPresentation.props.actionOverrides.share_conversation.kind,
+  "share",
+);
+beaconPresentation.props.onModalOpen();
+assert.notEqual(
+  beaconPresentation.props.renderPresentation({
+    content: "Beacon content",
+    supportStatus: "supported",
+  }),
+  null,
+);
+beaconPresentation.props.onDismiss();
+beaconPresentation.props.onUnsupported();
+assert.deepEqual(globalThis.__na.lifecycle.slice(-2), ["dismiss", "unsupported"]);
+runtimeAssertions += 7;
+const text = L.get("text-file-thumbnail");
+text.n();
+const card = text.t({
+  title: "R",
+  path: "R.md",
+  isMarkdown: true,
+  content: "# One\n## Two",
+});
+assert.equal(card.props.sections[1].content, "One\n  Two");
+runtimeAssertions++;
+const file = L.get("file-image-thumbnail");
+file.n();
+assert.deepEqual(
+  file.t({ title: "I", path: "a.png", sources: ["data:image/png;base64,x"] })
+    .props.sections,
+  [{ kind: "image", src: "data:image/png;base64,x" }],
+);
+file.i();
+assert.equal(
+  file.r({ title: "D", path: "a.pdf", format: "pdf", sizeBytes: 10 }).props
+    .sections[0].content.size,
+  "10 bytes en",
+);
+runtimeAssertions += 2;
+delete globalThis.__na;
+console.log(
+  sourceAssertions +
+    " source assertions and " +
+    runtimeAssertions +
+    " runtime assertions passed",
+);

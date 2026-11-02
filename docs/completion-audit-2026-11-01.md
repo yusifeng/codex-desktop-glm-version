@@ -250,3 +250,12 @@ environment draft, save validation/error recovery, discard interception, and con
 environment-variable and network-secret creation and retains a failed asynchronous delete inside its confirmation dialog.
 Stateful hook tests exercise rerenders and failure paths. This closes these three presentation owners only; it does not reduce
 the remaining conversation-route fallback or preserved inventories by itself.
+
+The next conversation-presentation batch replaces the `conversation-beacon-surfaces` and `conversation-followup-shelf`
+shells. Conversation beacons now consume the live conversation/message state families, apply page-context and competing-modal
+suppression, maintain a single open presentation, close stale or unmounted presentations without fabricating a dismissal,
+wire regenerate/share overrides, and preserve dismiss/action/unsupported lifecycle reporting. Follow-up suggestions now require
+the canonical finished assistant message and eligibility metadata, wait for bottom-of-thread admission, issue the cancellable
+13-second request, reject mismatched/invalid/duplicate responses, log visible/clicked suggestions, submit the published chosen-
+suggestion metadata, and clear a successfully used result. Stateful tests execute the candidate and network/submit paths. This
+restores two conversation React owners; it is not evidence that all remaining conversation-route chunks are migrated.

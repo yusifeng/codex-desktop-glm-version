@@ -24,11 +24,14 @@ for (const [asset, semantic] of modules) {
   sourceAssertions += 3;
 }
 
-globalThis.__md = { capability: { isCapable: true, isLoading: false }, handlers: {}, queued: [], host: [], unavailable: 0, warning: 0, registered: null, opened: null };
-const jsx = "export const I3=()=>({jsx:(kind,props,key)=>({kind,props,key}),jsxs:(kind,props,key)=>({kind,props,key})});";
+globalThis.__md = { capability: { isCapable: true, isLoading: false }, handlers: {}, queued: [], host: [], unavailable: 0, warning: 0, registered: null, opened: null, hooks: [], effects: [], hookIndex: 0, followupRequests: [] };
+const jsx = "const render=(kind,props,key)=>typeof kind==='function'&&kind.name==='FollowupShelfView'?kind(props):({kind,props,key});export const I3=()=>({Fragment:Symbol.for('fragment'),jsx:render,jsxs:render});";
 function mock(moduleName) {
-  if (moduleName === '@rchunk/app-shared') return jsx + "export const useCapability=()=>globalThis.__md.capability;export const useScope=()=>({get:()=>globalThis.__md.unsaved||new Set()});export const useHostMessage=(type,handler)=>{globalThis.__md.handlers[type]=handler};export const showUnavailable=()=>globalThis.__md.unavailable++;export const showUnsavedWarning=()=>globalThis.__md.warning++;export const dispatchHostMessage=(m)=>globalThis.__md.host.push(m);";
-  if (moduleName === '@rchunk/app-initial') return "export const unsavedSettings={};export const queueOpen=(m)=>globalThis.__md.queued.push(m);export const Tz='context';export const ypn='resolved';export const mpn='intl';export const Mbt=(_s,v)=>globalThis.__md.visible=v;export const Wvt=(_s,f)=>f();export const IDt=(id,_c,o)=>(globalThis.__md.registered={id,options:o});export const Gvt=(_s,_r,o)=>(globalThis.__md.opened=o);export const qvt={tabById$:'tabs',activateTab:(_s,id)=>globalThis.__md.activated=id,closeTab:(_s,id)=>globalThis.__md.closed=id,updateTabState:()=>{},updateTab:()=>{}};";
+  if (moduleName === '@rchunk/app-shared') return jsx + "const hook=(value)=>{const i=globalThis.__md.hookIndex++;if(!(i in globalThis.__md.hooks))globalThis.__md.hooks[i]=typeof value==='function'?value():value;return[globalThis.__md.hooks[i],next=>{globalThis.__md.hooks[i]=typeof next==='function'?next(globalThis.__md.hooks[i]):next}]};const effect=(callback,deps)=>{const i=globalThis.__md.hookIndex++;const old=globalThis.__md.effects[i];if(old==null||deps?.some((value,index)=>value!==old[index])){globalThis.__md.effects[i]=deps;callback()}};const ReactRuntime={Fragment:Symbol.for('fragment'),useRef:value=>({current:value}),useState:hook,useEffect:effect,useLayoutEffect:effect};export function e6(){return ReactRuntime}Object.assign(e6,ReactRuntime);export const $3=()=>({c:()=>[]});export const BX=(signal,value)=>signal==='conversation'?value:signal==='assistant'?'assistant-message':signal==='user'?'user-1':signal==='account'?'account-1':signal==='feature'?true:signal==='config'?{}:signal==='status'?'idle':signal==='hidden'?false:signal==='active'?{}:signal==='mapping'?{'assistant-message':{message:{author:{role:'assistant'},status:'finished_successfully',metadata:{conversation_followup_suggestions_eligible:true}}}}:signal==='branch'?{}:null;export const FX=()=>{};export const LX=()=>({});export const QI=()=>{};export const Yh='button';export const ZI={};export const d$='AnimatePresence';export const m4=(...values)=>values.filter(Boolean).join(' ');export const o$={div:'div',span:'span'};export const useCapability=()=>globalThis.__md.capability;export const useScope=()=>({get:()=>globalThis.__md.unsaved||new Set()});export const useHostMessage=(type,handler)=>{globalThis.__md.handlers[type]=handler};export const showUnavailable=()=>globalThis.__md.unavailable++;export const showUnsavedWarning=()=>globalThis.__md.warning++;export const dispatchHostMessage=(m)=>globalThis.__md.host.push(m);";
+  if (moduleName === '@rchunk/app-initial') return "export const unsavedSettings={};export const queueOpen=(m)=>globalThis.__md.queued.push(m);export const Tz='context';export const ypn='resolved';export const mpn='intl';export const Mbt=(_s,v)=>globalThis.__md.visible=v;export const Wvt=(_s,f)=>f();export const IDt=(id,_c,o)=>(globalThis.__md.registered={id,options:o});export const Gvt=(_s,_r,o)=>(globalThis.__md.opened=o);export const qvt={tabById$:'tabs',activateTab:(_s,id)=>globalThis.__md.activated=id,closeTab:(_s,id)=>globalThis.__md.closed=id,updateTabState:()=>{},updateTab:()=>{}};export const $9t=value=>value;export const GVt='active';export const RVt='mapping';export const Vzt=()=>{};export const XVt='hidden';export const YVt='status';export const _un='user';export const jVt='assistant';export const mun='account';export const pD={};export const rJt={safePost:async(_path,input)=>{globalThis.__md.followupRequests.push(input);return globalThis.__md.followupPayload}};export const uHt=()=>{};export const wVt='conversation';export const xun='feature';export const zVt='branch';";
+  if (moduleName === '@rchunk/app-primary') return "export const la='config';export const ua=()=>{};";
+  if (moduleName === '@rchunk/thread-scroll-controller-context-value') return "export const n=()=>{};export const r=()=>({});";
+  if (moduleName === '@rchunk/conversation-navigation-state') return "export const n={};export const t=()=>{};";
   return 'export const n=()=>{};export const t=()=>{};';
 }
 async function bundle(semantic) {
@@ -72,15 +75,34 @@ assert.equal(globalThis.__md.unavailable, 1);
 runtimeAssertions += 3;
 
 const shelf = loaded.get('conversation-followup-shelf');
+const resetShelfHooks = () => { globalThis.__md.hooks = []; globalThis.__md.effects = []; globalThis.__md.hookIndex = 0; };
+const renderShelf = (props) => { globalThis.__md.hookIndex = 0; return shelf.ConversationFollowupShelf(props); };
+resetShelfHooks();
 assert.equal(shelf.ConversationFollowupShelf({ conversationId: 'c', suggestions: [] }), null);
-const loading = shelf.ConversationFollowupShelf({ conversationId: 'c', loading: true });
-assert.equal(loading.props['aria-busy'], true);
-assert.equal(loading.props.children[1].props.children.length, 3);
+resetShelfHooks();
+const loading = renderShelf({ conversationId: 'c', loading: true });
+assert.equal(loading.kind, 'AnimatePresence');
+assert.equal(loading.props.children.props['aria-busy'], true);
+assert.equal(loading.props.children.props.children[1].props.children.props.children.length, 3);
 let chosen = -1;
-const suggestions = shelf.ConversationFollowupShelf({ conversationId: 'c', visible: true, suggestions: [{ id: 's', title: 'Next?', body: 'Next?', tier: 't1' }], onSelect: (index) => { chosen = index; } });
-suggestions.props.children[1].props.children[0].props.onClick();
+resetShelfHooks();
+const suggestions = renderShelf({ conversationId: 'c', visible: true, suggestions: [{ id: 's', title: 'Next?', body: 'Next?', tier: 't1' }], onSelect: (index) => { chosen = index; } });
+suggestions.props.children.props.children[1].props.children.props.children[0].props.onClick();
 assert.equal(chosen, 0);
-runtimeAssertions += 4;
+resetShelfHooks();
+globalThis.__md.followupPayload = { conversation_id: 'c', assistant_message_id: 'assistant-message', suggestions: [{ id: 'remote', title: 'Remote next?', body: 'Continue remotely', tier: 't2' }, { id: 'remote', title: 'Duplicate', body: 'Duplicate', tier: 't1' }, { id: '', title: 'Invalid', body: 'Invalid', tier: 't1' }] };
+let submittedFollowup;
+const remoteProps = { conversationId: 'c', ready: true, isSubmissionCurrent: () => true, async onSubmit(body, options) { submittedFollowup = { body, options }; return true; } };
+assert.equal(renderShelf(remoteProps), null);
+await new Promise(resolve => setTimeout(resolve, 0));
+const remoteShelf = renderShelf(remoteProps);
+assert.equal(globalThis.__md.followupRequests.length, 1);
+assert.equal(remoteShelf.props.children.props.children[1].props.children.props.children.length, 1);
+remoteShelf.props.children.props.children[1].props.children.props.children[0].props.onClick();
+await new Promise(resolve => setTimeout(resolve, 0));
+assert.equal(submittedFollowup.body, 'Continue remotely');
+assert.equal(submittedFollowup.options.chosenSuggestion.originating_assistant_message_id, 'assistant-message');
+runtimeAssertions += 9;
 
 const family = loaded.get('family-notification-surface');
 let pathValue = '';
