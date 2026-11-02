@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__artifactPreviewFlowTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } }, react: { useEffect(effect) { return effect(); }, useState(initial) { return [typeof initial === "function" ? initial() : initial, () => {}]; } } };
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "artifact-preview-flow-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => { let contents = "export {};"; if (importPath === "app-shared") contents = "export const I3=()=>globalThis.__artifactPreviewFlowTest.jsx;export const e6=()=>globalThis.__artifactPreviewFlowTest.react;"; else if (importPath === "library-file-download") contents = "export const i=async()=>\"text\";export const r=async()=>new Uint8Array();export const t=async()=>{};"; else if (importPath === "artifact-tab-content-electron") contents = "export const a=props=>({type:'artifact',props});"; else if (importPath === "library-json-preview") contents = "export const LibraryJsonPreview=props=>({type:'json',props});"; return { contents, loader: "js" }; }); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "artifact-preview-flow-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => { let contents = "export {};"; if (importPath === "app-shared") contents = "export const I3=()=>globalThis.__artifactPreviewFlowTest.jsx;export const e6=()=>globalThis.__artifactPreviewFlowTest.react;"; else if (importPath === "library-file-download") contents = "export const i=async()=>\"text\";export const r=async()=>new Uint8Array();export const t=async()=>{};"; else if (importPath === "artifact-tab-content-electron") contents = "export const n=props=>({type:'artifact',props});"; else if (importPath === "library-json-preview") contents = "export const LibraryJsonPreview=props=>({type:'json',props});"; return { contents, loader: "js" }; }); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(child => walk(child, visit)); else walk(children, visit); }
 function find(node, predicate) { let result; walk(node, value => { if (result == null && predicate(value)) result = value; }); return result; }
 function all(node, predicate) { const result = []; walk(node, value => { if (predicate(value)) result.push(value); }); return result; }
@@ -30,15 +30,15 @@ assert.equal(find(lightbox.t({ images: [], onClose() {} }), node => node.props?.
 // presentation: 10
 const presentation = await bundle("presentation");
 assert.deepEqual(Object.keys(presentation), ["a", "i", "n", "o", "r", "s", "t"]);
-assert.equal(presentation.a("create_chat", "active"), "Creating chat");
-assert.equal(presentation.a("create_chat", "completed"), "Created chat");
-assert.equal(presentation.a("create_worktree", "failed"), "Couldn’t complete worktree setup");
-assert.equal(presentation.a("unknown", "active"), "Working");
-assert.equal(presentation.i({ started: 2, total: 5 }), "2 of 5");
-assert.equal(presentation.o("failedFollowing"), "danger");
-assert.equal(presentation.o("completed"), "success");
-assert.equal(presentation.r("send_message"), "Send message");
-assert.match(text(presentation.t({ tool: "read_chat", state: "active", progress: { started: 1, total: 3 } })), /Reading chat\s+· 1 of 3/);
+assert.equal(presentation.a(), undefined);
+assert.equal(presentation.n({ tool: "create_thread" }).message.defaultMessage, "Creating chat");
+assert.equal(presentation.n({ tool: "create_thread", completed: true }).message.defaultMessage, "Created chat");
+assert.equal(presentation.n({ tool: "create_worktree", completed: true, failed: true }).message.defaultMessage, "Couldn’t complete worktree setup");
+assert.equal(presentation.n({ tool: "unknown" }), null);
+assert.equal(presentation.n({ tool: "read_thread" }).values.state, "active");
+assert.equal(presentation.o({ className: "icon" }).props["data-agent-mode-icon"], "codex");
+assert.equal(presentation.r({ namespace: "codex_app", tool: "read_thread" }).message.defaultMessage, "Reading chat");
+assert.equal(presentation.t({ serverName: "codex_app", toolName: "read_thread" }), "read_thread");
 
 // saved-memory-history: 9
 const history = await bundle("saved-memory-history");
@@ -94,6 +94,13 @@ assert.equal(typeof annotations.n, "function");
 // artifact-tab-content-electron: 10
 const artifactTab = await bundle("artifact-tab-content-electron");
 assert.deepEqual(Object.keys(artifactTab), ["a", "i", "n", "o", "r", "s", "t"]);
+const parsedCsv = await artifactTab.a(new TextEncoder().encode('name,value\n"one,two",3'), "csv");
+assert.equal(parsedCsv.kind, "spreadsheet");
+assert.deepEqual(parsedCsv.proto.sheets[0].rows, [["name", "value"], ["one,two", "3"]]);
+await assert.rejects(() => artifactTab.a(new Uint8Array(), "pdf"), /PdfPreviewPanel/);
+assert.equal(artifactTab.s(false), false);
+assert.equal(artifactTab.s({ annotationsEnabled: true }), true);
+artifactTab.i(); artifactTab.o(); artifactTab.r();
 assert.match(text(artifactTab.t({ isLoading: true })), /Loading artifact/);
 let retried = 0;
 const artifactError = artifactTab.t({ error: "Broken", onRetry() { retried++; } });
@@ -109,6 +116,7 @@ assert.equal(find(artifactUi, node => node.props?.["data-status"] === "ready").p
 find(artifactUi, node => node.props?.children === "Polish design").props.onClick();
 assert.equal(editPrompt, "Polish design");
 assert.equal(all(artifactUi, node => node.type === "li").length, 1);
+assert.equal(artifactTab.n({ kind: "text", content: "source", title: "Text" }).props["data-artifact-kind"], "text");
 
 // multiplayer-note: 6
 const note = await bundle("multiplayer-note");

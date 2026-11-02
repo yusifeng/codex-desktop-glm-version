@@ -7,7 +7,7 @@ import {
 } from "@rchunk/app-shared";
 import "@rchunk/app-initial";
 import "@rchunk/app-primary";
-import { a as ArtifactTabContent } from "@rchunk/artifact-tab-content-electron";
+import { n as ArtifactTabContent } from "@rchunk/artifact-tab-content-electron";
 import "@rchunk/editor-header";
 import "@rchunk/header-content-fade";
 import * as SurfaceRuntime from "@rchunk/surface";

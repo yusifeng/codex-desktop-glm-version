@@ -82,6 +82,35 @@ assert.equal(prevented, 1);
 assert.equal(saved, true);
 assert.equal(unsaved, false);
 assert.equal(editor.t({ editor: { kind: "pierre" }, filePath: "a", isActive: false, tabId: "t" }).props.hidden, true);
+let selectedEditorPath, markdownMode, slottedEditor;
+const markdownEditor = editor.t({
+  content: "# Title\n\nBody",
+  editor: { kind: "markdown" },
+  path: "notes/readme.md",
+  tabId: "markdown",
+  workspaceRoot: "/repo",
+  onModeChange(value) { markdownMode = value; },
+  onSelectFile(path) { selectedEditorPath = path; },
+  renderSlots(slots) { slottedEditor = slots; return slots.content; },
+});
+assert.equal(markdownEditor.props["data-editor-kind"], "markdown");
+assert.equal(find(markdownEditor, node => node.props?.["data-markdown-preview"] === true).type, "div");
+assert.match(text(markdownEditor), /Title Body/);
+find(markdownEditor, node => node.props?.children === "/repo/notes/readme.md").props.onClick();
+assert.equal(selectedEditorPath, "notes/readme.md");
+find(markdownEditor, node => node.props?.children === "View source").props.onClick();
+assert.equal(markdownMode, "source");
+assert.equal(slottedEditor.headerRows.length, 1);
+assert.equal(slottedEditor.sidePane, undefined);
+let savePayload, saveResult;
+const savingEditor = editor.t({ content: "old", editor: { kind: "code" }, filePath: "a.ts", tabId: "save", onSave(value) { savePayload = value; return false; }, onSaveChange(value) { saveResult = value; } });
+const savingTextarea = find(savingEditor, node => node.type === "textarea");
+savingTextarea.props.onChange({ currentTarget: { value: "new" } });
+savingTextarea.props.onKeyDown({ key: "s", ctrlKey: true, currentTarget: { value: "new" }, preventDefault() {} });
+assert.equal(savePayload, "new");
+assert.equal(saveResult, false);
+assert.equal(find(editor.t({ editor: { kind: "code" }, error: new Error("Denied"), filePath: "a", tabId: "error" }), node => node.props?.role === "alert").props.children, "Denied");
+assert.match(text(editor.t({ editor: { kind: "code" }, filePath: "a", isLoading: true, tabId: "loading" })), /Loading file/);
 assert.equal(editor.i(), undefined);
 assert.equal(editor.n(), undefined);
 

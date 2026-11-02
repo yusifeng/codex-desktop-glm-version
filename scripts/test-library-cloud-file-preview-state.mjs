@@ -63,7 +63,7 @@ const entryBuild = await esbuild.build({
           : path === "@rchunk/library-file-download"
             ? "export const i=async()=>\"text\";export const r=async()=>new Uint8Array();export const t=async()=>{};"
             : path === "@rchunk/artifact-tab-content-electron"
-              ? "export const a=props=>({type:'artifact',props});"
+              ? "export const n=props=>({type:'artifact',props});"
               : path === "@rchunk/library-json-preview"
                 ? "export const LibraryJsonPreview=props=>({type:'json',props});"
                 : "export {};",
