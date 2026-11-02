@@ -1,260 +1,1063 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import "@rchunk/theme-font-family";
-import "@rchunk/theme-font-face-loader";
-import "@rchunk/xterm-window-zoom";
+// @ts-nocheck
+import { n as e, t } from "@rchunk/rolldown-runtime";
+import {
+  $3 as n,
+  CL as r,
+  Cz as i,
+  I3 as a,
+  K2 as o,
+  SL as s,
+  Y2 as c,
+  Yh as l,
+  Zh as u,
+  e6 as d,
+  wL as f,
+  x_ as p,
+  y_ as m,
+} from "@rchunk/app-shared";
+import {
+  Aet as h,
+  CW as g,
+  E6t as ee,
+  Gt as _,
+  Kcn as v,
+  Lgn as y,
+  Net as b,
+  Rgn as x,
+  SW as S,
+  T6t as te,
+  Vcn as C,
+  bk as w,
+  jet as T,
+  ket as E,
+  mnt as D,
+  pnt as ne,
+  qt as re,
+  vk as O,
+  xW as k,
+  yk as A,
+} from "@rchunk/app-initial";
+import { t as j } from "@rchunk/theme-font-family";
+import { n as M, t as N } from "@rchunk/theme-font-face-loader";
+import {
+  _ as P,
+  a as ie,
+  c as ae,
+  d as oe,
+  f as F,
+  h as se,
+  i as ce,
+  l as le,
+  m as ue,
+  n as de,
+  p as fe,
+  r as pe,
+  s as me,
+  u as I,
+  v as he,
+  y as ge,
+} from "@rchunk/xterm-window-zoom";
 import "@rchunk/terminal-panel-bootstrap";
-
-const {
-  $3: initializeRuntimeLazy,
-  I3: getJsxRuntime,
-  Y2: FormattedMessage,
-  Yh: Button,
-  e6: getReactRuntime,
-} = appSharedChunk as typeof appSharedChunk & {
-  Yh: (props: Record<string, unknown>) => unknown;
-};
-const {
-  Rgn: terminalSessions,
-  jet: ErrorBoundary,
-  ket: EmptyState,
-} = appInitialChunk as typeof appInitialChunk & {
-  Rgn: TerminalSessionManager;
-  jet: (props: Record<string, unknown>) => unknown;
-  ket: (props: Record<string, unknown>) => unknown;
-};
-
-interface TerminalSnapshot {
-  output?: string;
-  shell?: string;
-  title?: string;
-}
-
-interface TerminalSessionManager {
-  close?(sessionId: string): void;
-  create(options: Record<string, unknown>): string;
-  getSnapshot?(sessionId: string): TerminalSnapshot | null | undefined;
-  isSessionStarted?(sessionId: string): boolean;
-  recordUserInteraction?(sessionId: string): void;
-  register?(sessionId: string, handlers: {
-    getRenderedOutput(): string;
-    onAttach(): void;
-    onClearActive(): void;
-    onData(data: string): void;
-    onInitLog(data: string): void;
-  }): () => void;
-  setTitle?(sessionId: string, title: string): void;
-  subscribeToSessionSnapshot?(sessionId: string, listener: () => void): () => void;
-  write(sessionId: string, data: string, source: "terminal-generated" | "user"): void;
-}
-
-export interface TerminalPanelProps {
-  conversationId: string;
-  conversationTitle: string;
-  cwd?: string | null;
-  environmentId?: string | null;
-  hostId?: string | null;
-  initialPromptHint?: unknown;
-  loadingOverlay?: unknown;
-  onKeyEvent?: (event: KeyboardEvent) => boolean | void;
-  onNewTerminalTab?: () => void;
-  sessionId?: string;
-  workspaceRoot?: string | null;
-}
-
-let React: import("@rchunk/app-shared").ReactRuntime;
-let jsx: import("@rchunk/app-shared").JsxRuntime;
-
-function TerminalError({ onRetry }: { onRetry(): void }): unknown {
-  return jsx.jsx(EmptyState, {
-    actions: jsx.jsx(Button, {
-      color: "secondary",
-      onClick: onRetry,
-      children: jsx.jsx(FormattedMessage, {
-        id: "terminal.error.retry",
-        defaultMessage: "Reload",
-        description: "Button label that reloads rendering the terminal after a crash",
-      }),
-    }),
-    className: "h-full bg-surface",
-    description: jsx.jsx(FormattedMessage, {
-      id: "terminal.error.description",
-      defaultMessage: "Try reloading the terminal to continue",
-      description: "Description shown in the terminal panel when the embedded terminal crashes",
-    }),
-    title: jsx.jsx(FormattedMessage, {
-      id: "terminal.error.title",
-      defaultMessage: "The terminal encountered an error",
-      description: "Title shown in the terminal panel when the embedded terminal crashes",
-    }),
-  });
-}
-
-function getControlSequence(event: KeyboardEvent): string | null {
-  if (!event.metaKey || event.altKey || event.ctrlKey || event.shiftKey) return null;
-  if (event.key === "ArrowLeft" || event.key === "ArrowUp") return "\u0001";
-  if (event.key === "ArrowRight" || event.key === "ArrowDown") return "\u0005";
-  if (event.key === "Backspace") return "\u0015";
-  if (event.key === "Delete") return "\u000b";
-  return null;
-}
-
-function stopKeyboardEvent(event: Event): void {
-  event.preventDefault();
-  event.stopPropagation();
-}
-
-function TerminalSurface({
-  conversationId,
-  conversationTitle,
-  cwd,
-  environmentId,
-  hostId,
-  initialPromptHint,
-  loadingOverlay,
-  onKeyEvent,
-  onNewTerminalTab,
-  sessionId,
-  workspaceRoot,
-}: TerminalPanelProps): unknown {
-  const ownedSessionRef = React.useRef(false);
-  const activeSessionRef = React.useRef(sessionId ?? "");
-  const [output, setOutput] = React.useState(
-    () => sessionId == null ? "" : terminalSessions.getSnapshot?.(sessionId)?.output ?? "",
+var L = t((e, t) => {
+  (function (n, r) {
+    typeof e == `object` && typeof t == `object`
+      ? (t.exports = r())
+      : typeof define == `function` && define.amd
+        ? define([], r)
+        : typeof e == `object`
+          ? (e.ClipboardAddon = r())
+          : (n.ClipboardAddon = r());
+  })(self, () =>
+    (() => {
+      var e = {
+          575: function (e, t, n) {
+            (typeof self < `u` || typeof window < `u` || (n.g !== void 0 && n.g),
+              (e.exports = (function () {
+                var e,
+                  t = `3.7.7`,
+                  n = t,
+                  r = typeof Buffer == `function`,
+                  i = typeof TextDecoder == `function` ? new TextDecoder() : void 0,
+                  a = typeof TextEncoder == `function` ? new TextEncoder() : void 0,
+                  o = Array.prototype.slice.call(
+                    `ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=`,
+                  ),
+                  s =
+                    ((e = {}),
+                    o.forEach(function (t, n) {
+                      return (e[t] = n);
+                    }),
+                    e),
+                  c = /^(?:[A-Za-z\d+\/]{4})*?(?:[A-Za-z\d+\/]{2}(?:==)?|[A-Za-z\d+\/]{3}=?)?$/,
+                  l = String.fromCharCode.bind(String),
+                  u =
+                    typeof Uint8Array.from == `function`
+                      ? Uint8Array.from.bind(Uint8Array)
+                      : function (e) {
+                          return new Uint8Array(Array.prototype.slice.call(e, 0));
+                        },
+                  d = function (e) {
+                    return e.replace(/=/g, ``).replace(/[+\/]/g, function (e) {
+                      return e == `+` ? `-` : `_`;
+                    });
+                  },
+                  f = function (e) {
+                    return e.replace(/[^A-Za-z0-9\+\/]/g, ``);
+                  },
+                  p = function (e) {
+                    for (var t, n, r, i, a = ``, s = e.length % 3, c = 0; c < e.length;) {
+                      if (
+                        (n = e.charCodeAt(c++)) > 255 ||
+                        (r = e.charCodeAt(c++)) > 255 ||
+                        (i = e.charCodeAt(c++)) > 255
+                      )
+                        throw TypeError(`invalid character found`);
+                      a +=
+                        o[((t = (n << 16) | (r << 8) | i) >> 18) & 63] +
+                        o[(t >> 12) & 63] +
+                        o[(t >> 6) & 63] +
+                        o[63 & t];
+                    }
+                    return s ? a.slice(0, s - 3) + `===`.substring(s) : a;
+                  },
+                  m =
+                    typeof btoa == `function`
+                      ? function (e) {
+                          return btoa(e);
+                        }
+                      : r
+                        ? function (e) {
+                            return Buffer.from(e, `binary`).toString(`base64`);
+                          }
+                        : p,
+                  h = r
+                    ? function (e) {
+                        return Buffer.from(e).toString(`base64`);
+                      }
+                    : function (e) {
+                        for (var t = [], n = 0, r = e.length; n < r; n += 4096)
+                          t.push(l.apply(null, e.subarray(n, n + 4096)));
+                        return m(t.join(``));
+                      },
+                  g = function (e, t) {
+                    return (t === void 0 && (t = !1), t ? d(h(e)) : h(e));
+                  },
+                  ee = function (e) {
+                    if (e.length < 2)
+                      return (t = e.charCodeAt(0)) < 128
+                        ? e
+                        : t < 2048
+                          ? l(192 | (t >>> 6)) + l(128 | (63 & t))
+                          : l(224 | ((t >>> 12) & 15)) +
+                            l(128 | ((t >>> 6) & 63)) +
+                            l(128 | (63 & t));
+                    var t = 65536 + 1024 * (e.charCodeAt(0) - 55296) + (e.charCodeAt(1) - 56320);
+                    return (
+                      l(240 | ((t >>> 18) & 7)) +
+                      l(128 | ((t >>> 12) & 63)) +
+                      l(128 | ((t >>> 6) & 63)) +
+                      l(128 | (63 & t))
+                    );
+                  },
+                  _ = /[\uD800-\uDBFF][\uDC00-\uDFFFF]|[^\x00-\x7F]/g,
+                  v = function (e) {
+                    return e.replace(_, ee);
+                  },
+                  y = r
+                    ? function (e) {
+                        return Buffer.from(e, `utf8`).toString(`base64`);
+                      }
+                    : a
+                      ? function (e) {
+                          return h(a.encode(e));
+                        }
+                      : function (e) {
+                          return m(v(e));
+                        },
+                  b = function (e, t) {
+                    return (t === void 0 && (t = !1), t ? d(y(e)) : y(e));
+                  },
+                  x = function (e) {
+                    return b(e, !0);
+                  },
+                  S = /[\xC0-\xDF][\x80-\xBF]|[\xE0-\xEF][\x80-\xBF]{2}|[\xF0-\xF7][\x80-\xBF]{3}/g,
+                  te = function (e) {
+                    switch (e.length) {
+                      case 4:
+                        var t =
+                          (((7 & e.charCodeAt(0)) << 18) |
+                            ((63 & e.charCodeAt(1)) << 12) |
+                            ((63 & e.charCodeAt(2)) << 6) |
+                            (63 & e.charCodeAt(3))) -
+                          65536;
+                        return l(55296 + (t >>> 10)) + l(56320 + (1023 & t));
+                      case 3:
+                        return l(
+                          ((15 & e.charCodeAt(0)) << 12) |
+                            ((63 & e.charCodeAt(1)) << 6) |
+                            (63 & e.charCodeAt(2)),
+                        );
+                      default:
+                        return l(((31 & e.charCodeAt(0)) << 6) | (63 & e.charCodeAt(1)));
+                    }
+                  },
+                  C = function (e) {
+                    return e.replace(S, te);
+                  },
+                  w = function (e) {
+                    if (((e = e.replace(/\s+/g, ``)), !c.test(e)))
+                      throw TypeError(`malformed base64.`);
+                    e += `==`.slice(2 - (3 & e.length));
+                    for (var t, n, r, i = ``, a = 0; a < e.length;)
+                      ((t =
+                        (s[e.charAt(a++)] << 18) |
+                        (s[e.charAt(a++)] << 12) |
+                        ((n = s[e.charAt(a++)]) << 6) |
+                        (r = s[e.charAt(a++)])),
+                        (i +=
+                          n === 64
+                            ? l((t >> 16) & 255)
+                            : r === 64
+                              ? l((t >> 16) & 255, (t >> 8) & 255)
+                              : l((t >> 16) & 255, (t >> 8) & 255, 255 & t)));
+                    return i;
+                  },
+                  T =
+                    typeof atob == `function`
+                      ? function (e) {
+                          return atob(f(e));
+                        }
+                      : r
+                        ? function (e) {
+                            return Buffer.from(e, `base64`).toString(`binary`);
+                          }
+                        : w,
+                  E = r
+                    ? function (e) {
+                        return u(Buffer.from(e, `base64`));
+                      }
+                    : function (e) {
+                        return u(
+                          T(e)
+                            .split(``)
+                            .map(function (e) {
+                              return e.charCodeAt(0);
+                            }),
+                        );
+                      },
+                  D = function (e) {
+                    return E(re(e));
+                  },
+                  ne = r
+                    ? function (e) {
+                        return Buffer.from(e, `base64`).toString(`utf8`);
+                      }
+                    : i
+                      ? function (e) {
+                          return i.decode(E(e));
+                        }
+                      : function (e) {
+                          return C(T(e));
+                        },
+                  re = function (e) {
+                    return f(
+                      e.replace(/[-_]/g, function (e) {
+                        return e == `-` ? `+` : `/`;
+                      }),
+                    );
+                  },
+                  O = function (e) {
+                    return ne(re(e));
+                  },
+                  k = function (e) {
+                    return { value: e, enumerable: !1, writable: !0, configurable: !0 };
+                  },
+                  A = function () {
+                    var e = function (e, t) {
+                      return Object.defineProperty(String.prototype, e, k(t));
+                    };
+                    (e(`fromBase64`, function () {
+                      return O(this);
+                    }),
+                      e(`toBase64`, function (e) {
+                        return b(this, e);
+                      }),
+                      e(`toBase64URI`, function () {
+                        return b(this, !0);
+                      }),
+                      e(`toBase64URL`, function () {
+                        return b(this, !0);
+                      }),
+                      e(`toUint8Array`, function () {
+                        return D(this);
+                      }));
+                  },
+                  j = function () {
+                    var e = function (e, t) {
+                      return Object.defineProperty(Uint8Array.prototype, e, k(t));
+                    };
+                    (e(`toBase64`, function (e) {
+                      return g(this, e);
+                    }),
+                      e(`toBase64URI`, function () {
+                        return g(this, !0);
+                      }),
+                      e(`toBase64URL`, function () {
+                        return g(this, !0);
+                      }));
+                  },
+                  M = {
+                    version: t,
+                    VERSION: n,
+                    atob: T,
+                    atobPolyfill: w,
+                    btoa: m,
+                    btoaPolyfill: p,
+                    fromBase64: O,
+                    toBase64: b,
+                    encode: b,
+                    encodeURI: x,
+                    encodeURL: x,
+                    utob: v,
+                    btou: C,
+                    decode: O,
+                    isValid: function (e) {
+                      if (typeof e != `string`) return !1;
+                      var t = e.replace(/\s+/g, ``).replace(/={0,2}$/, ``);
+                      return !/[^\s0-9a-zA-Z\+/]/.test(t) || !/[^\s0-9a-zA-Z\-_]/.test(t);
+                    },
+                    fromUint8Array: g,
+                    toUint8Array: D,
+                    extendString: A,
+                    extendUint8Array: j,
+                    extendBuiltins: function () {
+                      (A(), j());
+                    },
+                    Base64: {},
+                  };
+                return (
+                  Object.keys(M).forEach(function (e) {
+                    return (M.Base64[e] = M[e]);
+                  }),
+                  M
+                );
+              })()));
+          },
+        },
+        t = {};
+      function n(r) {
+        var i = t[r];
+        if (i !== void 0) return i.exports;
+        var a = (t[r] = { exports: {} });
+        return (e[r].call(a.exports, a, a.exports, n), a.exports);
+      }
+      n.g = (function () {
+        if (typeof globalThis == `object`) return globalThis;
+        try {
+          return this || Function(`return this`)();
+        } catch {
+          if (typeof window == `object`) return window;
+        }
+      })();
+      var r = {};
+      return (
+        (() => {
+          var e = r;
+          (Object.defineProperty(e, "__esModule", { value: !0 }),
+            (e.Base64 = e.BrowserClipboardProvider = e.ClipboardAddon = void 0));
+          let t = n(575);
+          e.ClipboardAddon = class {
+            constructor(e = new a(), t = new i()) {
+              ((this._base64 = e), (this._provider = t));
+            }
+            activate(e) {
+              ((this._terminal = e),
+                (this._disposable = e.parser.registerOscHandler(52, (e) =>
+                  this._setOrReportClipboard(e),
+                )));
+            }
+            dispose() {
+              return this._disposable?.dispose();
+            }
+            _readText(e, t) {
+              let n = this._base64.encodeText(t);
+              this._terminal?.input(`]52;${e};${n}`, !1);
+            }
+            _setOrReportClipboard(e) {
+              let t = e.split(`;`);
+              if (t.length < 2) return !0;
+              let n = t[0],
+                r = t[1];
+              if (r === `?`) {
+                let e = this._provider.readText(n);
+                return e instanceof Promise
+                  ? e.then((e) => (this._readText(n, e), !0))
+                  : (this._readText(n, e), !0);
+              }
+              let i = ``;
+              try {
+                i = this._base64.decodeText(r);
+              } catch {}
+              let a = this._provider.writeText(n, i);
+              return !(a instanceof Promise) || a.then(() => !0);
+            }
+          };
+          class i {
+            async readText(e) {
+              return e === `c` ? navigator.clipboard.readText() : Promise.resolve(``);
+            }
+            async writeText(e, t) {
+              return e === `c` ? navigator.clipboard.writeText(t) : Promise.resolve();
+            }
+          }
+          e.BrowserClipboardProvider = i;
+          class a {
+            encodeText(e) {
+              return t.Base64.encode(e);
+            }
+            decodeText(e) {
+              let n = t.Base64.decode(e);
+              return t.Base64.isValid(e) && t.Base64.encode(n) === e ? n : ``;
+            }
+          }
+          e.Base64 = a;
+        })(),
+        r
+      );
+    })(),
   );
-
-  React.useEffect(() => {
-    const activeSessionId = sessionId ?? terminalSessions.create({
-      conversationId,
-      conversationTitle,
-      hostId: hostId ?? null,
-      environmentId: environmentId ?? null,
-      cwd: cwd ?? null,
-      workspaceRoot: workspaceRoot ?? null,
-    });
-    activeSessionRef.current = activeSessionId;
-    ownedSessionRef.current = sessionId == null;
-    if (sessionId != null && !terminalSessions.isSessionStarted?.(sessionId)) {
-      terminalSessions.create({
-        sessionId,
-        conversationId,
-        conversationTitle,
-        hostId: hostId ?? null,
-        environmentId: environmentId ?? null,
-        cwd: cwd ?? null,
-        workspaceRoot: workspaceRoot ?? null,
-      });
+});
+function _e(e) {
+  let t = (0, ve.c)(7),
+    { onRetry: n } = e,
+    r;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((r = (0, R.jsx)(c, {
+        id: `terminal.error.retry`,
+        defaultMessage: `Reload`,
+        description: `Button label that reloads rendering the terminal after a crash`,
+      })),
+      (t[0] = r))
+    : (r = t[0]);
+  let i;
+  t[1] === n
+    ? (i = t[2])
+    : ((i = (0, R.jsx)(l, { color: `secondary`, onClick: n, children: r })),
+      (t[1] = n),
+      (t[2] = i));
+  let a, o;
+  t[3] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((a = (0, R.jsx)(c, {
+        id: `terminal.error.description`,
+        defaultMessage: `Try reloading the terminal to continue`,
+        description: `Description shown in the terminal panel when the embedded terminal crashes`,
+      })),
+      (o = (0, R.jsx)(c, {
+        id: `terminal.error.title`,
+        defaultMessage: `The terminal encountered an error`,
+        description: `Title shown in the terminal panel when the embedded terminal crashes`,
+      })),
+      (t[3] = a),
+      (t[4] = o))
+    : ((a = t[3]), (o = t[4]));
+  let s;
+  return (
+    t[5] === i
+      ? (s = t[6])
+      : ((s = (0, R.jsx)(E, {
+          actions: i,
+          className: `h-full bg-surface`,
+          description: a,
+          title: o,
+        })),
+        (t[5] = i),
+        (t[6] = s)),
+    s
+  );
+}
+var ve, R;
+function z() {
+  return (z = e(() => {
+    ((ve = n()), o(), u(), h(), (R = a()));
+  }))();
+}
+function ye({
+  clipboard: e,
+  event: t,
+  onNewTerminalTab: n,
+  onPaste: r,
+  pasteOnCtrlV: i = !1,
+  sendText: a,
+  term: o,
+}) {
+  if (t.type !== `keydown`) return !0;
+  if (n != null && U(t, [`t`])) return (B(t), n(), !1);
+  if (e != null) {
+    if (be(t, o.hasSelection())) {
+      B(t);
+      let n = o.getSelection();
+      return (n.length > 0 && e.writeText(n).catch(() => void 0), !1);
     }
-    const unregister = terminalSessions.register?.(activeSessionId, {
-      getRenderedOutput: () => output,
-      onAttach: () => undefined,
-      onClearActive: () => setOutput(""),
-      onData: (data) => setOutput((current) => current + data),
-      onInitLog: (data) => setOutput(data),
-    });
-    const unsubscribe = terminalSessions.subscribeToSessionSnapshot?.(
-      activeSessionId,
-      () => {
-        const snapshot = terminalSessions.getSnapshot?.(activeSessionId);
-        if (snapshot?.output != null) setOutput(snapshot.output);
-      },
-    );
-    return () => {
-      unregister?.();
-      unsubscribe?.();
-      if (ownedSessionRef.current) terminalSessions.close?.(activeSessionId);
-    };
-  }, [conversationId, conversationTitle, cwd, environmentId, hostId, sessionId, workspaceRoot]);
-
-  const write = (data: string, source: "terminal-generated" | "user" = "user") => {
-    const activeSessionId = activeSessionRef.current;
-    if (!activeSessionId || !data) return;
-    terminalSessions.recordUserInteraction?.(activeSessionId);
-    terminalSessions.write(activeSessionId, data, source);
-  };
-
-  const onKeyDown = (event: KeyboardEvent) => {
-    if (onKeyEvent?.(event) === false) return;
-    if (event.metaKey && !event.altKey && !event.ctrlKey && !event.shiftKey && event.key.toLowerCase() === "t" && onNewTerminalTab != null) {
-      stopKeyboardEvent(event);
-      onNewTerminalTab();
-      return;
-    }
-    const controlSequence = getControlSequence(event);
-    if (controlSequence != null) {
-      stopKeyboardEvent(event);
-      write(controlSequence);
-      return;
-    }
-    if (event.key === "Enter") {
-      stopKeyboardEvent(event);
-      write("\r", "terminal-generated");
-    } else if (event.key === "Backspace") {
-      stopKeyboardEvent(event);
-      write("\u007f", "terminal-generated");
-    } else if (!event.metaKey && !event.ctrlKey && !event.altKey && event.key.length === 1) {
-      stopKeyboardEvent(event);
-      write(event.key, "terminal-generated");
-    }
-  };
-
-  const onPaste = (event: ClipboardEvent) => {
-    const text = event.clipboardData?.getData("text") ?? "";
-    if (text) {
-      stopKeyboardEvent(event);
-      write(text);
-    }
-  };
-
-  return jsx.jsxs("div", {
-    id: sessionId == null ? undefined : "terminal-panel-" + sessionId,
-    "data-codex-terminal": true,
-    "data-codex-xterm": true,
-    className: "relative flex h-full w-full flex-col",
-    style: {
-      backgroundColor: "var(--color-codex-terminal-background)",
-      color: "var(--color-codex-terminal-foreground)",
+    if (xe(t, i))
+      return (
+        B(t),
+        e
+          .readText()
+          .then((e) => {
+            e.length > 0 && (r?.(), o.paste(e));
+          })
+          .catch(() => void 0),
+        !1
+      );
+  }
+  let s = Se(t);
+  return s == null || (B(t), a(s), !1);
+}
+function B(e) {
+  (e.preventDefault(), e.stopPropagation());
+}
+function be(e, t) {
+  return (t && H(e, `c`)) || V(e, `c`) || Ce(e, { ctrlKey: !0, shiftKey: !1 });
+}
+function xe(e, t) {
+  return (t && H(e, `v`)) || V(e, `v`) || Ce(e, { ctrlKey: !1, shiftKey: !0 });
+}
+function Se(e) {
+  return U(e, [`ArrowLeft`, `ArrowUp`])
+    ? W
+    : U(e, [`ArrowRight`, `ArrowDown`])
+      ? G
+      : U(e, [`Backspace`])
+        ? q
+        : U(e, [`Delete`])
+          ? K
+          : null;
+}
+function V(e, t) {
+  return e.ctrlKey && e.shiftKey && !e.altKey && !e.metaKey && e.key.toLowerCase() === t;
+}
+function H(e, t) {
+  return e.ctrlKey && !e.shiftKey && !e.altKey && !e.metaKey && e.key.toLowerCase() === t;
+}
+function Ce(e, t) {
+  return (
+    e.ctrlKey === t.ctrlKey &&
+    e.shiftKey === t.shiftKey &&
+    !e.altKey &&
+    !e.metaKey &&
+    e.key.toLowerCase() === `insert`
+  );
+}
+function U(e, t) {
+  return e.metaKey && !e.altKey && !e.ctrlKey && !e.shiftKey && t.includes(e.key);
+}
+var W, G, K, q;
+function J() {
+  return (J = e(() => {
+    ((W = ``), (G = ``), (K = `\v`), (q = ``));
+  }))();
+}
+function we(e, t, n, r = !1) {
+  (t.fit(), x.resize(n, e.cols, e.rows, r));
+}
+function Te(e) {
+  let t = (0, Oe.c)(5),
+    { conversationId: n, sessionId: r } = e,
+    i = r ?? n,
+    a;
+  t[0] === e ? (a = t[1]) : ((a = (0, X.jsx)(De, { ...e })), (t[0] = e), (t[1] = a));
+  let o;
+  return (
+    t[2] !== i || t[3] !== a
+      ? ((o = (0, X.jsx)(T, { name: `TerminalPanel`, fallback: Ee, children: a }, i)),
+        (t[2] = i),
+        (t[3] = a),
+        (t[4] = o))
+      : (o = t[4]),
+    o
+  );
+}
+function Ee(e) {
+  return (0, X.jsx)(_e, {
+    onRetry: () => {
+      e.resetError();
     },
-    children: [
-      jsx.jsx("div", {
-        className: "flex-1 overflow-auto ps-4 pt-2 pb-3 font-mono text-sm whitespace-pre-wrap outline-none",
-        role: "textbox",
-        tabIndex: 0,
-        onKeyDown,
-        onPaste,
-        children: output,
-      }),
-      loadingOverlay == null ? null : jsx.jsx("div", { className: "absolute inset-0", children: loadingOverlay }),
-      initialPromptHint == null ? null : jsx.jsx("div", {
-        className: "pointer-events-none absolute inset-x-4 bottom-3 z-10 overflow-hidden pt-2",
-        children: jsx.jsx("div", {
-          className: "pointer-events-auto max-h-full w-fit max-w-full overflow-y-auto",
-          children: initialPromptHint,
-        }),
-      }),
-    ],
   });
 }
-
-function TerminalPanel(props: TerminalPanelProps): unknown {
-  initializeTerminalPanel();
-  const key = props.sessionId ?? props.conversationId;
-  return jsx.jsx(ErrorBoundary, {
-    name: "TerminalPanel",
-    fallback: ({ resetError }: { resetError(): void }) => jsx.jsx(TerminalError, { onRetry: resetError }),
-    children: jsx.jsx(TerminalSurface, { ...props }),
-  }, key);
+function De(e) {
+  let t = (0, Oe.c)(67),
+    {
+      conversationId: n,
+      conversationTitle: a,
+      hostId: o,
+      environmentId: s,
+      cwd: c,
+      workspaceRoot: l,
+      sessionId: u,
+      initialPromptHint: d,
+      loadingOverlay: f,
+      onKeyEvent: m,
+      onNewTerminalTab: h,
+    } = e,
+    { platform: _ } = ee(),
+    y = r(),
+    b = p(),
+    te = S(),
+    C = g(te),
+    w = _ !== `macOS`,
+    T = v(i.lightChromeTheme),
+    E = v(i.darkChromeTheme),
+    D = v(i.codeFontSize),
+    k,
+    N,
+    P;
+  t[0] !== E || t[1] !== T || t[2] !== C
+    ? ((k = C === `light` ? A(T, `light`) : A(E, `dark`)),
+      (N =
+        k.fonts.codeFace != null && j(k.fonts.code, k.fonts.codeFace) ? k.fonts.codeFace : void 0),
+      (P = ie(k.fonts)),
+      (t[0] = E),
+      (t[1] = T),
+      (t[2] = C),
+      (t[3] = k),
+      (t[4] = N),
+      (t[5] = P))
+    : ((k = t[3]), (N = t[4]), (P = t[5]));
+  let F = P,
+    fe = (0, Y.useRef)(null),
+    me = (0, Y.useRef)(null),
+    I = (0, Y.useRef)(null),
+    he = (0, Y.useRef)(null),
+    ge = (0, Y.useRef)(null),
+    L = (0, Y.useRef)(!1),
+    _e = (0, Y.useRef)(F),
+    ve = (0, Y.useRef)(D),
+    R = (0, Y.useRef)(b),
+    z,
+    B;
+  (t[6] === F
+    ? ((z = t[7]), (B = t[8]))
+    : ((z = () => {
+        _e.current = F;
+      }),
+      (B = [F]),
+      (t[6] = F),
+      (t[7] = z),
+      (t[8] = B)),
+    (0, Y.useEffect)(z, B));
+  let be, xe;
+  (t[9] === D
+    ? ((be = t[10]), (xe = t[11]))
+    : ((be = () => {
+        ve.current = D;
+      }),
+      (xe = [D]),
+      (t[9] = D),
+      (t[10] = be),
+      (t[11] = xe)),
+    (0, Y.useEffect)(be, xe));
+  let Se, V;
+  (t[12] === b
+    ? ((Se = t[13]), (V = t[14]))
+    : ((Se = () => {
+        R.current = b;
+      }),
+      (V = [b]),
+      (t[12] = b),
+      (t[13] = Se),
+      (t[14] = V)),
+    (0, Y.useLayoutEffect)(Se, V));
+  let H;
+  t[15] === a ? (H = t[16]) : ((H = () => a), (t[15] = a), (t[16] = H));
+  let Ce = (0, Y.useEffectEvent)(H),
+    U,
+    W;
+  (t[17] !== k || t[18] !== C
+    ? ((W = () => {
+        let e = fe.current;
+        e && O(e, k, C);
+      }),
+      (U = [k, C]),
+      (t[17] = k),
+      (t[18] = C),
+      (t[19] = U),
+      (t[20] = W))
+    : ((U = t[19]), (W = t[20])),
+    (0, Y.useLayoutEffect)(W, U));
+  let G;
+  t[21] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((G = () => {
+        let e = I.current,
+          t = fe.current;
+        e && t && ((e.options.theme = oe(t)), e.rows > 0 && e.refresh(0, e.rows - 1));
+      }),
+      (t[21] = G))
+    : (G = t[21]);
+  let K;
+  (t[22] !== k || t[23] !== C ? ((K = [k, C]), (t[22] = k), (t[23] = C), (t[24] = K)) : (K = t[24]),
+    (0, Y.useEffect)(G, K));
+  let q;
+  t[25] !== n ||
+  t[26] !== c ||
+  t[27] !== s ||
+  t[28] !== Ce ||
+  t[29] !== o ||
+  t[30] !== m ||
+  t[31] !== h ||
+  t[32] !== _ ||
+  t[33] !== y ||
+  t[34] !== u ||
+  t[35] !== w ||
+  t[36] !== l
+    ? ((q = () => {
+        let e = me.current,
+          t = fe.current;
+        if (!e || !t) return;
+        let r = Ce(),
+          i =
+            u ??
+            x.create({
+              conversationId: n,
+              conversationTitle: r,
+              hostId: o ?? null,
+              environmentId: s,
+              cwd: c ?? null,
+              workspaceRoot: l,
+            });
+        ((ge.current = i), (L.current = !1));
+        let a = !1,
+          d = new Me.Terminal({
+            allowTransparency: !0,
+            cursorStyle: `bar`,
+            fontSize: ve.current,
+            allowProposedApi: !0,
+            cursorBlink: !0,
+            fontFamily: _e.current,
+            letterSpacing: 0,
+            lineHeight: 1.2,
+            linkHandler: se,
+            theme: oe(t),
+          }),
+          f = null,
+          p = null,
+          g = () => {
+            (p != null && clearTimeout(p),
+              (p = setTimeout(() => {
+                ((p = null), re(y, { cwd: c, hostId: o }));
+              }, Ne)));
+          },
+          ee = () => {
+            f ??= requestAnimationFrame(() => {
+              ((f = null), d.scrollToBottom());
+            });
+          };
+        I.current = d;
+        let v = pe(d),
+          b = !1,
+          S = () => {
+            ((b = !0), x.recordUserInteraction(i));
+          },
+          te = new ke.ClipboardAddon(),
+          C = new Ae.FitAddon();
+        ((he.current = C),
+          d.loadAddon(te),
+          d.loadAddon(C),
+          d.loadAddon(new je.WebLinksAddon(ue)),
+          d.attachCustomKeyEventHandler(
+            (e) =>
+              m?.(e) !== !1 &&
+              ye({
+                clipboard: w ? ne.clipboard : void 0,
+                event: e,
+                onNewTerminalTab: h,
+                onPaste: S,
+                pasteOnCtrlV: _ === `windows`,
+                sendText: (e) => {
+                  x.write(i, e, `user`);
+                },
+                term: d,
+              }),
+          ),
+          d.open(e));
+        let T = de(d, () => R.current),
+          E = (t) => {
+            let n = t !== void 0 && t;
+            a ||
+              (e.isConnected &&
+                requestAnimationFrame(() => {
+                  a || (e.isConnected && (L.current ? we(d, C, i, n) : C.fit()));
+                }));
+          };
+        E();
+        let D = x.getPreservedAlternateScreenMode(i),
+          O = D != null,
+          k = O,
+          A = O,
+          j = !1,
+          M = !1,
+          N = [],
+          P = (e) => {
+            let t = ae(d);
+            (v.write(e), g(), t && ee());
+          },
+          ie = x.register(i, {
+            getRenderedOutput: () => le(d),
+            onClearActive: () => {
+              t.contains(document.activeElement) && d.clear();
+            },
+            onInitLog: (e) => {
+              let t = ae(d),
+                n = k;
+              ((k = !1),
+                (O = n),
+                (j = !0),
+                (N.length = 0),
+                v.replaceOutput(
+                  n ? `\u001b[?${D ?? 1049}h${e}` : e,
+                  () => {
+                    ((j = !1), (M = !1), (O = !1));
+                    for (let e of N.splice(0)) P(e);
+                    t && ee();
+                  },
+                  () => {
+                    M = !0;
+                  },
+                ));
+            },
+            onData: (e) => {
+              if (j) {
+                N.push(e);
+                return;
+              }
+              P(e);
+            },
+            onAttach: () => {
+              a || ((L.current = !0), E(A), (A = !1));
+            },
+          }),
+          F = d.onData((e) => {
+            let t = b;
+            ((b = !1), (!M || t) && x.write(i, e, `terminal-generated`));
+          }),
+          ce = d.onTitleChange((e) => {
+            x.setTitle(i, e);
+          }),
+          z = d.onKey((e) => {
+            let { domEvent: t } = e;
+            (S(), t.key === `Enter` && g());
+          });
+        (e.addEventListener(`input`, S, !0),
+          e.addEventListener(`paste`, S, !0),
+          u &&
+            !x.isSessionStarted(u) &&
+            requestAnimationFrame(() => {
+              a ||
+                x.create({
+                  sessionId: u,
+                  conversationId: n,
+                  conversationTitle: r,
+                  hostId: o ?? null,
+                  environmentId: s,
+                  cwd: c ?? null,
+                  cols: d.cols,
+                  rows: d.rows,
+                  workspaceRoot: l,
+                });
+            }));
+        let B = new ResizeObserver(() => {
+          E();
+        });
+        return (
+          B.observe(e),
+          () => {
+            ((a = !0),
+              f != null && (cancelAnimationFrame(f), (f = null)),
+              p != null && clearTimeout(p),
+              B.disconnect(),
+              e.removeEventListener(`input`, S, !0),
+              e.removeEventListener(`paste`, S, !0),
+              F.dispose(),
+              ce.dispose(),
+              z.dispose(),
+              u && x.preserveAlternateScreen(i, d.buffer.active.type === `alternate` || O),
+              ie(),
+              (he.current = null),
+              (ge.current = null),
+              (L.current = !1),
+              u || x.close(i),
+              T(),
+              v.dispose(),
+              d.dispose(),
+              (I.current = null));
+          }
+        );
+      }),
+      (t[25] = n),
+      (t[26] = c),
+      (t[27] = s),
+      (t[28] = Ce),
+      (t[29] = o),
+      (t[30] = m),
+      (t[31] = h),
+      (t[32] = _),
+      (t[33] = y),
+      (t[34] = u),
+      (t[35] = w),
+      (t[36] = l),
+      (t[37] = q))
+    : (q = t[37]);
+  let J;
+  (t[38] !== n ||
+  t[39] !== c ||
+  t[40] !== s ||
+  t[41] !== o ||
+  t[42] !== m ||
+  t[43] !== h ||
+  t[44] !== _ ||
+  t[45] !== y ||
+  t[46] !== u ||
+  t[47] !== w ||
+  t[48] !== l
+    ? ((J = [n, c, o, s, m, h, _, y, u, w, l]),
+      (t[38] = n),
+      (t[39] = c),
+      (t[40] = s),
+      (t[41] = o),
+      (t[42] = m),
+      (t[43] = h),
+      (t[44] = _),
+      (t[45] = y),
+      (t[46] = u),
+      (t[47] = w),
+      (t[48] = l),
+      (t[49] = J))
+    : (J = t[49]),
+    (0, Y.useEffect)(q, J));
+  let Te, Ee;
+  (t[50] !== F || t[51] !== D || t[52] !== N
+    ? ((Te = () => {
+        let e = I.current;
+        if (!e) return;
+        let t = !1;
+        return (
+          (async () => {
+            (N != null && (await M(N)),
+              await ce(F, D),
+              !t &&
+                ((e.options.fontFamily = F),
+                (e.options.fontSize = D),
+                requestAnimationFrame(() => {
+                  let t = I.current;
+                  if (!t || t !== e) return;
+                  let n = he.current,
+                    r = ge.current;
+                  n && r && (L.current ? we(t, n, r) : n.fit());
+                })));
+          })(),
+          () => {
+            t = !0;
+          }
+        );
+      }),
+      (Ee = [F, D, N]),
+      (t[50] = F),
+      (t[51] = D),
+      (t[52] = N),
+      (t[53] = Te),
+      (t[54] = Ee))
+    : ((Te = t[53]), (Ee = t[54])),
+    (0, Y.useEffect)(Te, Ee));
+  let De = u == null ? void 0 : `terminal-panel-${u}`,
+    Z;
+  t[55] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((Z = {
+        backgroundColor: `var(--color-codex-terminal-background)`,
+        color: `var(--color-codex-terminal-foreground)`,
+      }),
+      (t[55] = Z))
+    : (Z = t[55]);
+  let Pe;
+  t[56] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((Pe = (0, X.jsx)(`div`, {
+        className: `flex-1 overflow-hidden ps-4 pt-2 pb-3 tracking-normal`,
+        children: (0, X.jsx)(`div`, { className: `h-full w-full overflow-hidden`, ref: me }),
+      })),
+      (t[56] = Pe))
+    : (Pe = t[56]);
+  let Q;
+  t[57] === f
+    ? (Q = t[58])
+    : ((Q = f != null && (0, X.jsx)(`div`, { className: `absolute inset-0`, children: f })),
+      (t[57] = f),
+      (t[58] = Q));
+  let $;
+  t[59] !== F || t[60] !== D || t[61] !== d
+    ? (($ =
+        d == null
+          ? null
+          : (0, X.jsx)(`div`, {
+              className: `pointer-events-none absolute inset-x-4 bottom-3 z-10 overflow-hidden pt-2`,
+              style: { fontFamily: F, top: D * 1.2 + 10 },
+              children: (0, X.jsx)(`div`, {
+                className: `pointer-events-auto max-h-full w-fit max-w-full overflow-y-auto`,
+                children: d,
+              }),
+            })),
+      (t[59] = F),
+      (t[60] = D),
+      (t[61] = d),
+      (t[62] = $))
+    : ($ = t[62]);
+  let Fe;
+  return (
+    t[63] !== De || t[64] !== Q || t[65] !== $
+      ? ((Fe = (0, X.jsxs)(`div`, {
+          id: De,
+          "data-codex-terminal": !0,
+          "data-codex-xterm": !0,
+          ref: fe,
+          className: `relative flex h-full w-full flex-col`,
+          style: Z,
+          children: [Pe, Q, $],
+        })),
+        (t[63] = De),
+        (t[64] = Q),
+        (t[65] = $),
+        (t[66] = Fe))
+      : (Fe = t[66]),
+    Fe
+  );
 }
-
-let initialized = false;
-function initializeTerminalPanel(): void {
-  if (initialized) return;
-  initializeRuntimeLazy();
-  React = getReactRuntime();
-  jsx = getJsxRuntime();
-  initialized = true;
+var Oe, ke, Ae, je, Me, Y, X, Ne;
+function Z() {
+  return (Z = e(() => {
+    ((Oe = n()),
+      s(),
+      (ke = L()),
+      (Ae = ge()),
+      (je = he()),
+      (Me = P()),
+      f(),
+      (Y = d()),
+      N(),
+      m(),
+      b(),
+      _(),
+      te(),
+      D(),
+      C(),
+      y(),
+      w(),
+      k(),
+      fe(),
+      z(),
+      J(),
+      F(),
+      I(),
+      me(),
+      (X = a()),
+      (Ne = 500));
+  }))();
 }
-
-initializeTerminalPanel();
-export { TerminalPanel };
+Z();
+export { Te as TerminalPanel };

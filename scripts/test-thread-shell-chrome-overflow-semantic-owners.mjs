@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const state = globalThis.__threadChromeOverflow = {
@@ -61,22 +62,7 @@ const initialMock = `
   export const _lt=()=>({isPinned:false,togglePin:()=>globalThis.__threadChromeOverflow.calls.push('pin')});
 `;
 
-const chrome = await bundle("thread-app-shell-chrome", {
-  "app-shared": sharedMock, "app-initial": initialMock,
-  "thread-shell-runtime": "export const n=()=>{};export const f=()=>globalThis.__threadChromeOverflow.calls.push('ensure-terminal');",
-  "thread-panel-toggle-button": "export const n=()=>{};export const t='PanelToggle';export const y='BottomChrome';export const r='RightChrome';",
-});
-chrome.n();
-const chromeTree = chrome.t({ conversationId: "thread-1", showReviewTab: true, showSidePanelToggle: true, threadType: "local" });
-const chromeNodes = walk(chromeTree);
-assert(chromeNodes.some(node => node.type === "BottomPanelOutlet"));
-assert(chromeNodes.some(node => node.type === "RightPanelOutlet"));
-assert(chromeNodes.some(node => node.type === "HeaderAction" && node.props.actionId === "thread-local-panel-toggles"));
-assert.equal(state.actions.openReviewTab.options.enabled, true);
-state.actions.openReviewTab.handler();
-assert(state.calls.includes("open-review"));
-chromeNodes.find(node => node.props?.["aria-label"] === "Toggle side panel").props.onClick();
-assert(state.calls.includes("toggle-side"));
+const threadChromeReleaseAssertions = assertReleaseOwner("thread-app-shell-chrome");
 
 const overflow = await bundle("thread-overflow-menu", {
   "app-shared": sharedMock, "app-initial": initialMock,
@@ -105,4 +91,4 @@ overflowTree = renderOverflow();
 walk(overflowTree).find(node => node.props?.children === "Save").props.onClick();
 assert(state.calls.some(call => Array.isArray(call) && call[0] === "rename" && call[1].title === "Renamed"));
 
-console.log("thread app-shell chrome and overflow semantic owner assertions passed");
+console.log(`thread overflow semantic assertions and ${threadChromeReleaseAssertions} app-shell chrome release assertions passed`);

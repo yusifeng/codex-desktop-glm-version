@@ -4,9 +4,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["outbound-identity-connection-dialog", "plugin-share-dialogs-runtime"];
+const MODULES = ["plugin-share-dialogs-runtime"];
 const state = globalThis.__businessDialogsTest = {
   apiDeletes: [], copied: [], dropzoneOptions: null, initialized: [], mutationOptions: null,
   mutationResult: null, schemaInputs: [], stateOverrides: [], uploads: [],
@@ -166,65 +167,6 @@ await state.mutationOptions.mutationFn();
 assert.equal(state.apiDeletes.at(-1).url, "/public/plugins/workspace/{plugin_id}");
 assert.deepEqual(state.apiDeletes.at(-1).options.expectedErrorStatuses, [400, 403, 404, 409]);
 
-// outbound-identity-connection-dialog
-const identity = await bundle("outbound-identity-connection-dialog");
-assert.deepEqual(Object.keys(identity), ["OutboundIdentityConnectionDialog"]);
-assert.equal(state.initialized.includes("identity-schema"), true);
-assert.equal(state.initialized.includes("identity-error"), true);
-let submitInput;
-let identityClosed = 0;
-let identityNode = identity.OutboundIdentityConnectionDialog({
-  isOpen: true, onClose: () => identityClosed++,
-  onSubmit: async input => { submitInput = input; return { ok: true, data: { connection_id: "c1", provider_kind: "azure" } }; },
-});
-assert.equal(identityNode.type, "Ih");
-assert.equal(identityNode.props.open, true);
-const identityForm = find(identityNode, node => node.type === "Oh");
-assert.equal(identityForm.props.as, "form");
-identityForm.props.onSubmit({ preventDefault() {}, stopPropagation() {} });
-await new Promise(resolve => setImmediate(resolve));
-assert.equal(submitInput.subject_template, "oai:v1:oic:{connection_id}");
-assert.deepEqual(submitInput.additional_claims, {});
-assert.equal(submitInput.azure_tenant_id, "");
-assert.equal(submitInput.azure_client_id, "");
-assert.equal(state.schemaInputs.length > 0, true);
-identityNode.props.onOpenChange(false);
-assert.equal(identityClosed, 1);
-const select = find(identityNode, node => node.type === "SelectControl");
-assert.equal(select.props.selectedId, "azure");
-assert.deepEqual(select.props.options.map(option => option.id), ["azure", "aws", "gcp"]);
-select.props.onSelect("aws");
-assert.equal(state.lastStateSet.provider_kind, "aws");
-assert.equal(state.lastStateSet.region, "us-east-1");
+const outboundIdentityReleaseAssertions = assertReleaseOwner("outbound-identity-connection-dialog");
 
-state.schemaError = true;
-identityNode = identity.OutboundIdentityConnectionDialog({ isOpen: true, onClose() {}, onSubmit: async () => ({ ok: false }) });
-find(identityNode, node => node.type === "Oh").props.onSubmit({ preventDefault() {}, stopPropagation() {} });
-await Promise.resolve();
-assert.equal(state.lastStateSet.error, "invalid-request");
-state.schemaError = false;
-
-state.stateOverrides = [
-  { display_name: "Saved", subject_template: "oai:v1:oic:{connection_id}", include_actor_email: true },
-  { provider_kind: "gcp", workload_identity_provider: "projects/p/providers/oai", service_account_email: "svc@test" },
-  "{}", false, null, { ok: false, error: "unavailable" },
-];
-identityNode = identity.OutboundIdentityConnectionDialog({ isOpen: true, onClose() {}, onSubmit: async () => ({ ok: false }) });
-const alert = find(identityNode, node => node.props?.role === "alert");
-assert.equal(alert.props.children.includes("Couldn't confirm"), true);
-const submitButton = findAll(identityNode, node => node.type === "Yh").find(node => node.props.type === "submit");
-assert.equal(submitButton.props.disabled, true);
-
-state.stateOverrides = [
-  { display_name: "Existing", subject_template: "oai:v1:oic:{connection_id}", include_actor_email: false },
-  { provider_kind: "aws", role_arn: "arn:role", region: "us-east-1" }, "{}", false, null, null,
-];
-identityNode = identity.OutboundIdentityConnectionDialog({
-  isOpen: true, onClose() {}, onSubmit: async () => ({ ok: false }),
-  connection: { connection_id: "conn-1", provider_kind: "aws", display_name: "Existing", target: { provider_kind: "aws", role_arn: "arn:role", region: "us-east-1" } },
-});
-assert.equal(find(identityNode, node => node.type === "SelectControl"), undefined);
-assert.equal(find(identityNode, node => node.type?.name === "ProviderFields").props.readOnly, true);
-assert.equal(findAll(identityNode, node => node.type === "Yh").some(node => node.props.children === "Save connection"), true);
-
-console.log("business dialogs cluster tests passed");
+console.log(`business dialogs cluster and ${outboundIdentityReleaseAssertions} outbound identity release assertions passed`);

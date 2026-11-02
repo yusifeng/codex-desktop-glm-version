@@ -72,31 +72,10 @@ assert.equal(copiedTask, "https://share/task");
 assert.equal(refreshedTask, "post");
 assert.equal(find(existingShare, node => node.props?.children === "Stop sharing").type, "button");
 
-const imageShare = await bundle("image-prompt-share-dialog");
-assert.deepEqual(Object.keys(imageShare), ["ImagePromptShareDialog"]);
-let publishedContent, copiedImage, imageClosed = 0;
-resetHooks();
-const imageProps = { accountId: "a", userId: "u", shareSessionId: "s", sourceContent: { title: "City", prompt: "A city at dusk" }, image: { src: "/city.png", chatGptDisplayTitle: "City image" }, onClose() { imageClosed++; }, onPublish(content, src) { publishedContent = `${content.title}:${src}`; return { postId: "p", url: "https://share/image", content }; }, onCopy(url) { copiedImage = url; return true; } };
-let imageUi = render(imageShare.ImagePromptShareDialog, imageProps);
-assert.match(text(imageUi), /Share prompt template/);
-assert.match(text(imageUi), /A city at dusk/);
-assert.equal(find(imageUi, node => node.type === "img").props.alt, "City image");
-find(imageUi, node => node.props?.children === "Copy link").props.onClick();
-await new Promise(resolve => setTimeout(resolve, 0));
-assert.equal(publishedContent, "City:/city.png");
-assert.equal(copiedImage, "https://share/image");
-imageUi = render(imageShare.ImagePromptShareDialog, imageProps);
-assert.equal(find(imageUi, node => node.props?.children === "Edit").type, "button");
-assert.equal(find(imageUi, node => node.props?.children === "Link copied").type, "button");
-find(imageUi, node => node.props?.["aria-label"] === "Close").props.onClick();
-assert.equal(imageClosed, 1);
-resetHooks();
-const publishedUi = render(imageShare.ImagePromptShareDialog, { accountId: "a", userId: "u", shareSessionId: "s", sourceContent: { title: "Old", prompt: "Old" }, published: { postId: "p", url: "https://share/image", content: { title: "New", prompt: "New prompt" } }, image: { src: "/city.png" }, onClose() {} });
-assert.match(text(publishedUi), /New prompt/);
-assert.equal(find(publishedUi, node => node.props?.children === "Edit").type, "button");
+const imageShareReleaseAssertions = assertReleaseOwner("image-prompt-share-dialog");
 
 const projectSettingsReleaseAssertions = assertReleaseOwner("chatgpt-project-settings-modal");
 
 const showcaseReleaseAssertions = assertReleaseOwner("profile-showcase-editor");
 
-console.log(`project profile sharing cluster tests passed with ${showcaseReleaseAssertions} release assertions`);
+console.log(`project profile sharing cluster tests passed with ${imageShareReleaseAssertions + projectSettingsReleaseAssertions + showcaseReleaseAssertions} release assertions`);

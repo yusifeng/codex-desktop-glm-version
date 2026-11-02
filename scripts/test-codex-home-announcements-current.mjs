@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__homeAnnouncementsTest = {
@@ -233,4 +234,5 @@ const suppressedEntries = suppressedCodex.type(suppressedCodex.props).props.entr
 check(suppressedEntries[1].isEligible && !suppressedEntries[2].isEligible && !suppressedEntries[3].isEligible, "lets a suppressing Beacon hide vanilla multi-agent and Fast promos");
 
 assert.equal(assertions, 18);
+assertions += assertReleaseOwner("announcement-entry-points");
 console.log(`${assertions} current Codex Home announcement assertions passed`);

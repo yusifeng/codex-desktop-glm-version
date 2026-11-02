@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
   jsx = {
     Fragment: Symbol("Fragment"),
@@ -174,100 +175,5 @@ assert.equal(
 scopeControl.props.children[2].props.children[0].props.onChange();
 assert.equal(changedScope, "user_provided");
 
-const domains = await load("allowed-domains-input");
-domains.n();
-assert.equal(domains.i({ issues: [] }), null);
-const issueSummary = domains.i({
-  issues: [
-    { code: "key", field: "variables.0" },
-    { code: "save", field: "variables.1" },
-    { code: "environment", message: "Changed", valuesSaved: true },
-  ],
-});
-assert.equal(issueSummary.props.role, "alert");
-assert.match(issueSummary.props.children[0], /Fix 1 error/);
-assert.equal(issueSummary.props.children[2].length, 1);
-assert.equal(issueSummary.props.children[2][0].props.issue.valuesSaved, true);
-const issueDetail = domains.r(
-  issueSummary.props.children[2][0].props,
-);
-assert.match(
-  issueDetail.props.children[1],
-  /Some values were saved/,
-);
-let domainList = ["api.example.com"],
-  domainInput = "",
-  inputChanges = [];
-const editor = domains.t({
-  domains: domainList,
-  value: "new.example.com",
-  onChange: (value) => {
-    domainList = value;
-  },
-  onInputChange: (value) => {
-    domainInput = value;
-    inputChanges.push(value);
-  },
-});
-assert.equal(
-  editor.props.children[0].props["aria-label"],
-  "Additional allowed domains",
-);
-editor.props.children[0].props.onKeyDown({ key: "Enter", preventDefault() {} });
-assert.deepEqual(domainList, ["api.example.com", "new.example.com"]);
-assert.equal(domainInput, "");
-const duplicate = domains.t({
-  domains: ["api.example.com"],
-  value: "API.EXAMPLE.COM",
-  onChange() {},
-  onInputChange() {},
-});
-assert.equal(duplicate.props.children[0].props["aria-invalid"], true);
-assert.match(duplicate.props.children[1].props.children, /already allowed/);
-const secretWildcard = domains.t({
-  domains: [],
-  value: "*.example.com",
-  purpose: "secret",
-  onChange() {},
-  onInputChange() {},
-});
-assert.match(secretWildcard.props.children[1].props.children, /Wildcards/);
-const url = domains.t({
-  domains: [],
-  value: "https://example.com/path",
-  onChange() {},
-  onInputChange() {},
-});
-assert.match(url.props.children[1].props.children, /without a URL/);
-const ipv4 = domains.t({
-  domains: [],
-  value: "192.168.1",
-  onChange() {},
-  onInputChange() {},
-});
-assert.match(ipv4.props.children[1].props.children, /full IPv4/);
-let removed = null;
-const chips = domains.t({
-  domains: ["one.example", "two.example"],
-  value: "",
-  onChange: (value) => {
-    removed = value;
-  },
-  onInputChange() {},
-});
-chips.props.children[2].props.children[0].props.children[1].props.onClick();
-assert.deepEqual(removed, ["two.example"]);
-const readOnly = domains.t({
-  domains: [],
-  value: "",
-  readOnly: true,
-  onChange() {},
-  onInputChange() {},
-});
-assert.equal(readOnly.props.children[0], null);
-assert.equal(
-  readOnly.props.children[2].props.children.props.children,
-  "No domains added yet",
-);
-
-console.log("secret scope domains cluster complete");
+const allowedDomainsReleaseAssertions = assertReleaseOwner("allowed-domains-input");
+console.log(`secret scope cluster and ${allowedDomainsReleaseAssertions} allowed domains release assertions complete`);

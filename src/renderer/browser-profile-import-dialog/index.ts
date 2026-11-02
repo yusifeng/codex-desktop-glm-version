@@ -1,1751 +1,2568 @@
-// browser-profile-import-dialog —— 浏览器资料导入弹窗与完整导入状态机。
-// 原版：app/webview/assets/dialog-d7d4fcb916e3.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as analyticsChunk from "@rchunk/browser-profile-import-analytics";
-import * as queryChunk from "@rchunk/browser-profile-import-query";
-import type {
-  JsxRuntime,
-  MessageDescriptor,
-  ReactRuntime,
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $h as n,
+  Ad as r,
+  Ah as i,
+  BX as a,
+  Dh as o,
+  FX as s,
+  G2 as c,
+  I3 as l,
+  If as u,
+  Ih as d,
+  K2 as f,
+  LX as p,
+  Lf as m,
+  Lh as h,
+  Lo as g,
+  Oh as _,
+  Ph as v,
+  QI as y,
+  Qc as b,
+  Qh as x,
+  Rf as S,
+  Rh as C,
+  Ro as w,
+  Tc as T,
+  Ud as E,
+  Wd as ee,
+  Y2 as D,
+  Yh as te,
+  ZI as ne,
+  Zc as re,
+  Zh as ie,
+  _L as ae,
+  a$ as O,
+  al as oe,
+  bD as se,
+  e6 as ce,
+  gL as le,
+  h4 as k,
+  iL as A,
+  jd as j,
+  jf as M,
+  jh as N,
+  kf as P,
+  kh as F,
+  m4 as I,
+  o$ as L,
+  rL as R,
+  rl as z,
+  wc as ue,
+  xD as B,
+  zh as V,
 } from "@rchunk/app-shared";
-
-void runtimeChunk;
-
-type Source = "atlas" | "chrome";
-type ImportKind = "passwords" | "cookies" | "history" | "extensions";
-
-type Profile = {
-  source: Source;
-  profilePath: string;
-  appName: string;
-  profileName?: string;
-  profileDirectoryName?: string;
-  hasExtensions?: boolean;
-};
-
-type ImportRequest = {
-  source: Source;
-  profilePath: string;
-  importCookies: boolean;
-  importPasswords: boolean;
-  importHistory: boolean;
-  importExtensions: boolean;
-  allowElevatedChromeDecryption?: boolean;
-  allowUnverifiedExtensions?: boolean;
-  cookieDomainAllowlist?: string[];
-};
-
-type DataResult = {
-  status?: string;
-  discovered?: number;
-  imported?: number;
-  failed?: number;
-  error?: unknown;
-  skippedExisting?: number;
-  skippedInvalid?: number;
-  failures?: Array<{ id?: string; name?: string; reason?: string }>;
-  profile?: DataResult;
-  account?: DataResult;
-};
-
-type ImportResult = {
-  source?: Source;
-  profilePath?: string;
-  cookies?: DataResult;
-  passwords?: DataResult;
-  history?: DataResult;
-  extensions?: DataResult;
-};
-
-type AttemptContext = {
-  flowId: string;
-  attemptIndex: number;
-  windowsChromeAdminApprovalNoticeRequired: boolean;
-  windowsChromeAdminApprovalNoticeAcknowledged: boolean;
-};
-
-interface BrowserProfileImportService {
-  getImportSignals(): Promise<Record<string, unknown>>;
-  importBrowserProfile(request: ImportRequest): Promise<ImportResult>;
-  listImportableBrowserProfiles(): Promise<Profile[]>;
-}
-
-interface ImportMutationVariables {
-  context: AttemptContext;
-  previousResult?: ImportResult;
-  request: ImportRequest;
-  startedAt: number;
-}
-
-interface ResultState {
-  result: ImportResult;
-  revealedRowCount: number;
-}
-
-interface ExtensionConfirmationState {
-  profile: Profile;
-  request: ImportRequest;
-}
-
-interface ImportResultsProps {
-  activeImportRequest?: ImportRequest;
-  cookieAccessFailureMessage?: unknown;
-  importCookies: boolean;
-  importExtensions: boolean;
-  importHistory: boolean;
-  importPasswords: boolean;
-  isImporting: boolean;
-  revealedImportResultRowCount?: number;
-  showCloseBrowserGuidance: boolean;
-  result: ImportResult | null;
-  onDone(): void;
-  onRetry?: () => void;
-}
-
-interface ImportSelectionProps extends ImportResultsProps {
-  confirmExtensionImport: boolean;
-  elevatedChromeConsent: boolean;
-  extensionsAvailable: boolean;
-  isLoadingProfiles: boolean;
-  profilePickerOpen?: boolean;
-  profiles?: Profile[];
-  profilesHaveError: boolean;
-  requiresElevatedChromeConsent: boolean;
-  selectedProfile: Profile | null;
-  onCancel(): void;
-  onElevatedChromeConsentChange(checked: boolean): void;
-  onImport(): void;
-  onImportCookiesChange(checked: boolean): void;
-  onImportExtensionsChange(checked: boolean): void;
-  onImportHistoryChange(checked: boolean): void;
-  onImportPasswordsChange(checked: boolean): void;
-  onProfilePickerOpenChange?: (open: boolean) => void;
-  onSelectProfile(profile: Profile): void;
-}
-
-export interface BrowserProfileImportDialogProps {
-  entryPoint: string;
-  flowId: string;
-  onClose(): void;
-  service: BrowserProfileImportService;
-}
-
-const {
-  _L: useQuery,
-  gL: initializeUseQuery,
-  iL: useMutation,
-  rL: initializeUseMutation,
-} = appSharedChunk;
-
-const {
-  $3: initializeRuntimeLazy,
-  $h: initializeSettingsRow,
-  Ad: Checkbox,
-  Ah: DialogHeader,
-  BX: useSignalFamilyValue,
-  Dh: dialogActionsClassName,
-  FX: initializeSignalRuntime,
-  G2: defineMessages,
-  I3: getJsxRuntime,
-  If: initializeMenu,
-  Ih: Dialog,
-  K2: initializeReactRuntime,
-  LX: useSignalScope,
-  Lf: CheckControl,
-  Lh: DialogDescription,
-  Lo: ErrorIcon,
-  Oh: DialogContent,
-  Ph: initializeDialogLayout,
-  QI: initializeAppScope,
-  Qc: initializeErrorIcon,
-  Qh: LoadingSpinner,
-  Rf: initializeSettingsList,
-  Rh: DialogTitle,
-  Ro: initializeSuccessIcon,
-  Tc: initializeMotion,
-  Ud: MinusIcon,
-  Wd: initializeMinusIcon,
-  Y2: FormattedMessage,
-  Yh: Button,
-  ZI: appScope,
-  Zc: SettingsList,
-  Zh: initializeButton,
-  a$: initializeMotionRuntime,
-  al: initializeSelectTrigger,
-  bD: selectedItemIcon,
-  e6: getReactRuntime,
-  h4: initializeClassNames,
-  jd: initializeCheckbox,
-  jf: Menu,
-  jh: DialogSection,
-  kf: MenuTrigger,
-  kh: DialogActions,
-  m4: classNames,
-  o$: MotionSpan,
-  rl: SettingsRow,
-  wc: SuccessIcon,
-  xD: initializeCheckControl,
-  zh: initializeDialog,
-} = appSharedChunk;
-const {
-  Gx: browserImportSucceededSignal,
-  Jx: browserImportCompletedAtSignal,
-  Kx: isImportSuccessful,
-  Slt: useReducedMotion,
-  Ux: isImportFailure,
-  Wx: isImportDataSuccessful,
-  Xl: initializeBrowserImportSettings,
-  mfn: browserExtensionsFeatureFamily,
-  pfn: initializeBrowserExtensionFeature,
-  ql: SelectTrigger,
-  qx: initializeBrowserImportRuntime,
-  xlt: initializeBrowserImportState,
-} = appInitialChunk;
-const {
-  Jp: WarningIcon,
-  Yp: initializeWarningIcon,
-} = appPrimaryChunk;
-const {
-  c: recordAdminNoticeShown,
-  i: recordDialogClosed,
-  n: recordAttemptFinished,
-  r: recordAttemptStarted,
-  s: recordAdminNoticeAcknowledged,
-  t: initializeBrowserImportAnalytics,
-} = analyticsChunk;
-const {
-  a: SourceIcon,
-  c: importMessages,
-  d: initializeImportDataIcons,
-  i: initializeImportQueries,
-  l: initializeImportMessages,
-  s: initializeSourceIcons,
-  t: createProfilesQueryOptions,
-  u: ImportDataIcon,
-} = queryChunk;
-
-const jsx: JsxRuntime = getJsxRuntime();
-const React: ReactRuntime = getReactRuntime();
-const revealInitialDelayMs = 750;
-const revealRowDelayMs = 500;
-
-const dialogMessages = defineMessages({
-  cancel: {
-    id: "settings.browserUse.profileImport.cancel",
-    defaultMessage: "Cancel",
-    description: "Button that closes the browser data import dialog",
-  },
-  complete: {
-    id: "settings.browserUse.profileImport.complete",
-    defaultMessage: "Import complete",
-    description: "Title shown after browser data import completes",
-  },
-  done: {
-    id: "settings.browserUse.profileImport.done",
-    defaultMessage: "Done",
-    description: "Button that closes the browser data import dialog",
-  },
-  failed: {
-    id: "settings.browserUse.profileImport.failed",
-    defaultMessage: "Import failed",
-    description: "Title shown when browser data import fails",
-  },
-  import: {
-    id: "settings.browserUse.profileImport.import",
-    defaultMessage: "Import",
-    description: "Button that starts importing browser data",
-  },
-  importingCookies: {
-    id: "settings.browserUse.profileImport.importingCookies",
-    defaultMessage: "Importing cookies…",
-    description: "Progress description shown while cookies are being imported",
-  },
-  importingHistory: {
-    id: "settings.browserUse.profileImport.importingHistory",
-    defaultMessage: "Importing browsing history…",
-    description:
-      "Progress description shown while browsing history is being imported",
-  },
-  importingPasswords: {
-    id: "settings.browserUse.profileImport.importingPasswords",
-    defaultMessage: "Importing saved passwords…",
-    description:
-      "Progress description shown while saved passwords are being imported",
-  },
-  importingExtensions: {
-    id: "settings.browserUse.profileImport.importingExtensions",
-    defaultMessage: "Importing extensions…",
-    description:
-      "Progress description shown while extensions are being imported",
-  },
-  retry: {
-    id: "settings.browserUse.profileImport.retry",
-    defaultMessage: "Retry",
-    description: "Button that retries browser data import",
-  },
-});
-
-function Message(props: Record<string, unknown>) {
-  return jsx.jsx(FormattedMessage, props);
-}
-
-function profileKey(profile: Profile): string {
-  return `${profile.source}:${profile.profilePath}`;
-}
-
-function profileAccessibleName(profile: Profile): string {
-  return `${profile.appName} ${profile.profileName || profile.profileDirectoryName}`;
-}
-
-function buildImportRequest(
-  profile: Profile,
-  importCookies: boolean,
-  importPasswords: boolean,
-  importHistory: boolean,
-  importExtensions: boolean,
-  allowElevatedChromeDecryption: boolean,
-): ImportRequest {
-  const request: ImportRequest = {
-    source: profile.source,
-    profilePath: profile.profilePath,
-    importCookies,
-    importPasswords,
-    importHistory,
-    importExtensions,
-  };
-  return allowElevatedChromeDecryption
-    ? { ...request, allowElevatedChromeDecryption: true }
-    : request;
-}
-
-function mergeDataResult(
-  previous?: DataResult,
-  next?: DataResult,
-): DataResult | undefined {
-  if (next == null) return previous;
-  const previousImported = previous?.imported ?? 0;
-  return previousImported === 0
-    ? next
-    : { ...next, imported: previousImported + (next.imported ?? 0) };
-}
-
-function mergeImportResults(
-  previous: ImportResult,
-  next: ImportResult,
-): ImportResult {
-  return {
-    ...previous,
-    ...next,
-    cookies: mergeDataResult(previous.cookies, next.cookies),
-    passwords: mergeDataResult(previous.passwords, next.passwords),
-    history: mergeDataResult(previous.history, next.history),
-    extensions: mergeDataResult(previous.extensions, next.extensions),
-  };
-}
-
-function shouldRetry(...results: (DataResult | undefined)[]): boolean {
-  return !results.some(isImportDataSuccessful) || results.some(isImportFailure);
-}
-
-function hasCleanStatus(result?: DataResult): boolean {
+import {
+  Gx as de,
+  Jx as fe,
+  Kx as pe,
+  Slt as H,
+  Ux as U,
+  Wx as W,
+  Xl as G,
+  mfn as me,
+  pfn as K,
+  ql as q,
+  qx as J,
+  xlt as he,
+} from "@rchunk/app-initial";
+import { Jp as Y, Yp as ge } from "@rchunk/app-primary";
+import { c as _e, i as ve, n as ye, r as be, s as xe, t as Se } from "@rchunk/browser-profile-import-analytics";
+import {
+  a as Ce,
+  c as we,
+  d as Te,
+  i as Ee,
+  l as De,
+  s as Oe,
+  t as ke,
+  u as X,
+} from "@rchunk/browser-profile-import-query";
+function Ae(e) {
+  let t = (0, Ne.c)(8),
+    { result: n } = e;
+  if (n?.failures != null && n.failures.length > 0) {
+    let e;
+    t[0] === n.failures ? (e = t[1]) : ((e = n.failures.map(je)), (t[0] = n.failures), (t[1] = e));
+    let r;
+    return (
+      t[2] === e
+        ? (r = t[3])
+        : ((r = (0, Z.jsx)(`ul`, { className: `flex flex-col gap-3 select-text`, children: e })),
+          (t[2] = e),
+          (t[3] = r)),
+      r
+    );
+  }
+  if (n?.status === `failed_to_read`) {
+    let e;
+    return (
+      t[4] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Z.jsx)(D, {
+            id: `settings.browserUse.profileImport.extensionSettingsUnreadable`,
+            defaultMessage: `Chrome’s extension settings couldn’t be read. Close Chrome and try again.`,
+            description: `Recovery guidance when the importer cannot read the source profile and therefore cannot identify individual extensions`,
+          })),
+          (t[4] = e))
+        : (e = t[4]),
+      e
+    );
+  }
+  if (n?.status === `failed_to_copy`) {
+    let e;
+    return (
+      t[5] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Z.jsx)(Me, { reason: `copy_failed` })), (t[5] = e))
+        : (e = t[5]),
+      e
+    );
+  }
+  if (n?.status === `failed_to_initialize`) {
+    let e;
+    return (
+      t[6] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Z.jsx)(Me, { reason: `initialization_failed` })), (t[6] = e))
+        : (e = t[6]),
+      e
+    );
+  }
+  let r;
   return (
-    result?.error == null &&
-    (result?.status == null ||
-      result.status === "success" ||
-      result.status === "missing" ||
-      result.status === "partial" ||
-      result.status === "partial-success") &&
-    (result?.status !== "missing" || (result.failed ?? 0) === 0)
+    t[7] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((r = (0, Z.jsx)(D, {
+          id: `settings.browserUse.profileImport.extensionsError`,
+          defaultMessage: `Some extensions couldn’t be imported`,
+          description: `Error shown when an older runtime does not provide individual extension import failures`,
+        })),
+        (t[7] = r))
+      : (r = t[7]),
+    r
   );
 }
-
-function ImportedDataIcon({ kind }: { kind: ImportKind }) {
-  return jsx.jsx(ImportDataIcon, { className: "size-5 text-secondary", kind });
-}
-
-const extensionFailureMessages: Record<string, [string, string]> = {
-  unsupported_installation: [
-    "settings.browserUse.profileImport.extensionUnsupportedInstallation",
-    "This type of extension installation isn’t supported",
-  ],
-  managed_extension: [
-    "settings.browserUse.profileImport.extensionManaged",
-    "Managed extensions must be installed by your administrator",
-  ],
-  chrome_component: [
-    "settings.browserUse.profileImport.extensionChromeComponent",
-    "Built-in Chrome components can’t be imported",
-  ],
-  invalid_metadata: [
-    "settings.browserUse.profileImport.extensionInvalidMetadata",
-    "Chrome’s installation details are missing or invalid",
-  ],
-  missing_files: [
-    "settings.browserUse.profileImport.extensionMissingFiles",
-    "The extension’s files are missing from this Chrome profile",
-  ],
-  invalid_files: [
-    "settings.browserUse.profileImport.extensionInvalidFiles",
-    "The extension’s files couldn’t be safely read",
-  ],
-  invalid_manifest: [
-    "settings.browserUse.profileImport.extensionInvalidManifest",
-    "The extension’s manifest is invalid or doesn’t match its installation",
-  ],
-  invalid_permissions: [
-    "settings.browserUse.profileImport.extensionInvalidPermissions",
-    "The saved permissions or enabled state couldn’t be read safely",
-  ],
-  unsupported_permissions: [
-    "settings.browserUse.profileImport.extensionUnsupportedPermissions",
-    "The saved site-access restrictions can’t be preserved in Codex",
-  ],
-  copy_failed: [
-    "settings.browserUse.profileImport.extensionCopyFailed",
-    "The extension’s files couldn’t be copied. Check available disk space and try again.",
-  ],
-  blocked_by_policy: [
-    "settings.browserUse.profileImport.extensionBlockedByPolicy",
-    "Blocked by your administrator",
-  ],
-  blocked_by_security: [
-    "settings.browserUse.profileImport.extensionBlockedBySecurity",
-    "Blocked by browser security checks",
-  ],
-  unsupported_requirements: [
-    "settings.browserUse.profileImport.extensionUnsupportedRequirements",
-    "This extension requires features that aren’t available in Codex",
-  ],
-  dependency_failed: [
-    "settings.browserUse.profileImport.extensionDependencyFailed",
-    "A required shared module is missing or incompatible",
-  ],
-  initialization_failed: [
-    "settings.browserUse.profileImport.extensionInitializationFailed",
-    "Codex couldn’t start extension import. Restart Codex and try again.",
-  ],
-  profile_closed: [
-    "settings.browserUse.profileImport.extensionProfileClosed",
-    "The browser profile closed before import finished",
-  ],
-};
-
-function ExtensionFailureReason({ reason }: { reason?: string }) {
-  const [id, defaultMessage] = extensionFailureMessages[reason ?? ""] ?? [
-    "settings.browserUse.profileImport.extensionInstallFailed",
-    "The extension couldn’t be installed",
-  ];
-  return jsx.jsx(Message, {
-    id,
-    defaultMessage,
-    description: "Reason an extension could not be imported",
-  });
-}
-
-function ExtensionFailureMessage({ result }: { result?: DataResult }) {
-  if (result?.failures?.length) {
-    return jsx.jsx("ul", {
-      className: "flex flex-col gap-3 select-text",
-      children: result.failures.map((failure, index) =>
-        jsx.jsxs(
-          "li",
-          {
-            className: "flex min-w-0 flex-col gap-1",
-            children: [
-              jsx.jsx("div", {
-                className: "font-medium wrap-anywhere text-default",
-                children:
-                  failure.name ||
-                  failure.id ||
-                  jsx.jsx(Message, {
-                    id: "settings.browserUse.profileImport.unknownExtension",
-                    defaultMessage: "Unknown extension",
-                  }),
-              }),
-              jsx.jsx(ExtensionFailureReason, { reason: failure.reason }),
-            ],
-          },
-          failure.id ?? index,
-        ),
-      ),
-    });
-  }
-  if (result?.status === "failed_to_read") {
-    return jsx.jsx(Message, {
-      id: "settings.browserUse.profileImport.extensionSettingsUnreadable",
-      defaultMessage:
-        "Chrome’s extension settings couldn’t be read. Close Chrome and try again.",
-    });
-  }
-  if (result?.status === "failed_to_copy") {
-    return jsx.jsx(ExtensionFailureReason, { reason: "copy_failed" });
-  }
-  if (result?.status === "failed_to_initialize") {
-    return jsx.jsx(ExtensionFailureReason, { reason: "initialization_failed" });
-  }
-  return jsx.jsx(Message, {
-    id: "settings.browserUse.profileImport.extensionsError",
-    defaultMessage: "Some extensions couldn’t be imported",
-  });
-}
-
-function ProfileLabel({ profile }: { profile: Profile }) {
-  const iconClass = classNames(
-    "size-4 shrink-0",
-    profile.source === "atlas" && "rounded-[22%]",
-  );
-  return jsx.jsxs("span", {
-    className: "flex min-w-0 flex-1 items-center gap-1.5",
-    children: [
-      jsx.jsx(SourceIcon, { className: iconClass, source: profile.source }),
-      jsx.jsx("span", {
-        className: "min-w-0 truncate text-default",
-        children: profile.appName,
-      }),
-      jsx.jsx("span", {
-        className: "min-w-0 truncate text-tertiary",
-        children: profile.profileName || profile.profileDirectoryName,
-      }),
-    ],
-  });
-}
-
-function ProfilePicker({
-  disabled,
-  isLoading,
-  open,
-  profiles,
-  selectedProfile,
-  onOpenChange,
-  onSelectProfile,
-}: {
-  disabled: boolean;
-  isLoading: boolean;
-  open: boolean;
-  profiles?: Profile[];
-  selectedProfile: Profile | null;
-  onOpenChange: (open: boolean) => void;
-  onSelectProfile: (profile: Profile) => void;
-}) {
-  const oneProfile = profiles?.length === 1;
-  const triggerContent = isLoading
-    ? jsx.jsxs(React.Fragment, {
-        children: [
-          jsx.jsx(LoadingSpinner, { className: "icon-2xs" }),
-          jsx.jsx(Message, {
-            id: "settings.browserUse.profileImport.loadingProfiles",
-            defaultMessage: "Loading profiles…",
-          }),
-        ],
-      })
-    : selectedProfile == null
-      ? jsx.jsx(Message, {
-          id: "settings.browserUse.profileImport.noProfiles",
-          defaultMessage: "No profiles found",
-        })
-      : jsx.jsx(ProfileLabel, { profile: selectedProfile });
-  const trigger = jsx.jsx(SelectTrigger, {
-    "aria-disabled": oneProfile || undefined,
-    "aria-label": selectedProfile
-      ? profileAccessibleName(selectedProfile)
-      : undefined,
-    className: classNames(
-      "min-w-0 flex-1",
-      oneProfile && "pointer-events-none",
-    ),
-    chevronClassName: oneProfile ? "hidden" : undefined,
-    disabled: oneProfile ? undefined : disabled,
-    tabIndex: oneProfile ? -1 : undefined,
-    children: triggerContent,
-  });
-  return jsx.jsxs("div", {
-    className: "flex items-center gap-3",
-    children: [
-      jsx.jsx("span", {
-        className: "shrink-0 text-sm text-codex-description",
-        children: jsx.jsx(Message, {
-          id: "settings.browserUse.profileImport.from",
-          defaultMessage: "From",
-        }),
-      }),
-      oneProfile
-        ? trigger
-        : jsx.jsx(MenuTrigger, {
-            align: "end",
-            contentWidth: "menuWide",
-            disabled,
-            open,
-            triggerButton: trigger,
-            onOpenChange,
-            children: jsx.jsx(Menu.Section, {
-              className: "max-h-[250px] overflow-y-auto",
-              children: profiles?.map((profile) =>
-                jsx.jsx(
-                  Menu.Item,
-                  {
-                    "aria-label": profileAccessibleName(profile),
-                    rightIconAsset:
-                      profileKey(profile) ===
-                      (selectedProfile == null
-                        ? null
-                        : profileKey(selectedProfile))
-                        ? selectedItemIcon
-                        : undefined,
-                    onSelect: () => onSelectProfile(profile),
-                    children: jsx.jsx(ProfileLabel, { profile }),
-                  },
-                  profileKey(profile),
-                ),
-              ),
+function je(e, t) {
+  return (0, Z.jsxs)(
+    `li`,
+    {
+      className: `flex min-w-0 flex-col gap-1`,
+      children: [
+        (0, Z.jsx)(`div`, {
+          className: `font-medium wrap-anywhere text-default`,
+          children:
+            e.name ||
+            e.id ||
+            (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.unknownExtension`,
+              defaultMessage: `Unknown extension`,
+              description: `Label for an extension import failure whose source metadata has neither a usable name nor a valid extension ID`,
             }),
-          }),
-    ],
-  });
-}
-
-function DataSelectionRow({
-  checked,
-  disabled,
-  kind,
-  onChange,
-}: {
-  checked: boolean;
-  disabled: boolean;
-  kind: ImportKind;
-  onChange: (checked: boolean) => void;
-}) {
-  return jsx.jsx(SettingsRow, {
-    icon: jsx.jsx(ImportedDataIcon, { kind }),
-    label: jsx.jsx("span", {
-      className: "select-none",
-      children: jsx.jsx(Message, { ...importMessages[kind] }),
-    }),
-    control: (props: Record<string, unknown>) =>
-      jsx.jsx(CheckControl, { ...props, checked, disabled, onChange }),
-  });
-}
-
-function ElevatedChromeConsent({
-  checked,
-  disabled,
-  onChange,
-}: {
-  checked: boolean;
-  disabled: boolean;
-  onChange: (checked: boolean) => void;
-}) {
-  return jsx.jsxs("div", {
-    className:
-      "flex flex-col gap-2 rounded-lg border border-primary-outline bg-text/[0.025] p-3 text-sm",
-    children: [
-      jsx.jsx("p", {
-        className: "font-medium text-default",
-        children: jsx.jsx(Message, {
-          id: "settings.browserUse.profileImport.windowsChrome.title",
-          defaultMessage: "Administrator approval required",
         }),
-      }),
-      jsx.jsx("p", {
-        className: "text-codex-description",
-        children: jsx.jsx(Message, {
-          id: "settings.browserUse.profileImport.windowsChrome.description",
-          defaultMessage:
-            "Windows protects Chrome cookies and passwords with App-Bound Encryption, so ChatGPT also needs administrator approval",
-        }),
-      }),
-      jsx.jsxs("label", {
-        className: "relative flex cursor-interaction items-start gap-2",
-        children: [
-          jsx.jsx(Checkbox, {
-            checked,
-            disabled,
-            onCheckedChange: onChange,
-          }),
-          jsx.jsx("span", {
-            children: jsx.jsx(Message, {
-              id: "settings.browserUse.profileImport.windowsChrome.consent",
-              defaultMessage:
-                "I understand the app will request administrator approval to import this Chrome data",
-            }),
-          }),
-        ],
-      }),
-    ],
-  });
-}
-
-function ExtensionsConfirmation({
-  profile,
-  onCancel,
-  onImport,
-}: {
-  profile: Profile;
-  onCancel: () => void;
-  onImport: () => void;
-}) {
-  const title = jsx.jsx(Message, {
-    id: "settings.browserUse.profileImport.extensionsConfirmationTitle",
-    defaultMessage: "Import unverified extensions?",
-  });
-  const description = jsx.jsx(Message, {
-    id: "settings.browserUse.profileImport.extensionsConfirmationDescription",
-    defaultMessage:
-      "Codex can’t verify extensions or saved permissions from this {appName} profile “{profileName}”. If imported, these extensions may run code or access data in Codex. Continue only if you trust the profile.",
-    values: { appName: profile.appName, profileName: profile.profileName },
-  });
-  return jsx.jsxs(DialogContent, {
-    as: "form",
-    onSubmit: (event: { preventDefault: () => void }) => {
-      event.preventDefault();
-      onImport();
+        (0, Z.jsx)(Me, { reason: e.reason }),
+      ],
     },
-    children: [
-      jsx.jsx(DialogTitle, { className: "sr-only", children: title }),
-      jsx.jsx(DialogDescription, { className: "sr-only", children: description }),
-      jsx.jsx(DialogSection, {
-        children: jsx.jsx(DialogHeader, { title, subtitle: description }),
+    e.id ?? t,
+  );
+}
+function Me(e) {
+  let t = (0, Ne.c)(17),
+    { reason: n } = e;
+  switch (n) {
+    case `unsupported_installation`: {
+      let e;
+      return (
+        t[0] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionUnsupportedInstallation`,
+              defaultMessage: `This type of extension installation isn’t supported`,
+              description: `Reason an extension cannot be imported because it is not a regular installed extension, such as an unpacked development extension, app, or theme`,
+            })),
+            (t[0] = e))
+          : (e = t[0]),
+        e
+      );
+    }
+    case `managed_extension`: {
+      let e;
+      return (
+        t[1] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionManaged`,
+              defaultMessage: `Managed extensions must be installed by your administrator`,
+              description: `Reason an extension installed by Chrome enterprise policy cannot be copied into Codex`,
+            })),
+            (t[1] = e))
+          : (e = t[1]),
+        e
+      );
+    }
+    case `chrome_component`: {
+      let e;
+      return (
+        t[2] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionChromeComponent`,
+              defaultMessage: `Built-in Chrome components can’t be imported`,
+              description: `Reason a built-in Chrome component extension cannot be copied into Codex`,
+            })),
+            (t[2] = e))
+          : (e = t[2]),
+        e
+      );
+    }
+    case `invalid_metadata`: {
+      let e;
+      return (
+        t[3] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionInvalidMetadata`,
+              defaultMessage: `Chrome’s installation details are missing or invalid`,
+              description: `Reason a Chrome extension record cannot be imported because its ID, path, or installation metadata is missing or invalid`,
+            })),
+            (t[3] = e))
+          : (e = t[3]),
+        e
+      );
+    }
+    case `missing_files`: {
+      let e;
+      return (
+        t[4] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionMissingFiles`,
+              defaultMessage: `The extension’s files are missing from this Chrome profile`,
+              description: `Reason an extension cannot be imported because the source profile no longer contains its installation directory`,
+            })),
+            (t[4] = e))
+          : (e = t[4]),
+        e
+      );
+    }
+    case `invalid_files`: {
+      let e;
+      return (
+        t[5] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionInvalidFiles`,
+              defaultMessage: `The extension’s files couldn’t be safely read`,
+              description: `Reason an extension cannot be imported because its files contain symbolic links or are unreadable or invalid`,
+            })),
+            (t[5] = e))
+          : (e = t[5]),
+        e
+      );
+    }
+    case `invalid_manifest`: {
+      let e;
+      return (
+        t[6] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionInvalidManifest`,
+              defaultMessage: `The extension’s manifest is invalid or doesn’t match its installation`,
+              description: `Reason an extension cannot be imported because its manifest, identity key, or version is invalid or inconsistent`,
+            })),
+            (t[6] = e))
+          : (e = t[6]),
+        e
+      );
+    }
+    case `invalid_permissions`: {
+      let e;
+      return (
+        t[7] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionInvalidPermissions`,
+              defaultMessage: `The saved permissions or enabled state couldn’t be read safely`,
+              description: `Reason an extension cannot be imported because Chrome’s saved permissions or enabled and disabled state cannot be interpreted safely`,
+            })),
+            (t[7] = e))
+          : (e = t[7]),
+        e
+      );
+    }
+    case `unsupported_permissions`: {
+      let e;
+      return (
+        t[8] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionUnsupportedPermissions`,
+              defaultMessage: `The saved site-access restrictions can’t be preserved in Codex`,
+              description: `Reason an extension is not imported because doing so would lose a source site restriction or broaden its permissions in the target profile`,
+            })),
+            (t[8] = e))
+          : (e = t[8]),
+        e
+      );
+    }
+    case `copy_failed`: {
+      let e;
+      return (
+        t[9] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionCopyFailed`,
+              defaultMessage: `The extension’s files couldn’t be copied. Check available disk space and try again.`,
+              description: `Recovery guidance when extension import cannot create temporary files or copy the installation into Codex`,
+            })),
+            (t[9] = e))
+          : (e = t[9]),
+        e
+      );
+    }
+    case `blocked_by_policy`: {
+      let e;
+      return (
+        t[10] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionBlockedByPolicy`,
+              defaultMessage: `Blocked by your administrator`,
+              description: `Reason an extension import was rejected by the target browser’s managed installation policy`,
+            })),
+            (t[10] = e))
+          : (e = t[10]),
+        e
+      );
+    }
+    case `blocked_by_security`: {
+      let e;
+      return (
+        t[11] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionBlockedBySecurity`,
+              defaultMessage: `Blocked by browser security checks`,
+              description: `Reason an extension import was rejected because the extension is blocklisted or fails browser security checks`,
+            })),
+            (t[11] = e))
+          : (e = t[11]),
+        e
+      );
+    }
+    case `unsupported_requirements`: {
+      let e;
+      return (
+        t[12] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionUnsupportedRequirements`,
+              defaultMessage: `This extension requires features that aren’t available in Codex`,
+              description: `Reason an extension import was rejected because its runtime requirements are unsupported`,
+            })),
+            (t[12] = e))
+          : (e = t[12]),
+        e
+      );
+    }
+    case `dependency_failed`: {
+      let e;
+      return (
+        t[13] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionDependencyFailed`,
+              defaultMessage: `A required shared module is missing or incompatible`,
+              description: `Reason an extension cannot be installed because another extension it depends on is missing, incompatible, or does not allow this extension to use it`,
+            })),
+            (t[13] = e))
+          : (e = t[13]),
+        e
+      );
+    }
+    case `initialization_failed`: {
+      let e;
+      return (
+        t[14] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionInitializationFailed`,
+              defaultMessage: `Codex couldn’t start extension import. Restart Codex and try again.`,
+              description: `Recovery guidance when the target profile’s extension system could not be initialized`,
+            })),
+            (t[14] = e))
+          : (e = t[14]),
+        e
+      );
+    }
+    case `profile_closed`: {
+      let e;
+      return (
+        t[15] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionProfileClosed`,
+              defaultMessage: `The browser profile closed before import finished`,
+              description: `Reason an extension import was interrupted by the target profile shutting down`,
+            })),
+            (t[15] = e))
+          : (e = t[15]),
+        e
+      );
+    }
+    default: {
+      let e;
+      return (
+        t[16] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Z.jsx)(D, {
+              id: `settings.browserUse.profileImport.extensionInstallFailed`,
+              defaultMessage: `The extension couldn’t be installed`,
+              description: `Reason shown for an extension installation error that has no more specific supported explanation, including unfamiliar reasons from newer runtimes`,
+            })),
+            (t[16] = e))
+          : (e = t[16]),
+        e
+      );
+    }
+  }
+}
+var Ne, Z;
+function Pe() {
+  return (Pe = e(() => {
+    ((Ne = t()), f(), (Z = l()));
+  }))();
+}
+function Fe(e) {
+  let t = (0, nt.c)(76),
+    {
+      activeImportRequest: n,
+      cookieAccessFailureMessage: r,
+      confirmExtensionImport: a,
+      elevatedChromeConsent: s,
+      extensionsAvailable: c,
+      importCookies: l,
+      importExtensions: u,
+      importHistory: d,
+      importPasswords: f,
+      isImporting: p,
+      isLoadingProfiles: m,
+      showCloseBrowserGuidance: g,
+      profilePickerOpen: v,
+      profiles: y,
+      profilesHaveError: b,
+      revealedImportResultRowCount: x,
+      requiresElevatedChromeConsent: S,
+      result: w,
+      selectedProfile: T,
+      onCancel: E,
+      onElevatedChromeConsentChange: ee,
+      onImport: ne,
+      onImportCookiesChange: ie,
+      onImportExtensionsChange: ae,
+      onImportHistoryChange: O,
+      onImportPasswordsChange: oe,
+      onProfilePickerOpenChange: se,
+      onRetry: ce,
+      onSelectProfile: le,
+    } = e;
+  if (a !== void 0 && a && T != null) {
+    let e;
+    return (
+      t[0] !== E || t[1] !== ne || t[2] !== T
+        ? ((e = (0, Q.jsx)(Re, { profile: T, onCancel: E, onImport: ne })),
+          (t[0] = E),
+          (t[1] = ne),
+          (t[2] = T),
+          (t[3] = e))
+        : (e = t[3]),
+      e
+    );
+  }
+  let k = T != null && l,
+    A = T != null && f,
+    j = T?.source === `chrome` && d,
+    M = c && u;
+  if (p || w != null) {
+    let e = w?.extensions != null || (n?.importExtensions ?? M),
+      i;
+    return (
+      t[4] !== n ||
+      t[5] !== r ||
+      t[6] !== k ||
+      t[7] !== j ||
+      t[8] !== A ||
+      t[9] !== p ||
+      t[10] !== E ||
+      t[11] !== ce ||
+      t[12] !== w ||
+      t[13] !== x ||
+      t[14] !== g ||
+      t[15] !== e
+        ? ((i = (0, Q.jsx)(Ve, {
+            activeImportRequest: n,
+            cookieAccessFailureMessage: r,
+            importCookies: k,
+            importExtensions: e,
+            importHistory: j,
+            importPasswords: A,
+            isImporting: p,
+            revealedImportResultRowCount: x,
+            showCloseBrowserGuidance: g,
+            result: w,
+            onDone: E,
+            onRetry: ce,
+          })),
+          (t[4] = n),
+          (t[5] = r),
+          (t[6] = k),
+          (t[7] = j),
+          (t[8] = A),
+          (t[9] = p),
+          (t[10] = E),
+          (t[11] = ce),
+          (t[12] = w),
+          (t[13] = x),
+          (t[14] = g),
+          (t[15] = e),
+          (t[16] = i))
+        : (i = t[16]),
+      i
+    );
+  }
+  let P = T == null || (!k && !A && !j && !M) || (S && !s),
+    I;
+  t[17] === ne
+    ? (I = t[18])
+    : ((I = (e) => {
+        (e.preventDefault(), ne());
       }),
-      jsx.jsx(DialogSection, {
-        children: jsx.jsxs(DialogActions, {
-          children: [
-            jsx.jsx(Button, {
-              autoFocus: true,
-              color: "secondary",
-              onClick: onCancel,
-              type: "button",
-              children: jsx.jsx(Message, { ...dialogMessages.cancel }),
-            }),
-            jsx.jsx(Button, {
-              type: "submit",
-              children: jsx.jsx(Message, {
-                id: "settings.browserUse.profileImport.extensionsConfirmationAction",
-                defaultMessage: "Import extensions",
+      (t[17] = ne),
+      (t[18] = I));
+  let L;
+  t[19] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((L = (0, Q.jsx)(C, {
+        asChild: !0,
+        children: (0, Q.jsx)(`h2`, {
+          className: `sr-only`,
+          children: (0, Q.jsx)(D, { ...we.title }),
+        }),
+      })),
+      (t[19] = L))
+    : (L = t[19]);
+  let R;
+  t[20] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((R = (0, Q.jsx)(D, { ...we.title })), (t[20] = R))
+    : (R = t[20]);
+  let z;
+  t[21] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((z = (0, Q.jsxs)(N, {
+        children: [
+          L,
+          (0, Q.jsx)(i, {
+            title: R,
+            subtitle: (0, Q.jsx)(h, {
+              asChild: !0,
+              children: (0, Q.jsx)(`div`, {
+                children: (0, Q.jsx)(D, {
+                  id: `settings.browserUse.profileImport.subtitle`,
+                  defaultMessage: `Choose data to bring over to the built-in browser`,
+                  description: `Subtitle for the browser data import dialog`,
+                }),
               }),
+            }),
+          }),
+        ],
+      })),
+      (t[21] = z))
+    : (z = t[21]);
+  let ue = p || !y?.length,
+    B;
+  t[22] !== m ||
+  t[23] !== se ||
+  t[24] !== le ||
+  t[25] !== v ||
+  t[26] !== y ||
+  t[27] !== T ||
+  t[28] !== ue
+    ? ((B = (0, Q.jsx)(Ie, {
+        disabled: ue,
+        isLoading: m,
+        open: v,
+        profiles: y,
+        selectedProfile: T,
+        onOpenChange: se,
+        onSelectProfile: le,
+      })),
+      (t[22] = m),
+      (t[23] = se),
+      (t[24] = le),
+      (t[25] = v),
+      (t[26] = y),
+      (t[27] = T),
+      (t[28] = ue),
+      (t[29] = B))
+    : (B = t[29]);
+  let V;
+  t[30] === y?.length
+    ? (V = t[31])
+    : ((V =
+        y?.length === 0 &&
+        (0, Q.jsx)(`p`, {
+          className: `text-sm text-codex-description`,
+          children: (0, Q.jsx)(D, {
+            id: `settings.browserUse.profileImport.noProfilesDescription`,
+            defaultMessage: `No Chrome or Atlas profiles were found on this device`,
+            description: `Message shown when no importable browser profiles are found`,
+          }),
+        })),
+      (t[30] = y?.length),
+      (t[31] = V));
+  let de;
+  t[32] !== T || t[33] !== g
+    ? ((de =
+        g &&
+        T != null &&
+        (0, Q.jsx)(`p`, {
+          className: `text-sm text-codex-description`,
+          children: (0, Q.jsx)(D, {
+            id: `settings.browserUse.profileImport.closeBrowser`,
+            defaultMessage: `Close {browserName} completely before importing`,
+            description: `Instruction to close the source browser before importing its profile data`,
+            values: { browserName: T.appName },
+          }),
+        })),
+      (t[32] = T),
+      (t[33] = g),
+      (t[34] = de))
+    : (de = t[34]);
+  let fe;
+  t[35] !== k ||
+  t[36] !== M ||
+  t[37] !== j ||
+  t[38] !== A ||
+  t[39] !== c ||
+  t[40] !== p ||
+  t[41] !== ie ||
+  t[42] !== ae ||
+  t[43] !== O ||
+  t[44] !== oe ||
+  t[45] !== T
+    ? ((fe =
+        T != null &&
+        (0, Q.jsxs)(re, {
+          children: [
+            (0, Q.jsx)(ze, { checked: A, disabled: p, kind: `passwords`, onChange: oe }),
+            (0, Q.jsx)(ze, { checked: k, disabled: p, kind: `cookies`, onChange: ie }),
+            T.source === `chrome` &&
+              (0, Q.jsx)(ze, { checked: j, disabled: p, kind: `history`, onChange: O }),
+            c && (0, Q.jsx)(ze, { checked: M, disabled: p, kind: `extensions`, onChange: ae }),
+          ],
+        })),
+      (t[35] = k),
+      (t[36] = M),
+      (t[37] = j),
+      (t[38] = A),
+      (t[39] = c),
+      (t[40] = p),
+      (t[41] = ie),
+      (t[42] = ae),
+      (t[43] = O),
+      (t[44] = oe),
+      (t[45] = T),
+      (t[46] = fe))
+    : (fe = t[46]);
+  let pe;
+  t[47] !== s || t[48] !== p || t[49] !== ee || t[50] !== S
+    ? ((pe = S && (0, Q.jsx)(Be, { checked: s, disabled: p, onChange: ee })),
+      (t[47] = s),
+      (t[48] = p),
+      (t[49] = ee),
+      (t[50] = S),
+      (t[51] = pe))
+    : (pe = t[51]);
+  let H;
+  t[52] === b
+    ? (H = t[53])
+    : ((H =
+        b &&
+        (0, Q.jsx)(`p`, {
+          className: `px-3 text-sm text-danger`,
+          role: `alert`,
+          children: (0, Q.jsx)(D, {
+            id: `settings.browserUse.profileImport.profilesError`,
+            defaultMessage: `We couldn't load browser profiles. Close and reopen this dialog to try again`,
+            description: `Error shown when browser profiles cannot be loaded for import`,
+          }),
+        })),
+      (t[52] = b),
+      (t[53] = H));
+  let U;
+  t[54] !== fe || t[55] !== pe || t[56] !== H || t[57] !== B || t[58] !== V || t[59] !== de
+    ? ((U = (0, Q.jsxs)(N, { className: `gap-3`, children: [B, V, de, fe, pe, H] })),
+      (t[54] = fe),
+      (t[55] = pe),
+      (t[56] = H),
+      (t[57] = B),
+      (t[58] = V),
+      (t[59] = de),
+      (t[60] = U))
+    : (U = t[60]);
+  let W;
+  t[61] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((W = (0, Q.jsx)(D, { ...rt.cancel })), (t[61] = W))
+    : (W = t[61]);
+  let G;
+  t[62] !== p || t[63] !== E
+    ? ((G = (0, Q.jsx)(te, {
+        color: `secondary`,
+        disabled: p,
+        onClick: E,
+        type: `button`,
+        children: W,
+      })),
+      (t[62] = p),
+      (t[63] = E),
+      (t[64] = G))
+    : (G = t[64]);
+  let me;
+  t[65] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((me = (0, Q.jsx)(D, { ...rt.import })), (t[65] = me))
+    : (me = t[65]);
+  let K;
+  t[66] !== P || t[67] !== p
+    ? ((K = (0, Q.jsx)(te, {
+        color: `primary`,
+        disabled: P,
+        loading: p,
+        type: `submit`,
+        children: me,
+      })),
+      (t[66] = P),
+      (t[67] = p),
+      (t[68] = K))
+    : (K = t[68]);
+  let q;
+  t[69] !== G || t[70] !== K
+    ? ((q = (0, Q.jsx)(N, { children: (0, Q.jsxs)(F, { className: o, children: [G, K] }) })),
+      (t[69] = G),
+      (t[70] = K),
+      (t[71] = q))
+    : (q = t[71]);
+  let J;
+  return (
+    t[72] !== U || t[73] !== q || t[74] !== I
+      ? ((J = (0, Q.jsxs)(_, { as: `form`, onSubmit: I, children: [z, U, q] })),
+        (t[72] = U),
+        (t[73] = q),
+        (t[74] = I),
+        (t[75] = J))
+      : (J = t[75]),
+    J
+  );
+}
+function Ie(e) {
+  let t = (0, nt.c)(27),
+    {
+      disabled: n,
+      isLoading: r,
+      open: i,
+      profiles: a,
+      selectedProfile: o,
+      onOpenChange: s,
+      onSelectProfile: c,
+    } = e,
+    l;
+  t[0] === o ? (l = t[1]) : ((l = o ? et(o) : null), (t[0] = o), (t[1] = l));
+  let u = l,
+    d;
+  t[2] === o ? (d = t[3]) : ((d = o ? tt(o) : void 0), (t[2] = o), (t[3] = d));
+  let f = d,
+    p = a?.length === 1,
+    m = p || void 0,
+    h = p && `pointer-events-none`,
+    g;
+  t[4] === h ? (g = t[5]) : ((g = I(`min-w-0 flex-1`, h)), (t[4] = h), (t[5] = g));
+  let _ = p ? `hidden` : void 0,
+    v = p ? void 0 : n,
+    y = p ? -1 : void 0,
+    b;
+  t[6] !== r || t[7] !== o
+    ? ((b = (0, Q.jsx)(Le, { isLoading: r, selectedProfile: o })),
+      (t[6] = r),
+      (t[7] = o),
+      (t[8] = b))
+    : (b = t[8]);
+  let x;
+  t[9] !== f ||
+  t[10] !== m ||
+  t[11] !== g ||
+  t[12] !== _ ||
+  t[13] !== v ||
+  t[14] !== y ||
+  t[15] !== b
+    ? ((x = (0, Q.jsx)(q, {
+        "aria-disabled": m,
+        "aria-label": f,
+        className: g,
+        chevronClassName: _,
+        disabled: v,
+        tabIndex: y,
+        children: b,
+      })),
+      (t[9] = f),
+      (t[10] = m),
+      (t[11] = g),
+      (t[12] = _),
+      (t[13] = v),
+      (t[14] = y),
+      (t[15] = b),
+      (t[16] = x))
+    : (x = t[16]);
+  let S = x,
+    C;
+  t[17] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((C = (0, Q.jsx)(`span`, {
+        className: `shrink-0 text-sm text-codex-description`,
+        children: (0, Q.jsx)(D, {
+          id: `settings.browserUse.profileImport.from`,
+          defaultMessage: `From`,
+          description: `Label before the browser profile selector`,
+        }),
+      })),
+      (t[17] = C))
+    : (C = t[17]);
+  let w;
+  return (
+    t[18] !== n ||
+    t[19] !== s ||
+    t[20] !== c ||
+    t[21] !== i ||
+    t[22] !== a ||
+    t[23] !== u ||
+    t[24] !== p ||
+    t[25] !== S
+      ? ((w = (0, Q.jsxs)(`div`, {
+          className: `flex items-center gap-3`,
+          children: [
+            C,
+            p
+              ? S
+              : (0, Q.jsx)(P, {
+                  align: `end`,
+                  contentWidth: `menuWide`,
+                  disabled: n,
+                  open: i,
+                  triggerButton: S,
+                  onOpenChange: s,
+                  children: (0, Q.jsx)(M.Section, {
+                    className: `max-h-[250px] overflow-y-auto`,
+                    children: a?.map((e) => {
+                      let t = et(e);
+                      return (0, Q.jsx)(
+                        M.Item,
+                        {
+                          "aria-label": tt(e),
+                          rightIconAsset: t === u ? se : void 0,
+                          onSelect: () => c(e),
+                          children: (0, Q.jsx)(Ze, { profile: e }),
+                        },
+                        t,
+                      );
+                    }),
+                  }),
+                }),
+          ],
+        })),
+        (t[18] = n),
+        (t[19] = s),
+        (t[20] = c),
+        (t[21] = i),
+        (t[22] = a),
+        (t[23] = u),
+        (t[24] = p),
+        (t[25] = S),
+        (t[26] = w))
+      : (w = t[26]),
+    w
+  );
+}
+function Le(e) {
+  let t = (0, nt.c)(4),
+    { isLoading: n, selectedProfile: r } = e;
+  if (n) {
+    let e;
+    return (
+      t[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Q.jsxs)(Q.Fragment, {
+            children: [
+              (0, Q.jsx)(x, { className: `icon-2xs` }),
+              (0, Q.jsx)(D, {
+                id: `settings.browserUse.profileImport.loadingProfiles`,
+                defaultMessage: `Loading profiles…`,
+                description: `Placeholder shown while importable browser profiles load`,
+              }),
+            ],
+          })),
+          (t[0] = e))
+        : (e = t[0]),
+      e
+    );
+  }
+  if (r == null) {
+    let e;
+    return (
+      t[1] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Q.jsx)(D, {
+            id: `settings.browserUse.profileImport.noProfiles`,
+            defaultMessage: `No profiles found`,
+            description: `Placeholder shown when no importable browser profiles are found`,
+          })),
+          (t[1] = e))
+        : (e = t[1]),
+      e
+    );
+  }
+  let i;
+  return (
+    t[2] === r ? (i = t[3]) : ((i = (0, Q.jsx)(Ze, { profile: r })), (t[2] = r), (t[3] = i)),
+    i
+  );
+}
+function Re(e) {
+  let t = (0, nt.c)(22),
+    { profile: n, onCancel: r, onImport: a } = e,
+    o;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((o = (0, Q.jsx)(D, {
+        id: `settings.browserUse.profileImport.extensionsConfirmationTitle`,
+        defaultMessage: `Import unverified extensions?`,
+        description: `Title asking for fresh consent before importing unauthenticated extension packages and saved permissions from a Chrome profile`,
+      })),
+      (t[0] = o))
+    : (o = t[0]);
+  let s = o,
+    c;
+  t[1] !== n.appName || t[2] !== n.profileName
+    ? ((c = (0, Q.jsx)(D, {
+        id: `settings.browserUse.profileImport.extensionsConfirmationDescription`,
+        defaultMessage: `Codex can’t verify extensions or saved permissions from this {appName} profile “{profileName}”. If imported, these extensions may run code or access data in Codex. Continue only if you trust the profile.`,
+        description: `Security warning that the selected browser profile's extension packages and saved permission grants cannot be authenticated and may access data in Codex`,
+        values: { appName: n.appName, profileName: n.profileName },
+      })),
+      (t[1] = n.appName),
+      (t[2] = n.profileName),
+      (t[3] = c))
+    : (c = t[3]);
+  let l = c,
+    u;
+  t[4] === a
+    ? (u = t[5])
+    : ((u = (e) => {
+        (e.preventDefault(), a());
+      }),
+      (t[4] = a),
+      (t[5] = u));
+  let d;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = (0, Q.jsx)(C, { className: `sr-only`, children: s })), (t[6] = d))
+    : (d = t[6]);
+  let f;
+  t[7] === l
+    ? (f = t[8])
+    : ((f = (0, Q.jsx)(h, { className: `sr-only`, children: l })), (t[7] = l), (t[8] = f));
+  let p;
+  t[9] === l
+    ? (p = t[10])
+    : ((p = (0, Q.jsx)(N, { children: (0, Q.jsx)(i, { title: s, subtitle: l }) })),
+      (t[9] = l),
+      (t[10] = p));
+  let m;
+  t[11] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((m = (0, Q.jsx)(D, { ...rt.cancel })), (t[11] = m))
+    : (m = t[11]);
+  let g;
+  t[12] === r
+    ? (g = t[13])
+    : ((g = (0, Q.jsx)(te, {
+        autoFocus: !0,
+        color: `secondary`,
+        onClick: r,
+        type: `button`,
+        children: m,
+      })),
+      (t[12] = r),
+      (t[13] = g));
+  let v;
+  t[14] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((v = (0, Q.jsx)(te, {
+        type: `submit`,
+        children: (0, Q.jsx)(D, {
+          id: `settings.browserUse.profileImport.extensionsConfirmationAction`,
+          defaultMessage: `Import extensions`,
+          description: `Button granting explicit consent to import unverified extension packages and their saved permissions from the selected profile`,
+        }),
+      })),
+      (t[14] = v))
+    : (v = t[14]);
+  let y;
+  t[15] === g
+    ? (y = t[16])
+    : ((y = (0, Q.jsx)(N, { children: (0, Q.jsxs)(F, { children: [g, v] }) })),
+      (t[15] = g),
+      (t[16] = y));
+  let b;
+  return (
+    t[17] !== y || t[18] !== u || t[19] !== f || t[20] !== p
+      ? ((b = (0, Q.jsxs)(_, { as: `form`, onSubmit: u, children: [d, f, p, y] })),
+        (t[17] = y),
+        (t[18] = u),
+        (t[19] = f),
+        (t[20] = p),
+        (t[21] = b))
+      : (b = t[21]),
+    b
+  );
+}
+function ze(e) {
+  let t = (0, nt.c)(12),
+    { checked: n, disabled: r, kind: i, onChange: a } = e,
+    o;
+  t[0] === i
+    ? (o = t[1])
+    : ((o = (0, Q.jsx)(X, { className: `size-5 text-secondary`, kind: i })),
+      (t[0] = i),
+      (t[1] = o));
+  let s = we[i],
+    c;
+  t[2] === s
+    ? (c = t[3])
+    : ((c = (0, Q.jsx)(`span`, { className: `select-none`, children: (0, Q.jsx)(D, { ...s }) })),
+      (t[2] = s),
+      (t[3] = c));
+  let l;
+  t[4] !== n || t[5] !== r || t[6] !== a
+    ? ((l = (e) => (0, Q.jsx)(m, { ...e, checked: n, disabled: r, onChange: a })),
+      (t[4] = n),
+      (t[5] = r),
+      (t[6] = a),
+      (t[7] = l))
+    : (l = t[7]);
+  let u;
+  return (
+    t[8] !== o || t[9] !== c || t[10] !== l
+      ? ((u = (0, Q.jsx)(z, { icon: o, label: c, control: l })),
+        (t[8] = o),
+        (t[9] = c),
+        (t[10] = l),
+        (t[11] = u))
+      : (u = t[11]),
+    u
+  );
+}
+function Be(e) {
+  let t = (0, nt.c)(9),
+    { checked: n, disabled: i, onChange: a } = e,
+    o;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((o = (0, Q.jsx)(`p`, {
+        className: `font-medium text-default`,
+        children: (0, Q.jsx)(D, {
+          id: `settings.browserUse.profileImport.windowsChrome.title`,
+          defaultMessage: `Administrator approval required`,
+          description: `Title for the Windows Chrome browser import consent notice`,
+        }),
+      })),
+      (t[0] = o))
+    : (o = t[0]);
+  let s;
+  t[1] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = (0, Q.jsx)(`p`, {
+        className: `text-codex-description`,
+        children: (0, Q.jsx)(D, {
+          id: `settings.browserUse.profileImport.windowsChrome.description`,
+          defaultMessage: `Windows protects Chrome cookies and passwords with App-Bound Encryption, so ChatGPT also needs administrator approval`,
+          description: `Description for the Windows Chrome browser import consent notice`,
+        }),
+      })),
+      (t[1] = s))
+    : (s = t[1]);
+  let c;
+  t[2] !== n || t[3] !== i || t[4] !== a
+    ? ((c = (0, Q.jsx)(r, { checked: n, disabled: i, onCheckedChange: a })),
+      (t[2] = n),
+      (t[3] = i),
+      (t[4] = a),
+      (t[5] = c))
+    : (c = t[5]);
+  let l;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((l = (0, Q.jsx)(`span`, {
+        children: (0, Q.jsx)(D, {
+          id: `settings.browserUse.profileImport.windowsChrome.consent`,
+          defaultMessage: `I understand the app will request administrator approval to import this Chrome data`,
+          description: `Consent label for elevated Windows Chrome browser data import`,
+        }),
+      })),
+      (t[6] = l))
+    : (l = t[6]);
+  let u;
+  return (
+    t[7] === c
+      ? (u = t[8])
+      : ((u = (0, Q.jsxs)(`div`, {
+          className: `flex flex-col gap-2 rounded-lg border border-primary-outline bg-text/[0.025] p-3 text-sm`,
+          children: [
+            o,
+            s,
+            (0, Q.jsxs)(`label`, {
+              className: `relative flex cursor-interaction items-start gap-2`,
+              children: [c, l],
             }),
           ],
-        }),
-      }),
-    ],
-  });
-}
-
-function cookieFailureMessage(
-  result: ImportResult,
-  message: unknown,
-  showCloseBrowserGuidance: boolean,
-  partiallyFailed: boolean,
-) {
-  if (result.cookies?.status === "failed_to_copy") {
-    if (message != null) return jsx.jsx(React.Fragment, { children: message });
-    const sourceGuidance = showCloseBrowserGuidance
-      ? result.source === "chrome"
-        ? "Chrome may still be running in the background. Close Chrome completely and try again. "
-        : "Atlas may still be running in the background. Close Atlas completely and try again. "
-      : "";
-    return jsx.jsx(Message, {
-      id: "settings.browserUse.profileImport.cookieAccessError",
-      defaultMessage: `ChatGPT couldn’t access this profile’s cookies. ${sourceGuidance}A device security policy may be blocking access`,
-    });
-  }
-  return jsx.jsx(Message, {
-    id: partiallyFailed
-      ? "settings.browserUse.profileImport.cookiesPartialError"
-      : "settings.browserUse.profileImport.cookiesError",
-    defaultMessage: partiallyFailed
-      ? "Some cookies couldn’t be imported"
-      : "Cookies couldn’t be imported",
-  });
-}
-
-function passwordFailureMessage(results: (DataResult | undefined)[]) {
-  const partiallyFailed =
-    results.some(isImportFailure) && results.some(isImportDataSuccessful);
-  const accessFailed = results.some(
-    (result) => result?.status === "failed_to_copy",
+        })),
+        (t[7] = c),
+        (t[8] = u)),
+    u
   );
-  return jsx.jsx(Message, {
-    id: partiallyFailed
-      ? "settings.browserUse.profileImport.passwordsPartialError"
-      : accessFailed
-        ? "settings.browserUse.profileImport.passwordAccessError"
-        : "settings.browserUse.profileImport.passwordsError",
-    defaultMessage: partiallyFailed
-      ? "Some passwords couldn’t be imported"
-      : accessFailed
-        ? "ChatGPT couldn’t access this profile’s passwords. A device security policy may be blocking access"
-        : "Passwords couldn’t be imported",
-  });
 }
-
-type ResultRowModel = {
-  kind: ImportKind;
-  visible: boolean;
-  importing: boolean;
-  succeeded: boolean;
-  warning?: boolean;
-  failureMessage?: unknown;
-};
-
-function AnimatedStatusIcon({
-  animationDelay,
-  children,
-  rotate,
-}: {
-  animationDelay: number;
-  children: unknown;
-  rotate: boolean;
-}) {
-  const reducedMotion = useReducedMotion();
-  const keyframes = rotate
-    ? [
-        "scale(0.9) rotate(-14deg)",
-        "scale(1.16) rotate(6deg)",
-        "scale(0.94) rotate(-3deg)",
-        "scale(1.04) rotate(1deg)",
-        "scale(1) rotate(0deg)",
-      ]
-    : ["scale(0.9)", "scale(1.16)", "scale(0.94)", "scale(1.04)", "scale(1)"];
-  return jsx.jsx(MotionSpan, {
-    className: "inline-flex",
-    animate: {
-      opacity: 1,
-      transform: reducedMotion ? "scale(1) rotate(0deg)" : keyframes,
-    },
-    initial: !reducedMotion && {
-      opacity: 0,
-      transform: rotate ? "scale(0.9) rotate(-14deg)" : "scale(0.9)",
-    },
-    transition: {
-      transform: {
-        duration: reducedMotion ? 0 : 0.5,
-        delay: reducedMotion ? 0 : animationDelay,
-        times: [0, 0.38, 0.62, 0.82, 1],
-        ease: "easeInOut",
-      },
-      opacity: {
-        duration: reducedMotion ? 0 : 0.18,
-        delay: reducedMotion ? 0 : animationDelay,
-      },
-    },
-    "aria-hidden": "true",
-    children,
-  });
-}
-
-function ResultRow({
-  animationDelay,
-  failureMessage,
-  kind,
-  showSpinner,
-  succeeded,
-  warning,
-}: {
-  animationDelay: number;
-  failureMessage?: unknown;
-  kind: ImportKind;
-  showSpinner: boolean;
-  succeeded: boolean;
-  warning?: boolean;
-}) {
-  const labelId = `browser-profile-import-${kind}-result-label`;
-  const descriptionId = `browser-profile-import-${kind}-result-description`;
-  let statusIcon = succeeded
-    ? jsx.jsx(SuccessIcon, { className: "size-5 text-chart-green" })
-    : jsx.jsx(MinusIcon, { className: "size-5 text-tertiary" });
-  if (failureMessage != null) {
-    statusIcon = warning
-      ? jsx.jsx(WarningIcon, { className: "size-5 text-warning" })
-      : jsx.jsx(ErrorIcon, { className: "size-5 text-danger" });
-  }
-  let control: unknown = jsx.jsx(AnimatedStatusIcon, {
-    animationDelay,
-    rotate: succeeded || failureMessage != null,
-    children: statusIcon,
-  });
-  if (showSpinner) {
-    control = jsx.jsx("span", {
-      className: "inline-flex size-5 items-center justify-center",
-      "aria-labelledby": labelId,
-      role: "status",
-      children: jsx.jsx(LoadingSpinner, { className: "size-5" }),
-    });
-  } else if (!succeeded && failureMessage == null) {
-    control = jsx.jsx("span", {
-      className: "inline-flex size-5 items-center justify-center",
-      "aria-describedby": descriptionId,
-      "aria-labelledby": labelId,
-      role: "status",
-      children: control,
-    });
-  }
-  const detail =
-    failureMessage != null
-      ? jsx.jsx("div", {
-          className: warning ? "text-warning" : "text-danger",
-          role: warning ? "status" : "alert",
-          children: failureMessage,
-        })
-      : !succeeded && !showSpinner
-        ? jsx.jsx("span", {
-            id: descriptionId,
-            className: "text-tertiary",
-            children: jsx.jsx(Message, {
-              id: "settings.browserUse.profileImport.noDataStatus",
-              defaultMessage: "No data was found to import",
-            }),
-          })
-        : undefined;
-  return jsx.jsxs("div", {
-    children: [
-      jsx.jsx(SettingsRow, {
-        control,
-        icon: jsx.jsx(ImportedDataIcon, { kind }),
-        label: jsx.jsx("span", {
-          id: labelId,
-          children: jsx.jsx(Message, { ...importMessages[kind] }),
-        }),
+function Ve(e) {
+  let t = (0, nt.c)(142),
+    {
+      activeImportRequest: n,
+      cookieAccessFailureMessage: r,
+      importCookies: a,
+      importExtensions: s,
+      importHistory: c,
+      importPasswords: l,
+      isImporting: u,
+      revealedImportResultRowCount: d,
+      showCloseBrowserGuidance: f,
+      result: p,
+      onDone: m,
+      onRetry: g,
+    } = e,
+    v = u || d != null,
+    y = v ? l : p?.passwords != null,
+    b = v ? a : p?.cookies != null,
+    x = v ? c : p?.history != null,
+    S = v ? s : p?.extensions != null,
+    w = u && y && (n?.importPasswords ?? l),
+    T = u && b && (n?.importCookies ?? a),
+    E = u && x && (n?.importHistory ?? c),
+    ee = u && S && (n?.importExtensions ?? s),
+    ne = p?.cookies?.status === `failed_to_copy`,
+    ie;
+  t[0] !== p || t[1] !== b
+    ? ((ie = b && p != null && (p.cookies == null || U(p.cookies))),
+      (t[0] = p),
+      (t[1] = b),
+      (t[2] = ie))
+    : (ie = t[2]);
+  let ae = ie,
+    O =
+      ae &&
+      ((p?.cookies?.imported ?? 0) > 0 ||
+        (p?.cookies?.status === `partial-success` && p.cookies.imported == null)),
+    oe =
+      O &&
+      p?.cookies?.error == null &&
+      (p?.cookies?.status === `success` || p?.cookies?.status === `partial-success`),
+    se = p?.passwords,
+    ce = p?.passwords?.profile,
+    le = p?.passwords?.account,
+    k,
+    A,
+    j,
+    M,
+    P,
+    I,
+    L,
+    R,
+    z,
+    ue,
+    B,
+    V;
+  if (
+    t[3] !== ae ||
+    t[4] !== w ||
+    t[5] !== p ||
+    t[6] !== S ||
+    t[7] !== x ||
+    t[8] !== y ||
+    t[9] !== se ||
+    t[10] !== ce ||
+    t[11] !== le
+  ) {
+    let e = [se, ce, le],
+      n = y && p != null && (p.passwords == null || e.some(U)),
+      r = e.some(Je),
+      i = n && e.some(W);
+    R = i && (e.some(qe) || e.some(Ke)) && e.every(Ge);
+    let a;
+    (t[24] !== p || t[25] !== x
+      ? ((a = x && p != null && (p.history == null || U(p.history))),
+        (t[24] = p),
+        (t[25] = x),
+        (t[26] = a))
+      : (a = t[26]),
+      (I = a),
+      (L = I && (p?.history?.imported ?? 0) > 0 && p?.history?.status === `success`));
+    let o;
+    (t[27] !== p || t[28] !== S
+      ? ((o = S && p != null && (p.extensions == null || U(p.extensions))),
+        (t[27] = p),
+        (t[28] = S),
+        (t[29] = o))
+      : (o = t[29]),
+      (A = o),
+      (j = S && (p?.extensions?.skippedInvalid ?? 0) > 0),
+      (P = ae || n || I || A));
+    let s = P || j,
+      c;
+    (t[30] === p ? (c = t[31]) : ((c = p != null && pe(p)), (t[30] = p), (t[31] = c)),
+      (M = c),
+      (k = s && !M),
+      t[32] !== r || t[33] !== n || t[34] !== i
+        ? ((z = n ? (0, Q.jsx)(Xe, { accessFailed: r, partiallyFailed: i }) : void 0),
+          (t[32] = r),
+          (t[33] = n),
+          (t[34] = i),
+          (t[35] = z))
+        : (z = t[35]),
+      (ue = w),
+      (B = `passwords`),
+      (V = e.some(W)),
+      (t[3] = ae),
+      (t[4] = w),
+      (t[5] = p),
+      (t[6] = S),
+      (t[7] = x),
+      (t[8] = y),
+      (t[9] = se),
+      (t[10] = ce),
+      (t[11] = le),
+      (t[12] = k),
+      (t[13] = A),
+      (t[14] = j),
+      (t[15] = M),
+      (t[16] = P),
+      (t[17] = I),
+      (t[18] = L),
+      (t[19] = R),
+      (t[20] = z),
+      (t[21] = ue),
+      (t[22] = B),
+      (t[23] = V));
+  } else
+    ((k = t[12]),
+      (A = t[13]),
+      (j = t[14]),
+      (M = t[15]),
+      (P = t[16]),
+      (I = t[17]),
+      (L = t[18]),
+      (R = t[19]),
+      (z = t[20]),
+      (ue = t[21]),
+      (B = t[22]),
+      (V = t[23]));
+  let de;
+  t[36] !== R || t[37] !== y || t[38] !== z || t[39] !== ue || t[40] !== B || t[41] !== V
+    ? ((de = { failureMessage: z, importing: ue, kind: B, succeeded: V, visible: y, warning: R }),
+      (t[36] = R),
+      (t[37] = y),
+      (t[38] = z),
+      (t[39] = ue),
+      (t[40] = B),
+      (t[41] = V),
+      (t[42] = de))
+    : (de = t[42]);
+  let fe;
+  t[43] !== ne || t[44] !== r || t[45] !== ae || t[46] !== O || t[47] !== p || t[48] !== f
+    ? ((fe =
+        p != null && ae
+          ? (0, Q.jsx)(Ye, {
+              accessFailed: ne,
+              showCloseBrowserGuidance: f,
+              message: r,
+              partiallyFailed: O,
+              source: p.source,
+            })
+          : void 0),
+      (t[43] = ne),
+      (t[44] = r),
+      (t[45] = ae),
+      (t[46] = O),
+      (t[47] = p),
+      (t[48] = f),
+      (t[49] = fe))
+    : (fe = t[49]);
+  let H = p?.cookies,
+    G;
+  t[50] === H ? (G = t[51]) : ((G = W(H)), (t[50] = H), (t[51] = G));
+  let me;
+  t[52] !== oe || t[53] !== T || t[54] !== b || t[55] !== fe || t[56] !== G
+    ? ((me = {
+        failureMessage: fe,
+        importing: T,
+        kind: `cookies`,
+        succeeded: G,
+        visible: b,
+        warning: oe,
       }),
-      detail == null
-        ? undefined
-        : jsx.jsx("div", {
-            className:
-              "min-w-0 px-4 pb-3 text-xs leading-4 text-balance text-secondary",
-            children: detail,
-          }),
-    ],
-  });
-}
-
-function ImportResults({
-  activeImportRequest,
-  cookieAccessFailureMessage,
-  importCookies,
-  importExtensions,
-  importHistory,
-  importPasswords,
-  isImporting,
-  revealedImportResultRowCount,
-  showCloseBrowserGuidance,
-  result,
-  onDone,
-  onRetry,
-}: ImportResultsProps) {
-  const revealing = isImporting || revealedImportResultRowCount != null;
-  const visible = {
-    passwords: revealing ? importPasswords : result?.passwords != null,
-    cookies: revealing ? importCookies : result?.cookies != null,
-    history: revealing ? importHistory : result?.history != null,
-    extensions: revealing ? importExtensions : result?.extensions != null,
-  };
-  const passwordResults = [
-    result?.passwords,
-    result?.passwords?.profile,
-    result?.passwords?.account,
-  ];
-  const passwordFailed =
-    visible.passwords &&
-    result != null &&
-    (result.passwords == null || passwordResults.some(isImportFailure));
-  const cookieFailed =
-    visible.cookies &&
-    result != null &&
-    (result.cookies == null || isImportFailure(result.cookies));
-  const historyFailed =
-    visible.history &&
-    result != null &&
-    (result.history == null || isImportFailure(result.history));
-  const extensionFailed =
-    visible.extensions &&
-    result != null &&
-    (result.extensions == null || isImportFailure(result.extensions));
-  const extensionSkipped =
-    visible.extensions && (result?.extensions?.skippedInvalid ?? 0) > 0;
-  const complete = result != null && isImportSuccessful(result);
-  const anyFailure =
-    passwordFailed || cookieFailed || historyFailed || extensionFailed;
-  const allFailed = (anyFailure || extensionSkipped) && !complete;
-
-  const cookiePartial =
-    cookieFailed &&
-    ((result?.cookies?.imported ?? 0) > 0 ||
-      (result?.cookies?.status === "partial-success" &&
-        result.cookies.imported == null));
-  const cookieWarning =
-    cookiePartial &&
-    result?.cookies?.error == null &&
-    ["success", "partial-success"].includes(result?.cookies?.status);
-  const passwordWarning =
-    passwordFailed &&
-    passwordResults.some(isImportDataSuccessful) &&
-    (passwordResults.some((item) => (item?.imported ?? 0) > 0) ||
-      passwordResults.some(
-        (item) => item?.status === "partial-success" && item.imported == null,
-      )) &&
-    passwordResults.every(hasCleanStatus);
-  const historyWarning =
-    historyFailed &&
-    (result?.history?.imported ?? 0) > 0 &&
-    result?.history?.status === "success";
-
-  const allRows: ResultRowModel[] = [
-    {
-      kind: "passwords",
-      visible: visible.passwords,
-      importing:
-        isImporting &&
-        visible.passwords &&
-        (activeImportRequest?.importPasswords ?? importPasswords),
-      succeeded: passwordResults.some(isImportDataSuccessful),
-      warning: passwordWarning,
-      failureMessage: passwordFailed
-        ? passwordFailureMessage(passwordResults)
-        : undefined,
-    },
-    {
-      kind: "cookies",
-      visible: visible.cookies,
-      importing:
-        isImporting &&
-        visible.cookies &&
-        (activeImportRequest?.importCookies ?? importCookies),
-      succeeded: isImportDataSuccessful(result?.cookies),
-      warning: cookieWarning,
-      failureMessage:
-        result != null && cookieFailed
-          ? cookieFailureMessage(
-              result,
-              cookieAccessFailureMessage,
-              showCloseBrowserGuidance,
-              cookiePartial,
-            )
-          : undefined,
-    },
-    {
-      kind: "history",
-      visible: visible.history,
-      importing:
-        isImporting &&
-        visible.history &&
-        (activeImportRequest?.importHistory ?? importHistory),
-      succeeded: isImportDataSuccessful(result?.history),
-      warning: historyWarning,
-      failureMessage: historyFailed
-        ? jsx.jsx(Message, {
-            id: "settings.browserUse.profileImport.historyRetryGuidance",
-            defaultMessage: "Make sure Chrome is fully closed",
+      (t[52] = oe),
+      (t[53] = T),
+      (t[54] = b),
+      (t[55] = fe),
+      (t[56] = G),
+      (t[57] = me))
+    : (me = t[57]);
+  let K;
+  t[58] === I
+    ? (K = t[59])
+    : ((K = I
+        ? (0, Q.jsx)(D, {
+            id: `settings.browserUse.profileImport.historyRetryGuidance`,
+            defaultMessage: `Make sure Chrome is fully closed`,
+            description: `Recovery guidance shown when Chrome browsing history could not be imported completely`,
           })
-        : undefined,
-    },
-    {
-      kind: "extensions",
-      visible: visible.extensions,
-      importing:
-        isImporting &&
-        visible.extensions &&
-        (activeImportRequest?.importExtensions ?? importExtensions),
-      succeeded: isImportDataSuccessful(result?.extensions),
-      warning: isImportDataSuccessful(result?.extensions),
-      failureMessage:
-        extensionFailed || extensionSkipped
-          ? jsx.jsx(ExtensionFailureMessage, { result: result?.extensions })
-          : undefined,
-    },
-  ];
-  const rows = allRows.filter((row) => row.visible);
-
-  const importingRows = rows.filter((row) => row.importing);
-  const revealIndex = revealedImportResultRowCount ?? 0;
-  const activeKind =
-    importingRows[Math.min(revealIndex, importingRows.length - 1)]?.kind ??
-    "passwords";
-  const titleMessage = isImporting
-    ? importMessages.title
-    : allFailed
-      ? dialogMessages.failed
-      : dialogMessages.complete;
-  const subtitle = isImporting
-    ? dialogMessages[
-        {
-          cookies: "importingCookies",
-          history: "importingHistory",
-          passwords: "importingPasswords",
-          extensions: "importingExtensions",
-        }[activeKind]
-      ]
-    : allFailed
-      ? {
-          id: "settings.browserUse.profileImport.failedSummary",
-          defaultMessage: "We were unable to import your browsing data",
-        }
-      : complete
-        ? {
-            id: "settings.browserUse.profileImport.completeDescription",
-            defaultMessage:
-              "Your data is now available in the built-in browser",
-          }
-        : {
-            id: "settings.browserUse.profileImport.noDataDescription",
-            defaultMessage: "No browser data was available to import",
-          };
-
-  return jsx.jsxs(DialogContent, {
-    children: [
-      jsx.jsx(DialogSection, {
-        children: jsx.jsx(DialogHeader, {
-          title: jsx.jsx(Message, { ...titleMessage }),
-          subtitle: jsx.jsx(Message, { ...subtitle }),
-        }),
+        : void 0),
+      (t[58] = I),
+      (t[59] = K));
+  let q = p?.history,
+    J;
+  t[60] === q ? (J = t[61]) : ((J = W(q)), (t[60] = q), (t[61] = J));
+  let he;
+  t[62] !== L || t[63] !== E || t[64] !== x || t[65] !== K || t[66] !== J
+    ? ((he = {
+        failureMessage: K,
+        importing: E,
+        kind: `history`,
+        succeeded: J,
+        visible: x,
+        warning: L,
       }),
-      jsx.jsx(DialogSection, {
-        className: "max-h-80 overflow-y-auto",
-        children: jsx.jsx(SettingsList, {
-          className: "shrink-0",
-          children: rows.map((row, index) => {
-            const waiting =
-              row.importing && revealIndex <= importingRows.indexOf(row);
-            return jsx.jsx(
-              ResultRow,
+      (t[62] = L),
+      (t[63] = E),
+      (t[64] = x),
+      (t[65] = K),
+      (t[66] = J),
+      (t[67] = he))
+    : (he = t[67]);
+  let Y;
+  t[68] !== A || t[69] !== j || t[70] !== p?.extensions
+    ? ((Y = A || j ? (0, Q.jsx)(Ae, { result: p?.extensions }) : void 0),
+      (t[68] = A),
+      (t[69] = j),
+      (t[70] = p?.extensions),
+      (t[71] = Y))
+    : (Y = t[71]);
+  let ge = p?.extensions,
+    _e;
+  t[72] === ge ? (_e = t[73]) : ((_e = W(ge)), (t[72] = ge), (t[73] = _e));
+  let ve = p?.extensions,
+    ye;
+  t[74] === ve ? (ye = t[75]) : ((ye = W(ve)), (t[74] = ve), (t[75] = ye));
+  let be;
+  t[76] !== ee || t[77] !== S || t[78] !== Y || t[79] !== _e || t[80] !== ye
+    ? ((be = {
+        failureMessage: Y,
+        importing: ee,
+        kind: `extensions`,
+        succeeded: _e,
+        visible: S,
+        warning: ye,
+      }),
+      (t[76] = ee),
+      (t[77] = S),
+      (t[78] = Y),
+      (t[79] = _e),
+      (t[80] = ye),
+      (t[81] = be))
+    : (be = t[81]);
+  let xe;
+  t[82] !== me || t[83] !== he || t[84] !== be || t[85] !== de
+    ? ((xe = [de, me, he, be].filter(We)),
+      (t[82] = me),
+      (t[83] = he),
+      (t[84] = be),
+      (t[85] = de),
+      (t[86] = xe))
+    : (xe = t[86]);
+  let Se = xe,
+    Ce;
+  t[87] !== M || t[88] !== u || t[89] !== Se
+    ? ((Ce = !u && M && Se.some(Ue)), (t[87] = M), (t[88] = u), (t[89] = Se), (t[90] = Ce))
+    : (Ce = t[90]);
+  let Te = Ce,
+    Ee;
+  t[91] === Se ? (Ee = t[92]) : ((Ee = Se.filter(He)), (t[91] = Se), (t[92] = Ee));
+  let De = Ee,
+    Oe = d ?? 0,
+    ke = rt.complete;
+  u ? (ke = we.title) : k && (ke = rt.failed);
+  let X;
+  if (u) {
+    let e = De[Math.min(Oe, De.length - 1)]?.kind ?? `passwords`,
+      n;
+    t[93] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((n = {
+          cookies: rt.importingCookies,
+          history: rt.importingHistory,
+          passwords: rt.importingPasswords,
+          extensions: rt.importingExtensions,
+        }),
+        (t[93] = n))
+      : (n = t[93]);
+    let r = n[e],
+      i;
+    (t[94] === r ? (i = t[95]) : ((i = (0, Q.jsx)(D, { ...r })), (t[94] = r), (t[95] = i)),
+      (X = i));
+  } else if (k) {
+    let e;
+    (t[96] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, Q.jsx)(D, {
+          id: `settings.browserUse.profileImport.failedSummary`,
+          defaultMessage: `We were unable to import your browsing data`,
+          description: `Description shown when every selected category of browser data fails to import`,
+        })),
+        (t[96] = e))
+      : (e = t[96]),
+      (X = e));
+  } else if (M) {
+    let e;
+    (t[97] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, Q.jsx)(D, {
+          id: `settings.browserUse.profileImport.completeDescription`,
+          defaultMessage: `Your data is now available in the built-in browser`,
+          description: `Description shown after browser data import completes`,
+        })),
+        (t[97] = e))
+      : (e = t[97]),
+      (X = e));
+  } else {
+    let e;
+    (t[98] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, Q.jsx)(D, {
+          id: `settings.browserUse.profileImport.noDataDescription`,
+          defaultMessage: `No browser data was available to import`,
+          description: `Description shown when browser profile import finds no available data in any selected category`,
+        })),
+        (t[98] = e))
+      : (e = t[98]),
+      (X = e));
+  }
+  let je;
+  t[99] === ke
+    ? (je = t[100])
+    : ((je = (0, Q.jsx)(C, {
+        asChild: !0,
+        children: (0, Q.jsx)(`h2`, { className: `sr-only`, children: (0, Q.jsx)(D, { ...ke }) }),
+      })),
+      (t[99] = ke),
+      (t[100] = je));
+  let Me;
+  t[101] !== Te || t[102] !== X
+    ? ((Me =
+        Te &&
+        (0, Q.jsx)(h, {
+          asChild: !0,
+          children: (0, Q.jsx)(`div`, { className: `sr-only`, children: X }),
+        })),
+      (t[101] = Te),
+      (t[102] = X),
+      (t[103] = Me))
+    : (Me = t[103]);
+  let Ne;
+  t[104] === ke ? (Ne = t[105]) : ((Ne = (0, Q.jsx)(D, { ...ke })), (t[104] = ke), (t[105] = Ne));
+  let Z;
+  t[106] !== Te || t[107] !== X
+    ? ((Z = Te
+        ? void 0
+        : (0, Q.jsx)(h, { asChild: !0, children: (0, Q.jsx)(`div`, { children: X }) })),
+      (t[106] = Te),
+      (t[107] = X),
+      (t[108] = Z))
+    : (Z = t[108]);
+  let Pe;
+  t[109] !== Ne || t[110] !== Z
+    ? ((Pe = (0, Q.jsx)(i, { title: Ne, subtitle: Z })), (t[109] = Ne), (t[110] = Z), (t[111] = Pe))
+    : (Pe = t[111]);
+  let Fe;
+  t[112] !== je || t[113] !== Me || t[114] !== Pe
+    ? ((Fe = (0, Q.jsxs)(N, { children: [je, Me, Pe] })),
+      (t[112] = je),
+      (t[113] = Me),
+      (t[114] = Pe),
+      (t[115] = Fe))
+    : (Fe = t[115]);
+  let Ie;
+  t[116] !== De || t[117] !== d || t[118] !== Oe || t[119] !== Se
+    ? ((Ie = (0, Q.jsx)(N, {
+        className: `max-h-80 overflow-y-auto`,
+        children: (0, Q.jsx)(re, {
+          className: `shrink-0`,
+          children: Se.map((e, t) => {
+            let n = e.importing && Oe <= De.indexOf(e);
+            return (0, Q.jsx)(
+              Qe,
               {
-                animationDelay:
-                  revealedImportResultRowCount == null ? index * 0.25 : 0,
-                failureMessage: waiting ? undefined : row.failureMessage,
-                kind: row.kind,
-                showSpinner: waiting,
-                succeeded: row.succeeded,
-                warning: row.warning,
+                animationDelay: d == null ? t * 0.25 : 0,
+                failureMessage: n ? void 0 : e.failureMessage,
+                kind: e.kind,
+                showSpinner: n,
+                succeeded: e.succeeded,
+                warning: e.warning,
               },
-              row.kind,
+              e.kind,
             );
           }),
         }),
-      }),
-      jsx.jsx(DialogSection, {
-        children: jsx.jsxs(DialogActions, {
-          className: dialogActionsClassName,
-          expandSingleButton: false,
-          children: [
-            isImporting
-              ? jsx.jsx(Button, {
-                  color: "secondary",
-                  disabled: true,
-                  onClick: onDone,
-                  type: "button",
-                  children: jsx.jsx(Message, { ...dialogMessages.cancel }),
-                })
-              : undefined,
-            !isImporting && anyFailure && onRetry != null
-              ? jsx.jsx(Button, {
-                  color: "secondary",
-                  onClick: onRetry,
-                  type: "button",
-                  children: jsx.jsx(Message, { ...dialogMessages.retry }),
-                })
-              : undefined,
-            jsx.jsx(Button, {
-              color: "primary",
-              disabled: isImporting,
-              loading: isImporting,
-              onClick: onDone,
-              type: "button",
-              children: jsx.jsx(Message, {
-                ...(isImporting ? dialogMessages.import : dialogMessages.done),
-              }),
-            }),
-          ],
-        }),
-      }),
-    ],
-  });
+      })),
+      (t[116] = De),
+      (t[117] = d),
+      (t[118] = Oe),
+      (t[119] = Se),
+      (t[120] = Ie))
+    : (Ie = t[120]);
+  let Le;
+  t[121] !== u || t[122] !== m
+    ? ((Le =
+        u &&
+        (0, Q.jsx)(te, {
+          color: `secondary`,
+          disabled: !0,
+          onClick: m,
+          type: `button`,
+          children: (0, Q.jsx)(D, { ...rt.cancel }),
+        })),
+      (t[121] = u),
+      (t[122] = m),
+      (t[123] = Le))
+    : (Le = t[123]);
+  let Re;
+  t[124] !== P || t[125] !== u || t[126] !== g
+    ? ((Re =
+        !u &&
+        P &&
+        g != null &&
+        (0, Q.jsx)(te, {
+          color: `secondary`,
+          onClick: g,
+          type: `button`,
+          children: (0, Q.jsx)(D, { ...rt.retry }),
+        })),
+      (t[124] = P),
+      (t[125] = u),
+      (t[126] = g),
+      (t[127] = Re))
+    : (Re = t[127]);
+  let ze = u ? rt.import : rt.done,
+    Be;
+  t[128] === ze ? (Be = t[129]) : ((Be = (0, Q.jsx)(D, { ...ze })), (t[128] = ze), (t[129] = Be));
+  let Ve;
+  t[130] !== u || t[131] !== m || t[132] !== Be
+    ? ((Ve = (0, Q.jsx)(te, {
+        color: `primary`,
+        disabled: u,
+        loading: u,
+        onClick: m,
+        type: `button`,
+        children: Be,
+      })),
+      (t[130] = u),
+      (t[131] = m),
+      (t[132] = Be),
+      (t[133] = Ve))
+    : (Ve = t[133]);
+  let Ze;
+  t[134] !== Le || t[135] !== Re || t[136] !== Ve
+    ? ((Ze = (0, Q.jsx)(N, {
+        children: (0, Q.jsxs)(F, { className: o, expandSingleButton: !1, children: [Le, Re, Ve] }),
+      })),
+      (t[134] = Le),
+      (t[135] = Re),
+      (t[136] = Ve),
+      (t[137] = Ze))
+    : (Ze = t[137]);
+  let $e;
+  return (
+    t[138] !== Fe || t[139] !== Ie || t[140] !== Ze
+      ? (($e = (0, Q.jsxs)(_, { children: [Fe, Ie, Ze] })),
+        (t[138] = Fe),
+        (t[139] = Ie),
+        (t[140] = Ze),
+        (t[141] = $e))
+      : ($e = t[141]),
+    $e
+  );
 }
-
-function ImportSelection(props: ImportSelectionProps) {
-  const {
-    activeImportRequest,
-    cookieAccessFailureMessage,
-    confirmExtensionImport,
-    elevatedChromeConsent,
-    extensionsAvailable,
-    importCookies,
-    importExtensions,
-    importHistory,
-    importPasswords,
-    isImporting,
-    isLoadingProfiles,
-    profilePickerOpen,
-    profiles,
-    profilesHaveError,
-    revealedImportResultRowCount,
-    requiresElevatedChromeConsent,
-    result,
-    selectedProfile,
-  } = props;
-  if (confirmExtensionImport && selectedProfile != null) {
-    return jsx.jsx(ExtensionsConfirmation, {
-      profile: selectedProfile,
-      onCancel: props.onCancel,
-      onImport: props.onImport,
-    });
-  }
-  const cookiesSelected = selectedProfile != null && importCookies;
-  const passwordsSelected = selectedProfile != null && importPasswords;
-  const historySelected = selectedProfile?.source === "chrome" && importHistory;
-  const extensionsSelected = extensionsAvailable && importExtensions;
-  if (isImporting || result != null) {
-    return jsx.jsx(ImportResults, {
-      activeImportRequest,
-      cookieAccessFailureMessage,
-      importCookies: cookiesSelected,
-      importExtensions:
-        result?.extensions != null ||
-        (activeImportRequest?.importExtensions ?? extensionsSelected),
-      importHistory: historySelected,
-      importPasswords: passwordsSelected,
-      isImporting,
-      revealedImportResultRowCount,
-      showCloseBrowserGuidance: props.showCloseBrowserGuidance,
-      result,
-      onDone: props.onCancel,
-      onRetry: props.onRetry,
-    });
-  }
-  const submitDisabled =
-    selectedProfile == null ||
-    (!cookiesSelected &&
-      !passwordsSelected &&
-      !historySelected &&
-      !extensionsSelected) ||
-    (requiresElevatedChromeConsent && !elevatedChromeConsent);
-  return jsx.jsxs(DialogContent, {
-    as: "form",
-    onSubmit: (event: { preventDefault: () => void }) => {
-      event.preventDefault();
-      props.onImport();
-    },
-    children: [
-      jsx.jsx(DialogSection, {
-        children: jsx.jsx(DialogHeader, {
-          title: jsx.jsx(Message, { ...importMessages.title }),
-          subtitle: jsx.jsx(DialogDescription, {
-            asChild: true,
-            children: jsx.jsx("div", {
-              children: jsx.jsx(Message, {
-                id: "settings.browserUse.profileImport.subtitle",
-                defaultMessage:
-                  "Choose data to bring over to the built-in browser",
-              }),
-            }),
-          }),
-        }),
-      }),
-      jsx.jsxs(DialogSection, {
-        className: "gap-3",
-        children: [
-          jsx.jsx(ProfilePicker, {
-            disabled: isImporting || !profiles?.length,
-            isLoading: isLoadingProfiles,
-            open: profilePickerOpen,
-            profiles,
-            selectedProfile,
-            onOpenChange: props.onProfilePickerOpenChange,
-            onSelectProfile: props.onSelectProfile,
-          }),
-          profiles?.length === 0
-            ? jsx.jsx("p", {
-                className: "text-sm text-codex-description",
-                children: jsx.jsx(Message, {
-                  id: "settings.browserUse.profileImport.noProfilesDescription",
-                  defaultMessage:
-                    "No Chrome or Atlas profiles were found on this device",
-                }),
-              })
-            : undefined,
-          props.showCloseBrowserGuidance && selectedProfile != null
-            ? jsx.jsx("p", {
-                className: "text-sm text-codex-description",
-                children: jsx.jsx(Message, {
-                  id: "settings.browserUse.profileImport.closeBrowser",
-                  defaultMessage:
-                    "Close {browserName} completely before importing",
-                  values: { browserName: selectedProfile.appName },
-                }),
-              })
-            : undefined,
-          selectedProfile == null
-            ? undefined
-            : jsx.jsxs(SettingsList, {
-                children: [
-                  jsx.jsx(DataSelectionRow, {
-                    checked: passwordsSelected,
-                    disabled: isImporting,
-                    kind: "passwords",
-                    onChange: props.onImportPasswordsChange,
-                  }),
-                  jsx.jsx(DataSelectionRow, {
-                    checked: cookiesSelected,
-                    disabled: isImporting,
-                    kind: "cookies",
-                    onChange: props.onImportCookiesChange,
-                  }),
-                  selectedProfile.source === "chrome"
-                    ? jsx.jsx(DataSelectionRow, {
-                        checked: historySelected,
-                        disabled: isImporting,
-                        kind: "history",
-                        onChange: props.onImportHistoryChange,
-                      })
-                    : undefined,
-                  extensionsAvailable
-                    ? jsx.jsx(DataSelectionRow, {
-                        checked: extensionsSelected,
-                        disabled: isImporting,
-                        kind: "extensions",
-                        onChange: props.onImportExtensionsChange,
-                      })
-                    : undefined,
-                ],
-              }),
-          requiresElevatedChromeConsent
-            ? jsx.jsx(ElevatedChromeConsent, {
-                checked: elevatedChromeConsent,
-                disabled: isImporting,
-                onChange: props.onElevatedChromeConsentChange,
-              })
-            : undefined,
-          profilesHaveError
-            ? jsx.jsx("p", {
-                className: "px-3 text-sm text-danger",
-                role: "alert",
-                children: jsx.jsx(Message, {
-                  id: "settings.browserUse.profileImport.profilesError",
-                  defaultMessage:
-                    "We couldn't load browser profiles. Close and reopen this dialog to try again",
-                }),
-              })
-            : undefined,
-        ],
-      }),
-      jsx.jsx(DialogSection, {
-        children: jsx.jsxs(DialogActions, {
-          className: dialogActionsClassName,
-          children: [
-            jsx.jsx(Button, {
-              color: "secondary",
-              disabled: isImporting,
-              onClick: props.onCancel,
-              type: "button",
-              children: jsx.jsx(Message, { ...dialogMessages.cancel }),
-            }),
-            jsx.jsx(Button, {
-              color: "primary",
-              disabled: submitDisabled,
-              loading: isImporting,
-              type: "submit",
-              children: jsx.jsx(Message, { ...dialogMessages.import }),
-            }),
-          ],
-        }),
-      }),
-    ],
-  });
+function He(e) {
+  let { importing: t } = e;
+  return t;
 }
-
-function BrowserProfileImportDialogModal({
-  entryPoint,
-  flowId,
-  onClose,
-  service,
-}: BrowserProfileImportDialogProps) {
-  const scope = useSignalScope(appScope);
-  const [selectedProfileKey, setSelectedProfileKey] = React.useState("");
-  const [importCookies, setImportCookies] = React.useState(true);
-  const [importPasswords, setImportPasswords] = React.useState(true);
-  const [importHistory, setImportHistory] = React.useState(true);
-  const [importExtensions, setImportExtensions] = React.useState(false);
-  const [extensionConfirmation, setExtensionConfirmation] =
-    React.useState<ExtensionConfirmationState | null>(null);
-  const extensionsFeatureEnabled = useSignalFamilyValue(
-    browserExtensionsFeatureFamily,
-    "2982604767",
+function Ue(e) {
+  let { failureMessage: t, warning: n } = e;
+  return t != null && !n;
+}
+function We(e) {
+  let { visible: t } = e;
+  return t;
+}
+function Ge(e) {
+  return (
+    e?.error == null &&
+    (e?.status == null ||
+      e.status === `success` ||
+      e.status === `missing` ||
+      e.status === `partial` ||
+      e.status === `partial-success`) &&
+    (e?.status !== `missing` || (e.failed ?? 0) === 0)
   );
-  const [resultState, setResultState] = React.useState<ResultState | undefined>(
-    undefined,
-  );
-  const [elevatedConsentProfileKey, setElevatedConsentProfileKey] =
-    React.useState<string | null>(null);
-  const exitState = React.useRef("before-attempt");
-  const closeRecorded = React.useRef(false);
-  const dismissalReason = React.useRef("close-button");
-  const adminNoticeAcknowledged = React.useRef(false);
-  const adminNoticeRequired = React.useRef(false);
-  const activeAttempt = React.useRef<ImportMutationVariables | null>(null);
-
-  const profilesQuery = useQuery<Profile[]>(
-    createProfilesQueryOptions(service, true),
-  );
-  const mutation = useMutation<
-    ImportResult,
-    unknown,
-    ImportMutationVariables
-  >({
-    mutationFn: ({ request }) =>
-      service.importBrowserProfile(request),
-    onError: (_error, variables) => {
-      exitState.current = "after-request-error";
-      recordAttemptFinished(scope, entryPoint, variables.request, variables.context);
-    },
-    onSuccess: async (nextResult, variables) => {
-      exitState.current = "after-result";
-      const result =
-        variables.previousResult == null
-          ? nextResult
-          : mergeImportResults(variables.previousResult, nextResult);
-      const successful = isImportSuccessful(result);
-      if (successful) scope.set(browserImportSucceededSignal, true);
-      if (isImportSuccessful(nextResult))
-        scope.set(browserImportCompletedAtSignal, Date.now());
-      recordAttemptFinished(
-        scope,
-        entryPoint,
-        variables.request,
-        variables.context,
-        nextResult,
+}
+function Ke(e) {
+  return e?.status === `partial-success` && e.imported == null;
+}
+function qe(e) {
+  return (e?.imported ?? 0) > 0;
+}
+function Je(e) {
+  return e?.status === `failed_to_copy`;
+}
+function Ye(e) {
+  let t = (0, nt.c)(7),
+    { accessFailed: n, showCloseBrowserGuidance: r, message: i, partiallyFailed: a, source: o } = e;
+  if (n) {
+    if (i != null) {
+      let e;
+      return (
+        t[0] === i
+          ? (e = t[1])
+          : ((e = (0, Q.jsx)(Q.Fragment, { children: i })), (t[0] = i), (t[1] = e)),
+        e
       );
-      const rowCount = [
-        variables.request.importPasswords,
-        variables.request.importCookies,
-        variables.request.importHistory,
-        variables.request.importExtensions,
-      ].filter((value) => value === true).length;
-      if (!successful) {
-        setResultState({ result, revealedRowCount: rowCount });
-        return;
+    }
+    if (!r) {
+      let e;
+      return (
+        t[2] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Q.jsx)(D, {
+              id: `settings.browserUse.profileImport.cookieAccessError`,
+              defaultMessage: `ChatGPT couldn’t access this profile’s cookies. A device security policy may be blocking access`,
+              description: `Error shown when device security may have blocked access to cookies during browser profile import`,
+            })),
+            (t[2] = e))
+          : (e = t[2]),
+        e
+      );
+    }
+    switch (o) {
+      case `chrome`: {
+        let e;
+        return (
+          t[3] === Symbol.for(`react.memo_cache_sentinel`)
+            ? ((e = (0, Q.jsx)(D, {
+                id: `settings.browserUse.profileImport.chromeCookieAccessError`,
+                defaultMessage: `ChatGPT couldn’t access this profile’s cookies. Chrome may still be running in the background. Close Chrome completely and try again. A device security policy may also block access`,
+                description: `Error shown when Chrome or device security may have blocked access to cookies during browser profile import`,
+              })),
+              (t[3] = e))
+            : (e = t[3]),
+          e
+        );
       }
-      setResultState({ result, revealedRowCount: 0 });
-      const initialDelay = Math.max(
-        0,
-        revealInitialDelayMs - (performance.now() - variables.startedAt),
-      );
-      await Promise.all(
-        Array.from({ length: rowCount }, async (_value, index) => {
-          const delay = initialDelay + index * revealRowDelayMs;
-          if (delay > 0) {
-            await new Promise((resolve) => setTimeout(resolve, delay));
-          }
-          setResultState({ result, revealedRowCount: index + 1 });
-        }),
-      );
-    },
-  });
-
-  const profiles: Profile[] | undefined = profilesQuery.data;
-  const selectedProfile =
-    profiles?.find((profile) => profileKey(profile) === selectedProfileKey) ??
-    profiles?.[0] ??
-    null;
-  const cookiesSelected = selectedProfile != null && importCookies;
-  const passwordsSelected = selectedProfile != null && importPasswords;
-  const historySelected = selectedProfile?.source === "chrome" && importHistory;
-  const extensionsAvailable =
-    extensionsFeatureEnabled &&
-    selectedProfile?.source === "chrome" &&
-    selectedProfile.hasExtensions != null;
-  const extensionsSelected = extensionsAvailable && importExtensions;
-  const isWindows =
-    typeof document !== "undefined" &&
-    document.documentElement.dataset.codexOs === "win32";
-  const showCloseBrowserGuidance =
-    isWindows ||
-    (typeof document !== "undefined" &&
-      document.documentElement.dataset.codexOs === "darwin");
-  const requiresElevatedChromeConsent =
-    isWindows &&
-    selectedProfile?.source === "chrome" &&
-    (cookiesSelected || passwordsSelected);
-  const selectedKey =
-    selectedProfile == null ? null : profileKey(selectedProfile);
-  const elevatedChromeConsent =
-    selectedKey != null && elevatedConsentProfileKey === selectedKey;
-
-  const failedResult: ImportResult | null =
-    mutation.isError && mutation.variables != null
-      ? {
-          source: mutation.variables.request.source,
-          profilePath: mutation.variables.request.profilePath,
-          ...(mutation.variables.request.importCookies === false
-            ? {}
-            : {
-                cookies: { ...resultState?.result.cookies, status: "failed" },
-              }),
-          ...(mutation.variables.request.importPasswords === false
-            ? {}
-            : {
-                passwords: {
-                  ...resultState?.result.passwords,
-                  status: "failed",
+      case `atlas`: {
+        let e;
+        return (
+          t[4] === Symbol.for(`react.memo_cache_sentinel`)
+            ? ((e = (0, Q.jsx)(D, {
+                id: `settings.browserUse.profileImport.atlasCookieAccessError`,
+                defaultMessage: `ChatGPT couldn’t access this profile’s cookies. Atlas may still be running in the background. Close Atlas completely and try again. A device security policy may also block access`,
+                description: `Error shown when Atlas or device security may have blocked access to cookies during browser profile import`,
+              })),
+              (t[4] = e))
+            : (e = t[4]),
+          e
+        );
+      }
+    }
+  }
+  if (a) {
+    let e;
+    return (
+      t[5] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Q.jsx)(D, {
+            id: `settings.browserUse.profileImport.cookiesPartialError`,
+            defaultMessage: `Some cookies couldn’t be imported`,
+            description: `Error shown when some cookies could not be imported from a browser profile`,
+          })),
+          (t[5] = e))
+        : (e = t[5]),
+      e
+    );
+  }
+  let s;
+  return (
+    t[6] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((s = (0, Q.jsx)(D, {
+          id: `settings.browserUse.profileImport.cookiesError`,
+          defaultMessage: `Cookies couldn’t be imported`,
+          description: `Error shown when cookies could not be imported from a browser profile`,
+        })),
+        (t[6] = s))
+      : (s = t[6]),
+    s
+  );
+}
+function Xe(e) {
+  let t = (0, nt.c)(3),
+    { accessFailed: n, partiallyFailed: r } = e;
+  if (r) {
+    let e;
+    return (
+      t[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Q.jsx)(D, {
+            id: `settings.browserUse.profileImport.passwordsPartialError`,
+            defaultMessage: `Some passwords couldn’t be imported`,
+            description: `Error shown when some passwords could not be imported from a browser profile`,
+          })),
+          (t[0] = e))
+        : (e = t[0]),
+      e
+    );
+  }
+  if (n) {
+    let e;
+    return (
+      t[1] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Q.jsx)(D, {
+            id: `settings.browserUse.profileImport.passwordAccessError`,
+            defaultMessage: `ChatGPT couldn’t access this profile’s passwords. A device security policy may be blocking access`,
+            description: `Error shown when device security may have blocked access to passwords during browser profile import`,
+          })),
+          (t[1] = e))
+        : (e = t[1]),
+      e
+    );
+  }
+  let i;
+  return (
+    t[2] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((i = (0, Q.jsx)(D, {
+          id: `settings.browserUse.profileImport.passwordsError`,
+          defaultMessage: `Passwords couldn’t be imported`,
+          description: `Error shown when passwords could not be imported from a browser profile`,
+        })),
+        (t[2] = i))
+      : (i = t[2]),
+    i
+  );
+}
+function Ze(e) {
+  let t = (0, nt.c)(13),
+    { profile: n } = e,
+    r = n.source === `atlas` && `rounded-[22%]`,
+    i;
+  t[0] === r ? (i = t[1]) : ((i = I(`size-4 shrink-0`, r)), (t[0] = r), (t[1] = i));
+  let a;
+  t[2] !== n.source || t[3] !== i
+    ? ((a = (0, Q.jsx)(Ce, { className: i, source: n.source })),
+      (t[2] = n.source),
+      (t[3] = i),
+      (t[4] = a))
+    : (a = t[4]);
+  let o;
+  t[5] === n.appName
+    ? (o = t[6])
+    : ((o = (0, Q.jsx)(`span`, {
+        className: `min-w-0 truncate text-default`,
+        children: n.appName,
+      })),
+      (t[5] = n.appName),
+      (t[6] = o));
+  let s = n.profileName || n.profileDirectoryName,
+    c;
+  t[7] === s
+    ? (c = t[8])
+    : ((c = (0, Q.jsx)(`span`, { className: `min-w-0 truncate text-tertiary`, children: s })),
+      (t[7] = s),
+      (t[8] = c));
+  let l;
+  return (
+    t[9] !== a || t[10] !== o || t[11] !== c
+      ? ((l = (0, Q.jsxs)(`span`, {
+          className: `flex min-w-0 flex-1 items-center gap-1.5`,
+          children: [a, o, c],
+        })),
+        (t[9] = a),
+        (t[10] = o),
+        (t[11] = c),
+        (t[12] = l))
+      : (l = t[12]),
+    l
+  );
+}
+function Qe(e) {
+  let t = (0, nt.c)(38),
+    { animationDelay: n, failureMessage: r, kind: i, succeeded: a, showSpinner: o, warning: s } = e,
+    c = `browser-profile-import-${i}-result-label`,
+    l = `browser-profile-import-${i}-result-description`,
+    u;
+  t[0] === a
+    ? (u = t[1])
+    : ((u = a
+        ? (0, Q.jsx)(ue, { className: `size-5 text-chart-green` })
+        : (0, Q.jsx)(E, { className: `size-5 text-tertiary` })),
+      (t[0] = a),
+      (t[1] = u));
+  let d = u;
+  if (r != null) {
+    let e;
+    (t[2] === s
+      ? (e = t[3])
+      : ((e = s
+          ? (0, Q.jsx)(Y, { className: `size-5 text-warning` })
+          : (0, Q.jsx)(g, { className: `size-5 text-danger` })),
+        (t[2] = s),
+        (t[3] = e)),
+      (d = e));
+  }
+  let f = a || r != null,
+    p;
+  t[4] !== n || t[5] !== d || t[6] !== f
+    ? ((p = (0, Q.jsx)($e, { animationDelay: n, rotate: f, children: d })),
+      (t[4] = n),
+      (t[5] = d),
+      (t[6] = f),
+      (t[7] = p))
+    : (p = t[7]);
+  let m = p;
+  if (o) {
+    let e;
+    t[8] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, Q.jsx)(x, { className: `size-5` })), (t[8] = e))
+      : (e = t[8]);
+    let n;
+    (t[9] === c
+      ? (n = t[10])
+      : ((n = (0, Q.jsx)(`span`, {
+          className: `inline-flex size-5 items-center justify-center`,
+          "aria-labelledby": c,
+          role: `status`,
+          children: e,
+        })),
+        (t[9] = c),
+        (t[10] = n)),
+      (m = n));
+  } else if (!a && r == null) {
+    let e;
+    (t[11] !== l || t[12] !== c || t[13] !== m
+      ? ((e = (0, Q.jsx)(`span`, {
+          className: `inline-flex size-5 items-center justify-center`,
+          "aria-describedby": l,
+          "aria-labelledby": c,
+          role: `status`,
+          children: m,
+        })),
+        (t[11] = l),
+        (t[12] = c),
+        (t[13] = m),
+        (t[14] = e))
+      : (e = t[14]),
+      (m = e));
+  }
+  let h;
+  if (r != null) {
+    let e = s ? `text-warning` : `text-danger`,
+      n = s ? `status` : `alert`,
+      i;
+    (t[15] !== r || t[16] !== e || t[17] !== n
+      ? ((i = (0, Q.jsx)(`div`, { className: e, role: n, children: r })),
+        (t[15] = r),
+        (t[16] = e),
+        (t[17] = n),
+        (t[18] = i))
+      : (i = t[18]),
+      (h = i));
+  } else if (!a && !o) {
+    let e;
+    t[19] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, Q.jsx)(D, {
+          id: `settings.browserUse.profileImport.noDataStatus`,
+          defaultMessage: `No data was found to import`,
+          description: `Visible description for a selected browser data type that has no source data available to import`,
+        })),
+        (t[19] = e))
+      : (e = t[19]);
+    let n;
+    (t[20] === l
+      ? (n = t[21])
+      : ((n = (0, Q.jsx)(`span`, { id: l, className: `text-tertiary`, children: e })),
+        (t[20] = l),
+        (t[21] = n)),
+      (h = n));
+  }
+  let _;
+  t[22] === i
+    ? (_ = t[23])
+    : ((_ = (0, Q.jsx)(X, { className: `size-5 text-secondary`, kind: i })),
+      (t[22] = i),
+      (t[23] = _));
+  let v = we[i],
+    y;
+  t[24] === v ? (y = t[25]) : ((y = (0, Q.jsx)(D, { ...v })), (t[24] = v), (t[25] = y));
+  let b;
+  t[26] !== c || t[27] !== y
+    ? ((b = (0, Q.jsx)(`span`, { id: c, children: y })), (t[26] = c), (t[27] = y), (t[28] = b))
+    : (b = t[28]);
+  let S;
+  t[29] !== m || t[30] !== _ || t[31] !== b
+    ? ((S = (0, Q.jsx)(z, { control: m, icon: _, label: b })),
+      (t[29] = m),
+      (t[30] = _),
+      (t[31] = b),
+      (t[32] = S))
+    : (S = t[32]);
+  let C;
+  t[33] === h
+    ? (C = t[34])
+    : ((C =
+        h != null &&
+        (0, Q.jsx)(`div`, {
+          className: `min-w-0 px-4 pb-3 text-xs leading-4 text-balance text-secondary`,
+          children: h,
+        })),
+      (t[33] = h),
+      (t[34] = C));
+  let w;
+  return (
+    t[35] !== S || t[36] !== C
+      ? ((w = (0, Q.jsxs)(`div`, { children: [S, C] })), (t[35] = S), (t[36] = C), (t[37] = w))
+      : (w = t[37]),
+    w
+  );
+}
+function $e(e) {
+  let t = (0, nt.c)(22),
+    { animationDelay: n, children: r, rotate: i } = e,
+    a = H(),
+    o;
+  t[0] === i
+    ? (o = t[1])
+    : ((o = i
+        ? [
+            `scale(0.9) rotate(-14deg)`,
+            `scale(1.16) rotate(6deg)`,
+            `scale(0.94) rotate(-3deg)`,
+            `scale(1.04) rotate(1deg)`,
+            `scale(1) rotate(0deg)`,
+          ]
+        : [`scale(0.9)`, `scale(1.16)`, `scale(0.94)`, `scale(1.04)`, `scale(1)`]),
+      (t[0] = i),
+      (t[1] = o));
+  let s = a ? `scale(1) rotate(0deg)` : o,
+    c;
+  t[2] === s ? (c = t[3]) : ((c = { opacity: 1, transform: s }), (t[2] = s), (t[3] = c));
+  let l;
+  t[4] !== a || t[5] !== i
+    ? ((l = !a && { opacity: 0, transform: i ? `scale(0.9) rotate(-14deg)` : `scale(0.9)` }),
+      (t[4] = a),
+      (t[5] = i),
+      (t[6] = l))
+    : (l = t[6]);
+  let u = a ? 0 : 0.5,
+    d = a ? 0 : n,
+    f;
+  t[7] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((f = [0, 0.38, 0.62, 0.82, 1]), (t[7] = f))
+    : (f = t[7]);
+  let p;
+  t[8] !== u || t[9] !== d
+    ? ((p = { duration: u, delay: d, times: f, ease: `easeInOut` }),
+      (t[8] = u),
+      (t[9] = d),
+      (t[10] = p))
+    : (p = t[10]);
+  let m = a ? 0 : 0.18,
+    h = a ? 0 : n,
+    g;
+  t[11] !== h || t[12] !== m
+    ? ((g = { duration: m, delay: h }), (t[11] = h), (t[12] = m), (t[13] = g))
+    : (g = t[13]);
+  let _;
+  t[14] !== g || t[15] !== p
+    ? ((_ = { transform: p, opacity: g }), (t[14] = g), (t[15] = p), (t[16] = _))
+    : (_ = t[16]);
+  let v;
+  return (
+    t[17] !== r || t[18] !== _ || t[19] !== c || t[20] !== l
+      ? ((v = (0, Q.jsx)(L.span, {
+          className: `inline-flex`,
+          animate: c,
+          initial: l,
+          transition: _,
+          "aria-hidden": `true`,
+          children: r,
+        })),
+        (t[17] = r),
+        (t[18] = _),
+        (t[19] = c),
+        (t[20] = l),
+        (t[21] = v))
+      : (v = t[21]),
+    v
+  );
+}
+function et(e) {
+  return `${e.source}:${e.profilePath}`;
+}
+function tt(e) {
+  let t = e.profileName || e.profileDirectoryName;
+  return `${e.appName} ${t}`;
+}
+var nt, Q, rt;
+function it() {
+  return (it = e(() => {
+    ((nt = t()),
+      B(),
+      k(),
+      O(),
+      f(),
+      ie(),
+      j(),
+      V(),
+      v(),
+      u(),
+      n(),
+      S(),
+      he(),
+      T(),
+      ee(),
+      ge(),
+      w(),
+      oe(),
+      G(),
+      b(),
+      Te(),
+      Pe(),
+      De(),
+      Oe(),
+      J(),
+      (Q = l()),
+      (rt = c({
+        cancel: {
+          id: `settings.browserUse.profileImport.cancel`,
+          defaultMessage: `Cancel`,
+          description: `Button that closes the browser data import dialog`,
+        },
+        complete: {
+          id: `settings.browserUse.profileImport.complete`,
+          defaultMessage: `Import complete`,
+          description: `Title shown after browser data import completes`,
+        },
+        done: {
+          id: `settings.browserUse.profileImport.done`,
+          defaultMessage: `Done`,
+          description: `Button that closes the browser data import dialog`,
+        },
+        failed: {
+          id: `settings.browserUse.profileImport.failed`,
+          defaultMessage: `Import failed`,
+          description: `Title shown when browser data import fails`,
+        },
+        import: {
+          id: `settings.browserUse.profileImport.import`,
+          defaultMessage: `Import`,
+          description: `Button that starts importing browser data`,
+        },
+        importingCookies: {
+          id: `settings.browserUse.profileImport.importingCookies`,
+          defaultMessage: `Importing cookies…`,
+          description: `Progress description shown while cookies are being imported from a browser profile`,
+        },
+        importingHistory: {
+          id: `settings.browserUse.profileImport.importingHistory`,
+          defaultMessage: `Importing browsing history…`,
+          description: `Progress description shown while browsing history is being imported from a browser profile`,
+        },
+        importingPasswords: {
+          id: `settings.browserUse.profileImport.importingPasswords`,
+          defaultMessage: `Importing saved passwords…`,
+          description: `Progress description shown while saved passwords are being imported from a browser profile`,
+        },
+        importingExtensions: {
+          id: `settings.browserUse.profileImport.importingExtensions`,
+          defaultMessage: `Importing extensions…`,
+          description: `Progress description shown while Chrome extensions, pins, and permissions are being imported`,
+        },
+        retry: {
+          id: `settings.browserUse.profileImport.retry`,
+          defaultMessage: `Retry`,
+          description: `Button that retries browser data import`,
+        },
+      })));
+  }))();
+}
+function at(e) {
+  let t = (0, dt.c)(105),
+    { entryPoint: n, flowId: r, onClose: i, service: o } = e,
+    s = p(ne),
+    [c, l] = (0, $.useState)(``),
+    [u, f] = (0, $.useState)(!0),
+    [m, h] = (0, $.useState)(!0),
+    [g, _] = (0, $.useState)(!0),
+    [v, y] = (0, $.useState)(!1),
+    [b, x] = (0, $.useState)(null),
+    S = a(me, `2982604767`),
+    [C, w] = (0, $.useState)(void 0),
+    [T, E] = (0, $.useState)(null),
+    ee = (0, $.useRef)(`before-attempt`),
+    D = (0, $.useRef)(!1),
+    te = (0, $.useRef)(`close-button`),
+    re = (0, $.useRef)(!1),
+    ie = (0, $.useRef)(!1),
+    O = (0, $.useRef)(null),
+    oe;
+  t[0] === o ? (oe = t[1]) : ((oe = ke(o, !0)), (t[0] = o), (t[1] = oe));
+  let se = ae(oe),
+    ce;
+  t[2] === o
+    ? (ce = t[3])
+    : ((ce = (e) => {
+        let { request: t } = e;
+        return o.importBrowserProfile(t);
+      }),
+      (t[2] = o),
+      (t[3] = ce));
+  let le, k;
+  t[4] !== n || t[5] !== s
+    ? ((le = (e, t) => {
+        let { context: r, request: i } = t;
+        ((ee.current = `after-request-error`), ye(s, n, i, r));
+      }),
+      (k = async (e, t) => {
+        let { context: r, previousResult: i, request: a, startedAt: o } = t;
+        ee.current = `after-result`;
+        let c =
+            i == null
+              ? e
+              : {
+                  ...i,
+                  ...e,
+                  cookies: ct(i.cookies, e.cookies),
+                  passwords: ct(i.passwords, e.passwords),
+                  history: ct(i.history, e.history),
+                  extensions: ct(i.extensions, e.extensions),
                 },
-              }),
-          ...(mutation.variables.request.importHistory === true
-            ? {
-                history: {
-                  discovered: 0,
-                  imported: 0,
-                  skippedExisting: 0,
-                  skippedInvalid: 0,
-                  failed: 0,
-                  ...resultState?.result.history,
-                  status: "failed",
-                },
-              }
-            : {}),
-          ...(mutation.variables.request.importExtensions === true
-            ? {
-                extensions: {
-                  ...resultState?.result.extensions,
-                  status: "failed",
-                },
-              }
-            : {}),
+          l = pe(c);
+        (l && s.set(de, !0), pe(e) && s.set(fe, Date.now()), ye(s, n, a, r, e));
+        let u = [a.importPasswords, a.importCookies, a.importHistory, a.importExtensions].filter(
+          ot,
+        ).length;
+        if (!l) {
+          w({ result: c, revealedRowCount: u });
+          return;
         }
-      : null;
-  const result: ImportResult | null =
-    mutation.isError && failedResult != null
-      ? { ...resultState?.result, ...failedResult }
-      : (resultState?.result ?? mutation.data ?? null);
-
-  const recordClose = (reason: string) => {
-    if (closeRecorded.current) return;
-    closeRecorded.current = true;
-    recordDialogClosed(scope, entryPoint, {
-      flowId,
-      attemptIndex: activeAttempt.current?.context.attemptIndex,
-      source:
-        activeAttempt.current?.request.source ??
-        (adminNoticeRequired.current ? "chrome" : selectedProfile?.source),
-      windowsChromeAdminApprovalNoticeRequired:
-        activeAttempt.current?.context
-          .windowsChromeAdminApprovalNoticeRequired ??
-        adminNoticeRequired.current,
-      windowsChromeAdminApprovalNoticeAcknowledged:
-        activeAttempt.current?.context
-          .windowsChromeAdminApprovalNoticeAcknowledged ??
-        adminNoticeAcknowledged.current,
-      exitState: mutation.isPending ? undefined : exitState.current,
-      dismissalReason: reason,
-    });
-  };
-
-  React.useEffect(() => {
-    if (
-      requiresElevatedChromeConsent &&
-      selectedKey != null &&
-      !adminNoticeRequired.current
-    ) {
-      adminNoticeRequired.current = true;
-      recordAdminNoticeShown(scope, entryPoint, flowId);
-    }
-  }, [selectedKey, entryPoint, flowId, requiresElevatedChromeConsent, scope]);
-
-  const close = (reason: string) => {
-    if (mutation.isPending) return;
-    recordClose(reason);
-    onClose();
-  };
-  const startImport = (
-    request: ImportRequest,
-    priorContext?: AttemptContext,
-    previousResult?: ImportResult,
-  ) => {
-    if (
-      request.importExtensions &&
-      !scope.get(browserExtensionsFeatureFamily, "2982604767")
-    )
-      return;
-    const context: AttemptContext = {
-      flowId,
-      attemptIndex: (activeAttempt.current?.context.attemptIndex ?? 0) + 1,
-      windowsChromeAdminApprovalNoticeRequired:
-        priorContext?.windowsChromeAdminApprovalNoticeRequired ??
-        Boolean(requiresElevatedChromeConsent),
-      windowsChromeAdminApprovalNoticeAcknowledged:
-        priorContext?.windowsChromeAdminApprovalNoticeAcknowledged ??
-        elevatedChromeConsent,
-    };
-    activeAttempt.current = {
-      context,
-      previousResult,
-      request,
-      startedAt: performance.now(),
-    };
-    setResultState(
-      previousResult == null
-        ? undefined
-        : { result: previousResult, revealedRowCount: 0 },
-    );
-    mutation.reset();
-    recordAttemptStarted(scope, entryPoint, request, context);
-    mutation.mutate(activeAttempt.current);
-  };
-
-  const importSelected = () => {
-    if (extensionConfirmation != null) {
-      startImport({
-        ...extensionConfirmation.request,
-        allowUnverifiedExtensions: true,
-      });
-      setExtensionConfirmation(null);
-      return;
-    }
-    if (selectedProfile == null) return;
-    const request = buildImportRequest(
-      selectedProfile,
-      Boolean(cookiesSelected),
-      Boolean(passwordsSelected),
-      Boolean(historySelected),
-      Boolean(extensionsSelected),
-      Boolean(requiresElevatedChromeConsent),
-    );
-    if (request.importExtensions) {
-      setExtensionConfirmation({ profile: selectedProfile, request });
-    } else {
-      startImport(request);
-    }
-  };
-
-  const retry =
-    result == null
-      ? undefined
-      : () => {
-          const attempt = activeAttempt.current;
-          if (attempt == null) return;
-          const passwordResults = [
-            result.passwords,
-            result.passwords?.profile,
-            result.passwords?.account,
-          ];
-          const request = {
-            ...attempt.request,
-            importCookies:
-              attempt.request.importCookies !== false &&
-              shouldRetry(result.cookies),
-            importPasswords:
-              attempt.request.importPasswords !== false &&
-              shouldRetry(...passwordResults),
-            importHistory:
-              attempt.request.importHistory === true &&
-              shouldRetry(result.history),
-            importExtensions:
-              attempt.request.importExtensions === true &&
-              shouldRetry(result.extensions),
-          };
-          if (!request.importCookies) delete request.cookieDomainAllowlist;
-          startImport(request, attempt.context, result);
+        w({ result: c, revealedRowCount: 0 });
+        let d = Math.max(0, pt - (performance.now() - o));
+        await Promise.all(
+          Array.from({ length: u }, async (e, t) => {
+            let n = d + t * mt;
+            (n > 0 &&
+              (await new Promise((e) => {
+                setTimeout(e, n);
+              })),
+              w({ result: c, revealedRowCount: t + 1 }));
+          }),
+        );
+      }),
+      (t[4] = n),
+      (t[5] = s),
+      (t[6] = le),
+      (t[7] = k))
+    : ((le = t[6]), (k = t[7]));
+  let j;
+  t[8] !== ce || t[9] !== le || t[10] !== k
+    ? ((j = { mutationFn: ce, onError: le, onSuccess: k }),
+      (t[8] = ce),
+      (t[9] = le),
+      (t[10] = k),
+      (t[11] = j))
+    : (j = t[11]);
+  let M = A(j),
+    N = se.data,
+    P;
+  t[12] !== N || t[13] !== c
+    ? ((P = N?.find((e) => ut(e) === c) ?? N?.[0] ?? null), (t[12] = N), (t[13] = c), (t[14] = P))
+    : (P = t[14]);
+  let F = P,
+    I = F != null && u,
+    L = F != null && m,
+    R = F?.source === `chrome` && g,
+    z = S && F?.source === `chrome` && F.hasExtensions != null,
+    ue = z && v,
+    B = typeof document < `u` && document.documentElement.dataset.codexOs === `win32`,
+    V = B || (typeof document < `u` && document.documentElement.dataset.codexOs === `darwin`),
+    H = B && F?.source === `chrome` && (I || L),
+    U;
+  t[15] === F ? (U = t[16]) : ((U = F ? ut(F) : null), (t[15] = F), (t[16] = U));
+  let W = U,
+    G = W != null && T === W,
+    K;
+  t[17] !== M.isError || t[18] !== M.variables || t[19] !== C?.result
+    ? ((K =
+        M.isError && M.variables != null
+          ? {
+              source: M.variables.request.source,
+              profilePath: M.variables.request.profilePath,
+              ...(M.variables.request.importCookies === !1
+                ? {}
+                : { cookies: { ...C?.result.cookies, status: `failed` } }),
+              ...(M.variables.request.importPasswords === !1
+                ? {}
+                : { passwords: { ...C?.result.passwords, status: `failed` } }),
+              ...(M.variables.request.importHistory === !0
+                ? {
+                    history: {
+                      discovered: 0,
+                      imported: 0,
+                      skippedExisting: 0,
+                      skippedInvalid: 0,
+                      failed: 0,
+                      ...C?.result.history,
+                      status: `failed`,
+                    },
+                  }
+                : {}),
+              ...(M.variables.request.importExtensions === !0
+                ? { extensions: { ...C?.result.extensions, status: `failed` } }
+                : {}),
+            }
+          : null),
+      (t[17] = M.isError),
+      (t[18] = M.variables),
+      (t[19] = C?.result),
+      (t[20] = K))
+    : (K = t[20]);
+  let q = K,
+    J;
+  t[21] !== q || t[22] !== M.data || t[23] !== M.isError || t[24] !== C?.result
+    ? ((J = M.isError && q != null ? { ...C?.result, ...q } : (C?.result ?? M.data)),
+      (t[21] = q),
+      (t[22] = M.data),
+      (t[23] = M.isError),
+      (t[24] = C?.result),
+      (t[25] = J))
+    : (J = t[25]);
+  let he = J,
+    Y = he ?? null,
+    ge;
+  t[26] !== n || t[27] !== r || t[28] !== M.isPending || t[29] !== s || t[30] !== F?.source
+    ? ((ge = (e) => {
+        D.current ||
+          ((D.current = !0),
+          ve(s, n, {
+            flowId: r,
+            attemptIndex: O.current?.context.attemptIndex,
+            source: O.current?.request.source ?? (ie.current ? `chrome` : F?.source),
+            windowsChromeAdminApprovalNoticeRequired:
+              O.current?.context.windowsChromeAdminApprovalNoticeRequired ?? ie.current,
+            windowsChromeAdminApprovalNoticeAcknowledged:
+              O.current?.context.windowsChromeAdminApprovalNoticeAcknowledged ?? re.current,
+            exitState: M.isPending ? void 0 : ee.current,
+            dismissalReason: e,
+          }));
+      }),
+      (t[26] = n),
+      (t[27] = r),
+      (t[28] = M.isPending),
+      (t[29] = s),
+      (t[30] = F?.source),
+      (t[31] = ge))
+    : (ge = t[31]);
+  let Se = ge,
+    Ce,
+    we;
+  (t[32] !== W || t[33] !== n || t[34] !== r || t[35] !== H || t[36] !== s
+    ? ((Ce = () => {
+        H && W != null && !ie.current && ((ie.current = !0), _e(s, n, r));
+      }),
+      (we = [W, n, r, H, s]),
+      (t[32] = W),
+      (t[33] = n),
+      (t[34] = r),
+      (t[35] = H),
+      (t[36] = s),
+      (t[37] = Ce),
+      (t[38] = we))
+    : ((Ce = t[37]), (we = t[38])),
+    (0, $.useEffect)(Ce, we));
+  let Te;
+  t[39] !== M.isPending || t[40] !== Se || t[41] !== i
+    ? ((Te = (e) => {
+        M.isPending || (Se(e), i());
+      }),
+      (t[39] = M.isPending),
+      (t[40] = Se),
+      (t[41] = i),
+      (t[42] = Te))
+    : (Te = t[42]);
+  let Ee = Te,
+    De;
+  t[43] !== n || t[44] !== r || t[45] !== G || t[46] !== M || t[47] !== H || t[48] !== s
+    ? ((De = (e, t, i) => {
+        if (e.importExtensions === !0 && !s.get(me, `2982604767`)) return;
+        let a = {
+          flowId: r,
+          attemptIndex: (O.current?.context.attemptIndex ?? 0) + 1,
+          windowsChromeAdminApprovalNoticeRequired:
+            t?.windowsChromeAdminApprovalNoticeRequired ?? H,
+          windowsChromeAdminApprovalNoticeAcknowledged:
+            t?.windowsChromeAdminApprovalNoticeAcknowledged ?? G,
         };
-
-  const content = jsx.jsx(ImportSelection, {
-    activeImportRequest: mutation.variables?.request,
-    confirmExtensionImport: extensionConfirmation != null,
-    cookieAccessFailureMessage: undefined,
-    elevatedChromeConsent,
-    extensionsAvailable,
-    importCookies,
-    importExtensions,
-    importHistory,
-    importPasswords,
-    isImporting: mutation.isPending,
-    isLoadingProfiles: profilesQuery.isLoading,
-    showCloseBrowserGuidance,
-    profiles,
-    profilesHaveError: profilesQuery.isError,
-    requiresElevatedChromeConsent,
-    result,
-    revealedImportResultRowCount: resultState?.revealedRowCount,
-    selectedProfile: extensionConfirmation?.profile ?? selectedProfile,
-    onCancel: () => {
-      if (extensionConfirmation == null) {
-        close(result == null ? "secondary-button" : "done-button");
-      } else {
-        setExtensionConfirmation(null);
-      }
-    },
-    onElevatedChromeConsentChange: (checked: boolean) => {
-      if (checked && !adminNoticeAcknowledged.current) {
-        adminNoticeAcknowledged.current = true;
-        recordAdminNoticeAcknowledged(scope, entryPoint, flowId);
-      }
-      setElevatedConsentProfileKey(checked ? selectedKey : null);
-    },
-    onImport: importSelected,
-    onImportCookiesChange: setImportCookies,
-    onImportExtensionsChange: setImportExtensions,
-    onImportHistoryChange: setImportHistory,
-    onImportPasswordsChange: setImportPasswords,
-    onProfilePickerOpenChange: undefined,
-    onRetry: retry,
-    onSelectProfile: (profile: Profile) => {
-      setSelectedProfileKey(profileKey(profile));
-      setElevatedConsentProfileKey(null);
-      setResultState(undefined);
-      mutation.reset();
-    },
-  });
-
-  return jsx.jsx(Dialog, {
-    contentProps: {
-      onEscapeKeyDown: () => {
-        dismissalReason.current = "escape-key";
-      },
-      onPointerDownOutside: () => {
-        dismissalReason.current = "backdrop";
-      },
-    },
-    open: true,
-    onOpenChange: (open: boolean) => {
-      if (!open) close(dismissalReason.current);
-    },
-    showDialogClose: !mutation.isPending && result == null,
-    size: "default",
-    children: content,
-  });
+        ((O.current = { context: a, previousResult: i, request: e, startedAt: performance.now() }),
+          w(i == null ? void 0 : { result: i, revealedRowCount: 0 }),
+          M.reset(),
+          be(s, n, e, a),
+          M.mutate(O.current));
+      }),
+      (t[43] = n),
+      (t[44] = r),
+      (t[45] = G),
+      (t[46] = M),
+      (t[47] = H),
+      (t[48] = s),
+      (t[49] = De))
+    : (De = t[49]);
+  let Oe = De,
+    X;
+  t[50] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((X = {
+        onEscapeKeyDown: () => {
+          te.current = `escape-key`;
+        },
+        onPointerDownOutside: () => {
+          te.current = `backdrop`;
+        },
+      }),
+      (t[50] = X))
+    : (X = t[50]);
+  let Ae;
+  t[51] === Ee
+    ? (Ae = t[52])
+    : ((Ae = (e) => {
+        e || Ee(te.current);
+      }),
+      (t[51] = Ee),
+      (t[52] = Ae));
+  let je = !M.isPending && Y == null,
+    Me = M.variables?.request,
+    Ne = b != null,
+    Z;
+  t[53] === he ? (Z = t[54]) : ((Z = void 0), (t[53] = he), (t[54] = Z));
+  let Pe = C?.revealedRowCount,
+    Ie = b?.profile ?? F,
+    Le;
+  t[55] !== Ee || t[56] !== b || t[57] !== Y
+    ? ((Le = () => {
+        b == null ? Ee(Y == null ? `secondary-button` : `done-button`) : x(null);
+      }),
+      (t[55] = Ee),
+      (t[56] = b),
+      (t[57] = Y),
+      (t[58] = Le))
+    : (Le = t[58]);
+  let Re;
+  t[59] !== W || t[60] !== n || t[61] !== r || t[62] !== s
+    ? ((Re = (e) => {
+        (e && !re.current && ((re.current = !0), xe(s, n, r)), E(e ? W : null));
+      }),
+      (t[59] = W),
+      (t[60] = n),
+      (t[61] = r),
+      (t[62] = s),
+      (t[63] = Re))
+    : (Re = t[63]);
+  let ze;
+  t[64] !== b ||
+  t[65] !== I ||
+  t[66] !== ue ||
+  t[67] !== R ||
+  t[68] !== L ||
+  t[69] !== H ||
+  t[70] !== F ||
+  t[71] !== Oe
+    ? ((ze = () => {
+        if (b != null) {
+          (Oe({ ...b.request, allowUnverifiedExtensions: !0 }), x(null));
+          return;
+        }
+        if (F == null) return;
+        let e = st(F, I, L, R, ue, H);
+        e.importExtensions ? x({ profile: F, request: e }) : Oe(e);
+      }),
+      (t[64] = b),
+      (t[65] = I),
+      (t[66] = ue),
+      (t[67] = R),
+      (t[68] = L),
+      (t[69] = H),
+      (t[70] = F),
+      (t[71] = Oe),
+      (t[72] = ze))
+    : (ze = t[72]);
+  let Be;
+  t[73] !== Y || t[74] !== Oe
+    ? ((Be =
+        Y == null
+          ? void 0
+          : () => {
+              let e = O.current;
+              if (e != null) {
+                let t = [Y.passwords, Y.passwords?.profile, Y.passwords?.account],
+                  n = {
+                    ...e.request,
+                    importCookies: e.request.importCookies !== !1 && lt(Y.cookies),
+                    importPasswords: e.request.importPasswords !== !1 && lt(...t),
+                    importHistory: e.request.importHistory === !0 && lt(Y.history),
+                    importExtensions: e.request.importExtensions === !0 && lt(Y.extensions),
+                  };
+                (n.importCookies || delete n.cookieDomainAllowlist, Oe(n, e.context, Y));
+              }
+            }),
+      (t[73] = Y),
+      (t[74] = Oe),
+      (t[75] = Be))
+    : (Be = t[75]);
+  let Ve;
+  t[76] === M
+    ? (Ve = t[77])
+    : ((Ve = (e) => {
+        (l(ut(e)), E(null), w(void 0), M.reset());
+      }),
+      (t[76] = M),
+      (t[77] = Ve));
+  let He;
+  t[78] !== z ||
+  t[79] !== G ||
+  t[80] !== u ||
+  t[81] !== v ||
+  t[82] !== g ||
+  t[83] !== M.isPending ||
+  t[84] !== m ||
+  t[85] !== N ||
+  t[86] !== se.isError ||
+  t[87] !== se.isLoading ||
+  t[88] !== H ||
+  t[89] !== Y ||
+  t[90] !== Me ||
+  t[91] !== Ne ||
+  t[92] !== Z ||
+  t[93] !== Pe ||
+  t[94] !== Ie ||
+  t[95] !== Le ||
+  t[96] !== Re ||
+  t[97] !== ze ||
+  t[98] !== Be ||
+  t[99] !== Ve
+    ? ((He = (0, ft.jsx)(Fe, {
+        activeImportRequest: Me,
+        confirmExtensionImport: Ne,
+        cookieAccessFailureMessage: Z,
+        elevatedChromeConsent: G,
+        extensionsAvailable: z,
+        importCookies: u,
+        importExtensions: v,
+        importHistory: g,
+        importPasswords: m,
+        isImporting: M.isPending,
+        isLoadingProfiles: se.isLoading,
+        showCloseBrowserGuidance: V,
+        profiles: N,
+        profilesHaveError: se.isError,
+        requiresElevatedChromeConsent: H,
+        result: Y,
+        revealedImportResultRowCount: Pe,
+        selectedProfile: Ie,
+        onCancel: Le,
+        onElevatedChromeConsentChange: Re,
+        onImport: ze,
+        onImportCookiesChange: f,
+        onImportExtensionsChange: y,
+        onImportHistoryChange: _,
+        onImportPasswordsChange: h,
+        onRetry: Be,
+        onSelectProfile: Ve,
+      })),
+      (t[78] = z),
+      (t[79] = G),
+      (t[80] = u),
+      (t[81] = v),
+      (t[82] = g),
+      (t[83] = M.isPending),
+      (t[84] = m),
+      (t[85] = N),
+      (t[86] = se.isError),
+      (t[87] = se.isLoading),
+      (t[88] = H),
+      (t[89] = Y),
+      (t[90] = Me),
+      (t[91] = Ne),
+      (t[92] = Z),
+      (t[93] = Pe),
+      (t[94] = Ie),
+      (t[95] = Le),
+      (t[96] = Re),
+      (t[97] = ze),
+      (t[98] = Be),
+      (t[99] = Ve),
+      (t[100] = He))
+    : (He = t[100]);
+  let Ue;
+  return (
+    t[101] !== Ae || t[102] !== je || t[103] !== He
+      ? ((Ue = (0, ft.jsx)(d, {
+          contentProps: X,
+          open: !0,
+          onOpenChange: Ae,
+          showDialogClose: je,
+          size: `default`,
+          children: He,
+        })),
+        (t[101] = Ae),
+        (t[102] = je),
+        (t[103] = He),
+        (t[104] = Ue))
+      : (Ue = t[104]),
+    Ue
+  );
 }
-
-function initializeBrowserProfileImportDialog(): void {
-  initializeRuntimeLazy();
-  initializeSignalRuntime();
-  initializeDialog();
-  initializeAppScope();
-  initializeCheckControl();
-  initializeClassNames();
-  initializeMotionRuntime();
-  initializeReactRuntime();
-  initializeButton();
-  initializeCheckbox();
-  initializeDialogLayout();
-  initializeMenu();
-  initializeSettingsRow();
-  initializeSettingsList();
-  initializeMotion();
-  initializeMinusIcon();
-  initializeSuccessIcon();
-  initializeSelectTrigger();
-  initializeErrorIcon();
-  initializeUseMutation();
-  initializeUseQuery();
-  initializeBrowserExtensionFeature();
-  initializeBrowserImportState();
-  initializeBrowserImportSettings();
-  initializeBrowserImportRuntime();
-  initializeWarningIcon();
-  initializeBrowserImportAnalytics();
-  initializeImportDataIcons();
-  initializeImportMessages();
-  initializeSourceIcons();
-  initializeImportQueries();
+function ot(e) {
+  return e === !0;
 }
-
-initializeBrowserProfileImportDialog();
-
-export { BrowserProfileImportDialogModal };
+function st(e, t, n, r, i, a) {
+  let o = {
+    source: e.source,
+    profilePath: e.profilePath,
+    importCookies: t,
+    importPasswords: n,
+    importHistory: r,
+    importExtensions: i,
+  };
+  return a ? { ...o, allowElevatedChromeDecryption: !0 } : o;
+}
+function ct(e, t) {
+  if (t == null) return e;
+  let n = e?.imported ?? 0;
+  return n === 0 ? t : { ...t, imported: n + (t.imported ?? 0) };
+}
+function lt(...e) {
+  return !e.some(W) || e.some(U);
+}
+function ut(e) {
+  return `${e.source}:${e.profilePath}`;
+}
+var dt, $, ft, pt, mt;
+function ht() {
+  return (ht = e(() => {
+    ((dt = t()),
+      R(),
+      le(),
+      s(),
+      ($ = ce()),
+      V(),
+      y(),
+      K(),
+      Se(),
+      it(),
+      Ee(),
+      J(),
+      (ft = l()),
+      (pt = 750),
+      (mt = 500));
+  }))();
+}
+ht();
+export { at as BrowserProfileImportDialogModal };

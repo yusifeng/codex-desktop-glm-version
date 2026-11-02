@@ -142,33 +142,7 @@ const custom = scroll.t({
 assert.equal(custom.content.type, "div");
 assert.equal(custom.footer.props.children[1], "y");
 
-const chrome = await load("thread-app-shell-chrome");
-chrome.n();
-let toggled = 0;
-const shell = chrome.t({
-  threadType: "local",
-  showReviewTab: true,
-});
-assert.equal(shell.type, jsx.Fragment);
-assert.equal(shell.props.children.length, 7);
-assert.equal(shell.props.children[0], null);
-assert.equal(shell.props.children[1], null);
-assert.equal(shell.props.children[2], null);
-assert.equal(shell.props.children[3].type, "button");
-assert.equal(
-  shell.props.children[3].props["aria-label"],
-  "Toggle bottom panel",
-);
-assert.equal(shell.props.children[4], null);
-assert.equal(shell.props.children[5].type, "button");
-assert.equal(shell.props.children[5].props["aria-label"], "Toggle side panel");
-shell.props.children[5].props.onClick();
-assert.equal(toggled, 0);
-const remoteShell = chrome.t({
-  threadType: "remote",
-  showSidePanelToggle: false,
-});
-assert.equal(remoteShell.props.children[5], null);
+assertReleaseOwner("thread-app-shell-chrome");
 
 assertReleaseOwner("thread-user-message-navigation-rail-app");
 

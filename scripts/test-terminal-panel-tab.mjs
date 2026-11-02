@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = {
@@ -123,40 +124,7 @@ function keyboardEvent(key, overrides = {}) {
   };
 }
 
-const panel = await load("terminal-panel");
-assert.deepEqual(Object.keys(panel), ["TerminalPanel"]);
-let openedNewTab = 0;
-const panelView = panel.TerminalPanel({
-  conversationId: "conversation-1",
-  conversationTitle: "Terminal test",
-  initialPromptHint: "Pick a root",
-  loadingOverlay: "Opening",
-  onNewTerminalTab() { openedNewTab += 1; },
-  sessionId: "panel-1",
-});
-assert.equal(panelView.type, "div");
-assert.equal(panelView.props.id, "terminal-panel-panel-1");
-assert.equal(panelView.props["data-codex-terminal"], true);
-assert.equal(panelView.props["data-codex-xterm"], true);
-assert.equal(panelView.props.children[0].props.role, "textbox");
-assert.equal(panelView.props.children[0].props.children, "ready");
-assert.equal(panelView.props.children[1].props.children, "Opening");
-assert.equal(panelView.props.children[2].props.children.props.children, "Pick a root");
-assert.equal(state.created[0].sessionId, "panel-1");
-assert.equal(state.registered.id, "panel-1");
-const textbox = panelView.props.children[0];
-const enter = keyboardEvent("Enter");
-textbox.props.onKeyDown(enter);
-assert.deepEqual(state.writes.at(-1), { id: "panel-1", data: "\r", source: "terminal-generated" });
-const metaLeft = keyboardEvent("ArrowLeft", { metaKey: true });
-textbox.props.onKeyDown(metaLeft);
-assert.deepEqual(state.writes.at(-1), { id: "panel-1", data: "\u0001", source: "user" });
-textbox.props.onKeyDown(keyboardEvent("x"));
-assert.equal(state.writes.at(-1).data, "x");
-textbox.props.onPaste({ clipboardData: { getData: () => "pasted" }, preventDefault() {}, stopPropagation() {} });
-assert.equal(state.writes.at(-1).data, "pasted");
-textbox.props.onKeyDown(keyboardEvent("t", { metaKey: true }));
-assert.equal(openedNewTab, 1);
+const terminalPanelReleaseAssertions = assertReleaseOwner("terminal-panel");
 
 const tab = await load("terminal-tab");
 assert.deepEqual(Object.keys(tab), ["TerminalTab"]);
@@ -192,4 +160,4 @@ state.snapshot = { error: "boom", shell: "bash" };
 assert.equal(tab.TerminalTab({ ...baseProps, hostId: "durable", sessionId: "cloud-2" }).content.type, "empty-state");
 
 const assertionCount = [...fs.readFileSync(fileURLToPath(import.meta.url), "utf8").matchAll(/\bassert\./g)].length;
-console.log(assertionCount + " terminal panel/tab assertions passed");
+console.log(assertionCount + ` terminal tab assertions and ${terminalPanelReleaseAssertions} terminal panel release assertions passed`);

@@ -1,361 +1,1203 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/dom-to-blob",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/chart",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/i18n-runtime-locale-bundle",
+      "@exact-chunk/with-selector-ee24d273d86e.js",
+      "@rchunk/react-redux-runtime",
+      "@rchunk/use-stable-callback-render-ref",
+      "./i18n-69b3ed0e0384.css",
+      "@rchunk/chart-stores",
+      "@rchunk/bar-sizing",
+      "@rchunk/chart-colors",
+      "@rchunk/PieChart",
+      "./PieChart-42f742eeab3c.css",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeLazyRuntime,
-  H3 as initializeLazyComponents,
-  I3 as getJsxRuntime,
-  Jm as createLazyComponent,
-  Qh as LoadingSpinner,
-  e6 as getReactRuntime,
-  type JsxRuntime,
-  type ReactRuntime,
+  $3 as t,
+  $h as n,
+  Cy as r,
+  EC as i,
+  FX as a,
+  G4 as o,
+  H3 as s,
+  I3 as c,
+  If as l,
+  Jm as u,
+  K2 as d,
+  LX as f,
+  QI as p,
+  Qh as m,
+  TO as h,
+  Tv as g,
+  V3 as _,
+  Xm as v,
+  Y2 as y,
+  Yh as b,
+  Ym as x,
+  Z4 as S,
+  ZI as C,
+  Zh as w,
+  c_ as T,
+  e6 as E,
+  eb as D,
+  g4 as O,
+  h4 as k,
+  jf as A,
+  kf as ee,
+  lk as j,
+  lw as te,
+  m4 as ne,
+  n4 as re,
+  o_ as ie,
+  pk as ae,
+  q4 as M,
+  qm as oe,
+  wO as N,
 } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import { a as initializeBarSizing, n as getVerticalBarChartStyle } from "@rchunk/bar-sizing";
-
-type ChartType = "bar" | "line" | "pie" | "scatter";
-type ChartView = "chart" | "table";
-type ValueFormat = "compact" | "integer" | "raw";
-
-interface ChartSeries {
-  dataKey: string;
-  label: string;
-  stack?: string;
-  valueFormat: ValueFormat;
-  valuePrefix: string;
-  valueSuffix: string;
-}
-
-interface ChartMeta {
-  description?: string;
-  footer?: string;
-  title?: string;
-}
-
-interface ChartSpec {
-  axes?: unknown;
-  chartType: ChartType;
-  data: Array<Record<string, unknown>>;
-  layout?: "horizontal" | "vertical";
-  meta?: ChartMeta;
-  nameKey: string;
-  series: ChartSeries[];
-  valueKey: string;
-  xAxisScale?: "linear";
-  xKey: string;
-}
-
-interface ChartTable {
-  columns: string[];
-  rows: unknown[][];
-}
-
-interface ContentReference {
-  data: { content: unknown };
-  matched_text?: string;
-}
-
-export interface ChatGptChartContentReferenceProps {
-  contentReferenceIndex: number;
-  initialView?: ChartView;
-  isStreaming?: boolean;
-  reference: unknown;
-  widgetRefSeenAtMs?: number;
-}
-
-interface ChartWidgetProps extends Record<string, unknown> {
-  ariaLabel: string;
-  chart: ChartSpec;
-  onReady(): void;
-  theme?: "dark" | "light";
-}
-
-interface DomToBlobOptions {
-  backgroundColor?: string;
-  filter?(element: Element): boolean;
-  scale?: number;
-}
-
-type ChartWidgetComponent = (props: ChartWidgetProps) => unknown;
-
-const SUPPORTED_CHART_TYPES = new Set<ChartType>(["bar", "line", "pie", "scatter"]);
-const FORMULA_PREFIX = /^[=+\-@]/;
-const EXCLUDED_DOWNLOAD_CONTENT = "[data-chart-widget-download-exclude], .recharts-tooltip-wrapper, .recharts-tooltip-cursor, .recharts-active-dot";
-
-let jsx: JsxRuntime;
-let React: ReactRuntime;
-
-const LazyChartWidget = createLazyComponent<ChartWidgetProps>(
-  async () => {
-    const chartModule = await import("@rchunk/chart");
-    const { ChartWidget } = chartModule;
-    return ChartWidget as unknown as ChartWidgetComponent;
-  },
-  { propagateLoadError: true },
-);
-
-function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value != null && !Array.isArray(value);
-}
-
-function parseReference(reference: unknown): ContentReference | null {
-  if (!isRecord(reference) || !isRecord(reference.data) || !("content" in reference.data)) return null;
-  return {
-    data: { content: reference.data.content },
-    matched_text: typeof reference.matched_text === "string" ? reference.matched_text : undefined,
-  };
-}
-
-function nonEmptyString(value: unknown, fallback?: string): string | undefined {
-  return typeof value === "string" && value.trim().length > 0 ? value.trim() : fallback;
-}
-
-function firstStringKey(data: Array<Record<string, unknown>>): string {
-  const first = data[0];
-  if (first == null) return "name";
-  for (const [key, value] of Object.entries(first)) if (typeof value === "string") return key;
-  return Object.keys(first)[0] ?? "name";
-}
-
-function firstValueKey(data: Array<Record<string, unknown>>, xKey: string): string {
-  const first = data[0];
-  if (first == null) return "value";
-  for (const [key, value] of Object.entries(first)) if (key !== xKey && typeof value === "number") return key;
-  return Object.keys(first).find((key) => key !== xKey) ?? "value";
-}
-
-function normalizeSeries(value: unknown, valueKey: string, root: Record<string, unknown>): ChartSeries[] {
-  const defaultFormat = root.valueFormat === "integer" || root.valueFormat === "raw" ? root.valueFormat : "compact";
-  const defaultPrefix = nonEmptyString(root.valuePrefix, "") ?? "";
-  const defaultSuffix = nonEmptyString(root.valueSuffix, "") ?? "";
-  const series: ChartSeries[] = [];
-  if (Array.isArray(value)) {
-    for (const item of value) {
-      if (!isRecord(item)) continue;
-      const dataKey = nonEmptyString(item.dataKey);
-      if (dataKey == null) continue;
-      const valueFormat = item.valueFormat === "integer" || item.valueFormat === "raw" ? item.valueFormat : defaultFormat;
-      series.push({
-        dataKey,
-        label: nonEmptyString(item.label, dataKey) ?? dataKey,
-        stack: nonEmptyString(item.stack),
-        valueFormat,
-        valuePrefix: nonEmptyString(item.valuePrefix, defaultPrefix) ?? defaultPrefix,
-        valueSuffix: nonEmptyString(item.valueSuffix, defaultSuffix) ?? defaultSuffix,
-      });
-    }
-  }
-  return series.length > 0 ? series : [{ dataKey: valueKey, label: valueKey, valueFormat: defaultFormat, valuePrefix: defaultPrefix, valueSuffix: defaultSuffix }];
-}
-
-function parseChartSpec(content: unknown): ChartSpec | null {
-  let decoded = content;
-  if (typeof content === "string") {
-    try {
-      decoded = JSON.parse(content);
-    } catch {
-      return null;
-    }
-  }
-  if (!isRecord(decoded) || !SUPPORTED_CHART_TYPES.has(decoded.chartType as ChartType) || !Array.isArray(decoded.data)) return null;
-  const data = decoded.data.filter(isRecord);
-  if (data.length !== decoded.data.length) return null;
-  const xKey = nonEmptyString(decoded.xKey, firstStringKey(data)) ?? "name";
-  const valueKey = nonEmptyString(decoded.valueKey, firstValueKey(data, xKey)) ?? "value";
-  const meta = isRecord(decoded.meta) ? {
-    title: nonEmptyString(decoded.meta.title),
-    description: nonEmptyString(decoded.meta.description),
-    footer: nonEmptyString(decoded.meta.footer),
-  } : undefined;
-  const spec: ChartSpec = {
-    chartType: decoded.chartType as ChartType,
-    data,
-    nameKey: nonEmptyString(decoded.nameKey, xKey) ?? xKey,
-    series: normalizeSeries(decoded.series, valueKey, decoded),
-    valueKey,
-    xKey,
-  };
-  if (decoded.axes != null) spec.axes = decoded.axes;
-  if (decoded.layout === "vertical") spec.layout = "vertical";
-  if (meta != null) spec.meta = meta;
-  if (spec.chartType === "line" && decoded.xAxisScale === "linear") spec.xAxisScale = "linear";
-  return spec;
-}
-
-function formatValue(value: number, series: ChartSeries): string {
-  let formatted: string;
-  if (series.valueFormat === "raw") formatted = String(value);
-  else if (series.valueFormat === "integer") formatted = new Intl.NumberFormat(undefined, { maximumFractionDigits: 0 }).format(value);
-  else formatted = new Intl.NumberFormat(undefined, { compactDisplay: "short", maximumFractionDigits: 1, notation: "compact" }).format(value);
-  return series.valuePrefix + formatted + series.valueSuffix;
-}
-
-function readableValue(value: unknown): string | null {
-  if (typeof value === "string") return value.trim().length > 0 ? value.trim() : null;
-  if (typeof value === "number" || typeof value === "boolean") return String(value);
-  return null;
-}
-
-function accessibleRows(chart: ChartSpec): string[] {
-  if (chart.chartType === "pie") {
-    const series = chart.series[0];
-    if (series == null) return [];
-    return chart.data.flatMap((row) => {
-      const value = row[chart.valueKey];
-      const name = readableValue(row[chart.nameKey]);
-      return typeof value === "number" && Number.isFinite(value) && name != null ? [name + ": " + formatValue(value, series)] : [];
-    });
-  }
-  return chart.data.flatMap((row) => {
-    const xValue = readableValue(row[chart.xKey]);
-    if (xValue == null) return [];
-    const values = chart.series.flatMap((series) => {
-      const value = row[series.dataKey];
-      return typeof value === "number" && Number.isFinite(value) ? [series.label + " " + formatValue(value, series)] : [];
-    });
-    return values.length > 0 ? [xValue + ": " + values.join(", ")] : [];
-  });
-}
-
-function chartTable(chart: ChartSpec): ChartTable | null {
-  if (chart.data.length === 0) return null;
-  const columns: string[] = [];
-  const seen = new Set<string>();
-  for (const row of chart.data) {
-    for (const key of Object.keys(row)) {
-      if (!seen.has(key)) {
-        seen.add(key);
-        columns.push(key);
+import {
+  CRt as P,
+  CW as se,
+  DJ as F,
+  EJ as I,
+  Ent as L,
+  LGt as R,
+  Net as z,
+  SW as ce,
+  Tnt as B,
+  _it as V,
+  bY as H,
+  bit as U,
+  cG as W,
+  crt as G,
+  drt as K,
+  frt as q,
+  git as J,
+  jet as le,
+  lG as ue,
+  lrt as de,
+  srt as fe,
+  urt as pe,
+  wRt as me,
+  xW as he,
+  xY as ge,
+  xit as _e,
+  yY as ve,
+} from "@rchunk/app-initial";
+import { a as ye, n as be } from "@rchunk/bar-sizing";
+function xe(e) {
+  let t = (0, Oe.c)(8),
+    { chart: n, intl: r } = e,
+    i,
+    a,
+    o;
+  if (t[0] !== n || t[1] !== r) {
+    o = Symbol.for(`react.early_return_sentinel`);
+    bb0: {
+      let e = Ce(n, r);
+      if (e.length === 0) {
+        o = null;
+        break bb0;
       }
+      ((i = `sr-only`), (a = e.map(Se)));
     }
-  }
-  return columns.length === 0 ? null : { columns, rows: chart.data.map((row) => columns.map((column) => row[column] ?? null)) };
+    ((t[0] = n), (t[1] = r), (t[2] = i), (t[3] = a), (t[4] = o));
+  } else ((i = t[2]), (a = t[3]), (o = t[4]));
+  if (o !== Symbol.for(`react.early_return_sentinel`)) return o;
+  let s;
+  return (
+    t[5] !== i || t[6] !== a
+      ? ((s = (0, ke.jsx)(`ul`, { className: i, children: a })), (t[5] = i), (t[6] = a), (t[7] = s))
+      : (s = t[7]),
+    s
+  );
 }
-
-function humanizeColumn(value: string): string {
-  return value
-    .replace(/([A-Z]+)([A-Z][a-z])/g, "$1 $2")
-    .replace(/([a-z0-9])([A-Z])/g, "$1 $2")
-    .replace(/[_./-]+/g, " ")
+function Se(e) {
+  return (0, ke.jsx)(`li`, { children: e }, e);
+}
+function Ce(e, t) {
+  return e.chartType === `pie`
+    ? e.data
+        .map((n) => {
+          let r = Ee(n[e.valueKey]),
+            i = De(n, e.nameKey);
+          return r == null || i == null ? null : `${i}: ${we(r, e.series[0], t)}`;
+        })
+        .filter((e) => e != null)
+    : e.data
+        .map((n) => {
+          let r = De(n, e.xKey);
+          if (r == null) return null;
+          let i = e.series
+            .map((e) => {
+              let r = Ee(n[e.dataKey]);
+              return r == null ? null : `${e.label} ${we(r, e, t)}`;
+            })
+            .filter((e) => e != null);
+          return i.length > 0 ? `${r}: ${i.join(`, `)}` : null;
+        })
+        .filter((e) => e != null);
+}
+function we(e, t, n) {
+  let r = Te(e, t?.valueFormat, n);
+  return `${t?.valuePrefix ?? ``}${r}${t?.valueSuffix ?? ``}`;
+}
+function Te(e, t, n) {
+  switch (t) {
+    case `integer`:
+      return n.formatNumber(e, { maximumFractionDigits: 0 });
+    case `raw`:
+      return String(e);
+    case `compact`:
+    case void 0:
+      return n.formatNumber(e, {
+        compactDisplay: `short`,
+        maximumFractionDigits: 1,
+        notation: `compact`,
+      });
+  }
+}
+function Ee(e) {
+  return typeof e == `number` && Number.isFinite(e) ? e : null;
+}
+function De(e, t) {
+  let n = e[t];
+  if (typeof n == `string`) {
+    let e = n.trim();
+    return e.length > 0 ? e : null;
+  }
+  return typeof n == `number` || typeof n == `boolean` ? String(n) : null;
+}
+var Oe, ke;
+function Ae() {
+  return (Ae = e(() => {
+    ((Oe = t()), (ke = c()));
+  }))();
+}
+function je(e) {
+  let t = (0, Ne.c)(2),
+    n;
+  return (
+    t[0] === e
+      ? (n = t[1])
+      : ((n = (0, Y.jsx)(`div`, {
+          className: `absolute end-2 top-6 z-10 opacity-100 focus-within:opacity-100 [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-hover/app-widget:opacity-100`,
+          "data-chart-widget-download-exclude": !0,
+          children: (0, Y.jsx)(Me, { ...e }),
+        })),
+        (t[0] = e),
+        (t[1] = n)),
+    n
+  );
+}
+function Me(e) {
+  let t = (0, Ne.c)(25),
+    {
+      canChangeView: n,
+      isReady: a,
+      isDownloading: o,
+      onCopyTable: s,
+      onDownload: c,
+      onViewChange: l,
+      view: u,
+    } = e,
+    d = re(),
+    f;
+  t[0] === d
+    ? (f = t[1])
+    : ((f = d.formatMessage({
+        id: `chatgpt.contentReferences.chart.options`,
+        defaultMessage: `Chart options`,
+        description: `Accessible label and tooltip for the menu of chart, table, copy, and download actions on a ChatGPT chart`,
+      })),
+      (t[0] = d),
+      (t[1] = f));
+  let p = f,
+    h;
+  t[2] === o
+    ? (h = t[3])
+    : ((h = o ? (0, Y.jsx)(m, { className: `icon-xs` }) : (0, Y.jsx)(D, {})),
+      (t[2] = o),
+      (t[3] = h));
+  let _;
+  t[4] !== p || t[5] !== h
+    ? ((_ = (0, Y.jsx)(b, {
+        "aria-label": p,
+        color: `secondary`,
+        radius: `full`,
+        size: `inputIcon`,
+        children: h,
+      })),
+      (t[4] = p),
+      (t[5] = h),
+      (t[6] = _))
+    : (_ = t[6]);
+  let v;
+  t[7] !== p || t[8] !== _
+    ? ((v = (0, Y.jsx)(ie, { side: `bottom`, tooltipContent: p, children: _ })),
+      (t[7] = p),
+      (t[8] = _),
+      (t[9] = v))
+    : (v = t[9]);
+  let x;
+  t[10] !== n || t[11] !== o || t[12] !== l || t[13] !== u
+    ? ((x = n
+        ? (0, Y.jsx)(A.Item, {
+            LeftIcon: u === `table` ? g : i,
+            disabled: o,
+            onClick: (e) => l(u === `table` ? `chart` : `table`, e.nativeEvent),
+            children:
+              u === `table`
+                ? (0, Y.jsx)(y, {
+                    id: `chatgpt.contentReferences.chart.viewChart`,
+                    defaultMessage: `View as chart`,
+                    description: `Menu action to switch from the data table back to the visualization in a ChatGPT chart`,
+                  })
+                : (0, Y.jsx)(y, {
+                    id: `chatgpt.contentReferences.chart.viewTable`,
+                    defaultMessage: `View as table`,
+                    description: `Menu action to show the underlying data in a table in a ChatGPT chart`,
+                  }),
+          })
+        : null),
+      (t[10] = n),
+      (t[11] = o),
+      (t[12] = l),
+      (t[13] = u),
+      (t[14] = x))
+    : (x = t[14]);
+  let S;
+  t[15] !== o || t[16] !== a || t[17] !== s || t[18] !== c || t[19] !== u
+    ? ((S =
+        u === `table`
+          ? (0, Y.jsx)(A.Item, {
+              LeftIcon: r,
+              onClick: (e) => s(e.nativeEvent),
+              children: (0, Y.jsx)(y, {
+                id: `chatgpt.contentReferences.chart.copyTable`,
+                defaultMessage: `Copy table`,
+                description: `Menu action to copy the chart's data table as tab-separated text for pasting into a spreadsheet`,
+              }),
+            })
+          : (0, Y.jsx)(A.Item, {
+              leftIconAsset: N,
+              disabled: !a || o,
+              onClick: (e) => c(e.nativeEvent),
+              children: (0, Y.jsx)(y, {
+                id: `chatgpt.contentReferences.chart.download`,
+                defaultMessage: `Download as image`,
+                description: `Menu action to download the displayed ChatGPT chart with its title, legend, and footer as a PNG image`,
+              }),
+            })),
+      (t[15] = o),
+      (t[16] = a),
+      (t[17] = s),
+      (t[18] = c),
+      (t[19] = u),
+      (t[20] = S))
+    : (S = t[20]);
+  let C;
+  return (
+    t[21] !== v || t[22] !== x || t[23] !== S
+      ? ((C = (0, Y.jsxs)(ee, {
+          align: `end`,
+          contentWidth: `xs`,
+          triggerButton: v,
+          children: [x, S],
+        })),
+        (t[21] = v),
+        (t[22] = x),
+        (t[23] = S),
+        (t[24] = C))
+      : (C = t[24]),
+    C
+  );
+}
+var Ne, Y;
+function Pe() {
+  return (Pe = e(() => {
+    ((Ne = t()), h(), d(), w(), l(), te(), n(), T(), (Y = c()));
+  }))();
+}
+async function Fe(e, t) {
+  let { domToBlob: n } = await _(
+    async () => {
+      let { domToBlob: e } = await import(`@rchunk/dom-to-blob`);
+      return { domToBlob: e };
+    },
+    __vite__mapDeps([0, 1]),
+    import.meta.url,
+  );
+  await document.fonts.ready;
+  let r = {
+      backgroundColor: B()[`--background`],
+      scale: Math.min(window.devicePixelRatio || 1, 2),
+      filter: (e) =>
+        !(e instanceof Element) ||
+        e.closest(
+          `[data-chart-widget-download-exclude], .recharts-tooltip-wrapper, .recharts-tooltip-cursor, .recharts-active-dot`,
+        ) == null,
+    },
+    i = e.getAttribute(`data-chart-widget-downloading`);
+  e.setAttribute(`data-chart-widget-downloading`, `true`);
+  try {
+    await new Promise((e) => requestAnimationFrame(() => e()));
+    let i = await n(e, r);
+    R(i, Ie(t));
+  } finally {
+    i == null
+      ? e.removeAttribute(`data-chart-widget-downloading`)
+      : e.setAttribute(`data-chart-widget-downloading`, i);
+  }
+}
+function Ie(e) {
+  return `${
+    (e.meta?.title?.trim() || `chart-${e.chartType}`)
+      .replace(/[\\/:*?"<>|]+/g, `-`)
+      .replace(/\s+/g, ` `)
+      .replace(/^\.+/, ``)
+      .slice(0, 80)
+      .trim() || `visualization`
+  }.png`;
+}
+function Le() {
+  return (Le = e(() => {
+    (L(), s());
+  }))();
+}
+function Re(e, t, n, r) {
+  let i = { renderer: `recharts`, source_format: `json_spec`, chart_type: t, action: n };
+  me(e).count(`web_sandbox`, `visualization.interaction.count`, i);
+  let a = Be(e, i, `interaction`, r);
+  window.setTimeout(() => a.finish(`success`), 1e3);
+}
+function ze(e, t) {
+  return Be(e, { renderer: `recharts`, source_format: `json_spec`, chart_type: t }, `render`);
+}
+function Be(e, t, n, r) {
+  let i = me(e),
+    a = performance.now(),
+    o = Ve(r, a),
+    s = n === `interaction` ? 100 : 0,
+    c = null,
+    l = null,
+    u = null,
+    d = !1,
+    f = (e) => {
+      for (let t of e)
+        t.entryType === `event` &&
+          ((o == null && t.startTime < a - s) ||
+            (o != null && (Math.abs(t.startTime - o) > 50 || t.name !== r?.type)) ||
+            (`interactionId` in t &&
+              typeof t.interactionId == `number` &&
+              t.interactionId !== 0 &&
+              ((n === `interaction` && ((c ??= t.interactionId), c !== t.interactionId)) ||
+                ((l == null || t.duration > l.duration) && (l = t)))));
+    };
+  if (
+    (n === `render` && i.count(`web_sandbox`, `visualization.render.start`, t),
+    typeof PerformanceObserver > `u` || !PerformanceObserver.supportedEntryTypes.includes(`event`))
+  )
+    i.count(`web_sandbox`, `visualization.${n}.inp_unavailable`, { ...t, reason: `unsupported` });
+  else
+    try {
+      ((u = new PerformanceObserver((e) => f(e.getEntries()))),
+        u.observe({ type: `event`, buffered: !0, durationThreshold: 0 }));
+    } catch (e) {
+      u != null && (u.disconnect(), (u = null));
+      let r = `unknown`;
+      (e instanceof Error && (r = e.name),
+        i.count(`web_sandbox`, `visualization.${n}.inp_unavailable`, { ...t, reason: r }));
+    }
+  return {
+    cancel: () => {
+      ((d = !0), u?.disconnect());
+    },
+    finish: (e) => {
+      d ||
+        ((d = !0),
+        u != null && (f(u.takeRecords()), u.disconnect()),
+        l != null &&
+          i.hist(
+            `web_sandbox`,
+            `visualization.${n}.inp_ms`,
+            { ...t, interaction_name: l.name, outcome: e },
+            Math.max(1, l.duration),
+          ));
+    },
+  };
+}
+function Ve(e, t) {
+  if (e == null || !Number.isFinite(e.timeStamp)) return null;
+  let n =
+    e.timeStamp > t + 6e4 && Number.isFinite(performance.timeOrigin)
+      ? e.timeStamp - performance.timeOrigin
+      : e.timeStamp;
+  return n < 0 || n > t + 6e4 ? null : n;
+}
+function He() {
+  return (He = e(() => {
+    P();
+  }))();
+}
+function X(e, t) {
+  return typeof e == `string` && e.trim().length > 0 ? e : t;
+}
+function Ue(e) {
+  let t = X(e.xKey, Ke(e.data)),
+    n = X(e.valueKey, qe(e.data, t)),
+    r = {
+      chartType: e.chartType,
+      data: e.data,
+      nameKey: X(e.nameKey, t),
+      series: Ge(e, n),
+      valueKey: n,
+      xKey: t,
+    };
+  return (
+    e.axes != null && (r.axes = e.axes),
+    e.layout === `vertical` && (r.layout = `vertical`),
+    e.meta != null && (r.meta = e.meta),
+    e.chartType === `line` && e.xAxisScale === `linear` && (r.xAxisScale = `linear`),
+    r
+  );
+}
+function We(e) {
+  if (e == null) return { spec: null, invalidReason: `missing_content` };
+  let t = e;
+  if (typeof e == `string`)
+    try {
+      t = JSON.parse(e);
+    } catch {
+      return { spec: null, invalidReason: `invalid_json` };
+    }
+  let n = Je.safeParse(t);
+  if (!n.success) return { spec: null, invalidReason: `invalid_root_type` };
+  let r = ve.safeParse(n.data);
+  if (r.success) return { spec: r.data, invalidReason: null };
+  let i = n.data.chartType;
+  return {
+    spec: null,
+    invalidReason:
+      typeof i != `string` || i.trim().length === 0
+        ? `missing_chart_type`
+        : `unsupported_chart_type`,
+  };
+}
+function Ge(e, t) {
+  let n = e.valueFormat ?? `compact`,
+    r = X(e.valuePrefix, ``),
+    i = X(e.valueSuffix, ``),
+    a = e.series?.map((e) => {
+      let t = X(e.stack),
+        a = {
+          dataKey: e.dataKey,
+          label: X(e.label, e.dataKey),
+          valueFormat: e.valueFormat ?? n,
+          valuePrefix: X(e.valuePrefix, r),
+          valueSuffix: X(e.valueSuffix, i),
+        };
+      return (t != null && (a.stack = t), a);
+    });
+  return a != null && a.length > 0
+    ? a
+    : [{ dataKey: t, label: t, valueFormat: n, valuePrefix: r, valueSuffix: i }];
+}
+function Ke(e) {
+  let t = e[0];
+  if (t == null) return `name`;
+  for (let [e, n] of Object.entries(t)) if (typeof n == `string`) return e;
+  return Object.keys(t)[0] ?? `name`;
+}
+function qe(e, t) {
+  let n = e[0];
+  if (n == null) return `value`;
+  for (let [e, r] of Object.entries(n)) if (e !== t && typeof r == `number`) return e;
+  return Object.keys(n).find((e) => e !== t) ?? `value`;
+}
+var Je;
+function Ye() {
+  return (Ye = e(() => {
+    (O(), ge(), (Je = o(M(), S())));
+  }))();
+}
+function Xe(e, t) {
+  let n = me(e),
+    r = performance.now(),
+    i = { renderer: `recharts`, source_format: `json_spec` },
+    a = !1,
+    o = !1,
+    s = null,
+    c = null;
+  function l() {
+    (s != null && (cancelAnimationFrame(s), (s = null)), c?.cancel(), (c = null));
+  }
+  function u(t) {
+    !a && c == null && (c = ze(e, t));
+  }
+  function d(e, t) {
+    if (o || e == null) return;
+    o = !0;
+    let r = { ...i };
+    (t != null && (r.chart_type = t),
+      n.hist(
+        `web_sandbox`,
+        `visualization.payload_size_kb`,
+        r,
+        new TextEncoder().encode(e).byteLength / 1024,
+      ));
+  }
+  function f(e, t) {
+    a ||
+      ((a = !0),
+      d(t),
+      n.count(`web_sandbox`, `visualization.load.failure`, {
+        ...i,
+        error_source: `parse`,
+        error_type: e,
+      }),
+      n.count(`web_sandbox`, `visualization.empty_or_invalid`, { ...i, reason: e }),
+      n.count(`web_sandbox`, `visualization.render.outcome`, { ...i, outcome: `failure` }),
+      c?.finish(`failure`),
+      l());
+  }
+  function p(e, t, r) {
+    if (a) return;
+    (u(t.chartType), (a = !0));
+    let o = { ...i, chart_type: t.chartType };
+    (d(r, t.chartType),
+      n.count(`web_sandbox`, `visualization.load.failure`, {
+        ...o,
+        error_source: `render`,
+        error_type: e.name,
+      }),
+      n.count(`web_sandbox`, `visualization.render.outcome`, { ...o, outcome: `failure` }),
+      c?.finish(`failure`),
+      l());
+  }
+  function m(e, o) {
+    if (a || s != null) return;
+    u(e.chartType);
+    let l = performance.now();
+    s = requestAnimationFrame(() => {
+      if (((s = null), a)) return;
+      a = !0;
+      let u = performance.now(),
+        f = { ...i, chart_type: e.chartType };
+      (d(o, e.chartType),
+        n.hist(`web_sandbox`, `visualization.first_render_time_ms`, f, u - r),
+        t != null && n.hist(`web_sandbox`, `visualization.widget_ref_to_first_paint_ms`, f, u - t),
+        n.hist(`web_sandbox`, `visualization.render_complete_to_first_paint_ms`, f, u - l),
+        n.hist(`web_sandbox`, `visualization.dataset.row_count`, f, e.data.length),
+        n.hist(`web_sandbox`, `visualization.view_count`, f, 1),
+        n.count(`web_sandbox`, `visualization.render.outcome`, { ...f, outcome: `success` }),
+        c?.finish(`success`),
+        (c = null));
+    });
+  }
+  return { start: u, cancel: l, parseFailed: f, renderFailed: p, renderComplete: m };
+}
+function Ze() {
+  return (Ze = e(() => {
+    (P(), He());
+  }))();
+}
+function Qe(e) {
+  let t = [],
+    n = new Set();
+  for (let r of e) for (let e of Object.keys(r)) n.has(e) || (n.add(e), t.push(e));
+  return t;
+}
+function $e(e) {
+  if (e == null) return null;
+  if (typeof e == `string` || typeof e == `number` || typeof e == `boolean`) return e;
+  let t = JSON.stringify(e);
+  return typeof t == `string` ? t : ``;
+}
+function et(e) {
+  if (e.data.length === 0) return null;
+  let t = Qe(e.data);
+  return t.length === 0 ? null : { columns: t, rows: e.data.map((e) => t.map((t) => $e(e[t]))) };
+}
+function tt(e) {
+  return e == null ? `` : String(e);
+}
+function nt(e) {
+  return e.length === 0 || e === e.toUpperCase()
+    ? e
+    : `${e.charAt(0).toUpperCase()}${e.slice(1).toLowerCase()}`;
+}
+function rt(e) {
+  return e
+    .replace(/([A-Z]+)([A-Z][a-z])/g, `$1 $2`)
+    .replace(/([a-z0-9])([A-Z])/g, `$1 $2`)
+    .replace(/[_./-]+/g, ` `)
     .trim()
     .split(/\s+/)
-    .map((part) => part.length === 0 || part === part.toUpperCase() ? part : part.charAt(0).toUpperCase() + part.slice(1).toLowerCase())
-    .join(" ");
+    .map(nt)
+    .join(` `);
 }
-
-function safeSpreadsheetCell(value: unknown): string {
-  const text = (value == null ? "" : String(value)).replace(/[\t\r\n]+/g, " ").trim();
-  return typeof value === "string" && FORMULA_PREFIX.test(text) ? "'" + text : text;
+function it(e) {
+  let t = tt(e)
+    .replaceAll(/[\t\r\n]+/g, ` `)
+    .trim();
+  return typeof e == `string` && /^[=+\-@]/.test(t) ? `'${t}` : t;
 }
-
-function tableAsTsv(table: ChartTable): string {
-  return [table.columns.map(humanizeColumn), ...table.rows].map((row) => row.map(safeSpreadsheetCell).join("\t")).join("\n");
+function at(e) {
+  return [e.columns.map(rt), ...e.rows].map((e) => e.map(it).join(`	`)).join(`
+`);
 }
-
-function chartFileName(chart: ChartSpec): string {
-  const base = chart.meta?.title?.trim() || "chart-" + chart.chartType;
-  const safe = base.replace(/[\\/:*?"<>|]+/g, "-").replace(/\s+/g, " ").replace(/^\.+/, "").slice(0, 80).trim();
-  return (safe || "visualization") + ".png";
+function ot(e) {
+  let t = (0, ct.c)(16),
+    { data: n } = e,
+    r;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((r = ne(_e.MarkdownRoot, `box-border h-full pt-4 select-text`)), (t[0] = r))
+    : (r = t[0]);
+  let i;
+  t[1] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((i = (0, Z.jsx)(`caption`, {
+        className: `sr-only`,
+        children: (0, Z.jsx)(y, {
+          id: `chatgpt.contentReferences.chart.tableLabel`,
+          defaultMessage: `Chart data table`,
+          description: `Accessible caption for the table of underlying data shown after selecting View as table in a ChatGPT chart`,
+        }),
+      })),
+      (t[1] = i))
+    : (i = t[1]);
+  let a;
+  t[2] === n.columns ? (a = t[3]) : ((a = n.columns.map(st)), (t[2] = n.columns), (t[3] = a));
+  let o;
+  t[4] === a
+    ? (o = t[5])
+    : ((o = (0, Z.jsx)(`thead`, { children: (0, Z.jsx)(K, { children: a }) })),
+      (t[4] = a),
+      (t[5] = o));
+  let s;
+  if (t[6] !== n.columns || t[7] !== n.rows) {
+    let e;
+    (t[9] === n.columns
+      ? (e = t[10])
+      : ((e = (e, t) =>
+          (0, Z.jsx)(
+            K,
+            { children: e.map((e, t) => (0, Z.jsx)(G, { children: tt(e) }, n.columns[t])) },
+            t,
+          )),
+        (t[9] = n.columns),
+        (t[10] = e)),
+      (s = n.rows.map(e)),
+      (t[6] = n.columns),
+      (t[7] = n.rows),
+      (t[8] = s));
+  } else s = t[8];
+  let c;
+  t[11] === s ? (c = t[12]) : ((c = (0, Z.jsx)(fe, { children: s })), (t[11] = s), (t[12] = c));
+  let l;
+  return (
+    t[13] !== o || t[14] !== c
+      ? ((l = (0, Z.jsx)(`div`, {
+          className: r,
+          children: (0, Z.jsx)(`div`, {
+            className: `h-full overflow-auto`,
+            children: (0, Z.jsxs)(de, { stickyHeader: !0, children: [i, o, c] }),
+          }),
+        })),
+        (t[13] = o),
+        (t[14] = c),
+        (t[15] = l))
+      : (l = t[15]),
+    l
+  );
 }
-
-async function downloadChart(element: HTMLElement, chart: ChartSpec): Promise<void> {
-  const { domToBlob } = await import("@rchunk/dom-to-blob") as { domToBlob(node: HTMLElement, options: DomToBlobOptions): Promise<Blob> };
-  await document.fonts.ready;
-  const previous = element.getAttribute("data-chart-widget-downloading");
-  element.setAttribute("data-chart-widget-downloading", "true");
-  try {
-    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
-    const blob = await domToBlob(element, {
-      backgroundColor: "var(--background)",
-      scale: Math.min(window.devicePixelRatio || 1, 2),
-      filter: (candidate) => candidate.closest(EXCLUDED_DOWNLOAD_CONTENT) == null,
-    });
-    const href = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = href;
-    link.download = chartFileName(chart);
-    link.click();
-    URL.revokeObjectURL(href);
-  } finally {
-    if (previous == null) element.removeAttribute("data-chart-widget-downloading");
-    else element.setAttribute("data-chart-widget-downloading", previous);
+function st(e) {
+  return (0, Z.jsx)(pe, { scope: `col`, children: rt(e) }, e);
+}
+var ct, Z;
+function lt() {
+  return (lt = e(() => {
+    ((ct = t()), k(), d(), q(), U(), (Z = c()));
+  }))();
+}
+var ut, dt;
+function ft() {
+  return (ft = e(() => {
+    ((ut = `_Root_15rhc_2`), (dt = { Root: ut }));
+  }))();
+}
+function pt(e) {
+  let t = (0, _t.c)(12),
+    {
+      contentReferenceIndex: n,
+      initialView: r,
+      isStreaming: i,
+      reference: a,
+      widgetRefSeenAtMs: o,
+    } = e,
+    s = r === void 0 ? `chart` : r,
+    c = V(),
+    l;
+  t[0] === a ? (l = t[1]) : ((l = H.safeParse(a)), (t[0] = a), (t[1] = l));
+  let u = l;
+  if (!u.success) {
+    let e;
+    return (
+      t[2] === a ? (e = t[3]) : ((e = (0, $.jsx)(I, { reference: a })), (t[2] = a), (t[3] = e)),
+      e
+    );
   }
+  let d = a.matched_text,
+    f = c?.contentReferenceMessageStatuses?.[n],
+    p = i;
+  if (p == null) {
+    if (((p = c?.isStreaming === !0), typeof d == `string` && d.startsWith(``))) {
+      let e;
+      (t[4] !== p || t[5] !== d
+        ? ((e = p && !d.endsWith(``)), (t[4] = p), (t[5] = d), (t[6] = e))
+        : (e = t[6]),
+        (p = e));
+    }
+    f === `finished_successfully` && (p = !1);
+  }
+  let m = p === !0,
+    h;
+  return (
+    t[7] !== s || t[8] !== u.data.data.content || t[9] !== m || t[10] !== o
+      ? ((h = (0, $.jsx)(mt, {
+          content: u.data.data.content,
+          initialView: s,
+          isStreaming: m,
+          widgetRefSeenAtMs: o,
+        })),
+        (t[7] = s),
+        (t[8] = u.data.data.content),
+        (t[9] = m),
+        (t[10] = o),
+        (t[11] = h))
+      : (h = t[11]),
+    h
+  );
 }
-
-function AccessibleChartSummary({ chart }: { chart: ChartSpec }): unknown {
-  const rows = accessibleRows(chart);
-  return rows.length === 0 ? null : jsx.jsx("ul", { className: "sr-only", children: rows.map((row) => jsx.jsx("li", { children: row }, row)) });
+function mt(e) {
+  let t = (0, _t.c)(38),
+    { content: n, initialView: r, isStreaming: i, widgetRefSeenAtMs: a } = e,
+    o = f(C),
+    s;
+  t[0] !== o || t[1] !== a
+    ? ((s = () => Xe(o, a)), (t[0] = o), (t[1] = a), (t[2] = s))
+    : (s = t[2]);
+  let [c] = (0, Q.useState)(s),
+    l,
+    u;
+  if (t[3] !== n || t[4] !== i) {
+    l = i ? null : We(n);
+    let e = l?.spec;
+    ((u = e == null ? null : Ue(e)), (t[3] = n), (t[4] = i), (t[5] = l), (t[6] = u));
+  } else ((l = t[5]), (u = t[6]));
+  let d = u,
+    p = l?.invalidReason,
+    m;
+  t[7] === n
+    ? (m = t[8])
+    : ((m = null),
+      typeof n == `string` ? (m = n) : n != null && (m = JSON.stringify(n)),
+      (t[7] = n),
+      (t[8] = m));
+  let h;
+  t[9] !== d || t[10] !== m || t[11] !== p || t[12] !== c
+    ? ((h = () => (d == null ? p != null && c.parseFailed(p, m) : c.start(d.chartType), c.cancel)),
+      (t[9] = d),
+      (t[10] = m),
+      (t[11] = p),
+      (t[12] = c),
+      (t[13] = h))
+    : (h = t[13]);
+  let g;
+  if (
+    (t[14] !== d || t[15] !== m || t[16] !== p || t[17] !== c
+      ? ((g = [d, m, p, c]), (t[14] = d), (t[15] = m), (t[16] = p), (t[17] = c), (t[18] = g))
+      : (g = t[18]),
+    (0, Q.useLayoutEffect)(h, g),
+    i)
+  ) {
+    let e;
+    return (
+      t[19] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, $.jsx)(W, {})), (t[19] = e))
+        : (e = t[19]),
+      e
+    );
+  }
+  if (d == null) return null;
+  let _;
+  t[20] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((_ = (0, $.jsx)($.Fragment, {})), (t[20] = _))
+    : (_ = t[20]);
+  let v;
+  t[21] !== d || t[22] !== m || t[23] !== c
+    ? ((v = (e) => c.renderFailed(e, d, m)), (t[21] = d), (t[22] = m), (t[23] = c), (t[24] = v))
+    : (v = t[24]);
+  let y;
+  t[25] !== d || t[26] !== m || t[27] !== c
+    ? ((y = () => c.renderComplete(d, m)), (t[25] = d), (t[26] = m), (t[27] = c), (t[28] = y))
+    : (y = t[28]);
+  let b;
+  t[29] !== d || t[30] !== m || t[31] !== r || t[32] !== y
+    ? ((b = (0, $.jsx)(ht, { chart: d, initialView: r, onRenderComplete: y }, m)),
+      (t[29] = d),
+      (t[30] = m),
+      (t[31] = r),
+      (t[32] = y),
+      (t[33] = b))
+    : (b = t[33]);
+  let x;
+  return (
+    t[34] !== m || t[35] !== v || t[36] !== b
+      ? ((x = (0, $.jsx)(le, {
+          name: `chart_widget_container`,
+          fallback: _,
+          resetKey: m,
+          onError: v,
+          children: b,
+        })),
+        (t[34] = m),
+        (t[35] = v),
+        (t[36] = b),
+        (t[37] = x))
+      : (x = t[37]),
+    x
+  );
 }
-
-function ChartDataTable({ table }: { table: ChartTable }): unknown {
-  return jsx.jsx("div", { className: "h-full overflow-auto pt-4", children: jsx.jsxs("table", { children: [
-    jsx.jsx("caption", { className: "sr-only", children: "Chart data table" }),
-    jsx.jsx("thead", { children: jsx.jsx("tr", { children: table.columns.map((column) => jsx.jsx("th", { scope: "col", children: humanizeColumn(column) }, column)) }) }),
-    jsx.jsx("tbody", { children: table.rows.map((row, rowIndex) => jsx.jsx("tr", { children: row.map((value, columnIndex) => jsx.jsx("td", { children: value == null ? "" : String(value) }, table.columns[columnIndex])) }, rowIndex)) }),
-  ] }) });
+function ht(e) {
+  let t = (0, _t.c)(81),
+    { chart: n, initialView: r, onRenderComplete: i } = e,
+    a = f(C),
+    o = re(),
+    s = (0, Q.useId)(),
+    c = ce(),
+    l = se(c),
+    u = (0, Q.useRef)(null),
+    [d, p] = (0, Q.useState)(r),
+    [m, h] = (0, Q.useState)(!1),
+    [g, _] = (0, Q.useState)(!1),
+    v;
+  t[0] === n.data ? (v = t[1]) : ((v = n.data.some(gt)), (t[0] = n.data), (t[1] = v));
+  let b = v,
+    S = b ? d : `chart`,
+    w;
+  t[2] !== n || t[3] !== S
+    ? ((w = S === `table` ? et(n) : null), (t[2] = n), (t[3] = S), (t[4] = w))
+    : (w = t[4]);
+  let T = w,
+    E,
+    D,
+    O,
+    k;
+  if (
+    t[5] !== n.meta?.description ||
+    t[6] !== n.meta?.footer ||
+    t[7] !== n.meta?.title ||
+    t[8] !== o
+  ) {
+    k = X(n.meta?.title);
+    let e = n.meta?.description,
+      r;
+    (t[13] === e ? (r = t[14]) : ((r = X(e)), (t[13] = e), (t[14] = r)), (E = r));
+    let i = n.meta?.footer,
+      a;
+    (t[15] === i ? (a = t[16]) : ((a = X(i)), (t[15] = i), (t[16] = a)), (D = a));
+    let s = o.formatMessage({
+      id: `chatgpt.contentReferences.chart.title`,
+      defaultMessage: `Chart`,
+      description: `Fallback title for a ChatGPT chart content reference`,
+    });
+    ((O = o.formatMessage(
+      {
+        id: `chatgpt.contentReferences.chart.ariaLabel`,
+        defaultMessage: `{title} chart`,
+        description: `ARIA label for a ChatGPT chart content reference`,
+      },
+      { title: k ?? s },
+    )),
+      (t[5] = n.meta?.description),
+      (t[6] = n.meta?.footer),
+      (t[7] = n.meta?.title),
+      (t[8] = o),
+      (t[9] = E),
+      (t[10] = D),
+      (t[11] = O),
+      (t[12] = k));
+  } else ((E = t[9]), (D = t[10]), (O = t[11]), (k = t[12]));
+  let A = O,
+    ee;
+  t[17] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((ee = ne(
+        dt.Root,
+        `group/app-widget relative my-3 h-[27rem] w-full overflow-visible text-default`,
+      )),
+      (t[17] = ee))
+    : (ee = t[17]);
+  let j;
+  t[18] === n ? (j = t[19]) : ((j = be(n)), (t[18] = n), (t[19] = j));
+  let te = k == null ? A : void 0,
+    ie = k == null ? void 0 : s,
+    M;
+  t[20] !== E || t[21] !== k || t[22] !== s
+    ? ((M =
+        k != null || E != null
+          ? (0, $.jsxs)(`div`, {
+              className: `min-h-[4.5rem] pe-12 pt-5`,
+              children: [
+                k == null
+                  ? null
+                  : (0, $.jsx)(`div`, {
+                      id: s,
+                      className: `line-clamp-2 text-base font-semibold text-default`,
+                      children: k,
+                    }),
+                E == null
+                  ? null
+                  : (0, $.jsx)(`p`, {
+                      className: `mt-1 line-clamp-2 text-sm text-secondary`,
+                      children: E,
+                    }),
+              ],
+            })
+          : null),
+      (t[20] = E),
+      (t[21] = k),
+      (t[22] = s),
+      (t[23] = M))
+    : (M = t[23]);
+  let oe = D == null ? `pb-4` : `pb-1`,
+    N;
+  t[24] === oe ? (N = t[25]) : ((N = ne(`min-h-0 flex-1`, oe)), (t[24] = oe), (t[25] = N));
+  let P = S === `chart` ? `visible` : `hidden`,
+    F;
+  t[26] === i
+    ? (F = t[27])
+    : ((F = () => {
+        (h(!0), i());
+      }),
+      (t[26] = i),
+      (t[27] = F));
+  let I;
+  t[28] !== A || t[29] !== n || t[30] !== F || t[31] !== l
+    ? ((I = (0, $.jsx)(vt, { ariaLabel: A, chart: n, theme: l, onReady: F })),
+      (t[28] = A),
+      (t[29] = n),
+      (t[30] = F),
+      (t[31] = l),
+      (t[32] = I))
+    : (I = t[32]);
+  let L;
+  t[33] !== n || t[34] !== o
+    ? ((L = (0, $.jsx)(xe, { chart: n, intl: o })), (t[33] = n), (t[34] = o), (t[35] = L))
+    : (L = t[35]);
+  let R;
+  t[36] !== P || t[37] !== I || t[38] !== L
+    ? ((R = (0, $.jsxs)(Q.Activity, { mode: P, children: [I, L] })),
+      (t[36] = P),
+      (t[37] = I),
+      (t[38] = L),
+      (t[39] = R))
+    : (R = t[39]);
+  let z;
+  t[40] === T
+    ? (z = t[41])
+    : ((z = T == null ? null : (0, $.jsx)(ot, { data: T })), (t[40] = T), (t[41] = z));
+  let B;
+  t[42] !== N || t[43] !== R || t[44] !== z
+    ? ((B = (0, $.jsxs)(`div`, { className: N, children: [R, z] })),
+      (t[42] = N),
+      (t[43] = R),
+      (t[44] = z),
+      (t[45] = B))
+    : (B = t[45]);
+  let V;
+  t[46] === D
+    ? (V = t[47])
+    : ((V =
+        D == null
+          ? null
+          : (0, $.jsx)(`p`, { className: `line-clamp-2 text-xs text-tertiary`, children: D })),
+      (t[46] = D),
+      (t[47] = V));
+  let H;
+  t[48] !== B || t[49] !== V
+    ? ((H = (0, $.jsxs)(`div`, {
+        className: `relative flex h-full min-h-0 w-full flex-1 flex-col`,
+        children: [B, V],
+      })),
+      (t[48] = B),
+      (t[49] = V),
+      (t[50] = H))
+    : (H = t[50]);
+  let U;
+  t[51] !== H || t[52] !== te || t[53] !== ie || t[54] !== M
+    ? ((U = (0, $.jsxs)(`section`, {
+        "aria-label": te,
+        "aria-labelledby": ie,
+        className: `group/app-block group/keyboard-or-hover flex h-full w-full flex-col overflow-visible text-default`,
+        children: [M, H],
+      })),
+      (t[51] = H),
+      (t[52] = te),
+      (t[53] = ie),
+      (t[54] = M),
+      (t[55] = U))
+    : (U = t[55]);
+  let W;
+  t[56] !== n.chartType || t[57] !== g || t[58] !== a
+    ? ((W = (e, t) => {
+        g || (Re(a, n.chartType, `view_change`, t), p(e));
+      }),
+      (t[56] = n.chartType),
+      (t[57] = g),
+      (t[58] = a),
+      (t[59] = W))
+    : (W = t[59]);
+  let G;
+  t[60] !== n.chartType || t[61] !== a || t[62] !== T
+    ? ((G = (e) => {
+        T != null && (Re(a, n.chartType, `copy`, e), x(at(T)));
+      }),
+      (t[60] = n.chartType),
+      (t[61] = a),
+      (t[62] = T),
+      (t[63] = G))
+    : (G = t[63]);
+  let K;
+  t[64] !== n || t[65] !== g || t[66] !== a || t[67] !== S
+    ? ((K = (e) => {
+        let t = u.current;
+        t == null ||
+          g ||
+          S !== `chart` ||
+          (Re(a, n.chartType, `download`, e),
+          _(!0),
+          Fe(t, n)
+            .catch(() => {
+              a.get(ae).danger(
+                (0, $.jsx)(y, {
+                  id: `chatgpt.contentReferences.chart.downloadFailed`,
+                  defaultMessage: `Couldn’t download chart`,
+                  description: `Error toast when exporting a ChatGPT chart to a PNG image fails; the user can try again`,
+                }),
+                { errorAnalytics: { toastId: `chatgpt.contentReferences.chart.downloadFailed` } },
+              );
+            })
+            .finally(() => _(!1)));
+      }),
+      (t[64] = n),
+      (t[65] = g),
+      (t[66] = a),
+      (t[67] = S),
+      (t[68] = K))
+    : (K = t[68]);
+  let q;
+  t[69] !== b ||
+  t[70] !== g ||
+  t[71] !== m ||
+  t[72] !== W ||
+  t[73] !== G ||
+  t[74] !== K ||
+  t[75] !== S
+    ? ((q = (0, $.jsx)(je, {
+        canChangeView: b,
+        isReady: m,
+        isDownloading: g,
+        view: S,
+        onViewChange: W,
+        onCopyTable: G,
+        onDownload: K,
+      })),
+      (t[69] = b),
+      (t[70] = g),
+      (t[71] = m),
+      (t[72] = W),
+      (t[73] = G),
+      (t[74] = K),
+      (t[75] = S),
+      (t[76] = q))
+    : (q = t[76]);
+  let J;
+  return (
+    t[77] !== U || t[78] !== q || t[79] !== j
+      ? ((J = (0, $.jsxs)(`div`, {
+          ref: u,
+          className: ee,
+          "data-testid": `chatgpt-chart-content-reference`,
+          style: j,
+          children: [U, q],
+        })),
+        (t[77] = U),
+        (t[78] = q),
+        (t[79] = j),
+        (t[80] = J))
+      : (J = t[80]),
+    J
+  );
 }
-
-function ChartContent({ chart, initialView }: { chart: ChartSpec; initialView: ChartView }): unknown {
-  const rootRef = React.useRef<HTMLElement | null>(null);
-  const [view, setView] = React.useState<ChartView>(initialView);
-  const [ready, setReady] = React.useState(false);
-  const [downloading, setDownloading] = React.useState(false);
-  const table = chartTable(chart);
-  const currentView = table == null ? "chart" : view;
-  const title = chart.meta?.title;
-  const fallbackTitle = title ?? "Chart";
-  const ariaLabel = fallbackTitle + " chart";
-  const style = getVerticalBarChartStyle(chart) as Record<string, string> | undefined;
-  const copyTable = (): void => {
-    if (table != null) void navigator.clipboard?.writeText(tableAsTsv(table));
-  };
-  const download = (): void => {
-    const element = rootRef.current;
-    if (element == null || currentView !== "chart" || downloading) return;
-    setDownloading(true);
-    void downloadChart(element, chart).finally(() => setDownloading(false));
-  };
-  return jsx.jsxs("div", {
-    ref: (element: HTMLElement | null) => { rootRef.current = element; },
-    className: "group/app-widget relative my-3 h-[27rem] w-full overflow-visible text-default",
-    "data-testid": "chatgpt-chart-content-reference",
-    style,
-    children: [
-      jsx.jsxs("section", { "aria-label": title == null ? ariaLabel : undefined, "aria-labelledby": title == null ? undefined : "chart-title", className: "flex h-full w-full flex-col", children: [
-        title == null && chart.meta?.description == null ? null : jsx.jsxs("header", { className: "min-h-[4.5rem] pe-12 pt-5", children: [
-          title == null ? null : jsx.jsx("h3", { id: "chart-title", children: title }),
-          chart.meta?.description == null ? null : jsx.jsx("p", { children: chart.meta.description }),
-        ] }),
-        jsx.jsxs("div", { className: "min-h-0 flex-1", children: [
-          jsx.jsx("div", { hidden: currentView !== "chart", children: jsx.jsxs(jsx.Fragment, { children: [
-            jsx.jsx(LazyChartWidget, { ariaLabel, chart, onReady: () => setReady(true) }),
-            jsx.jsx(AccessibleChartSummary, { chart }),
-          ] }) }),
-          currentView === "table" && table != null ? jsx.jsx(ChartDataTable, { table }) : null,
-        ] }),
-        chart.meta?.footer == null ? null : jsx.jsx("p", { className: "text-xs text-tertiary", children: chart.meta.footer }),
-      ] }),
-      jsx.jsxs("div", { "data-chart-widget-download-exclude": true, className: "absolute end-2 top-6 flex gap-1", children: [
-        table == null ? null : jsx.jsx("button", { "aria-label": currentView === "chart" ? "View as table" : "View as chart", disabled: downloading, onClick: () => setView(currentView === "chart" ? "table" : "chart"), type: "button", children: currentView === "chart" ? "Table" : "Chart" }),
-        currentView === "table" ? jsx.jsx("button", { onClick: copyTable, type: "button", children: "Copy table" }) : jsx.jsx("button", { disabled: !ready || downloading, onClick: download, type: "button", children: downloading ? "Downloading…" : "Download as image" }),
-      ] }),
-    ],
-  });
+function gt(e) {
+  return Object.keys(e).length > 0;
 }
-
-function ChatGptChartContentReference({ initialView = "chart", isStreaming, reference }: ChatGptChartContentReferenceProps): unknown {
-  const parsedReference = parseReference(reference);
-  if (parsedReference == null) return jsx.jsx("div", { role: "alert", children: "Unsupported chart reference" });
-  const matchedText = parsedReference.matched_text;
-  const streaming = isStreaming ?? (matchedText?.startsWith("") === true && matchedText.endsWith("") === false);
-  if (streaming) return jsx.jsx("div", { role: "status", "aria-label": "Loading chart", className: "my-3 flex h-72 items-center justify-center", children: jsx.jsx(LoadingSpinner, {}) });
-  const chart = parseChartSpec(parsedReference.data.content);
-  return chart == null ? null : jsx.jsx(ChartContent, { chart, initialView });
+var _t, Q, $, vt;
+function yt() {
+  return (yt = e(() => {
+    ((_t = t()),
+      k(),
+      a(),
+      (Q = E()),
+      d(),
+      J(),
+      z(),
+      oe(),
+      j(),
+      p(),
+      he(),
+      v(),
+      F(),
+      Ae(),
+      Pe(),
+      ye(),
+      Le(),
+      ue(),
+      He(),
+      Ye(),
+      Ze(),
+      ge(),
+      lt(),
+      ft(),
+      ($ = c()),
+      s(),
+      (vt = u(
+        async () =>
+          (
+            await _(
+              async () => {
+                let { ChartWidget: e } = await import(`@rchunk/chart`);
+                return { ChartWidget: e };
+              },
+              __vite__mapDeps([2, 1, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]),
+              import.meta.url,
+            )
+          ).ChartWidget,
+        { propagateLoadError: !0 },
+      )));
+  }))();
 }
-
-initializeLazyRuntime();
-initializeLazyComponents();
-initializeBarSizing();
-jsx = getJsxRuntime();
-React = getReactRuntime();
-
-export { ChatGptChartContentReference };
+yt();
+export { pt as ChatGptChartContentReference };

@@ -4,9 +4,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["checkout-policy", "checkout-dialog-fields", "checkout-error", "checkout-confirm-latency"];
+const MODULES = ["checkout-policy", "checkout-error", "checkout-confirm-latency"];
 const state = globalThis.__checkoutHelpersTest = {};
 state.jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
 state.react = { useState(initial) { let value = typeof initial === "function" ? initial() : initial; return [value, next => { value = typeof next === "function" ? next(value) : next; }]; } };
@@ -63,34 +64,7 @@ assert.deepEqual(policy.c({ countryCode: "US", pricingCountryCode: "US", isCandi
 assert.equal(policy.c({ countryCode: "US", pricingCountryCode: "DE", isCandidate: true, monthlyAmount: 20, yearlyAmount: 200 }), null);
 assert.equal(policy.u({ detail: "declined" }), "declined");
 
-// checkout-dialog-fields: 13
-const fields = await bundle("checkout-dialog-fields"); fields.l(); fields.o();
-const intl = { locale: "en-US" };
-const pricingInfo = { amountPerCredit: 0.01, currencyCode: "USD", minorUnitExponent: 2 };
-assert.equal(fields.s({ intl, creditQuantity: 500, pricingInfo }), "$5");
-assert.equal(fields.s({ intl, creditQuantity: Number.NaN, pricingInfo }), null);
-assert.equal(fields.c({ intl, creditBalance: 250, rechargeTarget: "1000", pricingInfo }), "$7.50");
-assert.equal(fields.c({ intl, creditBalance: 1000, rechargeTarget: "1000", pricingInfo }), null);
-const badge = fields.t({ discountPercent: 15 });
-assert.equal(badge.props.children, "15% off");
-let optionClicked = false;
-const option = fields.n({ isSelected: true, onClick: () => { optionClicked = true; }, children: "500" });
-assert.equal(option.props["aria-pressed"], true);
-option.props.onClick();
-assert.equal(optionClicked, true);
-assert.equal(fields.i({ fieldError: null }), null);
-assert.equal(fields.i({ fieldError: "missing" }).props.children, "Enter an amount");
-assert.equal(fields.i({ fieldError: "below-minimum", minimumQuantity: 500 }).props.children, "Enter at least 500 credits");
-let inputValue = null;
-const input = fields.r({ value: "", onChange: value => { inputValue = value; } });
-input.props.onChange({ currentTarget: { value: "$1,250" } });
-assert.equal(inputValue, "1,250");
-let selection = null;
-const selector = fields.a({ intl, value: "500", selection: "preset", pricingInfo, minimumQuantity: 500, onChange: value => { inputValue = value; }, onSelectionChange: value => { selection = value; } });
-const other = nodes(selector).find(node => node.type === "button" && node.props.children === "Other");
-other.props.onClick();
-assert.equal(selection, "custom");
-assert.equal(inputValue, "");
+const checkoutFieldsReleaseAssertions = assertReleaseOwner("checkout-dialog-fields");
 
 // checkout-error: 11
 const checkoutError = await bundle("checkout-error"); checkoutError.o(); checkoutError.i();
@@ -148,4 +122,4 @@ const errorState = latency.p({ loading: false, error: new Error("failed"), onRet
 assert.equal(errorState.props["data-return-path"], "/settings");
 assert.equal(errorState.props.children[0].type, state.secureForm);
 
-console.log("79 checkout helpers cluster assertions passed");
+console.log(`66 checkout helper assertions and ${checkoutFieldsReleaseAssertions} checkout fields release assertions passed`);

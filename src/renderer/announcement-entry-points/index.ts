@@ -1,543 +1,1352 @@
-// Home announcement entry points: persisted eligibility, account isolation,
-// exposure tracking, presentation, and actions for first-party announcements.
-
-import "@rchunk/rolldown-runtime";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as computerHistoryIconChunk from "@rchunk/computer-history-plugin-icon";
-import * as computerHistoryQueryChunk from "@rchunk/computer-history-query";
-import "@rchunk/computer-history-suggestion-prompt";
-import * as computerHistorySuggestionsChunk from "@rchunk/computer-history-suggestions";
-import * as entryPointAvailabilityChunk from "@rchunk/entry-point-availability";
-import * as externalAgentImportChunk from "@rchunk/run-external-agent-import-command";
-import type { JsxRuntime, MaitaiScopeApi, ReactRuntime, ScopedSignal } from "@rchunk/app-shared";
-
-type Scope = MaitaiScopeApi<Record<string, unknown>>;
-type PersistedSignal<Value> = ScopedSignal<Record<string, unknown>, Value>;
-interface ActivityInterval { endMs: number; startMs: number }
-interface ImportHistory { completedAtMs: number | string; successes: readonly unknown[] }
-interface ImportStatus { latestImportedAtMs?: number | null }
-interface QueryResult<Value> { data?: Value; isError?: boolean; isFetching?: boolean; isLoading?: boolean; isPending?: boolean }
-interface Experiment {
-  __evaluation?: { is_experiment_active?: boolean; is_user_in_experiment?: boolean };
-  get<Value>(key: string, fallback: Value): Value;
-}
-interface ExperimentClient {
-  getExperiment(id: string, options?: { disableExposureLog?: boolean }): Experiment;
-  isLoading: boolean;
-}
-interface DiscoveryResult {
-  detectedItems: Array<{ providerId: string }>;
-  hasDetectionRefreshError: boolean;
-  hasImportableItems: boolean;
-  isDetectionError: boolean;
-  isDetectionFetching: boolean;
-}
-interface RouteLocation { key?: string; pathname: string }
-interface AnnouncementViewProps { onDismiss(): void; onShown?(): void }
-interface ReplayAnnouncementProps extends AnnouncementViewProps { onReplay(): void }
-interface ExternalImportAnnouncementProps extends AnnouncementViewProps {
-  onImport(): void;
-  providerId?: "cursor" | "claude-code" | "claude-cowork" | null;
-}
-interface GiftCreditsAnnouncementProps extends AnnouncementViewProps { onOpenGiftCredits(): void }
-interface CandidateState { dismiss(): void; isEligible: boolean; isLoading: boolean }
-
-interface AppSharedBindings {
-  BX<Value>(family: unknown, parameter: unknown, options?: Record<string, unknown>): QueryResult<Value>;
-  HX<Value>(signal: unknown): Value;
-  I3: JsxRuntime | (() => JsxRuntime);
-  LX(scope: unknown): Scope;
-  Y2?: unknown;
-  ZI: unknown;
-  e6: ReactRuntime | (() => ReactRuntime);
-  ig?: unknown;
-  n4?(): { formatMessage(descriptor: { defaultMessage: string; id?: string }, values?: Record<string, unknown>): string };
-  pk?: unknown;
-  sZ?<Value>(scope: unknown, derive: (context: { get<T>(signal: unknown): T }) => Value): unknown;
-}
-interface AppInitialBindings {
-  CA?(options: Record<string, unknown>): DiscoveryResult;
-  Cpn?: unknown;
-  Gwt?(input: { hostId: string; queryClient: unknown; scope: Scope }): Promise<void>;
-  IA?(): unknown;
-  N6t?(): { accountId?: string | null; isLoading?: boolean };
-  VDt?(roots: string[], options: { prompt: string }): Promise<{ cwd?: string; projectlessOutputDirectory?: string; workspaceRoots?: string[] }>;
-  ZA?: unknown;
-  _A?: unknown;
-  _Et?(mode: string, source: string): boolean;
-  cfn?(): ExperimentClient;
-  dun<Value>(key: string, initialValue: Value): PersistedSignal<Value>;
-  e4t?: unknown;
-  gpt?(scope: Scope, hostId: string, request: Record<string, unknown>, callbacks: { afterConversationCreated?(conversationId: string): void }): Promise<{
-    conversationId: string;
-    firstTurn: { status: string; turnId?: string };
-    status: string;
-  }>;
-  h4t?(plugin: unknown): unknown;
-  i_n?(): RouteLocation;
-  mht?(): { data?: { desktop_onboarding_completed_at?: string | null }; isLoading?: boolean };
-  mpt?(scope: Scope, outcome: unknown): Error | null;
-  nfn?(client: ExperimentClient, id: string): Experiment;
-  ngn?<Value>(key: string, fallback: Value): Value;
-  ofn?(gate: string): boolean;
-  sbt?(options: { hideFirstNewThreadOnboardingPromos: boolean; pathname: string }): boolean;
-  sj?(input: { histories: readonly ImportHistory[]; importStatus: ImportStatus }): boolean;
-  ugn?: string;
-  vj?: unknown;
-  xpn?(scope: Scope, event: unknown, payload: Record<string, unknown>): void;
-  zA?(enabled: boolean): string[];
-  zdn?(scope: Scope, hostId: string, mode: string, options: { priority: string }): Promise<{ data: Array<{ name: string; tools?: Record<string, { name?: string }> }> }>;
-  Zgt?(scope: Scope, hostId: string, model: null): Promise<unknown>;
-}
-interface AppPrimaryBindings { Sm?: (props: Record<string, unknown>) => unknown; Zh?: string }
-interface EntryPointAvailabilityBindings {
-  a?(input: unknown, entryPoint: string): void;
-  n?(options: { enabled: boolean }): boolean | undefined;
-}
-interface ExternalAgentImportBindings {
-  runExternalAgentImportCommand?(scope: unknown, source: "home_beacon"): Promise<unknown>;
-}
-
-const shared = appSharedChunk as unknown as AppSharedBindings;
-const initial = appInitialChunk as unknown as AppInitialBindings;
-const primary = appPrimaryChunk as unknown as AppPrimaryBindings;
-const availability = entryPointAvailabilityChunk as unknown as EntryPointAvailabilityBindings;
-const externalImport = externalAgentImportChunk as unknown as ExternalAgentImportBindings;
-const computerHistory = computerHistoryQueryChunk as unknown as { i?: unknown };
-const computerHistorySuggestions = computerHistorySuggestionsChunk as unknown as { i?: unknown };
-const computerHistoryIcon = (computerHistoryIconChunk as unknown as { t?: string }).t;
-
-const HOUR = 60 * 60 * 1_000;
-const WEEK = 7 * 24 * HOUR;
-const IMPORT_BEACON_COOLDOWN = 30 * 24 * HOUR;
-const RECENT_IMPORT_WINDOW = 60 * 24 * HOUR;
-const REPLAY_EXPERIMENT = "3781811128";
-const IMPORT_EXPERIMENT = "1602805785";
-const IMPORT_CONTROL = "463876344";
-const IMPORT_PROVIDERS = ["cursor", "claude-code", "claude-cowork"] as const;
-const GIFT_COOLDOWN_DAYS = [7, 14, 30] as const;
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let initialized = false;
-let computerHistoryDismissedSignal: PersistedSignal<boolean>;
-let weeklyInsightsStatusSignal: unknown;
-let replayShownAccountsSignal: PersistedSignal<Record<string, boolean>>;
-let importLastShownSignal: PersistedSignal<number | null>;
-let giftDismissedSignal: PersistedSignal<boolean>;
-let giftStateSignal: PersistedSignal<{ lastShownAtMs?: number; shownCount: number }>;
-
-function initializeAnnouncementEntryPoints(): void {
-  if (initialized) return;
-  React = typeof shared.e6 === "function" ? shared.e6() : shared.e6;
-  jsx = typeof shared.I3 === "function" ? shared.I3() : shared.I3;
-  computerHistoryDismissedSignal = initial.dun("computer-history-weekly-insights-announcement-dismissed-v1", false);
-  replayShownAccountsSignal = initial.dun("codex-replay-home-announcement-shown-account-ids", {});
-  importLastShownSignal = initial.dun("external-agent-import-home-beacon-last-shown-at", null);
-  giftDismissedSignal = initial.dun("has-seen-gift-credits-home-banner", false);
-  giftStateSignal = initial.dun("gift-credits-home-beacon-state", { shownCount: 0 });
-  weeklyInsightsStatusSignal = shared.sZ?.(shared.ZI, ({ get }) => {
-    if (get<boolean>(computerHistoryDismissedSignal)) return "ineligible";
-    if (computerHistorySuggestions.i != null && !get<boolean>(computerHistorySuggestions.i)) return "ineligible";
-    const query = computerHistory.i == null ? null : get<QueryResult<ActivityInterval[]>>(computerHistory.i);
-    if (query?.isPending) return "loading";
-    return query?.data != null && isWeeklyInsightsEligible(query.data) ? "eligible" : "ineligible";
-  }) ?? { kind: "weekly-insights-status" };
-  initialized = true;
-}
-
-function mergedActivityDuration(intervals: readonly ActivityInterval[], windowStartMs: number, windowEndMs: number): number {
-  const clipped = intervals
-    .map(({ endMs, startMs }) => ({ endMs: Math.min(endMs, windowEndMs), startMs: Math.max(startMs, windowStartMs) }))
-    .filter(({ endMs, startMs }) => endMs > startMs)
-    .sort((left, right) => left.startMs - right.startMs);
-  let duration = 0;
-  let coveredUntil = windowStartMs;
-  for (const interval of clipped) {
-    if (interval.endMs <= coveredUntil) continue;
-    duration += interval.endMs - Math.max(interval.startMs, coveredUntil);
-    coveredUntil = interval.endMs;
-  }
-  return duration;
-}
-
-function isWeeklyInsightsEligible(intervals: readonly ActivityInterval[], nowMs = Date.now()): boolean {
-  const weekStart = nowMs - WEEK;
-  return intervals.some(({ startMs }) => startMs <= weekStart) &&
-    mergedActivityDuration(intervals, weekStart, nowMs) >= 48 * HOUR &&
-    mergedActivityDuration(intervals, nowMs - 48 * HOUR, nowMs) >= 6 * HOUR;
-}
-
-function isRecentOnboarding(completedAt: string | null | undefined, nowMs: number): boolean {
-  if (completedAt == null) return false;
-  const age = nowMs - Date.parse(completedAt);
-  return age >= 0 && age < WEEK;
-}
-
-function latestImportedAt(histories: readonly ImportHistory[], status: ImportStatus): number | null {
-  let latest = status.latestImportedAtMs ?? null;
-  for (const history of histories) {
-    if (history.successes.length === 0) continue;
-    const completedAt = Number(history.completedAtMs);
-    latest = latest == null ? completedAt : Math.max(latest, completedAt);
-  }
-  return latest;
-}
-
-function isExternalImportBeaconEligible(input: {
-  hasImportableItems: boolean;
-  isExperimentEnabled: boolean;
-  lastShownAtMs?: number | null;
-  latestImportedAtMs?: number | null;
-  nowMs: number;
-}): boolean {
-  return input.hasImportableItems && input.isExperimentEnabled &&
-    (input.lastShownAtMs == null || input.nowMs - input.lastShownAtMs >= IMPORT_BEACON_COOLDOWN) &&
-    !(input.latestImportedAtMs != null && input.nowMs - input.latestImportedAtMs < RECENT_IMPORT_WINDOW);
-}
-
-function useShownOnce(onShown: (() => void) | undefined): void {
-  const shown = React.useRef(false);
-  const notify = () => {
-    if (shown.current) return;
-    shown.current = true;
-    onShown?.();
-  };
-  React.useEffect(notify, []);
-}
-
-function message(id: string, defaultMessage: string, description: string): unknown {
-  return shared.Y2 == null ? defaultMessage : jsx.jsx(shared.Y2, { id, defaultMessage, description });
-}
-
-function AnnouncementCard(props: {
-  actionsPlacement?: string;
-  description: unknown;
-  leadingVisual?: unknown;
-  onDismiss(): void;
-  onPrimary(): void;
-  primaryLabel: unknown;
-  title: unknown;
-  variant?: string;
-}): unknown {
-  const dismissLabel = shared.n4?.().formatMessage({ id: "homeAnnouncement.dismiss", defaultMessage: "Dismiss announcement" }) ?? "Dismiss announcement";
-  if (primary.Sm != null) return jsx.jsx(primary.Sm, {
-    actionsPlacement: props.actionsPlacement,
-    description: props.description,
-    dismissAction: { ariaLabel: dismissLabel, icon: shared.ig, onClick: props.onDismiss },
-    leadingVisual: props.leadingVisual,
-    primaryAction: { label: props.primaryLabel, onClick: props.onPrimary },
-    title: props.title,
-    variant: props.variant,
-  });
-  return jsx.jsxs("aside", { className: "home-announcement", children: [
-    props.leadingVisual,
-    jsx.jsx("strong", { children: props.title }),
-    jsx.jsx("p", { children: props.description }),
-    jsx.jsx("button", { onClick: props.onPrimary, type: "button", children: props.primaryLabel }),
-    jsx.jsx("button", { "aria-label": dismissLabel, onClick: props.onDismiss, type: "button", children: "×" }),
-  ] });
-}
-
-function ComputerHistoryWeeklyInsightsAnnouncement({ onDismiss, onViewRecap }: AnnouncementViewProps & { onViewRecap(prompt: string): void }): unknown {
-  const prompt = "Give me a fun recap of my Computer History, including work patterns, distractions, favorite shortcuts, my writing style, and a light roast";
-  return AnnouncementCard({
-    title: message("computerHistory.weeklyInsightsAnnouncement.title", "Your week in Computer History", "Weekly Computer History announcement title"),
-    description: message("computerHistory.weeklyInsightsAnnouncement.description", "See insights based on your past week of computer activity", "Weekly Computer History announcement description"),
-    leadingVisual: computerHistoryIcon == null ? null : jsx.jsx("img", { alt: "", className: "h-8 w-8 shrink-0", src: computerHistoryIcon }),
-    primaryLabel: message("computerHistory.weeklyInsightsAnnouncement.viewRecap", "View recap", "Weekly Computer History announcement action"),
-    onDismiss,
-    onPrimary: () => onViewRecap(shared.n4?.().formatMessage({ id: "computerHistory.weeklyInsightsAnnouncement.weeklyRecapPrompt", defaultMessage: prompt }) ?? prompt),
-  });
-}
-
-function ReplayAnnouncement({ onDismiss, onReplay, onShown }: ReplayAnnouncementProps): unknown {
-  useShownOnce(onShown);
-  return jsx.jsx("div", { className: "select-none", children: AnnouncementCard({
-    title: message("codexReplay.homeAnnouncement.title", "See how codex handles imported tasks", "Codex Replay announcement title"),
-    description: message("codexReplay.homeAnnouncement.description", "Replay a task you imported from another agent and compare the results.", "Codex Replay announcement description"),
-    primaryLabel: message("codexReplay.homeAnnouncement.action", "Replay a task", "Codex Replay announcement action"),
-    onDismiss,
-    onPrimary: onReplay,
-  }) });
-}
-
-function ExternalImportAnnouncement({ onDismiss, onImport, onShown, providerId }: ExternalImportAnnouncementProps): unknown {
-  useShownOnce(onShown);
-  const provider = providerId === "cursor" ? "Cursor" : providerId === "claude-code" ? "Claude Code" : providerId === "claude-cowork" ? "Claude Cowork" : null;
-  return jsx.jsx("div", { className: "select-none", children: AnnouncementCard({
-    title: provider == null ? "Bring your work into ChatGPT" : `Bring your ${provider} work into ChatGPT`,
-    description: provider == null
-      ? "Import your setup, projects, and chats from other AI tools so you can continue here—and keep future changes in sync"
-      : `Import your setup, projects, and chats from ${provider} so you can continue here—and keep future changes in sync`,
-    primaryLabel: provider == null ? "Import your context" : `Import from ${provider}`,
-    onDismiss,
-    onPrimary: onImport,
-  }) });
-}
-
-function track(scope: Scope, event: unknown, payload: Record<string, unknown>): void {
-  initial.xpn?.(scope, event, payload);
-}
-
-function GiftCreditsAnnouncement({ onDismiss, onOpenGiftCredits, onShown }: GiftCreditsAnnouncementProps): unknown {
-  useShownOnce(onShown);
-  const scope = shared.LX(shared.ZI);
-  const route = initial.i_n?.();
-  const exposure = React.useRef(false);
-  React.useEffect(() => {
-    if (exposure.current) return;
-    exposure.current = true;
-    const now = Date.now();
-    const previous = scope.get<{ lastShownAtMs?: number; shownCount: number }>(giftStateSignal);
-    scope.set(giftStateSignal, { lastShownAtMs: now, shownCount: (previous?.shownCount ?? 0) + 1 });
-    track(scope, "gift_credits_home_beacon", { entryPoint: "codex_desktop_gift_beacon", outcome: "shown", routeEntryKey: route?.key, step: "entry_exposure" });
-  }, [route?.key, scope]);
-  return AnnouncementCard({
-    variant: "beacon",
-    actionsPlacement: "bodyOnNarrow",
-    title: "Gift ChatGPT credits",
-    description: "Send a friend credits they can use for Work or Codex tasks",
-    primaryLabel: "Gift credits",
-    onDismiss,
-    onPrimary: () => {
-      track(scope, "gift_credits_home_beacon", { entryPoint: "codex_desktop_gift_beacon", outcome: "opened", step: "entry_exposure" });
-      onOpenGiftCredits();
-    },
-  });
-}
-
-function useReplayAnnouncement(options: { enabled?: boolean } = {}): CandidateState & { markShown(): void; replay(): void } {
-  const scope = shared.LX(shared.ZI);
-  const globallyDisabled = initial.vj == null ? false : shared.HX<boolean>(initial.vj) === true;
-  const account = initial.N6t?.() ?? {};
-  const profile = initial.mht?.() ?? {};
-  const shownAccounts = shared.HX<Record<string, boolean> | undefined>(replayShownAccountsSignal);
-  const historyQuery = shared.BX<ImportHistory[]>(initial.ZA, initial.ugn ?? "local", { enabled: options.enabled !== false && !globallyDisabled });
-  const experimentClient = initial.cfn?.();
-  const [state, setState] = React.useState(() => ({ accountId: account.accountId, dismissed: false }));
-  if (state.accountId !== account.accountId) setState({ accountId: account.accountId, dismissed: false });
-  const accountId = account.accountId;
-  const baseEligible = options.enabled !== false && !globallyDisabled && !state.dismissed && accountId != null &&
-    shownAccounts?.[accountId] !== true && isRecentOnboarding(profile.data?.desktop_onboarding_completed_at, Date.now()) &&
-    historyQuery.data?.some((history) => history.successes.length > 0) === true;
-  const experimentEnabled = experimentClient == null ? false :
-    (initial.nfn?.(experimentClient, REPLAY_EXPERIMENT) ?? experimentClient.getExperiment(REPLAY_EXPERIMENT, { disableExposureLog: true })).get("enabled", false);
-  const markAccountShown = () => {
-    if (accountId == null) return;
-    scope.set(replayShownAccountsSignal, { ...(scope.get<Record<string, boolean>>(replayShownAccountsSignal) ?? {}), [accountId]: true });
-  };
-  return {
-    isEligible: baseEligible && experimentEnabled,
-    isLoading: options.enabled !== false && !state.dismissed && (account.isLoading === true || profile.isLoading === true || historyQuery.isLoading === true || experimentClient?.isLoading === true),
-    dismiss: () => { track(scope, "codex_replay_home_announcement", { action: "dismiss" }); markAccountShown(); setState((current) => ({ ...current, dismissed: true })); },
-    markShown: () => { track(scope, "codex_replay_home_announcement", { action: "view" }); markAccountShown(); },
-    replay: () => { track(scope, "codex_replay_home_announcement", { action: "click" }); markAccountShown(); setState((current) => ({ ...current, dismissed: true })); },
-  };
-}
-
-function useExternalImportAnnouncement(options: { enabled?: boolean } = {}): CandidateState & {
-  markShown(): void;
-  openImport(): void;
-  providerId?: "cursor" | "claude-code" | "claude-cowork";
-} {
-  const scope = shared.LX(shared.ZI);
-  const route = initial.i_n?.() ?? { pathname: "/" };
-  const globallyDisabled = initial.vj == null ? false : shared.HX<boolean>(initial.vj) === true;
-  const hidePromos = initial.sbt?.({ hideFirstNewThreadOnboardingPromos: false, pathname: route.pathname }) ?? false;
-  const persistedLastShown = shared.HX<number | null | undefined>(importLastShownSignal);
-  const [lastShownAtMount] = React.useState(() => persistedLastShown);
-  const [dismissed, setDismissed] = React.useState(false);
-  const [shown, setShown] = React.useState(false);
-  const [now] = React.useState(() => Date.now());
-  const experimentClient = initial.cfn?.();
-  const personalizedExperiment = experimentClient?.getExperiment(IMPORT_EXPERIMENT, { disableExposureLog: true });
-  const personalized = personalizedExperiment?.__evaluation?.is_user_in_experiment === true && personalizedExperiment.__evaluation.is_experiment_active === true;
-  const selectedExperiment = personalized ? IMPORT_EXPERIMENT : IMPORT_CONTROL;
-  const enabledByExperiment = experimentClient?.getExperiment(selectedExperiment, { disableExposureLog: true }).get<boolean>("enabled", false) === true;
-  const cooldownComplete = lastShownAtMount == null || now - lastShownAtMount >= IMPORT_BEACON_COOLDOWN;
-  const queryEnabled = options.enabled !== false && !globallyDisabled && !hidePromos && cooldownComplete && !dismissed;
-  const histories = shared.BX<ImportHistory[]>(initial.ZA, initial.ugn ?? "local", { enabled: queryEnabled });
-  const providers = initial.zA?.(initial.ofn?.("external-agent-import") ?? true) ?? [...IMPORT_PROVIDERS];
-  const status = shared.BX<ImportStatus>(initial._A, { hostId: initial.ugn ?? "local", providers }, { enabled: queryEnabled });
-  const latest = histories.data == null || status.data == null ? null : latestImportedAt(histories.data, status.data);
-  const discoveryEnabled = queryEnabled && histories.data != null && status.data != null && !(initial.sj?.({ histories: histories.data, importStatus: status.data }) ?? false);
-  const discovery = initial.CA?.({ cacheDiscovery: true, enabled: discoveryEnabled, hostId: initial.ugn ?? "local", providers, refetchOnWindowFocus: true, retry: false, sessionLimits: initial.IA?.() });
-  const providerId = personalized ? IMPORT_PROVIDERS.find((provider) => providers.includes(provider) && discovery?.detectedItems.some((item) => item.providerId === provider)) : undefined;
-  const discoveryReady = discovery != null && !discovery.isDetectionFetching && !discovery.isDetectionError && !discovery.hasDetectionRefreshError;
-  const eligible = queryEnabled && enabledByExperiment && !histories.isError && !status.isError &&
-    (!personalized || (discoveryReady && providerId != null)) &&
-    isExternalImportBeaconEligible({ hasImportableItems: discovery?.hasImportableItems === true, isExperimentEnabled: true, lastShownAtMs: lastShownAtMount, latestImportedAtMs: latest, nowMs: now });
-  const loading = queryEnabled && (experimentClient?.isLoading === true || histories.isLoading === true || histories.isFetching === true || status.isLoading === true || status.isFetching === true || (personalized && discovery?.isDetectionFetching === true));
-  return {
-    dismiss: () => { track(scope, "external_agent_import_home_beacon", { action: "dismissed" }); setDismissed(true); },
-    isEligible: eligible,
-    isLoading: loading,
-    markShown: () => { if (shown) return; setShown(true); track(scope, "external_agent_import_home_beacon", { action: "shown" }); scope.set(importLastShownSignal, Date.now()); },
-    openImport: () => { track(scope, "external_agent_import_home_beacon", { action: "import_clicked" }); void externalImport.runExternalAgentImportCommand?.(scope, "home_beacon").catch(() => undefined); },
-    providerId,
-  };
-}
-
-function useGiftCreditsAnnouncement(options: { enabled?: boolean } = {}): CandidateState & { openGiftCredits(): void } {
-  const scope = shared.LX(shared.ZI);
-  const dismissedPersisted = shared.HX<boolean | undefined>(giftDismissedSignal) ?? initial.ngn?.("has-seen-gift-credits-home-banner", false) ?? false;
-  const giftState = shared.HX<{ lastShownAtMs?: number; shownCount: number } | undefined>(giftStateSignal);
-  const [dismissed, setDismissed] = React.useState(false);
-  const [now] = React.useState(() => Date.now());
-  const cooldownDays = GIFT_COOLDOWN_DAYS[(giftState?.shownCount ?? 0) - 1] ?? 30;
-  const cooldownComplete = giftState?.lastShownAtMs == null || now - giftState.lastShownAtMs >= cooldownDays * 24 * HOUR;
-  const baseEligible = options.enabled !== false && !dismissed && !dismissedPersisted && giftState != null && cooldownComplete;
-  const available = availability.n?.({ enabled: baseEligible });
-  const dismiss = () => { setDismissed(true); scope.set(giftDismissedSignal, true); };
-  return {
-    dismiss,
-    isEligible: baseEligible && available === true,
-    isLoading: options.enabled !== false && !dismissed && !dismissedPersisted && (giftState == null || (baseEligible && available === undefined)),
-    openGiftCredits: () => { dismiss(); availability.a?.(undefined, "codex_desktop_gift_beacon"); },
-  };
-}
-
-interface ReplayLaunchOptions {
-  navigateToLocalConversation?(conversationId: string): void;
-  onReplay?(): void;
-  scope: Scope;
-  showPluginInstallDetails?(plugin: unknown, options: { hostId: string; marketplaceAnalytics: string; onSuccess(): Promise<void> }): boolean;
-}
-
-async function launchReplay(options: ReplayLaunchOptions): Promise<void> {
-  const { scope } = options;
-  const queryClient = scope.queryClient as {
-    fetchQuery(options: unknown): Promise<unknown>;
-  };
-  const queryOptions = (scope.query as { getOptions?(query: unknown, input: Record<string, unknown>): unknown }).getOptions?.(
-    initial.e4t,
-    {
-      hostId: initial.ugn ?? "local",
-      marketplacePath: null,
-      pluginName: "codex-replay",
-      remoteMarketplaceName: "openai-curated-remote",
-    },
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/run-external-agent-import-command",
+      "@rchunk/app-shared",
+      "@rchunk/rolldown-runtime",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $K as n,
+  BX as r,
+  C_ as i,
+  Ej as a,
+  FX as o,
+  H3 as s,
+  HX as c,
+  I3 as l,
+  K2 as u,
+  LX as d,
+  PB as f,
+  Q3 as p,
+  QI as m,
+  S_ as h,
+  V3 as g,
+  Y2 as _,
+  Z3 as v,
+  ZI as y,
+  ag as b,
+  cw as x,
+  e6 as S,
+  fI as C,
+  fj as w,
+  ig as T,
+  lk as E,
+  lw as D,
+  n4 as O,
+  ol as k,
+  oq as A,
+  pZ as j,
+  pj as M,
+  pk as N,
+  sZ as P,
+  sl as F,
+  wL as I,
+} from "@rchunk/app-shared";
+import {
+  $2t as L,
+  $A as R,
+  $yt as z,
+  Aj as B,
+  BA as V,
+  Bfn as H,
+  CA as ee,
+  Cpn as te,
+  Dj as U,
+  E4t as ne,
+  Ej as re,
+  FA as ie,
+  Gwt as ae,
+  HA as oe,
+  HDt as se,
+  IA as ce,
+  LA as le,
+  M6t as ue,
+  Mj as W,
+  N6t as de,
+  Oj as fe,
+  Qgn as G,
+  Rdn as pe,
+  SA as K,
+  VA as me,
+  VDt as q,
+  Wwt as J,
+  Xgt as he,
+  Xyt as ge,
+  ZA as _e,
+  Zgt as ve,
+  _Et as ye,
+  cfn as be,
+  dj as xe,
+  dun as Se,
+  e4t as Ce,
+  gpt as we,
+  h4t as Te,
+  hEt as Ee,
+  hZt as De,
+  hpt as Oe,
+  i_n as ke,
+  ifn as Ae,
+  jj as je,
+  kj as Me,
+  mZt as Ne,
+  mht as Pe,
+  mpn as Fe,
+  mpt as Ie,
+  nfn as Le,
+  ngn as Re,
+  ofn as ze,
+  oj as Be,
+  ppn as Ve,
+  rgn as He,
+  rht as Ue,
+  sbt as We,
+  sj as Ge,
+  ugn as Y,
+  uj as Ke,
+  uun as qe,
+  vj as Je,
+  xpn as Ye,
+  yj as Xe,
+  ypn as Ze,
+  zA as Qe,
+  zdn as $e,
+} from "@rchunk/app-initial";
+import {
+  Bf as et,
+  Cm as tt,
+  Nf as nt,
+  Pf as rt,
+  Rf as it,
+  Sm as at,
+  Xh as ot,
+  Zh as st,
+} from "@rchunk/app-primary";
+import { n as ct, t as lt } from "@rchunk/computer-history-plugin-icon";
+import { r as ut, t as dt } from "@rchunk/computer-history-suggestion-prompt";
+import { a as ft, i as pt } from "@rchunk/computer-history-query";
+import { a as mt, i as ht } from "@rchunk/computer-history-suggestions";
+import { a as gt, i as _t, n as vt, t as yt } from "@rchunk/entry-point-availability";
+function bt(e) {
+  let t = (0, xt.c)(15),
+    { onDismiss: r, onViewRecap: i } = e,
+    a = O(),
+    o,
+    s,
+    c,
+    l;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((o = (0, X.jsx)(_, {
+        id: `computerHistory.weeklyInsightsAnnouncement.title`,
+        defaultMessage: `Your week in Computer History`,
+        description: `Title of an announcement offering a recap of the user's recent Computer History`,
+      })),
+      (s = (0, X.jsx)(_, {
+        id: `computerHistory.weeklyInsightsAnnouncement.description`,
+        defaultMessage: `See insights based on your past week of computer activity`,
+        description: `Description of an announcement offering a recap of insights from the user's recent computer activity`,
+      })),
+      (c = (0, X.jsx)(`img`, { alt: ``, src: lt, className: `h-8 w-8 shrink-0` })),
+      (l = (0, X.jsx)(_, {
+        id: `computerHistory.weeklyInsightsAnnouncement.viewRecap`,
+        defaultMessage: `View recap`,
+        description: `Button that requests a personalized recap of insights from the user's Computer History`,
+      })),
+      (t[0] = o),
+      (t[1] = s),
+      (t[2] = c),
+      (t[3] = l))
+    : ((o = t[0]), (s = t[1]), (c = t[2]), (l = t[3]));
+  let u;
+  t[4] !== a || t[5] !== i
+    ? ((u = {
+        label: l,
+        onClick: () => {
+          i(
+            a.formatMessage(
+              {
+                id: `computerHistory.weeklyInsightsAnnouncement.weeklyRecapPrompt`,
+                defaultMessage: `Give me a fun recap of my {computerHistoryPlugin}, including work patterns, distractions, favorite shortcuts, my writing style, and a light roast`,
+                description: `Submitted conversation prompt asking Codex for an entertaining recap of the user's Computer History, including a mention of the Computer History plugin`,
+              },
+              {
+                computerHistoryPlugin: it({
+                  defaultPrompt: null,
+                  pluginDisplayName: a.formatMessage(dt),
+                  pluginId: `${n}@${A}`,
+                }).trim(),
+              },
+            ),
+          );
+        },
+      }),
+      (t[4] = a),
+      (t[5] = i),
+      (t[6] = u))
+    : (u = t[6]);
+  let d;
+  t[7] === a
+    ? (d = t[8])
+    : ((d = a.formatMessage({
+        id: `computerHistory.weeklyInsightsAnnouncement.dismissLabel`,
+        defaultMessage: `Dismiss Computer History weekly insights`,
+        description: `Accessible label for dismissing the announcement offering a recap of weekly Computer History insights`,
+      })),
+      (t[7] = a),
+      (t[8] = d));
+  let f;
+  t[9] !== r || t[10] !== d
+    ? ((f = { ariaLabel: d, icon: T, onClick: r }), (t[9] = r), (t[10] = d), (t[11] = f))
+    : (f = t[11]);
+  let p;
+  return (
+    t[12] !== u || t[13] !== f
+      ? ((p = (0, X.jsx)(at, {
+          title: o,
+          description: s,
+          leadingVisual: c,
+          primaryAction: u,
+          dismissAction: f,
+        })),
+        (t[12] = u),
+        (t[13] = f),
+        (t[14] = p))
+      : (p = t[14]),
+    p
   );
-  if (queryOptions == null || options.showPluginInstallDetails == null) {
-    throw new Error("Codex Replay catalog runtime is unavailable");
+}
+var xt, X;
+function St() {
+  return (St = e(() => {
+    ((xt = t()), I(), u(), ct(), ut(), tt(), b(), et(), (X = l()));
+  }))();
+}
+function Ct(e, t = Date.now()) {
+  let n = t - Et;
+  return e.some(({ startMs: e }) => e <= n) ? wt(e, n, t) >= Ot && wt(e, t - Dt, t) >= kt : !1;
+}
+function wt(e, t, n) {
+  let r = e
+      .map((e) => ({ endMs: Math.min(e.endMs, n), startMs: Math.max(e.startMs, t) }))
+      .filter(({ endMs: e, startMs: t }) => e > t)
+      .sort((e, t) => e.startMs - t.startMs),
+    i = 0,
+    a = t;
+  for (let { endMs: e, startMs: t } of r) e <= a || ((i += e - Math.max(t, a)), (a = e));
+  return i;
+}
+var Tt, Et, Dt, Ot, kt, At, jt;
+function Mt() {
+  return (Mt = e(() => {
+    (o(),
+      ft(),
+      mt(),
+      m(),
+      qe(),
+      (Tt = 36e5),
+      (Et = 168 * Tt),
+      (Dt = 48 * Tt),
+      (Ot = 48 * Tt),
+      (kt = 6 * Tt),
+      (At = Se(`computer-history-weekly-insights-announcement-dismissed-v1`, !1)),
+      (jt = P(y, ({ get: e }) => {
+        if (e(At) || !e(ht)) return `ineligible`;
+        let t = e(pt);
+        return t.isPending
+          ? `loading`
+          : !t.isSuccess || t.data == null
+            ? `ineligible`
+            : Ct(t.data)
+              ? `eligible`
+              : `ineligible`;
+      })));
+  }))();
+}
+function Nt(e) {
+  let t = (0, Pt.c)(18),
+    { onDismiss: n, onReplay: r, onShown: i } = e,
+    a = O(),
+    o = (0, Ft.useRef)(!1),
+    s;
+  t[0] === i
+    ? (s = t[1])
+    : ((s = () => {
+        o.current || ((o.current = !0), i());
+      }),
+      (t[0] = i),
+      (t[1] = s));
+  let c = (0, Ft.useEffectEvent)(s),
+    l;
+  t[2] === c
+    ? (l = t[3])
+    : ((l = () => {
+        c();
+      }),
+      (t[2] = c),
+      (t[3] = l));
+  let u;
+  (t[4] === Symbol.for(`react.memo_cache_sentinel`) ? ((u = []), (t[4] = u)) : (u = t[4]),
+    (0, Ft.useEffect)(l, u));
+  let d, f, p;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = (0, Z.jsx)(_, {
+        id: `codexReplay.homeAnnouncement.title`,
+        defaultMessage: `See how codex handles imported tasks`,
+        description: `Title of a Codex desktop Home announcement inviting a new user to compare Codex with a previously imported coding task`,
+      })),
+      (f = (0, Z.jsx)(_, {
+        id: `codexReplay.homeAnnouncement.description`,
+        defaultMessage: `Replay a task you imported from another agent and compare the results.`,
+        description: `Description of a Codex desktop Home announcement; replay means running Codex on an imported coding task and comparing the results`,
+      })),
+      (p = (0, Z.jsx)(_, {
+        id: `codexReplay.homeAnnouncement.action`,
+        defaultMessage: `Replay a task`,
+        description: `Button label for installing Codex Replay and opening its existing imported-task selection flow`,
+      })),
+      (t[5] = d),
+      (t[6] = f),
+      (t[7] = p))
+    : ((d = t[5]), (f = t[6]), (p = t[7]));
+  let m;
+  t[8] === r ? (m = t[9]) : ((m = { label: p, onClick: r }), (t[8] = r), (t[9] = m));
+  let h;
+  t[10] === a
+    ? (h = t[11])
+    : ((h = a.formatMessage({
+        id: `codexReplay.homeAnnouncement.dismiss`,
+        defaultMessage: `Dismiss imported task replay announcement`,
+        description: `Accessible label for dismissing the Codex desktop Home announcement about replaying an imported coding task`,
+      })),
+      (t[10] = a),
+      (t[11] = h));
+  let g;
+  t[12] !== n || t[13] !== h
+    ? ((g = { ariaLabel: h, icon: T, onClick: n }), (t[12] = n), (t[13] = h), (t[14] = g))
+    : (g = t[14]);
+  let v;
+  return (
+    t[15] !== m || t[16] !== g
+      ? ((v = (0, Z.jsx)(`div`, {
+          className: `select-none`,
+          children: (0, Z.jsx)(at, {
+            title: d,
+            description: f,
+            primaryAction: m,
+            dismissAction: g,
+          }),
+        })),
+        (t[15] = m),
+        (t[16] = g),
+        (t[17] = v))
+      : (v = t[17]),
+    v
+  );
+}
+var Pt, Ft, Z;
+function It() {
+  return (It = e(() => {
+    ((Pt = t()), (Ft = S()), u(), tt(), b(), (Z = l()));
+  }))();
+}
+function Lt({
+  desktopOnboardingCompletedAt: e,
+  hasBeenShownForAccount: t,
+  histories: n,
+  isDismissed: r,
+  nowMs: i,
+}) {
+  return !t && !r && Vt(e, i) && Be(n);
+}
+function Rt(e) {
+  let t = (0, Ht.c)(25),
+    { enabled: n } = e,
+    i = c(Je) === !0,
+    a = n && !i,
+    o = d(y),
+    { accountId: s, isLoading: l } = de(),
+    { data: u, isLoading: f } = Pe(),
+    p = u?.desktop_onboarding_completed_at,
+    m = c(Kt),
+    h;
+  t[0] !== s || t[1] !== m
+    ? ((h = () => ({ accountId: s, isDismissed: !1, shownAccountIdsAtMount: m })),
+      (t[0] = s),
+      (t[1] = m),
+      (t[2] = h))
+    : (h = t[2]);
+  let [g, _] = (0, Ut.useState)(h);
+  (g.accountId !== s || (g.shownAccountIdsAtMount === void 0 && m !== void 0)) &&
+    _({ accountId: s, isDismissed: !1, shownAccountIdsAtMount: m });
+  let v = g.accountId === s ? g.shownAccountIdsAtMount : m,
+    b = g.accountId === s && g.isDismissed,
+    { client: x, isLoading: S } = be(),
+    [C, w] = (0, Ut.useState)(null),
+    T = s != null && v?.[s] === !0,
+    E = Date.now(),
+    D;
+  D =
+    !a || b || T
+      ? `ineligible`
+      : l || f || v === void 0
+        ? `loading`
+        : s == null || !Vt(p, E)
+          ? `ineligible`
+          : `eligible`;
+  let O = D === `eligible`,
+    k;
+  t[3] === O ? (k = t[4]) : ((k = { enabled: O }), (t[3] = O), (t[4] = k));
+  let { data: A, isLoading: j } = r(_e, Y, k),
+    M = D;
+  D === `eligible` &&
+    (j
+      ? (M = `loading`)
+      : Lt({
+          desktopOnboardingCompletedAt: p,
+          hasBeenShownForAccount: T,
+          histories: A,
+          isDismissed: b,
+          nowMs: E,
+        }) || (M = `ineligible`));
+  let N = C?.accountId === s && C.enabled;
+  if (!S && M === `eligible` && s != null && C?.accountId !== s) {
+    let e;
+    (t[5] === x ? (e = t[6]) : ((e = Le(x, Wt).get(`enabled`, !1)), (t[5] = x), (t[6] = e)),
+      (N = e === !0),
+      w({ accountId: s, enabled: N }));
   }
+  let P;
+  t[7] === o
+    ? (P = t[8])
+    : ((P = (e) => {
+        o.get(te).logProductEvent(re, {
+          action: {
+            click: U.CODEX_REPLAY_ONBOARDING_ANNOUNCEMENT_ACTION_TYPE_CLICK,
+            dismiss: U.CODEX_REPLAY_ONBOARDING_ANNOUNCEMENT_ACTION_TYPE_DISMISS,
+            view: U.CODEX_REPLAY_ONBOARDING_ANNOUNCEMENT_ACTION_TYPE_VIEW,
+          }[e],
+        });
+      }),
+      (t[7] = o),
+      (t[8] = P));
+  let F = P,
+    I;
+  t[9] !== s || t[10] !== o
+    ? ((I = () => {
+        s != null && o.set(Kt, { ...o.get(Kt), [s]: !0 });
+      }),
+      (t[9] = s),
+      (t[10] = o),
+      (t[11] = I))
+    : (I = t[11]);
+  let L = I,
+    R;
+  t[12] !== F || t[13] !== L
+    ? ((R = () => {
+        (F(`dismiss`), L(), _(Bt));
+      }),
+      (t[12] = F),
+      (t[13] = L),
+      (t[14] = R))
+    : (R = t[14]);
+  let z = M === `eligible` && N,
+    B = M === `loading` || (M === `eligible` && S),
+    V,
+    H;
+  t[15] !== F || t[16] !== L
+    ? ((V = () => {
+        (F(`view`), L());
+      }),
+      (H = () => {
+        (F(`click`), L(), _(zt));
+      }),
+      (t[15] = F),
+      (t[16] = L),
+      (t[17] = V),
+      (t[18] = H))
+    : ((V = t[17]), (H = t[18]));
+  let ee;
+  return (
+    t[19] !== R || t[20] !== z || t[21] !== B || t[22] !== V || t[23] !== H
+      ? ((ee = { dismiss: R, isEligible: z, isLoading: B, markShown: V, replay: H }),
+        (t[19] = R),
+        (t[20] = z),
+        (t[21] = B),
+        (t[22] = V),
+        (t[23] = H),
+        (t[24] = ee))
+      : (ee = t[24]),
+    ee
+  );
+}
+function zt(e) {
+  return { ...e, isDismissed: !0 };
+}
+function Bt(e) {
+  return { ...e, isDismissed: !0 };
+}
+function Vt(e, t) {
+  if (e == null) return !1;
+  let n = t - Date.parse(e);
+  return n >= 0 && n < Gt;
+}
+var Ht, Ut, Wt, Gt, Kt, qt;
+function Jt() {
+  return (Jt = e(() => {
+    ((Ht = t()),
+      W(),
+      o(),
+      (Ut = S()),
+      ue(),
+      Ue(),
+      Xe(),
+      Ze(),
+      m(),
+      H(),
+      Ae(),
+      qe(),
+      Ke(),
+      (Wt = `3781811128`),
+      (Gt = 6048e5),
+      (Kt = Se(`codex-replay-home-announcement-shown-account-ids`, {})),
+      (qt = `[@Codex Replay](plugin://codex-replay@openai-curated-remote) Open the Replay controller.`));
+  }))();
+}
+async function Yt({
+  scope: e,
+  navigateToLocalConversation: t,
+  onReplay: n,
+  showPluginInstallDetails: r,
+}) {
   try {
-    const plugin = await queryClient.fetchQuery({
-      ...(queryOptions as Record<string, unknown>),
-      retry: false,
+    let i = await e.queryClient.fetchQuery({
+      ...e.query.getOptions(Ce, {
+        hostId: Y,
+        marketplacePath: null,
+        pluginName: `codex-replay`,
+        remoteMarketplaceName: f,
+      }),
+      retry: !1,
     });
-    const shown = options.showPluginInstallDetails(initial.h4t?.(plugin) ?? plugin, {
-      hostId: "local",
-      marketplaceAnalytics: primary.Zh ?? "globalAnnouncement",
+    r(Te(i), {
+      hostId: `local`,
+      marketplaceAnalytics: st.globalAnnouncement,
       onSuccess: async () => {
-        let outcome = "catalog_reload_failed";
+        let n = `catalog_reload_failed`,
+          r = null;
         try {
-          if (initial.Gwt == null) throw new Error("Catalog reload runtime is unavailable");
-          await initial.Gwt({ scope, hostId: initial.ugn ?? "local", queryClient: scope.queryClient });
-          outcome = "mcp_timeout";
-          await waitForReplayTool(scope);
-          outcome = "mode_unavailable";
-          if (initial._Et?.("switchToMode3", "codex_replay_home_announcement") !== true) {
-            throw new Error("Codex mode is unavailable");
-          }
-          outcome = "conversation_start_failed";
-          const conversationId = await createReplayConversation(scope);
-          options.navigateToLocalConversation?.(conversationId);
-          outcome = "conversation_started";
-        } catch (error) {
-          reportReplayError(scope, error);
+          if (
+            (await ae({ scope: e, hostId: `local`, queryClient: e.queryClient }),
+            (n = `mcp_timeout`),
+            await Xt(e),
+            (n = `mode_unavailable`),
+            !ye(`switchToMode3`, `codex_replay_home_announcement`))
+          )
+            throw Error(`Codex mode is unavailable`);
+          ((n = `conversation_start_failed`), (r = await Qt(e, t)), (n = `conversation_started`));
+        } catch (t) {
+          tn(e, t);
         } finally {
-          const logger = initial.Cpn == null ? null : scope.get<{ logProductEvent?(event: unknown, payload: Record<string, unknown>): void }>(initial.Cpn);
-          logger?.logProductEvent?.("codex_replay_onboarding_launch", { outcome });
+          e.get(te).logProductEvent(B, {
+            outcome: {
+              conversation_started: je.CODEX_REPLAY_ONBOARDING_LAUNCH_OUTCOME_CONVERSATION_STARTED,
+              catalog_reload_failed:
+                je.CODEX_REPLAY_ONBOARDING_LAUNCH_OUTCOME_CATALOG_RELOAD_FAILED,
+              mcp_timeout: je.CODEX_REPLAY_ONBOARDING_LAUNCH_OUTCOME_MCP_TIMEOUT,
+              mode_unavailable: je.CODEX_REPLAY_ONBOARDING_LAUNCH_OUTCOME_MODE_UNAVAILABLE,
+              conversation_start_failed:
+                je.CODEX_REPLAY_ONBOARDING_LAUNCH_OUTCOME_CONVERSATION_START_FAILED,
+            }[n],
+            threadId: r ?? void 0,
+          });
         }
       },
-    });
-    if (shown) options.onReplay?.();
-  } catch (error) {
-    reportReplayError(scope, error);
+    }) && n();
+  } catch (t) {
+    tn(e, t);
   }
 }
-
-async function waitForReplayTool(scope: Scope): Promise<void> {
-  if (initial.zdn == null) throw new Error("MCP readiness runtime is unavailable");
-  const timeoutError = new Error("Codex Replay did not become ready in time");
-  const deadline = Date.now() + 120_000;
-  while (Date.now() < deadline) {
-    const remaining = deadline - Date.now();
+async function Xt(e) {
+  let t = Error(
+      e
+        .get(Fe)
+        .formatMessage({
+          id: `codexReplay.homeAnnouncement.mcpTimeout`,
+          defaultMessage: `Codex Replay did not become ready in time`,
+          description: `Error shown after installing Codex Replay when its MCP server does not become ready before the launch timeout`,
+        }),
+    ),
+    n = Date.now() + rn;
+  for (; Date.now() < n;) {
+    let r = n - Date.now();
     try {
-      const response = await withTimeout(
-        initial.zdn(scope, initial.ugn ?? "local", "toolsAndAuthOnly", { priority: "interactive" }),
-        remaining,
-        timeoutError,
-      );
-      if (response.data.some((server) => server.name === "codex-replay" && server.tools?.open_controller?.name === "open_controller")) return;
-    } catch (error) {
-      if (error === timeoutError) throw error;
+      if (
+        (await Zt($e(e, `local`, `toolsAndAuthOnly`, { priority: `interactive` }), r, t)).data.some(
+          (e) => e.name === `codex-replay` && e.tools.open_controller?.name === `open_controller`,
+        )
+      )
+        return;
+    } catch (e) {
+      if (e === t) throw t;
     }
-    const delay = Math.min(500, deadline - Date.now());
-    if (delay > 0) await new Promise<void>((resolve) => setTimeout(resolve, delay));
+    let i = Math.min(nn, n - Date.now());
+    i > 0 &&
+      (await new Promise((e) => {
+        setTimeout(e, i);
+      }));
   }
-  throw timeoutError;
+  throw t;
 }
-
-function withTimeout<Value>(promise: Promise<Value>, timeoutMs: number, timeoutError: Error): Promise<Value> {
-  return new Promise((resolve, reject) => {
-    const timer = setTimeout(() => reject(timeoutError), timeoutMs);
-    promise.then(
-      (value) => { clearTimeout(timer); resolve(value); },
-      (error: unknown) => { clearTimeout(timer); reject(error instanceof Error ? error : new Error(String(error))); },
+function Zt(e, t, n) {
+  return new Promise((r, i) => {
+    let a = setTimeout(() => {
+      i(n);
+    }, t);
+    e.then(
+      (e) => {
+        (clearTimeout(a), r(e));
+      },
+      (e) => {
+        (clearTimeout(a), i(e instanceof Error ? e : Error(String(e))));
+      },
     );
   });
 }
-
-async function createReplayConversation(scope: Scope): Promise<string> {
-  if (initial.VDt == null || initial.Zgt == null || initial.gpt == null) {
-    throw new Error("Codex Replay conversation runtime is unavailable");
+async function Qt(e, t) {
+  let n = qt,
+    r = await q([`~`], { prompt: n });
+  if (r.cwd == null) throw Error(`Missing projectless thread cwd`);
+  let i = await ve(e, Y, null),
+    a = $t(),
+    o = await we(
+      e,
+      Y,
+      {
+        collaborationMode: null,
+        cwd: r.cwd,
+        initialTitle: `Codex Replay`,
+        input: [{ type: `text`, text: n, text_elements: [] }],
+        projectlessOutputDirectory: r.projectlessOutputDirectory,
+        serviceTier: i,
+        skipAutoTitleGeneration: !0,
+        threadSource: `codex_replay`,
+        turnTrigger: `codex_replay`,
+        useAppServerPermissionDefault: !0,
+        workspaceKind: `projectless`,
+        workspaceRoots: r.workspaceRoots,
+      },
+      {
+        afterConversationCreated: (t) => {
+          a = en(e, t);
+        },
+      },
+    );
+  if (o.status === `outcome-unknown`) throw (a.stop(), Ie(e, o));
+  t(o.conversationId);
+  let s = Ie(e, o);
+  if (s != null) throw (a.stop(), s);
+  return (
+    o.firstTurn.status === `accepted` ? a.setFirstTurnId(o.firstTurn.turnId) : a.stop(),
+    o.conversationId
+  );
+}
+function $t() {
+  return { setFirstTurnId: () => {}, stop: () => {} };
+}
+function en(e, t) {
+  let n = new Ne(e).getForHostIdOrThrow(Y),
+    r = null,
+    i = new Set(),
+    a = null,
+    o = !1,
+    s = [],
+    c = () => {
+      if (!o) {
+        o = !0;
+        for (let e of s) e();
+      }
+    },
+    l = n.addNotificationCallback(`item/completed`, ({ params: e }) => {
+      e.threadId === t &&
+        e.item.type === `mcpToolCall` &&
+        e.item.server === `codex-replay` &&
+        e.item.tool === `open_controller` &&
+        i.add(e.turnId);
+    }),
+    u = n.addNotificationCallback(`turn/completed`, ({ params: e }) => {
+      if (!(e.threadId !== t || (r != null && e.turn.id !== r))) {
+        if (r == null) {
+          a = { status: e.turn.status, turnId: e.turn.id };
+          return;
+        }
+        d(e.turn.id, e.turn.status);
+      }
+    });
+  s.push(l, u);
+  function d(n, r) {
+    let a;
+    ((a =
+      r === `failed`
+        ? `failed`
+        : r === `interrupted`
+          ? `interrupted`
+          : i.has(n)
+            ? `completed_with_open_controller`
+            : `completed_without_open_controller`),
+      e
+        .get(te)
+        .logProductEvent(fe, {
+          outcome: {
+            completed_with_open_controller:
+              Me.CODEX_REPLAY_ONBOARDING_FIRST_TURN_OUTCOME_COMPLETED_WITH_OPEN_CONTROLLER,
+            completed_without_open_controller:
+              Me.CODEX_REPLAY_ONBOARDING_FIRST_TURN_OUTCOME_COMPLETED_WITHOUT_OPEN_CONTROLLER,
+            failed: Me.CODEX_REPLAY_ONBOARDING_FIRST_TURN_OUTCOME_FAILED,
+            interrupted: Me.CODEX_REPLAY_ONBOARDING_FIRST_TURN_OUTCOME_INTERRUPTED,
+          }[a],
+          threadId: t,
+          turnId: n,
+        }),
+      c());
   }
-  const prompt = "[@Codex Replay](plugin://codex-replay@openai-curated-remote) Open the Replay controller.";
-  const projectless = await initial.VDt(["~"], { prompt });
-  if (projectless.cwd == null) throw new Error("Missing projectless thread cwd");
-  const serviceTier = await initial.Zgt(scope, initial.ugn ?? "local", null);
-  const outcome = await initial.gpt(scope, initial.ugn ?? "local", {
-    collaborationMode: null,
-    cwd: projectless.cwd,
-    initialTitle: "Codex Replay",
-    input: [{ type: "text", text: prompt, text_elements: [] }],
-    projectlessOutputDirectory: projectless.projectlessOutputDirectory,
-    serviceTier,
-    skipAutoTitleGeneration: true,
-    threadSource: "codex_replay",
-    turnTrigger: "codex_replay",
-    useAppServerPermissionDefault: true,
-    workspaceKind: "projectless",
-    workspaceRoots: projectless.workspaceRoots,
-  }, {});
-  const failure = initial.mpt?.(scope, outcome) ?? null;
-  if (outcome.status === "outcome-unknown" || failure != null) throw failure ?? new Error("Codex Replay conversation outcome is unknown");
-  return outcome.conversationId;
+  return {
+    setFirstTurnId: (e) => {
+      ((r = e), a?.turnId === e && d(a.turnId, a.status));
+    },
+    stop: c,
+  };
 }
-
-function reportReplayError(scope: Scope, error: unknown): void {
-  const toast = shared.pk == null ? null : scope.get<{ danger?(message: string, options?: Record<string, unknown>): void }>(shared.pk);
-  toast?.danger?.(error instanceof Error ? error.message : String(error), {
-    errorAnalytics: { toastId: "codexReplayHomeAnnouncementActions.reportCodexReplayStartError" },
-  });
+function tn(e, t) {
+  (p.error(`Failed to install or start Codex Replay`, { safe: {}, sensitive: { error: t } }),
+    e
+      .get(N)
+      .danger(nt(t, e.get(Fe)), {
+        errorAnalytics: {
+          toastId: `codexReplayHomeAnnouncementActions.reportCodexReplayStartError`,
+        },
+      }));
 }
-
-initializeAnnouncementEntryPoints();
-
+var nn, rn;
+function an() {
+  return (an = e(() => {
+    (W(),
+      I(),
+      De(),
+      pe(),
+      Oe(),
+      he(),
+      Ee(),
+      rt(),
+      E(),
+      Ve(),
+      se(),
+      ot(),
+      J(),
+      ne(),
+      Ze(),
+      L(),
+      H(),
+      v(),
+      Jt(),
+      (nn = 500),
+      (rn = 12e4));
+  }))();
+}
+function on(e) {
+  let t = (0, cn.c)(9),
+    { onDismiss: n, onImport: r, providerId: i, onShown: a } = e,
+    o = (0, ln.useRef)(!1),
+    s;
+  t[0] === a
+    ? (s = t[1])
+    : ((s = () => {
+        o.current || ((o.current = !0), a());
+      }),
+      (t[0] = a),
+      (t[1] = s));
+  let c = (0, ln.useEffectEvent)(s),
+    l;
+  t[2] === c
+    ? (l = t[3])
+    : ((l = () => {
+        c();
+      }),
+      (t[2] = c),
+      (t[3] = l));
+  let u;
+  (t[4] === Symbol.for(`react.memo_cache_sentinel`) ? ((u = []), (t[4] = u)) : (u = t[4]),
+    (0, ln.useEffect)(l, u));
+  let d;
+  return (
+    t[5] !== n || t[6] !== r || t[7] !== i
+      ? ((d = (0, Q.jsx)(sn, { onDismiss: n, onImport: r, providerId: i })),
+        (t[5] = n),
+        (t[6] = r),
+        (t[7] = i),
+        (t[8] = d))
+      : (d = t[8]),
+    d
+  );
+}
+function sn(e) {
+  let t = (0, cn.c)(19),
+    { onDismiss: n, onImport: r, providerId: i } = e,
+    a = O(),
+    o = i === `claude-code` ? `claudeCode` : i,
+    s;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = (0, Q.jsx)(me, { compact: !0, sourceIconVariant: `neutral` })), (t[0] = s))
+    : (s = t[0]);
+  let c, l, u;
+  t[1] !== o || t[2] !== i
+    ? ((c =
+        i == null
+          ? (0, Q.jsx)(_, {
+              id: `externalAgentImport.homeBeacon.title`,
+              defaultMessage: `Bring your work into ChatGPT`,
+              description: `Title shown in the Home banner prompting users to import work from another AI tool`,
+            })
+          : (0, Q.jsx)(_, {
+              id: `externalAgentImport.homeBeacon.personalizedTitle`,
+              defaultMessage: `Bring your {provider, select, cursor {Cursor} claudeCode {Claude Code} other {Claude Cowork}} work into ChatGPT`,
+              description: `Import banner title; provider selects the detected AI product's brand name`,
+              values: { provider: o },
+            })),
+      (l =
+        i == null
+          ? (0, Q.jsx)(_, {
+              id: `externalAgentImport.homeBeacon.description`,
+              defaultMessage: `Import your setup, projects, and chats from other AI tools so you can continue here—and keep future changes in sync`,
+              description: `Description shown in the Home banner prompting users to import work from another AI tool`,
+            })
+          : (0, Q.jsx)(_, {
+              id: `externalAgentImport.homeBeacon.personalizedDescription`,
+              defaultMessage: `Import your setup, projects, and chats from {provider, select, cursor {Cursor} claudeCode {Claude Code} other {Claude Cowork}} so you can continue here—and keep future changes in sync`,
+              description: `Import banner description; provider selects the detected AI product's brand name`,
+              values: { provider: o },
+            })),
+      (u =
+        i == null
+          ? (0, Q.jsx)(_, {
+              id: `externalAgentImport.homeBeacon.action`,
+              defaultMessage: `Import your context`,
+              description: `Button label in the Home banner that opens external agent import`,
+            })
+          : (0, Q.jsx)(_, {
+              id: `externalAgentImport.homeBeacon.personalizedAction`,
+              defaultMessage: `Import from {provider, select, cursor {Cursor} claudeCode {Claude Code} other {Claude Cowork}}`,
+              description: `Button opening import review; provider selects the detected AI product's brand name`,
+              values: { provider: o },
+            })),
+      (t[1] = o),
+      (t[2] = i),
+      (t[3] = c),
+      (t[4] = l),
+      (t[5] = u))
+    : ((c = t[3]), (l = t[4]), (u = t[5]));
+  let d;
+  t[6] !== r || t[7] !== u
+    ? ((d = { label: u, onClick: r }), (t[6] = r), (t[7] = u), (t[8] = d))
+    : (d = t[8]);
+  let f;
+  t[9] === a
+    ? (f = t[10])
+    : ((f = a.formatMessage({
+        id: `externalAgentImport.homeBeacon.dismiss`,
+        defaultMessage: `Dismiss import banner`,
+        description: `Accessible label for dismissing the external agent import Home banner`,
+      })),
+      (t[9] = a),
+      (t[10] = f));
+  let p;
+  t[11] !== n || t[12] !== f
+    ? ((p = { ariaLabel: f, icon: T, onClick: n }), (t[11] = n), (t[12] = f), (t[13] = p))
+    : (p = t[13]);
+  let m;
+  return (
+    t[14] !== c || t[15] !== l || t[16] !== d || t[17] !== p
+      ? ((m = (0, Q.jsx)(`div`, {
+          className: `select-none`,
+          children: (0, Q.jsx)(at, {
+            leadingVisual: s,
+            title: c,
+            description: l,
+            primaryAction: d,
+            dismissAction: p,
+          }),
+        })),
+        (t[14] = c),
+        (t[15] = l),
+        (t[16] = d),
+        (t[17] = p),
+        (t[18] = m))
+      : (m = t[18]),
+    m
+  );
+}
+var cn, ln, Q;
+function un() {
+  return (un = e(() => {
+    ((cn = t()), (ln = S()), u(), tt(), oe(), b(), (Q = l()));
+  }))();
+}
+function dn({ histories: e, importStatus: t }) {
+  let n = t.latestImportedAtMs;
+  for (let t of e) {
+    if (t.successes.length === 0) continue;
+    let e = Number(t.completedAtMs);
+    n = n == null ? e : Math.max(n, e);
+  }
+  return n;
+}
+function fn({
+  hasImportableItems: e,
+  isExperimentEnabled: t,
+  lastShownAtMs: n,
+  latestImportedAtMs: r,
+  nowMs: i,
+}) {
+  return e && t && gn(n, i) && !_n(r, i);
+}
+function pn(e) {
+  let t = (0, vn.c)(27),
+    { enabled: n } = e === void 0 ? {} : e,
+    i = n === void 0 || n,
+    a = c(Je) === !0,
+    o = i && !a,
+    s = d(y),
+    l = ke(),
+    u = c(ge) ?? !1,
+    f;
+  t[0] !== u || t[1] !== l.pathname
+    ? ((f = We({ hideFirstNewThreadOnboardingPromos: u, pathname: l.pathname })),
+      (t[0] = u),
+      (t[1] = l.pathname),
+      (t[2] = f))
+    : (f = t[2]);
+  let p = f,
+    m = c(Tn),
+    h = c(xe),
+    [g] = (0, yn.useState)(mn),
+    _;
+  t[3] === m ? (_ = t[4]) : ((_ = () => m), (t[3] = m), (t[4] = _));
+  let [v, b] = (0, yn.useState)(_);
+  v === void 0 && m !== void 0 && b(m);
+  let [x, S] = (0, yn.useState)(!1),
+    [C, T] = (0, yn.useState)(!1),
+    E = C ? v : m,
+    { getExperiment: D, isLoading: O } = be(),
+    k = o && !p && !O ? D(xn, { disableExposureLog: !0 }) : null,
+    A = k?.__evaluation?.is_user_in_experiment === !0 && k.__evaluation.is_experiment_active === !0,
+    j = A ? xn : bn,
+    N = o && !p && !O && D(j, { disableExposureLog: !0 }).get(`enabled`, !1) === !0,
+    P = ze(le),
+    F = Qe(P),
+    I = E !== void 0 && gn(E, g),
+    L = h?.hostId === Y,
+    z = o && !p && I && !x && !L,
+    { data: B, isError: V, isFetching: H, isLoading: te } = r(_e, Y, { enabled: z }),
+    {
+      data: U,
+      isError: ne,
+      isFetching: re,
+      isLoading: ie,
+    } = r(R, { hostId: Y, providers: F }, { enabled: z }),
+    ae = B == null || U == null ? null : dn({ histories: B, importStatus: U }),
+    oe = _n(ae, g),
+    se =
+      z &&
+      B != null &&
+      U != null &&
+      !V &&
+      !H &&
+      !te &&
+      !ne &&
+      !re &&
+      !ie &&
+      !oe &&
+      (!A || !Ge({ histories: B, importStatus: U })),
+    ue = ce(),
+    W = ee({
+      cacheDiscovery: !0,
+      enabled: se,
+      hostId: Y,
+      providers: F,
+      refetchOnWindowFocus: !0,
+      retry: !1,
+      sessionLimits: ue,
+    }),
+    de = A
+      ? Sn.find((e) => F.includes(e) && W.detectedItems.some((t) => t.providerId === e))
+      : void 0,
+    fe =
+      o &&
+      !x &&
+      !L &&
+      !V &&
+      !ne &&
+      E !== void 0 &&
+      (!A ||
+        (se &&
+          de != null &&
+          !W.isDetectionFetching &&
+          !W.isDetectionError &&
+          !W.hasDetectionRefreshError)) &&
+      fn({
+        hasImportableItems: W.hasImportableItems,
+        isExperimentEnabled: !0,
+        lastShownAtMs: E,
+        latestImportedAtMs: ae,
+        nowMs: g,
+      }),
+    G;
+  if (t[5] !== j || t[6] !== D || t[7] !== fe || t[8] !== A || t[9] !== O || t[10] !== p) {
+    let e = fe && !p && !O ? D(j) : null;
+    ((G =
+      e?.get(`enabled`, !1) === !0 &&
+      (!A ||
+        (e.__evaluation?.is_user_in_experiment === !0 &&
+          e.__evaluation.is_experiment_active === !0))),
+      (t[5] = j),
+      (t[6] = D),
+      (t[7] = fe),
+      (t[8] = A),
+      (t[9] = O),
+      (t[10] = p),
+      (t[11] = G));
+  } else G = t[11];
+  let pe = G,
+    K;
+  t[12] !== s || t[13] !== S
+    ? ((K = () => {
+        (Ye(s, M, { action: w.CODEX_EXTERNAL_AGENT_IMPORT_HOME_BEACON_ACTION_DISMISSED }), S(!0));
+      }),
+      (t[12] = s),
+      (t[13] = S),
+      (t[14] = K))
+    : (K = t[14]);
+  let me =
+      o &&
+      !p &&
+      !x &&
+      (v === void 0 || (I && (O || (N && (H || te || re || ie || (se && W.isDetectionFetching)))))),
+    q;
+  t[15] !== s || t[16] !== T
+    ? ((q = () => {
+        (T(!0),
+          Ye(s, M, { action: w.CODEX_EXTERNAL_AGENT_IMPORT_HOME_BEACON_ACTION_SHOWN }),
+          s.set(Tn, Date.now()));
+      }),
+      (t[15] = s),
+      (t[16] = T),
+      (t[17] = q))
+    : (q = t[17]);
+  let J;
+  t[18] === s
+    ? (J = t[19])
+    : ((J = () => {
+        (Ye(s, M, { action: w.CODEX_EXTERNAL_AGENT_IMPORT_HOME_BEACON_ACTION_IMPORT_CLICKED }),
+          hn(s));
+      }),
+      (t[18] = s),
+      (t[19] = J));
+  let he;
+  return (
+    t[20] !== pe || t[21] !== de || t[22] !== K || t[23] !== me || t[24] !== q || t[25] !== J
+      ? ((he = {
+          dismiss: K,
+          isEligible: pe,
+          providerId: de,
+          isLoading: me,
+          markShown: q,
+          openImport: J,
+        }),
+        (t[20] = pe),
+        (t[21] = de),
+        (t[22] = K),
+        (t[23] = me),
+        (t[24] = q),
+        (t[25] = J),
+        (t[26] = he))
+      : (he = t[26]),
+    he
+  );
+}
+function mn() {
+  return Date.now();
+}
+function hn(e) {
+  g(
+    async () => {
+      let { runExternalAgentImportCommand: e } = await import(
+        `@rchunk/run-external-agent-import-command`
+      );
+      return { runExternalAgentImportCommand: e };
+    },
+    __vite__mapDeps([0, 1, 2, 3, 4, 5]),
+    import.meta.url,
+  )
+    .then(({ runExternalAgentImportCommand: t }) => t(e, `home_beacon`))
+    .catch(() => void 0);
+}
+function gn(e, t) {
+  return e == null || t - e >= Cn;
+}
+function _n(e, t) {
+  return e != null && t - e < wn;
+}
+var vn, yn, bn, xn, Sn, Cn, wn, Tn;
+function En() {
+  return (En = e(() => {
+    ((vn = t()),
+      C(),
+      o(),
+      (yn = S()),
+      G(),
+      Xe(),
+      z(),
+      Ze(),
+      m(),
+      H(),
+      Ae(),
+      qe(),
+      Ke(),
+      V(),
+      ie(),
+      K(),
+      s(),
+      (bn = `463876344`),
+      (xn = `1602805785`),
+      (Sn = [`cursor`, `claude-code`, `claude-cowork`]),
+      (Cn = 2592e6),
+      (wn = 5184e6),
+      (Tn = Se(`external-agent-import-home-beacon-last-shown-at`, null)));
+  }))();
+}
+function Dn(e) {
+  let t = (0, kn.c)(13),
+    n;
+  t[0] === e ? (n = t[1]) : ((n = e === void 0 ? {} : e), (t[0] = e), (t[1] = n));
+  let { enabled: r } = n,
+    i = r === void 0 || r,
+    a = d(y),
+    { key: o } = ke(),
+    s = c(Nn) ?? Re(Mn, !1),
+    l = c(Pn),
+    u = c(Fn),
+    [f, p] = (0, An.useState)(!1),
+    [m] = (0, An.useState)(On),
+    [h, g] = (0, An.useState)(`loading`);
+  if (l != null && h === `loading`) {
+    let e = jn[l.shownCount - 1] ?? 30;
+    (u?.routeEntryKey === o && u.lastShownAtMs === l.lastShownAtMs) ||
+    l.lastShownAtMs == null ||
+    m - l.lastShownAtMs >= e * 864e5
+      ? g(`eligible`)
+      : g(`cooldown`);
+  }
+  let _ = i && !f && !s && h === `eligible`,
+    v;
+  t[2] === _ ? (v = t[3]) : ((v = { enabled: _ }), (t[2] = _), (t[3] = v));
+  let b = vt(v),
+    x;
+  t[4] === a
+    ? (x = t[5])
+    : ((x = () => {
+        (p(!0), a.set(Nn, !0));
+      }),
+      (t[4] = a),
+      (t[5] = x));
+  let S = _ && b === !0,
+    C = i && !f && !s && (h === `loading` || (h === `eligible` && b === void 0)),
+    w;
+  t[6] === a
+    ? (w = t[7])
+    : ((w = () => {
+        (p(!0), a.set(Nn, !0), gt(void 0, `codex_desktop_gift_beacon`));
+      }),
+      (t[6] = a),
+      (t[7] = w));
+  let T;
+  return (
+    t[8] !== x || t[9] !== S || t[10] !== C || t[11] !== w
+      ? ((T = { dismiss: x, isEligible: S, isLoading: C, openGiftCredits: w }),
+        (t[8] = x),
+        (t[9] = S),
+        (t[10] = C),
+        (t[11] = w),
+        (t[12] = T))
+      : (T = t[12]),
+    T
+  );
+}
+function On() {
+  return Date.now();
+}
+var kn, An, jn, Mn, Nn, Pn, Fn;
+function In() {
+  return (In = e(() => {
+    ((kn = t()),
+      o(),
+      (An = S()),
+      G(),
+      m(),
+      He(),
+      qe(),
+      _t(),
+      yt(),
+      (jn = [7, 14, 30]),
+      (Mn = `has-seen-gift-credits-home-banner`),
+      (Nn = Se(Mn, !1)),
+      (Pn = Se(`gift-credits-home-beacon-state`, { shownCount: 0 })),
+      (Fn = j(y, null)));
+  }))();
+}
+function Ln(e) {
+  let t = (0, Rn.c)(21),
+    { onDismiss: n, onOpenGiftCredits: r } = e,
+    i = d(y),
+    o = O(),
+    { key: s } = ke(),
+    c = (0, zn.useRef)(!1),
+    l;
+  t[0] !== s || t[1] !== i
+    ? ((l = () => {
+        if (c.current) return;
+        c.current = !0;
+        let e = i.get(Pn),
+          t = i.get(Fn);
+        if (t?.routeEntryKey === s && t.lastShownAtMs === e?.lastShownAtMs) return;
+        let n = Date.now();
+        (i.set(Fn, { lastShownAtMs: n, routeEntryKey: s }),
+          i.set(Pn, (e) => ({ lastShownAtMs: n, shownCount: (e?.shownCount ?? 0) + 1 })),
+          Ye(i, a, {
+            entryPoint: `codex_desktop_gift_beacon`,
+            outcome: `shown`,
+            step: `entry_exposure`,
+          }));
+      }),
+      (t[0] = s),
+      (t[1] = i),
+      (t[2] = l))
+    : (l = t[2]);
+  let u = (0, zn.useEffectEvent)(l),
+    f;
+  t[3] === u
+    ? (f = t[4])
+    : ((f = () => {
+        u();
+      }),
+      (t[3] = u),
+      (t[4] = f));
+  let p;
+  (t[5] === Symbol.for(`react.memo_cache_sentinel`) ? ((p = []), (t[5] = p)) : (p = t[5]),
+    (0, zn.useEffect)(f, p));
+  let m, g, v, b;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((m = (0, $.jsx)(_, {
+        id: `codex.giftCredits.homeBanner.chatgptCredits.title`,
+        defaultMessage: `Gift ChatGPT credits`,
+        description: `Title shown in the Codex home banner promoting gift credits`,
+      })),
+      (g = (0, $.jsx)(_, {
+        id: `codex.giftCredits.homeBanner.chatgptCredits.description`,
+        defaultMessage: `Send a friend credits they can use for Work or Codex tasks`,
+        description: `Description shown in the Codex home banner promoting gift credits`,
+      })),
+      (v = (0, $.jsx)(h, { "aria-hidden": !0, asset: k })),
+      (b = (0, $.jsx)(_, {
+        id: `codex.giftCredits.homeBanner.action`,
+        defaultMessage: `Gift credits`,
+        description: `Button label that opens the ChatGPT gift credits purchase flow`,
+      })),
+      (t[6] = m),
+      (t[7] = g),
+      (t[8] = v),
+      (t[9] = b))
+    : ((m = t[6]), (g = t[7]), (v = t[8]), (b = t[9]));
+  let S;
+  t[10] !== r || t[11] !== i
+    ? ((S = {
+        label: b,
+        onClick: () => {
+          (Ye(i, a, {
+            entryPoint: `codex_desktop_gift_beacon`,
+            outcome: `opened`,
+            step: `entry_exposure`,
+          }),
+            r());
+        },
+      }),
+      (t[10] = r),
+      (t[11] = i),
+      (t[12] = S))
+    : (S = t[12]);
+  let C;
+  t[13] === o
+    ? (C = t[14])
+    : ((C = o.formatMessage({
+        id: `codex.giftCredits.homeBanner.dismiss`,
+        defaultMessage: `Dismiss gift credits banner`,
+        description: `Accessible label for dismissing the Codex gift credits home banner`,
+      })),
+      (t[13] = o),
+      (t[14] = C));
+  let w;
+  t[15] !== n || t[16] !== C
+    ? ((w = { ariaLabel: C, icon: x, onClick: n }), (t[15] = n), (t[16] = C), (t[17] = w))
+    : (w = t[17]);
+  let T;
+  return (
+    t[18] !== w || t[19] !== S
+      ? ((T = (0, $.jsx)(at, {
+          variant: `beacon`,
+          actionsPlacement: `bodyOnNarrow`,
+          title: m,
+          description: g,
+          leadingVisual: v,
+          primaryAction: S,
+          dismissAction: w,
+        })),
+        (t[18] = w),
+        (t[19] = S),
+        (t[20] = T))
+      : (T = t[20]),
+    T
+  );
+}
+var Rn, zn, $;
+function Bn() {
+  return (Bn = e(() => {
+    ((Rn = t()), C(), F(), o(), (zn = S()), u(), G(), i(), D(), tt(), Ze(), m(), In(), ($ = l()));
+  }))();
+}
 export {
-  initializeAnnouncementEntryPoints as _, initializeAnnouncementEntryPoints as a,
-  initializeAnnouncementEntryPoints as c, initializeAnnouncementEntryPoints as d,
-  useReplayAnnouncement as f, weeklyInsightsStatusSignal as g,
-  computerHistoryDismissedSignal as h, useGiftCreditsAnnouncement as i,
-  initializeAnnouncementEntryPoints as l, initializeAnnouncementEntryPoints as m,
-  initializeAnnouncementEntryPoints as n, useExternalImportAnnouncement as o,
-  ReplayAnnouncement as p, initializeAnnouncementEntryPoints as r,
-  ExternalImportAnnouncement as s, GiftCreditsAnnouncement as t,
-  launchReplay as u, ComputerHistoryWeeklyInsightsAnnouncement as v,
-  initializeAnnouncementEntryPoints as y,
+  Mt as _,
+  En as a,
+  un as c,
+  Jt as d,
+  Rt as f,
+  jt as g,
+  At as h,
+  Dn as i,
+  an as l,
+  It as m,
+  Bn as n,
+  pn as o,
+  Nt as p,
+  In as r,
+  on as s,
+  Ln as t,
+  Yt as u,
+  bt as v,
+  St as y,
 };

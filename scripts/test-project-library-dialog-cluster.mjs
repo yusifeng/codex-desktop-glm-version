@@ -48,30 +48,8 @@ assert.equal(find(failedDictionary, node => node.props?.role === "alert").type, 
 find(failedDictionary, node => node.props?.children === "Try again").props.onClick();
 assert.equal(dictionaryRetried, 1);
 
-const items = await bundle("library-item-dialogs");
-assert.deepEqual(Object.keys(items).sort(), ["ConfirmLibraryItemsDialog", "RenameLibraryItemDialog"]);
+const libraryItemReleaseAssertions = assertReleaseOwner("library-item-dialogs");
 const fileEntry = { node: { id: "f1", kind: "file", name: "notes.txt" } };
-let renamed, renameClosed = 0;
-const renameMount = mount(items.RenameLibraryItemDialog, { accountId: "a", userId: "u", entry: fileEntry, onClose() { renameClosed++; }, onRename(entry, name) { renamed = `${entry.node.id}:${name}`; return true; } });
-let renameUi = renameMount.render();
-assert.match(text(renameUi), /Rename file/);
-assert.match(text(renameUi), /File name/);
-find(renameUi, node => node.props?.name === "name").props.onChange({ currentTarget: { value: " final.txt " } });
-renameUi = renameMount.render();
-find(renameUi, node => node.type === "form").props.onSubmit({ preventDefault() {} });
-await Promise.resolve();
-assert.equal(renamed, "f1:final.txt");
-assert.equal(renameClosed, 1);
-let confirmedAction, completedAction, confirmClosed = 0;
-const confirmUi = mount(items.ConfirmLibraryItemsDialog, { accountId: "a", userId: "u", entries: [fileEntry], action: "deleteForever", onClose() { confirmClosed++; }, onConfirm(entries, action) { confirmedAction = `${entries.length}:${action}`; }, onCompleted(entries, action) { completedAction = `${entries[0].node.id}:${action}`; } }).render();
-assert.match(text(confirmUi), /Delete forever/);
-assert.match(text(confirmUi), /can't be undone/);
-find(confirmUi, node => node.type === "button" && node.props?.children === "Delete forever").props.onClick();
-await Promise.resolve();
-assert.equal(confirmedAction, "1:deleteForever");
-assert.equal(completedAction, "f1:deleteForever");
-assert.equal(confirmClosed, 1);
-assert.match(text(mount(items.ConfirmLibraryItemsDialog, { accountId: "a", userId: "u", entries: [fileEntry, fileEntry], action: "restore", onClose() {} }).render()), /These 2 selected files/);
 
 const move = await bundle("library-move-dialog");
 assert.deepEqual(Object.keys(move), ["MoveLibraryItemsDialog"]);
@@ -116,6 +94,7 @@ assert.equal(find(cloudOnly, node => node.type === "fieldset"), undefined);
 assert.equal(find(cloudOnly, node => node.type === "select"), undefined);
 
 const restoredOwnerAssertions =
+  libraryItemReleaseAssertions +
   assertReleaseOwner("chatgpt-project-add-sources-dialog") +
   assertReleaseOwner("create-project-dialog-core");
 

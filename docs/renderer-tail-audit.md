@@ -1,5 +1,19 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Library/browser/chart/thread/terminal release-owner recovery：一次性恢复
+`library-item-dialogs`、`image-prompt-share-dialog`、`chart-content-reference`、
+`allowed-domains-input`、`checkout-dialog-fields`、`cloud-browser-side-panel`、
+`outbound-identity-connection-dialog`、`browser-profile-import-dialog`、
+`thread-app-shell-chrome`、`announcement-entry-points`、`chart` 与 `terminal-panel`
+十二个发布 owner，净恢复 9,938 行发布 TypeScript。绑定旧手写 ABI 的 Library、sharing、
+chart、domains、checkout、browser、business dialog、thread chrome 与 terminal 测试已迁移为
+发布一致性验证，并保留同簇其他行为覆盖。整批通过 12,448/12,448 transform check、
+1,888/1,888 renderer build/verify、2,247/2,247 app-code coverage、0 semantic tail 与
+typecheck。严格 hub 消费推进到 app-shared 1,685/3,185、app-initial 5,267/8,204、
+app-primary 667/917，仍为 0 unreviewed、0 invalid consumers。按发布源码正向行数缺口口径，
+覆盖率由约 87.5% 推进到 88.4%；preserved 边界、聚合 hub 耦合导出与最终真实登录态 E2E
+仍未完成。
+
 2026-11-02 Verification/library/diff/onboarding release-owner recovery：一次性恢复
 `cfc-verification-page`、`workspace-recovery-gate-electron`、`mermaid-image-rendering`、
 `color-icon`、`pepper-onboarding-modal`、`environment-setup-review-entry`、
