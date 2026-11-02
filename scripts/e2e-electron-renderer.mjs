@@ -310,8 +310,50 @@ if (mode === "smoke-readonly") {
     if (after === before) throw new Error(`${labelText} switch did not change state`);
     if (restored !== before) throw new Error(`${labelText} switch did not restore its original state`);
   };
+  const assertReversibleListControl = async ({ itemText, role }) => {
+    const marker = 'data-packaged-e2e-list-control';
+    const before = await evaluate(`(() => {
+      const item = [...document.querySelectorAll('[role="listitem"]')].find((element) =>
+        element.innerText?.split('\\n').map((text) => text.trim()).includes(${JSON.stringify(itemText)})
+      );
+      if (item == null) throw new Error('List item not found: ' + ${JSON.stringify(itemText)});
+      const control = item.querySelector(${JSON.stringify(`[role="${role}"]`)});
+      if (control == null) throw new Error('List control not found: ' + ${JSON.stringify(`${itemText} (${role})`)});
+      control.setAttribute(${JSON.stringify(marker)}, 'true');
+      const state = control.getAttribute('aria-checked');
+      if (state == null) throw new Error('List control has no aria-checked state');
+      control.click();
+      return state;
+    })()`);
+    const waitForState = async (expectedState, timeoutMs = 5_000) => {
+      const deadline = Date.now() + timeoutMs;
+      do {
+        const state = await evaluate(`document.querySelector('[${marker}="true"]')?.getAttribute('aria-checked') ?? null`);
+        if (state === expectedState) return;
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      } while (Date.now() < deadline);
+      throw new Error(`${itemText} ${role} did not reach state ${expectedState}`);
+    };
+    const changed = before === 'true' ? 'false' : 'true';
+    try {
+      await waitForState(changed);
+    } finally {
+      const current = await evaluate(`document.querySelector('[${marker}="true"]')?.getAttribute('aria-checked') ?? null`);
+      if (current !== before) {
+        await evaluate(`document.querySelector('[${marker}="true"]')?.click()`);
+        await waitForState(before);
+      }
+      await evaluate(`document.querySelector('[${marker}="true"]')?.removeAttribute(${JSON.stringify(marker)})`);
+    }
+    checkpoints.push({ name: 'app/explore-customize-toggle', itemText, role, before, changed, restored: before });
+  };
 
   await waitForAppReady();
+  const customizeOverlayAlreadyOpen = await evaluate(`(document.body?.innerText ?? '').includes('调整活动的顺序')`);
+  if (customizeOverlayAlreadyOpen) {
+    await clickText('完成');
+    await waitForBodyText('新对话');
+  }
   if (!(await evaluate(`document.querySelector('#settings-search') != null`))) {
     if (!(await evaluate(`document.querySelector('[aria-label="打开个人资料菜单"], [aria-label="Open profile menu"]') != null`))) {
       await evaluate(`(() => {
@@ -354,6 +396,33 @@ if (mode === "smoke-readonly") {
     if (!settingsClicked) throw new Error('Settings menu item did not appear');
   }
   await waitForBodyText('搜索设置');
+  const coveredSettingsNavigationLabels = new Set([
+    '常规', '通知', '导入', '个人资料', '外观', '家长控制', 'Trusted contact', '语音',
+    '配置', '个性化', '宠物', '键盘快捷键', '使用情况和计费', '电脑操控',
+    '计算机历史记录', '应用快照', '插件', '浏览器', '钩子', '连接', 'Git', '环境',
+    'Worktrees', '已归档的聊天',
+  ]);
+  const visibleSettingsNavigationLabels = await evaluate(`(() => {
+    const navigation = document.querySelector('#settings-search')?.closest('nav');
+    if (navigation == null) throw new Error('Settings navigation not found');
+    return [...navigation.querySelectorAll('button[aria-label]')]
+      .map((button) => button.getAttribute('aria-label'))
+      .filter(Boolean);
+  })()`);
+  const uncoveredSettingsNavigationLabels = visibleSettingsNavigationLabels.filter(
+    (label) => label !== '账户' && !coveredSettingsNavigationLabels.has(label),
+  );
+  if (uncoveredSettingsNavigationLabels.length > 0) {
+    throw new Error(`Visible settings routes lack E2E coverage: ${uncoveredSettingsNavigationLabels.join(', ')}`);
+  }
+  if (!visibleSettingsNavigationLabels.includes('账户')) {
+    throw new Error('The external account settings entry is missing');
+  }
+  checkpoints.push({
+    name: 'settings/navigation-coverage',
+    covered: [...coveredSettingsNavigationLabels],
+    external: ['账户'],
+  });
   await clickText('常规');
   await waitForBodyText(['默认权限', 'Send messages']);
   await assertHealthy('settings/general');
@@ -440,6 +509,19 @@ if (mode === "smoke-readonly") {
       text: [page.label, ...page.text],
       minimumInteractive: page.minimumInteractive,
     });
+    if (page.name === 'usage-and-billing') {
+      await clickText('分析');
+      await waitForBodyText(['总用量历史记录', 'Total usage history'], 60_000);
+      await waitForSettingsPageToSettle(60_000);
+      await assertVisualPage('settings/usage-and-billing-analytics', {
+        text: ['总用量历史记录', '聊天用量排行', '工具活动', '消息'],
+        forbidden: ['正在加载聊天用量', 'Loading chat usage'],
+        minimumInteractive: 12,
+        allowHorizontalOverflow: true,
+      });
+      await clickText('Overview');
+      await waitForBodyText(['当前套餐', 'Your plan', 'Plan limits'], 60_000);
+    }
   }
 
   await clickText('配置');
@@ -455,12 +537,29 @@ if (mode === "smoke-readonly") {
     text: ['浏览目录', '搜索插件'],
     minimumInteractive: 5,
   });
-  for (const tab of [
+  const pluginSettingsTabs = [
     { label: '应用', name: 'apps', text: ['搜索应用'], minimumInteractive: 10 },
     { label: 'MCP', name: 'mcp', text: ['搜索 MCP 服务器', '服务器', 'MCP Apps'], minimumInteractive: 8 },
     { label: '技能', name: 'skills', text: ['搜索技能'], minimumInteractive: 7 },
     { label: '插件', name: 'plugins', text: ['搜索插件'], minimumInteractive: 4 },
-  ]) {
+  ];
+  const visiblePluginSettingsTabs = await evaluate(`
+    [...document.querySelectorAll('[role="tab"]')]
+      .map((element) => element.innerText?.trim().split('\\n')[0])
+      .filter(Boolean)
+  `);
+  const knownPluginSettingsTabs = new Set(pluginSettingsTabs.map((tab) => tab.label));
+  const uncoveredPluginSettingsTabs = visiblePluginSettingsTabs.filter(
+    (label) => !knownPluginSettingsTabs.has(label),
+  );
+  if (uncoveredPluginSettingsTabs.length > 0) {
+    throw new Error(`Visible plugin settings tabs lack E2E coverage: ${uncoveredPluginSettingsTabs.join(', ')}`);
+  }
+  checkpoints.push({
+    name: 'settings/plugins-navigation-coverage',
+    covered: visiblePluginSettingsTabs,
+  });
+  for (const tab of pluginSettingsTabs) {
     await waitForClickableStartingWith(tab.label);
     await clickTextStartingWith(tab.label);
     await waitForSettingsPageToSettle();
@@ -578,6 +677,29 @@ if (mode === "smoke-readonly") {
   const visibleExploreLabels = await evaluate(`
     [...document.querySelectorAll('[role="menuitem"]')].map((element) => element.innerText?.trim()).filter(Boolean)
   `);
+  const knownExploreLabels = new Set([...explorePages.map((page) => page.label), '自定义']);
+  const uncoveredExploreLabels = visibleExploreLabels.filter((label) => !knownExploreLabels.has(label));
+  if (uncoveredExploreLabels.length > 0) {
+    throw new Error(`Visible Explore routes lack E2E coverage: ${uncoveredExploreLabels.join(', ')}`);
+  }
+  checkpoints.push({
+    name: 'app/explore-navigation-coverage',
+    covered: visibleExploreLabels,
+  });
+  if (visibleExploreLabels.includes('自定义')) {
+    await clickText('自定义');
+    await waitForSelectorGone('[role="menu"]');
+    await waitForBodyText('调整活动的顺序');
+    await assertReversibleListControl({ itemText: 'Pull Request', role: 'checkbox' });
+    await assertVisualPage('app/explore-customize', {
+      text: ['自定义', '完成', '调整活动的顺序', '调整项目的顺序'],
+      minimumInteractive: 8,
+      allowHorizontalOverflow: true,
+    });
+    await clickText('完成');
+    await waitForBodyText('新对话');
+    await openExploreMenu();
+  }
   const enabledExplorePages = explorePages.filter((page) => !page.optional || visibleExploreLabels.includes(page.label));
   for (const [pageIndex, page] of enabledExplorePages.entries()) {
     await clickText(page.label);
@@ -784,6 +906,50 @@ if (mode === "smoke-readonly") {
   })()`);
   const restored = [];
   const deepChecks = [];
+  const assertReversibleCurrentSwitch = async (label, description) => {
+    await waitUntil(`${label} switch to be present`, () => evaluate(`
+      document.querySelector('[role="switch"][aria-label=${JSON.stringify(label)}]') != null
+    `));
+    const initial = await evaluate(`(() => {
+      const target = document.querySelector('[role="switch"][aria-label=${JSON.stringify(label)}]');
+      if (target == null) throw new Error(${JSON.stringify("Switch not found: ")} + ${JSON.stringify(label)});
+      const state = target.getAttribute('aria-checked');
+      target.click();
+      return state;
+    })()`);
+    if (!['true', 'false'].includes(initial)) throw new Error(`Switch has no boolean state: ${label}=${initial}`);
+    try {
+      await waitUntil(`${label} to change`, async () => (await readSwitch(label)) !== initial);
+      await new Promise((resolve) => setTimeout(resolve, 1_500));
+    } finally {
+      await waitUntil(`${label} switch to remain present`, () => evaluate(`
+        document.querySelector('[role="switch"][aria-label=${JSON.stringify(label)}]') != null
+      `));
+      if ((await readSwitch(label)) !== initial) await toggleSwitch(label);
+      await waitUntil(`${label} to restore`, async () => (await readSwitch(label)) === initial);
+      await new Promise((resolve) => setTimeout(resolve, 1_500));
+      if ((await readSwitch(label)) !== initial) throw new Error(`${label} did not remain restored after settling`);
+    }
+    deepChecks.push(description);
+    await assertNoInteractionException(description);
+  };
+  const assertPopupOpensAndCloses = async (buttonText, description) => {
+    await clickTextWithMouse(buttonText);
+    await waitUntil(`${buttonText} popup to open`, () => evaluate(`
+      [...document.querySelectorAll('button[aria-haspopup]')].some((element) =>
+        element.innerText?.trim() === ${JSON.stringify(buttonText)} && element.getAttribute('aria-expanded') === 'true'
+      ) && document.querySelector('[role="menu"], [role="listbox"]') != null
+    `));
+    await command('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' });
+    await command('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape' });
+    await waitUntil(`${buttonText} popup to close`, () => evaluate(`
+      ![...document.querySelectorAll('button[aria-haspopup]')].some((element) =>
+        element.innerText?.trim() === ${JSON.stringify(buttonText)} && element.getAttribute('aria-expanded') === 'true'
+      )
+    `));
+    deepChecks.push(description);
+    await assertNoInteractionException(description);
+  };
   try {
     for (const label of switchLabels) {
       const initial = await readSwitch(label);
@@ -889,6 +1055,52 @@ if (mode === "smoke-readonly") {
       deepChecks.push(`browser switch: ${label}`);
       await assertNoInteractionException(`restoring browser switch ${label}`);
     }
+
+    await clickText("语音");
+    await waitUntil("voice controls", () => evaluate(`
+      [...document.querySelectorAll('button[aria-haspopup]')].some((element) => element.innerText?.trim() === '系统默认') &&
+      document.querySelector('[role="switch"][aria-label="为语音聊天启用屏幕上下文"]') != null
+    `));
+    await assertPopupOpensAndCloses("系统默认", "voice microphone popup");
+
+    await clickText("电脑操控");
+    await waitUntil("computer-use controls", () => evaluate(`
+      document.querySelector('[role="switch"][aria-label="显示或隐藏 @Chrome 浏览器引用"]') != null
+    `));
+    await assertReversibleCurrentSwitch("显示或隐藏 @Chrome 浏览器引用", "computer-use Chrome visibility switch");
+
+    await clickText("应用快照");
+    await waitUntil("appshot controls", () => evaluate(`
+      document.querySelector('[role="switch"][aria-label="播放 Appshot 音效"]') != null
+    `));
+    await assertReversibleCurrentSwitch("播放 Appshot 音效", "Appshot sound switch");
+
+    await clickText("钩子");
+    await waitUntil("hooks reload control", () => evaluate(`document.querySelector('button[aria-label="重新加载钩子"]') != null`));
+    await evaluate(`document.querySelector('button[aria-label="重新加载钩子"]')?.click()`);
+    await waitUntil("hooks reload completion", () => evaluate(`
+      document.querySelector('button[aria-label="重新加载钩子"]') != null &&
+      !document.querySelector('button[aria-label="重新加载钩子"]').disabled
+    `));
+    deepChecks.push("hooks reload");
+    await assertNoInteractionException("hooks reload");
+
+    await clickText("计算机历史记录");
+    await waitUntil("computer history carousel", () => evaluate(`document.querySelector('button[aria-label="下一示例"]') != null`));
+    await evaluate(`document.querySelector('button[aria-label="下一示例"]')?.click()`);
+    await assertNoInteractionException("computer history carousel");
+    deepChecks.push("computer history carousel");
+
+    await clickText("使用情况和计费");
+    await waitUntil("usage analytics tab", () => evaluate(`
+      [...document.querySelectorAll('[role="tab"]')].some((element) => element.innerText?.trim() === '分析')
+    `), 60_000);
+    await evaluate(`([...document.querySelectorAll('[role="tab"]')].find((element) => element.innerText?.trim() === '分析'))?.click()`);
+    await waitUntil("usage analytics content", () => evaluate(`(document.body?.innerText ?? '').includes('总用量历史记录')`), 60_000);
+    await evaluate(`([...document.querySelectorAll('[role="tab"]')].find((element) => element.innerText?.trim() === 'Overview'))?.click()`);
+    await waitUntil("usage overview restore", () => evaluate(`(document.body?.innerText ?? '').includes('当前套餐')`), 60_000);
+    deepChecks.push("usage analytics tab");
+    await assertNoInteractionException("usage analytics tab");
 
     await clickText("Git");
     await waitUntil("Git settings controls", () => evaluate(`
