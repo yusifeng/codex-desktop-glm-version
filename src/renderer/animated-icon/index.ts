@@ -1,24 +1,300 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/app-primary";
-import "@rchunk/animated-icon-svg";
-import "@rchunk/hello-icon";
-import "@rchunk/loader-icon";
-import "@rchunk/memory-footnote-icon";
-import "@rchunk/sidebar-finances-icon";
-import "@rchunk/sidebar-images-icon";
-import "@rchunk/sidebar-library-icon";
-import "@rchunk/sidebar-more-icon";
-import "@rchunk/sidebar-new-chat-icon";
-import "@rchunk/sidebar-plugins-icon";
-import "@rchunk/sidebar-projects-icon";
-import "@rchunk/sidebar-search-icon";
-import "@rchunk/sidebar-tasks-icon";
-type AnimationName = "automation" | "hello" | "loader" | "memory" | "sidebar-finances" | "sidebar-images" | "sidebar-library" | "sidebar-more" | "sidebar-new-chat" | "sidebar-plugins" | "sidebar-projects" | "sidebar-search" | "sidebar-tasks";
-interface AnimatedIconProps { animation: AnimationName; animated?: boolean; className?: string; color?: string; fallbackIcon?: unknown; loop?: boolean; onComplete?(): void; onReady?(): void }
-let runtime: JsxRuntime | undefined;
-function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function AnimatedIcon({ animation, animated = true, className = "h-full w-full", color = "currentColor", fallbackIcon, loop = false, onComplete, onReady }: AnimatedIconProps): unknown { const content = fallbackIcon ?? jsx().jsx("svg", { viewBox: "0 0 24 24", "aria-hidden": true, children: jsx().jsx("circle", { cx: 12, cy: 12, r: animation === "loader" ? 8 : 7, fill: "none", stroke: color, strokeWidth: 2 }) }); return jsx().jsx("div", { className, "data-animation": animation, "data-animated": animated, "data-loop": loop, onAnimationEnd: () => { onComplete?.(); }, ref: () => onReady?.(), children: content }); }
-function initializeAnimatedIcon(): void { void jsx(); }
-export { initializeAnimatedIcon as n, AnimatedIcon as t };
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/hello-icon",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/loader-icon",
+      "@rchunk/memory-footnote-icon",
+      "@rchunk/sidebar-finances-icon",
+      "@rchunk/sidebar-images-icon",
+      "@rchunk/sidebar-library-icon",
+      "@rchunk/sidebar-more-icon",
+      "@rchunk/sidebar-new-chat-icon",
+      "@rchunk/sidebar-plugins-icon",
+      "@rchunk/sidebar-projects-icon",
+      "@rchunk/sidebar-search-icon",
+      "@rchunk/sidebar-tasks-icon",
+      "@rchunk/animated-icon-svg",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  $3 as n,
+  H3 as r,
+  I3 as i,
+  V3 as a,
+  e6 as o,
+  h4 as s,
+  m4 as c,
+} from "@rchunk/app-shared";
+import {
+  $v as l,
+  A as u,
+  Slt as d,
+  ey as f,
+  j as p,
+  n6 as m,
+  r6 as h,
+  vmn as g,
+  xlt as _,
+} from "@rchunk/app-initial";
+import { o as v, s as y } from "@rchunk/app-primary";
+function b(e) {
+  let t = getComputedStyle(e).color;
+  if (!t) return null;
+  let n = u(t);
+  return n == null ? null : Array.from(n, (e) => e / 255);
+}
+function x(e) {
+  switch (e) {
+    case `hello`:
+      return a(
+        () => import(`@rchunk/hello-icon`).then((e) => e.default),
+        __vite__mapDeps([0, 1]),
+        import.meta.url,
+      );
+    case `loader`:
+      return a(
+        () => import(`@rchunk/loader-icon`).then((e) => e.default),
+        __vite__mapDeps([2, 1]),
+        import.meta.url,
+      );
+    case `memory`:
+      return a(
+        () => import(`@rchunk/memory-footnote-icon`).then((e) => e.default),
+        __vite__mapDeps([3, 1]),
+        import.meta.url,
+      );
+    case `automation`:
+      return null;
+    case `sidebar-finances`:
+      return a(
+        () => import(`@rchunk/sidebar-finances-icon`).then((e) => e.default),
+        __vite__mapDeps([4, 1]),
+        import.meta.url,
+      );
+    case `sidebar-images`:
+      return a(
+        () => import(`@rchunk/sidebar-images-icon`).then((e) => e.default),
+        __vite__mapDeps([5, 1]),
+        import.meta.url,
+      );
+    case `sidebar-library`:
+      return a(
+        () => import(`@rchunk/sidebar-library-icon`).then((e) => e.default),
+        __vite__mapDeps([6, 1]),
+        import.meta.url,
+      );
+    case `sidebar-more`:
+      return a(
+        () => import(`@rchunk/sidebar-more-icon`).then((e) => e.default),
+        __vite__mapDeps([7, 1]),
+        import.meta.url,
+      );
+    case `sidebar-new-chat`:
+      return a(
+        () => import(`@rchunk/sidebar-new-chat-icon`).then((e) => e.default),
+        __vite__mapDeps([8, 1]),
+        import.meta.url,
+      );
+    case `sidebar-plugins`:
+      return a(
+        () => import(`@rchunk/sidebar-plugins-icon`).then((e) => e.default),
+        __vite__mapDeps([9, 1]),
+        import.meta.url,
+      );
+    case `sidebar-projects`:
+      return a(
+        () => import(`@rchunk/sidebar-projects-icon`).then((e) => e.default),
+        __vite__mapDeps([10, 1]),
+        import.meta.url,
+      );
+    case `sidebar-search`:
+      return a(
+        () => import(`@rchunk/sidebar-search-icon`).then((e) => e.default),
+        __vite__mapDeps([11, 1]),
+        import.meta.url,
+      );
+    case `sidebar-tasks`:
+      return a(
+        () => import(`@rchunk/sidebar-tasks-icon`).then((e) => e.default),
+        __vite__mapDeps([12, 1]),
+        import.meta.url,
+      );
+  }
+}
+function S(e, t) {
+  let n = (0, E.default)(e);
+  if (!t) return n;
+  let r = (e) => {
+      ((e.ty === `fl` || e.ty === `st`) && e?.c?.k && (e.c.k = t),
+        Array.isArray(e.it) && e.it.forEach(r));
+    },
+    i = (e) => {
+      (e.ty === 4 && Array.isArray(e.shapes) && e.shapes.forEach(r),
+        Array.isArray(e.layers) && e.layers.forEach(i));
+    };
+  return (i(n), Array.isArray(n.assets) && n.assets.forEach(i), n);
+}
+function C(e) {
+  let t = (0, T.c)(19),
+    {
+      className: n,
+      animation: r,
+      animated: i,
+      loop: a,
+      FallbackIcon: o,
+      fallbackIcon: s,
+      onComplete: u,
+      onReady: f,
+    } = e,
+    p = i === void 0 || i,
+    h = a !== void 0 && a,
+    g = (0, D.useRef)(null),
+    [_, y] = (0, D.useState)(),
+    S = d(),
+    C;
+  t[0] === r ? (C = t[1]) : ((C = x(r)), (t[0] = r), (t[1] = C));
+  let E = C,
+    k,
+    A;
+  (t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((k = () => {
+        let e = g.current;
+        if (!e) return;
+        let t,
+          n = () => {
+            let n = b(e),
+              r = n?.join(`,`) ?? null;
+            t !== r &&
+              ((t = r),
+              (0, D.startTransition)(() => {
+                y(n);
+              }));
+          };
+        n();
+        let r = new MutationObserver(n),
+          i = { attributes: !0, attributeFilter: [`class`, `style`] };
+        return (
+          r.observe(document.documentElement, i),
+          r.observe(e, i),
+          () => {
+            r.disconnect();
+          }
+        );
+      }),
+      (A = []),
+      (t[2] = k),
+      (t[3] = A))
+    : ((k = t[2]), (A = t[3])),
+    (0, D.useEffect)(k, A));
+  let j = o ?? m;
+  o == null && r === `automation` ? (j = l) : o == null && r === `hello` && (j = v);
+  let M;
+  t[4] === n
+    ? (M = t[5])
+    : ((M = c(`h-full w-full`, n, `flex items-center justify-center`)), (t[4] = n), (t[5] = M));
+  let N;
+  t[6] !== j ||
+  t[7] !== p ||
+  t[8] !== E ||
+  t[9] !== _ ||
+  t[10] !== s ||
+  t[11] !== h ||
+  t[12] !== u ||
+  t[13] !== f ||
+  t[14] !== S
+    ? ((N =
+        S || !p || !E || _ === void 0
+          ? (s ?? (0, O.jsx)(j, { className: `h-full w-full` }))
+          : (0, O.jsx)(D.Suspense, {
+              fallback: null,
+              children: (0, O.jsx)(w, {
+                animationJson: E,
+                color: _,
+                loop: h,
+                onComplete: u,
+                onReady: f,
+              }),
+            })),
+      (t[6] = j),
+      (t[7] = p),
+      (t[8] = E),
+      (t[9] = _),
+      (t[10] = s),
+      (t[11] = h),
+      (t[12] = u),
+      (t[13] = f),
+      (t[14] = S),
+      (t[15] = N))
+    : (N = t[15]);
+  let P;
+  return (
+    t[16] !== M || t[17] !== N
+      ? ((P = (0, O.jsx)(`div`, { ref: g, className: M, children: N })),
+        (t[16] = M),
+        (t[17] = N),
+        (t[18] = P))
+      : (P = t[18]),
+    P
+  );
+}
+function w(e) {
+  let t = (0, T.c)(8),
+    { animationJson: n, color: r, loop: i, onComplete: a, onReady: o } = e,
+    s = (0, D.use)(n),
+    c;
+  t[0] !== s || t[1] !== r ? ((c = S(s, r)), (t[0] = s), (t[1] = r), (t[2] = c)) : (c = t[2]);
+  let l = c,
+    u;
+  return (
+    t[3] !== i || t[4] !== a || t[5] !== o || t[6] !== l
+      ? ((u = (0, O.jsx)(k, {
+          animationData: l,
+          autoplay: !0,
+          className: `pointer-events-none h-full w-full contain-[paint_style_layout_inline-size]`,
+          loop: i,
+          onComplete: a,
+          onDOMLoaded: o,
+        })),
+        (t[3] = i),
+        (t[4] = a),
+        (t[5] = o),
+        (t[6] = l),
+        (t[7] = u))
+      : (u = t[7]),
+    u
+  );
+}
+var T, E, D, O, k;
+function A() {
+  return (A = e(() => {
+    ((T = n()),
+      s(),
+      (E = t(g(), 1)),
+      (D = o()),
+      _(),
+      f(),
+      h(),
+      y(),
+      p(),
+      (O = i()),
+      r(),
+      (k = (0, D.lazy)(() =>
+        a(
+          async () => {
+            let { SvgLottie: e } = await import(`@rchunk/animated-icon-svg`);
+            return { SvgLottie: e };
+          },
+          __vite__mapDeps([13, 1, 14, 15]),
+          import.meta.url,
+        ).then(({ SvgLottie: e }) => ({ default: e })),
+      )));
+  }))();
+}
+export { A as n, C as t };

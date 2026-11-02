@@ -1,15 +1,253 @@
-import "@rchunk/rolldown-runtime";
-export interface FontDescriptor { family: string; stretch?: string; style?: string; weight?: string }
-export interface TextMetricsLike { actualBoundingBoxAscent?: number; actualBoundingBoxDescent?: number; fontBoundingBoxAscent?: number; fontBoundingBoxDescent?: number }
-export interface FontMetrics { ascentEm: number; descentEm: number; lineGapEm: number; measuredAtPx: number }
-const listeners = new Set<() => void>();
-function subscribeFontMetrics(listener: () => void): () => void { listeners.add(listener); return () => listeners.delete(listener); }
-function notifyFontMetrics(): void { listeners.forEach(listener => listener()); }
-function fractionalPart(value: number): number { return Number.isFinite(value) ? value - Math.round(value) : 0; }
-function createFontString(font: FontDescriptor, size: number): string { return `${font.style && font.style !== "normal" ? `${font.style} ` : ""}${font.weight && font.weight !== "normal" ? `${font.weight} ` : ""}${font.stretch && font.stretch !== "normal" ? `${font.stretch} ` : ""}${size}px ${font.family}`.trim(); }
-function calculateFontMetrics(cap: TextMetricsLike, descender: TextMetricsLike, size = 100): FontMetrics { const ascent = typeof cap.actualBoundingBoxAscent === "number" && cap.actualBoundingBoxAscent > 0 ? cap.actualBoundingBoxAscent : size * .8; const descent = typeof descender.actualBoundingBoxDescent === "number" && descender.actualBoundingBoxDescent > 0 ? descender.actualBoundingBoxDescent : size * .2; const fontAscent = typeof cap.fontBoundingBoxAscent === "number" && cap.fontBoundingBoxAscent > 0 ? cap.fontBoundingBoxAscent : ascent; const fontDescent = typeof descender.fontBoundingBoxDescent === "number" && descender.fontBoundingBoxDescent > 0 ? descender.fontBoundingBoxDescent : descent; return { ascentEm: ascent / size, descentEm: descent / size, lineGapEm: Math.max(0, fontAscent + fontDescent - ascent - descent) / size, measuredAtPx: size }; }
-function getMeasurementContext(): OffscreenCanvasRenderingContext2D { if (typeof OffscreenCanvas === "undefined") throw new Error("[font-metrics] OffscreenCanvas API is not available for measurements."); const context = new OffscreenCanvas(1, 1).getContext("2d"); if (!context) throw new Error("[font-metrics] OffscreenCanvas API is not available for measurements."); context.textBaseline = "alphabetic"; return context; }
-class FontMetricsCache { private cache = new Map<string, FontMetrics>(); getFontKey(font: FontDescriptor): string { return `${font.style?.trim().toLowerCase() || "normal"}|${font.weight?.trim().toLowerCase() || "normal"}|${font.stretch?.trim().toLowerCase() || "normal"}|${font.family}`; } getMetrics(font: FontDescriptor): FontMetrics { const key = this.getFontKey(font); const cached = this.cache.get(key); if (cached) return cached; const context = getMeasurementContext(); context.font = createFontString(font, 100); const metrics = calculateFontMetrics(context.measureText("H"), context.measureText("g")); this.cache.set(key, metrics); return metrics; } getMetricsForSize(font: FontDescriptor, size: number): { ascentPx: number; descentPx: number; lineGapPx: number } { const metrics = this.getMetrics(font); return { ascentPx: metrics.ascentEm * size, descentPx: metrics.descentEm * size, lineGapPx: metrics.lineGapEm * size }; } reset(): void { this.cache.clear(); } dispose(): void { this.reset(); } }
-let fontMetricsCache: FontMetricsCache;
-function initializeFontMetrics(): void { fontMetricsCache ??= new FontMetricsCache(); }
-export { subscribeFontMetrics as a, notifyFontMetrics as c, initializeFontMetrics as i, fontMetricsCache as n, calculateFontMetrics as o, getMeasurementContext as r, fractionalPart as s, createFontString as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+function t(e) {
+  return e
+    .trim()
+    .replace(/^(['"])(.*)\1$/, `$2`)
+    .replace(/\\(['"])/g, `$1`)
+    .normalize(`NFKC`)
+    .replace(/\s+/g, ` `)
+    .trim()
+    .toLocaleLowerCase(`en-US`);
+}
+function n(e) {
+  let n = [],
+    r = ``,
+    i,
+    a = !1,
+    o = () => {
+      let e = t(r);
+      (e && n.push(e), (r = ``));
+    };
+  for (let t = 0; t < e.length; t += 1) {
+    let n = e[t];
+    a
+      ? ((r += n), (a = !1))
+      : n === `\\`
+        ? (a = !0)
+        : i
+          ? n === i
+            ? (i = void 0)
+            : (r += n)
+          : n === `'` || n === `"`
+            ? (i = n)
+            : n === `,`
+              ? o()
+              : (r += n);
+  }
+  return (a && (r += `\\`), o(), n);
+}
+function r(e) {
+  if (!e || e === `normal`) return 400;
+  if (e === `bold`) return 700;
+  let t = Number(e);
+  return Number.isFinite(t) ? t : 400;
+}
+function i(e) {
+  let t = e?.trim().toLowerCase();
+  return t === `italic` || t === `oblique` ? t : `normal`;
+}
+function a(e) {
+  switch (e?.trim().toLowerCase()) {
+    case `ultra-condensed`:
+    case `extra-condensed`:
+    case `condensed`:
+    case `semi-condensed`:
+    case `semi-expanded`:
+    case `expanded`:
+    case `extra-expanded`:
+    case `ultra-expanded`:
+      return e.trim().toLowerCase();
+    default:
+      return `normal`;
+  }
+}
+function o(e) {
+  return (
+    [
+      ``,
+      `ultra-condensed`,
+      `extra-condensed`,
+      `condensed`,
+      `semi-condensed`,
+      `normal`,
+      `semi-expanded`,
+      `expanded`,
+      `extra-expanded`,
+      `ultra-expanded`,
+    ].indexOf(a(e)) || 5
+  );
+}
+function s(e) {
+  switch (i(e)) {
+    case `italic`:
+      return 1;
+    case `oblique`:
+      return 2;
+    default:
+      return 0;
+  }
+}
+function c(e, t) {
+  return e <= 5 ? (t <= e ? 10 - e + t : 10 - t) : t >= e ? 10 + e - t : t;
+}
+function l(e, t) {
+  return (
+    [
+      [3, 1, 2],
+      [1, 3, 2],
+      [1, 2, 3],
+    ][e]?.[t] ?? 0
+  );
+}
+function u(e, t) {
+  return e === t
+    ? 1e3
+    : e < 400
+      ? t <= e
+        ? 1e3 - e + t
+        : 1e3 - t
+      : e <= 500
+        ? t >= e && t <= 500
+          ? 1e3 + e - t
+          : t <= e
+            ? 500 + t
+            : 1e3 - t
+        : t > e
+          ? 1e3 + e - t
+          : t;
+}
+function d(e, t) {
+  return [c(o(e.stretch), o(t.width)), l(s(e.style), s(t.style)), u(r(e.weight), t.weight)];
+}
+function f(e, t) {
+  for (let n = 0; n < e.length; n += 1) {
+    let r = (e[n] ?? 0) - (t[n] ?? 0);
+    if (r !== 0) return r > 0;
+  }
+  return !1;
+}
+function p(e) {
+  for (let t of n(e.family)) {
+    let n = A.get(t),
+      r = n?.[0];
+    if (!r) continue;
+    let i = r,
+      a = d(e, i);
+    for (let t = 1; t < n.length; t += 1) {
+      let r = n[t];
+      if (!r) continue;
+      let o = d(e, r);
+      f(o, a) && ((i = r), (a = o));
+    }
+    return i;
+  }
+}
+function m(e) {
+  return Number.isFinite(e) ? e - Math.round(e) : 0;
+}
+function h() {
+  if (typeof OffscreenCanvas < `u`) {
+    let e = new OffscreenCanvas(1, 1).getContext(`2d`);
+    if (e) return e;
+  }
+  throw Error(`[font-metrics] OffscreenCanvas API is not available for measurements.`);
+}
+function g() {
+  return (D || ((D = h()), (D.textBaseline = `alphabetic`)), D);
+}
+function _() {
+  O.forEach((e) => e());
+}
+function v() {
+  if (k) return;
+  let e = globalThis.fonts;
+  if (!e || typeof e.addEventListener != `function`) return;
+  let t = () => _();
+  (e.addEventListener(`loadingdone`, t), e.addEventListener(`loadingerror`, t), (k = !0));
+}
+function y(e) {
+  return (
+    O.add(e),
+    v(),
+    () => {
+      O.delete(e);
+    }
+  );
+}
+function b() {
+  _();
+}
+function x(e, t) {
+  return `${e.style && e.style !== `normal` ? `${e.style} ` : ``}${e.weight && e.weight !== `normal` ? `${e.weight} ` : ``}${e.stretch && e.stretch !== `normal` ? `${e.stretch} ` : ``}${t}px ${e.family}`.trim();
+}
+function S(e) {
+  return `${e.style?.trim().toLowerCase() || `normal`}|${e.weight?.trim().toLowerCase() || `normal`}|${e.stretch?.trim().toLowerCase() || `normal`}|${e.family}`;
+}
+function C(e, t) {
+  return typeof e == `number` && Number.isFinite(e) && e > 0 ? e : t;
+}
+function w(e, t, n = 100) {
+  let r = C(e.actualBoundingBoxAscent, n * 0.8),
+    i = C(t.actualBoundingBoxDescent, n * 0.2),
+    a = C(e.fontBoundingBoxAscent, r),
+    o = C(t.fontBoundingBoxDescent, i),
+    s = a + o,
+    c = r + i,
+    l = Math.max(0, s - c);
+  return { ascentEm: a / n, descentEm: o / n, lineGapEm: l / n, measuredAtPx: n };
+}
+var T, E, D, O, k, A, j, M;
+function N() {
+  return (N = e(() => {
+    ((T = `H`),
+      (E = `g`),
+      (O = new Set()),
+      (k = !1),
+      (A = new Map()),
+      (j = class {
+        #e = new Map();
+        #t;
+        constructor() {
+          this.#t = y(() => this.reset());
+        }
+        getFontKey(e) {
+          return S(e);
+        }
+        getMetrics(e) {
+          let t = this.getFontKey(e),
+            n = this.#e.get(t);
+          if (n) return n;
+          let r = this.measure(e);
+          return (this.#e.set(t, r), r);
+        }
+        getMetricsForSize(e, t) {
+          let n = this.getMetrics(e),
+            r = n.ascentEm * t,
+            i = n.descentEm * t,
+            a = n.lineGapEm * t,
+            o = p(e);
+          return {
+            ascentPx: r,
+            descentPx: i,
+            lineGapPx: a,
+            officeAscentPx: o ? (o.ascent / o.unitsPerEm) * t : void 0,
+            officeDescentPx: o ? (o.descent / o.unitsPerEm) * t : void 0,
+            officeMetricsSource: o?.source,
+          };
+        }
+        reset() {
+          this.#e.clear();
+        }
+        dispose() {
+          (this.reset(), this.#t?.(), (this.#t = void 0));
+        }
+        measure(e) {
+          let t = g();
+          return ((t.font = x(e, 100)), w(t.measureText(T), t.measureText(E), 100));
+        }
+      }),
+      (M = new j()));
+  }))();
+}
+export { y as a, b as c, N as i, M as n, w as o, g as r, m as s, x as t };

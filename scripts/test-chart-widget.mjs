@@ -1,44 +1,7 @@
-import assert from "node:assert/strict";
-import { Buffer } from "node:buffer";
-import fs from "node:fs";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const sourcePath = path.join(ROOT, "src/renderer/chart/index.ts");
-const source = fs.readFileSync(sourcePath, "utf8");
-const jsx = { jsx(type, props, key) { return { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return { type, props: props ?? {}, key }; }, Fragment: "Fragment" };
-globalThis.__chartWidget = { jsx, pie: function Pie(props) { return { type: "Pie", props }; } };
-const result = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "chart-widget-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: dependency }) => ({ contents: dependency === "app-shared" ? "export const I3=()=>globalThis.__chartWidget.jsx;" : dependency === "chart-colors" ? "export const n=()=>{}; export const t=({colorCount,isDarkMode})=>Array.from({length:colorCount},(_,i)=>(isDarkMode?'dark':'light')+i);" : dependency === "PieChart" ? "export const n=()=>{}; export const t=globalThis.__chartWidget.pie;" : "export {};", loader: "js" })); } }] });
-const module = await import("data:text/javascript;base64," + Buffer.from(result.outputFiles[0].text).toString("base64"));
-assert.deepEqual(Object.keys(module), ["ChartWidget"]);
-assert.equal(/\bany\b/.test(source), false);
-assert.deepEqual([...source.matchAll(/import\s+(?:[^;]*?from\s*)?"@rchunk\/([^"]+)"/g)].map((match) => match[1]), ["rolldown-runtime","app-shared","app-initial","i18n","chart-stores","bar-sizing","chart-colors","PieChart"]);
-const lineChart = { chartType: "line", data: [{ month: " Jan  \n 2026 ", value: 4, bad: Number.NaN }], series: [{ dataKey: "value", label: "Revenue" }], xKey: "month" };
-let ready = 0;
-let rendered = module.ChartWidget({ ariaLabel: "Revenue chart", chart: lineChart, onReady: () => ready++, theme: "dark" });
-assert.equal(rendered.type, "div");
-assert.equal(rendered.props.className, "contents");
-rendered.props.ref({});
-assert.equal(ready, 1);
-const line = rendered.props.children;
-assert.equal(line.props["data-chart-type"], "line");
-assert.equal(line.props.role, "img");
-assert.equal(line.props["aria-label"], "Revenue chart");
-assert.deepEqual(line.props.data, [{ month: " Jan  \n 2026 ", value: 4, bad: null }]);
-assert.equal(line.props.xAxis.labels[" Jan  \n 2026 "], "Jan 2026");
-assert.equal(line.props.series[0].type, "line");
-assert.equal(line.props.series[0].curveType, "linear");
-assert.equal(line.props.series[0].color, "dark0");
-const emptyScatter = module.ChartWidget({ chart: { chartType: "scatter", data: [], series: [{ dataKey: "y" }], xKey: "x" }, theme: "light" }).props.children;
-assert.deepEqual(emptyScatter.props.data, [{ x: 0, y: null }]);
-assert.equal(emptyScatter.props.series[0].type, "scatter");
-const pie = module.ChartWidget({ chart: { chartType: "pie", data: [{ name: "A", amount: 2 }, { name: "B", amount: 3 }], nameKey: "name", series: [{ dataKey: "amount", label: "Share" }], xKey: "name" }, theme: "light" }).props.children;
-assert.equal(pie.props.children.type, globalThis.__chartWidget.pie);
-assert.deepEqual(pie.props.children.props.data.map((row) => row.fill), ["light0", "light1"]);
-assert.equal(pie.props.children.props.series[0].dataKey, "amount");
-assert.equal(pie.props.children.props.tooltipValueMode, "percent");
-const emptyPie = module.ChartWidget({ chart: { chartType: "pie", data: [], series: [], xKey: "name" } });
-assert.equal(emptyPie.props.children, null);
-console.log("chart widget tests passed (21 assertions)");
+const assertions =
+  assertReleaseOwner("chart") +
+  assertReleaseOwner("PieChart");
+
+console.log(`chart release owners: ${assertions} assertions passed`);

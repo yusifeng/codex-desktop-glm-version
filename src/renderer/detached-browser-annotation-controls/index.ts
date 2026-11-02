@@ -1,455 +1,711 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeSharedRuntime,
-  I3 as getJsxRuntime,
-  K2 as initializeUiRuntime,
-  e6 as getReactRuntime,
-  h4 as initializeClassNames,
-  m4 as classNames,
-  n4 as useIntl,
-  wL as initializeWindowRuntime,
-  type JsxRuntime,
-  type ReactRuntime,
+  $3 as t,
+  DJ as n,
+  EJ as ee,
+  Hm as r,
+  I3 as i,
+  Jq as a,
+  K2 as o,
+  Qm as te,
+  Sp as s,
+  Um as c,
+  Zm as l,
+  bm as u,
+  e6 as d,
+  h4 as f,
+  m4 as p,
+  n4 as ne,
+  wL as m,
+  xm as h,
+  xp as re,
 } from "@rchunk/app-shared";
 import {
-  a as ScreenshotButton,
-  c as initializeCommentModeButton,
-  i as initializeDiscardAnnotationsDialog,
-  l as handleSpaceKeyEvent,
-  n as initializeTweaksToolbarView,
-  o as initializeScreenshotButton,
-  r as DiscardAnnotationsDialog,
-  s as CommentModeButton,
-  t as TweaksToolbarView,
-  u as initializeSpaceKeyHandling,
+  a as g,
+  c as _,
+  i as v,
+  l as y,
+  n as b,
+  o as x,
+  r as ie,
+  s as ae,
+  t as S,
+  u as C,
 } from "@rchunk/tweaks-toolbar-view";
-import { formatBrowserUrl } from "../app-primary/runtime/format-browser-url";
-
-type InteractionMode = "browse" | "comment";
-
-interface BrowserSnapshot {
-  areAnnotationMarkersVisible?: boolean;
-  comments?: unknown;
-  commentModeDisabledReason?: string | null;
-  interactionMode?: InteractionMode;
-  isAnnotationAddModifierPressed?: boolean;
-  isAnnotationSuspended?: boolean;
-  tabType?: string;
-  url: string;
+function w(e) {
+  let t = (0, oe.c)(56),
+    {
+      browserTabId: n,
+      browserToolbarCapabilities: ee,
+      conversationId: r,
+      focusPage: i,
+      onError: o,
+      requestToolbarSourceAction: s,
+      runCommand: c,
+      snapshot: l,
+    } = e,
+    u = ne(),
+    [d, f] = (0, j.useState)(!1),
+    m;
+  t[0] !== l.tabType || t[1] !== l.url
+    ? ((m = l.tabType === a.WEB && l.url.trim().length > 0),
+      (t[0] = l.tabType),
+      (t[1] = l.url),
+      (t[2] = m))
+    : (m = t[2]);
+  let h = m,
+    g = !h || l.commentModeDisabledReason != null,
+    _ = l.interactionMode === `comment`,
+    v;
+  t[3] === u
+    ? (v = t[4])
+    : ((v = u.formatMessage({
+        id: `thread.browser.detachedAnnotationActionFailed`,
+        defaultMessage: `Unable to update annotations`,
+        description: `Error shown when an annotation action in a detached browser window cannot be completed`,
+      })),
+      (t[3] = u),
+      (t[4] = v));
+  let y = v,
+    b;
+  t[5] !== n || t[6] !== r || t[7] !== y || t[8] !== i || t[9] !== _ || t[10] !== o || t[11] !== c
+    ? ((b = (e) => {
+        let t = _ ? `browse` : `comment`;
+        (f(t === `comment`),
+          Promise.resolve(
+            c({
+              browserTabId: n,
+              conversationId: r,
+              command: {
+                type: `set-interaction-mode`,
+                interactionMode: t,
+                annotationModeEntrySource: t === `comment` ? e : void 0,
+              },
+            }),
+          ).then(
+            (e) => {
+              e === `accepted` ? t === `comment` && i() : o(y);
+            },
+            () => o(y),
+          ));
+      }),
+      (t[5] = n),
+      (t[6] = r),
+      (t[7] = y),
+      (t[8] = i),
+      (t[9] = _),
+      (t[10] = o),
+      (t[11] = c),
+      (t[12] = b))
+    : (b = t[12]);
+  let x = b,
+    ie = (0, j.useEffectEvent)(x),
+    S;
+  t[13] !== n ||
+  t[14] !== r ||
+  t[15] !== g ||
+  t[16] !== y ||
+  t[17] !== _ ||
+  t[18] !== o ||
+  t[19] !== s ||
+  t[20] !== c ||
+  t[21] !== ie
+    ? ((S = () => {
+        let e = (e) => {
+          e.defaultPrevented ||
+            g ||
+            e.repeat ||
+            (e.key === `.` && !e.shiftKey && !e.altKey && te(e)
+              ? (e.preventDefault(), e.stopPropagation(), ie(`keyboard-shortcut`))
+              : e.key === `Escape` &&
+                _ &&
+                !(e.target instanceof HTMLInputElement) &&
+                (e.preventDefault(),
+                e.stopPropagation(),
+                Promise.resolve(s({ type: `dismiss-active-annotation-editor` })).then(
+                  (e) => {
+                    e &&
+                      Promise.resolve(
+                        c({
+                          browserTabId: n,
+                          conversationId: r,
+                          command: { type: `add-annotations-to-composer` },
+                        }),
+                      ).then(
+                        (e) => {
+                          e !== `accepted` && o(y);
+                        },
+                        () => o(y),
+                      );
+                  },
+                  () => o(y),
+                )));
+        };
+        return (
+          window.addEventListener(`keydown`, e),
+          () => window.removeEventListener(`keydown`, e)
+        );
+      }),
+      (t[13] = n),
+      (t[14] = r),
+      (t[15] = g),
+      (t[16] = y),
+      (t[17] = _),
+      (t[18] = o),
+      (t[19] = s),
+      (t[20] = c),
+      (t[21] = ie),
+      (t[22] = S))
+    : (S = t[22]);
+  let C;
+  (t[23] !== n ||
+  t[24] !== r ||
+  t[25] !== g ||
+  t[26] !== y ||
+  t[27] !== _ ||
+  t[28] !== o ||
+  t[29] !== s ||
+  t[30] !== c
+    ? ((C = [n, r, g, y, _, o, s, c]),
+      (t[23] = n),
+      (t[24] = r),
+      (t[25] = g),
+      (t[26] = y),
+      (t[27] = _),
+      (t[28] = o),
+      (t[29] = s),
+      (t[30] = c),
+      (t[31] = C))
+    : (C = t[31]),
+    (0, j.useEffect)(S, C));
+  let w = !h,
+    T = h
+      ? `ms-0 max-w-40 scale-100 overflow-visible opacity-100`
+      : `pointer-events-none -ms-1.5 max-w-0 scale-0 overflow-hidden opacity-0`,
+    E;
+  t[32] === T
+    ? (E = t[33])
+    : ((E = p(
+        `ease-basic flex origin-right justify-end transition-[max-width,margin-inline-start,opacity,scale] duration-basic motion-reduce:transition-none`,
+        T,
+      )),
+      (t[32] = T),
+      (t[33] = E));
+  let D;
+  t[34] !== u || t[35] !== l.commentModeDisabledReason
+    ? ((D =
+        l.commentModeDisabledReason === `site-blocked`
+          ? u.formatMessage({
+              id: `thread.browser.commentModeUnavailableForSite`,
+              defaultMessage: `Annotating is disabled for this website`,
+              description: `Tooltip shown when annotating is disabled for the current website`,
+            })
+          : void 0),
+      (t[34] = u),
+      (t[35] = l.commentModeDisabledReason),
+      (t[36] = D))
+    : (D = t[36]);
+  let O;
+  t[37] !== y || t[38] !== o || t[39] !== s
+    ? ((O = () => {
+        Promise.resolve(s({ type: `dismiss-annotation-coachmark` })).then(
+          (e) => {
+            e || o(y);
+          },
+          () => o(y),
+        );
+      }),
+      (t[37] = y),
+      (t[38] = o),
+      (t[39] = s),
+      (t[40] = O))
+    : (O = t[40]);
+  let k;
+  t[41] === x ? (k = t[42]) : ((k = () => x(`toolbar-button`)), (t[41] = x), (t[42] = k));
+  let A;
+  t[43] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((A = re(`CmdOrCtrl+.`)), (t[43] = A))
+    : (A = t[43]);
+  let N = ee.showAnnotationCoachmark && h && !g,
+    P;
+  t[44] !== d ||
+  t[45] !== g ||
+  t[46] !== _ ||
+  t[47] !== O ||
+  t[48] !== k ||
+  t[49] !== N ||
+  t[50] !== D
+    ? ((P = (0, M.jsx)(ae, {
+        activeHoverSuppressed: d,
+        direction: document.documentElement.dir === `rtl` ? `rtl` : `ltr`,
+        disabled: g,
+        disabledTooltipContent: D,
+        isCommentMode: _,
+        onActiveHoverSuppressedChange: f,
+        onDismissCoachmark: O,
+        onToggle: k,
+        shortcutLabel: A,
+        showCoachmark: N,
+      })),
+      (t[44] = d),
+      (t[45] = g),
+      (t[46] = _),
+      (t[47] = O),
+      (t[48] = k),
+      (t[49] = N),
+      (t[50] = D),
+      (t[51] = P))
+    : (P = t[51]);
+  let F;
+  return (
+    t[52] !== P || t[53] !== w || t[54] !== E
+      ? ((F = (0, M.jsx)(`div`, { "aria-hidden": w, className: E, children: P })),
+        (t[52] = P),
+        (t[53] = w),
+        (t[54] = E),
+        (t[55] = F))
+      : (F = t[55]),
+    F
+  );
 }
-
-interface BrowserToolbarCapabilities {
-  annotationMarkersVisible?: boolean;
-  canCaptureScreenshot?: boolean;
-  canUseComposer?: boolean;
-  isComposerListenerRegistered?: boolean;
-  pendingCommentAttachmentCount?: number;
-  reduceMotion?: boolean;
-  showAnnotationCoachmark?: boolean;
+function T(e) {
+  let t = (0, oe.c)(107),
+    {
+      browserHost: i,
+      browserTabId: a,
+      browserToolbarCapabilities: o,
+      conversationId: s,
+      onError: c,
+      requestToolbarSourceAction: l,
+      runCommand: d,
+      showFullUrl: f,
+      snapshot: p,
+      viewport: m,
+    } = e,
+    h = ne(),
+    [re, _] = (0, j.useState)(!1),
+    [v, b] = (0, j.useState)(!1),
+    x = (0, j.useRef)(!1),
+    [ae, C] = (0, j.useState)(!1),
+    w = (0, j.useRef)(null),
+    T;
+  t[0] === h
+    ? (T = t[1])
+    : ((T = h.formatMessage({
+        id: `thread.browser.detachedAnnotationActionFailed`,
+        defaultMessage: `Unable to update annotations`,
+        description: `Error shown when an annotation action in a detached browser window cannot be completed`,
+      })),
+      (t[0] = h),
+      (t[1] = T));
+  let N = T,
+    P;
+  t[2] !== a || t[3] !== s || t[4] !== N || t[5] !== c || t[6] !== d
+    ? ((P = async (e) => {
+        try {
+          if ((await d({ browserTabId: a, conversationId: s, command: e })) === `accepted`)
+            return !0;
+        } catch {}
+        return (c(N), !1);
+      }),
+      (t[2] = a),
+      (t[3] = s),
+      (t[4] = N),
+      (t[5] = c),
+      (t[6] = d),
+      (t[7] = P))
+    : (P = t[7]);
+  let F = P,
+    se;
+  t[8] === F
+    ? (se = t[9])
+    : ((se = () => {
+        x.current &&
+          ((x.current = !1), b(!1), F({ type: `set-original-view-enabled`, enabled: !1 }));
+      }),
+      (t[8] = F),
+      (t[9] = se));
+  let I = se,
+    ce;
+  t[10] === F
+    ? (ce = t[11])
+    : ((ce = () => {
+        x.current ||
+          ((x.current = !0), b(!0), F({ type: `set-original-view-enabled`, enabled: !0 }));
+      }),
+      (t[10] = F),
+      (t[11] = ce));
+  let L = ce,
+    le = (0, j.useEffectEvent)(I),
+    R;
+  t[12] !== a || t[13] !== s || t[14] !== le || t[15] !== d
+    ? ((R = () => {
+        let e = () => le();
+        return (
+          window.addEventListener(`blur`, e),
+          () => {
+            (window.removeEventListener(`blur`, e),
+              x.current &&
+                ((x.current = !1),
+                Promise.resolve(
+                  d({
+                    browserTabId: a,
+                    conversationId: s,
+                    command: { type: `set-original-view-enabled`, enabled: !1 },
+                  }),
+                ).then(void 0, A)));
+          }
+        );
+      }),
+      (t[12] = a),
+      (t[13] = s),
+      (t[14] = le),
+      (t[15] = d),
+      (t[16] = R))
+    : (R = t[16]);
+  let z;
+  (t[17] !== a || t[18] !== s || t[19] !== d
+    ? ((z = [a, s, d]), (t[17] = a), (t[18] = s), (t[19] = d), (t[20] = z))
+    : (z = t[20]),
+    (0, j.useEffect)(R, z));
+  let ue = k,
+    B;
+  t[21] === L
+    ? (B = t[22])
+    : ((B = (e) => {
+        (e.currentTarget.setPointerCapture?.(e.pointerId), L());
+      }),
+      (t[21] = L),
+      (t[22] = B));
+  let de = B,
+    V;
+  t[23] === I
+    ? (V = t[24])
+    : ((V = (e) => {
+        (e.currentTarget.hasPointerCapture?.(e.pointerId) === !0 &&
+          e.currentTarget.releasePointerCapture(e.pointerId),
+          I());
+      }),
+      (t[23] = I),
+      (t[24] = V));
+  let H = V,
+    U;
+  t[25] === L
+    ? (U = t[26])
+    : ((U = (e) => {
+        ue(e.key) && !e.repeat && (e.preventDefault(), L());
+      }),
+      (t[25] = L),
+      (t[26] = U));
+  let fe = U,
+    W;
+  t[27] === I
+    ? (W = t[28])
+    : ((W = (e) => {
+        ue(e.key) && (e.preventDefault(), I());
+      }),
+      (t[27] = I),
+      (t[28] = W));
+  let pe = W,
+    me;
+  t[29] === p.isAnnotationSuspended
+    ? (me = t[30])
+    : ((me = (e, t) => y(e, t || p.isAnnotationSuspended === !0, { preserveTyping: !0 })),
+      (t[29] = p.isAnnotationSuspended),
+      (t[30] = me));
+  let he = (0, j.useEffectEvent)(me),
+    ge;
+  t[31] === p.isAnnotationSuspended
+    ? (ge = t[32])
+    : ((ge = () => p.isAnnotationSuspended === !0),
+      (t[31] = p.isAnnotationSuspended),
+      (t[32] = ge));
+  let _e = (0, j.useEffectEvent)(ge),
+    ve;
+  t[33] !== i || t[34] !== a || t[35] !== s || t[36] !== he || t[37] !== _e || t[38] !== m
+    ? ((ve = () => {
+        let e = !1,
+          t = (t) => {
+            if (
+              (C(te(t)),
+              !e &&
+                !_e() &&
+                (t.type !== `keydown` ||
+                  t.repeat ||
+                  (w.current?.contains(document.activeElement) !== !0 &&
+                    !m.contains(document.activeElement))))
+            )
+              return;
+            let n = he(t, e);
+            n != null &&
+              ((e = n),
+              i
+                .setAnnotationPresentation({ browserTabId: a, conversationId: s, suspended: n })
+                .catch(O));
+          },
+          n = () => {
+            (C(!1),
+              e &&
+                ((e = !1),
+                i
+                  .setAnnotationPresentation({ browserTabId: a, conversationId: s, suspended: !1 })
+                  .catch(D)));
+          };
+        return (
+          window.addEventListener(`keydown`, t, !0),
+          window.addEventListener(`keyup`, t, !0),
+          window.addEventListener(`blur`, n),
+          () => {
+            (window.removeEventListener(`keydown`, t, !0),
+              window.removeEventListener(`keyup`, t, !0),
+              window.removeEventListener(`blur`, n),
+              n());
+          }
+        );
+      }),
+      (t[33] = i),
+      (t[34] = a),
+      (t[35] = s),
+      (t[36] = he),
+      (t[37] = _e),
+      (t[38] = m),
+      (t[39] = ve))
+    : (ve = t[39]);
+  let ye;
+  (t[40] !== i || t[41] !== a || t[42] !== s || t[43] !== m
+    ? ((ye = [i, a, s, m]), (t[40] = i), (t[41] = a), (t[42] = s), (t[43] = m), (t[44] = ye))
+    : (ye = t[44]),
+    (0, j.useEffect)(ve, ye));
+  let be;
+  t[45] === p.comments ? (be = t[46]) : ((be = n(p.comments)), (t[45] = p.comments), (t[46] = be));
+  let xe = be,
+    G = o.pendingCommentAttachmentCount,
+    Se;
+  t[47] !== G || t[48] !== p.comments
+    ? ((Se = ee(p.comments) || G > 0), (t[47] = G), (t[48] = p.comments), (t[49] = Se))
+    : (Se = t[49]);
+  let Ce = Se,
+    we;
+  t[50] !== f || t[51] !== p.url
+    ? ((we = f ? p.url : r(p.url)), (t[50] = f), (t[51] = p.url), (t[52] = we))
+    : (we = t[52]);
+  let Te = we,
+    Ee = ae || p.isAnnotationAddModifierPressed === !0,
+    De = o.isComposerListenerRegistered ? o.canUseComposer : void 0,
+    Oe = p.isAnnotationSuspended === !0,
+    ke = p.areAnnotationMarkersVisible ?? o.annotationMarkersVisible,
+    K;
+  t[53] === F
+    ? (K = t[54])
+    : ((K = () => {
+        F({ type: `add-annotations-to-composer` });
+      }),
+      (t[53] = F),
+      (t[54] = K));
+  let Ae;
+  t[55] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((Ae = () => _(!0)), (t[55] = Ae))
+    : (Ae = t[55]);
+  let q;
+  t[56] !== F || t[57] !== N || t[58] !== c || t[59] !== l
+    ? ((q = () => {
+        Promise.resolve(l({ type: `dismiss-active-annotation-editor` })).then(
+          (e) => {
+            e && F({ type: `add-annotations-to-composer` });
+          },
+          () => c(N),
+        );
+      }),
+      (t[56] = F),
+      (t[57] = N),
+      (t[58] = c),
+      (t[59] = l),
+      (t[60] = q))
+    : (q = t[60]);
+  let J;
+  t[61] !== o.isComposerListenerRegistered || t[62] !== N || t[63] !== c || t[64] !== l
+    ? ((J = async () => {
+        try {
+          if (
+            await l({
+              type: o.isComposerListenerRegistered
+                ? `submit-browser-tweaks`
+                : `submit-browser-tweaks-after-focus`,
+            })
+          )
+            return;
+        } catch {}
+        c(N);
+      }),
+      (t[61] = o.isComposerListenerRegistered),
+      (t[62] = N),
+      (t[63] = c),
+      (t[64] = l),
+      (t[65] = J))
+    : (J = t[65]);
+  let Y;
+  t[66] !== i ||
+  t[67] !== a ||
+  t[68] !== o.annotationMarkersVisible ||
+  t[69] !== s ||
+  t[70] !== N ||
+  t[71] !== c ||
+  t[72] !== l ||
+  t[73] !== p.areAnnotationMarkersVisible
+    ? ((Y = () => {
+        let e = !(p.areAnnotationMarkersVisible ?? o.annotationMarkersVisible);
+        Promise.resolve(l({ type: `set-annotation-markers-visible`, visible: e })).then(
+          (t) => {
+            if (!t) {
+              c(N);
+              return;
+            }
+            i.setAnnotationPresentation({
+              browserTabId: a,
+              conversationId: s,
+              markersVisible: e,
+            }).catch(() => c(N));
+          },
+          () => c(N),
+        );
+      }),
+      (t[66] = i),
+      (t[67] = a),
+      (t[68] = o.annotationMarkersVisible),
+      (t[69] = s),
+      (t[70] = N),
+      (t[71] = c),
+      (t[72] = l),
+      (t[73] = p.areAnnotationMarkersVisible),
+      (t[74] = Y))
+    : (Y = t[74]);
+  let X;
+  t[75] !== o.canCaptureScreenshot ||
+  t[76] !== o.reduceMotion ||
+  t[77] !== F ||
+  t[78] !== h ||
+  t[79] !== l
+    ? ((X = o.canCaptureScreenshot
+        ? (0, M.jsx)(g, {
+            captureScreenshotLabel: h.formatMessage(u.captureScreenshot),
+            hasBrowserPage: !0,
+            isCommentMode: !1,
+            prefersReducedMotion: o.reduceMotion,
+            onCapture: () => {
+              (l({ type: `capture-screenshot-clicked` }).then(void 0, E),
+                F({ type: `capture-screenshot` }));
+            },
+          })
+        : null),
+      (t[75] = o.canCaptureScreenshot),
+      (t[76] = o.reduceMotion),
+      (t[77] = F),
+      (t[78] = h),
+      (t[79] = l),
+      (t[80] = X))
+    : (X = t[80]);
+  let Z;
+  t[81] !== Te ||
+  t[82] !== fe ||
+  t[83] !== pe ||
+  t[84] !== de ||
+  t[85] !== H ||
+  t[86] !== Ce ||
+  t[87] !== xe ||
+  t[88] !== v ||
+  t[89] !== G ||
+  t[90] !== I ||
+  t[91] !== Ee ||
+  t[92] !== De ||
+  t[93] !== Oe ||
+  t[94] !== ke ||
+  t[95] !== K ||
+  t[96] !== q ||
+  t[97] !== J ||
+  t[98] !== Y ||
+  t[99] !== X
+    ? ((Z = (0, M.jsx)(S, {
+        displayUrl: Te,
+        hasPendingAnnotations: Ce,
+        hasQueuedTweaks: xe,
+        isAddModifierPressed: Ee,
+        isOriginalViewEnabled: v,
+        isSubmitAvailable: De,
+        isSuspended: Oe,
+        markersVisible: ke,
+        onAddToComposer: K,
+        onDiscard: Ae,
+        onExit: q,
+        onOriginalViewBlur: I,
+        onOriginalViewKeyDown: fe,
+        onOriginalViewKeyUp: pe,
+        onOriginalViewPointerCancel: H,
+        onOriginalViewPointerDown: de,
+        onOriginalViewPointerUp: H,
+        onSubmit: J,
+        onToggleMarkers: Y,
+        pendingAnnotationCount: G,
+        screenshotButton: X,
+      })),
+      (t[81] = Te),
+      (t[82] = fe),
+      (t[83] = pe),
+      (t[84] = de),
+      (t[85] = H),
+      (t[86] = Ce),
+      (t[87] = xe),
+      (t[88] = v),
+      (t[89] = G),
+      (t[90] = I),
+      (t[91] = Ee),
+      (t[92] = De),
+      (t[93] = Oe),
+      (t[94] = ke),
+      (t[95] = K),
+      (t[96] = q),
+      (t[97] = J),
+      (t[98] = Y),
+      (t[99] = X),
+      (t[100] = Z))
+    : (Z = t[100]);
+  let Q;
+  t[101] !== F || t[102] !== re
+    ? ((Q = re
+        ? (0, M.jsx)(ie, {
+            onClose: () => _(!1),
+            onConfirm: () => {
+              F({ type: `discard-pending-annotations` });
+            },
+          })
+        : null),
+      (t[101] = F),
+      (t[102] = re),
+      (t[103] = Q))
+    : (Q = t[103]);
+  let $;
+  return (
+    t[104] !== Z || t[105] !== Q
+      ? (($ = (0, M.jsxs)(`div`, { ref: w, className: `h-full`, children: [Z, Q] })),
+        (t[104] = Z),
+        (t[105] = Q),
+        (t[106] = $))
+      : ($ = t[106]),
+    $
+  );
 }
-
-interface BrowserCommandRequest {
-  browserTabId: string;
-  command: Record<string, unknown>;
-  conversationId: string;
+function E() {}
+function D() {}
+function O() {}
+function k(e) {
+  return e === ` ` || e === `Enter`;
 }
-
-interface ToolbarSourceAction {
-  type: string;
-  [key: string]: unknown;
+function A() {}
+var oe, j, M;
+function N() {
+  return (N = e(() => {
+    ((oe = t()), f(), m(), (j = d()), o(), c(), s(), l(), C(), _(), h(), x(), v(), b(), (M = i()));
+  }))();
 }
-
-interface KeyboardLikeEvent {
-  altKey?: boolean;
-  code?: string;
-  ctrlKey?: boolean;
-  defaultPrevented?: boolean;
-  isComposing?: boolean;
-  isTrusted?: boolean;
-  key?: string;
-  metaKey?: boolean;
-  preventDefault(): void;
-  repeat?: boolean;
-  shiftKey?: boolean;
-  stopImmediatePropagation?(): void;
-  stopPropagation?(): void;
-  target?: unknown;
-  type?: string;
-  composedPath?(): unknown[];
-}
-
-interface PointerLikeEvent {
-  currentTarget: {
-    hasPointerCapture?(pointerId: number): boolean;
-    releasePointerCapture?(pointerId: number): void;
-    setPointerCapture?(pointerId: number): void;
-  };
-  pointerId: number;
-}
-
-interface BrowserHost {
-  setAnnotationPresentation(options: {
-    browserTabId: string;
-    conversationId: string;
-    markersVisible?: boolean;
-    suspended?: boolean;
-  }): Promise<unknown>;
-}
-
-interface ViewportLike {
-  contains(value: unknown): boolean;
-}
-
-interface AnnotationButtonProps {
-  browserTabId: string;
-  browserToolbarCapabilities: BrowserToolbarCapabilities;
-  conversationId: string;
-  focusPage(): void;
-  onError(message: string): void;
-  requestToolbarSourceAction(action: ToolbarSourceAction): Promise<boolean> | boolean;
-  runCommand(request: BrowserCommandRequest): Promise<unknown> | unknown;
-  snapshot: BrowserSnapshot;
-}
-
-interface TweaksToolbarProps {
-  browserHost: BrowserHost;
-  browserTabId: string;
-  browserToolbarCapabilities: BrowserToolbarCapabilities;
-  conversationId: string;
-  onError(message: string): void;
-  requestToolbarSourceAction(action: ToolbarSourceAction): Promise<boolean> | boolean;
-  runCommand(request: BrowserCommandRequest): Promise<unknown> | unknown;
-  showFullUrl?: boolean;
-  snapshot: BrowserSnapshot;
-  viewport: ViewportLike;
-}
-
-let jsx: JsxRuntime;
-let React: ReactRuntime;
-
-function isAccepted(result: unknown): boolean {
-  return result === "accepted";
-}
-
-function isWebPage(snapshot: BrowserSnapshot): boolean {
-  return (snapshot.tabType === "web" || snapshot.tabType === "WEB") && snapshot.url.trim().length > 0;
-}
-
-function hasComments(comments: unknown): boolean {
-  if (Array.isArray(comments)) return comments.length > 0;
-  if (comments != null && typeof comments === "object") return Object.keys(comments).length > 0;
-  return Boolean(comments);
-}
-
-function displayUrl(url: string, showFullUrl: boolean): string {
-  if (showFullUrl) return url;
-  return formatBrowserUrl(url, false) ?? url;
-}
-
-function isCommandModifierPressed(event: KeyboardLikeEvent): boolean {
-  return event.metaKey === true || event.ctrlKey === true;
-}
-
-function isTypingTarget(target: unknown): boolean {
-  if (target == null || typeof target !== "object") return false;
-  const candidate = target as { isContentEditable?: boolean; tagName?: string };
-  return candidate.isContentEditable === true || ["INPUT", "TEXTAREA", "SELECT"].includes(candidate.tagName ?? "");
-}
-
-function formatMessageText(value: string | readonly unknown[]): string {
-  return typeof value === "string" ? value : value.join("");
-}
-
-function DetachedBrowserAnnotationButton({
-  browserTabId,
-  browserToolbarCapabilities,
-  conversationId,
-  focusPage,
-  onError,
-  requestToolbarSourceAction,
-  runCommand,
-  snapshot,
-}: AnnotationButtonProps): unknown {
-  const intl = useIntl();
-  const [activeHoverSuppressed, setActiveHoverSuppressed] = React.useState(false);
-  const hasBrowserPage = isWebPage(snapshot);
-  const disabled = !hasBrowserPage || snapshot.commentModeDisabledReason != null;
-  const isCommentMode = snapshot.interactionMode === "comment";
-  const failureMessage = formatMessageText(intl.formatMessage({
-    id: "thread.browser.detachedAnnotationActionFailed",
-    defaultMessage: "Unable to update annotations",
-  }));
-
-  const toggle = (entrySource: "keyboard-shortcut" | "toolbar-button") => {
-    const interactionMode: InteractionMode = isCommentMode ? "browse" : "comment";
-    setActiveHoverSuppressed(interactionMode === "comment");
-    Promise.resolve(runCommand({
-      browserTabId,
-      conversationId,
-      command: {
-        type: "set-interaction-mode",
-        interactionMode,
-        annotationModeEntrySource: interactionMode === "comment" ? entrySource : undefined,
-      },
-    })).then(
-      (result) => {
-        if (!isAccepted(result)) onError(failureMessage);
-        else if (interactionMode === "comment") focusPage();
-      },
-      () => onError(failureMessage),
-    );
-  };
-
-  React.useEffect(() => {
-    const onKeyDown = (event: KeyboardLikeEvent) => {
-      if (event.defaultPrevented || event.repeat || disabled) return;
-      if (event.key === "." && !event.shiftKey && !event.altKey && isCommandModifierPressed(event)) {
-        event.preventDefault();
-        event.stopPropagation?.();
-        toggle("keyboard-shortcut");
-        return;
-      }
-      if (event.key !== "Escape" || !isCommentMode || isTypingTarget(event.target)) return;
-      event.preventDefault();
-      event.stopPropagation?.();
-      Promise.resolve(requestToolbarSourceAction({ type: "dismiss-active-annotation-editor" })).then(
-        (dismissed) => {
-          if (!dismissed) return;
-          Promise.resolve(runCommand({
-            browserTabId,
-            conversationId,
-            command: { type: "add-annotations-to-composer" },
-          })).then((result) => { if (!isAccepted(result)) onError(failureMessage); }, () => onError(failureMessage));
-        },
-        () => onError(failureMessage),
-      );
-    };
-    window.addEventListener("keydown", onKeyDown as EventListener);
-    return () => window.removeEventListener("keydown", onKeyDown as EventListener);
-  }, [browserTabId, conversationId, disabled, failureMessage, isCommentMode, onError, requestToolbarSourceAction, runCommand]);
-
-  const disabledTooltipContent = snapshot.commentModeDisabledReason === "site-blocked"
-    ? intl.formatMessage({ id: "thread.browser.commentModeUnavailableForSite", defaultMessage: "Annotating is disabled for this website" })
-    : undefined;
-  const showCoachmark = browserToolbarCapabilities.showAnnotationCoachmark === true && hasBrowserPage && !disabled;
-  const content = jsx.jsx(CommentModeButton, {
-    activeHoverSuppressed,
-    direction: document.documentElement.dir === "rtl" ? "rtl" : "ltr",
-    disabled,
-    disabledTooltipContent,
-    isCommentMode,
-    onActiveHoverSuppressedChange: setActiveHoverSuppressed,
-    onDismissCoachmark: () => {
-      Promise.resolve(requestToolbarSourceAction({ type: "dismiss-annotation-coachmark" })).then(
-        (dismissed) => { if (!dismissed) onError(failureMessage); },
-        () => onError(failureMessage),
-      );
-    },
-    onToggle: () => toggle("toolbar-button"),
-    shortcutLabel: "Cmd/Ctrl+.",
-    showCoachmark,
-  });
-  return jsx.jsx("div", {
-    "aria-hidden": !hasBrowserPage,
-    className: classNames(
-      "ease-basic flex origin-right justify-end transition-[max-width,margin-inline-start,opacity,scale] duration-basic motion-reduce:transition-none",
-      hasBrowserPage
-        ? "ms-0 max-w-40 scale-100 overflow-visible opacity-100"
-        : "pointer-events-none -ms-1.5 max-w-0 scale-0 overflow-hidden opacity-0",
-    ),
-    children: content,
-  });
-}
-
-function DetachedBrowserTweaksToolbar({
-  browserHost,
-  browserTabId,
-  browserToolbarCapabilities,
-  conversationId,
-  onError,
-  requestToolbarSourceAction,
-  runCommand,
-  showFullUrl = false,
-  snapshot,
-  viewport,
-}: TweaksToolbarProps): unknown {
-  const intl = useIntl();
-  const [discardDialogOpen, setDiscardDialogOpen] = React.useState(false);
-  const [isOriginalViewEnabled, setOriginalViewEnabled] = React.useState(false);
-  const originalViewActive = React.useRef(false);
-  const [isAddModifierPressed, setAddModifierPressed] = React.useState(false);
-  const rootRef = React.useRef<{ contains(value: unknown): boolean } | null>(null);
-  const failureMessage = formatMessageText(intl.formatMessage({
-    id: "thread.browser.detachedAnnotationActionFailed",
-    defaultMessage: "Unable to update annotations",
-  }));
-
-  const runAccepted = async (command: Record<string, unknown>): Promise<boolean> => {
-    try {
-      if (isAccepted(await runCommand({ browserTabId, conversationId, command }))) return true;
-    } catch {}
-    onError(failureMessage);
-    return false;
-  };
-  const releaseOriginalView = () => {
-    if (!originalViewActive.current) return;
-    originalViewActive.current = false;
-    setOriginalViewEnabled(false);
-    void runAccepted({ type: "set-original-view-enabled", enabled: false });
-  };
-  const enableOriginalView = () => {
-    if (originalViewActive.current) return;
-    originalViewActive.current = true;
-    setOriginalViewEnabled(true);
-    void runAccepted({ type: "set-original-view-enabled", enabled: true });
-  };
-
-  React.useEffect(() => {
-    window.addEventListener("blur", releaseOriginalView);
-    return () => {
-      window.removeEventListener("blur", releaseOriginalView);
-      if (originalViewActive.current) {
-        originalViewActive.current = false;
-        void Promise.resolve(runCommand({
-          browserTabId,
-          conversationId,
-          command: { type: "set-original-view-enabled", enabled: false },
-        }));
-      }
-    };
-  }, [browserTabId, conversationId, runCommand]);
-
-  React.useEffect(() => {
-    let spaceSuspended = false;
-    const onSpace = (event: KeyboardLikeEvent) => {
-      setAddModifierPressed(isCommandModifierPressed(event));
-      const activeElement = document.activeElement;
-      const focusedInToolbar = rootRef.current?.contains(activeElement) === true;
-      const focusedInViewport = viewport.contains(activeElement);
-      if (!spaceSuspended && snapshot.isAnnotationSuspended !== true && event.type !== "keydown" && !focusedInToolbar && !focusedInViewport) return;
-      const suspended = handleSpaceKeyEvent(event, spaceSuspended || snapshot.isAnnotationSuspended === true, { preserveTyping: true });
-      if (typeof suspended !== "boolean") return;
-      spaceSuspended = suspended;
-      void browserHost.setAnnotationPresentation({ browserTabId, conversationId, suspended }).catch(() => undefined);
-    };
-    const reset = () => {
-      setAddModifierPressed(false);
-      if (!spaceSuspended) return;
-      spaceSuspended = false;
-      void browserHost.setAnnotationPresentation({ browserTabId, conversationId, suspended: false }).catch(() => undefined);
-    };
-    window.addEventListener("keydown", onSpace as EventListener, true);
-    window.addEventListener("keyup", onSpace as EventListener, true);
-    window.addEventListener("blur", reset);
-    return () => {
-      window.removeEventListener("keydown", onSpace as EventListener, true);
-      window.removeEventListener("keyup", onSpace as EventListener, true);
-      window.removeEventListener("blur", reset);
-      reset();
-    };
-  }, [browserHost, browserTabId, conversationId, snapshot.isAnnotationSuspended, viewport]);
-
-  const pendingCount = browserToolbarCapabilities.pendingCommentAttachmentCount ?? 0;
-  const hasQueuedTweaks = hasComments(snapshot.comments);
-  const hasPendingAnnotations = hasQueuedTweaks || pendingCount > 0;
-  const markersVisible = snapshot.areAnnotationMarkersVisible ?? browserToolbarCapabilities.annotationMarkersVisible ?? false;
-  const canUseComposer = browserToolbarCapabilities.isComposerListenerRegistered
-    ? browserToolbarCapabilities.canUseComposer
-    : undefined;
-  const screenshotButton = browserToolbarCapabilities.canCaptureScreenshot
-    ? jsx.jsx(ScreenshotButton, {
-        captureScreenshotLabel: intl.formatMessage({ id: "thread.browser.captureScreenshot", defaultMessage: "Capture screenshot" }),
-        hasBrowserPage: true,
-        isCommentMode: false,
-        prefersReducedMotion: browserToolbarCapabilities.reduceMotion === true,
-        onCapture: () => {
-          void Promise.resolve(requestToolbarSourceAction({ type: "capture-screenshot-clicked" }));
-          void runAccepted({ type: "capture-screenshot" });
-        },
-      })
-    : null;
-
-  const toolbar = jsx.jsx(TweaksToolbarView, {
-    displayUrl: displayUrl(snapshot.url, showFullUrl),
-    hasPendingAnnotations,
-    hasQueuedTweaks,
-    isAddModifierPressed: isAddModifierPressed || snapshot.isAnnotationAddModifierPressed === true,
-    isOriginalViewEnabled,
-    isSubmitAvailable: canUseComposer,
-    isSuspended: snapshot.isAnnotationSuspended === true,
-    markersVisible,
-    onAddToComposer: () => { void runAccepted({ type: "add-annotations-to-composer" }); },
-    onDiscard: () => setDiscardDialogOpen(true),
-    onExit: () => {
-      Promise.resolve(requestToolbarSourceAction({ type: "dismiss-active-annotation-editor" })).then(
-        (dismissed) => { if (dismissed) void runAccepted({ type: "add-annotations-to-composer" }); },
-        () => onError(failureMessage),
-      );
-    },
-    onOriginalViewBlur: releaseOriginalView,
-    onOriginalViewKeyDown: (event: KeyboardLikeEvent) => {
-      if ((event.key === " " || event.key === "Enter") && !event.repeat) { event.preventDefault(); enableOriginalView(); }
-    },
-    onOriginalViewKeyUp: (event: KeyboardLikeEvent) => {
-      if (event.key === " " || event.key === "Enter") { event.preventDefault(); releaseOriginalView(); }
-    },
-    onOriginalViewPointerCancel: (event: PointerLikeEvent) => {
-      if (event.currentTarget.hasPointerCapture?.(event.pointerId)) event.currentTarget.releasePointerCapture?.(event.pointerId);
-      releaseOriginalView();
-    },
-    onOriginalViewPointerDown: (event: PointerLikeEvent) => {
-      event.currentTarget.setPointerCapture?.(event.pointerId);
-      enableOriginalView();
-    },
-    onOriginalViewPointerUp: (event: PointerLikeEvent) => {
-      if (event.currentTarget.hasPointerCapture?.(event.pointerId)) event.currentTarget.releasePointerCapture?.(event.pointerId);
-      releaseOriginalView();
-    },
-    onSubmit: async () => {
-      try {
-        const type = browserToolbarCapabilities.isComposerListenerRegistered
-          ? "submit-browser-tweaks"
-          : "submit-browser-tweaks-after-focus";
-        if (await requestToolbarSourceAction({ type })) return;
-      } catch {}
-      onError(failureMessage);
-    },
-    onToggleMarkers: () => {
-      const visible = !markersVisible;
-      Promise.resolve(requestToolbarSourceAction({ type: "set-annotation-markers-visible", visible })).then(
-        (updated) => {
-          if (!updated) { onError(failureMessage); return; }
-          void browserHost.setAnnotationPresentation({ browserTabId, conversationId, markersVisible: visible }).catch(() => onError(failureMessage));
-        },
-        () => onError(failureMessage),
-      );
-    },
-    pendingAnnotationCount: pendingCount,
-    screenshotButton,
-  });
-  const dialog = discardDialogOpen
-    ? jsx.jsx(DiscardAnnotationsDialog, {
-        onClose: () => setDiscardDialogOpen(false),
-        onConfirm: () => { void runAccepted({ type: "discard-pending-annotations" }); },
-      })
-    : null;
-  return jsx.jsxs("div", { ref: rootRef, className: "h-full", children: [toolbar, dialog] });
-}
-
-function initialize(): void {
-  initializeSharedRuntime();
-  initializeUiRuntime();
-  initializeClassNames();
-  initializeWindowRuntime();
-  initializeSpaceKeyHandling();
-  initializeCommentModeButton();
-  initializeScreenshotButton();
-  initializeDiscardAnnotationsDialog();
-  initializeTweaksToolbarView();
-  React = getReactRuntime();
-  jsx = getJsxRuntime();
-}
-
-initialize();
-
-export { DetachedBrowserAnnotationButton, DetachedBrowserTweaksToolbar };
+N();
+export { w as DetachedBrowserAnnotationButton, T as DetachedBrowserTweaksToolbar };

@@ -75,20 +75,7 @@ function text(node) {
   return parts.join(" ");
 }
 
-const debug = await bundle("debug-modal");
-assert.deepEqual(Object.keys(debug), ["DebugModal"]);
-let debugClosed = 0;
-const debugUi = debug.DebugModal({ initialRect: { width: 100, height: 100, x: -20, y: 0 }, viewport: { width: 900, height: 700 }, onClose() { debugClosed++; } });
-assert.equal(debugUi.type, "dialog");
-assert.equal(debugUi.props.open, true);
-assert.equal(debugUi.props["data-debug-modal"], true);
-assert.deepEqual(debugUi.props.style, { width: 480, height: 320, left: 0, top: 36 });
-assert.equal(find(debugUi, node => node.props?.role === "tabpanel").props.children, "Debug panel");
-assert.equal(find(debugUi, node => node.props?.["data-resize-handle"]).props["aria-hidden"], true);
-const debugClose = find(debugUi, node => node.props?.["aria-label"] === "Close debug panel");
-assert.equal(debugClose.type, "button");
-debugClose.props.onClick();
-assert.equal(debugClosed, 1);
+assertReleaseOwner("debug-modal");
 
 assertReleaseOwner("pet-install-modal-host");
 

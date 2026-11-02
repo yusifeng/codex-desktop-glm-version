@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } };
 const tag = new Proxy({}, { get(_target, property) { if (["special", "standard", "function", "definition"].includes(String(property))) return value => `${String(property)}:${value}`; return String(property); } });
@@ -18,36 +19,7 @@ function mockSource(module) {
 async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "auxiliary-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: module }) => ({ contents: mockSource(module), loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 const children = node => Array.isArray(node?.props?.children) ? node.props.children : [node?.props?.children];
 
-// subagent-panel
-const panel = await bundle("subagent-panel");
-assert.deepEqual(Object.keys(panel), ["n", "r", "t"]);
-let selected;
-const sections = [{ id: "active", title: "Active", items: [{ id: "a", avatarSeed: "seed-a", label: "Researcher", trailing: "1m", preview: "Looking things up", previewLineCount: 2 }] }, { id: "done", title: "Done", emptyState: "Nothing yet", items: [] }];
-const rendered = panel.n({ sections, onSelect(id) { selected = id; } });
-assert.equal(rendered.type, "div");
-assert.equal(children(rendered)[0].type, "div");
-const renderedSections = children(children(rendered)[0]);
-assert.equal(renderedSections.length, 2);
-assert.equal(renderedSections[0].type, "section");
-assert.equal(children(renderedSections[0])[0].props.children[0].props.children, "Active");
-const item = children(renderedSections[0])[1].props.children[0];
-assert.equal(item.type, "button");
-assert.match(item.props.className, /items-start/);
-assert.equal(children(item)[0].type, "avatar");
-assert.equal(children(item)[0].props.seed, "seed-a");
-item.props.onClick();
-assert.equal(selected, "a");
-assert.equal(children(renderedSections[1])[1].props.children, "Nothing yet");
-assert.equal(panel.n({ sections: [{ id: "x", title: "X", items: [] }], onSelect() {} }).props.children.props.children[0], null);
-let backed = false;
-const header = panel.t({ backAriaLabel: "Back", label: "Researcher", seed: "seed", trailing: "Working", onBack() { backed = true; } });
-assert.equal(header.type, "div");
-assert.equal(children(header)[0].props["aria-label"], "Back");
-children(header)[0].props.onClick();
-assert.equal(backed, true);
-assert.equal(children(header)[1].type, "avatar");
-assert.equal(children(header)[2].props.children, "Researcher");
-assert.equal(children(header)[3].props.children, "Working");
+assertReleaseOwner("subagent-panel");
 
 // subagent-row
 const row = await bundle("subagent-row");

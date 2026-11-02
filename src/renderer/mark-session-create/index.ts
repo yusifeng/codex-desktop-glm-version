@@ -1,18 +1,16 @@
-// @ts-nocheck -- recovered release runtime; dependencies retain their published ABI names.
-// Recovered TypeScript owner for voice session creation, timing, state and command dispatch.
-// This source is compiled directly and no longer falls back to the shipped JavaScript asset.
+// @ts-nocheck
 const __vite__mapDeps = (
   i,
   m = __vite__mapDeps,
   d = m.f ||
     (m.f = [
-      "@exact-chunk/entry-6a5124b71d02.js",
-      "@exact-chunk/rolldown-runtime-2d059c5e81f4.js",
-      "@exact-chunk/app-shared-7b9edc1bfb7f.js",
+      "@rchunk/voice-dsp-entry",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
       "./app-shared-fa570b9eb9dd.css",
     ]),
 ) => i.map((i) => d[i]);
-import { n as e } from "@exact-chunk/rolldown-runtime-2d059c5e81f4.js";
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
   FX as t,
   H3 as n,
@@ -34,7 +32,7 @@ import {
   sZ as v,
   x4 as y,
   zZ as b,
-} from "@exact-chunk/app-shared-7b9edc1bfb7f.js";
+} from "@rchunk/app-shared";
 import {
   $9t as x,
   $Bt as S,
@@ -143,17 +141,19 @@ import {
   yln as jt,
   ypn as Mt,
   zFt as Nt,
-} from "@exact-chunk/app-initial-51da50e6c6e3.js";
-import { n as Pt, t as Ft } from "@exact-chunk/chatgpt-user-context-3b1c70ea4d16.js";
-import { a as It, o as Lt, r as Rt, s as zt } from "@exact-chunk/preferences-c824e7299e20.js";
-import { i as Bt, r as Vt } from "@exact-chunk/dsp-d76b3132336b.js";
-import { i as B, n as Ht, o as Ut, t as Wt } from "@exact-chunk/voice-configuration-manager-459bb6c6d96a.js";
-import { l as Gt, n as Kt, o as qt, r as Jt, t as Yt } from "@exact-chunk/chatgpt_voice-cb350881bdb5.js";
+} from "@rchunk/app-initial";
+import { n as Pt, t as Ft } from "@rchunk/chatgpt-user-context";
+import { a as It, o as Lt, r as Rt, s as zt } from "@rchunk/voice-preferences";
+import { i as Bt, r as Vt } from "@rchunk/voice-dsp-state";
+import { i as B, n as Ht, o as Ut, t as Wt } from "@rchunk/voice-configuration-manager";
+import { l as Gt, n as Kt, o as qt, r as Jt, t as Yt } from "@rchunk/chatgpt-voice-analytics-protobuf";
 function Xt(e) {
   return e.get(Ge)?.getLayer(`815598430`).get(`web_enabled`, !1) ?? !1;
 }
 function Zt(e) {
-  return e.get(Ge)?.getLayer(`794043821`).get(`startup_connection_timeout_threshold_millis`, 1e4) ?? 1e4;
+  return (
+    e.get(Ge)?.getLayer(`794043821`).get(`startup_connection_timeout_threshold_millis`, 1e4) ?? 1e4
+  );
 }
 function Qt() {
   return (Qt = e(() => {
@@ -181,7 +181,8 @@ function en() {
         let r = t($e),
           i = r?.pathname ?? `/`,
           a = Fe(i);
-        if (jt(r?.search ?? ``) || (i !== `/` && a == null) || (a != null && `gizmoId` in a.params)) return !1;
+        if (jt(r?.search ?? ``) || (i !== `/` && a == null) || (a != null && `gizmoId` in a.params))
+          return !1;
         let o = t(Ie),
           s = t(St);
         if (
@@ -290,7 +291,9 @@ function an() {
         this.endTime = e;
       }
       end(e) {
-        this.failTime === void 0 && this.endTime === void 0 && (this.endTime = e ?? performance.now());
+        this.failTime === void 0 &&
+          this.endTime === void 0 &&
+          (this.endTime = e ?? performance.now());
       }
       fail() {
         this.endTime === void 0 && this.failTime === void 0 && (this.failTime = performance.now());
@@ -417,7 +420,11 @@ function W() {
             createAbortSignal: V(),
             setLocalDescription: V(),
           },
-          _parameterResolution: { voiceCommit: V(), backendReasoningEffort: V(), workModelSlug: V() },
+          _parameterResolution: {
+            voiceCommit: V(),
+            backendReasoningEffort: V(),
+            workModelSlug: V(),
+          },
           _connect: { authHeaders: V(), newForm: V() },
           _postConnect: { setRemoteDescription: V(), getResponseText: V() },
           _instantConnect: {
@@ -460,7 +467,11 @@ function W() {
             },
           },
           _microphonePermissions: { request: V() },
-          _interactivePreConnect: { advancedVoiceDisclosure: V(), voicePicker: V(), temporaryChatNotice: V() },
+          _interactivePreConnect: {
+            advancedVoiceDisclosure: V(),
+            voicePicker: V(),
+            temporaryChatNotice: V(),
+          },
           _visualizer: {
             kind: void 0,
             mounted: H(e),
@@ -493,7 +504,10 @@ function W() {
 function gn(e) {
   let t = L(e).getState();
   return t.voiceSessionId
-    ? { voiceSessionId: t.voiceSessionId, conversationId: t.earlyServerThreadId ?? t.conversationId ?? void 0 }
+    ? {
+        voiceSessionId: t.voiceSessionId,
+        conversationId: t.earlyServerThreadId ?? t.conversationId ?? void 0,
+      }
     : null;
 }
 function _n(e, { audioRoute: t, analyticsContext: n, nowMs: r = Date.now() }) {
@@ -567,7 +581,9 @@ function bn(e, { actor: t, state: n }) {
       case Yt.UNRECOGNIZED:
         return;
     }
-    ((e.metrics.voiceActorStateChangeIndex += 1), (i = e.metrics.voiceActorStateChangeIndex), (a = !0));
+    ((e.metrics.voiceActorStateChangeIndex += 1),
+      (i = e.metrics.voiceActorStateChangeIndex),
+      (a = !0));
   }),
     a && Dt(e, Jt, { ...r, actor: t, state: n, stateChangeIndex: Be(i) }));
 }
@@ -584,7 +600,8 @@ function xn(e, { actor: t, isSpeaking: n, nowMs: r = Date.now() }) {
           e.isAssistantSpeaking && (e.metrics.assistantSpeakingTimeMs += t),
           e.isUserSpeaking && e.isAssistantSpeaking && (e.metrics.simultaneousSpeakingTimeMs += t));
       }
-      ((e.metrics.speakingStateUpdatedAtMs = r), t === `user` ? (e.isUserSpeaking = n) : (e.isAssistantSpeaking = n));
+      ((e.metrics.speakingStateUpdatedAtMs = r),
+        t === `user` ? (e.isUserSpeaking = n) : (e.isAssistantSpeaking = n));
     }),
     t === `user` &&
       bn(e, {
@@ -594,7 +611,11 @@ function xn(e, { actor: t, isSpeaking: n, nowMs: r = Date.now() }) {
 }
 function Sn(e, t = U(e).session.getEndAsTimestamp() ?? Date.now()) {
   Cn(e, t);
-  let { userSpeakingTimeMs: n, assistantSpeakingTimeMs: r, simultaneousSpeakingTimeMs: i } = L(e).getState().metrics;
+  let {
+    userSpeakingTimeMs: n,
+    assistantSpeakingTimeMs: r,
+    simultaneousSpeakingTimeMs: i,
+  } = L(e).getState().metrics;
   return {
     ...(n > 0 ? { userSpeakingTimeMs: Be(n) } : {}),
     ...(r > 0 ? { assistantSpeakingTimeMs: Be(r) } : {}),
@@ -659,7 +680,9 @@ function Tn(e) {
 function En(e, t = U(e).session.getEndAsTimestamp() ?? Date.now()) {
   L(e).setState((e) => {
     let n = e.metrics.backgroundedAtMs;
-    n == null || t <= n || ((e.metrics.backgroundTotalDurationMs += t - n), (e.metrics.backgroundedAtMs = t));
+    n == null ||
+      t <= n ||
+      ((e.metrics.backgroundTotalDurationMs += t - n), (e.metrics.backgroundedAtMs = t));
   });
   let {
     firstBackgroundTsMs: n,
@@ -713,7 +736,13 @@ function An(e, t, n, r) {
     voiceStore: t,
     event: {
       type: P.TrackState,
-      payload: { type: P.TrackState, track_id: `microphone`, media_type: `audio`, media_source: n, state: r },
+      payload: {
+        type: P.TrackState,
+        track_id: `microphone`,
+        media_type: `audio`,
+        media_source: n,
+        state: r,
+      },
     },
   });
 }
@@ -747,7 +776,10 @@ async function Fn({ scope: e, room: t, expectedVoiceSessionId: n }) {
         options: { reliable: !0 },
       });
     } catch (e) {
-      i.debug(`[voice] Failed to publish audio route metadata`, { safe: {}, sensitive: { error: e } });
+      i.debug(`[voice] Failed to publish audio route metadata`, {
+        safe: {},
+        sensitive: { error: e },
+      });
     }
 }
 async function In(e, { snapshotActiveDevices: t = !1 } = {}) {
@@ -767,7 +799,10 @@ async function In(e, { snapshotActiveDevices: t = !1 } = {}) {
         c = { inputDevice: o ? { name: o } : void 0, outputDevice: s ? { name: s } : void 0 };
       return c.inputDevice || c.outputDevice ? c : void 0;
     } catch (e) {
-      i.debug(`[voice] Failed to capture audio route metadata`, { safe: {}, sensitive: { error: e } });
+      i.debug(`[voice] Failed to capture audio route metadata`, {
+        safe: {},
+        sensitive: { error: e },
+      });
     }
 }
 var Ln;
@@ -793,7 +828,8 @@ function Zn() {
       (Kn = (e, t, n, r) => Gn(e.name) === t && e.startTime + Hn >= n && e.startTime <= r),
       (qn = (e, t) => {
         try {
-          return typeof PerformanceObserver > `u` || !PerformanceObserver.supportedEntryTypes?.includes(`resource`)
+          return typeof PerformanceObserver > `u` ||
+            !PerformanceObserver.supportedEntryTypes?.includes(`resource`)
             ? null
             : Jn(Gn(e), t);
         } catch {
@@ -815,7 +851,10 @@ function Zn() {
             for (let a of r)
               Un(a) &&
                 Kn(a, e, t, i) &&
-                (n.push(a), n.sort((e, t) => t.startTime - e.startTime), (n.length = Math.min(n.length, zn)), (s = !0));
+                (n.push(a),
+                n.sort((e, t) => t.startTime - e.startTime),
+                (n.length = Math.min(n.length, zn)),
+                (s = !0));
             s && !a && o !== void 0 && n.length >= o && f();
           };
         function f() {
@@ -907,7 +946,12 @@ function $n() {
           return (
             i && (r[`Content-Type`] = i.contentType),
             Pe(
-              { url: e, method: `POST`, body: i?.bytes ?? (typeof t.body == `string` ? t.body : void 0), headers: r },
+              {
+                url: e,
+                method: `POST`,
+                body: i?.bytes ?? (typeof t.body == `string` ? t.body : void 0),
+                headers: r,
+              },
               t.signal,
             )
           );
@@ -949,7 +993,14 @@ async function rr(e, t, n) {
         try {
           let n = Xn(e ?? Yn(t), t, r, s);
           if (!n) return;
-          let { domainLookup: i, connect: o, secureConnection: c, request: l, response: u, latency: d } = a,
+          let {
+              domainLookup: i,
+              connect: o,
+              secureConnection: c,
+              request: l,
+              response: u,
+              latency: d,
+            } = a,
             {
               domainLookupEnd: f,
               domainLookupStart: p,
@@ -1008,7 +1059,12 @@ function _r() {
       Zn(),
       Ht(),
       $n(),
-      (ar = [/\[abort\]/, /The user aborted a request/, /Fetch is aborted/, /Request signal is aborted/]),
+      (ar = [
+        /\[abort\]/,
+        /The user aborted a request/,
+        /Fetch is aborted/,
+        /Request signal is aborted/,
+      ]),
       (or = `session_limit_exceeded`),
       (sr = `global_limits_exceeded`),
       (cr = class extends Error {
@@ -1036,7 +1092,9 @@ function _r() {
           r.toString()
         );
       }),
-      (pr = r({ proofofwork: r({ required: u(), seed: g().min(1), difficulty: g().min(1) }).optional() })),
+      (pr = r({
+        proofofwork: r({ required: u(), seed: g().min(1), difficulty: g().min(1) }).optional(),
+      })),
       (mr = r({
         error: r({
           code: g()
@@ -1056,17 +1114,29 @@ function _r() {
           return n.success ? pe(n.data) : Promise.resolve(null);
         }
         static async startTransceiverSession(e, t) {
-          let { accessToken: n, offer: r, payload: i, dataChannelId: a, signal: o, proofOfWorkAnswer: s } = t;
+          let {
+            accessToken: n,
+            offer: r,
+            payload: i,
+            dataChannelId: a,
+            signal: o,
+            proofOfWorkAnswer: s,
+          } = t;
           o?.throwIfAborted();
           let c = B.voicePath(
               e,
               i.voice_mode,
-              i.conversation_mode?.kind === `gizmo_interaction` ? i.conversation_mode.gizmo_id : void 0,
+              i.conversation_mode?.kind === `gizmo_interaction`
+                ? i.conversation_mode.gizmo_id
+                : void 0,
             ),
             l = er(e),
             u =
               t.type === `instant_connect`
-                ? { refresh: t.phase === `prefetch` && t.serverUfragId != null, serverUfragId: t.serverUfragId }
+                ? {
+                    refresh: t.phase === `prefetch` && t.serverUfragId != null,
+                    serverUfragId: t.serverUfragId,
+                  }
                 : void 0,
             d = `${l}${c}?${fr(e, a, u)}`,
             f = async (a) => {
@@ -1085,7 +1155,8 @@ function _r() {
                     Dt(e, de, {
                       voiceMetadata: t.voiceMetadata,
                       errorBucket: dt.CHATGPT_VOICE_SESSION_USER_PERCEIVED_ERROR_BUCKET_CLIENT,
-                      errorType: ue.CHATGPT_VOICE_SESSION_USER_PERCEIVED_ERROR_TYPE_CONNECTION_ESTABLISHMENT_FAILED,
+                      errorType:
+                        ue.CHATGPT_VOICE_SESSION_USER_PERCEIVED_ERROR_TYPE_CONNECTION_ESTABLISHMENT_FAILED,
                     }),
                   r?.code === or || r?.code === sr
                     ? new cr(r.message, r.code)
@@ -1131,7 +1202,8 @@ function br(e, t, n) {
   if (!t) return;
   let r = e.get(q, void 0),
     i = r.cacheMiss;
-  (i?.voiceSessionId === t && i.reason.startsWith(Pr)) || (r.cacheMiss = { reason: n, voiceSessionId: t });
+  (i?.voiceSessionId === t && i.reason.startsWith(Pr)) ||
+    (r.cacheMiss = { reason: n, voiceSessionId: t });
 }
 function xr(e, t, n, r, i = {}) {
   let a = e.get(q, void 0).prefetchAccounting[t];
@@ -1164,7 +1236,8 @@ function wr(e, t, n, r) {
   let i = { accessToken: r, params: n, preciseLocationHeader: nr(), sessionType: t },
     a = e.get(q, void 0),
     o = a.latestSuccessfulPrewarm;
-  if (!o || o.accessToken !== i.accessToken || o.preciseLocationHeader !== i.preciseLocationHeader) return;
+  if (!o || o.accessToken !== i.accessToken || o.preciseLocationHeader !== i.preciseLocationHeader)
+    return;
   try {
     if (!o.isUsable()) return;
   } catch {
@@ -1214,7 +1287,8 @@ function kr(e, t) {
   return e.params[t];
 }
 function Ar(e, t) {
-  for (let [n, r, i] of Fr) if ((i == null || i === e.sessionType) && kr(e, n) !== kr(t, n)) return jr[`${Nr}${r}`];
+  for (let [n, r, i] of Fr)
+    if ((i == null || i === e.sessionType) && kr(e, n) !== kr(t, n)) return jr[`${Nr}${r}`];
 }
 var K, q, jr, Mr, Nr, Pr, Fr;
 function Ir() {
@@ -1370,11 +1444,14 @@ function Lr(e, t, n) {
     conversationStartLatency: r.conversationLatency.getLatency(),
     sessionConnectedTime: r.sessionConnected.getMarkAsTimestamp(),
     userAbortTime: r.userAborted.getMarkAsTimestamp(),
-    advancedVoiceDisclosureStartTime: r._interactivePreConnect.advancedVoiceDisclosure.getStartAsTimestamp(),
-    advancedVoiceDisclosureEndTime: r._interactivePreConnect.advancedVoiceDisclosure.getEndAsTimestamp(),
+    advancedVoiceDisclosureStartTime:
+      r._interactivePreConnect.advancedVoiceDisclosure.getStartAsTimestamp(),
+    advancedVoiceDisclosureEndTime:
+      r._interactivePreConnect.advancedVoiceDisclosure.getEndAsTimestamp(),
     voicePickerStartTime: r._interactivePreConnect.voicePicker.getStartAsTimestamp(),
     voicePickerEndTime: r._interactivePreConnect.voicePicker.getEndAsTimestamp(),
-    temporaryChatNoticeStartTime: r._interactivePreConnect.temporaryChatNotice.getStartAsTimestamp(),
+    temporaryChatNoticeStartTime:
+      r._interactivePreConnect.temporaryChatNotice.getStartAsTimestamp(),
     temporaryChatNoticeEndTime: r._interactivePreConnect.temporaryChatNotice.getEndAsTimestamp(),
     mode: t,
   };
@@ -1631,7 +1708,8 @@ function Oi() {
             (this.includeWebRTCStats = e.includeWebRTCStats ?? (() => !1)));
         }
         start({ sampleIntervalMs: e = this.defaultLatency, onSample: t } = {}) {
-          (this.startRtpTimestampCapture(), this.startSampling({ sampleIntervalMs: e, onSample: t }));
+          (this.startRtpTimestampCapture(),
+            this.startSampling({ sampleIntervalMs: e, onSample: t }));
         }
         startRtpTimestampCapture() {
           this.startAudioRtpTimestampCapture();
@@ -1649,7 +1727,8 @@ function Oi() {
           this.stop();
         }
         stopSampling() {
-          (this.statsTimer != null && window.clearInterval(this.statsTimer), (this.statsTimer = null));
+          (this.statsTimer != null && window.clearInterval(this.statsTimer),
+            (this.statsTimer = null));
         }
         startAudioRtpTimestampCapture() {
           if (Ci()) {
@@ -1665,7 +1744,8 @@ function Oi() {
               ((e.onmessage = (e) => {
                 let { type: t, rtpTimestamp: n } = e.data ?? {};
                 Number.isFinite(n) &&
-                  (t === `outbound-audio-rtp-timestamp` && (this.latestAudioOutboundRtpTimestamp = n),
+                  (t === `outbound-audio-rtp-timestamp` &&
+                    (this.latestAudioOutboundRtpTimestamp = n),
                   t === `inbound-audio-rtp-timestamp` && (this.latestAudioInboundRtpTimestamp = n));
               }),
                 (this.audioTransceiver.sender.transform = new RTCRtpScriptTransform(e, {
@@ -1718,7 +1798,10 @@ function Oi() {
               p = wi(a),
               m = mi(p.concealedSamples, this.previousInboundAudioCounters?.concealedSamples),
               h = mi(p.concealmentEvents, this.previousInboundAudioCounters?.concealmentEvents),
-              g = mi(p.silentConcealedSamples, this.previousInboundAudioCounters?.silentConcealedSamples),
+              g = mi(
+                p.silentConcealedSamples,
+                this.previousInboundAudioCounters?.silentConcealedSamples,
+              ),
               _ = mi(p.packetsLost, this.previousInboundAudioCounters?.packetsLost);
             Ti(p) && (this.previousInboundAudioCounters = p);
             let v = m === void 0 ? void 0 : (m / s) * 1e3,
@@ -1846,11 +1929,15 @@ function Bi() {
             stunRequestsSent: Y(n?.requestsSent),
             stunResponsesReceived: Y(n?.responsesReceived),
           }),
-            (this.networkTelemetrySamples = this.networkTelemetrySamples.filter((e) => r - e.timestampMs <= Li)));
+            (this.networkTelemetrySamples = this.networkTelemetrySamples.filter(
+              (e) => r - e.timestampMs <= Li,
+            )));
         }
         getEndSessionNetworkTelemetry(e) {
           let t = e - Li,
-            n = this.networkTelemetrySamples.filter((n) => n.timestampMs >= t && n.timestampMs <= e),
+            n = this.networkTelemetrySamples.filter(
+              (n) => n.timestampMs >= t && n.timestampMs <= e,
+            ),
             r = n[0],
             i = n[n.length - 1];
           if (!r || !i || r === i) return;
@@ -1860,7 +1947,9 @@ function Bi() {
           for (let e = 1; e < n.length; e++) {
             let t = n[e - 1],
               r = n[e];
-            (t.packetsLost !== void 0 && r.packetsLost !== void 0 && (o = (o ?? 0) + r.packetsLost - t.packetsLost),
+            (t.packetsLost !== void 0 &&
+              r.packetsLost !== void 0 &&
+              (o = (o ?? 0) + r.packetsLost - t.packetsLost),
               (s = Mi(s, r.packetsReceived, t.packetsReceived)),
               t.candidatePairId !== void 0 &&
                 t.candidatePairId === r.candidatePairId &&
@@ -1872,7 +1961,8 @@ function Bi() {
             aggregateTelemetryDurationSeconds: a / Ii,
             packetsLostCount: o,
             packetsReceivedCount: s,
-            packetLossRatio: o !== void 0 && u !== void 0 && u > 0 ? Math.min(1, Math.max(0, o / u)) : void 0,
+            packetLossRatio:
+              o !== void 0 && u !== void 0 && u > 0 ? Math.min(1, Math.max(0, o / u)) : void 0,
             stunRequestsSentCount: c,
             stunResponsesReceivedCount: l,
           };
@@ -1930,7 +2020,8 @@ function Bi() {
                   l = bi(e, t) ?? Ni;
                 ((d.concealedSamples = f),
                   (d.silentConcealedSamples = n),
-                  u?.concealedSamples !== void 0 && ((i = (i ?? 0) + (s / l) * Ii), (a = (a ?? 0) + (c / l) * Ii)),
+                  u?.concealedSamples !== void 0 &&
+                    ((i = (i ?? 0) + (s / l) * Ii), (a = (a ?? 0) + (c / l) * Ii)),
                   (r = !0));
               }
               let p = Y(t.totalSamplesDuration);
@@ -1938,7 +2029,8 @@ function Bi() {
                 let e = hi(p, u?.totalSamplesDuration),
                   n = e * Ii,
                   i = Y(t.totalAudioEnergy);
-                if (((d.totalSamplesDuration = p), (o = (o ?? 0) + n), i === void 0)) delete d.totalAudioEnergy;
+                if (((d.totalSamplesDuration = p), (o = (o ?? 0) + n), i === void 0))
+                  delete d.totalAudioEnergy;
                 else {
                   let t = u?.totalAudioEnergy;
                   if (((d.totalAudioEnergy = i), t !== void 0 && e > 0)) {
@@ -2012,7 +2104,10 @@ function Hi() {
   }))();
 }
 function Ui(e) {
-  return (e?.getSynchronizationSources?.() ?? []).find((e) => Number.isFinite(e.rtpTimestamp))?.rtpTimestamp ?? null;
+  return (
+    (e?.getSynchronizationSources?.() ?? []).find((e) => Number.isFinite(e.rtpTimestamp))
+      ?.rtpTimestamp ?? null
+  );
 }
 var Wi;
 function Gi() {
@@ -2031,7 +2126,8 @@ function Gi() {
         start({ sampleIntervalMs: e = 500, onSample: t }) {
           this.stop();
           let n = Symbol();
-          ((this.run = n), (this.timerId = window.setInterval(() => void this.sampleOnce(n, t), e)));
+          ((this.run = n),
+            (this.timerId = window.setInterval(() => void this.sampleOnce(n, t), e)));
         }
         stop() {
           ((this.run = null),
@@ -2051,7 +2147,8 @@ function Gi() {
               let r = this.sampler.sample(n);
               if (!r) return;
               t({
-                outputAudioFirstChunkReceivedTs: r.receivedPacketsDelta > 0 ? Date.now() / 1e3 : null,
+                outputAudioFirstChunkReceivedTs:
+                  r.receivedPacketsDelta > 0 ? Date.now() / 1e3 : null,
                 outputAudioPlayoutStartTs: null,
                 outputAudioBufferDepthMs: r.outputAudioBufferDepthMs,
                 serviceRttMs: r.serviceRttMs,
@@ -2110,21 +2207,27 @@ function Yi() {
               if (!r) throw Error(`getPeerConnection is required for fresh setup`);
               return r();
             }),
-            d = l.dataChannel.time(() => n?.dataChannel ?? u.createDataChannel(``, { negotiated: !0, id: 0 })),
+            d = l.dataChannel.time(
+              () => n?.dataChannel ?? u.createDataChannel(``, { negotiated: !0, id: 0 }),
+            ),
             f = l.eventHandlers.time(() =>
               t?.({
                 dataChannel: d,
                 getEventTimestamp: () => performance.now(),
                 getPeerConnectionState: () => {
                   let e = r?.() ?? u;
-                  return { connectionState: e.connectionState, iceConnectionState: e.iceConnectionState };
+                  return {
+                    connectionState: e.connectionState,
+                    iceConnectionState: e.iceConnectionState,
+                  };
                 },
                 pc: u,
               }),
             ),
             { audioTransceiver: p, videoTransceiver: m } = l.blankTransceiver.time(() => ({
               audioTransceiver: n?.audioTransceiver ?? u.addTransceiver(`audio`),
-              videoTransceiver: n?.videoTransceiver ?? u.addTransceiver(`video`, { direction: `sendonly` }),
+              videoTransceiver:
+                n?.videoTransceiver ?? u.addTransceiver(`video`, { direction: `sendonly` }),
             })),
             h = () => {
               (a?.(u), i?.(d), o?.(`audio`, p), o?.(`video`, m));
@@ -2132,7 +2235,10 @@ function Yi() {
           if ((f ? f(h) : h(), n))
             return (
               await l.createOffer.timeAsync(
-                async () => (await l.setLocalDescription.timeAsync(() => Promise.resolve()), n.offer),
+                async () => (
+                  await l.setLocalDescription.timeAsync(() => Promise.resolve()),
+                  n.offer
+                ),
               ),
               c.preConnectionSetup.end(),
               n
@@ -2154,7 +2260,10 @@ function Yi() {
               },
               stop: () => {
                 v.phase !== `stopped` &&
-                  ((v.phase = `stopped`), d.removeEventListener(`close`, v.stop), g.destroy(), _?.destroy());
+                  ((v.phase = `stopped`),
+                  d.removeEventListener(`close`, v.stop),
+                  g.destroy(),
+                  _?.destroy());
               },
             };
           d.addEventListener(`close`, v.stop);
@@ -2165,7 +2274,12 @@ function Yi() {
               return (await l.setLocalDescription.timeAsync(() => u.setLocalDescription(e)), e);
             });
           } catch (e) {
-            throw (v.stop(), d.readyState !== `closed` && d.close(), u.signalingState !== `closed` && u.close(), e);
+            throw (
+              v.stop(),
+              d.readyState !== `closed` && d.close(),
+              u.signalingState !== `closed` && u.close(),
+              e
+            );
           }
           return (
             c.preConnectionSetup.end(),
@@ -2212,7 +2326,8 @@ function Zi(e, t) {
 function Qi(e, t, n) {
   return new Promise((r, i) => {
     let a = e.transaction(aa, `readwrite`).objectStore(aa).put(n, t);
-    ((a.onsuccess = () => r()), (a.onerror = () => i(a.error ?? Error(`Certificate storage request failed`))));
+    ((a.onsuccess = () => r()),
+      (a.onerror = () => i(a.error ?? Error(`Certificate storage request failed`))));
   });
 }
 function $i(e) {
@@ -2242,7 +2357,10 @@ async function na(e = {}) {
         let a = await ta(t);
         return (
           (n = Qi(e, oa, a).catch((e) => {
-            i.debug(`[voice] Certificate persistence unavailable`, { safe: {}, sensitive: { error: e } });
+            i.debug(`[voice] Certificate persistence unavailable`, {
+              safe: {},
+              sensitive: { error: e },
+            });
           })),
           a
         );
@@ -2273,7 +2391,12 @@ function la() {
   ((t.httpEquiv = `origin-trial`), (t.content = pa), document.head.append(t));
 }
 function ua(e) {
-  return !(!e || e.signalingState === `closed` || e.connectionState !== `new` || e.iceConnectionState !== `new`);
+  return !(
+    !e ||
+    e.signalingState === `closed` ||
+    e.connectionState !== `new` ||
+    e.iceConnectionState !== `new`
+  );
 }
 function da() {
   if (((ha = !0), ya)) return ya;
@@ -2331,7 +2454,10 @@ function ba() {
           } finally {
             (ha &&
               fa().catch((e) => {
-                i.debug(`[voice] Peer connection prewarm unavailable`, { safe: {}, sensitive: { error: e } });
+                i.debug(`[voice] Peer connection prewarm unavailable`, {
+                  safe: {},
+                  sensitive: { error: e },
+                });
               }),
               (Z = void 0));
           }
@@ -2353,7 +2479,8 @@ function Sa(e) {
       let e = n.slice(12).trim();
       e && t.add(e);
     }
-  if (t.size !== 1) throw Error(`Expected one server ICE ufrag in Instant Connect answer, found ${t.size}`);
+  if (t.size !== 1)
+    throw Error(`Expected one server ICE ufrag in Instant Connect answer, found ${t.size}`);
   return [...t][0];
 }
 function Ca(e) {
@@ -2389,7 +2516,8 @@ function Ta(e, t, n, r, i) {
           return typeof n == `function` ? n.bind(e) : n;
         },
         set: (e, t, n) => {
-          if (typeof t != `string` || !t.startsWith(`on`) || typeof n != `function`) return Reflect.set(e, t, n, e);
+          if (typeof t != `string` || !t.startsWith(`on`) || typeof n != `function`)
+            return Reflect.set(e, t, n, e);
           let r = n,
             i = (t) => {
               let n = performance.now();
@@ -2440,7 +2568,8 @@ function Ta(e, t, n, r, i) {
         (e.addEventListener(`abort`, n, { once: !0, signal: s.signal }), e.aborted && n());
       },
       detach: (e) => {
-        p !== `detached` && ((p = `detached`), (a.length = 0), s.abort(), o.forEach((e) => e(!1)), l(e));
+        p !== `detached` &&
+          ((p = `detached`), (a.length = 0), s.abort(), o.forEach((e) => e(!1)), l(e));
       },
       ready: c,
     };
@@ -2480,7 +2609,11 @@ function Ta(e, t, n, r, i) {
   );
 }
 function Ea(e, t, n) {
-  return oi({ accessToken: n, preciseLocationHeader: nr(), ...Object.fromEntries(Da[e].map((e) => [e, t[e]])) });
+  return oi({
+    accessToken: n,
+    preciseLocationHeader: nr(),
+    ...Object.fromEntries(Da[e].map((e) => [e, t[e]])),
+  });
 }
 var Da, Oa, ka;
 function Aa() {
@@ -2548,7 +2681,8 @@ function Aa() {
         }
         async createCache(e, t, n, r = {}) {
           let i = Ea(t, n, r.accessToken);
-          if ((this.pruneUnusableCacheEntries(e, t), this.getUsableCacheEntry(e, t, i))) return { type: `success` };
+          if ((this.pruneUnusableCacheEntries(e, t), this.getUsableCacheEntry(e, t, i)))
+            return { type: `success` };
           let a = this.cacheCreations[t].get(i);
           if (a) {
             if (!a.signal.aborted) return { type: `alreadyInProgress` };
@@ -2561,7 +2695,8 @@ function Aa() {
             l = new AbortController();
           if ((this.cacheCreations[t].set(i, l), r.signal && !c)) {
             let e = () => l.abort(r.signal?.reason);
-            (r.signal.addEventListener(`abort`, e, { once: !0, signal: l.signal }), r.signal.aborted && e());
+            (r.signal.addEventListener(`abort`, e, { once: !0, signal: l.signal }),
+              r.signal.aborted && e());
           }
           let u = c?.pc,
             d = c;
@@ -2586,7 +2721,9 @@ function Aa() {
               type: `instant_connect`,
             });
             if (!Ca(f))
-              throw Error(`Expected Instant Connect prefetch to create server state, received status ${f.status}`);
+              throw Error(
+                `Expected Instant Connect prefetch to create server state, received status ${f.status}`,
+              );
             let p = await f.text();
             l.signal.throwIfAborted();
             let m = {
@@ -2597,14 +2734,19 @@ function Aa() {
               serverUfragId: Sa(p),
               voiceSessionParams: o,
             };
-            if (this.cacheCreations[t].get(i) !== l) throw Error(`Instant Connect cache creation was invalidated`);
+            if (this.cacheCreations[t].get(i) !== l)
+              throw Error(`Instant Connect cache creation was invalidated`);
             return (this.caches[t].set(i, m), { type: `success` });
           } catch (n) {
             return (
               l.signal.aborted ||
-                xr(e, t, i, j.CHATGPT_VOICE_INSTANT_CONNECT_CACHE_MISS_REASON_TRANSPORT_PREFETCH_FAILED, {
-                  overwrite: !0,
-                }),
+                xr(
+                  e,
+                  t,
+                  i,
+                  j.CHATGPT_VOICE_INSTANT_CONNECT_CACHE_MISS_REASON_TRANSPORT_PREFETCH_FAILED,
+                  { overwrite: !0 },
+                ),
               d ? Q(d) : u?.close(),
               { type: `failed`, err: xa(n) }
             );
@@ -2658,7 +2800,9 @@ function Aa() {
                 e,
                 t,
                 i,
-                Array.from(this.caches[t].entries()).some(([e, n]) => e === Ea(t, n.voiceSessionParams, r.accessToken)),
+                Array.from(this.caches[t].entries()).some(
+                  ([e, n]) => e === Ea(t, n.voiceSessionParams, r.accessToken),
+                ),
               );
               br(e, n.voice_session_id, a);
             }
@@ -2686,7 +2830,8 @@ function Aa() {
           let c = m(),
             l = (e) =>
               c.promise.then((t) => {
-                if (e.pc.signalingState !== `closed`) return e.audioTransceiver.sender.replaceTrack(t);
+                if (e.pc.signalingState !== `closed`)
+                  return e.audioTransceiver.sender.replaceTrack(t);
               }),
             u = new AbortController(),
             d = AbortSignal.timeout(Zt(e)),
@@ -2743,19 +2888,30 @@ function Aa() {
                   (h.winner = r.candidateId),
                   h.winnerSelected.mark(),
                   r.candidateId === `pc2` &&
-                    br(e, n.voice_session_id, j.CHATGPT_VOICE_INSTANT_CONNECT_CACHE_MISS_REASON_TRANSPORT_CACHE_MISS),
+                    br(
+                      e,
+                      n.voice_session_id,
+                      j.CHATGPT_VOICE_INSTANT_CONNECT_CACHE_MISS_REASON_TRANSPORT_CACHE_MISS,
+                    ),
                   Tr(e, r.candidateId),
                   r
                 );
               })
               .catch((t) => {
-                f.aborted ? Er(e, f.reason === d.reason ? `timeout` : `cancelled`) : Er(e, `candidate_failure`);
-                let n = f.aborted ? xa(f.reason) : Error(`Instant Connect race failed`, { cause: t });
+                f.aborted
+                  ? Er(e, f.reason === d.reason ? `timeout` : `cancelled`)
+                  : Er(e, `candidate_failure`);
+                let n = f.aborted
+                  ? xa(f.reason)
+                  : Error(`Instant Connect race failed`, { cause: t });
                 u.abort(`Instant Connect race failed`);
                 for (let { candidate: e, eventBuffer: t } of p) (t.detach(n), Q(e));
                 throw n;
               });
-          return (_.catch(() => {}), { futureWinner: _, setAudioTrack: c.resolve, type: `raceStarted` });
+          return (
+            _.catch(() => {}),
+            { futureWinner: _, setAudioTrack: c.resolve, type: `raceStarted` }
+          );
         }
         async startCached(e, t, n, r, a, o, s) {
           let c = U(e)._instantConnect.candidates[t.candidateId];
@@ -2765,10 +2921,10 @@ function Aa() {
             return (
               c.signalingCompleted.mark(),
               o().catch((e) => {
-                i.debug(`[instant-connect] Failed to attach the microphone track to ${t.candidateId}`, {
-                  safe: {},
-                  sensitive: { error: e },
-                });
+                i.debug(
+                  `[instant-connect] Failed to attach the microphone track to ${t.candidateId}`,
+                  { safe: {}, sensitive: { error: e } },
+                );
               }),
               await n.ready,
               c.becameUsable.mark(),
@@ -2812,17 +2968,25 @@ function Aa() {
                   serverUfragId: t.serverUfragId,
                   signal: c,
                   type: `instant_connect`,
-                  voiceMetadata: { ...i.voiceMetadata, sessionId: t.voiceSessionParams.voice_session_id ?? void 0 },
+                  voiceMetadata: {
+                    ...i.voiceMetadata,
+                    sessionId: t.voiceSessionParams.voice_session_id ?? void 0,
+                  },
                 });
               } catch (t) {
                 throw (c.aborted || G(e, K.validationFailed), t);
               }
               if (((U(e)._instantConnect.pc2ResponseStatus = n.status), wa(n)))
-                throw (G(e, K.validationConfirmed), Error(`Instant Connect server match found; PC2 is not needed`));
+                throw (
+                  G(e, K.validationConfirmed),
+                  Error(`Instant Connect server match found; PC2 is not needed`)
+                );
               if (!Ca(n))
                 throw (
                   G(e, K.validationFailed),
-                  Error(`Expected an Instant Connect server match result, received status ${n.status}`)
+                  Error(
+                    `Expected an Instant Connect server match result, received status ${n.status}`,
+                  )
                 );
               try {
                 let e = await n.text();
@@ -2869,7 +3033,8 @@ function Aa() {
           return r;
         }
         pruneUnusableCacheEntries(e, t) {
-          for (let [n, r] of this.caches[t]) this.isCacheEntryUsable(e, r) || this.removeCacheEntry(t, n);
+          for (let [n, r] of this.caches[t])
+            this.isCacheEntryUsable(e, r) || this.removeCacheEntry(t, n);
         }
         removeCacheEntry(e, t) {
           let n = this.caches[e].get(t);
@@ -2979,7 +3144,9 @@ function Ra() {
                 (r.push(e),
                 (a ||= !this.isFresh(e)),
                 this.remoteWindow.packetsSent.push(
-                  e.packetsReceived !== void 0 && e.packetsLost !== void 0 ? e.packetsReceived + e.packetsLost : void 0,
+                  e.packetsReceived !== void 0 && e.packetsLost !== void 0
+                    ? e.packetsReceived + e.packetsLost
+                    : void 0,
                 ),
                 this.remoteWindow.packetsLost.push(e.packetsLost)),
               e.type === `candidate-pair` && (n[e.id] = e));
@@ -2988,7 +3155,8 @@ function Ra() {
             this.audioGapSummaryTracker.observe(e, r, Na));
           let o = t !== void 0 && n[t];
           o
-            ? (this.remoteWindow.rtt.push(o.currentRoundTripTime), this.localWindow.rtt.push(o.currentRoundTripTime))
+            ? (this.remoteWindow.rtt.push(o.currentRoundTripTime),
+              this.localWindow.rtt.push(o.currentRoundTripTime))
             : i.error(`QualityMonitor no candidate-pair found!`);
         }
         report() {
@@ -3068,7 +3236,8 @@ function Va({ scope: e, room: t }) {
       connection_type: typeof n.type == `string` && n.type.length > 0 ? n.type : void 0,
       effective_connection_type:
         typeof n.effectiveType == `string` && n.effectiveType.length > 0 ? n.effectiveType : void 0,
-      downlink_mbps: typeof n.downlink == `number` && Number.isFinite(n.downlink) ? n.downlink : void 0,
+      downlink_mbps:
+        typeof n.downlink == `number` && Number.isFinite(n.downlink) ? n.downlink : void 0,
       rtt_ms: typeof n.rtt == `number` && Number.isFinite(n.rtt) ? n.rtt : void 0,
       save_data: typeof n.saveData == `boolean` ? n.saveData : void 0,
     };
@@ -3076,10 +3245,16 @@ function Va({ scope: e, room: t }) {
       On({
         room: t,
         voiceStore: L(e),
-        event: { type: P.ClientMetadataUpdate, payload: { type: P.ClientMetadataUpdate, network: r } },
+        event: {
+          type: P.ClientMetadataUpdate,
+          payload: { type: P.ClientMetadataUpdate, network: r },
+        },
         options: { reliable: !0 },
       }).catch((e) => {
-        i.debug(`[voice] Failed to publish network metadata`, { safe: {}, sensitive: { error: e } });
+        i.debug(`[voice] Failed to publish network metadata`, {
+          safe: {},
+          sensitive: { error: e },
+        });
       });
   };
   return (
@@ -3101,7 +3276,12 @@ function Wa(e) {
 }
 function Ga(e, t) {
   let n = e.get(St),
-    r = n.status === `allowed` && `plan` in n && n.plan !== A.FREE && n.plan !== A.FREE_WORKSPACE && n.plan !== A.GO;
+    r =
+      n.status === `allowed` &&
+      `plan` in n &&
+      n.plan !== A.FREE &&
+      n.plan !== A.FREE_WORKSPACE &&
+      n.plan !== A.GO;
   return Wa(e) && e.get(T, t) !== `tpp` && (r || !1);
 }
 function Ka() {
@@ -3136,14 +3316,22 @@ function Xa(e, { ambientParameters: t, explicitParameters: n, liveParameters: r,
       sessionType: u,
       voice: d,
     } = t,
-    { modelSpeaksFirst: f, requestedVoiceMode: p, voiceSessionId: m, voiceStatus: h, workModelSlug: g } = r,
+    {
+      modelSpeaksFirst: f,
+      requestedVoiceMode: p,
+      voiceSessionId: m,
+      voiceStatus: h,
+      workModelSlug: g,
+    } = r,
     _ = [],
     v = p ?? B.requestedVoiceMode(e, B.isStandardVoiceSelected$(e) ? `standard` : `advanced`),
     y = n ? n.requested_default_model : e.get(Ze, o).slug,
-    b = v === `advanced` && !Ut(u) && !(n && `thinking_effort` in n) ? Ja(e, o) : n?.thinking_effort,
+    b =
+      v === `advanced` && !Ut(u) && !(n && `thinking_effort` in n) ? Ja(e, o) : n?.thinking_effort,
     x = Ut(u) && Ga(e, o),
     S = {
-      backend_reasoning_effort: Ut(u) && !x ? (n?.backend_reasoning_effort ?? a ?? `instant`) : void 0,
+      backend_reasoning_effort:
+        Ut(u) && !x ? (n?.backend_reasoning_effort ?? a ?? `instant`) : void 0,
       conversation_id: n ? n.conversation_id : (e.get(Ct, o) ?? void 0),
       language_code: n?.language_code,
       parent_message_id: n?.parent_message_id,
@@ -3171,7 +3359,9 @@ function Xa(e, { ambientParameters: t, explicitParameters: n, liveParameters: r,
       chatreq_token: typeof h?.chatreq?.token == `string` ? h.chatreq.token : void 0,
       client_tools: _,
       history_and_training_disabled: c,
-      conversation_mode: ee ? { kind: `gizmo_interaction`, gizmo_id: ee } : { kind: `primary_assistant` },
+      conversation_mode: ee
+        ? { kind: `gizmo_interaction`, gizmo_id: ee }
+        : { kind: `primary_assistant` },
       ...(Ut(u) && i?.length ? { system_hints: [...i] } : {}),
       jobs_mock_interview_config: n?.jobsMockInterviewConfig,
       system_prompt_type: n?.system_prompt_type,
@@ -3200,7 +3390,8 @@ function $a(e, t, n, r, i) {
   (Ut(n) &&
     (t.chat_mode !== `work` &&
       t.backend_model === `auto` &&
-      (t.backend_model = e.get(we).data?.versionOptions?.[0]?.modelSlugByLane.auto ?? t.backend_model),
+      (t.backend_model =
+        e.get(we).data?.versionOptions?.[0]?.modelSlugByLane.auto ?? t.backend_model),
     Za(e, t.requested_default_model) || (t.requested_default_model = ``),
     Za(e, t.model_slug) || (t.model_slug = ``),
     Za(e, t.model_slug_advanced) || (t.model_slug_advanced = ``)),
@@ -3209,7 +3400,8 @@ function $a(e, t, n, r, i) {
 async function eo(e, t, n) {
   n?.throwIfAborted();
   let r = e.get(Ne);
-  if (r == null || !e.get(Ot)) throw Error(`Authenticated ChatGPT settings must be available before preparing voice`);
+  if (r == null || !e.get(Ot))
+    throw Error(`Authenticated ChatGPT settings must be available before preparing voice`);
   let i = e.get(rt),
     a = e.get($e)?.pathname,
     o = Wt(e),
@@ -3232,7 +3424,25 @@ async function eo(e, t, n) {
 }
 function to() {
   return (to = e(() => {
-    (ge(), Ce(), ye(), S(), _t(), ke(), ht(), ot(), gt(), Pt(), xe(), xt(), Oe(), Ue(), ne(), We(), Ka(), Ya(), Ht());
+    (ge(),
+      Ce(),
+      ye(),
+      S(),
+      _t(),
+      ke(),
+      ht(),
+      ot(),
+      gt(),
+      Pt(),
+      xe(),
+      xt(),
+      Oe(),
+      Ue(),
+      ne(),
+      We(),
+      Ka(),
+      Ya(),
+      Ht());
   }))();
 }
 function no(e) {
@@ -3372,7 +3582,10 @@ function mo() {
           O = $(null),
           oe = (e, t) => {
             g.current === e &&
-              (i.debug(`[transceiver] Assistant playback blocked`, { safe: {}, sensitive: { detail: t } }),
+              (i.debug(`[transceiver] Assistant playback blocked`, {
+                safe: {},
+                sensitive: { detail: t },
+              }),
               b(r, () => {
                 r.set(Vt, t instanceof Error ? t : Error(String(t)));
               }));
@@ -3381,7 +3594,10 @@ function mo() {
             let n = e.media === c.Audio ? ae : D;
             if (n.current && !n.current.stopped) await n.current.sender.replaceTrack(e.track);
             else if (t) n.current = We().addTransceiver(e.track);
-            else throw Error(`Cannot replace track on ${e.media} transceiver that was not initialized.`);
+            else
+              throw Error(
+                `Cannot replace track on ${e.media} transceiver that was not initialized.`,
+              );
           },
           ce = $(void 0),
           le = $(void 0),
@@ -3408,7 +3624,9 @@ function mo() {
           },
           be = (e) => {
             b(r, () => {
-              ((k.current = e), r.set(te, e), xe((t) => (t == null ? t : { ...t, state: e ?? I.Disconnected })));
+              ((k.current = e),
+                r.set(te, e),
+                xe((t) => (t == null ? t : { ...t, state: e ?? I.Disconnected })));
             });
           },
           xe = (e) => {
@@ -3418,7 +3636,9 @@ function mo() {
           Ce = (e) => {
             xe((t) =>
               _e(t, (t) => {
-                t && (t.activeSpeakers.some((t) => t.identity === e) || t.activeSpeakers.push({ identity: e }));
+                t &&
+                  (t.activeSpeakers.some((t) => t.identity === e) ||
+                    t.activeSpeakers.push({ identity: e }));
               }),
             );
           },
@@ -3451,14 +3671,22 @@ function mo() {
             M.trackPublished.forEach((t) => t(e));
           },
           Ne = () => {
-            (y.current?.destroy(), (y.current = null), v.current?.dispose(), (v.current = null), E(!1), re(!1), ie(!1));
+            (y.current?.destroy(),
+              (y.current = null),
+              v.current?.dispose(),
+              (v.current = null),
+              E(!1),
+              re(!1),
+              ie(!1));
           },
           Pe = async (t, n) => {
             if ((Ne(), !t)) return;
             ((y.current = new m(r, ie, () => ie(!1))),
               o(
                 async () => {
-                  let { preloadSileroVoiceActivityDetector: e } = await import(`@exact-chunk/entry-6a5124b71d02.js`);
+                  let { preloadSileroVoiceActivityDetector: e } = await import(
+                    `@rchunk/voice-dsp-entry`
+                  );
                   return { preloadSileroVoiceActivityDetector: e };
                 },
                 __vite__mapDeps([0, 1, 2, 3]),
@@ -3475,7 +3703,9 @@ function mo() {
                 duckMinimumDurationMs: c.duckMinimumDurationMs,
                 duckedVolume: s(It() ?? c.duckedRemoteVolumeDb),
                 erleDbForConfiguredDuckingDepth: i.getErleDbForConfiguredDuckingDepth(r),
-                erleStatsReportReader: i.isErleInformedDuckingEnabled(r) ? () => F.current?.getStats() ?? null : void 0,
+                erleStatsReportReader: i.isErleInformedDuckingEnabled(r)
+                  ? () => F.current?.getStats() ?? null
+                  : void 0,
                 manualDuckingControl: Rt(),
                 onDuckingChange: (e) => {
                   E(e);
@@ -3515,7 +3745,10 @@ function mo() {
                   (await se({ avmTrack: e }), Me(e));
                 } catch (e) {
                   throw (
-                    i.debug(`[transceiver] Error acquiring camera input`, { safe: {}, sensitive: { detail: e } }),
+                    i.debug(`[transceiver] Error acquiring camera input`, {
+                      safe: {},
+                      sensitive: { detail: e },
+                    }),
                     e
                   );
                 }
@@ -3528,7 +3761,10 @@ function mo() {
                   (await se({ avmTrack: e }), Me(e));
                 } catch (e) {
                   throw (
-                    i.debug(`[transceiver] Error acquiring screen share input`, { safe: {}, sensitive: { detail: e } }),
+                    i.debug(`[transceiver] Error acquiring screen share input`, {
+                      safe: {},
+                      sensitive: { detail: e },
+                    }),
                     e
                   );
                 }
@@ -3537,7 +3773,8 @@ function mo() {
             },
             publishData: function (e) {
               let t = j.current;
-              if (t?.readyState !== `open`) return Promise.reject(Error(`Data channel is not open`));
+              if (t?.readyState !== `open`)
+                return Promise.reject(Error(`Data channel is not open`));
               let n = new TextDecoder().decode(e),
                 r = JSON.stringify({ type: `data_message`, data: n });
               return (t.send(r), Promise.resolve());
@@ -3586,7 +3823,8 @@ function mo() {
               (ae.current = void 0),
               (D.current = void 0),
               ke(),
-              (g.current &&= (g.current.pause(), (g.current.srcObject = null), g.current.remove(), null)),
+              (g.current &&=
+                (g.current.pause(), (g.current.srcObject = null), g.current.remove(), null)),
               be(null),
               await Je());
             let { isVoiceModeActive: t } = n.getState(),
@@ -3597,10 +3835,10 @@ function mo() {
           switchActiveDevice: async (e, t, n) => {
             if (k.current !== I.Connected)
               return (
-                i.debug(`[transceiver] Attempt to switch device when not connected, current state is`, {
-                  safe: {},
-                  sensitive: { detail: k.current },
-                }),
+                i.debug(
+                  `[transceiver] Attempt to switch device when not connected, current state is`,
+                  { safe: {}, sensitive: { detail: k.current } },
+                ),
                 !1
               );
             try {
@@ -3629,7 +3867,10 @@ function mo() {
               }
             } catch (t) {
               return (
-                i.debug(`[transceiver] Failed to switch ${e} device`, { safe: {}, sensitive: { detail: t } }),
+                i.debug(`[transceiver] Failed to switch ${e} device`, {
+                  safe: {},
+                  sensitive: { detail: t },
+                }),
                 !1
               );
             }
@@ -3701,13 +3942,19 @@ function mo() {
                   output_audio_received_rtpts: e.outputAudioReceivedRtpts,
                 },
               }).catch((e) => {
-                i.debug(`[transceiver] Failed to publish client metrics sample`, { safe: {}, sensitive: { error: e } });
+                i.debug(`[transceiver] Failed to publish client metrics sample`, {
+                  safe: {},
+                  sensitive: { error: e },
+                });
               });
           },
           F = $(void 0),
           We = () => {
             try {
-              return ((F.current = F.current ?? ga.getFreshPeerConnection(`voice-mode`)), F.current);
+              return (
+                (F.current = F.current ?? ga.getFreshPeerConnection(`voice-mode`)),
+                F.current
+              );
             } catch (e) {
               let t = B.reportedVoiceMode(r, { voiceMode: O.current?.voice_mode });
               throw (
@@ -3718,7 +3965,8 @@ function mo() {
                     style: O.current?.voice ?? void 0,
                   },
                   errorBucket: dt.CHATGPT_VOICE_SESSION_USER_PERCEIVED_ERROR_BUCKET_CLIENT,
-                  errorType: ue.CHATGPT_VOICE_SESSION_USER_PERCEIVED_ERROR_TYPE_PEER_CONNECTION_CREATION_FAILED,
+                  errorType:
+                    ue.CHATGPT_VOICE_SESSION_USER_PERCEIVED_ERROR_TYPE_PEER_CONNECTION_CREATION_FAILED,
                 }),
                 e
               );
@@ -3732,14 +3980,16 @@ function mo() {
                   (n.localParticipant.isMicrophoneForceMuted = t),
                   e
                     ? (n.activeSpeakers = n.activeSpeakers.filter((e) => e.identity !== oo))
-                    : n.activeSpeakers.some((e) => e.identity === oo) || n.activeSpeakers.push({ identity: oo }));
+                    : n.activeSpeakers.some((e) => e.identity === oo) ||
+                      n.activeSpeakers.push({ identity: oo }));
               }),
             );
           },
           Ke = async (t, i = _.current.signal) => {
             let o = t,
               c = await ne?.({ deviceId: o });
-            (i.aborted && (c?.cleanup?.(), c?.stream.getTracks().forEach((e) => e.stop()), i.throwIfAborted()),
+            (i.aborted &&
+              (c?.cleanup?.(), c?.stream.getTracks().forEach((e) => e.stop()), i.throwIfAborted()),
               c ||
                 (o || ((o = await p()), i.throwIfAborted()),
                 (c = {
@@ -3750,10 +4000,24 @@ function mo() {
                     },
                   }),
                 }),
-                i.aborted && (c.cleanup?.(), c.stream.getTracks().forEach((e) => e.stop()), i.throwIfAborted())));
-            let { cleanup: l, forceMute: d = !1, microphoneDeviceId: m, preserveMute: h = !0, stream: g } = c,
+                i.aborted &&
+                  (c.cleanup?.(),
+                  c.stream.getTracks().forEach((e) => e.stop()),
+                  i.throwIfAborted())));
+            let {
+                cleanup: l,
+                forceMute: d = !1,
+                microphoneDeviceId: m,
+                preserveMute: h = !0,
+                stream: g,
+              } = c,
               y = g.getTracks();
-            if (y.length !== 1) throw (l?.(), y.forEach((e) => e.stop()), Error(`Only one input is supported for now`));
+            if (y.length !== 1)
+              throw (
+                l?.(),
+                y.forEach((e) => e.stop()),
+                Error(`Only one input is supported for now`)
+              );
             let [b] = y,
               { echoCancellation: x } = b.getSettings();
             (typeof x == `boolean` &&
@@ -3765,7 +4029,13 @@ function mo() {
               pe.current && pe.current.track !== b && (ze(), pe.current.track.stop()),
               (Re.current = l),
               (d || (h && pe.current?.isMuted)) && (b.enabled = !1));
-            let S = s(b, { source: f.Microphone, name: `user`, userName: `User`, origin: u.Local, mutedCb: Ge });
+            let S = s(b, {
+              source: f.Microphone,
+              name: `user`,
+              userName: `User`,
+              origin: u.Local,
+              mutedCb: Ge,
+            });
             return (ge(S), Ge(S.isMuted, S.isSystemMuted), S);
           },
           qe = async (e, t) => {
@@ -3776,7 +4046,11 @@ function mo() {
                   : await a.getDisplayMedia(r);
             n.aborted && (i.getTracks().forEach((e) => e.stop()), n.throwIfAborted());
             let o = i.getTracks();
-            if (o.length !== 1) throw (o.forEach((e) => e.stop()), Error(`Only one video input is supported for now`));
+            if (o.length !== 1)
+              throw (
+                o.forEach((e) => e.stop()),
+                Error(`Only one video input is supported for now`)
+              );
             let [c] = o;
             (e === `camera` && (le.current = c.getSettings().deviceId),
               A.current && A.current.track !== c && A.current.track.stop());
@@ -3865,7 +4139,8 @@ function mo() {
                         sessionId: O.current?.voice_session_id ?? void 0,
                         style: O.current?.voice ?? void 0,
                       },
-                      errorType: ue.CHATGPT_VOICE_SESSION_USER_PERCEIVED_ERROR_TYPE_CONNECTION_ESTABLISHMENT_FAILED,
+                      errorType:
+                        ue.CHATGPT_VOICE_SESSION_USER_PERCEIVED_ERROR_TYPE_CONNECTION_ESTABLISHMENT_FAILED,
                     }))
                   : !je.current &&
                     i === I.Connected &&
@@ -3877,7 +4152,8 @@ function mo() {
                         style: O.current?.voice ?? void 0,
                       },
                       errorBucket: dt.CHATGPT_VOICE_SESSION_USER_PERCEIVED_ERROR_BUCKET_SERVER,
-                      errorType: ue.CHATGPT_VOICE_SESSION_USER_PERCEIVED_ERROR_TYPE_CONNECTION_LOST_AFTER_ESTABLISHED,
+                      errorType:
+                        ue.CHATGPT_VOICE_SESSION_USER_PERCEIVED_ERROR_TYPE_CONNECTION_LOST_AFTER_ESTABLISHED,
                     }),
                   s === I.Connected && (e.end(t()), M.connected.forEach((e) => e())),
                   be(s),
@@ -3899,10 +4175,10 @@ function mo() {
                 let a = r.getTracks();
                 if (a.length !== 1)
                   throw (
-                    i.debug(`[transceiver] Only one remote track is supported for now, detected these tracks`, {
-                      safe: {},
-                      sensitive: { detail: a },
-                    }),
+                    i.debug(
+                      `[transceiver] Only one remote track is supported for now, detected these tracks`,
+                      { safe: {}, sensitive: { detail: a } },
+                    ),
                     Error(`Only one remote track is supported for transceiver`)
                   );
                 let [o] = a;
@@ -3945,7 +4221,11 @@ function mo() {
                 },
                 timings: U(r),
               }).then(
-                (e) => (n.aborted && (e.stopMonitoring(), e.dataChannel.close(), e.pc.close(), n.throwIfAborted()), e),
+                (e) => (
+                  n.aborted &&
+                    (e.stopMonitoring(), e.dataChannel.close(), e.pc.close(), n.throwIfAborted()),
+                  e
+                ),
               );
             return (i.catch(() => {}), i);
           },
@@ -3967,7 +4247,9 @@ function mo() {
             let t = We();
             (Fe.current && Fe.current.stop(),
               (Fe.current = new Ia(t, (e) => {
-                let t = k.current && [I.Disconnected, I.Reconnecting, I.SignalReconnecting].includes(k.current);
+                let t =
+                  k.current &&
+                  [I.Disconnected, I.Reconnecting, I.SignalReconnecting].includes(k.current);
                 (M.connectionQualityChanged.forEach((n) => n(t ? J.LOST : e.general)),
                   Ae.current.forEach((n) => n(t ? J.LOST : e.local)));
               })),
@@ -3995,7 +4277,8 @@ function mo() {
             (u.catch(() => {}),
               l.start(),
               (Le.current ||=
-                (i.debug(`[transceiver] Audio input setup step not executed for initial TC offer!`), Qe(o))));
+                (i.debug(`[transceiver] Audio input setup step not executed for initial TC offer!`),
+                Qe(o))));
             let { completeAudioSetup: d } = Le.current,
               f;
             try {
@@ -4078,7 +4361,8 @@ function mo() {
           getConnectionState: Se,
           getAudioGapSummary: Ie,
           initVoiceMode: async (e, t) => {
-            if (P.current) throw Error(`Not ready to connect, ${JSON.stringify({ isConnecting: P.current })}`);
+            if (P.current)
+              throw Error(`Not ready to connect, ${JSON.stringify({ isConnecting: P.current })}`);
             let n = _.current.signal;
             try {
               (b(r, () => {
@@ -4086,7 +4370,9 @@ function mo() {
               }),
                 (O.current = e));
               let a = nt();
-              if (((a.muted = !1), ke(), (P.current = !0), (je.current = !1), fe.current !== void 0)) {
+              if (
+                ((a.muted = !1), ke(), (P.current = !0), (je.current = !1), fe.current !== void 0)
+              ) {
                 try {
                   await a.setSinkId(fe.current);
                 } catch (e) {
@@ -4151,12 +4437,21 @@ function mo() {
               }
               N.current === l && (N.current = void 0);
               let m = tt(e, t, p, n).catch((e) => {
-                throw (n.aborted || (t.onConnectionSetupError?.(e), S?.disconnect().catch(() => {})), e);
+                throw (
+                  n.aborted || (t.onConnectionSetupError?.(e), S?.disconnect().catch(() => {})),
+                  e
+                );
               });
-              return (m.catch(() => {}), { connectionSetupPromise: m, type: `transceiver`, success: !0 });
+              return (
+                m.catch(() => {}),
+                { connectionSetupPromise: m, type: `transceiver`, success: !0 }
+              );
             } catch (e) {
               throw (
-                n.aborted || ((P.current = !1), t.onConnectionSetupError?.(e), S?.disconnect().catch(() => {})),
+                n.aborted ||
+                  ((P.current = !1),
+                  t.onConnectionSetupError?.(e),
+                  S?.disconnect().catch(() => {})),
                 e
               );
             }
@@ -4193,7 +4488,12 @@ function ho(e, t, n) {
   let m = Sn(e),
     h = s.getState().voiceSessionId ? En(e) : {},
     { metrics: g, voiceMode: _, sessionType: v, style: y, server: b } = s.getState(),
-    S = B.reportedVoiceMode(e, { voiceMode: _, sessionType: v, voiceBackend: b.voiceBackend, reason: t }),
+    S = B.reportedVoiceMode(e, {
+      voiceMode: _,
+      sessionType: v,
+      voiceBackend: b.voiceBackend,
+      reason: t,
+    }),
     C = c.getStartAsTimestamp(),
     w = c.getEndAsTimestamp(),
     T = u.getMarkAsTimestamp(),
@@ -4248,9 +4548,18 @@ function ho(e, t, n) {
     ae = { ...Lr(e, S, r), productExperience: ne },
     D = e.get(ie),
     O = In(n, { snapshotActiveDevices: !0 })
-      .then((e) => (D.logProductEvent(oe, { ...re, finalAudioRoute: e }), D.logProductEvent(Te, ae), D.flush(yo)))
+      .then(
+        (e) => (
+          D.logProductEvent(oe, { ...re, finalAudioRoute: e }),
+          D.logProductEvent(Te, ae),
+          D.flush(yo)
+        ),
+      )
       .catch((e) => {
-        i.debug(`[voice] Failed to log session end analytics`, { safe: {}, sensitive: { error: e } });
+        i.debug(`[voice] Failed to log session end analytics`, {
+          safe: {},
+          sensitive: { error: e },
+        });
       });
   if ((a.set(r, O), a.size > 100)) {
     let e = a.keys().next().value;
@@ -4259,7 +4568,11 @@ function ho(e, t, n) {
   return O;
 }
 function go(e) {
-  return e === it.UserNavigatedAway ? `conversation_nav` : e === it.UserSwitchedToStandard ? `voice_changed` : e;
+  return e === it.UserNavigatedAway
+    ? `conversation_nav`
+    : e === it.UserSwitchedToStandard
+      ? `voice_changed`
+      : e;
 }
 var _o, vo, yo;
 function bo() {

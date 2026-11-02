@@ -1,157 +1,434 @@
-import { I3 as getJsxRuntime, e6 as getReactRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/remote-connection-editor-dialog";
-import "@rchunk/remote-connection-editor-draft";
-import "@rchunk/rolldown-runtime";
-
-export interface RemoteConnectionDraft {
-  color?: string | null;
-  displayName: string;
-  host?: string;
-  hostId: string;
-  identity?: string | null;
-  kind?: "remote-control" | "ssh" | "wsl";
-  port?: number | null;
-  user?: string;
-}
-
-export interface RemoteConnectionEditorModalProps {
-  connection?: RemoteConnectionDraft | null;
-  connections?: readonly RemoteConnectionDraft[] | null;
-  error?: string | null;
-  hostId: string;
-  isLoading?: boolean;
-  isSaving?: boolean;
-  onClose(): void;
-  onSave?(connection: RemoteConnectionDraft): Promise<void> | void;
-}
-
-let jsx: JsxRuntime;
-let React: ReturnType<typeof getReactRuntime>;
-
-function connectionHost(connection: RemoteConnectionDraft): string {
-  return connection.host ?? "";
-}
-
-function RemoteConnectionEditorModal(props: RemoteConnectionEditorModalProps): unknown {
-  const connection = props.connection ?? props.connections?.find((candidate) => candidate.hostId === props.hostId) ?? null;
-  const loading = props.isLoading === true || (props.connection === undefined && props.connections == null && props.error == null);
-  if (connection == null) {
-    return jsx.jsxs("dialog", {
-      open: true,
-      children: [
-        jsx.jsx("h2", { children: loading ? "Loading connection" : "Connection unavailable" }),
-        props.error == null ? null : jsx.jsx("p", { role: "alert", children: props.error }),
-        jsx.jsx("button", { type: "button", onClick: props.onClose, children: "Close" }),
-      ],
-    });
-  }
-
-  const [draft, setDraft] = React.useState<RemoteConnectionDraft>(() => ({ ...connection }));
-  const draftRef = React.useRef(draft);
-  const [saveError, setSaveError] = React.useState<string | null>(null);
-  const [saving, setSaving] = React.useState(false);
-  const pending = props.isSaving === true || saving;
-  const update = (key: keyof RemoteConnectionDraft, value: string | number | null) => {
-    const next = { ...draftRef.current, [key]: value };
-    draftRef.current = next;
-    setDraft(next);
-    setSaveError(null);
-  };
-  const submit = async (event?: { preventDefault(): void }) => {
-    event?.preventDefault();
-    if (pending || props.onSave == null) return;
-    if (draftRef.current.displayName.trim().length === 0) {
-      setSaveError("Display name is required.");
-      return;
-    }
-    setSaving(true);
-    setSaveError(null);
-    try {
-      await props.onSave({
-        ...draftRef.current,
-        displayName: draftRef.current.displayName.trim(),
-        host: draftRef.current.host?.trim(),
-        identity: draftRef.current.identity?.trim() || null,
-        user: draftRef.current.user?.trim(),
-      });
-      props.onClose();
-    } catch (error) {
-      setSaveError(error instanceof Error ? error.message : "Failed to save remote connection.");
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const sshLike = connection.kind == null || connection.kind === "ssh";
-  return jsx.jsxs("dialog", {
-    open: true,
-    "data-host-id": props.hostId,
-    "data-connection-kind": connection.kind ?? "ssh",
-    children: [
-      jsx.jsx("h2", { children: "Edit connection" }),
-      jsx.jsxs("form", {
-        onSubmit: submit,
-        children: [
-          jsx.jsxs("label", {
-            children: ["Display name", jsx.jsx("input", {
-              "aria-label": "Display name",
-              disabled: pending,
-              value: draft.displayName,
-              onChange: (event: { currentTarget: { value: string } }) => update("displayName", event.currentTarget.value),
-            })],
-          }),
-          sshLike ? jsx.jsxs("label", {
-            children: ["Host", jsx.jsx("input", {
-              "aria-label": "Host",
-              disabled: pending,
-              value: connectionHost(draft),
-              onChange: (event: { currentTarget: { value: string } }) => update("host", event.currentTarget.value),
-            })],
-          }) : null,
-          sshLike ? jsx.jsxs("label", {
-            children: ["User", jsx.jsx("input", {
-              "aria-label": "User",
-              disabled: pending,
-              value: draft.user ?? "",
-              onChange: (event: { currentTarget: { value: string } }) => update("user", event.currentTarget.value),
-            })],
-          }) : null,
-          sshLike ? jsx.jsxs("label", {
-            children: ["Port", jsx.jsx("input", {
-              "aria-label": "Port",
-              disabled: pending,
-              inputMode: "numeric",
-              value: draft.port == null ? "" : String(draft.port),
-              onChange: (event: { currentTarget: { value: string } }) => update("port", event.currentTarget.value.length === 0 ? null : Number(event.currentTarget.value)),
-            })],
-          }) : null,
-          jsx.jsxs("label", {
-            children: ["Color", jsx.jsx("input", {
-              "aria-label": "Connection color",
-              disabled: pending,
-              type: "color",
-              value: draft.color ?? "#6b7280",
-              onChange: (event: { currentTarget: { value: string } }) => update("color", event.currentTarget.value),
-            })],
-          }),
-          saveError == null ? null : jsx.jsx("p", { role: "alert", children: saveError }),
-          jsx.jsxs("footer", {
-            children: [
-              jsx.jsx("button", { type: "button", disabled: pending, onClick: props.onClose, children: "Cancel" }),
-              jsx.jsx("button", { type: "submit", disabled: pending || props.onSave == null, children: pending ? "Saving…" : "Save" }),
-            ],
-          }),
-        ],
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Ah as n,
+  FP as r,
+  FX as i,
+  HU as a,
+  HX as o,
+  I3 as s,
+  IP as c,
+  Ih as l,
+  K2 as u,
+  LX as d,
+  Lh as f,
+  MP as p,
+  NP as m,
+  Oh as h,
+  Ph as g,
+  Q3 as _,
+  QI as v,
+  Rh as y,
+  Y2 as b,
+  Yh as x,
+  Z3 as S,
+  ZI as C,
+  Zh as w,
+  e6 as T,
+  fI as E,
+  jh as D,
+  kh as O,
+  lk as k,
+  n4 as A,
+  pk as j,
+  wL as M,
+  zh as N,
+} from "@rchunk/app-shared";
+import {
+  Cpn as P,
+  Gfn as F,
+  Jfn as I,
+  Wfn as L,
+  Yfn as R,
+  bM as z,
+  iun as ee,
+  nun as B,
+  vM as V,
+  yM as H,
+  ypn as U,
+} from "@rchunk/app-initial";
+import { a as W, i as G, r as K } from "@rchunk/remote-connection-editor-draft";
+import {
+  i as te,
+  n as ne,
+  r as re,
+  t as ie,
+} from "@rchunk/remote-connection-editor-dialog";
+function ae(e) {
+  let t = (0, q.c)(27),
+    { hostId: r, onClose: i } = e,
+    a = d(C),
+    [s] = F(`remote_wsl_connections`),
+    [c] = F(`remote_control_connections`),
+    u = o(H),
+    [p, m] = (0, J.useState)(),
+    g = [...(s ?? []), ...(c ?? [])].find((e) => e.hostId === r)?.displayName,
+    _;
+  t[0] === i
+    ? (_ = t[1])
+    : ((_ = (e) => {
+        e || i();
       }),
-    ],
-  });
+      (t[0] = i),
+      (t[1] = _));
+  let v;
+  t[2] !== p || t[3] !== r || t[4] !== i || t[5] !== a
+    ? ((v = (e) => {
+        (e.preventDefault(), p !== void 0 && z(a, r, p), i());
+      }),
+      (t[2] = p),
+      (t[3] = r),
+      (t[4] = i),
+      (t[5] = a),
+      (t[6] = v))
+    : (v = t[6]);
+  let S;
+  t[7] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((S = (0, Y.jsx)(y, {
+        children: (0, Y.jsx)(b, {
+          id: `codex.remoteConnectionEditor.title`,
+          defaultMessage: `Edit connection`,
+          description: `Title for editing the appearance of a remote connection`,
+        }),
+      })),
+      (t[7] = S))
+    : (S = t[7]);
+  let w = g ?? r,
+    T;
+  t[8] === w
+    ? (T = t[9])
+    : ((T = (0, Y.jsx)(D, {
+        children: (0, Y.jsx)(n, {
+          title: S,
+          subtitle: (0, Y.jsx)(f, {
+            children: (0, Y.jsx)(b, {
+              id: `codex.remoteConnectionEditor.subtitle`,
+              defaultMessage: `Color changes for {host} everywhere it appears`,
+              description: `Explains that a remote connection color is shared by all its chats and projects`,
+              values: { host: w },
+            }),
+          }),
+        }),
+      })),
+      (t[8] = w),
+      (t[9] = T));
+  let E = p === void 0 ? (u?.[r] ?? null) : p,
+    k;
+  t[10] !== r || t[11] !== E
+    ? ((k = (0, Y.jsx)(D, {
+        className: `pt-4`,
+        children: (0, Y.jsx)(re, { hostId: r, color: E, disabled: !1, onChange: m }),
+      })),
+      (t[10] = r),
+      (t[11] = E),
+      (t[12] = k))
+    : (k = t[12]);
+  let A;
+  t[13] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((A = (0, Y.jsx)(b, {
+        id: `settings.remoteConnections.dialog.cancel`,
+        defaultMessage: `Cancel`,
+        description: `Cancel button for the remote connection editor`,
+      })),
+      (t[13] = A))
+    : (A = t[13]);
+  let j;
+  t[14] === i
+    ? (j = t[15])
+    : ((j = (0, Y.jsx)(x, { color: `ghost`, type: `button`, onClick: i, children: A })),
+      (t[14] = i),
+      (t[15] = j));
+  let M;
+  t[16] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((M = (0, Y.jsx)(x, {
+        color: `primary`,
+        type: `submit`,
+        children: (0, Y.jsx)(b, {
+          id: `settings.remoteConnections.dialog.apply`,
+          defaultMessage: `Save`,
+          description: `Save button for the remote connection editor`,
+        }),
+      })),
+      (t[16] = M))
+    : (M = t[16]);
+  let N;
+  t[17] === j
+    ? (N = t[18])
+    : ((N = (0, Y.jsx)(D, { className: `pt-4`, children: (0, Y.jsxs)(O, { children: [j, M] }) })),
+      (t[17] = j),
+      (t[18] = N));
+  let P;
+  t[19] !== N || t[20] !== v || t[21] !== T || t[22] !== k
+    ? ((P = (0, Y.jsxs)(h, { as: `form`, onSubmit: v, children: [T, k, N] })),
+      (t[19] = N),
+      (t[20] = v),
+      (t[21] = T),
+      (t[22] = k),
+      (t[23] = P))
+    : (P = t[23]);
+  let I;
+  return (
+    t[24] !== _ || t[25] !== P
+      ? ((I = (0, Y.jsx)(l, { open: !0, onOpenChange: _, size: `compact`, children: P })),
+        (t[24] = _),
+        (t[25] = P),
+        (t[26] = I))
+      : (I = t[26]),
+    I
+  );
 }
-
-function initializeRemoteConnectionEditorModal(): void {
-  jsx = getJsxRuntime();
-  React = getReactRuntime();
+var q, J, Y;
+function X() {
+  return (X = e(() => {
+    ((q = t()), i(), (J = T()), u(), w(), N(), g(), v(), L(), te(), V(), (Y = s()));
+  }))();
 }
-
-initializeRemoteConnectionEditorModal();
-export { RemoteConnectionEditorModal };
+function oe(e) {
+  let t = (0, Z.c)(46),
+    { hostId: i, onClose: s } = e,
+    u = d(C),
+    f = o(P),
+    g = A(),
+    [v] = F(`remote_ssh_connections`),
+    [S] = F(`remote_wsl_connections`),
+    [w] = F(`remote_control_connections`),
+    T = o(H),
+    E = ee(`save-codex-managed-remote-ssh-connections`),
+    O,
+    k,
+    M,
+    N,
+    I,
+    L;
+  if (
+    t[0] !== i ||
+    t[1] !== g ||
+    t[2] !== s ||
+    t[3] !== f ||
+    t[4] !== w ||
+    t[5] !== E ||
+    t[6] !== u ||
+    t[7] !== v ||
+    t[8] !== S
+  ) {
+    L = Symbol.for(`react.early_return_sentinel`);
+    bb0: {
+      let e = [...(v ?? []), ...(S ?? []), ...(w ?? [])].find((e) => e.hostId === i);
+      if (e == null) {
+        let e = v == null || S == null || w == null,
+          r;
+        t[15] === s ? (r = t[16]) : ((r = (e) => !e && s()), (t[15] = s), (t[16] = r));
+        let i;
+        t[17] === e
+          ? (i = t[18])
+          : ((i = (0, Q.jsx)(n, {
+              title: (0, Q.jsx)(y, {
+                children: e
+                  ? (0, Q.jsx)(b, {
+                      id: `codex.remoteConnectionEditor.loading`,
+                      defaultMessage: `Loading connection`,
+                      description: `Dialog title while remote connection data is loading`,
+                    })
+                  : (0, Q.jsx)(b, {
+                      id: `codex.remoteConnectionEditor.unavailable`,
+                      defaultMessage: `Connection unavailable`,
+                      description: `Dialog title when a remote connection was removed before its editor opened`,
+                    }),
+              }),
+            })),
+            (t[17] = e),
+            (t[18] = i));
+        let a;
+        t[19] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((a = (0, Q.jsx)(b, {
+              id: `settings.remoteConnections.dialog.close`,
+              defaultMessage: `Close`,
+              description: `Button to dismiss an unavailable connection editor`,
+            })),
+            (t[19] = a))
+          : (a = t[19]);
+        let o;
+        t[20] === s
+          ? (o = t[21])
+          : ((o = (0, Q.jsx)(x, { color: `secondary`, onClick: s, children: a })),
+            (t[20] = s),
+            (t[21] = o));
+        let c;
+        t[22] !== i || t[23] !== o
+          ? ((c = (0, Q.jsx)(h, { children: (0, Q.jsxs)(D, { children: [i, o] }) })),
+            (t[22] = i),
+            (t[23] = o),
+            (t[24] = c))
+          : (c = t[24]);
+        let u;
+        (t[25] !== r || t[26] !== c
+          ? ((u = (0, Q.jsx)(l, { open: !0, onOpenChange: r, size: `compact`, children: c })),
+            (t[25] = r),
+            (t[26] = c),
+            (t[27] = u))
+          : (u = t[27]),
+          (L = u));
+        break bb0;
+      }
+      if (!a(e)) {
+        let e;
+        (t[28] !== i || t[29] !== s
+          ? ((e = (0, Q.jsx)(ae, { hostId: i, onClose: s })), (t[28] = i), (t[29] = s), (t[30] = e))
+          : (e = t[30]),
+          (L = e));
+        break bb0;
+      }
+      ((k = (t, n) => {
+        if (v == null || E.isPending) return;
+        let a = G(t, e);
+        E.mutate(
+          { remoteConnections: v.map((e) => (e.hostId === i ? a : G(W(e), e))).sort(se) },
+          {
+            onSuccess: (e) => {
+              let { remoteConnections: t } = e;
+              (R(f, {
+                action: p.CODEX_REMOTE_SSH_CONNECTION_ACTION_SAVE_CONNECTION,
+                result: c.CODEX_REMOTE_SSH_CONNECTION_RESULT_SUCCEEDED,
+                source: r.CODEX_REMOTE_SSH_CONNECTION_EVENT_SOURCE_SIDEBAR,
+                connection: t.find((e) => e.hostId === i) ?? a,
+              }),
+                n !== void 0 && z(u, i, n),
+                u
+                  .get(j)
+                  .success(
+                    g.formatMessage({
+                      id: `settings.remoteConnections.save.success`,
+                      defaultMessage: `Saved remote connections`,
+                      description: `Toast shown when remote connections are saved`,
+                    }),
+                  ),
+                s());
+            },
+            onError: (e) => {
+              (R(f, {
+                action: p.CODEX_REMOTE_SSH_CONNECTION_ACTION_SAVE_CONNECTION,
+                result: c.CODEX_REMOTE_SSH_CONNECTION_RESULT_FAILED,
+                source: r.CODEX_REMOTE_SSH_CONNECTION_EVENT_SOURCE_SIDEBAR,
+                connection: a,
+                errorCategory: m.CODEX_REMOTE_SSH_CONNECTION_ERROR_CATEGORY_UNKNOWN,
+              }),
+                _.warning(`[remote-connections/editor] save_failed`, {
+                  safe: {},
+                  sensitive: { error: e, hostId: i },
+                }),
+                u
+                  .get(j)
+                  .danger(
+                    g.formatMessage({
+                      id: `settings.remoteConnections.save.error`,
+                      defaultMessage: `Failed to save remote connections`,
+                      description: `Toast shown when a remote connection fails to save`,
+                    }),
+                    { errorAnalytics: { toastId: `settings.remoteConnections.save.error` } },
+                  ));
+            },
+          },
+        );
+      }),
+        (O = ie),
+        (M = !0),
+        (N = `edit`),
+        (I = W(e)));
+    }
+    ((t[0] = i),
+      (t[1] = g),
+      (t[2] = s),
+      (t[3] = f),
+      (t[4] = w),
+      (t[5] = E),
+      (t[6] = u),
+      (t[7] = v),
+      (t[8] = S),
+      (t[9] = O),
+      (t[10] = k),
+      (t[11] = M),
+      (t[12] = N),
+      (t[13] = I),
+      (t[14] = L));
+  } else ((O = t[9]), (k = t[10]), (M = t[11]), (N = t[12]), (I = t[13]), (L = t[14]));
+  if (L !== Symbol.for(`react.early_return_sentinel`)) return L;
+  let B;
+  t[31] === v ? (B = t[32]) : ((B = v ?? []), (t[31] = v), (t[32] = B));
+  let V = T?.[i] ?? null,
+    U;
+  t[33] === s
+    ? (U = t[34])
+    : ((U = (e) => {
+        e || s();
+      }),
+      (t[33] = s),
+      (t[34] = U));
+  let K;
+  return (
+    t[35] !== O ||
+    t[36] !== k ||
+    t[37] !== i ||
+    t[38] !== E.isPending ||
+    t[39] !== M ||
+    t[40] !== N ||
+    t[41] !== I ||
+    t[42] !== B ||
+    t[43] !== V ||
+    t[44] !== U
+      ? ((K = (0, Q.jsx)(O, {
+          open: M,
+          mode: N,
+          draft: I,
+          existingConnections: B,
+          editingHostId: i,
+          color: V,
+          onOpenChange: U,
+          onSubmit: k,
+          isSaving: E.isPending,
+        })),
+        (t[35] = O),
+        (t[36] = k),
+        (t[37] = i),
+        (t[38] = E.isPending),
+        (t[39] = M),
+        (t[40] = N),
+        (t[41] = I),
+        (t[42] = B),
+        (t[43] = V),
+        (t[44] = U),
+        (t[45] = K))
+      : (K = t[45]),
+    K
+  );
+}
+function se(e, t) {
+  return e.displayName.localeCompare(t.displayName);
+}
+var Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((Z = t()),
+      E(),
+      i(),
+      M(),
+      u(),
+      I(),
+      w(),
+      N(),
+      g(),
+      k(),
+      U(),
+      v(),
+      L(),
+      S(),
+      B(),
+      ne(),
+      K(),
+      X(),
+      V(),
+      (Q = s()));
+  }))();
+}
+$();
+export { oe as RemoteConnectionEditorModal };

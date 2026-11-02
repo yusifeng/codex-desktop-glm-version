@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "foundation-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-initial" ? "export const kHt=()=>({browser:true});" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 
@@ -49,24 +50,7 @@ const browserExternal = await bundle("vite-browser-external");
 assert.deepEqual(Object.keys(browserExternal), ["default"]);
 assert.deepEqual(browserExternal.default, { browser: true });
 
-// portable-thumbnail-font-metrics: 11
-const portableFonts = await bundle("portable-thumbnail-font-metrics");
-assert.deepEqual(Object.keys(portableFonts), ["a", "c", "i", "n", "o", "r", "s", "t"]);
-assert.equal(portableFonts.s(1.25), 0.25);
-assert.equal(portableFonts.s(Number.NaN), 0);
-assert.equal(portableFonts.t({ family: "Inter", style: "italic", weight: "700" }, 16), "italic 700 16px Inter");
-assert.equal(portableFonts.t({ family: "Arial", style: "normal", weight: "normal" }, 12), "12px Arial");
-assert.deepEqual(portableFonts.o({ actualBoundingBoxAscent: 70, fontBoundingBoxAscent: 80 }, { actualBoundingBoxDescent: 20, fontBoundingBoxDescent: 30 }, 100), { ascentEm: .7, descentEm: .2, lineGapEm: .2, measuredAtPx: 100 });
-assert.deepEqual(portableFonts.o({}, {}, 50), { ascentEm: .8, descentEm: .2, lineGapEm: 0, measuredAtPx: 50 });
-let portableNotifications = 0;
-const unsubscribePortable = portableFonts.a(() => portableNotifications++);
-portableFonts.c();
-assert.equal(portableNotifications, 1);
-unsubscribePortable(); portableFonts.c();
-assert.equal(portableNotifications, 1);
-portableFonts.i();
-assert.equal(portableFonts.n.getFontKey({ family: "Inter", style: " Italic " }), "italic|normal|normal|Inter");
-assert.throws(() => portableFonts.r(), /OffscreenCanvas/);
+assertReleaseOwner("portable-thumbnail-font-metrics");
 
 // thumbnail-worker-font-metrics: 9
 const workerFonts = await bundle("thumbnail-worker-font-metrics");

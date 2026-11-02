@@ -41,22 +41,6 @@ const modelPickerReleaseAssertions = assertReleaseOwner("model-picker-upsell-mod
 
 const firstLimitReleaseAssertions = assertReleaseOwner("first-limit-dialog");
 
-const remote = await load("remote-connection-editor-modal");
-const unavailable = remote.RemoteConnectionEditorModal({ hostId: "missing", onClose() {} });
-assert.equal(unavailable.props.children[0].props.children, "Loading connection");
-const missing = remote.RemoteConnectionEditorModal({ connections: [], hostId: "missing", onClose() {} });
-assert.equal(missing.props.children[0].props.children, "Connection unavailable");
-let savedHost = null;
-let editorClosed = 0;
-const editor = remote.RemoteConnectionEditorModal({ connection: { displayName: "Server", host: "example.com", hostId: "remote-1" }, hostId: "remote-1", onClose() { editorClosed++; }, onSave: (connection) => { savedHost = connection.host; } });
-assert.equal(editor.props["data-host-id"], "remote-1");
-const editorForm = editor.props.children[1];
-editorForm.props.children[1].props.children[1].props.onChange({ currentTarget: { value: "new.example.com" } });
-await editorForm.props.onSubmit({ preventDefault() {} });
-assert.equal(savedHost, "new.example.com");
-assert.equal(editorClosed, 1);
-const colorOnly = remote.RemoteConnectionEditorModal({ connection: { displayName: "Laptop", hostId: "remote-2", kind: "remote-control", color: "#112233" }, hostId: "remote-2", onClose() {}, onSave() {} });
-assert.equal(colorOnly.props["data-connection-kind"], "remote-control");
-assert.equal(colorOnly.props.children[1].props.children.filter(Boolean).some(node => node.props?.children?.[0] === "Host"), false);
+const remoteReleaseAssertions = assertReleaseOwner("remote-connection-editor-modal");
 
-console.log(`account modals cluster complete (${modelPickerReleaseAssertions + quietHoursReleaseAssertions + firstLimitReleaseAssertions} release assertions)`);
+console.log(`account modals cluster complete (${modelPickerReleaseAssertions + quietHoursReleaseAssertions + firstLimitReleaseAssertions + remoteReleaseAssertions} release assertions)`);

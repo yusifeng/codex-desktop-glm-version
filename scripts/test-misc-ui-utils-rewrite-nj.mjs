@@ -10,7 +10,6 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCE = '/Users/david/Workspace/ppio_github/chatgpt-desktop-src/app/webview/assets';
 const modules = [
   ['library-empty-trash-758597c77867.js', 'library-empty-trash-dialog', ['EmptyLibraryTrashDialog']],
-  ['notifications-runtime-a5056e67819a.js', 'parental-control-notifications-runtime', ['listenForParentalControlNotifications']],
   ['open-in-codex-c690ffed81f6.js', 'windows-tabs-open', ['runWindowsTabsOpen']],
 ];
 const aliases = new Map([
@@ -29,6 +28,7 @@ for (const [asset, semantic] of modules) {
   assert.equal(/\bany\b|@ts-expect-error|@ts-nocheck/.test(restored), false);
   sourceAssertions += 3;
 }
+sourceAssertions += assertReleaseOwner('parental-control-notifications-runtime');
 
 globalThis.__nj = { hookIndex: 0, hookState: [], logs: [] };
 const jsxRuntime = `
@@ -77,14 +77,6 @@ const form = dialog.props.children;
 await form.props.onSubmit({ preventDefault() {} });
 assert.equal(closed, 1); assert.equal(globalThis.__nj.reset, 1); assert.deepEqual(invalidations, [['library-api'], ['chatgpt-composer-library-files'], ['4231797315']]); assert.deepEqual(toastMessages, [['success', 'Trash emptied']]); assert.deepEqual(globalThis.__nj.logs.map(entry => entry.type), ['delete', 'delete_succeeded']);
 runtimeAssertions += 5;
-
-const socketListeners = {}; let subscribed = 0; let unsubscribed = 0;
-globalThis.__nj.logs = []; globalThis.__nj.socket = { onMessage(fn) { socketListeners.message = fn; return () => delete socketListeners.message; }, onPotentialMissedMessages(fn) { socketListeners.missed = fn; return () => delete socketListeners.missed; }, onSubscribed(fn) { socketListeners.subscribed = fn; return () => delete socketListeners.subscribed; }, subscribe() { subscribed++; }, unsubscribe() { unsubscribed++; } };
-const notificationPage = { items: [{ id: 'invite', notification_type: 'family-invite' }, { id: 'cache', notification_type: 'setting-updated', payload: { clear_cache_only: true } }] };
-globalThis.__nj.scope.queryClient.getQueryData = () => notificationPage;
-const cleanup = loaded.get('parental-control-notifications-runtime').listenForParentalControlNotifications(globalThis.__nj.scope, 'u', 'a');
-assert.equal(subscribed, 1); assert.equal(globalThis.__nj.logs.length, 1); assert.equal(globalThis.__nj.logs[0].surface, 'info'); socketListeners.message({ id: 'alert', notification_type: 'self-harm' }); assert.equal(globalThis.__nj.logs.at(-1).surface, 'banner'); cleanup(); assert.equal(unsubscribed, 1); assert.equal(socketListeners.message, undefined);
-runtimeAssertions += 6;
 
 const scope = { value: { routeKind: 'local-thread', conversationId: 'thread-1' }, get(key) { if (key === Symbol.for('archived')) return false; if (key === Symbol.for('host')) return 'host-1'; if (key === Symbol.for('terminal-tab-ids')) return []; return undefined; } };
 const open = loaded.get('windows-tabs-open').runWindowsTabsOpen;

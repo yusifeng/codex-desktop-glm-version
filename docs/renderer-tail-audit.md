@@ -1,5 +1,32 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Browser/voice/environment release-owner convergence：一次性恢复
+`mark-session-create`、`debug-modal`、`parental-control-notifications-runtime`、
+`browser-mfa-disable-page`、`remote-connection-editor-modal`、
+`realtime-voice-launch-surface`、`animated-icon`、
+`business-checkout-switch-workspace-dialog`、`geometry-shapes`、
+`browser-composer-disclaimer-core`、`environment-variables-batch-dialog`、
+`chatgpt-header-upgrade`、`submit-artifact-feedback`、`profile-site-details`、
+`environment-variable-row`、`PieChart`、
+`browser-site-annotation-permission-dialog`、
+`detached-browser-annotation-controls`、`checkout-confirm-latency`、
+`mermaid-editable-preview`、`diff-file-view`、
+`environment-batch-secrets-dialog`、`learning-model-anova-decomposition`、
+`detached-browser-annotation-host`、`auto-review-approval-nudge`、
+`subagent-panel`、`builder-analytics`、`portable-thumbnail-font-metrics`、
+`create-workspace-page` 与 `checkout-error` 三十个发布 owner，净恢复 7,823 行
+发布 TypeScript。旧缩减 ABI/mock 回归已迁移为发布一致性验证，同时保留相邻
+voice stage、account、安全页面、workspace、chart indicator、annotation registry、
+Git review、subagent row、analytics、payment/font 与 editor 行为覆盖；同簇已发布一致的
+`layout` 旧回归也一并收敛。39 组聚焦测试、12,448/12,448 transform check、
+1,888/1,888 renderer build/verify、2,247/2,247 app-code coverage、0 semantic tail、
+typecheck 与 1,912-script test-index 通过。严格 hub 消费推进到 app-shared
+1,790/3,185、app-initial 5,770/8,204、app-primary 761/917，仍为 0 unreviewed、
+0 invalid consumers。按发布源码正向行数缺口口径，剩余由 46,560 行降至
+38,737 行，覆盖率约 96.26%；可比对 owner 中已有 413 个与发布证据一致，
+仍有 1,449 个不完全一致。425 个 preserved 边界、三个聚合 hub 的剩余耦合导出
+与最终真实 Electron E2E 尚未完成，因此本批仍不构成“完整反编译完成”。
+
 2026-11-02 Large release-owner convergence batch：一次性恢复
 `workspace-auto-generated-name`、`voice-configuration-manager`、
 `pull-request-code-review-navigation-core`、`tab-address-input`、`editor-header`、

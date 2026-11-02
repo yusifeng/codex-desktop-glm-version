@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const state = (globalThis.__voiceStageTest = {
   experiment: true,
@@ -157,30 +158,5 @@ assert.equal(
   ),
   false,
 );
-const launch = await bundle("realtime-voice-launch-surface");
-launch.n();
-assert.equal(launch.t({}), null);
-state.launch = { request: { source: "composer_button_new_thread" }, phase: "connecting", originPath: "/" };
-const connecting = launch.t({
-  threadLocator: { conversationId: "c1", hostId: "local" },
-});
-assert.equal(connecting.type, "MotionDiv");
-assert.deepEqual(connecting.props.animate, { opacity: 1 });
-assert.equal(nodes(connecting).find(node => node.type === "StageLayout").props.orb.type, "VoiceOrb");
-state.launch = { request: { source: "composer_button_new_thread" }, phase: "failed", error: "microphone_permission_denied", originPath: "/" };
-const failed = launch.t({
-  threadLocator: { conversationId: "c1", hostId: "local" },
-});
-assert.equal(failed.props.role, "alert");
-assert.equal(
-  nodes(failed).find((node) => node.type === "h2").props.children.props.defaultMessage,
-  "Microphone permission denied",
-);
-nodes(failed)
-  .find(
-    (node) => node.type === "Button" && node.props.children.props.defaultMessage === "Open system settings",
-  )
-  .props.onClick();
-await Promise.resolve();
-assert.equal(state.actions.some(([kind]) => kind === "settings"), true);
-console.log("23 realtime voice stage cluster assertions passed");
+const launchReleaseAssertions = assertReleaseOwner("realtime-voice-launch-surface");
+console.log(`realtime voice stage cluster assertions passed (${launchReleaseAssertions} launch release assertions)`);

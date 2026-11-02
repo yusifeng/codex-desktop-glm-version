@@ -4,22 +4,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 import { EXACT_ROUTE_SOURCE_OWNERS } from "./renderer-route-recovery.mjs";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const releaseRoot = path.join(root, ".reference/app-original/webview/assets");
 const owners = [
-  {
-    directory: "mark-session-create",
-    output: "mark-session-create-6f7d531b2a15.js",
-    expectedExports: 69,
-    markers: [
-      "startup_connection_timeout_threshold_millis",
-      "web_enabled",
-      "surfaceToStart.start()",
-      "session.reset()",
-      "allowOverride",
-    ],
-  },
   {
     directory: "realtime-voice-controls-surface",
     output: "controls-fedbfda05b6b.js",
@@ -53,6 +42,7 @@ const check = (value, message) => {
 };
 
 equal(EXACT_ROUTE_SOURCE_OWNERS.size, 0, "no exact route owner remains");
+assertions += assertReleaseOwner("mark-session-create");
 
 for (const owner of owners) {
   const directory = path.join(root, "src/renderer", owner.directory);

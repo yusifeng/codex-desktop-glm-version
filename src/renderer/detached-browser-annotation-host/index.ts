@@ -1,127 +1,371 @@
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as commentPopupChunk from "@rchunk/comment-popup-portal";
-import * as registryChunk from "@rchunk/source-annotation-host-registry";
-import { projectAnnotationItems as normalizeSnapshotComments } from "../app-shared/runtime/project-annotation-items";
-import { isBrowserCommentForTab as belongsToBrowserTab } from "../app-primary/runtime/is-browser-comment-for-tab";
-
-type StateUpdater<Value> = Value | ((current: Value) => Value);
-interface MutableRef<Value> { current: Value }
-interface JsxRuntime { Fragment: unknown; jsx(type: unknown, props: object, key?: string): unknown }
-interface ReactRuntime { useCallback<Callback extends (...arguments_: never[]) => unknown>(callback: Callback, dependencies: readonly unknown[]): Callback; useEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void; useRef<Value>(initialValue: Value): MutableRef<Value>; useState<Value>(initialValue: Value): [Value, (next: StateUpdater<Value>) => void] }
-interface Metadata { browserTabId?: string; commentId?: string; [key: string]: unknown }
-interface Comment { id?: string; localBrowserCommentMetadata?: Metadata; [key: string]: unknown }
-interface DirectCommentMessage { browserTabId: string; comment: Comment; conversationId: string; sessionId: string }
-interface SnapshotComment { additionalAnchors?: unknown; body?: string; designChange?: unknown; id: string; [key: string]: unknown }
-interface BrowserSnapshot { annotationFlow?: unknown; comments: SnapshotComment[]; url: string }
-interface Tab { annotationFlow?: unknown; browserSnapshot?: BrowserSnapshot | null; browserTabId?: string | null; commentAttachmentConversationId?: string | null; conversationId?: string | null; phase?: string; sourceThreadId?: string; tabId?: string }
-interface DetachedTabs { focusSourceForBrowserComment(conversationId: string, browserTabId: string): Promise<boolean> | boolean; isBrowserTabDetachedFromSource(conversationId: string, browserTabId: string): Promise<boolean> | boolean }
-interface StoreScope { get<Value>(signal: unknown, key?: string): Value; set<Value>(signal: unknown, key: string, value: Value): void }
-interface PendingFocus { abort: AbortController; message: DirectCommentMessage }
-interface BrowserUiState { currentUrls: string[] }
-
-const shared = appSharedChunk as unknown as { $3?: () => void; BX: (query: unknown, input: object) => Comment[]; CJ: (flow: unknown) => { defaultSubmitMode: string }; FX?: () => void; G3: { dispatchMessage(type: string, payload: unknown): void }; HX: <Value>(signal: unknown) => Value; I3: () => JsxRuntime; K3: (event: string, callback: (message: never) => void, dependencies: readonly unknown[]) => void; LX: (scope: unknown) => StoreScope; OJ?: () => void; QI?: () => void; W3?: () => void; ZI: unknown; e6: () => ReactRuntime; iK: (comment: unknown, index: number, browserTabId: string) => Comment; wL?: () => void };
-const initial = appInitialChunk as unknown as { Q6: (scope: StoreScope, key: object, updater: (comments: Comment[]) => Comment[]) => void; RDt: unknown; X6: unknown; Y6?: () => void; ifn?: () => void; mnt?: () => void; ofn: (flag: string) => boolean; pnt?: { browserHost?: { detachedTabs: Promise<DetachedTabs | null> | DetachedTabs | null } }; zDt?: () => void };
-const primary = appPrimaryChunk as unknown as { Vi?: () => void; Ws?: () => void; zs?: () => void };
-const popup = commentPopupChunk as unknown as { n?: () => void; t?: unknown };
-const registry = registryChunk as unknown as { i: (browserTabId: string, conversationId: string, callback: () => boolean) => (() => void) | void; n: typeof registryChunk.n };
-const { $3: initializeSharedRuntime, BX: queryComments, CJ: getAnnotationFlowConfig, FX: initializeSharedFeatures, G3: bridge, HX: useSignal, I3: getJsxRuntime, K3: useHostEvent, LX: useStoreScope, OJ: initializeSharedQueries, QI: initializeSharedState, W3: initializeSharedBridge, ZI: appScope, e6: getReactRuntime, iK: convertSnapshotComment, wL: initializeSharedLinks } = shared;
-const { Q6: updateComments, RDt: detachedTabsSignal, X6: commentsQuery, Y6: initializeInitialQueries, ifn: initializeFlags, mnt: initializeBrowserRuntime, ofn: useFeatureFlag, pnt: browserEnvironment, zDt: initializeDetachedTabs } = initial;
-const { Vi: initializePrimaryAnnotations, Ws: initializePrimaryBrowser, zs: initializePrimaryState } = primary;
-const { n: initializeCommentPopup, t: CommentPopupPortal } = popup;
-const { i: registerAnnotationHost, n: initializeRegistry } = registry;
-const {
-  hasBrowserCommentHandler: isBrowserCommentBusy,
-  getBrowserTabUrlState: getBrowserUiState,
-  setBrowserTabUrlState: setBrowserUiState,
-  submitBrowserComment,
-  waitForBrowserCommentHandler: waitForBrowserCommentReady,
-} = initializeRegistry.browserComments;
-const executeDirectComment = submitBrowserComment<DirectCommentMessage, unknown>;
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let initialized = false;
-function initializeDetachedBrowserAnnotationHost(): void {
-  if (initialized) return;
-  initializeSharedRuntime?.(); initializeSharedFeatures?.(); initializeSharedLinks?.(); initializeSharedQueries?.();
-  React = getReactRuntime();
-  initializeDetachedTabs?.(); initializePrimaryAnnotations?.(); initializeCommentPopup?.(); initializePrimaryBrowser?.(); initializePrimaryState?.();
-  initializeInitialQueries?.(); initializeSharedBridge?.(); initializeBrowserRuntime?.(); initializeSharedState?.(); initializeFlags?.(); initializeRegistry?.();
-  jsx = getJsxRuntime(); initialized = true;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  CJ as r,
+  FX as i,
+  G3 as ee,
+  HX as a,
+  I3 as o,
+  K3 as s,
+  LX as c,
+  OJ as l,
+  QI as u,
+  W3 as d,
+  ZI as te,
+  e6 as f,
+  iK as ne,
+  wJ as re,
+  wL as p,
+} from "@rchunk/app-shared";
+import {
+  Q6 as m,
+  RDt as h,
+  X6 as ie,
+  Y6 as g,
+  ifn as _,
+  mnt as v,
+  ofn as y,
+  pnt as ae,
+  zDt as b,
+} from "@rchunk/app-initial";
+import {
+  Bs as x,
+  Hi as S,
+  Ks as oe,
+  Rs as C,
+  Us as se,
+  Vi as w,
+  Vs as ce,
+  Ws as T,
+  zs as E,
+} from "@rchunk/app-primary";
+import { n as D, t as le } from "@rchunk/browser-comment-popup-portal";
+import { i as ue, n as O } from "@rchunk/source-annotation-host-registry";
+function k() {
+  let e = (0, M.c)(4),
+    t = a(h),
+    n;
+  e[0] === t ? (n = e[1]) : ((n = t.map(A)), (e[0] = t), (e[1] = n));
+  let r;
+  return (
+    e[2] === n
+      ? (r = e[3])
+      : ((r = (0, P.jsx)(P.Fragment, { children: n })), (e[2] = n), (e[3] = r)),
+    r
+  );
 }
-
-function appendBrowserComment(scope: StoreScope, attachmentConversationId: string, browserTabId: string, message: DirectCommentMessage): void {
-  const commentId = message.comment.localBrowserCommentMetadata?.commentId;
-  let comment = message.comment;
-  if (comment.localBrowserCommentMetadata != null) {
-    const { browserTabId: _discardedBrowserTabId, ...metadata } = comment.localBrowserCommentMetadata;
-    comment = { ...comment, localBrowserCommentMetadata: metadata };
-  }
-  updateComments(scope, { conversationId: attachmentConversationId, path: null, pullRequestReviewKey: null }, comments => {
-    if (commentId != null && comments.some(existing => (existing.localBrowserCommentMetadata?.browserTabId == null || belongsToBrowserTab(existing, browserTabId)) && existing.localBrowserCommentMetadata?.commentId === commentId)) return comments;
-    return [...comments, comment];
-  });
+function A(e) {
+  return e.browserTabId == null || e.conversationId == null
+    ? null
+    : (0, P.jsx)(
+        j,
+        { tab: e, browserTabId: e.browserTabId, conversationId: e.conversationId },
+        `${e.conversationId}\0${e.browserTabId}`,
+      );
 }
-
-function BrowserAnnotationHost({ browserTabId, conversationId, tab }: { browserTabId: string; conversationId: string; tab: Tab }): unknown {
-  const scope = useStoreScope(appScope);
-  const showAdjustEntry = useFeatureFlag("2327881676");
-  const transformFlag = useFeatureFlag("2849306825");
-  const [snapshot, setSnapshot] = React.useState(tab.browserSnapshot ?? null);
-  const activeDismiss = React.useRef<(() => boolean) | null>(null);
-  const justSynchronized = React.useRef(false);
-  const openState = React.useRef<BrowserUiState | null>(null);
-  const processedSessions = React.useRef(new Set<string>());
-  const pendingFocus = React.useRef<PendingFocus | null>(null);
-  const attachmentConversationId = tab.commentAttachmentConversationId ?? conversationId;
-  const queryKey = { conversationId: attachmentConversationId, path: null, pullRequestReviewKey: null };
-  const comments = queryComments(commentsQuery, queryKey);
-  const browserComments = comments.filter(comment => belongsToBrowserTab(comment, browserTabId));
-
-  useHostEvent("browser-sidebar-state", (message: { browserTabId: string; conversationId: string; snapshot: BrowserSnapshot | null }) => { if (message.browserTabId === browserTabId && message.conversationId === conversationId) setSnapshot(message.snapshot); }, [browserTabId, conversationId]);
-  const append = React.useCallback((message: DirectCommentMessage): void => appendBrowserComment(scope, attachmentConversationId, browserTabId, message), [scope, attachmentConversationId, browserTabId]);
-  React.useEffect(() => () => { const pending = pendingFocus.current; if (pending != null) { pendingFocus.current = null; pending.abort.abort(); append(pending.message); } }, [append, tab.phase]);
-  useHostEvent("browser-sidebar-direct-comment", (message: DirectCommentMessage) => {
-    if (message.browserTabId !== browserTabId || message.conversationId !== conversationId || tab.phase !== "detached" || isBrowserCommentBusy(conversationId, browserTabId) || processedSessions.current.has(message.sessionId)) return;
-    processedSessions.current.add(message.sessionId);
-    const host = browserEnvironment?.browserHost;
-    if (host == null || pendingFocus.current != null) { append(message); return; }
-    const pending = { abort: new AbortController(), message }; pendingFocus.current = pending;
-    void (async () => {
-      try {
-        const detachedTabs = await host.detachedTabs; if (pendingFocus.current !== pending) return;
-        const focused = await detachedTabs?.focusSourceForBrowserComment(conversationId, browserTabId);
-        const ready = Boolean(focused) && await waitForBrowserCommentReady(conversationId, browserTabId, pending.abort.signal, 5000); if (pendingFocus.current !== pending) return;
-        const stillDetached = ready && Boolean(await detachedTabs?.isBrowserTabDetachedFromSource(conversationId, browserTabId)) && scope.get<Tab[]>(detachedTabsSignal).some(candidate => candidate.phase === "detached" && candidate.tabId === tab.tabId && candidate.sourceThreadId === tab.sourceThreadId && candidate.browserTabId === browserTabId && candidate.conversationId === conversationId);
-        if (pendingFocus.current !== pending) return; pendingFocus.current = null;
-        const command = stillDetached ? executeDirectComment(message) : undefined; if (command == null) append(message); else await command.catch(() => append(message));
-      } catch { if (pendingFocus.current === pending) { pendingFocus.current = null; append(message); } }
-    })();
-  }, [browserTabId, conversationId, append, scope, tab]);
-  React.useEffect(() => registerAnnotationHost(browserTabId, conversationId, () => activeDismiss.current?.() ?? true), [browserTabId, conversationId]);
-  React.useEffect(() => () => { const state = openState.current; if (state != null && getBrowserUiState(scope, conversationId, browserTabId) === state) setBrowserUiState(scope, conversationId, browserTabId, { isOpen: false, url: state.currentUrls[0] ?? "" }); }, [browserTabId, conversationId, scope]);
-  React.useEffect(() => {
-    if (snapshot == null) return;
-    setBrowserUiState(scope, conversationId, browserTabId, { isOpen: true, url: snapshot.url }); openState.current = getBrowserUiState(scope, conversationId, browserTabId);
-    const normalized = normalizeSnapshotComments(snapshot.comments, showAdjustEntry, transformFlag); const commentIds = new Set(normalized.map(comment => comment.id)); justSynchronized.current = true;
-    updateComments(scope, queryKey, current => [...current.filter(comment => !belongsToBrowserTab(comment, browserTabId) && !(comment.localBrowserCommentMetadata?.browserTabId == null && comment.localBrowserCommentMetadata?.commentId != null && commentIds.has(comment.localBrowserCommentMetadata.commentId))), ...normalized.map((comment, index) => convertSnapshotComment(comment, index + 1, browserTabId))]);
-  }, [browserTabId, attachmentConversationId, conversationId, transformFlag, showAdjustEntry, scope, snapshot]);
-  React.useEffect(() => {
-    if (justSynchronized.current) { justSynchronized.current = false; return; }
-    if (snapshot != null && browserComments.length === 0 && normalizeSnapshotComments(snapshot.comments, showAdjustEntry, transformFlag).length > 0) bridge.dispatchMessage("browser-sidebar-command", { browserTabId, conversationId, command: { type: "clear-comments" } });
-  }, [browserComments.length, browserTabId, conversationId, transformFlag, showAdjustEntry, snapshot]);
-  const flow = snapshot?.annotationFlow ?? tab.annotationFlow;
-  return jsx.jsx(CommentPopupPortal ?? "div", { browserTabId, conversationId, defaultCreateSubmitMode: getAnnotationFlowConfig(flow).defaultSubmitMode, onActiveEditorDismissRequestChange: (callback: (() => boolean) | null) => { activeDismiss.current = callback; }, showAdjustEntry });
+function j(e) {
+  let t = (0, M.c)(69),
+    { tab: i, browserTabId: a, conversationId: o } = e,
+    l = c(te),
+    u = y(`2327881676`),
+    d = y(`2849306825`),
+    [f, p] = (0, N.useState)(i.browserSnapshot ?? null),
+    g = (0, N.useRef)(null),
+    _ = (0, N.useRef)(!1),
+    v = (0, N.useRef)(null),
+    b;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`) ? ((b = new Set()), (t[0] = b)) : (b = t[0]);
+  let w = (0, N.useRef)(b),
+    T = (0, N.useRef)(null),
+    E = i.commentAttachmentConversationId ?? o,
+    D;
+  t[1] === E
+    ? (D = t[2])
+    : ((D = { conversationId: E, path: null, pullRequestReviewKey: null }), (t[1] = E), (t[2] = D));
+  let O = n(ie, D),
+    k;
+  if (t[3] !== a || t[4] !== O) {
+    let e;
+    (t[6] === a ? (e = t[7]) : ((e = (e) => S(e, a)), (t[6] = a), (t[7] = e)),
+      (k = O.filter(e)),
+      (t[3] = a),
+      (t[4] = O),
+      (t[5] = k));
+  } else k = t[5];
+  let A = k.length,
+    j,
+    F;
+  (t[8] !== a || t[9] !== o
+    ? ((j = (e) => {
+        e.browserTabId === a && e.conversationId === o && p(e.snapshot);
+      }),
+      (F = [a, o]),
+      (t[8] = a),
+      (t[9] = o),
+      (t[10] = j),
+      (t[11] = F))
+    : ((j = t[10]), (F = t[11])),
+    s(`browser-sidebar-state`, j, F));
+  let I;
+  t[12] !== a || t[13] !== E || t[14] !== l
+    ? ((I = (e) => {
+        let t = e.comment.localBrowserCommentMetadata?.commentId,
+          n = e.comment;
+        if (n.localBrowserCommentMetadata != null) {
+          let { browserTabId: e, ...t } = n.localBrowserCommentMetadata;
+          n = { ...n, localBrowserCommentMetadata: t };
+        }
+        m(l, { conversationId: E, path: null, pullRequestReviewKey: null }, (e) =>
+          t != null &&
+          e.some(
+            (e) =>
+              (e.localBrowserCommentMetadata?.browserTabId == null || S(e, a)) &&
+              e.localBrowserCommentMetadata?.commentId === t,
+          )
+            ? e
+            : [...e, n],
+        );
+      }),
+      (t[12] = a),
+      (t[13] = E),
+      (t[14] = l),
+      (t[15] = I))
+    : (I = t[15]);
+  let L = I,
+    R;
+  t[16] === L
+    ? (R = t[17])
+    : ((R = () => () => {
+        let e = T.current;
+        e != null && ((T.current = null), e.abort.abort(), L(e.message));
+      }),
+      (t[16] = L),
+      (t[17] = R));
+  let z;
+  (t[18] !== L || t[19] !== i.phase
+    ? ((z = [L, i.phase]), (t[18] = L), (t[19] = i.phase), (t[20] = z))
+    : (z = t[20]),
+    (0, N.useEffect)(R, z));
+  let B;
+  t[21] !== a ||
+  t[22] !== o ||
+  t[23] !== L ||
+  t[24] !== l ||
+  t[25] !== i.phase ||
+  t[26] !== i.sourceThreadId ||
+  t[27] !== i.tabId
+    ? ((B = (e) => {
+        if (
+          e.browserTabId !== a ||
+          e.conversationId !== o ||
+          i.phase !== `detached` ||
+          se(o, a) ||
+          w.current.has(e.sessionId)
+        )
+          return;
+        w.current.add(e.sessionId);
+        let t = ae?.browserHost;
+        if (t == null || T.current != null) {
+          L(e);
+          return;
+        }
+        let n = { abort: new AbortController(), message: e };
+        ((T.current = n),
+          (async () => {
+            try {
+              let r = await t.detachedTabs;
+              if (T.current !== n) return;
+              let ee =
+                (await r?.focusSourceForBrowserComment(o, a)) &&
+                (await oe(o, a, n.abort.signal, 5e3));
+              if (T.current !== n) return;
+              let s =
+                ee &&
+                (await r?.isBrowserTabDetachedFromSource(o, a)) &&
+                l
+                  .get(h)
+                  .some(
+                    (e) =>
+                      e.phase === `detached` &&
+                      e.tabId === i.tabId &&
+                      e.sourceThreadId === i.sourceThreadId &&
+                      e.browserTabId === a &&
+                      e.conversationId === o,
+                  );
+              if (T.current !== n) return;
+              T.current = null;
+              let c = s ? ce(e) : void 0;
+              c == null ? L(e) : await c.catch(() => L(e));
+            } catch {
+              T.current === n && ((T.current = null), L(e));
+            }
+          })());
+      }),
+      (t[21] = a),
+      (t[22] = o),
+      (t[23] = L),
+      (t[24] = l),
+      (t[25] = i.phase),
+      (t[26] = i.sourceThreadId),
+      (t[27] = i.tabId),
+      (t[28] = B))
+    : (B = t[28]);
+  let V;
+  (t[29] !== a || t[30] !== o || t[31] !== L || t[32] !== l || t[33] !== i
+    ? ((V = [a, o, L, l, i]),
+      (t[29] = a),
+      (t[30] = o),
+      (t[31] = L),
+      (t[32] = l),
+      (t[33] = i),
+      (t[34] = V))
+    : (V = t[34]),
+    s(`browser-sidebar-direct-comment`, B, V));
+  let H, U;
+  (t[35] !== a || t[36] !== o
+    ? ((H = () => ue(a, o, () => g.current?.() ?? !0)),
+      (U = [a, o]),
+      (t[35] = a),
+      (t[36] = o),
+      (t[37] = H),
+      (t[38] = U))
+    : ((H = t[37]), (U = t[38])),
+    (0, N.useEffect)(H, U));
+  let W, G;
+  (t[39] !== a || t[40] !== o || t[41] !== l
+    ? ((W = () => () => {
+        let e = v.current;
+        e != null && C(l, o, a) === e && x(l, o, a, { isOpen: !1, url: e.currentUrls[0] ?? `` });
+      }),
+      (G = [a, o, l]),
+      (t[39] = a),
+      (t[40] = o),
+      (t[41] = l),
+      (t[42] = W),
+      (t[43] = G))
+    : ((W = t[42]), (G = t[43])),
+    (0, N.useEffect)(W, G));
+  let K, q;
+  (t[44] !== a ||
+  t[45] !== E ||
+  t[46] !== o ||
+  t[47] !== d ||
+  t[48] !== u ||
+  t[49] !== l ||
+  t[50] !== f
+    ? ((K = () => {
+        if (f == null) return;
+        (x(l, o, a, { isOpen: !0, url: f.url }), (v.current = C(l, o, a)));
+        let e = re(f.comments, u, d),
+          t = new Set(e.map(de));
+        ((_.current = !0),
+          m(l, { conversationId: E, path: null, pullRequestReviewKey: null }, (n) => [
+            ...n.filter(
+              (e) =>
+                !S(e, a) &&
+                !(
+                  e.localBrowserCommentMetadata?.browserTabId == null &&
+                  e.localBrowserCommentMetadata?.commentId != null &&
+                  t.has(e.localBrowserCommentMetadata.commentId)
+                ),
+            ),
+            ...e.map((e, t) => ne(e, t + 1, a)),
+          ]));
+      }),
+      (q = [a, E, o, d, u, l, f]),
+      (t[44] = a),
+      (t[45] = E),
+      (t[46] = o),
+      (t[47] = d),
+      (t[48] = u),
+      (t[49] = l),
+      (t[50] = f),
+      (t[51] = K),
+      (t[52] = q))
+    : ((K = t[51]), (q = t[52])),
+    (0, N.useEffect)(K, q));
+  let J, Y;
+  (t[53] !== A || t[54] !== a || t[55] !== o || t[56] !== d || t[57] !== u || t[58] !== f
+    ? ((J = () => {
+        if (_.current) {
+          _.current = !1;
+          return;
+        }
+        f != null &&
+          A === 0 &&
+          re(f.comments, u, d).length > 0 &&
+          ee.dispatchMessage(`browser-sidebar-command`, {
+            browserTabId: a,
+            conversationId: o,
+            command: { type: `clear-comments` },
+          });
+      }),
+      (Y = [A, a, o, d, u, f]),
+      (t[53] = A),
+      (t[54] = a),
+      (t[55] = o),
+      (t[56] = d),
+      (t[57] = u),
+      (t[58] = f),
+      (t[59] = J),
+      (t[60] = Y))
+    : ((J = t[59]), (Y = t[60])),
+    (0, N.useEffect)(J, Y));
+  let X = f?.annotationFlow ?? i.annotationFlow,
+    Z;
+  t[61] === X ? (Z = t[62]) : ((Z = r(X)), (t[61] = X), (t[62] = Z));
+  let Q;
+  t[63] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((Q = (e) => {
+        g.current = e;
+      }),
+      (t[63] = Q))
+    : (Q = t[63]);
+  let $;
+  return (
+    t[64] !== a || t[65] !== o || t[66] !== u || t[67] !== Z.defaultSubmitMode
+      ? (($ = (0, P.jsx)(le, {
+          browserTabId: a,
+          conversationId: o,
+          defaultCreateSubmitMode: Z.defaultSubmitMode,
+          onActiveEditorDismissRequestChange: Q,
+          showAdjustEntry: u,
+        })),
+        (t[64] = a),
+        (t[65] = o),
+        (t[66] = u),
+        (t[67] = Z.defaultSubmitMode),
+        (t[68] = $))
+      : ($ = t[68]),
+    $
+  );
 }
-
-function DetachedBrowserAnnotationHost(): unknown {
-  initializeDetachedBrowserAnnotationHost();
-  const tabs = useSignal<Tab[]>(detachedTabsSignal);
-  return jsx.jsx(jsx.Fragment, { children: tabs.map(tab => tab.browserTabId == null || tab.conversationId == null ? null : jsx.jsx(BrowserAnnotationHost, { tab, browserTabId: tab.browserTabId, conversationId: tab.conversationId }, `${tab.conversationId}\0${tab.browserTabId}`)) });
+function de(e) {
+  return e.id;
 }
-
-initializeDetachedBrowserAnnotationHost();
-export { DetachedBrowserAnnotationHost };
+var M, N, P;
+function F() {
+  return (F = e(() => {
+    ((M = t()),
+      i(),
+      p(),
+      l(),
+      (N = f()),
+      b(),
+      w(),
+      D(),
+      T(),
+      E(),
+      g(),
+      d(),
+      v(),
+      u(),
+      _(),
+      O(),
+      (P = o()));
+  }))();
+}
+F();
+export { k as DetachedBrowserAnnotationHost };

@@ -3,10 +3,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(import.meta.dirname, "..");
 const modules = {
-  PieChart: { dependencies: ["rolldown-runtime","app-shared","i18n"], exports: ["n","t"] },
   "chart-indicator": { dependencies: ["rolldown-runtime","app-shared","app-initial","contracts"], exports: ["EpicChartIndicator"] },
 };
 let sourceAssertions = 0;
@@ -18,8 +18,9 @@ for (const [name, expectation] of Object.entries(modules)) {
   sourceAssert(!source.includes("import("), name + " no dynamic dependencies");
   sourceAssert(!/\bany\b/.test(source), name + " no any");
   sourceAssert(!/\w+Chunk\.[A-Za-z_$]/.test(source), name + " no direct namespace consumption");
-  for (const exported of expectation.exports) sourceAssert(name === "PieChart" ? source.includes(" as " + exported) : source.includes("export { " + exported + " }"), name + " export " + exported);
+  for (const exported of expectation.exports) sourceAssert(source.includes("export { " + exported + " }"), name + " export " + exported);
 }
+sourceAssertions += assertReleaseOwner("PieChart");
 
 const state = globalThis.__chartsUiTest = { initializers: [], layouts: [], nativePending: null, nativeValue: null, nativeDestination: null, messages: {}, query: { isError: false }, apiCalls: [], subscriptions: [] };
 const jsx = { jsx: (type, props, key) => ({ type, props, key }), jsxs: (type, props, key) => ({ type, props, key }) };
@@ -36,17 +37,6 @@ const commonShared = [
   "export const I3=()=>globalThis.__chartsUiTest.jsx;export const e6=()=>globalThis.__chartsUiTest.React;",
   "export const K2=" + marker("compiler") + ";export const n4=()=>({formatNumber:value=>Math.round(value*1000)/10+'%'});",
 ].join("\n");
-const pieMocks = {
-  "rolldown-runtime": "export {};",
-  "app-shared": commonShared,
-  "i18n": [
-    "export const g=" + marker("chart-runtime") + ";export const S=" + marker("charts") + ";",
-    "export const C=()=>({theme:'dark',isPrimarilyTouchDevice:false});export const _=value=>value==='blue';export const b=value=>value;",
-    "export const c='Cell';export const d='RechartsPieChart';export const f='ResponsiveContainer';export const l='Legend';export const p='Tooltip';export const s='ChartContainer';export const u='Pie';",
-    "export const h=(_intl,value)=>value==null?null:String(value);export const m=(...values)=>values.filter(Boolean).join(' ');",
-    "export const v=(_theme,color)=>typeof color==='object'?color.dark:color;export const y=()=>()=> 'evaluated';",
-  ].join("\n"),
-};
 Object.assign(state, { jsx, React });
 
 async function load(name, mocks) {
@@ -61,33 +51,6 @@ async function load(name, mocks) {
 
 let runtimeAssertions = 0;
 const runtimeAssert = (actual, expected, message) => { runtimeAssertions += 1; assert.deepEqual(actual, expected, message); };
-
-const pie = await load("PieChart", pieMocks);
-runtimeAssert(Object.keys(pie).sort(), ["n","t"], "PieChart exact exports");
-runtimeAssert(state.initializers, ["chart-runtime","charts","compiler"], "PieChart initializer order");
-const pieView = pie.t({ id:"sales", role:"img", "data-test":"pie", ignored:"kept", data:[{category:"One",value:30},{category:"Two",value:70,fill:{light:"pink",dark:"purple"}}], series:[{dataKey:"value",label:"Sales",color:"blue"}], xAxis:{dataKey:"category",labels:{One:"First"}}, showValueLabels:true, dimInactiveSlices:true });
-runtimeAssert(pieView.type, "ChartContainer", "chart container root");
-runtimeAssert(pieView.props["data-w-component"], "pie-chart", "chart marker");
-runtimeAssert(pieView.props.id, "sales", "safe id forwarded");
-runtimeAssert(pieView.props["data-test"], "pie", "data prop forwarded");
-runtimeAssert(pieView.props.aspectRatio, 4/3, "default aspect ratio");
-const chart = pieView.props.children.props.children;
-runtimeAssert(chart.type, "RechartsPieChart", "recharts root");
-const tooltip = chart.props.children[0];
-const legend = chart.props.children[1];
-const slices = chart.props.children[2];
-runtimeAssert(tooltip.type, "Tooltip", "tooltip enabled");
-runtimeAssert(legend.props.payload.map((entry) => entry.value), ["First","Two"], "legend labels resolved");
-runtimeAssert(slices.props.data[0].fill, "var(--blue-400)", "palette color resolved");
-runtimeAssert(slices.props.data[1].fill, "purple", "dual theme color resolved");
-runtimeAssert(slices.props.data[0].__sliceId, "pie-id-0", "stable slice id");
-runtimeAssert(slices.props.isAnimationActive, true, "animation initially active");
-runtimeAssert(slices.props.label({value:30,payload:{formatted:"30 units"}}), "30 units", "formatted label preferred");
-const tooltipView = tooltip.props.content({active:true,payload:[{value:30,name:"First",dataKey:"value",payload:{__sliceLabel:"First",fill:"red"},color:"red"}]});
-runtimeAssert(tooltipView.props.children[1].props.children, "30", "tooltip value formatted");
-const legendView = legend.props.content(legend.props);
-runtimeAssert(legendView.props.children.length, 2, "legend items rendered");
-runtimeAssert(state.layouts.length >= 2, true, "layout effects registered");
 
 state.initializers = [];
 const listeners = new Map();

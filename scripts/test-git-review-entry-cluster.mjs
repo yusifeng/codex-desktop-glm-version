@@ -13,19 +13,7 @@ function find(node, predicate) { let result; walk(node, value => { if (result ==
 function all(node, predicate) { const result = []; walk(node, value => { if (predicate(value)) result.push(value); }); return result; }
 function text(node) { const parts = []; const collect = value => { if (typeof value === "string" || typeof value === "number") { parts.push(String(value)); return; } if (value == null || typeof value !== "object") return; const children = value.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(collect); else collect(children); }; collect(node); return parts.join(" "); }
 
-const nudge = await bundle("auto-review-approval-nudge");
-assert.deepEqual(Object.keys(nudge), ["AutoReviewApprovalNudge"]);
-let enabled, dismissed;
-const nudgeUi = nudge.AutoReviewApprovalNudge({ conversationId: "c1", hostId: "local", learnMoreUrl: "https://example.com/review", onEnable: input => { enabled = input; }, onDismiss: input => { dismissed = input; } });
-assert.equal(nudgeUi.type, "form");
-assert.match(text(nudgeUi), /Automatically approve safe review commands/);
-assert.equal(find(nudgeUi, node => node.type === "a").props.href, "https://example.com/review");
-assert.equal(find(nudgeUi, node => node.type === "button" && node.props.type === "submit").props.children, "Enable");
-find(nudgeUi, node => node.type === "button" && node.props.children === "Not now").props.onClick();
-assert.deepEqual(dismissed, { conversationId: "c1", hostId: "local" });
-await nudgeUi.props.onSubmit({ preventDefault() {} });
-await Promise.resolve();
-assert.deepEqual(enabled, { conversationId: "c1", hostId: "local" });
+assertReleaseOwner("auto-review-approval-nudge");
 
 assertReleaseOwner("editor-diff-page");
 

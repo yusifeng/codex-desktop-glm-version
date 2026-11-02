@@ -1,160 +1,418 @@
-// Themed pie chart with legend, tooltip, value labels, and slice dimming.
-
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as i18nChartChunk from "@rchunk/i18n";
-
-type StateUpdater<Value> = Value | ((current: Value) => Value);
-interface JsxRuntime { jsx(type: unknown, props: object, key?: string): unknown; jsxs(type: unknown, props: object, key?: string): unknown }
-interface ReactRuntime {
-  useCallback<Arguments extends unknown[], Result>(callback: (...arguments_: Arguments) => Result, dependencies: readonly unknown[]): (...arguments_: Arguments) => Result;
-  useId(): string;
-  useLayoutEffect(effect: () => void | (() => void), dependencies: readonly unknown[]): void;
-  useMemo<Value>(factory: () => Value, dependencies: readonly unknown[]): Value;
-  useState<Value>(initialValue: Value): [Value, (next: StateUpdater<Value>) => void];
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { I3 as t, K2 as n, e6 as r, n4 as i } from "@rchunk/app-shared";
+import {
+  C as a,
+  S as o,
+  _ as s,
+  b as c,
+  c as l,
+  d as u,
+  f as d,
+  g as f,
+  h as p,
+  l as m,
+  m as h,
+  p as g,
+  s as ee,
+  u as _,
+  v,
+  y as te,
+} from "@rchunk/i18n-runtime-locale-bundle";
+function ne(e) {
+  let t = {};
+  if (!e) return t;
+  for (let [n, r] of Object.entries(e))
+    (n === `role` || n === `id` || n.startsWith(`data-`) || n.startsWith(`aria-`)) && (t[n] = r);
+  return t;
 }
-interface IntlShape { formatNumber(value: number, options?: Record<string, unknown>): string }
-interface Series { color?: unknown; dataKey: string; label?: string; [key: string]: unknown }
-interface Slice { [key: string]: unknown; fill?: unknown; stroke?: unknown; __sliceId?: string; __sliceLabel?: string }
-interface Axis { dataKey?: string; labels?: Record<string, string> }
-interface PieChartProps {
-  data?: Slice[];
-  series?: Series[];
-  xAxis?: string | Axis;
-  showLegend?: boolean;
-  legendMaxRows?: number;
-  dimInactiveSlices?: boolean;
-  showTooltip?: boolean;
-  tooltipOffset?: number;
-  tooltipAnimationDuration?: number;
-  tooltipAllowEscapeViewBox?: unknown;
-  showValueLabels?: boolean;
-  showLabelLines?: boolean;
-  disableAnimation?: boolean;
-  animationBegin?: number;
-  animationDuration?: number;
-  innerRadius?: number | string;
-  outerRadius?: number | string;
-  startAngle?: number;
-  endAngle?: number;
-  paddingAngle?: number;
-  cornerRadius?: number;
-  sliceStrokeWidth?: number;
-  tooltipValueMode?: "value" | "percent";
-  minHeight?: number;
-  height?: number;
-  aspectRatio?: number;
-  tooltipValueFormatter?: Record<string, unknown>;
-  children?: unknown;
-  [key: string]: unknown;
+function y(e) {
+  return `${e * k + Math.max(0, e - 1) * A + j}px`;
 }
-
-const shared = appSharedChunk as unknown as { I3: () => JsxRuntime; K2?: () => void; e6: () => ReactRuntime; n4: () => IntlShape };
-const charts = i18nChartChunk as unknown as {
-  C?: () => { theme: unknown; isPrimarilyTouchDevice: boolean };
-  S?: () => void;
-  _?: (value: string) => boolean;
-  b?: <Value>(value: Value) => Value;
-  c?: unknown;
-  d?: unknown;
-  f?: unknown;
-  g?: () => void;
-  h?: (intl: IntlShape, value: unknown, series: Series) => string | null;
-  l?: unknown;
-  m?: (...classes: Array<string | false | undefined>) => string;
-  p?: unknown;
-  s?: unknown;
-  u?: unknown;
-  v?: (theme: unknown, color: unknown) => string | undefined;
-  y?: () => (expression: unknown, context: Record<string, unknown>) => unknown;
-};
-const { I3: getJsxRuntime, K2: initializeReactCompilerRuntime, e6: getReactRuntime, n4: useIntl } = shared;
-const { C: useChartEnvironment, S: initializeCharts, _: isPaletteToken, b: normalizeProps, c: Cell, d: RechartsPieChart, f: ResponsiveContainer, g: initializeChartRuntime, h: formatSeriesValue, l: Legend, m: classNames, p: Tooltip, s: ChartContainer, u: Pie, v: resolveColor, y: useTooltipExpression } = charts;
-
-let jsx: JsxRuntime;
-let React: ReactRuntime;
-let initialized = false;
-const defaultSeries: Series = { dataKey: "" };
-const paletteWeights = [400, 500, 600, 300, 200];
-const activeShape = { opacity: 1 };
-const inactiveShape = { opacity: 0.5 };
-
-function initializePieChart(): void {
-  if (initialized) return;
-  initializeChartRuntime?.();
-  initializeCharts?.();
-  React = getReactRuntime();
-  initializeReactCompilerRuntime?.();
-  jsx = getJsxRuntime();
-  initialized = true;
+function b(e, t, n) {
+  return typeof t != `number` || !Number.isFinite(t) || !Number.isFinite(n) || n === 0
+    ? null
+    : e.formatNumber(t / n, { maximumFractionDigits: 1, style: `percent` });
 }
-
-function pickAccessibilityProps(props: PieChartProps): Record<string, unknown> {
-  const result: Record<string, unknown> = {};
-  for (const [key, value] of Object.entries(props)) if (key === "role" || key === "id" || key.startsWith("data-") || key.startsWith("aria-")) result[key] = value;
-  return result;
+function x(e) {
+  return e && typeof e == `object` ? e : null;
 }
-
-function PieChart(input: PieChartProps): unknown {
-  initializePieChart();
-  const props = normalizeProps?.(input) ?? input;
-  const { data = [], series = [defaultSeries], xAxis, showLegend = true, legendMaxRows, dimInactiveSlices = false, showTooltip = true, tooltipOffset = 6, tooltipAnimationDuration = 600, tooltipAllowEscapeViewBox, showValueLabels = false, showLabelLines = false, disableAnimation = false, animationBegin = 400, animationDuration = 1500, innerRadius, outerRadius = "80%", startAngle = 90, endAngle = -270, paddingAngle, cornerRadius, sliceStrokeWidth = 2, tooltipValueMode = "value", minHeight, height, aspectRatio, tooltipValueFormatter, children, ...rest } = props;
-  const accessibility = pickAccessibilityProps(input);
-  const intl = useIntl();
-  const environment = useChartEnvironment?.() ?? { theme: null, isPrimarilyTouchDevice: false };
-  const evaluateExpression = useTooltipExpression?.() ?? (() => null);
-  const instanceId = React.useId();
-  const [activeSliceId, setActiveSliceId] = React.useState<string | null>(null);
-  const [hasInteracted, setHasInteracted] = React.useState(false);
-  const calculatedAspectRatio = aspectRatio ?? (height || minHeight ? undefined : 4 / 3);
-  const maxRows = typeof legendMaxRows === "number" && Number.isFinite(legendMaxRows) && legendMaxRows > 0 ? Math.floor(legendMaxRows) : undefined;
-  const primarySeries = series[0] ?? defaultSeries;
-  const axis = typeof xAxis === "string" ? null : xAxis;
-  const labelKey = typeof xAxis === "string" ? xAxis : axis?.dataKey ?? "";
-  const labels = axis?.labels ?? {};
-  const resolvedSeriesColor = resolveColor?.(environment.theme, primarySeries.color);
-  const palette = React.useMemo(() => {
-    if (resolvedSeriesColor != null && isPaletteToken?.(resolvedSeriesColor)) return paletteWeights.map((weight) => "var(--" + resolvedSeriesColor + "-" + weight + ")");
-    return resolvedSeriesColor ? [resolvedSeriesColor] : createDefaultPalette();
-  }, [resolvedSeriesColor]);
-  const getLabel = React.useCallback((slice: Slice, index: number) => { const value = slice[labelKey]; if (value == null) return "Slice " + (index + 1); const text = String(value); return labels[text] ?? text; }, [labelKey, labels]);
-  const slices = React.useMemo(() => data.map((slice, index) => ({ ...slice, fill: resolveSliceColor(environment.theme, slice.fill) ?? palette[index % Math.max(1, palette.length)], stroke: resolveSliceColor(environment.theme, slice.stroke) ?? "var(--color-surface)", __sliceId: instanceId + "-" + index, __sliceLabel: getLabel(slice, index) })), [data, environment.theme, getLabel, instanceId, palette]);
-  React.useLayoutEffect(() => { setActiveSliceId(null); setHasInteracted(false); }, [data]);
-  const legendPayload = React.useMemo(() => slices.map((slice) => ({ color: slice.fill, dataKey: primarySeries.dataKey, payload: { value: slice.__sliceLabel, __sliceId: slice.__sliceId }, type: "square", value: slice.__sliceLabel })), [slices, primarySeries.dataKey]);
-  const total = slices.reduce((sum, slice) => { const value = slice[primarySeries.dataKey]; return typeof value === "number" && Number.isFinite(value) ? sum + value : sum; }, 0);
-  const formatValue = React.useCallback((value: unknown, payload: unknown) => formattedValue(payload) ?? formatSeriesValue?.(intl, value, primarySeries) ?? null, [intl, primarySeries]);
-  const dismiss = React.useCallback(() => setActiveSliceId(null), []);
-  const activate = React.useCallback((sliceId: string) => { setHasInteracted(true); setActiveSliceId(sliceId); }, []);
-  const activateByIndex = React.useCallback((_event: unknown, index: number) => { const slice = slices[index]; if (slice != null) activate(slice.__sliceId ?? ""); }, [activate, slices]);
-  const pieChildren = slices.map((slice) => jsx.jsx(Cell, { fill: slice.fill, opacity: activeSliceId == null || activeSliceId === slice.__sliceId ? undefined : 0.5, stroke: slice.stroke, strokeWidth: sliceStrokeWidth }, slice.__sliceId));
-  return jsx.jsx(ChartContainer ?? "div", { ...accessibility, ...rest, className: classNames?.("PieChart_Chart") ?? "PieChart_Chart", "data-w-component": "pie-chart", aspectRatio: calculatedAspectRatio, height, minHeight, children: jsx.jsx(ResponsiveContainer ?? "div", { children: jsx.jsxs(RechartsPieChart ?? "div", { onMouseLeave: dimInactiveSlices && !environment.isPrimarilyTouchDevice ? dismiss : undefined, children: [showTooltip ? jsx.jsx(Tooltip ?? "div", { offset: tooltipOffset, animationDuration: tooltipAnimationDuration, isAnimationActive: tooltipAnimationDuration > 0, allowEscapeViewBox: tooltipAllowEscapeViewBox, content: (tooltipProps: Record<string, unknown>) => renderTooltip(tooltipProps, primarySeries, total, tooltipValueMode, tooltipValueFormatter, evaluateExpression, formatValue, dismiss, intl) }) : null, showLegend ? jsx.jsx(Legend ?? "div", { payload: legendPayload, content: (legendProps: Record<string, unknown>) => renderLegend(legendProps, activeSliceId, maxRows, activate, dismiss) }) : null, jsx.jsx(Pie ?? "div", { data: slices, dataKey: primarySeries.dataKey, nameKey: "__sliceLabel", cx: "50%", cy: "50%", innerRadius, outerRadius, startAngle, endAngle, paddingAngle, cornerRadius, isAnimationActive: !disableAnimation && !hasInteracted, animationBegin, animationDuration, activeShape: dimInactiveSlices ? activeShape : undefined, inactiveShape: dimInactiveSlices ? inactiveShape : undefined, onMouseEnter: dimInactiveSlices ? activateByIndex : undefined, onMouseLeave: dimInactiveSlices ? dismiss : undefined, onClick: dimInactiveSlices ? activateByIndex : undefined, label: showValueLabels ? ({ value, payload }: { value: unknown; payload: unknown }) => formatValue(value, payload) : false, labelLine: showValueLabels ? showLabelLines : false, children: pieChildren })] }) }) });
+function re(e) {
+  let t = x(e);
+  return typeof t?.formatted == `string` ? t.formatted : null;
 }
-
-function renderTooltip(props: Record<string, unknown>, series: Series, total: number, mode: string, formatter: Record<string, unknown> | undefined, evaluate: (expression: unknown, context: Record<string, unknown>) => unknown, formatValue: (value: unknown, payload: unknown) => string | null, dismiss: () => void, intl: IntlShape): unknown {
-  const active = props.active === true;
-  const payload = Array.isArray(props.payload) ? props.payload : [];
-  React.useLayoutEffect(() => { if (!active || payload.length === 0) dismiss(); }, [active, dismiss, payload.length]);
-  if (!active || payload.length === 0) return null;
-  const entry = payload[0] as Record<string, unknown>;
-  const slice = asRecord(entry.payload);
-  const label = typeof slice?.__sliceLabel === "string" ? slice.__sliceLabel : entry.name == null ? "" : String(entry.name);
-  const expressionValue = formatter?.type === "expression" ? evaluate(formatter.expression, { value: entry.value, dataKey: entry.dataKey, name: entry.name, payload: entry.payload, color: entry.color, seriesLabel: series.label, xAxisLabel: label }) : formatter?.type === "xAxisLabel" ? label : null;
-  const percent = mode === "percent" && typeof entry.value === "number" && total !== 0 ? intl.formatNumber(entry.value / total, { maximumFractionDigits: 1, style: "percent" }) : null;
-  const value = expressionValue ?? percent ?? formatValue(entry.value, entry.payload) ?? "";
-  return jsx.jsxs("div", { className: "PieChart_ChartTooltip", children: [label ? jsx.jsx("div", { className: "PieChart_TooltipHeader", children: label }) : null, jsx.jsx("span", { className: "PieChart_TooltipValue", children: value })] });
+function ie(e) {
+  let {
+      data: t = [],
+      series: n = [T],
+      xAxis: r,
+      showLegend: o = !0,
+      legendMaxRows: f,
+      dimInactiveSlices: m = !1,
+      showTooltip: y = !0,
+      tooltipOffset: b = 6,
+      tooltipAnimationDuration: x = 600,
+      tooltipAllowEscapeViewBox: ie,
+      showValueLabels: k = !1,
+      showLabelLines: A = !1,
+      disableAnimation: j = !1,
+      animationBegin: M = 400,
+      animationDuration: P = 1500,
+      innerRadius: F,
+      outerRadius: de = `80%`,
+      startAngle: fe = 90,
+      endAngle: pe = -270,
+      paddingAngle: me,
+      cornerRadius: he,
+      sliceStrokeWidth: ge = 2,
+      tooltipValueMode: _e = `value`,
+      minHeight: I,
+      height: L,
+      aspectRatio: ve,
+      tooltipValueFormatter: ye,
+      children: be,
+      ...xe
+    } = c(e),
+    Se = ne(e),
+    R = i(),
+    { theme: z, isPrimarilyTouchDevice: Ce } = a(),
+    B = te(),
+    V = (0, S.useId)(),
+    [H, U] = (0, S.useState)(null),
+    [we, W] = (0, S.useState)(!1),
+    Te = ve ?? (L || I ? void 0 : 4 / 3),
+    Ee = typeof f == `number` && Number.isFinite(f) && f > 0 ? Math.floor(f) : void 0,
+    G = n[0] ?? T,
+    K = typeof r == `string` ? null : r,
+    q = typeof r == `string` ? r : (K?.dataKey ?? ``),
+    J = K?.labels ?? ce,
+    Y = v(z, G.color),
+    X = (0, S.useMemo)(() => (s(Y ?? ``) ? N.map((e) => `var(--${Y}-${e})`) : Y ? [Y] : le), [Y]),
+    De = (0, S.useCallback)(
+      (e, t) => {
+        let n = e[q];
+        if (n == null) return `Slice ${t + 1}`;
+        let r = String(n);
+        return J[r] ?? r;
+      },
+      [q, J],
+    ),
+    Z = (0, S.useMemo)(
+      () =>
+        t.map((e, t) => {
+          let n = e,
+            r = se(z, n.fill) ?? X[t % Math.max(1, X.length)],
+            i = se(z, n.stroke) ?? `var(--color-surface)`;
+          return { ...e, fill: r, stroke: i, __sliceId: `${V}-${t}`, __sliceLabel: De(n, t) };
+        }),
+      [V, X, t, De, z],
+    );
+  (0, S.useLayoutEffect)(() => {
+    (U(null), W(!1));
+  }, [t]);
+  let Oe = (0, S.useMemo)(
+      () =>
+        Z.map((e) => ({
+          color: e.fill,
+          dataKey: G.dataKey,
+          payload: { value: e.__sliceLabel, __sliceId: e.__sliceId },
+          type: `square`,
+          value: e.__sliceLabel,
+        })),
+      [Z, G.dataKey],
+    ),
+    ke = Z.reduce((e, t) => {
+      let n = t[G.dataKey];
+      return typeof n == `number` && Number.isFinite(n) ? e + n : e;
+    }, 0),
+    Ae = (0, S.useCallback)(
+      (e, t) => {
+        try {
+          return B(e, { tooltip: t });
+        } catch {
+          return null;
+        }
+      },
+      [B],
+    ),
+    Q = (0, S.useCallback)((e, t) => re(t) ?? p(R, e, G), [R, G]),
+    je = (0, S.useCallback)(
+      ({ x: e, y: t, textAnchor: n, value: r, payload: i }) => {
+        if (typeof e != `number` || typeof t != `number`) return null;
+        let a = Q(r, i);
+        return a == null || a === ``
+          ? null
+          : (0, C.jsx)(`text`, {
+              x: e,
+              y: t,
+              textAnchor:
+                n === `start` || n === `middle` || n === `end` || n === `inherit` ? n : `middle`,
+              className: w.ValueLabel,
+              children: a,
+            });
+      },
+      [Q],
+    ),
+    Me = (0, S.useCallback)((e) => {
+      (W(!0), U(e));
+    }, []),
+    $ = (0, S.useCallback)(() => {
+      U(null);
+    }, []),
+    Ne = (0, S.useCallback)(
+      (e, t) => {
+        let n = Z[t];
+        n && (W(!0), U(n.__sliceId));
+      },
+      [Z],
+    );
+  return (0, C.jsx)(ee, {
+    as: `div`,
+    ...Se,
+    className: h(w.Chart),
+    "data-w-component": `pie-chart`,
+    aspectRatio: Te,
+    height: L,
+    minHeight: I,
+    ...xe,
+    children: (0, C.jsx)(d, {
+      children: (0, C.jsxs)(u, {
+        onMouseLeave: m && !Ce ? $ : void 0,
+        children: [
+          y &&
+            (0, C.jsx)(g, {
+              offset: b,
+              animationDuration: x,
+              isAnimationActive: x > 0,
+              allowEscapeViewBox: ie,
+              content: (e) =>
+                (0, C.jsx)(ae, {
+                  series: G,
+                  valueFormatter: ye,
+                  evaluateTooltipExpression: Ae,
+                  formatValue: Q,
+                  onDismiss: $,
+                  total: ke,
+                  valueMode: _e,
+                  ...e,
+                }),
+            }),
+          o &&
+            (0, C.jsx)(ue, {
+              payload: Oe,
+              content: (e) =>
+                (0, C.jsx)(oe, {
+                  activeSliceId: m ? H : void 0,
+                  maxRows: Ee,
+                  onSliceHoverEnd: $,
+                  onSliceHoverStart: Me,
+                  ...e,
+                }),
+            }),
+          (0, C.jsx)(_, {
+            data: Z,
+            dataKey: G.dataKey,
+            nameKey: `__sliceLabel`,
+            cx: `50%`,
+            cy: `50%`,
+            innerRadius: F,
+            outerRadius: de,
+            startAngle: fe,
+            endAngle: pe,
+            paddingAngle: me,
+            cornerRadius: he,
+            isAnimationActive: !j && !we,
+            animationBegin: M,
+            animationDuration: P,
+            activeShape: m ? D : void 0,
+            inactiveShape: m ? O : void 0,
+            onMouseEnter: m ? Ne : void 0,
+            onMouseLeave: m ? $ : void 0,
+            onClick: m ? Ne : void 0,
+            label: k ? je : !1,
+            labelLine: k ? A : !1,
+            children: Z.map((e) =>
+              (0, C.jsx)(
+                l,
+                {
+                  fill: e.fill,
+                  opacity: H == null || H === e.__sliceId ? void 0 : E,
+                  stroke: e.stroke,
+                  strokeWidth: ge,
+                },
+                e.__sliceId,
+              ),
+            ),
+          }),
+        ],
+      }),
+    }),
+  });
 }
-
-function renderLegend(props: Record<string, unknown>, activeSliceId: string | null, maxRows: number | undefined, activate: (sliceId: string) => void, dismiss: () => void): unknown {
-  const payload = Array.isArray(props.payload) ? props.payload : [];
-  if (payload.length === 0) return null;
-  return jsx.jsx("div", { className: "PieChart_Legend", style: maxRows == null ? undefined : { maxHeight: maxRows * 28 + Math.max(0, maxRows - 1) * 6 + 12 + "px" }, onPointerLeave: (event: { pointerType: string }) => { if (event.pointerType !== "touch") dismiss(); }, children: payload.map((entry) => { const item = entry as Record<string, unknown>; const details = asRecord(item.payload); const sliceId = typeof details?.__sliceId === "string" ? details.__sliceId : null; return jsx.jsx("button", { "data-w-dimmed": activeSliceId != null && activeSliceId !== sliceId ? "" : undefined, onPointerEnter: (event: { pointerType: string }) => { if (sliceId != null && event.pointerType !== "touch") activate(sliceId); }, children: String(item.value ?? "") }, String(item.value ?? "")); }) });
+function ae({
+  active: e,
+  payload: t,
+  series: n,
+  total: r,
+  valueMode: a,
+  valueFormatter: o,
+  evaluateTooltipExpression: s,
+  formatValue: c,
+  onDismiss: l,
+}) {
+  let u = i();
+  if (
+    ((0, S.useLayoutEffect)(() => {
+      (!e || !t?.length) && l();
+    }, [e, l, t?.length]),
+    !e || !t?.length)
+  )
+    return null;
+  let d = t[0],
+    f = x(d.payload),
+    p = f?.__sliceLabel,
+    m =
+      typeof d.name == `string`
+        ? d.name
+        : d.name == null
+          ? typeof p == `string`
+            ? p
+            : ``
+          : String(d.name);
+  if (o?.type === `xAxisOnly`)
+    return (0, C.jsx)(`div`, {
+      className: w.ChartTooltip,
+      children: (0, C.jsx)(`div`, { className: w.TooltipValue, children: m }),
+    });
+  let h = {
+      value: d.value,
+      dataKey: d.dataKey,
+      name: d.name,
+      payload: d.payload,
+      color: d.color,
+      seriesLabel: n.label,
+      xAxisLabel: m,
+    },
+    g = o?.type === `expression` && s ? s(o.expression, h) : o?.type === `xAxisLabel` ? m : null,
+    ee = a === `percent` ? b(u, d.value, r) : null,
+    _ = g ?? ee ?? c(d.value, d.payload) ?? ``,
+    v = m !== `` && !(o?.type === `xAxisLabel` && !n.label);
+  return (0, C.jsxs)(`div`, {
+    className: w.ChartTooltip,
+    children: [
+      v && (0, C.jsx)(`div`, { className: w.TooltipHeader, children: m }),
+      (0, C.jsxs)(`div`, {
+        className: `width-full flex flex-wrap items-center gap-1.5`,
+        children: [
+          (0, C.jsx)(`div`, {
+            className: `h-2.5 w-2.5 shrink-0 rounded-full`,
+            style: { background: typeof f?.fill == `string` ? f.fill : d.color },
+          }),
+          (0, C.jsxs)(`div`, {
+            className: `flex flex-1 items-center justify-between gap-3`,
+            children: [
+              n.label && (0, C.jsx)(`span`, { className: w.TooltipSeriesLabel, children: n.label }),
+              (0, C.jsx)(`span`, { className: w.TooltipValue, children: _ }),
+            ],
+          }),
+        ],
+      }),
+    ],
+  });
 }
-
-function createDefaultPalette(): string[] { return paletteWeights.flatMap((weight) => ["blue","purple","orange","green","red","yellow","pink"].map((color) => "var(--" + color + "-" + weight + ")")); }
-function resolveSliceColor(theme: unknown, color: unknown): string | undefined { return typeof color === "string" && color !== "" || isDualColor(color) ? resolveColor?.(theme, color) : undefined; }
-function isDualColor(value: unknown): boolean { return typeof value === "object" && value != null && "light" in value && "dark" in value; }
-function asRecord(value: unknown): Record<string, unknown> | null { return typeof value === "object" && value != null ? value as Record<string, unknown> : null; }
-function formattedValue(value: unknown): string | null { const record = asRecord(value); return typeof record?.formatted === "string" ? record.formatted : null; }
-
-initializePieChart();
-export { initializePieChart as n, PieChart as t };
+function oe({
+  activeSliceId: e,
+  className: t,
+  payload: n,
+  maxRows: r,
+  onSliceHoverEnd: i,
+  onSliceHoverStart: a,
+}) {
+  if (!n?.length) return null;
+  let o = r != null && r > 1,
+    s = r == null ? void 0 : { maxHeight: y(r) },
+    c = (e) => {
+      e.pointerType === `touch` && i?.();
+    },
+    l = (e) => {
+      e.pointerType !== `touch` && i?.();
+    },
+    u = (e, t) => {
+      t.pointerType !== `touch` && a?.(e);
+    };
+  return (0, C.jsx)(`div`, {
+    className: h(
+      `flex items-center justify-center pt-3`,
+      o ? `flex-wrap gap-x-4 gap-y-1.5` : `gap-4`,
+      r != null && `overflow-hidden`,
+      t,
+    ),
+    onPointerDown: c,
+    onPointerLeave: l,
+    style: s,
+    children: n.map((t) => {
+      let n = t.value == null ? `` : String(t.value),
+        r = x(t.payload),
+        i = typeof r?.__sliceId == `string` ? r.__sliceId : null,
+        a = i == null ? void 0 : (e) => u(i, e);
+      return n === ``
+        ? null
+        : (0, C.jsxs)(
+            `div`,
+            {
+              className: h(`flex max-w-full min-w-0 items-center gap-1.5 px-2 py-1`, w.LegendItem),
+              "data-w-dimmed": e != null && e !== i ? `` : void 0,
+              onPointerEnter: a,
+              children: [
+                (0, C.jsx)(`div`, {
+                  className: `h-2.5 w-2.5 shrink-0 rounded-full`,
+                  style: { backgroundColor: t.color },
+                }),
+                (0, C.jsx)(`span`, { className: `min-w-0 truncate`, children: n }),
+              ],
+            },
+            n,
+          );
+    }),
+  });
+}
+function se(e, t) {
+  if (
+    (typeof t == `string` && t !== ``) ||
+    (typeof t == `object` && t && `light` in t && `dark` in t)
+  )
+    return v(e, t);
+}
+var S, C, w, T, ce, E, D, O, k, A, j, M, N, P, le, ue;
+function F() {
+  return (F = e(() => {
+    (f(),
+      o(),
+      (S = r()),
+      n(),
+      (C = t()),
+      (w = {
+        Chart: `PieChart_Chart`,
+        ChartTooltip: `PieChart_ChartTooltip`,
+        LegendItem: `PieChart_LegendItem`,
+        TooltipHeader: `PieChart_TooltipHeader`,
+        TooltipSeriesLabel: `PieChart_TooltipSeriesLabel`,
+        TooltipValue: `PieChart_TooltipValue`,
+        ValueLabel: `PieChart_ValueLabel`,
+      }),
+      (T = { dataKey: `` }),
+      (ce = {}),
+      (E = 0.5),
+      (D = { opacity: 1 }),
+      (O = { opacity: E }),
+      (k = 28),
+      (A = 6),
+      (j = 12),
+      (M = [400, 500, 600, 300, 200]),
+      (N = [500, 200, 400, 600, 300]),
+      (P = [`blue`, `purple`, `orange`, `green`, `red`, `yellow`, `pink`]),
+      (le = M.flatMap((e) => P.map((t) => `var(--${t}-${e})`))),
+      (ue = m));
+  }))();
+}
+export { F as n, ie as t };

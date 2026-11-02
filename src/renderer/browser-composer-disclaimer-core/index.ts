@@ -1,239 +1,510 @@
-// browser-composer-disclaimer-core —— ChatGPT browser composer 法务/隐私提示。
-//
-// 原版：app/webview/assets/browser-composer-disclaimer-6a73b502bd51.js
-//（18.3KB / 517 行）。
-//
-// 两个导出：n = initializeBrowserComposerDisclaimer（原 `K`），
-// t = BrowserComposerDisclaimer（原 `P`）。
-
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-
-export type DisclaimerPlacement = "home" | "thread" | string;
-export type RegulatedConnectorKind = "finance" | "health" | string | null;
-
-export interface PersonalAccountDisclaimerState {
-  structure: "personal";
-  id: string;
-  showAiServiceDisclaimer?: boolean;
-  browserSideChat?: boolean;
-  regulatedConnectorKind?: RegulatedConnectorKind;
-}
-
-export interface WorkspaceAccountDisclaimerState {
-  structure: "workspace";
-  id: string;
-  name?: string | null;
-  planType?: string | null;
-  workspaceType?: string | null;
-  trainingAllowed?: boolean;
-  encrypted?: boolean;
-  hideStandardDisclaimer?: boolean;
-  dataLoaded?: boolean;
-}
-
-export type BrowserDisclaimerAccountState =
-  | PersonalAccountDisclaimerState
-  | WorkspaceAccountDisclaimerState;
-
-export interface BrowserComposerDisclaimerProps {
-  conversationId?: string | null;
-  hasUserMessage?: boolean;
-  isTemporaryChat?: boolean;
-  placement?: DisclaimerPlacement;
-  regulatedConnectorKindOverride?: RegulatedConnectorKind;
-  /** 语义重写层显式输入；真实组件从 account/query stores 读取。 */
-  account?: BrowserDisclaimerAccountState | null;
-}
-
-export interface BrowserComposerDisclaimerView {
-  kind: "browser-composer-disclaimer";
-  placement: DisclaimerPlacement;
-  message: string;
-  messageKind:
-    | "ai-service"
-    | "early-access-workspace"
-    | "encrypted-k12-workspace"
-    | "encrypted-workspace"
-    | "finance"
-    | "health"
-    | "k12-workspace"
-    | "personal"
-    | "temporary-chat"
-    | "workspace"
-    | "workspace-research-partner"
-    | "workspace-temporary-chat";
-  workspaceName?: string | null;
-  learnMoreUrl?: string;
-}
-
-const MESSAGE = {
-  finance: "ChatGPT can make mistakes and isn’t a licensed investment adviser or authorized to prepare tax returns.",
-  health: "ChatGPT can make mistakes and isn't intended for diagnosis or treatment. Consult a doctor for medical advice.",
-  aiService: "ChatGPT is AI and can make mistakes. Check important info.",
-  personal: "ChatGPT can make mistakes. Check important info.",
-  temporaryChat: "For safety, we may keep a copy of this chat for up to 30 days.",
-  workspace: "ChatGPT can make mistakes. Workspace data isn't used to train models.",
-  workspaceResearchPartner:
-    "ChatGPT can make mistakes. This workspace is opted in to the ChatGPT Business Research Partner Program. Learn more",
-  earlyAccessWorkspace: (name: string | null) =>
-    name == null
-      ? "ChatGPT can make mistakes. OpenAI uses your workspace data to train its models."
-      : `ChatGPT can make mistakes. OpenAI uses ${name} workspace data to train its models.`,
-  workspaceTemporaryChat:
-    "Workspace data isn't used to train models by default. For safety, we may keep a copy of this chat for up to 30 days.",
-  encryptedWorkspace: (name: string | null) =>
-    name == null
-      ? "ChatGPT can make mistakes. OpenAI doesn't use your workspace data to train its models. The content of this workspace is encrypted with your organization managed keys."
-      : `ChatGPT can make mistakes. OpenAI doesn't use ${name} workspace data to train its models. The content of this workspace is encrypted with your organization managed keys.`,
-  k12Workspace: (name: string | null) =>
-    name == null
-      ? "ChatGPT for Teachers can make mistakes. OpenAI doesn't use your workspace data to train its models."
-      : `ChatGPT for Teachers can make mistakes. OpenAI doesn't use ${name} workspace data to train its models.`,
-  encryptedK12Workspace: (name: string | null) =>
-    name == null
-      ? "ChatGPT for Teachers can make mistakes. OpenAI doesn't use your workspace data to train its models. The content of this workspace is encrypted with your organization managed keys."
-      : `ChatGPT for Teachers can make mistakes. OpenAI doesn't use ${name} workspace data to train its models. The content of this workspace is encrypted with your organization managed keys.`,
-} as const;
-
-const shared = sharedChunk as unknown as Record<string, any>;
-const initial = initialChunk as unknown as Record<string, any>;
-let jsx: any;
-let initialized = false;
-
-function call(value: unknown): void { if (typeof value === "function") value(); }
-function normalizeAccount(value: any): BrowserDisclaimerAccountState | null {
-  if (value == null) return null;
-  if (value.structure === "personal") return {
-    structure: "personal", id: value.id, showAiServiceDisclaimer: value.showAiServiceDisclaimer,
-    browserSideChat: value.browserSideChat, regulatedConnectorKind: value.regulatedConnectorKind,
-  };
-  if (value.structure === "workspace") return {
-    structure: "workspace", id: value.id, name: value.name, planType: value.planType ?? value.plan_type,
-    workspaceType: value.workspaceType ?? value.workspace_type, trainingAllowed: value.trainingAllowed,
-    encrypted: value.encrypted ?? value.ekm_config != null, hideStandardDisclaimer: value.hideStandardDisclaimer,
-    dataLoaded: value.dataLoaded,
-  };
-  return null;
-}
-
-function regulatedMessage(kind: RegulatedConnectorKind): Pick<BrowserComposerDisclaimerView, "message" | "messageKind"> {
-  if (kind === "finance") return { message: MESSAGE.finance, messageKind: "finance" };
-  if (kind === "health") return { message: MESSAGE.health, messageKind: "health" };
-  return { message: MESSAGE.personal, messageKind: "personal" };
-}
-
-function workspaceDisclaimer(
-  account: WorkspaceAccountDisclaimerState,
-  temporary: boolean,
-  placement: DisclaimerPlacement,
-): BrowserComposerDisclaimerView | null {
-  if (account.dataLoaded === false) return null;
-  const name = account.name ?? null;
-  const base = { kind: "browser-composer-disclaimer" as const, placement, workspaceName: name };
-  if (account.trainingAllowed === true) {
-    return {
-      ...base,
-      message: MESSAGE.workspaceResearchPartner,
-      messageKind: "workspace-research-partner",
-      learnMoreUrl: "https://help.openai.com/articles/20001245",
-    };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  G2 as i,
+  HX as a,
+  I3 as o,
+  K2 as s,
+  Y2 as c,
+  h4 as l,
+  m4 as u,
+} from "@rchunk/app-shared";
+import {
+  $un as d,
+  Dln as f,
+  HVt as p,
+  Jot as m,
+  M6t as h,
+  N6t as g,
+  Oln as _,
+  Qgn as v,
+  Sqt as y,
+  U6t as b,
+  Xot as x,
+  Zun as S,
+  dqt as C,
+  i_n as w,
+  ifn as T,
+  ofn as E,
+  rht as D,
+  sfn as O,
+  uHt as k,
+  uht as A,
+  uqt as j,
+  vln as M,
+  yln as N,
+} from "@rchunk/app-initial";
+function P(e) {
+  let t = (0, U.c)(15),
+    {
+      conversationId: n,
+      hasUserMessage: r,
+      isTemporaryChat: i,
+      placement: a,
+      regulatedConnectorKindOverride: o,
+    } = e,
+    s = a === void 0 ? `thread` : a,
+    { search: c } = w(),
+    { data: l } = A(),
+    u;
+  t[0] !== r || t[1] !== i || t[2] !== s || t[3] !== c
+    ? ((u = (i ?? N(c)) && !(r ?? s === `thread`)),
+      (t[0] = r),
+      (t[1] = i),
+      (t[2] = s),
+      (t[3] = c),
+      (t[4] = u))
+    : (u = t[4]);
+  let d = u;
+  if (l == null) return null;
+  if (l.structure === `workspace`) {
+    let e;
+    return (
+      t[5] !== l || t[6] !== s || t[7] !== d
+        ? ((e = (0, W.jsx)(B, { account: l, isTemporaryChat: d, placement: s })),
+          (t[5] = l),
+          (t[6] = s),
+          (t[7] = d),
+          (t[8] = e))
+        : (e = t[8]),
+      e
+    );
   }
-  if (account.workspaceType === "early-access") {
-    return { ...base, message: MESSAGE.earlyAccessWorkspace(name), messageKind: "early-access-workspace" };
-  }
-  if (temporary) {
-    return { ...base, message: MESSAGE.workspaceTemporaryChat, messageKind: "workspace-temporary-chat" };
-  }
-  if (account.encrypted === true && account.planType === "k12") {
-    return { ...base, message: MESSAGE.encryptedK12Workspace(name), messageKind: "encrypted-k12-workspace" };
-  }
-  if (account.encrypted === true) {
-    return { ...base, message: MESSAGE.encryptedWorkspace(name), messageKind: "encrypted-workspace" };
-  }
-  if (account.planType === "k12") {
-    return { ...base, message: MESSAGE.k12Workspace(name), messageKind: "k12-workspace" };
-  }
-  if (account.hideStandardDisclaimer === true) return null;
-  return { ...base, message: MESSAGE.workspace, messageKind: "workspace" };
+  let f;
+  return (
+    t[9] !== l.id || t[10] !== n || t[11] !== s || t[12] !== o || t[13] !== d
+      ? ((f = (0, W.jsx)(F, {
+          accountId: l.id,
+          conversationId: n,
+          isTemporaryChat: d,
+          placement: s,
+          regulatedConnectorKindOverride: o,
+        })),
+        (t[9] = l.id),
+        (t[10] = n),
+        (t[11] = s),
+        (t[12] = o),
+        (t[13] = d),
+        (t[14] = f))
+      : (f = t[14]),
+    f
+  );
 }
-
-function initializeBrowserComposerDisclaimer(): void {
-  if (initialized) return;
-  initialized = true;
-  for (const candidate of [shared.$3, shared.h4, shared.FX, shared.K2, initial.Qgn, initial.Oln, initial.M6t, initial.$un, initial.dqt, initial.uHt, initial.Sqt, initial.vln, initial.rht, initial.Xot, initial.ifn]) call(candidate);
-  jsx = shared.I3();
+function F(e) {
+  let t = (0, U.c)(12),
+    {
+      accountId: n,
+      conversationId: r,
+      isTemporaryChat: i,
+      placement: a,
+      regulatedConnectorKindOverride: o,
+    } = e,
+    s = E(`1831960162`);
+  if (!O(`1831960162`) && !s) {
+    let e;
+    return (
+      t[0] !== n || t[1] !== r || t[2] !== i || t[3] !== a || t[4] !== o
+        ? ((e = (0, W.jsx)(I, {
+            accountId: n,
+            conversationId: r,
+            isTemporaryChat: i,
+            placement: a,
+            regulatedConnectorKindOverride: o,
+          })),
+          (t[0] = n),
+          (t[1] = r),
+          (t[2] = i),
+          (t[3] = a),
+          (t[4] = o),
+          (t[5] = e))
+        : (e = t[5]),
+      e
+    );
+  }
+  let c;
+  return (
+    t[6] !== r || t[7] !== i || t[8] !== a || t[9] !== o || t[10] !== s
+      ? ((c = (0, W.jsx)(L, {
+          conversationId: r,
+          isTemporaryChat: i,
+          placement: a,
+          regulatedConnectorKindOverride: o,
+          showAiServiceDisclaimer: s,
+        })),
+        (t[6] = r),
+        (t[7] = i),
+        (t[8] = a),
+        (t[9] = o),
+        (t[10] = s),
+        (t[11] = c))
+      : (c = t[11]),
+    c
+  );
 }
-
-function DisclaimerSurface({ view }: { view: BrowserComposerDisclaimerView }): unknown {
-  const body = view.messageKind === "workspace-research-partner"
-    ? jsx.jsxs(jsx.Fragment, { children: [view.message.replace(/ Learn more$/, " "), jsx.jsx("a", {
-      className: "cursor-interaction underline underline-offset-2 hover:text-default",
-      href: view.learnMoreUrl, target: "_blank", rel: "noreferrer", children: "Learn more",
-    })] })
-    : view.message;
-  return jsx.jsx("div", {
-    className: ["text-center text-xs text-pretty text-codex-description select-none", view.placement === "thread" ? "px-toolbar pb-2" : null].filter(Boolean).join(" "),
-    "data-markdown-copy": "exclude", "data-disclaimer-kind": view.messageKind, children: body,
+function I(e) {
+  let t = (0, U.c)(6),
+    {
+      accountId: n,
+      conversationId: r,
+      isTemporaryChat: i,
+      placement: o,
+      regulatedConnectorKindOverride: s,
+    } = e,
+    { userId: c } = g(),
+    l = a(b),
+    { data: u } = a(j),
+    d = c != null && l === n,
+    f = E(d && (u == null || u.age_status === `under_18`) ? `1639821169` : !1);
+  if (!d) return null;
+  let p;
+  return (
+    t[0] !== r || t[1] !== i || t[2] !== o || t[3] !== s || t[4] !== f
+      ? ((p = (0, W.jsx)(L, {
+          conversationId: r,
+          isTemporaryChat: i,
+          placement: o,
+          regulatedConnectorKindOverride: s,
+          showAiServiceDisclaimer: f,
+        })),
+        (t[0] = r),
+        (t[1] = i),
+        (t[2] = o),
+        (t[3] = s),
+        (t[4] = f),
+        (t[5] = p))
+      : (p = t[5]),
+    p
+  );
+}
+function L(e) {
+  let t = (0, U.c)(15),
+    {
+      conversationId: n,
+      isTemporaryChat: r,
+      placement: i,
+      regulatedConnectorKindOverride: o,
+      showAiServiceDisclaimer: s,
+    } = e,
+    l = a(!1);
+  if (r) {
+    let e;
+    t[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, W.jsx)(c, { ...G.temporaryChat })), (t[0] = e))
+      : (e = t[0]);
+    let n;
+    return (
+      t[1] === i
+        ? (n = t[2])
+        : ((n = (0, W.jsx)(H, { placement: i, children: e })), (t[1] = i), (t[2] = n)),
+      n
+    );
+  }
+  if (s) {
+    let e;
+    t[3] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, W.jsx)(c, { ...G.aiService })), (t[3] = e))
+      : (e = t[3]);
+    let n;
+    return (
+      t[4] === i
+        ? (n = t[5])
+        : ((n = (0, W.jsx)(H, { placement: i, children: e })), (t[4] = i), (t[5] = n)),
+      n
+    );
+  }
+  if (o !== void 0) {
+    if (o == null && (l || i === `home`)) return null;
+    let e;
+    t[6] === o
+      ? (e = t[7])
+      : ((e = (0, W.jsx)(z, { regulatedConnectorKind: o })), (t[6] = o), (t[7] = e));
+    let n;
+    return (
+      t[8] !== i || t[9] !== e
+        ? ((n = (0, W.jsx)(H, { placement: i, children: e })), (t[8] = i), (t[9] = e), (t[10] = n))
+        : (n = t[10]),
+      n
+    );
+  }
+  if (i === `home`) return null;
+  let u;
+  return (
+    t[11] !== n || t[12] !== l || t[13] !== i
+      ? ((u = (0, W.jsx)(R, { conversationId: n, isBrowserSideChat: l, placement: i })),
+        (t[11] = n),
+        (t[12] = l),
+        (t[13] = i),
+        (t[14] = u))
+      : (u = t[14]),
+    u
+  );
+}
+function R(e) {
+  let t = (0, U.c)(5),
+    { conversationId: r, isBrowserSideChat: i, placement: a } = e,
+    o = n(p, r ?? null);
+  if (i && o == null) return null;
+  let s;
+  t[0] === o
+    ? (s = t[1])
+    : ((s = (0, W.jsx)(z, { regulatedConnectorKind: o })), (t[0] = o), (t[1] = s));
+  let c;
+  return (
+    t[2] !== a || t[3] !== s
+      ? ((c = (0, W.jsx)(H, { placement: a, children: s })), (t[2] = a), (t[3] = s), (t[4] = c))
+      : (c = t[4]),
+    c
+  );
+}
+function z(e) {
+  let t = (0, U.c)(3),
+    { regulatedConnectorKind: n } = e;
+  if (n === `finance`) {
+    let e;
+    return (
+      t[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, W.jsx)(c, { ...G.finance })), (t[0] = e))
+        : (e = t[0]),
+      e
+    );
+  }
+  if (n === `health`) {
+    let e;
+    return (
+      t[1] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, W.jsx)(c, { ...G.health })), (t[1] = e))
+        : (e = t[1]),
+      e
+    );
+  }
+  let r;
+  return (
+    t[2] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((r = (0, W.jsx)(c, { ...G.personal })), (t[2] = r))
+      : (r = t[2]),
+    r
+  );
+}
+function B(e) {
+  "use forget";
+  let t = (0, U.c)(14),
+    { account: r, isTemporaryChat: i, placement: o } = e,
+    s = a(!1),
+    { data: l } = n(S, r.id),
+    { data: u } = n(f, r.id);
+  if (l == null) return null;
+  let d = l.account.workspace_type === `early-access`;
+  if (!d && u == null) return null;
+  let p = l.account.name ?? r.name,
+    m;
+  if (u?.beta_settings.training_allowed === !0) {
+    let e;
+    (t[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, W.jsx)(c, { ...G.workspaceResearchPartner, values: { link: V } })), (t[0] = e))
+      : (e = t[0]),
+      (m = e));
+  } else if (d) {
+    let e;
+    (t[1] === p
+      ? (e = t[2])
+      : ((e =
+          p == null
+            ? (0, W.jsx)(c, { ...G.earlyAccessWorkspaceWithoutName })
+            : (0, W.jsx)(c, { ...G.earlyAccessWorkspace, values: { workspaceName: p } })),
+        (t[1] = p),
+        (t[2] = e)),
+      (m = e));
+  } else if (i) {
+    let e;
+    (t[3] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, W.jsx)(c, { ...G.workspaceTemporaryChat })), (t[3] = e))
+      : (e = t[3]),
+      (m = e));
+  } else if (l.account.ekm_config != null) {
+    if (r.plan_type === `k12`) {
+      let e;
+      (t[4] === p
+        ? (e = t[5])
+        : ((e =
+            p == null
+              ? (0, W.jsx)(c, { ...G.encryptedK12WorkspaceWithoutName })
+              : (0, W.jsx)(c, { ...G.encryptedK12Workspace, values: { workspaceName: p } })),
+          (t[4] = p),
+          (t[5] = e)),
+        (m = e));
+    } else {
+      let e;
+      (t[6] === p
+        ? (e = t[7])
+        : ((e =
+            p == null
+              ? (0, W.jsx)(c, { ...G.encryptedWorkspaceWithoutName })
+              : (0, W.jsx)(c, { ...G.encryptedWorkspace, values: { workspaceName: p } })),
+          (t[6] = p),
+          (t[7] = e)),
+        (m = e));
+    }
+  } else if (r.plan_type === `k12`) {
+    let e;
+    (t[8] === p
+      ? (e = t[9])
+      : ((e =
+          p == null
+            ? (0, W.jsx)(c, { ...G.k12WorkspaceWithoutName })
+            : (0, W.jsx)(c, { ...G.k12Workspace, values: { workspaceName: p } })),
+        (t[8] = p),
+        (t[9] = e)),
+      (m = e));
+  } else {
+    if (s) return null;
+    let e;
+    (t[10] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, W.jsx)(c, { ...G.workspace })), (t[10] = e))
+      : (e = t[10]),
+      (m = e));
+  }
+  let h;
+  return (
+    t[11] !== m || t[12] !== o
+      ? ((h = (0, W.jsx)(H, { placement: o, children: m })), (t[11] = m), (t[12] = o), (t[13] = h))
+      : (h = t[13]),
+    h
+  );
+}
+function V(e) {
+  return (0, W.jsx)(m, {
+    className: `cursor-interaction underline underline-offset-2 hover:text-default`,
+    href: `https://help.openai.com/articles/20001245`,
+    initiator: `open_in_browser_bridge`,
+    isBrowserEnabled: !1,
+    children: e,
   });
 }
-
-/**
- * BrowserComposerDisclaimer（原 `P`）。临时聊天优先于其他个人提示；显式
- * regulated connector override 决定 finance/health/personal；Home 默认不展示
- * 普通 personal 文案。Workspace 依次处理 Research Partner、Early Access、
- * 临时聊天、EKM、K12 和标准隐私提示。
- */
-function BrowserComposerDisclaimer(
-  props: BrowserComposerDisclaimerProps,
-): unknown {
-  initializeBrowserComposerDisclaimer();
-  const placement = props.placement ?? "thread";
-  const route = typeof initial.i_n === "function" ? initial.i_n() : { search: "" };
-  const accountQuery = typeof initial.uht === "function" ? initial.uht() : { data: null };
-  const account = normalizeAccount(props.account ?? accountQuery?.data);
-  if (account == null) return null;
-  const routeTemporary = typeof initial.yln === "function" ? initial.yln(route?.search ?? "") : false;
-  const temporary = (props.isTemporaryChat ?? routeTemporary) === true && !(props.hasUserMessage ?? placement === "thread");
-
-  if (account.structure === "workspace") {
-    let workspace = account;
-    if (typeof shared.BX === "function") {
-      const details = shared.BX(initial.Zun, account.id)?.data;
-      const settings = shared.BX(initial.Dln, account.id)?.data;
-      if (details == null && account.dataLoaded == null) return null;
-      workspace = {
-        ...account,
-        dataLoaded: details != null || account.dataLoaded,
-        name: details?.account?.name ?? account.name,
-        workspaceType: details?.account?.workspace_type ?? account.workspaceType,
-        encrypted: details?.account?.ekm_config != null || account.encrypted,
-        trainingAllowed: settings?.beta_settings?.training_allowed ?? account.trainingAllowed,
-      };
-      if (workspace.workspaceType !== "early-access" && settings == null && account.dataLoaded == null) return null;
-    }
-    const view = workspaceDisclaimer(workspace, temporary, placement);
-    return view == null ? null : jsx.jsx(DisclaimerSurface, { view });
-  }
-  const aiService = props.account == null && typeof initial.ofn === "function" ? initial.ofn("1831960162") : account.showAiServiceDisclaimer;
-  const regulatedFromStore = props.regulatedConnectorKindOverride === undefined && typeof shared.BX === "function"
-    ? shared.BX(initial.HVt, props.conversationId ?? null) : undefined;
-  const personal = { ...account, showAiServiceDisclaimer: aiService, regulatedConnectorKind: regulatedFromStore ?? account.regulatedConnectorKind };
-  const base = { kind: "browser-composer-disclaimer" as const, placement };
-  let view: BrowserComposerDisclaimerView | null;
-  if (temporary) view = { ...base, message: MESSAGE.temporaryChat, messageKind: "temporary-chat" };
-  else if (personal.showAiServiceDisclaimer === true) view = { ...base, message: MESSAGE.aiService, messageKind: "ai-service" };
-  if (props.regulatedConnectorKindOverride !== undefined) {
-    const regulatedKind = props.regulatedConnectorKindOverride;
-    if (regulatedKind == null && (personal.browserSideChat === true || placement === "home")) view = null;
-    else view = { ...base, ...regulatedMessage(regulatedKind) };
-  } else if (temporary || personal.showAiServiceDisclaimer === true) {
-    // Earlier priority branches already selected the view.
-  } else if (placement === "home" || (personal.browserSideChat === true && personal.regulatedConnectorKind == null)) view = null;
-  else view = { ...base, ...regulatedMessage(personal.regulatedConnectorKind ?? null) };
-  return view == null ? null : jsx.jsx(DisclaimerSurface, { view });
+function H(e) {
+  let t = (0, U.c)(5),
+    { children: n, placement: r } = e,
+    i = r === `thread` && `px-toolbar pb-2`,
+    a;
+  t[0] === i
+    ? (a = t[1])
+    : ((a = u(`text-center text-xs text-pretty text-codex-description select-none`, i)),
+      (t[0] = i),
+      (t[1] = a));
+  let o;
+  return (
+    t[2] !== n || t[3] !== a
+      ? ((o = (0, W.jsx)(`div`, { className: a, "data-markdown-copy": `exclude`, children: n })),
+        (t[2] = n),
+        (t[3] = a),
+        (t[4] = o))
+      : (o = t[4]),
+    o
+  );
 }
-
-initializeBrowserComposerDisclaimer();
-
-export { initializeBrowserComposerDisclaimer as n, BrowserComposerDisclaimer as t };
+var U, W, G;
+function K() {
+  return (K = e(() => {
+    ((U = t()),
+      l(),
+      r(),
+      s(),
+      v(),
+      _(),
+      h(),
+      d(),
+      C(),
+      k(),
+      y(),
+      M(),
+      D(),
+      x(),
+      T(),
+      (W = o()),
+      (G = i({
+        finance: {
+          id: `mattressFinanceDisclaimer.composerDisclaimer`,
+          defaultMessage: `ChatGPT can make mistakes and isn’t a licensed investment adviser or authorized to prepare tax returns.`,
+          description: `Footer disclaimer shown below the ChatGPT Personal Finance chat composer on web and below the regular Chat composer after a Finance app, connector, or plugin is selected or invoked. Legal/regulatory context: U.S.-specific. ‘Licensed investment adviser’ refers to a regulated, licensed/registered professional (e.g., SEC/state registered). ‘Prepare tax returns’ means preparing and filing tax return documents for tax authorities (not ‘tax refunds’). Keep the tone as a legal disclaimer.`,
+        },
+        health: {
+          id: `potion.footerDisclaimer.medicalDisclaimer`,
+          defaultMessage: `ChatGPT can make mistakes and isn't intended for diagnosis or treatment. Consult a doctor for medical advice.`,
+          description: `Medical disclaimer under the Health message composer`,
+        },
+        aiService: {
+          id: `codex.composer.browserDisclaimer.aiService`,
+          defaultMessage: `ChatGPT is AI and can make mistakes. Check important info.`,
+          description: `Compact legal disclosure beside the ChatGPT composer on Home and in conversations for eligible personal-account users. It explicitly identifies ChatGPT as artificial intelligence and reminds users to verify important information. Keep both sentences together; the footer may wrap on narrow screens.`,
+        },
+        personal: {
+          id: `codex.composer.browserDisclaimer`,
+          defaultMessage: `ChatGPT can make mistakes. Check important info.`,
+          description: `Compact legal disclosure above the browser conversation composer for a personal ChatGPT account, reminding users that AI responses may contain mistakes and important information should be checked.`,
+        },
+        temporaryChat: {
+          id: `codex.composer.browserDisclaimer.temporaryChat`,
+          defaultMessage: `For safety, we may keep a copy of this chat for up to 30 days.`,
+          description: `Compact privacy disclosure above the browser composer before a personal-account user sends the first message in a temporary ChatGPT conversation, explaining its maximum safety-retention period.`,
+        },
+        workspace: {
+          id: `codex.composer.browserDisclaimer.workspace`,
+          defaultMessage: `ChatGPT can make mistakes. Workspace data isn't used to train models.`,
+          description: `Compact legal and privacy disclosure above the browser composer for a Business or Enterprise workspace that has not opted in to model training, reassuring workspace members that their data is excluded from training.`,
+        },
+        workspaceResearchPartner: {
+          id: `codex.composer.browserDisclaimer.workspaceResearchPartner`,
+          defaultMessage: `ChatGPT can make mistakes. This workspace is opted in to the ChatGPT Business Research Partner Program. <link>Learn more</link>`,
+          description: `Legal and privacy disclosure above the browser composer for a Business workspace opted in to sharing its data through the ChatGPT Business Research Partner Program. The <link> tag wraps a clickable Help Center article labeled Learn more.`,
+        },
+        earlyAccessWorkspace: {
+          id: `codex.composer.browserDisclaimer.earlyAccessWorkspace`,
+          defaultMessage: `ChatGPT can make mistakes. OpenAI uses {workspaceName} workspace data to train its models.`,
+          description: `Legal and privacy disclosure above the browser composer for an early-access workspace whose data is used to train AI models. The {workspaceName} placeholder is the human-readable name of the current workspace.`,
+        },
+        earlyAccessWorkspaceWithoutName: {
+          id: `codex.composer.browserDisclaimer.earlyAccessWorkspaceWithoutName`,
+          defaultMessage: `ChatGPT can make mistakes. OpenAI uses your workspace data to train its models.`,
+          description: `Legal and privacy disclosure above the browser composer for an early-access workspace whose data is used to train AI models when the workspace has no display name.`,
+        },
+        workspaceTemporaryChat: {
+          id: `codex.composer.browserDisclaimer.workspaceTemporaryChat`,
+          defaultMessage: `Workspace data isn't used to train models by default. For safety, we may keep a copy of this chat for up to 30 days.`,
+          description: `Privacy disclosure above the browser composer before a workspace member sends the first message in a temporary ChatGPT conversation, explaining that workspace data is not used for model training and may be retained for safety for up to 30 days.`,
+        },
+        encryptedWorkspace: {
+          id: `codex.composer.browserDisclaimer.encryptedWorkspace`,
+          defaultMessage: `ChatGPT can make mistakes. OpenAI doesn't use {workspaceName} workspace data to train its models. The content of this workspace is encrypted with your organization managed keys.`,
+          description: `Legal and privacy disclosure above the browser composer for a Business or Enterprise workspace protected by organization-managed cryptographic encryption keys. The {workspaceName} placeholder is the human-readable name of the current workspace.`,
+        },
+        encryptedWorkspaceWithoutName: {
+          id: `codex.composer.browserDisclaimer.encryptedWorkspaceWithoutName`,
+          defaultMessage: `ChatGPT can make mistakes. OpenAI doesn't use your workspace data to train its models. The content of this workspace is encrypted with your organization managed keys.`,
+          description: `Legal and privacy disclosure above the browser composer for a Business or Enterprise workspace protected by organization-managed cryptographic encryption keys when the workspace has no display name.`,
+        },
+        k12Workspace: {
+          id: `codex.composer.browserDisclaimer.k12Workspace`,
+          defaultMessage: `ChatGPT for Teachers can make mistakes. OpenAI doesn't use {workspaceName} workspace data to train its models.`,
+          description: `Legal and privacy disclosure above the browser composer for a ChatGPT for Teachers workspace, assuring educators that their workspace data is not used to train AI models. The {workspaceName} placeholder is the human-readable name of the school workspace.`,
+        },
+        k12WorkspaceWithoutName: {
+          id: `codex.composer.browserDisclaimer.k12WorkspaceWithoutName`,
+          defaultMessage: `ChatGPT for Teachers can make mistakes. OpenAI doesn't use your workspace data to train its models.`,
+          description: `Legal and privacy disclosure above the browser composer for a ChatGPT for Teachers workspace without a display name, assuring educators that their workspace data is not used to train AI models.`,
+        },
+        encryptedK12Workspace: {
+          id: `codex.composer.browserDisclaimer.encryptedK12Workspace`,
+          defaultMessage: `ChatGPT for Teachers can make mistakes. OpenAI doesn't use {workspaceName} workspace data to train its models. The content of this workspace is encrypted with your organization managed keys.`,
+          description: `Legal and privacy disclosure above the browser composer for a ChatGPT for Teachers workspace protected by organization-managed cryptographic encryption keys. The {workspaceName} placeholder is the human-readable name of the school workspace.`,
+        },
+        encryptedK12WorkspaceWithoutName: {
+          id: `codex.composer.browserDisclaimer.encryptedK12WorkspaceWithoutName`,
+          defaultMessage: `ChatGPT for Teachers can make mistakes. OpenAI doesn't use your workspace data to train its models. The content of this workspace is encrypted with your organization managed keys.`,
+          description: `Legal and privacy disclosure above the browser composer for a ChatGPT for Teachers workspace protected by organization-managed cryptographic encryption keys when the school workspace has no display name.`,
+        },
+      })));
+  }))();
+}
+export { K as n, P as t };

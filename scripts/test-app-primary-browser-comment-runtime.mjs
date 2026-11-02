@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import fs from "node:fs";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 import * as esbuild from "esbuild";
 
 const entry = "src/renderer/app-primary-browser-comment-runtime/index.ts";
@@ -72,13 +73,11 @@ equal(runtime.resolveBrowserContext({ conversationId: "thread", id: 7 }), undefi
 disposeEmpty();
 
 const hubSource = fs.readFileSync("src/webview/assets/app-primary-d66705000d76.ts", "utf8");
-const consumerSource = fs.readFileSync("src/renderer/detached-browser-annotation-host/index.ts", "utf8");
 const registrySource = fs.readFileSync("src/renderer/source-annotation-host-registry/index.ts", "utf8");
 equal(hubSource.includes('from "./source-annotation-host-registry-60c474ef605e.js"'), true);
 equal(hubSource.includes("return recoveredRegisterBrowserCommentHandler(e, t)"), true);
 equal(hubSource.includes("return recoveredWaitForBrowserCommentHandler(e, t, n, r)"), true);
 equal(registrySource.includes('from "../app-primary-browser-comment-runtime"'), true);
-equal(consumerSource.includes("initializeRegistry.browserComments"), true);
-equal(/\bKs:|\bUs:|\bVs:/.test(consumerSource), false);
+assertions += assertReleaseOwner("detached-browser-annotation-host");
 
 console.log(`app-primary browser-comment runtime tests passed (${assertions} assertions)`);

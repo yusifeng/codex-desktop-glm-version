@@ -1,12 +1,246 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-const jsx = getJsxRuntime();
-class CheckoutFormError extends Error { status?: number; errorCode?: string; constructor(message: string, options: { status?: number; errorCode?: string } = {}) { super(message); this.status = options.status; this.errorCode = options.errorCode; } }
-const messages: Record<string, string> = { save: "Unable to save payment method. Please try again.", insufficient_funds: "This payment method has insufficient funds. Try another payment method.", expired_card: "This payment method has expired. Update your payment method to continue.", incorrect_number: "Check your card number and try again", incorrect_cvc: "Check your card's security code and try again", invalid_cvc: "Check your card's security code and try again", missing_payment_method: "Add a payment method to continue", authentication_failed: "This payment method couldn't be authorized. Try another payment method.", payment_method_unavailable: "This payment method can't be used for this payment. Try another payment method.", payment_method_declined: "This payment method was declined. Try another payment method.", other: "We couldn't process this payment. Try another payment method." };
-function SecureFormState({ kind, loading, error, onRetry }: { kind: "billing" | "payment"; loading?: boolean; error?: Error | null; onRetry(): void }): unknown { if (loading) return jsx.jsx("div", { role: "status", children: `Loading secure ${kind} form…` }); const rateLimited = (error as CheckoutFormError | null)?.status === 429; const text = rateLimited ? "Too many payment method attempts. Please try again later." : error?.name === "TimeoutError" ? `The ${kind} form took too long to load. Please try again.` : `Unable to load ${kind} form. Please try again.`; return jsx.jsxs("div", { children: [jsx.jsx("p", { role: "alert", children: text }), jsx.jsx("button", { type: "button", onClick: onRetry, children: "Retry" })] }); }
-function classifyCheckoutError(error: unknown): string { if (!(error instanceof CheckoutFormError) || (error.status ?? 0) < 400 || (error.status ?? 0) >= 500 || error.errorCode !== "confirmation_token_requires_new_token") return "save"; try { const detail = (JSON.parse(error.message) as { detail?: { stripe_error_code?: string; stripe_decline_code?: string } }).detail ?? {}; for (const code of [detail.stripe_decline_code, detail.stripe_error_code]) if (code && code in messages) return code; if ([detail.stripe_decline_code, detail.stripe_error_code].some(code => ["authentication_required", "payment_intent_authentication_failure", "setup_intent_authentication_failure"].includes(code ?? ""))) return "authentication_failed"; if (["approve_with_id", "do_not_honor", "generic_decline", "lost_card", "pickup_card", "restricted_card", "stolen_card"].includes(detail.stripe_decline_code ?? "") || ["card_declined", "payment_intent_payment_attempt_failed"].includes(detail.stripe_error_code ?? "")) return "payment_method_declined"; return "other"; } catch { return "save"; } }
-function checkoutErrorMessage(code: string): string | undefined { return messages[code]; }
-function initializeCheckoutErrorUi(): void {}
-function initializeCheckoutError(): void {}
-export { SecureFormState as a, initializeCheckoutError as i, checkoutErrorMessage as n, initializeCheckoutErrorUi as o, classifyCheckoutError as r, CheckoutFormError as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  G2 as n,
+  H4 as r,
+  I3 as i,
+  K2 as a,
+  Mh as o,
+  Ph as s,
+  Y2 as c,
+  Yh as l,
+  Zh as u,
+  g4 as d,
+  q4 as f,
+  x4 as p,
+} from "@rchunk/app-shared";
+import { Sdn as m, iu as h, ru as g, wdn as _ } from "@rchunk/app-initial";
+function v(e) {
+  let t = (0, y.c)(15),
+    { kind: n, loading: r, error: i, onRetry: a } = e;
+  if (r) {
+    let e;
+    return (
+      t[0] === n
+        ? (e = t[1])
+        : ((e = (0, b.jsx)(g, {
+            children: (0, b.jsx)(c, {
+              id: `settings.consumerBilling.secureFormLoading`,
+              defaultMessage: `{kind, select, billing {Loading secure billing form…} other {Loading secure payment form…}}`,
+              description: `Loading status in a secure Stripe editor. kind selects billing information or saved payment methods.`,
+              values: { kind: n },
+            }),
+          })),
+          (t[0] = n),
+          (t[1] = e)),
+      e
+    );
+  }
+  let s;
+  if (i instanceof m && i.status === 429) {
+    let e;
+    (t[2] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, b.jsx)(c, {
+          id: `settings.consumerBilling.paymentFormRateLimit`,
+          defaultMessage: `Too many payment method attempts. Please try again later.`,
+          description: `Warning when initializing another payment form is rate limited`,
+        })),
+        (t[2] = e))
+      : (e = t[2]),
+      (s = e));
+  } else if (i?.name === `TimeoutError`) {
+    let e;
+    (t[3] === n
+      ? (e = t[4])
+      : ((e = (0, b.jsx)(c, {
+          id: `settings.consumerBilling.secureFormTimeout`,
+          defaultMessage: `{kind, select, billing {The billing form took too long to load. Please try again.} other {The payment form took too long to load. Please try again.}}`,
+          description: `Shown when secure form initialization times out; the nearby Retry button starts a new attempt`,
+          values: { kind: n },
+        })),
+        (t[3] = n),
+        (t[4] = e)),
+      (s = e));
+  } else {
+    let e;
+    (t[5] === n
+      ? (e = t[6])
+      : ((e = (0, b.jsx)(c, {
+          id: `settings.consumerBilling.secureFormLoadError`,
+          defaultMessage: `{kind, select, billing {Unable to load billing form. Please try again.} other {Unable to load payment form. Please try again.}}`,
+          description: `Error when the secure Stripe editor cannot initialize. kind selects billing information or saved payment methods.`,
+          values: { kind: n },
+        })),
+        (t[5] = n),
+        (t[6] = e)),
+      (s = e));
+  }
+  let u;
+  t[7] === s
+    ? (u = t[8])
+    : ((u = (0, b.jsx)(`p`, { role: `alert`, className: `text-sm text-warning`, children: s })),
+      (t[7] = s),
+      (t[8] = u));
+  let d;
+  t[9] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = (0, b.jsx)(c, {
+        id: `settings.consumerBilling.retryPaymentForm`,
+        defaultMessage: `Retry`,
+        description: `Retry initializing the secure billing or payment-method form`,
+      })),
+      (t[9] = d))
+    : (d = t[9]);
+  let f;
+  t[10] === a
+    ? (f = t[11])
+    : ((f = (0, b.jsx)(`div`, {
+        className: `flex`,
+        children: (0, b.jsx)(l, { color: `secondary`, onClick: a, children: d }),
+      })),
+      (t[10] = a),
+      (t[11] = f));
+  let p;
+  return (
+    t[12] !== u || t[13] !== f
+      ? ((p = (0, b.jsxs)(o, { children: [u, f] })), (t[12] = u), (t[13] = f), (t[14] = p))
+      : (p = t[14]),
+    p
+  );
+}
+var y, b;
+function x() {
+  return (x = e(() => {
+    ((y = t()), a(), u(), s(), h(), _(), (b = i()));
+  }))();
+}
+function S(e) {
+  if (
+    !(e instanceof m) ||
+    e.status < 400 ||
+    e.status >= 500 ||
+    e.errorCode !== `confirmation_token_requires_new_token`
+  )
+    return D.save;
+  try {
+    let t = T.safeParse(JSON.parse(e.message));
+    if (!t.success) return D.save;
+    let { stripe_error_code: n, stripe_decline_code: r } = t.data.detail;
+    if (n == null && r == null) return D.save;
+    for (let e of [r, n]) {
+      let t = E.safeParse(e);
+      if (t.success) return D[t.data];
+    }
+    return [r, n].some(
+      (e) =>
+        e != null &&
+        [
+          `authentication_required`,
+          `payment_intent_authentication_failure`,
+          `setup_intent_authentication_failure`,
+        ].includes(e),
+    )
+      ? D.authentication_failed
+      : [
+            `approve_with_id`,
+            `do_not_honor`,
+            `generic_decline`,
+            `lost_card`,
+            `pickup_card`,
+            `restricted_card`,
+            `revocation_of_all_authorizations`,
+            `revocation_of_authorization`,
+            `stolen_card`,
+          ].includes(r ?? ``) ||
+          [`card_declined`, `payment_intent_payment_attempt_failed`].includes(n ?? ``)
+        ? D.payment_method_declined
+        : D.other;
+  } catch {
+    return D.save;
+  }
+}
+function C(e) {
+  return D[e];
+}
+var w, T, E, D;
+function O() {
+  return (O = e(() => {
+    (a(),
+      d(),
+      _(),
+      (w = class extends Error {}),
+      (T = r({
+        detail: r({ stripe_error_code: f().nullish(), stripe_decline_code: f().nullish() }),
+      })),
+      (E = p([
+        `insufficient_funds`,
+        `expired_card`,
+        `incorrect_number`,
+        `incorrect_cvc`,
+        `invalid_cvc`,
+        `missing_payment_method`,
+        `authentication_failed`,
+        `payment_method_unavailable`,
+        `payment_method_declined`,
+        `other`,
+      ])),
+      (D = n({
+        save: {
+          id: `settings.consumerBilling.addCardError`,
+          defaultMessage: `Unable to save payment method. Please try again.`,
+          description: `Error after Stripe or the billing server cannot save a new payment method`,
+        },
+        insufficient_funds: {
+          id: `settings.consumerBilling.paymentFailure.insufficient_funds`,
+          defaultMessage: `This payment method has insufficient funds. Try another payment method.`,
+          description: `Actionable error after saving a consumer payment method fails; never reveals a sensitive bank decline reason`,
+        },
+        expired_card: {
+          id: `settings.consumerBilling.paymentFailure.expired_card`,
+          defaultMessage: `This payment method has expired. Update your payment method to continue.`,
+          description: `Actionable error after saving a consumer payment method fails; never reveals a sensitive bank decline reason`,
+        },
+        incorrect_number: {
+          id: `settings.consumerBilling.paymentFailure.incorrect_number`,
+          defaultMessage: `Check your card number and try again`,
+          description: `Actionable error after saving a consumer payment method fails; never reveals a sensitive bank decline reason`,
+        },
+        incorrect_cvc: {
+          id: `settings.consumerBilling.paymentFailure.incorrect_cvc`,
+          defaultMessage: `Check your card's security code and try again`,
+          description: `Actionable error after saving a consumer payment method fails; never reveals a sensitive bank decline reason`,
+        },
+        invalid_cvc: {
+          id: `settings.consumerBilling.paymentFailure.invalid_cvc`,
+          defaultMessage: `Check your card's security code and try again`,
+          description: `Actionable error after saving a consumer payment method fails; never reveals a sensitive bank decline reason`,
+        },
+        missing_payment_method: {
+          id: `settings.consumerBilling.paymentFailure.missing_payment_method`,
+          defaultMessage: `Add a payment method to continue`,
+          description: `Actionable error after saving a consumer payment method fails; never reveals a sensitive bank decline reason`,
+        },
+        authentication_failed: {
+          id: `settings.consumerBilling.paymentFailure.authentication_failed`,
+          defaultMessage: `This payment method couldn't be authorized. Try another payment method.`,
+          description: `Actionable error after saving a consumer payment method fails; never reveals a sensitive bank decline reason`,
+        },
+        payment_method_unavailable: {
+          id: `settings.consumerBilling.paymentFailure.payment_method_unavailable`,
+          defaultMessage: `This payment method can't be used for this payment. Try another payment method.`,
+          description: `Actionable error after saving a consumer payment method fails; never reveals a sensitive bank decline reason`,
+        },
+        payment_method_declined: {
+          id: `settings.consumerBilling.paymentFailure.payment_method_declined`,
+          defaultMessage: `This payment method was declined. Try another payment method.`,
+          description: `Actionable error after saving a consumer payment method fails; never reveals a sensitive bank decline reason`,
+        },
+        other: {
+          id: `settings.consumerBilling.paymentFailure.other`,
+          defaultMessage: `We couldn't process this payment. Try another payment method.`,
+          description: `Actionable error after saving a consumer payment method fails; never reveals a sensitive bank decline reason`,
+        },
+      })));
+  }))();
+}
+export { v as a, O as i, C as n, x as o, S as r, w as t };

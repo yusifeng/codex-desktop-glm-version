@@ -1,18 +1,265 @@
-// One-way ANOVA decomposition model. Release chunk: model-21bcfa25d0a8.js.
-import "@rchunk/rolldown-runtime";
-type Group = "A" | "B" | "C"; type CellKey = `group${Group}${1 | 2 | 3 | 4 | 5 | 6}`; type Values = Partial<Record<CellKey, number>> & { separation?: number; spread?: number; seed?: number }; type SafeValues = Record<CellKey, number> & { separation: number; spread: number; seed: number };
-interface Parameter { kind: "number"; defaultValue: number; min: number; max: number } interface Manifest { type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string; parameters: Record<CellKey, Parameter> }
-interface Result { groups: number[][]; groupMeans: number[]; grandMean: number; ssWithin: number; ssBetween: number; ssTotal: number; dfWithin: number; dfBetween: number; msWithin: number; msBetween: number; fStatistic: number | null; pValue: number | null; significant: boolean | null }
-let manifest: Manifest; let groupNames: Group[]; let minimum: number; let maximum: number; let significanceLevel: number; let separationControl: { defaultValue: number; min: number; max: number; step: number }; let spreadControl: typeof separationControl; let defaults: SafeValues; let normalizeValues: (values: Values) => SafeValues; let calculate: (values: Values) => Result; let setSeparation: (values: Values, separation: number) => SafeValues; let setSpread: (values: Values, spread: number) => SafeValues; let regenerate: (values: Values) => SafeValues; let updateCell: (values: Values, groupIndex: number, valueIndex: number, value: number) => SafeValues; let initialValues: (values: Values) => SafeValues; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; const parameter = (defaultValue: number): Parameter => ({ kind: "number", defaultValue, min: 0, max: 100 }); const parameters = { groupA1: parameter(32), groupA2: parameter(36), groupA3: parameter(38), groupA4: parameter(40), groupA5: parameter(43), groupA6: parameter(45), groupB1: parameter(44), groupB2: parameter(47), groupB3: parameter(49), groupB4: parameter(51), groupB5: parameter(53), groupB6: parameter(56), groupC1: parameter(55), groupC2: parameter(58), groupC3: parameter(60), groupC4: parameter(62), groupC5: parameter(65), groupC6: parameter(66) } satisfies Record<CellKey, Parameter>; manifest = { type: "ANOVA_DECOMPOSITION", version: 2, thumbnailAssetKey: "anova-decomposition-v1", canonicalFormula: "F = \\frac{\\text{between-group variation}}{\\text{within-group variation}}", parameters }; }
-function initializeModel(): void {
-  if (modelReady) return; modelReady = true; initializeManifest(); groupNames = ["A", "B", "C"]; minimum = manifest.parameters.groupA1.min; maximum = manifest.parameters.groupA1.max; significanceLevel = .05; const defaultSeed = 7; const maxSeed = 2147483647; separationControl = { defaultValue: 11, min: 0, max: 24, step: 1 }; spreadControl = { defaultValue: 1, min: 0, max: 2.25, step: .05 }; const keys: Record<Group, CellKey[]> = { A: ["groupA1", "groupA2", "groupA3", "groupA4", "groupA5", "groupA6"], B: ["groupB1", "groupB2", "groupB3", "groupB4", "groupB5", "groupB6"], C: ["groupC1", "groupC2", "groupC3", "groupC4", "groupC5", "groupC6"] }; const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max); const finite = (value: number | undefined, fallback: number) => Number.isFinite(value) ? value as number : fallback; const defaultFor = (key: CellKey) => manifest.parameters[key].defaultValue; defaults = { groupA1: defaultFor("groupA1"), groupA2: defaultFor("groupA2"), groupA3: defaultFor("groupA3"), groupA4: defaultFor("groupA4"), groupA5: defaultFor("groupA5"), groupA6: defaultFor("groupA6"), groupB1: defaultFor("groupB1"), groupB2: defaultFor("groupB2"), groupB3: defaultFor("groupB3"), groupB4: defaultFor("groupB4"), groupB5: defaultFor("groupB5"), groupB6: defaultFor("groupB6"), groupC1: defaultFor("groupC1"), groupC2: defaultFor("groupC2"), groupC3: defaultFor("groupC3"), groupC4: defaultFor("groupC4"), groupC5: defaultFor("groupC5"), groupC6: defaultFor("groupC6"), separation: separationControl.defaultValue, spread: spreadControl.defaultValue, seed: defaultSeed };
-  normalizeValues = values => { const cells = Object.fromEntries(groupNames.flatMap(group => keys[group].map(key => [key, clamp(finite(values[key], defaultFor(key)), minimum, maximum)]))) as Record<CellKey, number>; return { ...cells, separation: clamp(finite(values.separation, defaults.separation), separationControl.min, separationControl.max), spread: clamp(finite(values.spread, defaults.spread), spreadControl.min, spreadControl.max), seed: clamp(Math.round(finite(values.seed, defaults.seed)), 0, maxSeed) }; }; const groups = (values: SafeValues) => groupNames.map(group => keys[group].map(key => values[key])); const mean = (values: number[]) => values.reduce((sum, value) => sum + value, 0) / values.length; const rootMeanSquare = (values: number[]) => Math.sqrt(mean(values.map(value => value ** 2))); const pooledWithinSpread = (sets: number[][]) => rootMeanSquare(sets.flatMap(set => { const center = mean(set); return set.map(value => value - center); })); const defaultWithinSpread = pooledWithinSpread(groups(defaults));
-  const betaFraction = (a: number, b: number, x: number) => { const tiny = 1e-30; const sum = a + b; const plus = a + 1; const minus = a - 1; let c = 1; let d = 1 - sum * x / plus; d = Math.abs(d) < tiny ? tiny : d; d = 1 / d; let result = d; for (let iteration = 1; iteration <= 200; iteration += 1) { const doubled = 2 * iteration; let coefficient = iteration * (b - iteration) * x / ((minus + doubled) * (a + doubled)); d = 1 + coefficient * d; d = Math.abs(d) < tiny ? tiny : d; c = 1 + coefficient / c; c = Math.abs(c) < tiny ? tiny : c; d = 1 / d; result *= d * c; coefficient = -((a + iteration) * (sum + iteration) * x) / ((a + doubled) * (plus + doubled)); d = 1 + coefficient * d; d = Math.abs(d) < tiny ? tiny : d; c = 1 + coefficient / c; c = Math.abs(c) < tiny ? tiny : c; d = 1 / d; const delta = d * c; result *= delta; if (Math.abs(delta - 1) < 3e-12) break; } return result; }; const logGamma = (value: number): number => { const coefficients = [676.5203681218851, -1259.1392167224028, 771.3234287776531, -176.6150291621406, 12.507343278686905, -.13857109526572012, 9.984369578019572e-6, 1.5056327351493116e-7]; if (value < .5) return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * value)) - logGamma(1 - value); const shifted = value - 1; let sum = .9999999999998099; coefficients.forEach((coefficient, index) => { sum += coefficient / (shifted + index + 1); }); const t = shifted + coefficients.length - .5; return .5 * Math.log(2 * Math.PI) + (shifted + .5) * Math.log(t) - t + Math.log(sum); }; const regularizedBeta = (x: number, a: number, b: number) => { if (x <= 0) return 0; if (x >= 1) return 1; const front = Math.exp(logGamma(a + b) - logGamma(a) - logGamma(b) + a * Math.log(x) + b * Math.log(1 - x)); return x < (a + 1) / (a + b + 2) ? front * betaFraction(a, b, x) / a : 1 - front * betaFraction(b, a, 1 - x) / b; }; const fTail = (statistic: number, numeratorDf: number, denominatorDf: number) => { if (!Number.isFinite(statistic)) return statistic === Infinity ? 0 : 1; if (statistic <= 0) return 1; const x = denominatorDf / (denominatorDf + numeratorDf * Math.max(0, statistic)); return clamp(regularizedBeta(x, denominatorDf / 2, numeratorDf / 2), 0, 1); };
-  calculate = values => { const safe = normalizeValues(values); const sets = groups(safe); const groupMeans = sets.map(mean); const flattened = sets.flat(); const grandMean = mean(flattened); const ssWithin = sets.reduce((total, set, index) => total + set.reduce((sum, value) => sum + (value - (groupMeans[index] ?? 0)) ** 2, 0), 0); const ssBetween = groupMeans.reduce((total, groupMean, index) => total + (sets[index]?.length ?? 0) * (groupMean - grandMean) ** 2, 0); const dfBetween = sets.length - 1; const dfWithin = flattened.length - sets.length; const msBetween = ssBetween / dfBetween; const msWithin = ssWithin / dfWithin; const fStatistic = msWithin === 0 ? msBetween === 0 ? null : Infinity : msBetween / msWithin; const pValue = fStatistic === null ? null : fTail(fStatistic, dfBetween, dfWithin); return { groups: sets, groupMeans, grandMean, ssWithin, ssBetween, ssTotal: ssWithin + ssBetween, dfWithin, dfBetween, msWithin, msBetween, fStatistic, pValue, significant: pValue === null ? null : pValue <= significanceLevel }; };
-  const rebuild = (values: SafeValues, sets: number[][], extra: Partial<Pick<SafeValues, "separation" | "spread" | "seed">>) => ({ ...values, ...Object.fromEntries(groupNames.flatMap((group, groupIndex) => keys[group].map((key, valueIndex) => [key, clamp(sets[groupIndex]?.[valueIndex] ?? values[key], minimum, maximum)]))), ...extra }) as SafeValues;
-  setSeparation = (values, separation) => { const safe = normalizeValues(values); const next = clamp(separation, separationControl.min, separationControl.max); const sets = groups(safe); const grandMean = mean(sets.flat()); return rebuild(safe, sets.map((set, index) => { const center = mean(set); const target = grandMean + (index - 1) * next; return set.map(value => value + target - center); }), { separation: next }); };
-  setSpread = (values, spread) => { const safe = normalizeValues(values); const next = clamp(spread, spreadControl.min, spreadControl.max); const current = pooledWithinSpread(groups(safe)); const target = defaultWithinSpread * next; const defaultSets = groups(defaults); return rebuild(safe, groups(safe).map((set, index) => { const center = mean(set); if (current > Number.EPSILON) return set.map(value => center + (value - center) * (target / current)); const fallback = defaultSets[index]; if (!fallback) return set; const fallbackCenter = mean(fallback); const scale = rootMeanSquare(fallback.map(value => value - fallbackCenter)); return fallback.map(value => center + (value - fallbackCenter) / scale * target); }), { spread: next }); };
-  const randomGenerator = (seed: number) => { let state = seed >>> 0 || 1; return () => { state = (1664525 * state + 1013904223) >>> 0; return state / 4294967296; }; }; regenerate = values => { const safe = normalizeValues(values); const seed = safe.seed >= maxSeed ? 0 : safe.seed + 1; const random = randomGenerator(seed); const sets = [50 - safe.separation, 50, 50 + safe.separation].map(center => { const raw = Array.from({ length: 6 }, () => random() + random() + random() - 1.5); const rawCenter = mean(raw); const centered = raw.map(value => value - rawCenter); const source = Math.sqrt(mean(centered.map(value => value ** 2))) > Number.EPSILON ? centered : [-5, -3, -1, 1, 3, 5]; const scale = Math.sqrt(mean(source.map(value => value ** 2))); return source.map(value => center + value / scale * (4 * safe.spread)); }); return rebuild(safe, sets, { seed }); }; updateCell = (values, groupIndex, valueIndex, value) => { const safe = normalizeValues(values); const group = groupNames[groupIndex]; const key = group ? keys[group][valueIndex] : undefined; return key ? { ...safe, [key]: clamp(value, minimum, maximum) } : safe; }; initialValues = values => { const safe = normalizeValues({ ...defaults, ...values, separation: defaults.separation, spread: defaults.spread }); const sets = groups(safe); const groupMeans = sets.map(mean); const grandMean = mean(groupMeans); const separation = clamp(mean(groupMeans.map(value => Math.abs(value - grandMean))) * 1.5, separationControl.min, separationControl.max); const spread = clamp(pooledWithinSpread(sets) / defaultWithinSpread, spreadControl.min, spreadControl.max); return { ...safe, separation, spread }; };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `ANOVA_DECOMPOSITION`),
+      (n = `anova-decomposition-v1`),
+      (r = `F = \\frac{\\text{between-group variation}}{\\text{within-group variation}}`),
+      (i = {
+        groupA1: { kind: `number`, defaultValue: 32, min: 0, max: 100 },
+        groupA2: { kind: `number`, defaultValue: 36, min: 0, max: 100 },
+        groupA3: { kind: `number`, defaultValue: 38, min: 0, max: 100 },
+        groupA4: { kind: `number`, defaultValue: 40, min: 0, max: 100 },
+        groupA5: { kind: `number`, defaultValue: 43, min: 0, max: 100 },
+        groupA6: { kind: `number`, defaultValue: 45, min: 0, max: 100 },
+        groupB1: { kind: `number`, defaultValue: 44, min: 0, max: 100 },
+        groupB2: { kind: `number`, defaultValue: 47, min: 0, max: 100 },
+        groupB3: { kind: `number`, defaultValue: 49, min: 0, max: 100 },
+        groupB4: { kind: `number`, defaultValue: 51, min: 0, max: 100 },
+        groupB5: { kind: `number`, defaultValue: 53, min: 0, max: 100 },
+        groupB6: { kind: `number`, defaultValue: 56, min: 0, max: 100 },
+        groupC1: { kind: `number`, defaultValue: 55, min: 0, max: 100 },
+        groupC2: { kind: `number`, defaultValue: 58, min: 0, max: 100 },
+        groupC3: { kind: `number`, defaultValue: 60, min: 0, max: 100 },
+        groupC4: { kind: `number`, defaultValue: 62, min: 0, max: 100 },
+        groupC5: { kind: `number`, defaultValue: 65, min: 0, max: 100 },
+        groupC6: { kind: `number`, defaultValue: 66, min: 0, max: 100 },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
 }
-export { maximum as a, setSpread as c, regenerate as d, initializeModel as f, manifest as g, initializeManifest as h, spreadControl as i, calculate as l, updateCell as m, groupNames as n, minimum as o, normalizeValues as p, separationControl as r, setSeparation as s, significanceLevel as t, initialValues as u };
+var s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w, T, E, D, O, k, A, j, M, N, P, F, I, L, R;
+function z() {
+  return (z = e(() => {
+    (o(),
+      (s = [`A`, `B`, `C`]),
+      (c = a.parameters.groupA1.min),
+      (l = a.parameters.groupA1.max),
+      (u = 0.05),
+      (d = 7),
+      (f = 2147483647),
+      (p = { defaultValue: 11, min: 0, max: 24, step: 1 }),
+      (m = { defaultValue: 1, min: 0, max: 2.25, step: 0.05 }),
+      (h = {
+        A: [`groupA1`, `groupA2`, `groupA3`, `groupA4`, `groupA5`, `groupA6`],
+        B: [`groupB1`, `groupB2`, `groupB3`, `groupB4`, `groupB5`, `groupB6`],
+        C: [`groupC1`, `groupC2`, `groupC3`, `groupC4`, `groupC5`, `groupC6`],
+      }),
+      (g = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (_ = (e, t) => (Number.isFinite(e) ? e : t)),
+      (v = (e) => a.parameters[e].defaultValue),
+      (y = {
+        groupA1: a.parameters.groupA1.defaultValue,
+        groupA2: a.parameters.groupA2.defaultValue,
+        groupA3: a.parameters.groupA3.defaultValue,
+        groupA4: a.parameters.groupA4.defaultValue,
+        groupA5: a.parameters.groupA5.defaultValue,
+        groupA6: a.parameters.groupA6.defaultValue,
+        groupB1: a.parameters.groupB1.defaultValue,
+        groupB2: a.parameters.groupB2.defaultValue,
+        groupB3: a.parameters.groupB3.defaultValue,
+        groupB4: a.parameters.groupB4.defaultValue,
+        groupB5: a.parameters.groupB5.defaultValue,
+        groupB6: a.parameters.groupB6.defaultValue,
+        groupC1: a.parameters.groupC1.defaultValue,
+        groupC2: a.parameters.groupC2.defaultValue,
+        groupC3: a.parameters.groupC3.defaultValue,
+        groupC4: a.parameters.groupC4.defaultValue,
+        groupC5: a.parameters.groupC5.defaultValue,
+        groupC6: a.parameters.groupC6.defaultValue,
+        separation: p.defaultValue,
+        spread: m.defaultValue,
+        seed: d,
+      }),
+      (b = (e) => ({
+        ...Object.fromEntries(s.flatMap((t) => h[t].map((t) => [t, g(_(e[t], v(t)), c, l)]))),
+        separation: g(_(e.separation, y.separation), p.min, p.max),
+        spread: g(_(e.spread, y.spread), m.min, m.max),
+        seed: g(Math.round(_(e.seed, y.seed)), 0, f),
+      })),
+      (x = (e) => s.map((t) => h[t].map((t) => e[t]))),
+      (S = (e) => e.reduce((e, t) => e + t, 0) / e.length),
+      (C = (e) => Math.sqrt(S(e.map((e) => e ** 2)))),
+      (w = (e) =>
+        C(
+          e.flatMap((e) => {
+            let t = S(e);
+            return e.map((e) => e - t);
+          }),
+        )),
+      (T = w(x(y))),
+      (E = (e) => {
+        let t = x(e),
+          n = t.map(S),
+          r = S(n),
+          i = S(n.map((e) => Math.abs(e - r))) * 1.5,
+          a = w(t) / T;
+        return { separation: g(i, p.min, p.max), spread: g(a, m.min, m.max) };
+      }),
+      (D = (e, t, n) => {
+        let r = 1e-30,
+          i = e + t,
+          a = e + 1,
+          o = e - 1,
+          s = 1,
+          c = 1 - (i * n) / a;
+        ((c = Math.abs(c) < r ? r : c), (c = 1 / c));
+        let l = c;
+        for (let u = 1; u <= 200; u += 1) {
+          let d = (u * (t - u) * n) / ((o + 2 * u) * (e + 2 * u));
+          ((c = 1 + d * c),
+            (c = Math.abs(c) < r ? r : c),
+            (s = 1 + d / s),
+            (s = Math.abs(s) < r ? r : s),
+            (c = 1 / c),
+            (l *= c * s));
+          let f = (-(e + u) * (i + u) * n) / ((e + 2 * u) * (a + 2 * u));
+          ((c = 1 + f * c),
+            (c = Math.abs(c) < r ? r : c),
+            (s = 1 + f / s),
+            (s = Math.abs(s) < r ? r : s),
+            (c = 1 / c));
+          let p = c * s;
+          if (((l *= p), Math.abs(p - 1) < 3e-12)) break;
+        }
+        return l;
+      }),
+      (O = (e) => {
+        let t = [
+          676.5203681218851, -1259.1392167224028, 771.3234287776531, -176.6150291621406,
+          12.507343278686905, -0.13857109526572012, 9984369578019572e-21, 1.5056327351493116e-7,
+        ];
+        if (e < 0.5) return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * e)) - O(1 - e);
+        let n = e - 1,
+          r = 0.9999999999998099;
+        t.forEach((e, t) => {
+          r += e / (n + t + 1);
+        });
+        let i = n + t.length - 0.5;
+        return 0.5 * Math.log(2 * Math.PI) + (n + 0.5) * Math.log(i) - i + Math.log(r);
+      }),
+      (k = (e, t, n) => {
+        if (e <= 0) return 0;
+        if (e >= 1) return 1;
+        let r = Math.exp(O(t + n) - O(t) - O(n) + t * Math.log(e) + n * Math.log(1 - e));
+        return e < (t + 1) / (t + n + 2) ? (r * D(t, n, e)) / t : 1 - (r * D(n, t, 1 - e)) / n;
+      }),
+      (A = (e, t, n) => {
+        if (!Number.isFinite(e)) return e === 1 / 0 ? 0 : 1;
+        if (e <= 0) return 1;
+        let r = n / (n + t * Math.max(0, e));
+        return g(k(r, n / 2, t / 2), 0, 1);
+      }),
+      (j = (e) => {
+        let t = b(e),
+          n = x(t),
+          r = n.map(S),
+          i = n.flat(),
+          a = S(i),
+          o = n.reduce((e, t, n) => e + t.reduce((e, t) => e + (t - r[n]) ** 2, 0), 0),
+          s = r.reduce((e, t, r) => e + n[r].length * (t - a) ** 2, 0),
+          c = n.length - 1,
+          l = i.length - n.length,
+          d = s / c,
+          f = o / l,
+          p = f === 0 ? (d === 0 ? null : 1 / 0) : d / f,
+          m = p === null ? null : A(p, c, l);
+        return {
+          groups: n,
+          groupMeans: r,
+          grandMean: a,
+          ssWithin: o,
+          ssBetween: s,
+          ssTotal: o + s,
+          dfWithin: l,
+          dfBetween: c,
+          msWithin: f,
+          msBetween: d,
+          fStatistic: p,
+          pValue: m,
+          significant: m === null ? null : m <= u,
+        };
+      }),
+      (M = (e, t, n) => {
+        let r = s.flatMap((e, n) => h[e].map((e, r) => [e, g(t[n][r], c, l)]));
+        return { ...e, ...Object.fromEntries(r), ...n };
+      }),
+      (N = (e, t) => {
+        let n = b(e),
+          r = g(t, p.min, p.max),
+          i = x(n),
+          a = S(i.flat()),
+          o = i.map((e, t) => {
+            let n = S(e),
+              i = a + (t - 1) * r;
+            return e.map((e) => e + i - n);
+          });
+        return M(n, o, { separation: r });
+      }),
+      (P = (e, t) => {
+        let n = b(e),
+          r = g(t, m.min, m.max),
+          i = w(x(n)),
+          a = T * r,
+          o = x(y),
+          s = x(n).map((e, t) => {
+            let n = S(e);
+            if (i > 2 ** -52) return e.map((e) => n + (e - n) * (a / i));
+            let r = o[t];
+            if (!r) return e;
+            let s = S(r),
+              c = C(r.map((e) => e - s));
+            return r.map((e) => n + ((e - s) / c) * a);
+          });
+        return M(n, s, { spread: r });
+      }),
+      (F = (e) => {
+        let t = e >>> 0 || 1;
+        return () => ((t = (1664525 * t + 1013904223) >>> 0), t / 4294967296);
+      }),
+      (I = (e) => {
+        let t = b(e),
+          n = t.seed >= f ? 0 : t.seed + 1,
+          r = F(n),
+          i = [50 - t.separation, 50, 50 + t.separation].map((e) => {
+            let n = Array.from({ length: 6 }, () => r() + r() + r() - 1.5),
+              i = S(n),
+              a = n.map((e) => e - i),
+              o = Math.sqrt(S(a.map((e) => e ** 2))) > 2 ** -52 ? a : [-5, -3, -1, 1, 3, 5],
+              s = Math.sqrt(S(o.map((e) => e ** 2))),
+              c = 4 * t.spread;
+            return o.map((t) => e + (t / s) * c);
+          });
+        return M(t, i, { seed: n });
+      }),
+      (L = (e, t, n, r) => {
+        let i = b(e),
+          a = s[t],
+          o = a ? h[a][n] : void 0;
+        return o ? { ...i, [o]: g(r, c, l) } : i;
+      }),
+      (R = (e) => {
+        let t = b({ ...y, ...e, separation: y.separation, spread: y.spread });
+        return { ...t, ...E(t) };
+      }));
+  }))();
+}
+export {
+  l as a,
+  P as c,
+  I as d,
+  z as f,
+  a as g,
+  o as h,
+  m as i,
+  j as l,
+  L as m,
+  s as n,
+  c as o,
+  b as p,
+  p as r,
+  N as s,
+  u as t,
+  R as u,
+};

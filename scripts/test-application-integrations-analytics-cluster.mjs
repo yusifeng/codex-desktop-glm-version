@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 async function bundle(directory) {
   const result = await esbuild.build({
@@ -44,64 +45,7 @@ async function bundle(directory) {
   );
 }
 
-// builder-analytics: 13
-const builder = await bundle("builder-analytics");
-assert.deepEqual(Object.keys(builder), [
-  "a",
-  "c",
-  "i",
-  "l",
-  "n",
-  "o",
-  "r",
-  "s",
-  "t",
-  "u",
-]);
-assert.equal(
-  builder.a.CHATGPT_AGENT_BUILDER_CHANNEL_TYPE_SLACK,
-  "CHATGPT_AGENT_BUILDER_CHANNEL_TYPE_SLACK",
-);
-assert.equal(
-  builder.c.CHATGPT_AGENT_BUILDER_SCHEDULE_TYPE_WEEKLY,
-  "CHATGPT_AGENT_BUILDER_SCHEDULE_TYPE_WEEKLY",
-);
-assert.equal(
-  builder.i.CHATGPT_AGENT_BUILDER_ACTION_TYPE_PUBLISH,
-  "CHATGPT_AGENT_BUILDER_ACTION_TYPE_PUBLISH",
-);
-assert.equal(
-  builder.l.CHATGPT_AGENT_BUILDER_SOURCE_HEADER,
-  "CHATGPT_AGENT_BUILDER_SOURCE_HEADER",
-);
-assert.equal(
-  builder.o.CHATGPT_AGENT_BUILDER_PAGE_PREVIEW,
-  "CHATGPT_AGENT_BUILDER_PAGE_PREVIEW",
-);
-assert.equal(
-  builder.r.CHATGPT_AGENT_BUILDER_ACTION_RESULT_FAILED,
-  "CHATGPT_AGENT_BUILDER_ACTION_RESULT_FAILED",
-);
-assert.equal(
-  builder.s.CHATGPT_AGENT_BUILDER_RESOURCE_TYPE_SKILL,
-  "CHATGPT_AGENT_BUILDER_RESOURCE_TYPE_SKILL",
-);
-const tracked = [],
-  builderScope = {
-    track(schema, payload) {
-      tracked.push({ schema, payload });
-    },
-  };
-builder.n(builderScope, { action: "save" });
-builder.n(builderScope, { action: "publish" });
-assert.equal(tracked.length, 2);
-assert.equal(
-  tracked[0].schema.$type,
-  "protobuf_analytics_events.v1.ChatgptAgentBuilderAction",
-);
-assert.equal(tracked[0].payload.builderSequenceNumber, 1);
-assert.equal(tracked[1].payload.builderSequenceNumber, 2);
-assert.equal(builder.t(), undefined);
+assertReleaseOwner("builder-analytics");
 
 // api: 15
 const api = await bundle("api");

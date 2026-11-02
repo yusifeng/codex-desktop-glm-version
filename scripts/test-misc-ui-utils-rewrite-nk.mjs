@@ -14,13 +14,6 @@ const cases = [
     0,
     ["ViewOnlySeatBanner", "WorkspaceSeatTopBanner"],
   ],
-  [
-    "chatgpt-header-upgrade-b1c003dededb.js",
-    "chatgpt-header-upgrade",
-    ["rolldown-runtime", "app-shared", "app-initial"],
-    0,
-    ["ChatGptHeaderUpgrade"],
-  ],
 ];
 const releaseAliases = new Map([
   ["state-92adb03a8a05", "workspace-renewal-state"],
@@ -130,13 +123,7 @@ for (const [_asset, directory, _deps, _dynamic, exports] of cases) {
     assert.equal(module.ViewOnlySeatBanner().type.name, "SeatBanner");
     assertions += 2;
   }
-  if (directory === "chatgpt-header-upgrade") {
-    state.account = { account_id: "a", plan_type: "free" };
-    const result = module.ChatGptHeaderUpgrade({ isHomepage: true });
-    assert.equal(result.type, "header-action");
-    assert.equal(result.props.actionId, "chatgpt-header-upgrade");
-    assertions += 2;
-  }
 }
+assertions += assertReleaseOwner("chatgpt-header-upgrade");
 assertions += assertReleaseOwner("subscription-payment-announcement");
 console.log(`misc-ui-utils NK: ${assertions} assertions passed`);

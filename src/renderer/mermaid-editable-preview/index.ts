@@ -1,119 +1,373 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/mermaid-code-editor",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/codex-diff-css",
+      "@rchunk/register-pierre-themes",
+      "@rchunk/diff-file-view",
+      "@rchunk/render-file-children",
+      "@rchunk/code-editor-runtime",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  H3 as initializePreloadRuntime,
-  I3 as getJsxRuntime,
-  Jm as createLazyComponent,
-  V3 as loadWithPreload,
-  __ as stableCallbackValue,
-  ck as getToastManager,
-  e6 as getReactRuntime,
-  fg as useDarkMode,
-  n4 as useIntl,
-  type JsxRuntime,
-  type ReactRuntime,
+  $3 as t,
+  BX as n,
+  FX as r,
+  H3 as i,
+  I3 as a,
+  Jm as o,
+  K2 as s,
+  V3 as c,
+  Y2 as ee,
+  __ as te,
+  ck as l,
+  dg as u,
+  e6 as d,
+  fg as f,
+  g_ as p,
+  lk as m,
+  n4 as h,
+  qm as g,
 } from "@rchunk/app-shared";
-// @ts-expect-error Art is part of the published app-initial export surface.
-import { Art as downloadImage, Nat as LoadingRow, Pat as initializeLoadingRow, Trt as initializeLightbox, wrt as ImageLightbox } from "@rchunk/app-initial";
-// @ts-expect-error The image chunk's full Mermaid surface is declared with this alias.
-import { a as initializeImage, c as resolveThemeVariables, i as MermaidSvgRenderer, n as cloneSvg, s as defaultThemeVariables, t as rasterizeSvg, u as renderMermaidSource } from "@rchunk/image";
-
-interface MermaidImage { height: number; src: string; width: number }
-interface MermaidEditablePreviewProps { alt: string; chatTheme?: string; code: string; downloadAriaLabel: string; image: MermaidImage | null; onCodeBlur?: () => void; onCodeChange?: (code: string) => void; onOpenChange(open: boolean): void }
-interface IntlRuntime { formatMessage(descriptor: { defaultMessage: string; description?: string; id: string }): string }
-interface ToastRuntime { danger(message: string, options?: { errorAnalytics?: { toastId: string } }): void }
-interface ThemeVariables extends Record<string, unknown> {}
-interface SvgLike { src: string }
-type Mode = "code" | "diagram" | "error" | "loading";
-type StableCallback = <Arguments extends unknown[], Result>(callback: (...arguments_: Arguments) => Result) => (...arguments_: Arguments) => Result;
-type MermaidCodeEditorComponent = (props: { editStateKey: string; initialCode: string; onBlur(): void; onChange(value: string): void }) => unknown;
-
-const useStableCallback = stableCallbackValue as StableCallback;
-const copySvg = cloneSvg as unknown as (element: SVGSVGElement | null) => MermaidImage | null;
-const renderSource = renderMermaidSource as unknown as (input: { diagramId: string; isDarkMode: boolean; source: string; themeVariables: ThemeVariables }) => Promise<string | null>;
-const sanitizeSvg = copySvg as unknown as (element: SVGSVGElement | null) => MermaidImage | null;
-const themeVariablesFor = resolveThemeVariables as unknown as (input: { chatTheme: string; isDarkMode: boolean }) => ThemeVariables | null;
-const fallbackThemeVariables = defaultThemeVariables as unknown as ThemeVariables;
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let MermaidCodeEditor: MermaidCodeEditorComponent;
-
-function MermaidEditablePreview({ alt, chatTheme, code, downloadAriaLabel, image, onCodeChange, onCodeBlur, onOpenChange }: MermaidEditablePreviewProps): unknown {
-  const intl = useIntl() as IntlRuntime;
-  const id = React.useId();
-  const darkMode = useDarkMode() === true;
-  const resolvedTheme = chatTheme == null ? fallbackThemeVariables : themeVariablesFor({ chatTheme, isDarkMode: darkMode }) ?? fallbackThemeVariables;
-  const [draftCode, setDraftCode] = React.useState(code);
-  const [renderedCode, setRenderedCode] = React.useState(code);
-  const [renderedImage, setRenderedImage] = React.useState(image);
-  const [renderTheme, setRenderTheme] = React.useState({ isDarkMode: darkMode, themeVariables: resolvedTheme });
-  const [mode, setMode] = React.useState<Mode>(image == null ? "code" : "diagram");
-  const renderSequence = React.useRef(0);
-  React.useEffect(() => () => { renderSequence.current += 1; }, []);
-
-  const toggle = useStableCallback(async (): Promise<void> => {
-    const sequence = ++renderSequence.current;
-    if (mode !== "code") { setMode("code"); return; }
-    if (draftCode === renderedCode && renderedImage != null) { setMode("diagram"); return; }
-    setMode("loading");
-    try {
-      const markup = await renderSource({
-        diagramId: `chatgpt-mermaid-expanded-${id.replace(/[^a-zA-Z0-9_-]/g, "")}`,
-        isDarkMode: darkMode,
-        source: draftCode,
-        themeVariables: resolvedTheme,
-      });
-      const template = document.createElement("template");
-      template.innerHTML = markup ?? "";
-      const nextImage = sanitizeSvg(template.content.querySelector("svg"));
-      if (sequence !== renderSequence.current) return;
-      if (nextImage == null) { setMode("error"); return; }
-      setRenderedImage(nextImage);
-      setRenderedCode(draftCode);
-      setRenderTheme({ isDarkMode: darkMode, themeVariables: resolvedTheme });
-      setMode("diagram");
-    } catch {
-      if (sequence === renderSequence.current) setMode("error");
-    }
-  });
-  const download = React.useCallback(async (): Promise<void> => {
-    if (renderedImage == null) return;
-    const source = await rasterizeSvg(renderedImage.src);
-    const success = source == null ? false : await downloadImage({ downloadSrc: source, suggestedFilename: "mermaid-diagram.png" });
-    if (!success) (getToastManager() as ToastRuntime).danger(intl.formatMessage({ id: "imageSidePanel.downloadFailure", defaultMessage: "Could not download image", description: "Error shown when the image toolbar download fails." }), { errorAnalytics: { toastId: "imageSidePanel.downloadFailure" } });
-  }, [intl, renderedImage]);
-  const buttonLabel = intl.formatMessage(mode === "code" ? { id: "mermaidDiagram.viewDiagram", defaultMessage: "View Diagram", description: "Switch from Mermaid code to the diagram" } : { id: "mermaidDiagram.editCode", defaultMessage: "Edit Code", description: "Switch from the diagram to Mermaid code" });
-  let previewContent: unknown;
-  if (mode === "code") previewContent = jsx.jsx(MermaidCodeEditor, { editStateKey: id, initialCode: draftCode, onBlur: () => onCodeBlur?.(), onChange: (value: string) => { setDraftCode(value); onCodeChange?.(value); } });
-  else if (mode === "loading") previewContent = jsx.jsx(LoadingRow, { isStreaming: false });
-  else if (mode === "error") previewContent = jsx.jsx("div", { role: "alert", children: "Couldn’t render diagram. Edit the code to try again" });
-  const zoomableContent = renderedImage == null ? undefined : { width: renderedImage.width, height: renderedImage.height, content: jsx.jsx(MermaidSvgRenderer, { chatTheme, code: renderedCode, diagramId: `expanded-${id}`, renderTheme, sizing: "fill", onError: () => setMode("error") }) };
-  return jsx.jsx(ImageLightbox, {
-    alt,
-    downloadAriaLabel,
-    imageSurface: "card",
-    onDownload: () => void download(),
-    onOpenChange,
-    open: true,
-    previewContent: previewContent == null ? undefined : jsx.jsx("div", { className: "flex h-full min-h-0 w-full flex-col bg-surface text-default", children: previewContent }),
-    showDownload: mode === "diagram",
-    showZoomControls: mode === "diagram",
-    src: renderedImage?.src ?? "",
-    toolbarLeadingAction: onCodeChange == null ? undefined : { ariaLabel: buttonLabel, label: buttonLabel, onClick: () => void toggle() },
-    zoomableContent,
-  });
+import {
+  Art as ne,
+  Nat as re,
+  Pat as _,
+  Trt as v,
+  krt as y,
+  wrt as ie,
+} from "@rchunk/app-initial";
+import {
+  a as b,
+  c as ae,
+  d as x,
+  i as oe,
+  l as S,
+  n as se,
+  o as C,
+  r as w,
+  s as ce,
+  t as le,
+  u as ue,
+} from "@rchunk/mermaid-image-rendering";
+function T(e) {
+  let t = (0, E.c)(61),
+    {
+      alt: r,
+      chatTheme: i,
+      code: a,
+      downloadAriaLabel: o,
+      image: s,
+      onCodeChange: c,
+      onCodeBlur: u,
+      onOpenChange: d,
+    } = e,
+    p = h(),
+    m = (0, D.useId)(),
+    g = f(),
+    _;
+  t[0] !== i || t[1] !== g
+    ? ((_ = i != null && g != null ? ae({ chatTheme: i, isDarkMode: g }) : null),
+      (t[0] = i),
+      (t[1] = g),
+      (t[2] = _))
+    : (_ = t[2]);
+  let v = _,
+    y;
+  t[3] !== i || t[4] !== g
+    ? ((y = { chatTheme: i, isDarkMode: g }), (t[3] = i), (t[4] = g), (t[5] = y))
+    : (y = t[5]);
+  let b = n(i == null ? ce : v, y),
+    [x, S] = (0, D.useState)(a),
+    [C, w] = (0, D.useState)(a),
+    [T, A] = (0, D.useState)(s),
+    j;
+  t[6] !== g || t[7] !== b
+    ? ((j = b == null || g == null ? null : { themeVariables: b, isDarkMode: g }),
+      (t[6] = g),
+      (t[7] = b),
+      (t[8] = j))
+    : (j = t[8]);
+  let [M, N] = (0, D.useState)(j),
+    [P, F] = (0, D.useState)(s == null ? `code` : `diagram`),
+    I = (0, D.useRef)(0);
+  M == null && T != null && b != null && g != null && N({ themeVariables: b, isDarkMode: g });
+  let L, R;
+  (t[9] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((L = () => () => {
+        I.current += 1;
+      }),
+      (R = []),
+      (t[9] = L),
+      (t[10] = R))
+    : ((L = t[9]), (R = t[10])),
+    (0, D.useEffect)(L, R));
+  let z;
+  t[11] !== p || t[12] !== P
+    ? ((z =
+        P === `code`
+          ? p.formatMessage({
+              id: `mermaidDiagram.viewDiagram`,
+              defaultMessage: `View Diagram`,
+              description: `Button that switches from editing Mermaid source code to the rendered diagram`,
+            })
+          : p.formatMessage({
+              id: `mermaidDiagram.editCode`,
+              defaultMessage: `Edit Code`,
+              description: `Button that switches from the rendered Mermaid diagram to its code editor`,
+            })),
+      (t[11] = p),
+      (t[12] = P),
+      (t[13] = z))
+    : (z = t[13]);
+  let B = z,
+    V;
+  t[14] !== m ||
+  t[15] !== x ||
+  t[16] !== T ||
+  t[17] !== g ||
+  t[18] !== C ||
+  t[19] !== b ||
+  t[20] !== P
+    ? ((V = async () => {
+        let e = (I.current += 1);
+        if (P !== `code`) {
+          F(`code`);
+          return;
+        }
+        if (x === C && T != null) {
+          F(`diagram`);
+          return;
+        }
+        if (b != null && g != null) {
+          F(`loading`);
+          try {
+            let t = await ue({
+                source: x,
+                themeVariables: b,
+                isDarkMode: g,
+                diagramId: `chatgpt-mermaid-expanded-${m.replace(/[^a-zA-Z0-9_-]/g, ``)}`,
+              }),
+              n = document.createElement(`template`);
+            n.innerHTML = t ?? ``;
+            let r = se(n.content.querySelector(`svg`));
+            if (e !== I.current) return;
+            if (r == null) {
+              F(`error`);
+              return;
+            }
+            (A(r), w(x), N({ themeVariables: b, isDarkMode: g }), F(`diagram`));
+          } catch {
+            e === I.current && F(`error`);
+          }
+        }
+      }),
+      (t[14] = m),
+      (t[15] = x),
+      (t[16] = T),
+      (t[17] = g),
+      (t[18] = C),
+      (t[19] = b),
+      (t[20] = P),
+      (t[21] = V))
+    : (V = t[21]);
+  let H = te(V),
+    U;
+  t[22] !== T || t[23] !== p
+    ? ((U = async () => {
+        if (T == null) return;
+        let e = await le(T.src);
+        (e != null && (await ne({ downloadSrc: e, suggestedFilename: `mermaid-diagram.png` }))) ||
+          l().danger(
+            p.formatMessage({
+              id: `imageSidePanel.downloadFailure`,
+              defaultMessage: `Could not download image`,
+              description: `Error shown when the image toolbar download fails.`,
+            }),
+            { errorAnalytics: { toastId: `imageSidePanel.downloadFailure` } },
+          );
+      }),
+      (t[22] = T),
+      (t[23] = p),
+      (t[24] = U))
+    : (U = t[24]);
+  let W = U,
+    G;
+  if (P === `code`) {
+    let e;
+    t[25] === c
+      ? (e = t[26])
+      : ((e = (e) => {
+          (S(e), c?.(e));
+        }),
+        (t[25] = c),
+        (t[26] = e));
+    let n;
+    t[27] === u ? (n = t[28]) : ((n = () => u?.()), (t[27] = u), (t[28] = n));
+    let r;
+    (t[29] !== m || t[30] !== x || t[31] !== n || t[32] !== e
+      ? ((r = (0, O.jsx)(k, { initialCode: x, editStateKey: m, onChange: e, onBlur: n })),
+        (t[29] = m),
+        (t[30] = x),
+        (t[31] = n),
+        (t[32] = e),
+        (t[33] = r))
+      : (r = t[33]),
+      (G = r));
+  } else if (P === `loading`) {
+    let e;
+    (t[34] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, O.jsx)(re, { isStreaming: !1 })), (t[34] = e))
+      : (e = t[34]),
+      (G = e));
+  } else if (P === `error`) {
+    let e;
+    (t[35] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, O.jsx)(`div`, {
+          className: `flex min-h-0 flex-1 items-center justify-center p-4`,
+          role: `alert`,
+          children: (0, O.jsx)(ee, {
+            id: `mermaidDiagram.editRenderFailed`,
+            defaultMessage: `Couldn’t render diagram. Edit the code to try again`,
+            description: `Error shown when edited Mermaid source cannot be rendered as a diagram; the Edit Code button remains available`,
+          }),
+        })),
+        (t[35] = e))
+      : (e = t[35]),
+      (G = e));
+  }
+  let K = T?.src ?? ``,
+    q;
+  t[36] === W ? (q = t[37]) : ((q = () => void W()), (t[36] = W), (t[37] = q));
+  let J;
+  t[38] === G
+    ? (J = t[39])
+    : ((J =
+        G == null
+          ? void 0
+          : (0, O.jsx)(`div`, {
+              className: `flex h-full min-h-0 w-full flex-col bg-surface text-default`,
+              children: G,
+            })),
+      (t[38] = G),
+      (t[39] = J));
+  let Y;
+  t[40] !== i || t[41] !== m || t[42] !== T || t[43] !== C || t[44] !== M
+    ? ((Y =
+        T == null || M == null
+          ? void 0
+          : {
+              width: T.width,
+              height: T.height,
+              content: (0, O.jsx)(oe, {
+                chatTheme: i,
+                code: C,
+                diagramId: `expanded-${m}`,
+                renderTheme: M,
+                sizing: `fill`,
+                onError: () => F(`error`),
+              }),
+            }),
+      (t[40] = i),
+      (t[41] = m),
+      (t[42] = T),
+      (t[43] = C),
+      (t[44] = M),
+      (t[45] = Y))
+    : (Y = t[45]);
+  let X = P === `diagram`,
+    Z = P === `diagram`,
+    Q;
+  t[46] !== c || t[47] !== B || t[48] !== H
+    ? ((Q = c == null ? void 0 : { ariaLabel: B, label: B, onClick: () => void H() }),
+      (t[46] = c),
+      (t[47] = B),
+      (t[48] = H),
+      (t[49] = Q))
+    : (Q = t[49]);
+  let $;
+  return (
+    t[50] !== r ||
+    t[51] !== o ||
+    t[52] !== d ||
+    t[53] !== q ||
+    t[54] !== J ||
+    t[55] !== Y ||
+    t[56] !== X ||
+    t[57] !== Z ||
+    t[58] !== Q ||
+    t[59] !== K
+      ? (($ = (0, O.jsx)(ie, {
+          src: K,
+          alt: r,
+          downloadAriaLabel: o,
+          imageSurface: `card`,
+          open: !0,
+          onOpenChange: d,
+          onDownload: q,
+          previewContent: J,
+          zoomableContent: Y,
+          showDownload: X,
+          showZoomControls: Z,
+          toolbarLeadingAction: Q,
+        })),
+        (t[50] = r),
+        (t[51] = o),
+        (t[52] = d),
+        (t[53] = q),
+        (t[54] = J),
+        (t[55] = Y),
+        (t[56] = X),
+        (t[57] = Z),
+        (t[58] = Q),
+        (t[59] = K),
+        (t[60] = $))
+      : ($ = t[60]),
+    $
+  );
 }
-
-initializeImage();
-initializeLoadingRow();
-initializeLightbox();
-React = getReactRuntime();
-jsx = getJsxRuntime();
-initializePreloadRuntime();
-MermaidCodeEditor = createLazyComponent(async () => {
-  const loaded = await loadWithPreload(() => import("@rchunk/mermaid-code-editor"), [
-    "./editor-586a9e08096d.js", "./rolldown-runtime-2d059c5e81f4.js", "./app-shared-7b9edc1bfb7f.js", "./app-shared-fa570b9eb9dd.css", "./app-initial-51da50e6c6e3.js", "./app-initial-e8ceb32eb626.css", "./codex-diff-css-4cc1d2356a79.js", "./register-pierre-themes-58d8ca57f84b.js", "./File-4270090fca79.js", "./renderFileChildren-897963e963e5.js", "./editor-370fecef1630.js",
-  ], import.meta.url);
-  return loaded.MermaidCodeEditor;
-});
-
-export { MermaidEditablePreview };
+var E, D, O, k;
+function A() {
+  return (A = e(() => {
+    ((E = t()),
+      r(),
+      (D = d()),
+      s(),
+      g(),
+      m(),
+      v(),
+      y(),
+      u(),
+      p(),
+      x(),
+      b(),
+      w(),
+      _(),
+      S(),
+      C(),
+      (O = a()),
+      i(),
+      (k = o(async () => {
+        let { MermaidCodeEditor: e } = await c(
+          async () => {
+            let { MermaidCodeEditor: e } = await import(`@rchunk/mermaid-code-editor`);
+            return { MermaidCodeEditor: e };
+          },
+          __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]),
+          import.meta.url,
+        );
+        return e;
+      })));
+  }))();
+}
+A();
+export { T as MermaidEditablePreview };

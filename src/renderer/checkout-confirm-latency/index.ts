@@ -1,33 +1,287 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import { S as initializeCheckoutPolicy, b as checkoutDestination, d as planType } from "@rchunk/checkout-policy";
-import { a as SecureFormState, o as initializeCheckoutErrorUi } from "@rchunk/checkout-error";
-import "@rchunk/checkout-session";
-const jsx = getJsxRuntime();
-const CONTEXT_KEY = "oai/apps/modalCreditCheckoutSuccessContext";
-const LATENCY_KEY = "oai/apps/checkoutConfirmLatencyPending";
-const MAX_LATENCY_AGE = 1_800_000;
-const EMAIL_PATTERN = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
-interface StorageConfig { getStorage?(): Storage | null; isSafeReturnPath(path: string): boolean; onChange?(value: unknown): void }
-const browserStorage: StorageConfig = { getStorage: () => typeof window === "undefined" ? null : window.sessionStorage, isSafeReturnPath: path => { const pathOnly = path.split(/[?#]/u, 1)[0] ?? path; return path.startsWith("/") && !path.startsWith("//") && !pathOnly.includes("\\") && !/[\t\r\n]/u.test(pathOnly) && !/%(?:5c|09|0a|0d)/iu.test(pathOnly); } };
-function CheckoutLoadingState({ loading, error, onRetry, loadingContent, returnPath }: { loading?: boolean; error?: Error | null; onRetry(): void; loadingContent?: unknown; returnPath?: string; [key: string]: unknown }): unknown { if (loading) return loadingContent ?? jsx.jsx("div", { role: "status", children: "Loading checkout…" }); return jsx.jsxs("div", { "data-return-path": returnPath, children: [jsx.jsx(SecureFormState, { kind: "payment", loading: false, error, onRetry })] }); }
-function initializeCheckoutLoadingState(): void { initializeCheckoutErrorUi(); }
-function readSuccessContext(config: StorageConfig): Record<string, unknown> | null { try { const raw = config.getStorage?.()?.getItem(CONTEXT_KEY); if (raw == null) return null; const parsed = JSON.parse(raw) as Record<string, unknown>; if (typeof parsed.checkoutSessionId !== "string" || (parsed.quantity !== null && parsed.quantity !== undefined && typeof parsed.quantity !== "number")) return null; const task = parsed.task as Record<string, unknown> | undefined; if (task && (![task.accountId, task.conversationId, task.messageId, task.returnPath].every(value => typeof value === "string" && value.length > 0) || !config.isSafeReturnPath(String(task.returnPath)))) return null; return parsed; } catch { return null; } }
-function writeSuccessContext(config: StorageConfig, value: Record<string, unknown>): void { config.onChange?.(value); try { config.getStorage?.()?.setItem(CONTEXT_KEY, JSON.stringify(value)); } catch {} }
-function migrateCheckoutSession(previousId: string, checkoutSessionId: string): void { const current = readSuccessContext(browserStorage); if (current?.checkoutSessionId === previousId && previousId !== checkoutSessionId) writeSuccessContext(browserStorage, { ...current, checkoutSessionId }); copyEmbeddedSource(previousId, checkoutSessionId); }
-function initializeCheckoutStorage(): void { initializeCheckoutPolicy(); }
-function persistCheckoutSource(checkoutSessionId: string, params: URLSearchParams): void { const current = readSuccessContext(browserStorage); if (current?.checkoutSessionId !== checkoutSessionId) writeSuccessContext(browserStorage, { checkoutSessionId, quantity: null }); const source = params.get("source"); if (typeof window === "undefined" || (source !== "codex" && source !== "codex-embedded-checkout")) return; const key = `oai/apps/codexEmbeddedCheckoutSource/${checkoutSessionId}`; window.sessionStorage.setItem(key, source); if (source === "codex" && params.get("checkout_from") === "codex_app") window.sessionStorage.setItem(`${key}/checkout_from`, "codex_app"); }
-function setCheckoutQuantity(checkoutSessionId: string, quantity: number | null): void { const current = readSuccessContext(browserStorage); if (current?.checkoutSessionId === checkoutSessionId) writeSuccessContext(browserStorage, { ...current, quantity }); }
-function copyEmbeddedSource(previousId: string, nextId: string): void { if (typeof window === "undefined") return; for (const suffix of ["", "/checkout_from"]) { const value = window.sessionStorage.getItem(`oai/apps/codexEmbeddedCheckoutSource/${previousId}${suffix}`); if (value != null && window.sessionStorage.getItem(`oai/apps/codexEmbeddedCheckoutSource/${nextId}${suffix}`) == null) window.sessionStorage.setItem(`oai/apps/codexEmbeddedCheckoutSource/${nextId}${suffix}`, value); } }
-function checkoutReturnPath(checkoutSessionId: string, params: URLSearchParams, audience: string, setupFailed: boolean): string { let source = params.get("source"); let checkoutFrom = params.get("checkout_from"); if (typeof window !== "undefined") { const key = `oai/apps/codexEmbeddedCheckoutSource/${checkoutSessionId}`; source = window.sessionStorage.getItem(key) ?? source; checkoutFrom = window.sessionStorage.getItem(`${key}/checkout_from`) ?? checkoutFrom; } const destination = checkoutDestination({ audience, checkoutFrom, setupFailed, source }); return destination === "desktop_handoff" ? "/codex/open-app?target=launch" : destination === "workspace_billing" ? "/admin/billing" : "/settings/usage"; }
-function replaceLocation(path: string): void { if (typeof window !== "undefined") window.location.replace(path); }
-function initializeCheckoutRuntime(): void { initializeCheckoutStorage(); }
-function normalizeCheckoutEmail(email: string | null | undefined, fallback?: string): { checkoutEmail: string; hasCheckoutEmail: boolean; defaultEmail: string } { const checkoutEmail = email?.trim() ?? ""; const valid = checkoutEmail.length > 0 && EMAIL_PATTERN.test(checkoutEmail); return { checkoutEmail, hasCheckoutEmail: valid, defaultEmail: valid ? "" : fallback ?? "" }; }
-function initializeEmailValidation(): void {}
-async function measureCheckoutConfirmation(checkout: Record<string, unknown>, confirm: () => Promise<{ type: string }>): Promise<{ type: string }> { const resolvedPlan = checkoutPlanType(checkout); if (resolvedPlan == null || typeof window === "undefined") return confirm(); window.localStorage.setItem(LATENCY_KEY, JSON.stringify({ started_at_ms: Date.now(), checkout_session_id: checkout.checkout_session_id, processor_entity: checkout.processor_entity, plan_type: resolvedPlan })); try { const result = await confirm(); if (result.type !== "success" && result.type !== "pending") clearCheckoutLatency(); return result; } catch (error) { clearCheckoutLatency(); throw error; } }
-function consumeCheckoutLatency({ checkoutSessionId }: { checkoutSessionId?: string; processorEntity?: string; checkoutPlanType?: string; resultType?: string }): { durationMs: number; checkoutSessionId?: string } | undefined { if (typeof window === "undefined") return undefined; try { const raw = window.localStorage.getItem(LATENCY_KEY); if (raw == null) return undefined; const stored = JSON.parse(raw) as { started_at_ms?: number; checkout_session_id?: string }; if (stored.started_at_ms == null || !Number.isFinite(stored.started_at_ms) || Date.now() - stored.started_at_ms > MAX_LATENCY_AGE) { clearCheckoutLatency(); return undefined; } if (stored.checkout_session_id && stored.checkout_session_id !== checkoutSessionId) return undefined; const result = { durationMs: Math.max(0, Math.round(Date.now() - stored.started_at_ms)), checkoutSessionId: stored.checkout_session_id }; clearCheckoutLatency(); return result; } catch { return undefined; } }
-function clearCheckoutLatency(): void { try { if (typeof window !== "undefined") window.localStorage.removeItem(LATENCY_KEY); } catch {} }
-function checkoutPlanType(checkout: Record<string, unknown>): string | null { if (checkout.checkout_kind != null && checkout.checkout_kind !== "standard") return null; const plan = String(checkout.plan_name ?? "").toLowerCase(); if (plan === "team" || plan === "self_serve_business_prolite") return "team"; return ["chatgptteamplan", "chatgptbusiness_usage_based", "chatgptplusplan", "chatgptgoplan", "chatgptprolite", "chatgptpro"].includes(plan) ? planType(plan) : null; }
-function initializeCheckoutConfirmLatency(): void { initializeCheckoutRuntime(); initializeEmailValidation(); }
-export { normalizeCheckoutEmail as a, initializeCheckoutRuntime as c, replaceLocation as d, migrateCheckoutSession as f, EMAIL_PATTERN as i, setCheckoutQuantity as l, initializeCheckoutLoadingState as m, consumeCheckoutLatency as n, initializeEmailValidation as o, CheckoutLoadingState as p, initializeCheckoutConfirmLatency as r, checkoutReturnPath as s, measureCheckoutConfirmation as t, persistCheckoutSource as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  H4 as n,
+  I3 as r,
+  V4 as i,
+  g4 as a,
+  k4 as o,
+  q4 as s,
+} from "@rchunk/app-shared";
+import { _T as c, vT as l } from "@rchunk/app-initial";
+import { S as u, b as d, d as f } from "@rchunk/checkout-policy";
+import { a as p, o as m } from "@rchunk/checkout-error";
+import { d as h, u as g } from "@rchunk/checkout-session";
+function _(e) {
+  let t = (0, v.c)(10),
+    {
+      loading: n,
+      error: r,
+      onRetry: i,
+      context: a,
+      exitRequested: o,
+      onExitReady: s,
+      loadingContent: l,
+      returnPath: u,
+    } = e;
+  if (n) {
+    if (l !== void 0) return l;
+    let e;
+    return (
+      t[0] !== a || t[1] !== o || t[2] !== s
+        ? ((e = (0, y.jsx)(c, { context: a, exitRequested: o, onExitReady: s })),
+          (t[0] = a),
+          (t[1] = o),
+          (t[2] = s),
+          (t[3] = e))
+        : (e = t[3]),
+      e
+    );
+  }
+  let d;
+  t[4] !== r || t[5] !== i
+    ? ((d = (0, y.jsx)(p, { kind: `payment`, loading: !1, error: r, onRetry: i })),
+      (t[4] = r),
+      (t[5] = i),
+      (t[6] = d))
+    : (d = t[6]);
+  let f;
+  return (
+    t[7] !== u || t[8] !== d
+      ? ((f = (0, y.jsx)(g, { returnPath: u, children: d })), (t[7] = u), (t[8] = d), (t[9] = f))
+      : (f = t[9]),
+    f
+  );
+}
+var v, y;
+function b() {
+  return (b = e(() => {
+    ((v = t()), l(), m(), h(), (y = r()));
+  }))();
+}
+function x(e) {
+  try {
+    let t = e.getStorage()?.getItem(w);
+    if (t == null) return null;
+    let n = JSON.parse(t);
+    return typeof n.checkoutSessionId != `string` ||
+      (n.quantity !== null && typeof n.quantity != `number`) ||
+      (n.task &&
+        ![n.task.accountId, n.task.conversationId, n.task.messageId, n.task.returnPath].every(
+          (e) => typeof e == `string` && e.length > 0,
+        )) ||
+      (n.task && !e.isSafeReturnPath(n.task.returnPath))
+      ? null
+      : n;
+  } catch {
+    return null;
+  }
+}
+function S(e, t) {
+  e.onChange?.(t);
+  try {
+    e.getStorage()?.setItem(w, JSON.stringify(t));
+  } catch {}
+}
+function C(e, { previousCheckoutSessionId: t, checkoutSessionId: n }) {
+  try {
+    let r = e.getStorage()?.getItem(w);
+    if (r == null || t === n || JSON.parse(r).checkoutSessionId !== t) return;
+    let i = x(e);
+    i && S(e, { ...i, checkoutSessionId: n });
+  } catch {}
+}
+var w;
+function T() {
+  return (T = e(() => {
+    w = `oai/apps/modalCreditCheckoutSuccessContext`;
+  }))();
+}
+function E(e, t) {
+  x(j)?.checkoutSessionId !== e && S(j, { checkoutSessionId: e, quantity: null });
+  let n = t.get(`source`);
+  if (n === `codex` || n === `codex-embedded-checkout`)
+    try {
+      let r = `oai/apps/codexEmbeddedCheckoutSource/${e}`;
+      window.sessionStorage.getItem(r) ??
+        (window.sessionStorage.setItem(r, n),
+        n === `codex` &&
+          t.get(`checkout_from`) === `codex_app` &&
+          window.sessionStorage.setItem(`${r}/checkout_from`, `codex_app`));
+    } catch {}
+}
+function D(e, t) {
+  let n = x(j);
+  n?.checkoutSessionId === e && S(j, { ...n, quantity: t });
+}
+function O(e, t) {
+  C(j, { previousCheckoutSessionId: e, checkoutSessionId: t });
+  try {
+    let n = `oai/apps/codexEmbeddedCheckoutSource/${e}`,
+      r = `oai/apps/codexEmbeddedCheckoutSource/${t}`;
+    if (window.sessionStorage.getItem(r) == null)
+      for (let e of [``, `/checkout_from`]) {
+        let t = window.sessionStorage.getItem(`${n}${e}`);
+        t != null && window.sessionStorage.setItem(`${r}${e}`, t);
+      }
+  } catch {}
+}
+function k(e, t, n, r) {
+  let i = t.get(`source`),
+    a = t.get(`checkout_from`);
+  try {
+    let t = `oai/apps/codexEmbeddedCheckoutSource/${e}`;
+    ((i = window.sessionStorage.getItem(t) ?? i),
+      (a = window.sessionStorage.getItem(`${t}/checkout_from`) ?? a));
+  } catch {}
+  let o = d({ audience: n, checkoutFrom: a, setupFailed: r, source: i });
+  return o === `desktop_handoff`
+    ? `/codex/open-app?target=launch`
+    : o === `workspace_billing`
+      ? `/admin/billing`
+      : `/settings/usage`;
+}
+function A(e) {
+  window.location.replace(e);
+}
+var j;
+function M() {
+  return (M = e(() => {
+    (u(),
+      T(),
+      (j = {
+        getStorage: () => window.sessionStorage,
+        isSafeReturnPath: (e) => {
+          let t = e.split(/[?#]/u, 1)[0] ?? e;
+          return (
+            e.startsWith(`/`) &&
+            !e.startsWith(`//`) &&
+            !t.includes(`\\`) &&
+            !/[\t\r\n]/u.test(t) &&
+            !/%(?:5c|09|0a|0d)/iu.test(t)
+          );
+        },
+      }));
+  }))();
+}
+function N(e, t) {
+  let n = e?.trim() ?? ``,
+    r = n.length > 0 && P.test(n);
+  return { checkoutEmail: n, hasCheckoutEmail: r, defaultEmail: r ? `` : (t ?? ``) };
+}
+var P;
+function F() {
+  return (F = e(() => {
+    P =
+      /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)+$/;
+  }))();
+}
+async function I(e, t) {
+  let n = z(e);
+  if (n == null) return t();
+  try {
+    window.localStorage.setItem(
+      B,
+      JSON.stringify({
+        started_at_ms: Date.now(),
+        requires_manual_approval: e.requires_manual_approval === !0,
+        checkout_session_id: e.checkout_session_id,
+        processor_entity: e.processor_entity,
+        plan_type: n,
+        is_checkout_modal_enabled: !1,
+      }),
+    );
+  } catch {}
+  let r = performance.now(),
+    i = `exception`;
+  try {
+    let e = await t();
+    return ((i = e.type), e);
+  } finally {
+    (Math.round(performance.now() - r), i !== `success` && i !== `pending` && R());
+  }
+}
+function L({ checkoutSessionId: e, processorEntity: t, checkoutPlanType: n, resultType: r }) {
+  let i;
+  try {
+    let e = window.localStorage.getItem(B);
+    if (e == null) return;
+    let t = H.safeParse(JSON.parse(e));
+    if (!t.success) {
+      R();
+      return;
+    }
+    i = t.data;
+  } catch {
+    return;
+  }
+  if (
+    i.started_at_ms == null ||
+    !Number.isFinite(i.started_at_ms) ||
+    Date.now() - i.started_at_ms > V
+  ) {
+    R();
+    return;
+  }
+  if (i.checkout_session_id != null && i.checkout_session_id !== e) return;
+  let a = Math.max(0, Math.round(Date.now() - i.started_at_ms));
+  return (R(), { durationMs: a, checkoutSessionId: i.checkout_session_id });
+}
+function R() {
+  try {
+    window.localStorage.removeItem(B);
+  } catch {}
+}
+function z(e) {
+  if (e.checkout_kind != null && e.checkout_kind !== `standard`) return null;
+  switch (e.plan_name?.toLowerCase()) {
+    case void 0:
+      return null;
+    case `team`:
+    case `self_serve_business_prolite`:
+      return `team`;
+    case `chatgptteamplan`:
+    case `chatgptbusiness_usage_based`:
+    case `chatgptplusplan`:
+    case `chatgptgoplan`:
+    case `chatgptprolite`:
+    case `chatgptpro`:
+      return f(e.plan_name);
+    default:
+      return null;
+  }
+}
+var B, V, H;
+function U() {
+  return (U = e(() => {
+    (u(),
+      a(),
+      (B = `oai/apps/checkoutConfirmLatencyPending`),
+      (V = 18e5),
+      (H = n({
+        started_at_ms: i().optional(),
+        requires_manual_approval: o().optional(),
+        checkout_session_id: s().optional(),
+        processor_entity: s().optional(),
+        plan_type: s().nullable().optional(),
+        is_checkout_modal_enabled: o().optional(),
+      })));
+  }))();
+}
+export {
+  N as a,
+  M as c,
+  A as d,
+  O as f,
+  P as i,
+  D as l,
+  b as m,
+  L as n,
+  F as o,
+  _ as p,
+  U as r,
+  k as s,
+  I as t,
+  E as u,
+};

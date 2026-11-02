@@ -22,26 +22,8 @@ async function load(name) {
   return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${name}`);
 }
 
-const checkout = await load("business-checkout-switch-workspace-dialog");
-let switched = null;
-let closed = 0;
-let switchError = null;
-const switchView = checkout.BusinessCheckoutSwitchWorkspaceDialog({ workspaceId: "w1", onClose: () => { closed++; }, onSwitch: id => { switched = id; }, onError: error => { switchError = error; } });
-assert.equal(switchView.props.children.props.children[0].props.children, "Switch to your new workspace?");
-assert.match(switchView.props.children.props.children[1].props.children, /ready/);
-await switchView.props.children.props.onSubmit({ preventDefault() {} });
-assert.equal(switched, "w1");
-assert.equal(closed, 1);
-const pending = checkout.BusinessCheckoutSwitchWorkspaceDialog({ workspaceId: "w1", pending: true, onClose() {} });
-assert.equal(pending.props.children.props.children[2].props.role, "status");
-assert.equal(pending.props.children.props.children[4].props.children[1].props.disabled, true);
-const failure = new Error("bad");
-const failed = checkout.BusinessCheckoutSwitchWorkspaceDialog({ workspaceId: "w1", error: "Earlier", onClose() {}, onSwitch() { throw failure; }, onError: error => { switchError = error; } });
-assert.equal(failed.props.children.props.children[3].props.role, "alert");
-await failed.props.children.props.onSubmit({ preventDefault() {} });
-assert.equal(switchError, failure);
-
-const releaseAssertions = assertReleaseOwner("personal-workspace-access-blocked-dialog") +
+const releaseAssertions = assertReleaseOwner("business-checkout-switch-workspace-dialog") +
+  assertReleaseOwner("personal-workspace-access-blocked-dialog") +
   assertReleaseOwner("stable-worktree-status-dialog") +
   assertReleaseOwner("habitat-automation-migration-prompt");
 

@@ -1,712 +1,949 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/chatgpt-token-auth-browser",
+      "@rchunk/app-initial",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "./app-initial-e8ceb32eb626.css",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeCompilerRuntime,
-  FX as initializeScopeRuntime,
-  I3 as getJsxRuntime,
-  LX as useScope,
-  Qh as LoadingSpinner,
-  Y2 as FormattedMessage,
-  Yh as Button,
-  ZI as AppScope,
-  Zh as initializeButton,
-  _L as useQuery,
-  dg as initializeThemeSubscription,
-  e6 as getReactRuntime,
-  fg as useIsDarkTheme,
-  gL as initializeQueryRuntime,
-  n4 as useIntl,
-  sw as CloseIcon,
-  vW as expectedAccountIdHeader,
-  type JsxRuntime,
-  type ReactRuntime,
+  $3 as t,
+  $h as n,
+  FX as r,
+  H3 as i,
+  I3 as a,
+  K2 as o,
+  LX as s,
+  Q3 as c,
+  QI as l,
+  Qh as u,
+  V3 as d,
+  Y2 as f,
+  Yh as p,
+  Z3 as m,
+  ZI as h,
+  Zh as g,
+  _L as _,
+  dg as v,
+  e6 as y,
+  fg as b,
+  gL as x,
+  lw as S,
+  n4 as C,
+  sw as ee,
+  vW as w,
+  wL as T,
 } from "@rchunk/app-shared";
 import {
-  M6t as initializeAuthentication,
-  N6t as useAuthentication,
-  Qgn as initializeRouter,
-  Sdn as ApiError,
-  Ygn as Navigate,
-  cJt as initializeApiClient,
-  i_n as useLocation,
-  ifn as initializeAccountQueries,
-  lfn as useStatsig,
-  o_n as useNavigate,
-  rJt as apiClient,
-  rfn as getExperiment,
+  JMt as E,
+  M6t as D,
+  N6t as O,
+  Qgn as k,
+  Sdn as te,
+  Ygn as A,
+  cJt as j,
+  fMt as ne,
+  i_n as M,
+  ifn as N,
+  is as re,
+  lfn as P,
+  o_n as F,
+  rJt as I,
+  r_n as L,
+  rfn as R,
+  rs as z,
+  s_n as B,
+  wdn as V,
+  xpn as ie,
+  ypn as ae,
 } from "@rchunk/app-initial";
-import { S as initializeCheckoutPolicy } from "@rchunk/checkout-policy";
+import { S as oe, m as se } from "@rchunk/checkout-policy";
+import { n as ce, t as H } from "@rchunk/billing-pricing";
 import {
-  n as initializeBillingPricing,
-  t as resolvePricingConfig,
-} from "@rchunk/billing-pricing";
-import "@rchunk/create-workspace-presentation";
-import "@rchunk/checkout-session";
-import {
-  n as HostedCheckoutPage,
-  r as initializeCheckoutPage,
-} from "@rchunk/checkout-page-core";
-// @ts-expect-error The release create-session chunk has no semantic declaration yet.
-import { n as initSession, t as createSession } from "@rchunk/create-session";
-
-interface StatsigClient {
-  getContext(): { user: { country?: string | null } };
-  getLayer(id: string): { get(key: string, fallback: boolean): boolean };
-}
-
-const getExperimentWithOptions = getExperiment as unknown as (
-  context: unknown,
-  id: string,
-  options: { disableExposureLog: boolean },
-) => { get(key: string, fallback: boolean): boolean };
-
-interface TokenAuthModule {
-  getBrowserChatGptAuthSnapshot(): {
-    accessToken: string;
-    accountId?: string;
-    userId?: string;
-  } | null;
-  readChatGptTokenClaims(token: string): { accountId?: string } | null;
-}
-
-interface ProvisioningState {
-  checkoutSessionId: string;
-  processorEntity: string;
-  state: string;
-  workspaceId?: string | null;
-}
-
-interface PendingWorkspace {
-  query_params?: string | null;
-  seat_quantity?: number | null;
-  status?: string;
-  step_name?: string | null;
-  workspace_name?: string | null;
-}
-
-interface WorkspaceSignupState {
-  completed: boolean;
-  pendingWorkspace?: PendingWorkspace;
-  resumeUrl: string | null;
-}
-
-interface CheckoutAccount {
-  account: {
-    account_user_id: string;
-    is_deactivated?: boolean;
-    plan_type: string;
-    structure?: string;
-  };
-  can_access_with_session?: boolean;
-  eligible_promo_campaigns?: { team?: { id?: string } | null };
-  entitlement: {
-    billing_currency?: string | null;
-    has_active_subscription?: boolean;
-  };
-  last_active_subscription?: { purchase_origin_platform?: string | null };
-}
-
-interface AccountsCheckResponse {
-  accounts: Record<string, CheckoutAccount | undefined>;
-}
-
-interface PricingConfig {
-  currency_config: {
-    business_currency_override?: string | null;
-    symbol_code?: string | null;
-  };
-}
-
-interface CheckoutRequest extends Record<string, unknown> {
-  billing_details: { country?: string; currency: string };
-  checkout_ui_mode: "custom";
-  entry_point: "team_direct_signup";
-  plan_name: "chatgptteamplan";
-  team_plan_data: {
-    price_interval: "month" | "year";
-    seat_quantity: number;
-    workspace_name: string;
-  };
-}
-
-interface CustomCheckoutSession {
-  checkout_session_id: string;
-  processor_entity: string;
-  tag: "custom_checkout_session";
-}
-
-interface HostedCheckoutSession {
-  url?: string | null;
-}
-
-type CheckoutSession = CustomCheckoutSession | HostedCheckoutSession;
-interface CheckoutResult {
-  request: CheckoutRequest;
-  session: CheckoutSession;
-}
-
-interface QueryClient {
-  fetchQuery<Data>(options: {
-    queryFn(): Promise<Data>;
-    queryKey: readonly unknown[];
-    retry: boolean;
-    staleTime: number;
-  }): Promise<Data>;
-}
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-
-async function loadTokenAuth(): Promise<TokenAuthModule> {
-  // @ts-expect-error The release token-auth chunk has no semantic declaration yet.
-  return import("@rchunk/chatgpt-token-auth.browser") as Promise<TokenAuthModule>;
-}
-
-async function fetchWorkspaceSignupState({
-  accountId,
-  durable,
-  signal,
-}: {
-  accountId: string;
-  durable: boolean;
-  signal: AbortSignal;
-}): Promise<WorkspaceSignupState> {
-  const requestOptions = {
-    additionalHeaders: {
-      "ChatGPT-Account-ID": accountId,
-      [expectedAccountIdHeader]: accountId,
-    },
-    signal,
-  };
-  let resumeUrl: string | null = null;
-  let completed = false;
-
-  if (durable) {
-    const provisioning = await apiClient
-      .safeGet<ProvisioningState>("/accounts/business_workspace_provisioning", {
-        ...requestOptions,
-        parameters: { query: { wait_ms: 0 } },
-      })
-      .catch((error: unknown) => {
-        if (error instanceof ApiError && error.status === 404) return null;
-        throw error;
+  C as U,
+  T as le,
+  _ as ue,
+  a as de,
+  c as fe,
+  f as pe,
+  n as me,
+  o as W,
+  p as he,
+  s as G,
+  t as ge,
+  u as _e,
+  v as K,
+} from "@rchunk/create-workspace-presentation";
+import { G as ve, I as ye, K as be, M as xe, T as q } from "@rchunk/checkout-session";
+import { n as Se, r as Ce } from "@rchunk/checkout-page-core";
+import { n as we, t as Te } from "@rchunk/create-session";
+async function Ee({ accountId: e, durable: t, signal: n }) {
+  let r = { additionalHeaders: { "ChatGPT-Account-ID": e, [w]: e }, signal: n },
+    i = null,
+    a = !1;
+  if (t) {
+    let e = await I.safeGet(`/accounts/business_workspace_provisioning`, {
+      ...r,
+      parameters: { query: { wait_ms: 0 } },
+      signal: AbortSignal.any([n, AbortSignal.timeout(_e)]),
+    })
+      .then(pe)
+      .catch((e) => {
+        if (e instanceof te && e.status === 404) return null;
+        throw e;
       });
-    signal.throwIfAborted();
-    const tokenAuth = await loadTokenAuth();
-    const snapshot = tokenAuth.getBrowserChatGptAuthSnapshot();
-    const browserAccountId =
-      snapshot == null
-        ? undefined
-        : tokenAuth.readChatGptTokenClaims(snapshot.accessToken)?.accountId;
-    if (
-      provisioning != null &&
-      (provisioning.state !== "succeeded" ||
-        provisioning.workspaceId !== browserAccountId)
-    ) {
-      const parameters = new URLSearchParams({
-        durable_business_checkout: "true",
-        stripe_session_id: provisioning.checkoutSessionId,
-        processor_entity: provisioning.processorEntity,
+    n.throwIfAborted();
+    let t = await Oe(),
+      o = t.getBrowserChatGptAuthSnapshot(),
+      s = o == null ? void 0 : t.readChatGptTokenClaims(o.accessToken)?.accountId;
+    if (e != null && (e.state !== `succeeded` || e.workspaceId !== s)) {
+      let t = new URLSearchParams({
+        durable_business_checkout: `true`,
+        stripe_session_id: e.checkoutSessionId,
+        processor_entity: e.processorEntity,
       });
-      if (provisioning.workspaceId != null)
-        parameters.set("account_id", provisioning.workspaceId);
-      resumeUrl = `/payments/success-team?${parameters}`;
-      completed = provisioning.state === "succeeded";
-      if (!completed)
-        return { pendingWorkspace: undefined, resumeUrl, completed };
+      if (
+        (e.workspaceId != null && t.set(`account_id`, e.workspaceId),
+        (i = `/payments/success-team?${t}`),
+        (a = e.state === `succeeded`),
+        !a)
+      )
+        return { pendingWorkspace: void 0, resumeUrl: i, completed: a };
     }
   }
-
-  const pendingWorkspace = await apiClient
-    .safeGet<PendingWorkspace>(
-      "/accounts/pending_team_workspace",
-      requestOptions,
-    )
-    .catch(() => {
-      signal.throwIfAborted();
-      return undefined;
-    });
-  return {
-    pendingWorkspace:
-      pendingWorkspace?.status === "completed" ? undefined : pendingWorkspace,
-    resumeUrl,
-    completed,
-  };
+  let o = await I.safeGet(`/accounts/pending_team_workspace`, r).catch(() => {
+    n.throwIfAborted();
+  });
+  return { pendingWorkspace: o?.status === `completed` ? void 0 : o, resumeUrl: i, completed: a };
 }
-
-function validCountryCode(value: string | null | undefined): value is string {
-  return value != null && /^[A-Z]{2}$/u.test(value);
-}
-
-function validCurrency(value: string | null | undefined): value is string {
-  return value != null && /^[A-Z]{3}$/u.test(value);
-}
-
-async function prepareCheckout({
-  scope,
-  statsig,
-  accountId,
-  userId,
-  pendingWorkspace,
-  search,
-  cancelUrl,
-  isDark,
-  attemptId,
-  signal,
-}: {
-  scope: { queryClient: QueryClient };
-  statsig: StatsigClient;
-  accountId: string;
-  userId: string;
-  pendingWorkspace?: PendingWorkspace;
-  search: string;
-  cancelUrl: string;
-  isDark: boolean;
-  attemptId: string;
-  signal: AbortSignal;
-}): Promise<CheckoutResult> {
-  const additionalHeaders = {
-    "ChatGPT-Account-ID": accountId,
-    [expectedAccountIdHeader]: accountId,
-  };
-  if (pendingWorkspace == null) {
-    await scope.queryClient.fetchQuery({
-      queryKey: [
-        "business-workspace-signup-receipt",
-        userId,
-        accountId,
-        attemptId,
-      ],
+async function De({
+  scope: e,
+  statsig: t,
+  accountId: n,
+  userId: r,
+  pendingWorkspace: i,
+  search: a,
+  locationKey: o,
+  navigationType: s,
+  cancelUrl: l,
+  isDark: u,
+  attemptId: d,
+  signal: f,
+}) {
+  let p = Date.now(),
+    m = { additionalHeaders: { "ChatGPT-Account-ID": n, [w]: n }, signal: f },
+    h = new URLSearchParams(a);
+  i ??
+    (await e.queryClient.fetchQuery({
+      queryKey: [`business-workspace-signup-receipt`, r, n, d],
       queryFn: async () => {
+        W(e, {
+          checkpoint: `pending_workspace_save_started`,
+          flow: `standard_business`,
+          step: `configure-plan`,
+        });
         try {
-          await apiClient.safePost("/accounts/pending_team_workspace", {
-            additionalHeaders,
-            signal: AbortSignal.timeout(30_000),
-            requestBody: {
-              step_name: "configure-plan",
-              query_params: search,
-              user_segment: "v1",
-            },
-          });
-        } catch {
-          return false;
+          (await I.safePost(`/accounts/pending_team_workspace`, {
+            additionalHeaders: m.additionalHeaders,
+            signal: AbortSignal.timeout(3e4),
+            requestBody: { step_name: `configure-plan`, query_params: a, user_segment: `v1` },
+          }),
+            W(e, {
+              checkpoint: `pending_workspace_saved`,
+              flow: `standard_business`,
+              durationMs: Date.now() - p,
+            }));
+        } catch (t) {
+          (G(e, {
+            checkpoint: `pending_workspace_save_failed`,
+            flow: `standard_business`,
+            severity: `error`,
+            durationMs: Date.now() - p,
+            errorType: t instanceof Error ? t.name : typeof t,
+          }),
+            c.warning(`Failed to save pending Business workspace`, {
+              safe: {},
+              sensitive: { error: t },
+            }));
         }
-        return true;
+        return !0;
       },
-      staleTime: Infinity,
-      retry: false,
-    });
-    signal.throwIfAborted();
-  }
-
-  const accountResponse = await apiClient.safeGet<AccountsCheckResponse>(
-    "/accounts/check/{version}",
-    {
-      additionalHeaders,
-      parameters: { path: { version: "v4-2023-04-27" } },
-      signal,
-    },
-  );
-  const checkoutAccount = accountResponse.accounts[accountId];
-  if (
-    checkoutAccount == null ||
-    checkoutAccount.account.account_user_id !== `${userId}__${accountId}` ||
-    checkoutAccount.account.is_deactivated === true ||
-    checkoutAccount.can_access_with_session === false
-  )
-    throw new Error("Business checkout account is unavailable");
-
-  const parameters = new URLSearchParams(search);
-  const userCountry = statsig.getContext().user.country ?? undefined;
-  const requestedCountry = parameters.get("country_code");
-  const country = validCountryCode(requestedCountry)
-    ? requestedCountry
-    : validCountryCode(userCountry)
-      ? userCountry
-      : "US";
-  const pricingEnabled = (gate: string): boolean =>
-    statsig.getLayer("3768341700").get(gate, false);
-  const initialPricing = (await resolvePricingConfig({
-    country,
-    signal,
-    isPricingEnabled: pricingEnabled,
-  })) as unknown as PricingConfig;
-  const initialCurrency = initialPricing.currency_config.symbol_code;
-  if (!validCurrency(initialCurrency))
-    throw new Error("Business checkout currency is unavailable");
-
-  let billingDetails: { country?: string; currency: string } = {
-    country,
-    currency: initialCurrency,
-  };
-  const activeSubscription =
-    checkoutAccount.entitlement.has_active_subscription === true &&
-    checkoutAccount.last_active_subscription?.purchase_origin_platform !==
-      "chatgpt_no_payment_trial";
-  const multiWorkspaceEnabled = getExperimentWithOptions(
-    statsig,
-    "3573128711",
-    { disableExposureLog: true },
-  ).get("enabled", false);
-  const preserveSubscriptionCurrency =
-    activeSubscription &&
-    (!multiWorkspaceEnabled ||
-      checkoutAccount.account.structure === "personal");
-  const subscriptionCurrency =
-    checkoutAccount.entitlement.billing_currency ?? "USD";
-  const overrideCurrency =
-    initialPricing.currency_config.business_currency_override;
-  if (
-    preserveSubscriptionCurrency &&
-    subscriptionCurrency !== initialCurrency
-  ) {
-    if (!validCurrency(subscriptionCurrency))
-      throw new Error("Subscription billing currency is unavailable");
-    billingDetails = { currency: subscriptionCurrency };
-  } else if (
-    validCurrency(overrideCurrency) &&
-    getExperiment(statsig, "2658206886").get(
-      "is_business_currency_override_enabled",
-      false,
+      staleTime: 1 / 0,
+      retry: !1,
+    }),
+    f.throwIfAborted());
+  let g = !1,
+    _ = !1,
+    v = setTimeout(() => {
+      !g &&
+        !f.aborted &&
+        G(e, {
+          checkpoint: `checkout_dependencies_timed_out`,
+          flow: `standard_business`,
+          severity: `warning`,
+          durationMs: Date.now() - p,
+          timeoutMs: 1e4,
+        });
+    }, 1e4);
+  try {
+    let a = (
+      await I.safeGet(`/accounts/check/{version}`, {
+        ...m,
+        parameters: { path: { version: `v4-2023-04-27` } },
+      })
+    ).accounts[n];
+    if (
+      a == null ||
+      a.account.account_user_id !== `${r}__${n}` ||
+      a.account.is_deactivated === !0 ||
+      a.can_access_with_session === !1
     )
-  ) {
-    billingDetails = { country, currency: overrideCurrency };
-  }
-  await resolvePricingConfig({
-    country: billingDetails.country,
-    currency: billingDetails.currency,
-    signal,
-    isPricingEnabled: pricingEnabled,
-  });
-
-  const pendingParameters = new URLSearchParams(
-    pendingWorkspace?.query_params ?? "",
-  );
-  const requestedCampaign =
-    parameters.get("promo_campaign") ?? pendingParameters.get("promo_campaign");
-  const coupon =
-    requestedCampaign == null
-      ? null
-      : await apiClient.safeGet<{ coupon?: string }>(
-          "/promo_campaign/check_coupon",
-          {
-            additionalHeaders,
-            parameters: {
-              query: {
-                coupon: requestedCampaign,
-                is_coupon_from_query_param: true,
-              },
-            },
-            signal,
-          },
+      throw Error(`Business checkout account is unavailable`);
+    let c = t.getContext().user.country,
+      v = h.get(`country_code`),
+      y = v && be(v) ? v : c,
+      b = y && be(y) ? y : `US`,
+      x = await H({
+        country: b,
+        signal: f,
+        isPricingEnabled: (e) => t.getLayer(`3768341700`).get(e, !1),
+      }).catch((t) => {
+        throw (
+          G(e, {
+            checkpoint: `checkout_pricing_config_failed`,
+            flow: `standard_business`,
+            severity: `error`,
+            durationMs: Date.now() - p,
+            errorType: t instanceof Error ? t.name : typeof t,
+          }),
+          t
         );
-  const eligibleCampaign = checkoutAccount.eligible_promo_campaigns?.team?.id;
-  const fallbackCampaign =
-    requestedCampaign == null &&
-    eligibleCampaign != null &&
-    !eligibleCampaign.startsWith("resurrection-discount-v1-")
-      ? eligibleCampaign
-      : undefined;
-  const campaign = coupon?.coupon ?? fallbackCampaign;
-  const priceInterval =
-    parameters.get("selectedPlan") === "year" ? "year" : "month";
-
-  const isFreeWorkspace =
-    checkoutAccount.account.plan_type === "free_workspace";
-  const users = isFreeWorkspace
-    ? await apiClient.safeGet<{ total?: number }>(
-        "/accounts/{account_id}/users",
-        {
-          additionalHeaders,
-          parameters: {
-            path: { account_id: accountId },
-            query: { limit: 1, offset: 0 },
-          },
-          signal,
-        },
-      )
-    : null;
-  const existingMembers =
-    isFreeWorkspace && (users?.total ?? 0) > 0 ? users?.total : undefined;
-  const minimumSeats = Math.max(existingMembers ?? 2, 2);
-  const defaultSeats = Math.max(existingMembers ?? 5, minimumSeats);
-  const requestedSeats = Number.parseInt(parameters.get("numSeats") ?? "", 10);
-  const seatQuantity = Math.max(
-    pendingWorkspace?.seat_quantity ??
-      (Number.isNaN(requestedSeats) ? defaultSeats : requestedSeats),
-    minimumSeats,
-  );
-
-  const request: CheckoutRequest = {
-    entry_point: "team_direct_signup",
-    plan_name: "chatgptteamplan",
-    checkout_ui_mode: "custom",
-    team_plan_data: {
-      workspace_name: pendingWorkspace?.workspace_name ?? "",
-      price_interval: priceInterval,
-      seat_quantity: seatQuantity,
-    },
-    billing_details: billingDetails,
-    ...(priceInterval === "month" && campaign != null
-      ? {
-          promo_campaign: {
-            promo_campaign_id: campaign,
-            is_coupon_from_query_param: coupon != null,
-          },
-        }
-      : {}),
-  };
-
-  const snapshot = (await loadTokenAuth()).getBrowserChatGptAuthSnapshot();
-  signal.throwIfAborted();
-  if (snapshot?.userId !== userId || snapshot.accountId !== accountId)
-    throw new DOMException("Checkout owner changed", "AbortError");
-  const session = (await createSession({
-    accountId,
-    request,
-    statsig,
-    isDark,
-    cancelUrl,
-    attemptId,
-    signal,
-  })) as CheckoutSession;
-  return { session, request };
-}
-
-function CreateWorkspacePage(): unknown {
-  const { userId, accountId, isLoading } = useAuthentication();
-  const location = useLocation();
-  if (!isLoading && userId == null) {
-    const next = `${location.pathname}${location.search}`;
-    return jsx.jsx(Navigate, {
-      to: `/auth/login?${new URLSearchParams({ next })}`,
-      replace: true,
-    });
-  }
-  if (userId == null || accountId == null) return jsx.jsx(CheckoutStatus, {});
-  return jsx.jsx(
-    AuthenticatedCreateWorkspacePage,
-    { userId, accountId },
-    `${userId}:${accountId}`,
-  );
-}
-
-function AuthenticatedCreateWorkspacePage({
-  userId,
-  accountId,
-}: {
-  userId: string;
-  accountId: string;
-}): unknown {
-  const statsig = useStatsig() as unknown as StatsigClient;
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [createAfterResume, setCreateAfterResume] = React.useState<
-    string | null
-  >(null);
-  const durable = statsig
-    .getLayer("550361471")
-    .get("durable_workspace_onboarding_enabled", false);
-  const signup = useQuery<WorkspaceSignupState>({
-    queryKey: ["business-workspace-signup", userId, accountId, durable],
-    queryFn: ({ signal }) =>
-      fetchWorkspaceSignupState({ accountId, durable, signal }),
-    staleTime: Infinity,
-    gcTime: 0,
-    retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
-  if (signup.error != null)
-    return jsx.jsx(CheckoutStatus, { onRetry: () => signup.refetch() });
-  if (signup.data == null) return jsx.jsx(CheckoutStatus, {});
-  if (signup.data.resumeUrl != null && !signup.data.completed)
-    return jsx.jsx(Navigate, { to: signup.data.resumeUrl, replace: true });
-  if (
-    signup.data.resumeUrl != null &&
-    createAfterResume !== signup.data.resumeUrl
-  )
-    return jsx.jsx(ResumeWorkspaceChoice, {
-      onResume: () => navigate(signup.data?.resumeUrl ?? "/"),
-      onCreate: () => setCreateAfterResume(signup.data?.resumeUrl ?? null),
-      onClose: () => navigate("/"),
-    });
-
-  const parameters = new URLSearchParams(location.search);
-  for (const [key, value] of new URLSearchParams(
-    signup.data.pendingWorkspace?.query_params ?? "",
-  ))
-    if (key !== "step" && !parameters.get(key)) parameters.set(key, value);
-  parameters.set("step", "configure-plan");
-  const search = `?${parameters}`;
-  if (search !== location.search)
-    return jsx.jsx(Navigate, {
-      to: `${location.pathname}${search}`,
-      replace: true,
-    });
-  return jsx.jsx(AutoCheckout, {
-    userId,
-    accountId,
-    pendingWorkspace: signup.data.pendingWorkspace,
-  });
-}
-
-function AutoCheckout({
-  userId,
-  accountId,
-  pendingWorkspace,
-}: {
-  userId: string;
-  accountId: string;
-  pendingWorkspace?: PendingWorkspace;
-}): unknown {
-  const scope = useScope(AppScope) as unknown as { queryClient: QueryClient };
-  const statsig = useStatsig() as unknown as StatsigClient;
-  const location = useLocation();
-  const isDark = Boolean(useIsDarkTheme());
-  const [attemptId] = React.useState(createAttemptId);
-  const checkout = useQuery<CheckoutResult>({
-    queryKey: [
-      "business-workspace-auto-checkout",
-      userId,
-      accountId,
-      attemptId,
-    ],
-    queryFn: ({ signal }) =>
-      prepareCheckout({
-        scope,
-        statsig,
-        accountId,
-        userId,
-        pendingWorkspace,
-        search: location.search,
-        cancelUrl: new URL(
-          `${location.pathname}${location.search}`,
-          window.location.origin,
-        ).href,
-        isDark,
-        attemptId,
-        signal,
       }),
-    staleTime: Infinity,
-    gcTime: 0,
-    retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
-  if (checkout.data != null) {
-    const { session, request } = checkout.data;
-    if ("tag" in session && session.tag === "custom_checkout_session")
-      return jsx.jsx(Navigate, {
-        to: `/checkout/${session.processor_entity}/${session.checkout_session_id}${location.search}`,
-        state: { checkoutRequest: request },
-        replace: true,
-      });
-    if ("url" in session && session.url != null)
-      return jsx.jsx(HostedCheckoutPage, { url: session.url });
+      S = x.currency_config.symbol_code;
+    if (!S || !J(S)) throw Error(`Business checkout currency is unavailable`);
+    let C = { country: b, currency: S },
+      ee = R(t, `3573128711`, { disableExposureLog: !0 }).get(`enabled`, !1),
+      w =
+        a.entitlement.has_active_subscription === !0 &&
+        a.last_active_subscription.purchase_origin_platform !== `chatgpt_no_payment_trial` &&
+        (!ee || a.account.structure === `personal`),
+      T = a.entitlement.billing_currency ?? `USD`,
+      E = x.currency_config.business_currency_override;
+    if (w && T !== S) {
+      if (!J(T)) throw Error(`Subscription billing currency is unavailable`);
+      C = { currency: T };
+    } else
+      typeof E == `string` &&
+        J(E) &&
+        R(t, `2658206886`).get(`is_business_currency_override_enabled`, !1) &&
+        (C = { country: b, currency: E });
+    await H({
+      country: C.country ?? void 0,
+      currency: C.currency ?? void 0,
+      signal: f,
+      isPricingEnabled: (e) => t.getLayer(`3768341700`).get(e, !1),
+    });
+    let D =
+        h.get(`promo_campaign`) ?? new URLSearchParams(i?.query_params ?? ``).get(`promo_campaign`),
+      O = D
+        ? await I.safeGet(`/promo_campaign/check_coupon`, {
+            ...m,
+            parameters: { query: { coupon: D, is_coupon_from_query_param: !0 } },
+          })
+        : null,
+      k = a.eligible_promo_campaigns?.team?.id,
+      te = !D && k && !k.startsWith(`resurrection-discount-v1-`) ? k : void 0,
+      A = O?.coupon ?? te,
+      j = h.get(`selectedPlan`) === `year` ? q.ANNUAL : q.FLEXIBLE,
+      M =
+        a.account.plan_type === `free_workspace`
+          ? await I.safeGet(`/accounts/{account_id}/users`, {
+              ...m,
+              parameters: { path: { account_id: n }, query: { limit: 1, offset: 0 } },
+            })
+          : null,
+      N = xe({
+        isFreeWorkspace: a.account.plan_type === `free_workspace`,
+        workspaceMemberCount: M?.total,
+      }),
+      P = Number.parseInt(h.get(`numSeats`) ?? ``, 10),
+      F = Math.max(i?.seat_quantity ?? (Number.isNaN(P) ? N.defaultSeats : P), N.minimumSeats);
+    (f.throwIfAborted(), (g = !0));
+    let L = [`business-workspace-signup-visit`, r, n, d];
+    (e.queryClient.getQueryData(L) !== !0 &&
+      (ie(
+        e,
+        ne,
+        {
+          checkpoint: `signup_step_viewed`,
+          flow: `standard_business`,
+          entryPoint: `team_direct_signup`,
+          step: `configure-plan`,
+          initialStep: i?.step_name === `configure-plan` ? `configure-plan` : void 0,
+        },
+        void 0,
+        (e) => {
+          re(
+            t,
+            `chatgpt_account_payment_team_direct_sign_up_flow`,
+            {
+              ...K(a),
+              referrer: h.get(`referrer`) || document.referrer,
+              initialTab: i?.step_name,
+              currentTab: `configure-plan`,
+              locationKey: o,
+              navigationType: s,
+              initialCountrySelectorCountry: v ?? b,
+              selectedCountry: C.country ?? ``,
+              selectedCurrency: C.currency ?? ``,
+              userCountry: c ?? ``,
+            },
+            void 0,
+            { eventId: e },
+          );
+        },
+      ),
+      e.queryClient.setQueryData(L, !0)),
+      W(e, {
+        checkpoint: `checkout_dependencies_ready`,
+        flow: `standard_business`,
+        durationMs: Date.now() - p,
+        seatCount: F,
+        hasPromo: A != null,
+      }),
+      W(e, {
+        checkpoint: `checkout_started`,
+        flow: `standard_business`,
+        seatCount: F,
+        billingCountry: C.country ?? void 0,
+        priceInterval: j,
+      }),
+      fe(t, `Account Pay: Payment Checkout Clicked`, {
+        planType: `team`,
+        ...K(a),
+        referrer: document.referrer,
+        checkout_origin_product_experience: `work`,
+        checkout_origin_delivery_surface: `web`,
+      }));
+    let z = {
+        entry_point: `team_direct_signup`,
+        plan_name: `chatgptteamplan`,
+        checkout_ui_mode: `custom`,
+        team_plan_data: {
+          workspace_name: i?.workspace_name ?? ``,
+          price_interval: j,
+          seat_quantity: F,
+        },
+        billing_details: C,
+        ...(j === q.FLEXIBLE && A
+          ? { promo_campaign: { promo_campaign_id: A, is_coupon_from_query_param: O != null } }
+          : {}),
+      },
+      B = (await Oe()).getBrowserChatGptAuthSnapshot();
+    if ((f.throwIfAborted(), B?.userId !== r || B.accountId !== n))
+      throw new DOMException(`Checkout owner changed`, `AbortError`);
+    let V = await Te({
+      accountId: n,
+      request: z,
+      statsig: t,
+      isDark: u,
+      cancelUrl: l,
+      attemptId: d,
+      signal: f,
+    });
+    return (
+      (_ = !0),
+      W(e, {
+        checkpoint: `checkout_session_created`,
+        flow: `standard_business`,
+        checkoutSessionId: `checkout_session_id` in V ? V.checkout_session_id : void 0,
+        durationMs: Date.now() - p,
+        seatCount: F,
+        priceInterval: j,
+      }),
+      { session: V, request: z }
+    );
+  } catch (t) {
+    if (!f.aborted) {
+      let n = `checkout_start_failed`;
+      (_ ? (n = `checkout_navigation_failed`) : g && (n = `checkout_creation_failed`),
+        G(e, {
+          checkpoint: n,
+          flow: `standard_business`,
+          severity: `error`,
+          durationMs: Date.now() - p,
+          errorType: t instanceof Error ? t.name : typeof t,
+        }),
+        c.warning(`Failed to prepare Business workspace checkout`, {
+          safe: {},
+          sensitive: { error: t },
+        }));
+    }
+    throw t;
+  } finally {
+    clearTimeout(v);
   }
-  return jsx.jsx(CheckoutStatus, {
-    onRetry:
-      checkout.error == null
-        ? undefined
-        : () => {
-            checkout.refetch();
-          },
-  });
 }
-
-function createAttemptId(): string {
+function Oe() {
+  return d(
+    () => import(`@rchunk/chatgpt-token-auth-browser`),
+    __vite__mapDeps([0, 1, 2, 3, 4, 5]),
+    import.meta.url,
+  );
+}
+function J(e) {
+  return Number.isFinite(se(e));
+}
+function ke() {
+  return (ke = e(() => {
+    (ye(), oe(), ve(), E(), T(), j(), ae(), z(), N(), m(), V(), ce(), we(), ue(), he(), de(), i());
+  }))();
+}
+function Ae() {
+  let e = (0, X.c)(9),
+    { userId: t, accountId: n, isLoading: r } = O(),
+    i = M();
+  if (!r && t == null) {
+    let t = `${i.pathname}${i.search}`,
+      n;
+    e[0] === t ? (n = e[1]) : ((n = new URLSearchParams({ next: t })), (e[0] = t), (e[1] = n));
+    let r = `/auth/login?${n}`,
+      a;
+    return (
+      e[2] === r
+        ? (a = e[3])
+        : ((a = (0, Q.jsx)(A, { to: r, replace: !0 })), (e[2] = r), (e[3] = a)),
+      a
+    );
+  }
+  if (t == null || n == null) {
+    let t;
+    return (
+      e[4] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, Q.jsx)(ge, {})), (e[4] = t))
+        : (t = e[4]),
+      t
+    );
+  }
+  let a = `${t}:${n}`,
+    o;
+  return (
+    e[5] !== n || e[6] !== a || e[7] !== t
+      ? ((o = (0, Q.jsx)(je, { userId: t, accountId: n }, a)),
+        (e[5] = n),
+        (e[6] = a),
+        (e[7] = t),
+        (e[8] = o))
+      : (o = e[8]),
+    o
+  );
+}
+function je(e) {
+  let t = (0, X.c)(37),
+    { userId: n, accountId: r } = e,
+    i = P(),
+    a = M(),
+    o = F(),
+    [s, c] = (0, Z.useState)(null),
+    l;
+  t[0] === i
+    ? (l = t[1])
+    : ((l = i.getLayer(`550361471`).get(`durable_workspace_onboarding_enabled`, !1)),
+      (t[0] = i),
+      (t[1] = l));
+  let u = l,
+    d;
+  t[2] !== r || t[3] !== u || t[4] !== n
+    ? ((d = [`business-workspace-signup`, n, r, u]), (t[2] = r), (t[3] = u), (t[4] = n), (t[5] = d))
+    : (d = t[5]);
+  let f;
+  t[6] !== r || t[7] !== u
+    ? ((f = (e) => {
+        let { signal: t } = e;
+        return Ee({ accountId: r, durable: u, signal: t });
+      }),
+      (t[6] = r),
+      (t[7] = u),
+      (t[8] = f))
+    : (f = t[8]);
+  let p;
+  t[9] !== d || t[10] !== f
+    ? ((p = {
+        queryKey: d,
+        queryFn: f,
+        staleTime: 1 / 0,
+        gcTime: 0,
+        retry: !1,
+        refetchOnWindowFocus: !1,
+        refetchOnReconnect: !1,
+      }),
+      (t[9] = d),
+      (t[10] = f),
+      (t[11] = p))
+    : (p = t[11]);
+  let { data: m, error: h, refetch: g } = _(p);
+  if (h != null) {
+    let e;
+    return (
+      t[12] === g
+        ? (e = t[13])
+        : ((e = (0, Q.jsx)(Y, {
+            onRetry: () => {
+              g();
+            },
+          })),
+          (t[12] = g),
+          (t[13] = e)),
+      e
+    );
+  }
+  if (m == null) {
+    let e;
+    return (
+      t[14] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, Q.jsx)(Y, {})), (t[14] = e))
+        : (e = t[14]),
+      e
+    );
+  }
+  if (m.resumeUrl != null && !m.completed) {
+    let e;
+    return (
+      t[15] === m.resumeUrl
+        ? (e = t[16])
+        : ((e = (0, Q.jsx)(A, { to: m.resumeUrl, replace: !0 })),
+          (t[15] = m.resumeUrl),
+          (t[16] = e)),
+      e
+    );
+  }
+  if (m.resumeUrl != null && s !== m.resumeUrl) {
+    let e;
+    t[17] !== m.resumeUrl || t[18] !== o
+      ? ((e = () => {
+          o(m.resumeUrl ?? `/`);
+        }),
+        (t[17] = m.resumeUrl),
+        (t[18] = o),
+        (t[19] = e))
+      : (e = t[19]);
+    let n;
+    t[20] === m.resumeUrl
+      ? (n = t[21])
+      : ((n = () => c(m.resumeUrl)), (t[20] = m.resumeUrl), (t[21] = n));
+    let r;
+    t[22] === o
+      ? (r = t[23])
+      : ((r = () => {
+          o(`/`);
+        }),
+        (t[22] = o),
+        (t[23] = r));
+    let i;
+    return (
+      t[24] !== e || t[25] !== n || t[26] !== r
+        ? ((i = (0, Q.jsx)(Pe, { onResume: e, onCreate: n, onClose: r })),
+          (t[24] = e),
+          (t[25] = n),
+          (t[26] = r),
+          (t[27] = i))
+        : (i = t[27]),
+      i
+    );
+  }
+  let v;
+  if (t[28] !== m.pendingWorkspace?.query_params || t[29] !== a.search) {
+    v = new URLSearchParams(a.search);
+    for (let [e, t] of new URLSearchParams(m.pendingWorkspace?.query_params ?? ``))
+      e !== `step` && !v.get(e) && v.set(e, t);
+    (v.set(`step`, `configure-plan`),
+      (t[28] = m.pendingWorkspace?.query_params),
+      (t[29] = a.search),
+      (t[30] = v));
+  } else v = t[30];
+  let y = `?${v}`;
+  if (y !== a.search) {
+    let e = `${a.pathname}${y}`,
+      n;
+    return (
+      t[31] === e
+        ? (n = t[32])
+        : ((n = (0, Q.jsx)(A, { to: e, replace: !0 })), (t[31] = e), (t[32] = n)),
+      n
+    );
+  }
+  let b;
+  return (
+    t[33] !== r || t[34] !== m.pendingWorkspace || t[35] !== n
+      ? ((b = (0, Q.jsx)(Me, { userId: n, accountId: r, pendingWorkspace: m.pendingWorkspace })),
+        (t[33] = r),
+        (t[34] = m.pendingWorkspace),
+        (t[35] = n),
+        (t[36] = b))
+      : (b = t[36]),
+    b
+  );
+}
+function Me(e) {
+  let t = (0, X.c)(31),
+    { userId: n, accountId: r, pendingWorkspace: i } = e,
+    a = s(h),
+    o = P(),
+    c = M(),
+    l = B(),
+    u = L(`${c.pathname}${c.search}`),
+    d = b(),
+    [f] = (0, Z.useState)(Ne),
+    p;
+  t[0] !== r || t[1] !== f || t[2] !== n
+    ? ((p = [`business-workspace-auto-checkout`, n, r, f]),
+      (t[0] = r),
+      (t[1] = f),
+      (t[2] = n),
+      (t[3] = p))
+    : (p = t[3]);
+  let m;
+  t[4] !== r ||
+  t[5] !== f ||
+  t[6] !== u ||
+  t[7] !== d ||
+  t[8] !== c.key ||
+  t[9] !== c.search ||
+  t[10] !== l ||
+  t[11] !== i ||
+  t[12] !== a ||
+  t[13] !== o ||
+  t[14] !== n
+    ? ((m = (e) => {
+        let { signal: t } = e;
+        return De({
+          scope: a,
+          statsig: o,
+          accountId: r,
+          userId: n,
+          pendingWorkspace: i,
+          search: c.search,
+          locationKey: c.key,
+          navigationType: l,
+          cancelUrl: new URL(u, window.location.origin).href,
+          isDark: !!d,
+          attemptId: f,
+          signal: t,
+        });
+      }),
+      (t[4] = r),
+      (t[5] = f),
+      (t[6] = u),
+      (t[7] = d),
+      (t[8] = c.key),
+      (t[9] = c.search),
+      (t[10] = l),
+      (t[11] = i),
+      (t[12] = a),
+      (t[13] = o),
+      (t[14] = n),
+      (t[15] = m))
+    : (m = t[15]);
+  let g;
+  t[16] !== p || t[17] !== m
+    ? ((g = {
+        queryKey: p,
+        queryFn: m,
+        staleTime: 1 / 0,
+        gcTime: 0,
+        retry: !1,
+        refetchOnWindowFocus: !1,
+        refetchOnReconnect: !1,
+      }),
+      (t[16] = p),
+      (t[17] = m),
+      (t[18] = g))
+    : (g = t[18]);
+  let { data: v, error: y, refetch: x } = _(g);
+  if (v != null) {
+    let { session: e, request: n } = v;
+    if (`tag` in e && e.tag === `custom_checkout_session`) {
+      let r = `/checkout/${e.processor_entity}/${e.checkout_session_id}${c.search}`,
+        i;
+      t[19] === n ? (i = t[20]) : ((i = { checkoutRequest: n }), (t[19] = n), (t[20] = i));
+      let a = i,
+        o;
+      return (
+        t[21] !== r || t[22] !== a
+          ? ((o = (0, Q.jsx)(A, { to: r, state: a, replace: !0 })),
+            (t[21] = r),
+            (t[22] = a),
+            (t[23] = o))
+          : (o = t[23]),
+        o
+      );
+    }
+    if (e.url != null) {
+      let n;
+      return (
+        t[24] === e.url
+          ? (n = t[25])
+          : ((n = (0, Q.jsx)(Se, { url: e.url })), (t[24] = e.url), (t[25] = n)),
+        n
+      );
+    }
+  }
+  let S;
+  t[26] !== y || t[27] !== x
+    ? ((S =
+        y == null
+          ? void 0
+          : () => {
+              x();
+            }),
+      (t[26] = y),
+      (t[27] = x),
+      (t[28] = S))
+    : (S = t[28]);
+  let C;
+  return (
+    t[29] === S ? (C = t[30]) : ((C = (0, Q.jsx)(Y, { onRetry: S })), (t[29] = S), (t[30] = C)),
+    C
+  );
+}
+function Ne() {
   return crypto.randomUUID();
 }
-
-function CheckoutStatus({ onRetry }: { onRetry?: () => void }): unknown {
-  const intl = useIntl();
-  const title = intl.formatMessage({
-    id: "businessWorkspaceCheckout.pageTitle",
-    defaultMessage: "Sign up for a Business plan",
-    description: "Page title for the Business sign-up page.",
-  });
-  return jsx.jsxs("div", {
-    "data-dark-mode": Boolean(useIsDarkTheme()),
-    children: [
-      jsx.jsx("title", { children: title }),
-      onRetry == null
-        ? jsx.jsx(LoadingSpinner, { className: "size-8" })
-        : jsx.jsxs("div", {
-            children: [
-              jsx.jsx("h1", {
-                children: jsx.jsx(FormattedMessage, {
-                  id: "businessWorkspaceCheckout.errorTitle",
-                  defaultMessage: "We couldn't start checkout",
+function Y(e) {
+  let t = (0, X.c)(10),
+    { onRetry: n } = e,
+    r = C(),
+    i = !!b(),
+    a;
+  t[0] === r
+    ? (a = t[1])
+    : ((a = r.formatMessage({
+        defaultMessage: `Sign up for a Business plan`,
+        description: `Page title for the Business sign-up page.`,
+      })),
+      (t[0] = r),
+      (t[1] = a));
+  let o;
+  t[2] === a ? (o = t[3]) : ((o = (0, Q.jsx)(`title`, { children: a })), (t[2] = a), (t[3] = o));
+  let s;
+  t[4] === n
+    ? (s = t[5])
+    : ((s = (0, Q.jsx)(`div`, {
+        className: `fixed inset-0 flex min-h-[100dvh] w-screen justify-center overflow-y-auto pt-16 [@media(min-width:450px)]:pt-[12vh]`,
+        children: (0, Q.jsx)(`div`, {
+          className: `flex max-w-full flex-none items-center justify-center [@media(min-width:450px)]:w-[380px]`,
+          children:
+            n == null
+              ? (0, Q.jsx)(u, { className: `size-8 text-(--checkout-text-secondary)` })
+              : (0, Q.jsxs)(`div`, {
+                  className: `box-content flex w-full flex-col gap-6 px-4`,
+                  children: [
+                    (0, Q.jsxs)(`div`, {
+                      className: `flex flex-col gap-4 text-center`,
+                      children: [
+                        (0, Q.jsx)(`h1`, {
+                          className: `text-3xl font-normal`,
+                          children: (0, Q.jsx)(f, {
+                            defaultMessage: `We couldn't start checkout`,
+                            description: `Title shown when automatic checkout fails to start in the Business sign-up flow.`,
+                          }),
+                        }),
+                        (0, Q.jsx)(`p`, {
+                          className: `text-(--checkout-text-secondary)`,
+                          children: (0, Q.jsx)(f, {
+                            defaultMessage: `Please try again to continue with checkout.`,
+                            description: `Subtitle shown when automatic checkout fails to start in the Business sign-up flow.`,
+                          }),
+                        }),
+                      ],
+                    }),
+                    (0, Q.jsx)(p, {
+                      size: `beaconAction`,
+                      radius: `full`,
+                      color: `primary`,
+                      onClick: n,
+                      children: (0, Q.jsx)(f, {
+                        defaultMessage: `Try again`,
+                        description: `Button text used to retry automatic checkout in the Business sign-up flow.`,
+                      }),
+                    }),
+                  ],
                 }),
-              }),
-              jsx.jsx("p", {
-                children: jsx.jsx(FormattedMessage, {
-                  id: "businessWorkspaceCheckout.errorDescription",
-                  defaultMessage: "Please try again to continue with checkout.",
-                }),
-              }),
-              jsx.jsx(Button, {
-                onClick: onRetry,
-                children: jsx.jsx(FormattedMessage, {
-                  id: "businessWorkspaceCheckout.retry",
-                  defaultMessage: "Try again",
-                }),
-              }),
-            ],
-          }),
-    ],
-  });
+        }),
+      })),
+      (t[4] = n),
+      (t[5] = s));
+  let c;
+  return (
+    t[6] !== i || t[7] !== o || t[8] !== s
+      ? ((c = (0, Q.jsxs)(U, { isDarkMode: i, children: [o, s] })),
+        (t[6] = i),
+        (t[7] = o),
+        (t[8] = s),
+        (t[9] = c))
+      : (c = t[9]),
+    c
+  );
 }
-
-function ResumeWorkspaceChoice({
-  onResume,
-  onCreate,
-  onClose,
-}: {
-  onResume(): void;
-  onCreate(): void;
-  onClose(): void;
-}): unknown {
-  return jsx.jsxs("div", {
-    "data-dark-mode": Boolean(useIsDarkTheme()),
-    children: [
-      jsx.jsx(Button, {
-        color: "ghost",
-        onClick: onClose,
-        "aria-label": "Back to ChatGPT",
-        children: jsx.jsx(CloseIcon, {}),
-      }),
-      jsx.jsx("h1", { children: "Your workspace is ready" }),
-      jsx.jsx("p", {
-        children:
-          "Your previous checkout already created a workspace. You can continue its setup or create another workspace.",
-      }),
-      jsx.jsx(Button, {
-        onClick: onResume,
-        children: "Continue previous setup",
-      }),
-      jsx.jsx(Button, {
-        onClick: onCreate,
-        children: "Create another workspace",
-      }),
-    ],
-  });
+function Pe(e) {
+  let t = (0, X.c)(23),
+    { onResume: n, onCreate: r, onClose: i } = e,
+    a = b(),
+    o = C(),
+    s = !!a,
+    c;
+  t[0] === o
+    ? (c = t[1])
+    : ((c = o.formatMessage({
+        id: `businessWorkspaceResumeChoice.close`,
+        defaultMessage: `Back to ChatGPT`,
+        description: `Accessible label for closing the workspace choice without resuming setup or starting another checkout.`,
+      })),
+      (t[0] = o),
+      (t[1] = c));
+  let l;
+  t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((l = (0, Q.jsx)(ee, {})), (t[2] = l))
+    : (l = t[2]);
+  let u;
+  t[3] !== i || t[4] !== c
+    ? ((u = (0, Q.jsx)(`header`, {
+        className: `sticky top-0 flex h-14 shrink-0 items-center gap-2 border-b border-(--checkout-border-default) px-2 md:px-4`,
+        children: (0, Q.jsx)(p, {
+          color: `ghost`,
+          size: `icon`,
+          onClick: i,
+          "aria-label": c,
+          children: l,
+        }),
+      })),
+      (t[3] = i),
+      (t[4] = c),
+      (t[5] = u))
+    : (u = t[5]);
+  let d;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = (0, Q.jsx)(`h1`, {
+        className: `text-xl font-semibold`,
+        children: (0, Q.jsx)(f, {
+          id: `businessWorkspaceResumeChoice.title`,
+          defaultMessage: `Your workspace is ready`,
+          description: `Heading when a previous Business checkout has finished creating its workspace.`,
+        }),
+      })),
+      (t[6] = d))
+    : (d = t[6]);
+  let m;
+  t[7] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((m = (0, Q.jsx)(`p`, {
+        className: `text-sm leading-6 text-(--checkout-text-secondary)`,
+        children: (0, Q.jsx)(f, {
+          id: `businessWorkspaceResumeChoice.description`,
+          defaultMessage: `Your previous checkout already created a workspace. You can continue its setup or create another workspace.`,
+          description: `Explains the choice before a Business customer in a different workspace starts another checkout. Setup may or may not have been completed.`,
+        }),
+      })),
+      (t[7] = m))
+    : (m = t[7]);
+  let h;
+  t[8] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((h = (0, Q.jsx)(f, {
+        id: `businessWorkspaceResumeChoice.resume`,
+        defaultMessage: `Continue previous setup`,
+        description: `Returns to onboarding for the same paid Business checkout without starting a new purchase.`,
+      })),
+      (t[8] = h))
+    : (h = t[8]);
+  let g;
+  t[9] === n
+    ? (g = t[10])
+    : ((g = (0, Q.jsx)(p, {
+        color: `primary`,
+        size: `dialogAction`,
+        radius: `full`,
+        onClick: n,
+        children: h,
+      })),
+      (t[9] = n),
+      (t[10] = g));
+  let _;
+  t[11] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((_ = (0, Q.jsx)(f, {
+        id: `businessWorkspaceResumeChoice.create`,
+        defaultMessage: `Create another workspace`,
+        description: `Explicitly starts the existing new-workspace flow after the previous workspace was successfully created.`,
+      })),
+      (t[11] = _))
+    : (_ = t[11]);
+  let v;
+  t[12] === r
+    ? (v = t[13])
+    : ((v = (0, Q.jsx)(p, {
+        color: `secondary`,
+        size: `dialogAction`,
+        radius: `full`,
+        onClick: r,
+        children: _,
+      })),
+      (t[12] = r),
+      (t[13] = v));
+  let y;
+  t[14] !== v || t[15] !== g
+    ? ((y = (0, Q.jsx)(`div`, {
+        className: `flex flex-1 items-center justify-center px-6`,
+        children: (0, Q.jsxs)(`div`, {
+          className: `flex w-full max-w-md flex-col gap-5 text-center`,
+          children: [d, m, g, v],
+        }),
+      })),
+      (t[14] = v),
+      (t[15] = g),
+      (t[16] = y))
+    : (y = t[16]);
+  let x;
+  t[17] !== y || t[18] !== u
+    ? ((x = (0, Q.jsxs)(`div`, { className: `fixed inset-0 flex flex-col`, children: [u, y] })),
+      (t[17] = y),
+      (t[18] = u),
+      (t[19] = x))
+    : (x = t[19]);
+  let S;
+  return (
+    t[20] !== s || t[21] !== x
+      ? ((S = (0, Q.jsx)(U, { isDarkMode: s, children: x })), (t[20] = s), (t[21] = x), (t[22] = S))
+      : (S = t[22]),
+    S
+  );
 }
-
-initializeCompilerRuntime();
-initializeCheckoutPolicy();
-initializeQueryRuntime();
-initializeScopeRuntime();
-React = getReactRuntime();
-initializeButton();
-initializeRouter();
-initializeAuthentication();
-initializeApiClient();
-initializeAccountQueries();
-initializeBillingPricing();
-initializeThemeSubscription();
-initializeCheckoutPage();
-initSession();
-jsx = getJsxRuntime();
-
-export { CreateWorkspacePage };
+var X, Z, Q;
+function $() {
+  return ($ = e(() => {
+    ((X = t()),
+      le(),
+      x(),
+      r(),
+      (Z = y()),
+      o(),
+      k(),
+      D(),
+      g(),
+      S(),
+      n(),
+      l(),
+      N(),
+      v(),
+      Ce(),
+      ke(),
+      me(),
+      (Q = a()));
+  }))();
+}
+$();
+export { Ae as CreateWorkspacePage };
