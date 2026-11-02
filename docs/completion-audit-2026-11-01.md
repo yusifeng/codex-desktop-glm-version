@@ -259,3 +259,11 @@ the canonical finished assistant message and eligibility metadata, wait for bott
 13-second request, reject mismatched/invalid/duplicate responses, log visible/clicked suggestions, submit the published chosen-
 suggestion metadata, and clear a successfully used result. Stateful tests execute the candidate and network/submit paths. This
 restores two conversation React owners; it is not evidence that all remaining conversation-route chunks are migrated.
+
+The following conversation transcript and command-lifecycle batch restores live server conversation projection, turn rendering,
+timestamp/pending/error paths, Business Agent disclosures and starters, and the interactive user-message navigation rail. The
+command catalog is now deterministically recovered as 311 checked-in descriptors instead of eight handwritten fallbacks, and
+the delete-task confirmation uses the production request client with duplicate-submit protection, toast feedback, and focus
+restoration. Structural route-root drafts are now zero and the source-build gate reports zero compatibility modules and zero
+structural drafts. Remote-conversation fidelity, review-side-panel fidelity, remaining preserved owners, and the final E2E
+matrix are still open; these results therefore do not establish whole-project completion.

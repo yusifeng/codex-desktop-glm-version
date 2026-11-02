@@ -1,32 +1,102 @@
 import "@rchunk/rolldown-runtime";
-import "@rchunk/app-shared";
-import "@rchunk/app-initial";
+import * as appSharedChunk from "@rchunk/app-shared";
+import * as appInitialChunk from "@rchunk/app-initial";
+import {
+  commandMessageCatalog,
+  type CommandMessageDescriptor,
+} from "./catalog.generated";
 
-interface MessageDescriptor { defaultMessage: string; description: string; id: string }
-interface IntlShape { formatMessage(descriptor: MessageDescriptor, values?: Record<string, unknown>): string }
-interface Command { descriptionIntlId?: string; electron?: { menuTitleIntlId: string }; id: string; titleIntlId?: string }
-interface CommandOverride { description?: string; title?: string }
-const messages: Record<string, MessageDescriptor> = {
-  "codex.command.newThread": { id: "codex.command.newThread", defaultMessage: "New chat", description: "Start a new chat" },
-  "codex.command.quickChat": { id: "codex.command.quickChat", defaultMessage: "Quick chat", description: "Open quick chat" },
-  "codex.command.archiveThread": { id: "codex.command.archiveThread", defaultMessage: "Archive chat", description: "Archive the current chat" },
-  "codex.command.composer.submit": { id: "codex.command.composer.submit", defaultMessage: "Send message", description: "Send the current composer message" },
-  "codex.commandDescription.composer.submit": { id: "codex.commandDescription.composer.submit", defaultMessage: "Send the current message", description: "Description for send message" },
-  "codex.command.toggleMiniOverlay": { id: "codex.command.toggleMiniOverlay", defaultMessage: "Show pet", description: "Show the floating pet overlay" },
-  "codex.command.composer.captureAppshot": { id: "codex.command.composer.captureAppshot", defaultMessage: "Capture appshot", description: "Capture an appshot" },
-  "codex.commandDescription.composer.captureAppshot": { id: "codex.commandDescription.composer.captureAppshot", defaultMessage: "Capture an appshot for the active composer", description: "Description for appshot capture" },
+interface IntlShape {
+  formatMessage(
+    descriptor: CommandMessageDescriptor,
+    values?: Record<string, unknown>,
+  ): string;
+}
+interface Command {
+  descriptionIntlId?: string;
+  electron?: { menuTitleIntlId: string };
+  id: string;
+  titleIntlId?: string;
+}
+interface CommandOverride {
+  description?: string;
+  title?: string;
+}
+
+const shared = appSharedChunk as unknown as Record<string, unknown>;
+const initial = appInitialChunk as unknown as Record<string, unknown>;
+let initialized = false;
+
+function initializeCommandMessages(): void {
+  if (initialized) return;
+  initialized = true;
+  for (const value of [shared.Ep, shared.K2, initial.Ndn]) {
+    if (typeof value === "function") (value as () => void)();
+  }
+}
+
+function fallbackDescriptor(
+  id: string,
+  defaultMessage = "",
+): CommandMessageDescriptor {
+  return { id, defaultMessage, description: defaultMessage };
+}
+
+function descriptor(id: string, defaultMessage = ""): CommandMessageDescriptor {
+  return commandMessageCatalog[id] ?? fallbackDescriptor(id, defaultMessage);
+}
+
+function formatCommandTitle(
+  command: Command,
+  intl: IntlShape,
+  petEnabled = false,
+): string {
+  initializeCommandMessages();
+  if (command.id === "openAvatarOverlay" && petEnabled) {
+    return intl.formatMessage(
+      descriptor("codex.command.toggleMiniOverlay", "Show pet"),
+    );
+  }
+  if (command.id === "composer.captureAppshot") {
+    return intl.formatMessage(
+      descriptor("codex.command.composer.captureAppshot", "Capture appshot"),
+    );
+  }
+
+  const id =
+    command.titleIntlId ??
+    command.electron?.menuTitleIntlId ??
+    `codex.command.${command.id}`;
+  const message = descriptor(id);
+  return message.defaultMessage === ""
+    ? command.id
+    : intl.formatMessage(message);
+}
+
+function formatCommandMetadata(
+  command: Command,
+  intl: IntlShape,
+  override?: CommandOverride,
+  petEnabled = false,
+): { description: string; title: string } {
+  initializeCommandMessages();
+  const title =
+    override?.title ?? formatCommandTitle(command, intl, petEnabled);
+  const descriptionId =
+    command.descriptionIntlId ?? `codex.commandDescription.${command.id}`;
+  const descriptionMessage = descriptor(descriptionId);
+  const appName = initial.Mdn;
+  const description =
+    override?.description ??
+    (descriptionMessage.defaultMessage === ""
+      ? ""
+      : intl.formatMessage(descriptionMessage, { appName }));
+  return { title, description };
+}
+
+initializeCommandMessages();
+export {
+  formatCommandTitle as n,
+  initializeCommandMessages as r,
+  formatCommandMetadata as t,
 };
-function descriptor(key: string, fallback: string): MessageDescriptor { return messages[key] ?? { id: key, defaultMessage: fallback, description: fallback }; }
-function formatCommandTitle(command: Command, intl: IntlShape, petEnabled = false): string {
-  if (command.id === "openAvatarOverlay" && petEnabled) return intl.formatMessage(messages["codex.command.toggleMiniOverlay"]);
-  if (command.id === "composer.captureAppshot") return intl.formatMessage(messages["codex.command.composer.captureAppshot"]);
-  const id = command.titleIntlId ?? command.electron?.menuTitleIntlId ?? `codex.command.${command.id}`;
-  return intl.formatMessage(descriptor(id, command.id));
-}
-function formatCommandMetadata(command: Command, intl: IntlShape, override?: CommandOverride, petEnabled = false): { description: string; title: string } {
-  const title = override?.title ?? formatCommandTitle(command, intl, petEnabled);
-  const id = command.descriptionIntlId ?? `codex.commandDescription.${command.id}`;
-  return { title, description: override?.description ?? intl.formatMessage(descriptor(id, "")) };
-}
-function initializeCommandMessages(): void {}
-export { formatCommandTitle as n, initializeCommandMessages as r, formatCommandMetadata as t };

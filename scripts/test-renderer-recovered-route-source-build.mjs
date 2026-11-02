@@ -148,6 +148,12 @@ assert.match(
 );
 assert.doesNotMatch(buildSource, /fs\.copyFile\(/, "renderer build never copies published JavaScript into runtime output");
 assert.doesNotMatch(buildSource, /\.reference\/app-original/, "renderer build has no release-tree runtime dependency");
+const aggregateBuildSource = await fs.readFile(path.join(root, "scripts/build.mjs"), "utf8");
+assert.match(
+  aggregateBuildSource,
+  /await import\("\.\/build-renderer\.mjs"\)/,
+  "aggregate build finishes with semantic renderer emission",
+);
 
 const missingExactDependencies = [];
 const exactOwnerFiles = await Promise.all(

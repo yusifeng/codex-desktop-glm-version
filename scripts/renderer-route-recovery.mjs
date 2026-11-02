@@ -191,19 +191,10 @@ export const HOME_ROUTE_ROOTS = [
   "worktree-onboarding-state-7d07364a277a.js",
 ];
 
-// Semantic drafts that still expose structural `{ kind, props }` view models
-// where the application expects real React components. Keep their complete
-// implementations in the recovered source graph until those drafts reproduce
-// the original component contracts. This list is intentionally exhaustive and
-// guarded by test-renderer-recovered-route-source-build.mjs.
-export const STRUCTURAL_COMPONENT_ROOTS = [
-  "content-bd6ed75ea274.js",
-  "hover-card-data-95a14e835743.js",
-  "library-cloud-file-preview-b3ddfaa823c0.js",
-  "open-a618d40921b2.js",
-  "page-268e2fb6d880.js",
-  "workbook-review-utils-3e78f7501b68.js",
-];
+// Structural `{ kind, props }` drafts are no longer accepted as route roots.
+// The source-build gate keeps this list empty and rejects any new structural
+// component owner instead of silently restoring the release implementation.
+export const STRUCTURAL_COMPONENT_ROOTS = [];
 
 // Static and lazy dependencies referenced by exact semantic owners that do not
 // yet have their own renderer or transform-only source owner. Keeping them as
@@ -269,12 +260,11 @@ export const CONVERSATION_ROUTE_ROOTS = [
   "math-block-utils-ca3c4f5321e8.js",
   // Settings route registration is indirect, so include every classified
   // settings entry as a root instead of relying only on static imports from
-  // settings-page. Several readable reconstructions still return structural
-  // `{ kind }` placeholders and are not safe React components yet.
+  // settings-page. Their checked-in TypeScript owners supply the route graph.
   ...SETTINGS_ROUTE_ROOTS,
   // Composer controls are similarly reached through runtime registries. Keep
-  // the whole classified surface exact so a single reconstructed placeholder
-  // cannot break home or conversation rendering.
+  // the full classified surface explicit so registry-only dependencies remain
+  // reproducible from a clean checkout.
   ...COMPOSER_ROUTE_ROOTS,
   ...HOME_ROUTE_ROOTS,
   ...STRUCTURAL_COMPONENT_ROOTS,

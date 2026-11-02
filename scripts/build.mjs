@@ -275,3 +275,10 @@ await fs.writeFile(
   path.join(ROOT, "app/.vite/build/bootstrap/protocol/app-protocol.js"),
   'const bootstrap = require("../../bootstrap-C4dRql4x.js");\nmodule.exports = { getWebviewEntryPath: bootstrap.ln };\n',
 );
+
+// The transform-only webview pass above emits every captured release source,
+// including filenames now owned by readable semantic renderer modules. Always
+// finish the aggregate build with the renderer pipeline so `npm run build`
+// cannot leave those runtime assets silently overwritten by their historical
+// transform-only counterparts.
+await import("./build-renderer.mjs");

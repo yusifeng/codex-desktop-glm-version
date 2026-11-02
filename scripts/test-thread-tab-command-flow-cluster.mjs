@@ -5,38 +5,217 @@ import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-globalThis.__threadTabTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
-globalThis.__threadTabTest.React={useRef:value=>({current:value}),useState:value=>[typeof value==="function"?value():value,()=>{}],useCallback:value=>value,useSyncExternalStore:(_subscribe,getSnapshot)=>getSnapshot(),useEffect:()=>{},useLayoutEffect:()=>{},useImperativeHandle:()=>{}};
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "thread-tab-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\/(popup|conversation-thumbnail-ui)$/ }, ({ path: importPath }) => ({ path: path.join(ROOT, "src/renderer", importPath.slice(8), "index.ts") })); build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__threadTabTest.jsx;export const e6=()=>globalThis.__threadTabTest.React;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
-function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(child => walk(child, visit)); else walk(children, visit); }
-function find(node, predicate) { let result; walk(node, value => { if (result == null && predicate(value)) result = value; }); return result; }
-function all(node, predicate) { const result = []; walk(node, value => { if (predicate(value)) result.push(value); }); return result; }
-function text(node) { const result = []; walk(node, value => { if (typeof value.props?.children === "string") result.push(value.props.children); }); return result.join(" "); }
+globalThis.__threadTabTest = {
+  jsx: {
+    Fragment: "Fragment",
+    jsx(type, props, key) {
+      return typeof type === "function"
+        ? type(props ?? {})
+        : { type, props: props ?? {}, key };
+    },
+    jsxs(type, props, key) {
+      return typeof type === "function"
+        ? type(props ?? {})
+        : { type, props: props ?? {}, key };
+    },
+  },
+};
+globalThis.__threadTabTest.React = {
+  useRef: (value) => ({ current: value }),
+  useState: (value) => [
+    typeof value === "function" ? value() : value,
+    () => {},
+  ],
+  useCallback: (value) => value,
+  useSyncExternalStore: (_subscribe, getSnapshot) => getSnapshot(),
+  useEffect: () => {},
+  useLayoutEffect: () => {},
+  useImperativeHandle: () => {},
+};
+async function bundle(directory) {
+  const result = await esbuild.build({
+    entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")],
+    bundle: true,
+    format: "esm",
+    platform: "node",
+    target: "node22",
+    write: false,
+    logLevel: "silent",
+    plugins: [
+      {
+        name: "thread-tab-mocks",
+        setup(build) {
+          build.onResolve(
+            { filter: /^@rchunk\/(popup|conversation-thumbnail-ui)$/ },
+            ({ path: importPath }) => ({
+              path: path.join(
+                ROOT,
+                "src/renderer",
+                importPath.slice(8),
+                "index.ts",
+              ),
+            }),
+          );
+          build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({
+            path: importPath.slice(8),
+            namespace: "mock",
+          }));
+          build.onLoad(
+            { filter: /.*/, namespace: "mock" },
+            ({ path: importPath }) => ({
+              contents:
+                importPath === "app-shared"
+                  ? "export const I3=()=>globalThis.__threadTabTest.jsx;export const e6=()=>globalThis.__threadTabTest.React;"
+                  : "export {};",
+              loader: "js",
+            }),
+          );
+        },
+      },
+    ],
+  });
+  return import(
+    `data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`
+  );
+}
+function walk(node, visit) {
+  if (node == null || typeof node !== "object") return;
+  visit(node);
+  const children = node.props?.children;
+  if (Array.isArray(children))
+    children.flat(Infinity).forEach((child) => walk(child, visit));
+  else walk(children, visit);
+}
+function find(node, predicate) {
+  let result;
+  walk(node, (value) => {
+    if (result == null && predicate(value)) result = value;
+  });
+  return result;
+}
+function all(node, predicate) {
+  const result = [];
+  walk(node, (value) => {
+    if (predicate(value)) result.push(value);
+  });
+  return result;
+}
+function text(node) {
+  const result = [];
+  walk(node, (value) => {
+    if (typeof value.props?.children === "string")
+      result.push(value.props.children);
+  });
+  return result.join(" ");
+}
 
 // command-messages: 9
 const commandMessages = await bundle("command-messages");
 assert.deepEqual(Object.keys(commandMessages), ["n", "r", "t"]);
-const intl = { formatMessage(descriptor) { return descriptor.defaultMessage; } };
-assert.equal(commandMessages.n({ id: "newThread", titleIntlId: "codex.command.newThread" }, intl), "New chat");
+const intl = {
+  formatMessage(descriptor) {
+    return descriptor.defaultMessage;
+  },
+};
+assert.equal(
+  commandMessages.n(
+    { id: "newThread", titleIntlId: "codex.command.newThread" },
+    intl,
+  ),
+  "New chat",
+);
 assert.equal(commandMessages.n({ id: "quickChat" }, intl), "Quick chat");
-assert.equal(commandMessages.n({ id: "openAvatarOverlay" }, intl, true), "Show pet");
-assert.equal(commandMessages.n({ id: "composer.captureAppshot" }, intl), "Capture appshot");
-assert.deepEqual(commandMessages.t({ id: "composer.submit" }, intl), { title: "Send message", description: "Send the current message" });
-assert.deepEqual(commandMessages.t({ id: "unknown" }, intl, { title: "Custom", description: "Help" }), { title: "Custom", description: "Help" });
-assert.equal(commandMessages.t({ id: "archiveThread" }, intl).title, "Archive chat");
+assert.equal(
+  commandMessages.n({ id: "openAvatarOverlay" }, intl, true),
+  "Show pet",
+);
+assert.equal(
+  commandMessages.n({ id: "composer.captureAppshot" }, intl),
+  "Capture appshot",
+);
+assert.deepEqual(commandMessages.t({ id: "composer.submit" }, intl), {
+  title: "Send message",
+  description: "Send the current composer message",
+});
+assert.deepEqual(
+  commandMessages.t({ id: "unknown" }, intl, {
+    title: "Custom",
+    description: "Help",
+  }),
+  { title: "Custom", description: "Help" },
+);
+assert.equal(
+  commandMessages.t({ id: "archiveThread" }, intl).title,
+  "Archive chat",
+);
+assert.deepEqual(commandMessages.t({ id: "composer.toggleFastMode" }, intl), {
+  title: "Toggle Fast mode",
+  description: "Turn Fast mode on or off in the current composer",
+});
+assert.deepEqual(commandMessages.t({ id: "git.createPullRequest" }, intl), {
+  title: "Create PR",
+  description: "Open pull request creation options",
+});
+assert.deepEqual(commandMessages.t({ id: "openBrowserTab" }, intl), {
+  title: "Open browser tab",
+  description: "Open a new browser tab",
+});
+assert.deepEqual(commandMessages.t({ id: "personalitySettings" }, intl), {
+  title: "Personality",
+  description: "Adjust tone and response style",
+});
+assert.deepEqual(commandMessages.t({ id: "toggleBottomPanel" }, intl), {
+  title: "Toggle bottom panel",
+  description: "Show or hide the bottom panel",
+});
+assert.deepEqual(commandMessages.t({ id: "keyboardShortcuts" }, intl), {
+  title: "Keyboard shortcuts",
+  description: "Customize keyboard shortcuts",
+});
 assert.equal(commandMessages.r(), undefined);
 
 // popup: 16
 const popup = await bundle("popup");
 assert.deepEqual(Object.keys(popup), ["i", "n", "r", "t"]);
-let deleted = 0, stopped = 0, published = 0;
-const exact = { id: "exact", textMatch: "exact", canBeDefault: true, content: "Exact", preview: { inline: { value: "exact", selectionStart: 1, selectionEnd: 5 }, selected: { value: "exact", selectionStart: 0, selectionEnd: 5 } }, deleteAction: { label: "Remove", run() { deleted++; return true; } } };
+let deleted = 0,
+  stopped = 0,
+  published = 0;
+const exact = {
+  id: "exact",
+  textMatch: "exact",
+  canBeDefault: true,
+  content: "Exact",
+  preview: {
+    inline: { value: "exact", selectionStart: 1, selectionEnd: 5 },
+    selected: { value: "exact", selectionStart: 0, selectionEnd: 5 },
+  },
+  deleteAction: {
+    label: "Remove",
+    run() {
+      deleted++;
+      return true;
+    },
+  },
+};
 const prefix = { id: "prefix", textMatch: "prefix", content: "Prefix" };
-const source = { id: "history", getSuggestions() { return { suggestions: [prefix, exact] }; }, stop() { stopped++; } };
+const source = {
+  id: "history",
+  getSuggestions() {
+    return { suggestions: [prefix, exact] };
+  },
+  stop() {
+    stopped++;
+  },
+};
 const controller = new popup.r();
-const unsubscribe = controller.subscribe(() => { published++; });
+const unsubscribe = controller.subscribe(() => {
+  published++;
+});
 controller.start({ value: "e", selectionStart: 1, selectionEnd: 1 }, [source]);
-assert.deepEqual(controller.getSnapshot().suggestions.map(item => item.id), ["exact", "prefix"]);
+assert.deepEqual(
+  controller.getSnapshot().suggestions.map((item) => item.id),
+  ["exact", "prefix"],
+);
 assert.equal(controller.getSnapshot().selectedSuggestion.id, "exact");
 assert.equal(controller.getSnapshot().preview.value, "exact");
 assert.equal(controller.hasKeyboardSelection(), false);
@@ -55,52 +234,150 @@ assert.equal(stopped, 1);
 assert.equal(controller.getSnapshot().query, null);
 assert.ok(published >= 3);
 unsubscribe();
-const popupUi = popup.t({ label: "Suggestions", listboxId: "list", suggestions: [exact], selectedIndex: 0, onSelect() {} });
-assert.equal(find(popupUi, node => node.props?.role === "option").props["aria-selected"], true);
+const popupUi = popup.t({
+  label: "Suggestions",
+  listboxId: "list",
+  suggestions: [exact],
+  selectedIndex: 0,
+  onSelect() {},
+});
+assert.equal(
+  find(popupUi, (node) => node.props?.role === "option").props["aria-selected"],
+  true,
+);
 
 // tab-address-input: 10
 const addressInput = await bundle("tab-address-input");
 assert.deepEqual(Object.keys(addressInput), ["n", "t"]);
 const addressEvents = [];
-const addressUi = addressInput.t({ addressValue: "exa", id: "address", isAddressEditing: true, isVisible: true, sources: [source], onAddressValueChange(value) { addressEvents.push(["change", value]); }, onCancelAddressEditing() { addressEvents.push("cancel"); }, onCommitAddress(value) { addressEvents.push(["commit", value]); } });
-const input = find(addressUi, node => node.type === "input");
+const addressUi = addressInput.t({
+  addressValue: "exa",
+  id: "address",
+  isAddressEditing: true,
+  isVisible: true,
+  sources: [source],
+  onAddressValueChange(value) {
+    addressEvents.push(["change", value]);
+  },
+  onCancelAddressEditing() {
+    addressEvents.push("cancel");
+  },
+  onCommitAddress(value) {
+    addressEvents.push(["commit", value]);
+  },
+});
+const input = find(addressUi, (node) => node.type === "input");
 assert.equal(input.props.value, "exact");
 assert.equal(input.props["aria-autocomplete"], "both");
 assert.equal(input.props["aria-expanded"], true);
-assert.equal(find(addressUi, node => node.props?.role === "listbox").props.id, "address-suggestions-address");
+assert.equal(
+  find(addressUi, (node) => node.props?.role === "listbox").props.id,
+  "address-suggestions-address",
+);
 input.props.onChange({ currentTarget: { value: "next" } });
 assert.deepEqual(addressEvents[0], ["change", "next"]);
 let prevented = 0;
-input.props.onKeyDown({ key: "Enter", preventDefault() { prevented++; } });
+input.props.onKeyDown({
+  key: "Enter",
+  preventDefault() {
+    prevented++;
+  },
+});
 assert.deepEqual(addressEvents[1], ["commit", "exact"]);
 assert.equal(prevented, 1);
 input.props.onKeyDown({ key: "Escape", preventDefault() {} });
 assert.equal(addressEvents[2], "cancel");
-find(addressUi, node => node.props?.role === "option").props.onClick();
+find(addressUi, (node) => node.props?.role === "option").props.onClick();
 assert.deepEqual(addressEvents[3], ["commit", "exact"]);
 assert.equal(addressInput.n(), undefined);
 
 // conversation-thumbnail-ui: 10
 const thumbnail = await bundle("conversation-thumbnail-ui");
 assert.deepEqual(Object.keys(thumbnail), ["n", "t"]);
-assert.equal(thumbnail.t({ title: "Idle", statusState: { type: "idle" } }), null);
-assert.match(text(thumbnail.t({ title: "Build", statusState: { type: "loading" } })), /Working/);
-assert.match(text(thumbnail.t({ title: "Build", statusState: { type: "error" } })), /Task failed/);
-assert.match(text(thumbnail.t({ title: "Build", waitingFor: "waitingOnApproval", statusState: { type: "idle" } })), /Awaiting approval/);
-assert.match(text(thumbnail.t({ title: "Build", waitingFor: "waitingOnUserInput", statusState: { type: "idle" } })), /Needs input/);
-assert.match(text(thumbnail.t({ title: "Build", draft: "Unsent", statusState: { type: "idle" } })), /Draft/);
-assert.match(text(thumbnail.t({ title: "Build", statusState: { type: "idle", unread: true } })), /Unread response/);
-const excerptUi = thumbnail.t({ title: "Build", requestExcerpt: "Question", responseExcerpt: "Answer", statusState: { type: "idle" } });
-assert.equal(find(excerptUi, node => node.type === "blockquote").props.children, "Question");
-assert.equal(find(excerptUi, node => node.type === "p").props.children, "Answer");
+assert.equal(
+  thumbnail.t({ title: "Idle", statusState: { type: "idle" } }),
+  null,
+);
+assert.match(
+  text(thumbnail.t({ title: "Build", statusState: { type: "loading" } })),
+  /Working/,
+);
+assert.match(
+  text(thumbnail.t({ title: "Build", statusState: { type: "error" } })),
+  /Task failed/,
+);
+assert.match(
+  text(
+    thumbnail.t({
+      title: "Build",
+      waitingFor: "waitingOnApproval",
+      statusState: { type: "idle" },
+    }),
+  ),
+  /Awaiting approval/,
+);
+assert.match(
+  text(
+    thumbnail.t({
+      title: "Build",
+      waitingFor: "waitingOnUserInput",
+      statusState: { type: "idle" },
+    }),
+  ),
+  /Needs input/,
+);
+assert.match(
+  text(
+    thumbnail.t({
+      title: "Build",
+      draft: "Unsent",
+      statusState: { type: "idle" },
+    }),
+  ),
+  /Draft/,
+);
+assert.match(
+  text(
+    thumbnail.t({
+      title: "Build",
+      statusState: { type: "idle", unread: true },
+    }),
+  ),
+  /Unread response/,
+);
+const excerptUi = thumbnail.t({
+  title: "Build",
+  requestExcerpt: "Question",
+  responseExcerpt: "Answer",
+  statusState: { type: "idle" },
+});
+assert.equal(
+  find(excerptUi, (node) => node.type === "blockquote").props.children,
+  "Question",
+);
+assert.equal(
+  find(excerptUi, (node) => node.type === "p").props.children,
+  "Answer",
+);
 
 // thread-tab-entity: 5
 const entity = await bundle("thread-tab-entity");
 assert.deepEqual(Object.keys(entity), ["RegisteredChatGptEntityThumbnail"]);
-assert.equal(entity.RegisteredChatGptEntityThumbnail({ conversationId: "c1", title: "Empty" }), null);
-const entityUi = entity.RegisteredChatGptEntityThumbnail({ conversationId: "c1", title: "Chat", responseExcerpt: "Done", statusState: { type: "idle" } });
+assert.equal(
+  entity.RegisteredChatGptEntityThumbnail({
+    conversationId: "c1",
+    title: "Empty",
+  }),
+  null,
+);
+const entityUi = entity.RegisteredChatGptEntityThumbnail({
+  conversationId: "c1",
+  title: "Chat",
+  responseExcerpt: "Done",
+  statusState: { type: "idle" },
+});
 assert.equal(entityUi.props["aria-label"], "Chat");
 assert.equal(entityUi.props["data-status"], "idle");
-assert.equal(all(entityUi, node => node.type === "p").length, 1);
+assert.equal(all(entityUi, (node) => node.type === "p").length, 1);
 
-console.log("50 thread tab and command flow cluster assertions passed");
+console.log("56 thread tab and command flow cluster assertions passed");
