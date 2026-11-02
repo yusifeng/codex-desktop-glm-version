@@ -1,12 +1,23 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Settings plan/query runtime recovery：Usage 不再依赖默认隐藏或静态 plan，现从真实 usage
+query、credit balance 与 `dS` plan hook 读取 visible/loading/plan；Analytics、enterprise label、Consumer
+View 和 Code Review 按发布版 plan predicate、experiment gate 与 activity query 组合。Profile 接回实时
+visibility/loading contract，Trusted Contact 则执行 account-scoped enabled query，并在 loading/error 时保持
+正确的 route redirect 语义。同批修复两个此前会在真实请求时暴露的契约错误：`command-menu-client.i`
+恢复发布 ABI `(userId, accountId)`，query key 和两个 account header 不再错用 user id；Code Review query
+恢复 `/wham/analytics/daily-code-review-metrics` 的真实 queryFn、日期范围、auth/scope/polling 规则。
+新增 focused 24 项，既有 Usage/Profile/Trusted Contact 229 项、typecheck、strict hub、1,912-script index、
+1,888/1,888 build/verify 均通过。其余 feature-specific Settings 展示差异继续按各 owner 审计，不据此
+宣称整项目完成。
+
 2026-11-02 Settings eligibility recovery：`use-visible-settings-sections` 在 surface/host 路由之外恢复了
 发布版 section eligibility 的确定性关闭矩阵，并按发布顺序将 eligibility 与 surface/remote-host 做 AND，
 不再让局部 `visible=true` 越过宿主限制。Account/Voice capability、Appshots、notifications/parental auth、
 Import experiment/remote mode、Codex Micro availability 和 Debug gate 现均读取真实公共 ABI；pending/error
 状态会阻止过早重定向并控制 route content。focused settings application cluster 从 44 增至 61 项断言，
-typecheck 与 strict hub gate 通过。Usage/Analytics/Profile/Trusted Contact 等 plan/query 组合仍需继续恢复，
-因此该批不宣称设置资格矩阵已完全等同发布版。
+typecheck 与 strict hub gate 通过。该批当时尚缺的 Usage/Analytics/Profile/Trusted Contact plan/query
+组合已由上面的 follow-up 恢复；这条保留为阶段性历史记录。
 
 2026-11-02 Codex Home announcements runtime recovery：`codex-home-announcements-current` 不再把
 `D0t` initializer 误当生产 override hook，也不再插入发布候选序列不存在的 synthetic recap entry。

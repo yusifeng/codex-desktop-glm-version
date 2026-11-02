@@ -41,11 +41,23 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
+The settings plan/query follow-up removes the remaining synthetic defaults for Usage, Analytics, Profile, and Trusted
+Contact navigation. Usage visibility and loading now come from the live usage-plan hook and credit query; Analytics and the
+enterprise label apply the published plan predicates and experiment gates; Profile consumes its live visibility/loading
+contract; Trusted Contact executes the account-scoped enabled query and preserves loading/error redirect behavior. The same
+batch repairs two runtime contracts hidden by the former navigation fallback: the trusted-contact query factory now accepts
+the published `(userId, accountId)` ABI and sends account headers for the actual account, while Code Review options include
+the real `/wham/analytics/daily-code-review-metrics` query function and auth gating. A 24-assertion focused suite covers these
+states and request shapes; the existing 229 Usage/Profile/Trusted Contact assertions, typecheck, strict public-ABI gate,
+1,912-script index, and 1,888/1,888 renderer build/verify pass. Other settings sections still retain separately documented
+feature-specific presentation gaps, so this is not a whole-project completion claim.
+
 The settings eligibility follow-up restores the published static-disabled matrix and combines per-section eligibility with
 surface and remote-host constraints instead of allowing an override to bypass them. Account/Voice capabilities, Appshots,
 notifications/parental authorization, Import experiment/remote mode, Codex Micro availability, and Debug gating now consume
 live public ABIs with pending/error redirect semantics. The settings application cluster grows from 44 to 61 assertions.
-Plan/query-heavy Usage, Analytics, Profile, and Trusted Contact rules remain incomplete.
+That first eligibility pass left plan/query-heavy Usage, Analytics, Profile, and Trusted Contact rules incomplete; the
+follow-up above supersedes that limitation.
 
 The current Codex Home announcement batch removes a synthetic recap candidate and restores the published global-disable,
 focused-source, and ordered gift/voice/import/worktree/history/replay gates. Product Beacon candidates now precede vanilla
