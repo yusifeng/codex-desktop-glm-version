@@ -41,6 +41,31 @@ function command(method, params = {}) {
   return new Promise((resolve, reject) => pending.set(id, { reject, resolve }));
 }
 
+function protocolEventDetails(event) {
+  if (event.method === "Log.entryAdded") {
+    const entry = event.params?.entry ?? {};
+    return { method: event.method, level: entry.level ?? "", text: entry.text ?? "", url: entry.url ?? "", stackTrace: entry.stackTrace ?? null };
+  }
+  if (event.method === "Runtime.exceptionThrown") {
+    const exception = event.params?.exceptionDetails ?? {};
+    return {
+      method: event.method,
+      text: exception.exception?.description ?? exception.text ?? "",
+      url: exception.url ?? "",
+      lineNumber: exception.lineNumber ?? null,
+      columnNumber: exception.columnNumber ?? null,
+      stackTrace: exception.stackTrace ?? exception.exception?.preview ?? null,
+    };
+  }
+  const args = event.params?.args ?? [];
+  return {
+    method: event.method,
+    type: event.params?.type ?? "",
+    text: args.map((value) => value.value ?? value.description ?? value.unserializableValue ?? JSON.stringify(value.preview ?? {})).join(" "),
+    stackTrace: event.params?.stackTrace ?? null,
+  };
+}
+
 async function evaluate(expression) {
   const result = await command("Runtime.evaluate", { expression, awaitPromise: true, returnByValue: true });
   if (result.exceptionDetails != null) {
@@ -66,6 +91,15 @@ if (mode === "smoke-readonly") {
       element.innerText?.trim() === ${JSON.stringify(text)} || element.innerText?.trim().split('\\n')[0] === ${JSON.stringify(text)}
     );
     if (target == null) throw new Error(${JSON.stringify("No clickable element: ")} + ${JSON.stringify(text)});
+    target.click();
+    return { tagName: target.tagName, text: target.innerText?.trim() ?? '' };
+  })()`);
+  const clickOneOf = async (texts) => evaluate(`(() => {
+    const texts = ${JSON.stringify([])}.concat(${JSON.stringify(texts)});
+    const target = [...document.querySelectorAll('button, a, [role="button"], [role="tab"], [role="menuitem"]')].find((element) =>
+      texts.includes(element.getAttribute('aria-label')) || texts.includes(element.innerText?.trim())
+    );
+    if (target == null) throw new Error('No clickable element matching: ' + texts.join(' | '));
     target.click();
     return { tagName: target.tagName, text: target.innerText?.trim() ?? '' };
   })()`);
@@ -110,6 +144,26 @@ if (mode === "smoke-readonly") {
     } while (Date.now() < deadline);
     throw new Error(`Timed out waiting for selector: ${selector}`);
   };
+  const waitForSettingsPageToSettle = async (timeoutMs = 30_000) => {
+    const deadline = Date.now() + timeoutMs;
+    do {
+      const settled = await evaluate(`(() => {
+        const visible = (element) => {
+          const style = getComputedStyle(element);
+          const rect = element.getBoundingClientRect();
+          return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+        };
+        const loadingLeaves = [...document.querySelectorAll('span, p, div')].filter((element) =>
+          element.childElementCount === 0 && visible(element) &&
+          (/^正在加载.+…$/.test(element.innerText?.trim() ?? '') || /^Loading .+…$/i.test(element.innerText?.trim() ?? ''))
+        );
+        return loadingLeaves.length === 0;
+      })()`);
+      if (settled) return;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    } while (Date.now() < deadline);
+    throw new Error('Settings page remained on its loading placeholder');
+  };
   const assertHealthy = async (name) => {
     const bodyText = await evaluate(`document.body?.innerText ?? ''`);
     const recoveryText = ['ChatGPT hit a snag', 'ChatGPT 遇到了问题', 'Something went wrong. Try again to continue', '出了点问题。请重试以继续'];
@@ -146,7 +200,7 @@ if (mode === "smoke-readonly") {
       throw new Error(`${name} has only ${result.interactiveCount} visible controls; expected at least ${expectations.minimumInteractive}`);
     }
     if (result.brokenImages !== 0) throw new Error(`${name} contains ${result.brokenImages} broken image(s)`);
-    if (result.documentWidth > result.viewportWidth + 2) {
+    if (!expectations.allowHorizontalOverflow && result.documentWidth > result.viewportWidth + 2) {
       throw new Error(`${name} horizontally overflows: ${result.documentWidth}px > ${result.viewportWidth}px`);
     }
     const screenshot = await command('Page.captureScreenshot', { format: 'png', fromSurface: true });
@@ -242,6 +296,7 @@ if (mode === "smoke-readonly") {
 
   await clickText('个性化');
   await waitForBodyText(['Codex 说明', 'Codex instructions']);
+  await waitForSettingsPageToSettle();
   await assertVisualPage('settings/personalization', {
     text: ['Codex 说明', 'Codex 记忆', '保存'],
     forbidden: ['Personalization\nInstructions\nMemory'],
@@ -255,18 +310,91 @@ if (mode === "smoke-readonly") {
     forbidden: ['Remote connections\nRefreshAdd connection'],
     minimumInteractive: 5,
   });
+  await clickText('SSH');
+  await waitForSettingsPageToSettle();
+  await clickOneOf(['添加', 'Add']);
+  await waitForSelector('[role="dialog"]');
+  await assertVisualPage('settings/connections-add-ssh-dialog', {
+    text: ['SSH'],
+    minimumInteractive: 5,
+  });
+  await command('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' });
+  await command('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape' });
+  await new Promise((resolve) => setTimeout(resolve, 250));
+
+  for (const page of [
+    { label: '通知', name: 'notifications' },
+    { label: '导入', name: 'import' },
+    { label: '个人资料', name: 'profile' },
+    { label: '家长控制', name: 'parental-controls' },
+    { label: 'Trusted contact', name: 'trusted-contact' },
+    { label: '语音', name: 'voice' },
+    { label: '宠物', name: 'pets' },
+    { label: '键盘快捷键', name: 'keyboard-shortcuts' },
+    { label: '电脑操控', name: 'computer-use' },
+    { label: '计算机历史记录', name: 'computer-history' },
+    { label: '应用快照', name: 'appshots' },
+    { label: '已归档的聊天', name: 'archived-chats' },
+  ]) {
+    await clickText(page.label);
+    await waitForSettingsPageToSettle();
+    await assertVisualPage(`settings/${page.name}`, {
+      text: [page.label],
+      minimumInteractive: 1,
+    });
+  }
+
+  await clickText('配置');
+  await waitForBodyText(['智能体默认设置', 'Agent defaults']);
+  await assertVisualPage('settings/configuration', {
+    text: ['批准策略', '沙盒设置', '网页搜索'],
+    minimumInteractive: 7,
+  });
+
+  await clickText('插件');
+  await waitForBodyText(['管理插件、技能和 MCP', 'Manage plugins, skills, and MCP']);
+  await assertVisualPage('settings/plugins', {
+    text: ['浏览目录', '搜索插件'],
+    minimumInteractive: 5,
+  });
+
+  await clickText('钩子');
+  await waitForSettingsPageToSettle();
+  await assertVisualPage('settings/hooks', {
+    text: ['钩子'],
+    minimumInteractive: 1,
+  });
+
+  await clickText('环境');
+  await waitForSettingsPageToSettle();
+  await assertVisualPage('settings/environment', {
+    text: ['环境'],
+    minimumInteractive: 1,
+  });
 
   await clickText('Git');
   await waitForBodyText(['分支前缀', 'Branch prefix']);
-  await assertHealthy('settings/git');
+  await waitForSettingsPageToSettle();
+  await assertVisualPage('settings/git', {
+    text: ['Git'],
+    minimumInteractive: 1,
+  });
 
   await clickText('Worktrees');
   await waitForBodyText(['工作树根目录', 'Worktree root']);
-  await assertHealthy('settings/worktrees');
+  await waitForSettingsPageToSettle();
+  await assertVisualPage('settings/worktrees', {
+    text: ['Worktrees'],
+    minimumInteractive: 1,
+  });
 
   await clickText('浏览器');
   await waitForBodyText(['In-app browser', '管理你的 Browser Use']);
-  await assertHealthy('settings/browser');
+  await waitForSettingsPageToSettle();
+  await assertVisualPage('settings/browser', {
+    text: ['浏览器'],
+    minimumInteractive: 2,
+  });
 
   if (await evaluate(`document.querySelector('nav[aria-label="应用导航"]') != null`)) {
     await evaluate(`(() => {
@@ -280,10 +408,34 @@ if (mode === "smoke-readonly") {
     await clickText('返回应用');
   }
   await waitForBodyText('新对话');
+  await assertVisualPage('app/shell', {
+    text: ['新对话'],
+    minimumInteractive: 8,
+    allowHorizontalOverflow: true,
+  });
   await clickText(conversationTitle);
-  await waitForSelector('[data-local-conversation-page]');
-  await waitForSelector('[data-conversation-block="assistant-message"]');
+  await waitForSelector('[data-content-search-unit-key]');
+  const assistantUnitDeadline = Date.now() + 30_000;
+  let hasAssistantUnit = false;
+  let conversationUnitTexts = [];
+  do {
+    conversationUnitTexts = await evaluate(`
+      [...document.querySelectorAll('[data-content-search-unit-key]')].map((element) =>
+        element.innerText || element.textContent || element.getAttribute('aria-label') || ''
+      )
+    `);
+    hasAssistantUnit = conversationUnitTexts.some((text) => text.includes('ChatGPT 说：') || text.includes('ChatGPT said:'));
+    if (!hasAssistantUnit) await new Promise((resolve) => setTimeout(resolve, 250));
+  } while (!hasAssistantUnit && Date.now() < assistantUnitDeadline);
+  if (!hasAssistantUnit) throw new Error(`Conversation history did not render an assistant unit: ${JSON.stringify(conversationUnitTexts.slice(-10))}`);
   await assertHealthy('conversation/history');
+  await assertVisualPage('conversation/history-visual', {
+    text: [conversationTitle],
+    minimumInteractive: 8,
+    // The release summary panel is translated off-canvas while collapsed;
+    // it intentionally remains measurable until its exit transition ends.
+    allowHorizontalOverflow: true,
+  });
 
   await evaluate(`(() => {
     const button = document.querySelector('[aria-label="添加文件等内容"]');
@@ -332,6 +484,10 @@ if (mode === "smoke-readonly") {
   const marker = argument.length > 0 ? argument : `E2E_REPLY_${new Date().toISOString().replace(/\D/g, '').slice(0, 14)}`;
   const prompt = process.env.CODEX_E2E_PROMPT?.replaceAll('{marker}', marker) ?? `只回复：${marker}`;
   await command("Log.enable");
+  // Log.enable can replay entries that predate this CDP session. Only failures
+  // emitted by the send/reply operation belong to this checkpoint.
+  await new Promise((resolve) => setTimeout(resolve, 100));
+  protocolEvents.length = 0;
   const fillResult = await evaluate(`(() => {
     const editor = document.querySelector('[contenteditable="true"][aria-label="随心输入"]');
     if (editor == null) throw new Error('Composer editor not found');
@@ -373,28 +529,28 @@ if (mode === "smoke-readonly") {
     conversationUnits = await evaluate(`[...document.querySelectorAll('[data-content-search-unit-key]')].map((element) => element.innerText || element.textContent || '')`);
     bodyText = await evaluate(`document.body?.innerText ?? ''`);
     const normalizedMarker = marker.replaceAll('\\', '');
-    assistantReply = assistantMessages.find((text) => text.replaceAll('\\', '').includes(normalizedMarker)) ??
-      conversationUnits.find((text) => text.includes('ChatGPT 说：') && text.replaceAll('\\', '').includes(normalizedMarker)) ??
+    assistantReply = assistantMessages.find((text) =>
+      text.replaceAll('\\', '').includes(normalizedMarker) && !/回复已开始|Reply started/i.test(text)
+    ) ?? conversationUnits.find((text) =>
+      (text.includes('ChatGPT 说：') || text.includes('ChatGPT said:')) &&
+      text.replaceAll('\\', '').includes(normalizedMarker) && !/回复已开始|Reply started/i.test(text)
+    ) ??
       null;
     if (assistantReply == null) await new Promise((resolve) => setTimeout(resolve, 500));
   } while (assistantReply == null && Date.now() < replyDeadline);
   if (assistantReply == null) throw new Error(`Timed out waiting for assistant reply marker: ${marker}; assistant messages=${JSON.stringify(assistantMessages.slice(-5))}; conversation units=${JSON.stringify(conversationUnits.slice(-5))}; body tail=${JSON.stringify(bodyText.slice(-2000))}`);
 
   const fatalEvents = protocolEvents.filter((event) => {
-    const eventText = event.method === 'Log.entryAdded'
-      ? event.params?.entry?.text ?? ''
-      : (event.params?.args ?? []).map((value) => value.value ?? value.description ?? '').join(' ');
+    const eventText = protocolEventDetails(event).text;
     if (/Statsig|cloudflare_challenge|DEPRECATED_ENDPOINT|ResizeObserver loop completed with undelivered notifications/u.test(eventText)) return false;
+    if (/t3\.gstatic\.com\/faviconV2/u.test(event.params?.entry?.url ?? '') && /404/u.test(eventText)) return false;
     if (event.method === 'Runtime.exceptionThrown') return true;
     if (event.method === 'Log.entryAdded') return event.params?.entry?.level === 'error';
     if (event.method !== 'Runtime.consoleAPICalled' || event.params?.type !== 'error') return false;
     return true;
   });
   if (fatalEvents.length > 0) {
-    const details = fatalEvents.map((event) => event.method === 'Log.entryAdded'
-      ? { text: event.params?.entry?.text ?? '', url: event.params?.entry?.url ?? '' }
-      : { text: (event.params?.args ?? []).map((value) => value.value ?? value.description ?? '').join(' '), url: '' }
-    ).slice(0, 10);
+    const details = fatalEvents.map(protocolEventDetails).slice(0, 10);
     throw new Error(`Renderer emitted ${fatalEvents.length} fatal protocol event(s): ${JSON.stringify(details)}`);
   }
   console.log(JSON.stringify({ mode, marker, prompt, fillResult, sendResult, assistantReply, assistantMessageCount: assistantMessages.length }, null, 2));
@@ -472,10 +628,15 @@ if (mode === "smoke-readonly") {
   } while (Date.now() < navigationDeadline);
   if (!state.address?.includes("example.com")) throw new Error(`IAB navigation did not commit: ${JSON.stringify(state)}`);
   if (state.bodyText.includes("标签页内容无法显示")) throw new Error("IAB rendered its error boundary");
-  const targets = await fetch(`${endpoint}/json/list`).then((response) => response.json());
-  const browserTargets = targets
-    .filter((target) => target.type === "page" && target.url === requestedUrl)
-    .map((target) => ({ title: target.title, type: target.type, url: target.url }));
+  const targetDeadline = Date.now() + 30_000;
+  let browserTargets = [];
+  do {
+    const targets = await fetch(`${endpoint}/json/list`).then((response) => response.json());
+    browserTargets = targets
+      .filter((target) => target.type === "page" && target.url === requestedUrl)
+      .map((target) => ({ title: target.title, type: target.type, url: target.url }));
+    if (browserTargets.length === 0) await new Promise((resolve) => setTimeout(resolve, 250));
+  } while (browserTargets.length === 0 && Date.now() < targetDeadline);
   if (browserTargets.length === 0) throw new Error(`No browser target committed ${requestedUrl}`);
   console.log(JSON.stringify({
     mode,

@@ -378,6 +378,19 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["security-settings", "security-settings-2da2a3b205ab.js"],
   ["codex-micro-settings", "codex-micro-settings-cbf47e1d3359.js"],
   ["settings-plugin-selection", "settings-plugin-selection-e42895d573ba.js"],
+  // Conversation and detached-window owners were readable structural
+  // approximations, but retained only a small fraction of the release UI.
+  // Preserve their full message rendering, turn state, panels, dialogs, and
+  // detached-window chrome until equivalent maintainable rewrites exist.
+  ["conversation-blocks", "conversation-blocks-3f59e850f9fb.js"],
+  ["local-conversation-page", "local-conversation-page-bcc7eca0b3ab.js"],
+  ["local-conversation-thread", "local-conversation-thread-c6e40fdd6d59.js"],
+  ["local-conversation-turn", "local-conversation-turn-14bf296d5217.js"],
+  ["user-message", "user-message-e36f9e2dfe24.js"],
+  // Review annotations and file-tree preferences still used a compact model
+  // that replaced the release comment cards and draft interaction surface.
+  ["review-preferences-model", "review-preferences-model-677402e96a42.js"],
+  ["detached-entry", "entry-d8508ad25dff.js"],
 ]);
 
 export const SEMANTIC_ROUTE_OVERRIDES = new Set([

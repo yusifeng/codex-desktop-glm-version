@@ -33,11 +33,18 @@ const runtimeSourceRoots = [
 ];
 const expectedExactRouteSources = new Map([
   ["codex-micro-settings", "codex-micro-settings-cbf47e1d3359.js"],
+  ["conversation-blocks", "conversation-blocks-3f59e850f9fb.js"],
+  ["detached-entry", "entry-d8508ad25dff.js"],
   ["general-settings", "general-settings-3d550f75d0eb.js"],
+  ["local-conversation-page", "local-conversation-page-bcc7eca0b3ab.js"],
+  ["local-conversation-thread", "local-conversation-thread-c6e40fdd6d59.js"],
+  ["local-conversation-turn", "local-conversation-turn-14bf296d5217.js"],
   ["personalization-settings", "personalization-settings-c52a4963cfd3.js"],
   ["remote-connections-settings", "remote-connections-settings-12e860fd2983.js"],
+  ["review-preferences-model", "review-preferences-model-677402e96a42.js"],
   ["security-settings", "security-settings-2da2a3b205ab.js"],
   ["settings-plugin-selection", "settings-plugin-selection-e42895d573ba.js"],
+  ["user-message", "user-message-e36f9e2dfe24.js"],
 ]);
 const managedExactSources = new Set(
   [...expectedExactRouteSources].map(([owner]) => path.join(ROOT, "src/renderer", owner, "exact.js")),
