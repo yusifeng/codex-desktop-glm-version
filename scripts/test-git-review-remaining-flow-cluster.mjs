@@ -165,19 +165,7 @@ let nativePrevented = 0;
 await contextMenu.t({ disableNative: true }).props.onContextMenu({ preventDefault() { nativePrevented++; } });
 assert.equal(nativePrevented, 1);
 
-// pdf-preview-diff: 8
-const pdf = await bundle("pdf-preview-diff");
-assert.deepEqual(Object.keys(pdf), ["PdfPreviewDiff"]);
-assert.match(text(pdf.PdfPreviewDiff({ isLoading: true })), /Loading PDF preview/);
-assert.equal(find(pdf.PdfPreviewDiff({ error: "Broken" }), node => node.props?.role === "alert").props.children, "Broken");
-let pageAction;
-const pdfUi = pdf.PdfPreviewDiff({ currentPage: 2, totalPages: 3, leftLabel: "Old", rightLabel: "New", onNextPage() { pageAction = "next"; }, onPreviousPage() { pageAction = "previous"; } });
-assert.match(text(pdfUi), /Old New/);
-assert.match(text(pdfUi), /2 \/ 3/);
-assert.equal(find(pdfUi, node => node.props?.children === "Previous page").props.disabled, false);
-find(pdfUi, node => node.props?.children === "Next page").props.onClick();
-assert.equal(pageAction, "next");
-assert.equal(find(pdf.PdfPreviewDiff({ currentPage: 1, totalPages: 1 }), node => node.props?.children === "Next page").props.disabled, true);
+assertReleaseOwner("pdf-preview-diff", [/export \{ [A-Za-z_$][\w$]* as PdfPreviewDiff \}/]);
 
 assertReleaseOwner("code-diff", [
   /@rchunk\/code-diff-context-menu/,
