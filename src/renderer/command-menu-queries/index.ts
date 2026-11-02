@@ -1,7 +1,19 @@
 // @ts-nocheck
+import { queryOptions as o } from "../app-shared/runtime/query-options";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { $3 as t, $O as n, _L as r, ek as i, gL as a, pL as o } from "@rchunk/app-shared";
-import { M6t as s, N6t as c, pdn as l, udn as u } from "@rchunk/app-initial";
+import {
+  $3 as t,
+  $O as n,
+  _L as r,
+  ek as i,
+  gL as a,
+} from "@rchunk/app-shared";
+import {
+  M6t as s,
+  N6t as c,
+  pdn as l,
+  udn as u,
+} from "@rchunk/app-initial";
 function d(e) {
   let t = (0, L.c)(11),
     { credits: i, enabled: a, isPolling: o } = e,

@@ -13,7 +13,19 @@ const result = await esbuild.build({
   format: "esm",
   platform: "node",
   target: "node22",
-  external: ["react"],
+  plugins: [{
+    name: "release-react-runtime",
+    setup(build) {
+      build.onResolve(
+        { filter: /^@rchunk\/app-shared$/ },
+        () => ({ path: "app-shared-react-runtime", namespace: "test" }),
+      );
+      build.onLoad(
+        { filter: /.*/, namespace: "test" },
+        () => ({ contents: "export const e6 = () => { throw new Error('release React fallback should not run in this test') }" }),
+      );
+    },
+  }],
   write: false,
   logLevel: "silent",
 });

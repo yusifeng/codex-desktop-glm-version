@@ -28,6 +28,7 @@ const __vite__mapDeps = (
       "./app-primary-484df789f2f5.css",
     ]),
 ) => i.map((i) => d[i]);
+import { initializeMountedState as Ie, useIsMounted as Ce } from "../app-shared/runtime/mounted-state";
 import { isTerminalConversationStatus as Ki } from "../app-initial/runtime/is-terminal-conversation-status";
 import { classNames as je, initializeClassNames as Se } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
@@ -94,7 +95,6 @@ import {
   gL as ye,
   g_ as be,
   gu as xe,
-  if as Ce,
   jf as we,
   kE as Te,
   k_ as Ee,
@@ -109,7 +109,6 @@ import {
   q4 as Pe,
   qm as W,
   rZ as Fe,
-  rf as Ie,
   sZ as Le,
   uI as Re,
   ug as ze,

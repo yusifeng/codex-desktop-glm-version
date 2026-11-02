@@ -1,7 +1,17 @@
 // @ts-nocheck
+import { queryOptions as i } from "../app-shared/runtime/query-options";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { H4 as t, V4 as n, g4 as r, pL as i, q4 as a, x4 as o } from "@rchunk/app-shared";
-import { pdn as s, udn as c } from "@rchunk/app-initial";
+import {
+  H4 as t,
+  V4 as n,
+  g4 as r,
+  q4 as a,
+  x4 as o,
+} from "@rchunk/app-shared";
+import {
+  pdn as s,
+  udn as c,
+} from "@rchunk/app-initial";
 import { n as l, t as u } from "@rchunk/billing-pricing";
 function d(e) {
   return i({

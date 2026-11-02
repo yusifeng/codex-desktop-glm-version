@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getBooleanFeatureFlag as F } from "../app-shared/runtime/permission-profiles";
 import { configurationQueryKey as ue } from "../app-initial/runtime/configuration-query-key";
 import { createPrefilledPluginPrompt as Ke } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 import { classNames as H, initializeClassNames as R } from "../app-shared/ui/class-names";
@@ -39,7 +40,6 @@ import {
   c_ as M,
   cm as N,
   cz as P,
-  dX as F,
   e6 as I,
   f_ as L,
   jf as z,

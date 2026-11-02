@@ -15,6 +15,7 @@ const __vite__mapDeps = (
       "@rchunk/conversation-thumbnail-ui",
     ]),
 ) => i.map((i) => d[i]);
+import { createWorkspaceWritePermissionState as ie } from "../app-shared/runtime/permission-profiles";
 import { formatErrorMessage as l } from "../app-shared/runtime/format-error-message";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -51,7 +52,6 @@ import {
   kh as te,
   pZ as ne,
   qm as re,
-  tX as ie,
   wL as j,
   zU as ae,
   zh as oe,

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { initializeMountedState as m, useIsMounted as fe } from "../app-shared/runtime/mounted-state";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -24,14 +25,12 @@ import {
   Zh as u,
   br as de,
   e6 as d,
-  if as fe,
   jf as f,
   kf as pe,
   lk as p,
   lw as me,
   n4 as he,
   pk as ge,
-  rf as m,
   sZ as _e,
   sx as ve,
   uy as ye,

@@ -1,7 +1,11 @@
 // @ts-nocheck
+import { queryOptions as t } from "../app-shared/runtime/query-options";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { pL as t } from "@rchunk/app-shared";
-import { pdn as n, udn as r } from "@rchunk/app-initial";
+
+import {
+  pdn as n,
+  udn as r,
+} from "@rchunk/app-initial";
 import { r as i, t as a } from "@rchunk/stripe-pure";
 function o(e) {
   let t = getComputedStyle(document.body);

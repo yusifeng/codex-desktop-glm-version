@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createWorkspaceWritePermissionState as Se } from "../app-shared/runtime/permission-profiles";
 import { CODEX_WEB_URL as E } from "../app-shared/runtime/codex-links";
 import { gitSettings as l } from "../app-shared/runtime/git-settings";
 import { classNames as _e, initializeClassNames as le } from "../app-shared/ui/class-names";
@@ -67,7 +68,6 @@ import {
   o_ as ye,
   pk as be,
   q4 as xe,
-  tX as Se,
   tm as Ce,
   wL as we,
   xD as Te,

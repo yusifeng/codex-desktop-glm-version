@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isHeartbeatAutomation as ce } from "../app-shared/runtime/automation-models";
 import { classNames as ie, initializeClassNames as O } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -48,7 +49,6 @@ import {
   wL as R,
   xD as z,
   yS as B,
-  zY as ce,
 } from "@rchunk/app-shared";
 import {
   $en as le,

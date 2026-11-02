@@ -36,6 +36,7 @@ const __vite__mapDeps = (
       "@rchunk/stripe-pure",
     ]),
 ) => i.map((i) => d[i]);
+import { queryOptions as H } from "../app-shared/runtime/query-options";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -88,7 +89,6 @@ import {
   my as B,
   n4 as ce,
   o_ as V,
-  pL as H,
   rL as U,
   rl as le,
   tC as ue,

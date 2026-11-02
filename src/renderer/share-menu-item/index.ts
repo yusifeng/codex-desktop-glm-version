@@ -19,6 +19,8 @@ const __vite__mapDeps = (
       "@rchunk/permission-dropdown",
     ]),
 ) => i.map((i) => d[i]);
+import { initializeMountedState as ge, useIsMounted as H } from "../app-shared/runtime/mounted-state";
+import { queryOptions as pe } from "../app-shared/runtime/query-options";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -67,7 +69,6 @@ import {
   gL as V,
   gu as re,
   iL as ie,
-  if as H,
   jT as ae,
   jf as U,
   jh as W,
@@ -79,13 +80,11 @@ import {
   n4 as ue,
   o$ as de,
   o_ as fe,
-  pL as pe,
   pO as K,
   pk as q,
   qT as me,
   qv as J,
   rL as he,
-  rf as ge,
   wD as _e,
   wL as ve,
   xD as ye,
@@ -135,7 +134,10 @@ import {
   xlt as at,
   ydn as ot,
 } from "@rchunk/app-initial";
-import { Kl as st, ql as ct } from "@rchunk/app-primary";
+import {
+  Kl as st,
+  ql as ct,
+} from "@rchunk/app-primary";
 import { r as lt, t as ut } from "@rchunk/plugin-skill-queries";
 import { n as dt, t as ft } from "@rchunk/plugin-connected-account-links";
 import { O as pt, k as mt } from "@rchunk/plugins-page-section";

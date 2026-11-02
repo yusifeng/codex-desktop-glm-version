@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isHeartbeatAutomation as W } from "../app-shared/runtime/automation-models";
 import { createCommandQueryKey as qe } from "../app-initial/runtime/create-command-query-key";
 import { classNames as Ae, initializeClassNames as _e } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
@@ -86,7 +87,6 @@ import {
   wc as Be,
   wg as Ve,
   xD as He,
-  zY as W,
   zh as Ue,
 } from "@rchunk/app-shared";
 import {

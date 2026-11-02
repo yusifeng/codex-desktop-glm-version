@@ -24,19 +24,24 @@
 // 依赖（28 个文件，保持与原版一致的 import 集合）：app-shared/app-initial/
 // app-primary + conversation-blocks（turn 渲染体 rl）+ 25 个功能 chunk。
 
+import { appgenInteractionActions as appgenAccessApi } from "../app-shared/runtime/appgen-interaction-action";
 import {
   $3 as runtimeLazy,
   $h as resourceIconHelpers,
   $r as appgenHelpers,
   BK as agentActivityApi,
-  Bk as appgenAccessApi,
   I3 as getJsxRuntime,
   e6 as getReact,
 } from "@rchunk/app-shared";
 import * as appSharedChunk from "@rchunk/app-shared";
-import { C as environmentSetupInit, mnn as projectConversationTurn } from "@rchunk/app-initial";
+import {
+  C as environmentSetupInit,
+  mnn as projectConversationTurn,
+} from "@rchunk/app-initial";
 import * as appInitialChunk from "@rchunk/app-initial";
-import { d as appPrimaryInit } from "@rchunk/app-primary";
+import {
+  d as appPrimaryInit,
+} from "@rchunk/app-primary";
 import * as conversationBlocksTurnBody from "@rchunk/conversation-blocks";
 import * as aboveComposerFixedContentSurface from "@rchunk/above-composer-fixed-content-surface";
 import * as agentActivityItem from "@rchunk/agent-activity-item";

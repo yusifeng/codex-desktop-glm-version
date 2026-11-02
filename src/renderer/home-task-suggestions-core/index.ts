@@ -15,6 +15,7 @@ const __vite__mapDeps = (
       "@rchunk/departments",
     ]),
 ) => i.map((i) => d[i]);
+import { initializeMountedState as fe, useIsMounted as oe } from "../app-shared/runtime/mounted-state";
 import { ambientSuggestionSettings as y } from "../app-shared/runtime/ambient-suggestion-settings";
 import { isTerminalConversationStatus as et } from "../app-initial/runtime/is-terminal-conversation-status";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
@@ -48,7 +49,6 @@ import {
   e6 as w,
   ek as T,
   fI as ae,
-  if as oe,
   l3 as E,
   lk as se,
   lw as ce,
@@ -58,7 +58,6 @@ import {
   qm as O,
   rC as de,
   rZ as k,
-  rf as fe,
   sZ as pe,
   wL as me,
   zM as he,

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getBooleanFeatureFlag as ae } from "../app-shared/runtime/permission-profiles";
 import { gitSettings as o } from "../app-shared/runtime/git-settings";
 import { parseGitRemoteUrl as ie } from "../app-shared/runtime/parse-git-remote-url";
 import { createCommandQueryKey as _e } from "../app-initial/runtime/create-command-query-key";
@@ -26,7 +27,6 @@ import {
   Y2 as y,
   Ym as re,
   ZI as b,
-  dX as ae,
   ek as oe,
   fI as se,
   g4 as ce,

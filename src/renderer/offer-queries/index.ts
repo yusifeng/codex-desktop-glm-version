@@ -1,8 +1,8 @@
 // @ts-nocheck
+import { queryOptions as t } from "../app-shared/runtime/query-options";
 import { EXPECTED_ACCOUNT_ID_HEADER as n } from "../app-shared/runtime/request-protocol";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
-  pL as t,
   wL as r,
 } from "@rchunk/app-shared";
 import {

@@ -1,3 +1,5 @@
+import { e6 as getReactRuntime } from "@rchunk/app-shared";
+
 interface MutableRef<T> {
   current: T;
 }
@@ -13,7 +15,7 @@ interface ReactLike {
 function reactOf(): ReactLike {
   return (
     (globalThis as { __RENDERER_REACT__?: ReactLike }).__RENDERER_REACT__ ??
-    (require("react") as ReactLike)
+    (getReactRuntime() as ReactLike)
   );
 }
 

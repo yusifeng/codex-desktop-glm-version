@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { infiniteQueryOptions as m } from "../app-shared/runtime/query-options";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -17,7 +18,6 @@ import {
   ek as f,
   jZ as p,
   tY as ne,
-  uL as m,
   wL as h,
 } from "@rchunk/app-shared";
 import {

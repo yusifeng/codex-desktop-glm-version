@@ -1,7 +1,18 @@
 // @ts-nocheck
+import { queryOptions as a } from "../app-shared/runtime/query-options";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { FX as t, QI as n, QX as r, ZI as i, pL as a } from "@rchunk/app-shared";
-import { cJt as o, cdn as s, ldn as c, rJt as l } from "@rchunk/app-initial";
+import {
+  FX as t,
+  QI as n,
+  QX as r,
+  ZI as i,
+} from "@rchunk/app-shared";
+import {
+  cJt as o,
+  cdn as s,
+  ldn as c,
+  rJt as l,
+} from "@rchunk/app-initial";
 function u(e) {
   return a({
     queryKey: s(e),

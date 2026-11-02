@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { infiniteQueryOptions as ie } from "../app-shared/runtime/query-options";
 import { formatBrowserUrl as me } from "../app-primary/runtime/format-browser-url";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -44,7 +45,6 @@ import {
   o$ as ne,
   pk as re,
   rL as R,
-  uL as ie,
   zh as z,
 } from "@rchunk/app-shared";
 import {

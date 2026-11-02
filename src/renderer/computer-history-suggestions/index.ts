@@ -1,10 +1,10 @@
 // @ts-nocheck
+import { getBooleanFeatureFlag as i } from "../app-shared/runtime/permission-profiles";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   FX as t,
   QI as n,
   ZI as r,
-  dX as i,
   pZ as a,
   sZ as o,
   wL as s,

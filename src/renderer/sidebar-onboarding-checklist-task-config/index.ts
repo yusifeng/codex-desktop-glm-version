@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isPermissionPresetAllowed as d } from "../app-shared/runtime/permission-profiles";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -11,7 +12,6 @@ import {
   QX as c,
   Z4 as l,
   ZI as u,
-  cX as d,
   g4 as f,
   k4 as p,
   lY as m,

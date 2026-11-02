@@ -45,6 +45,7 @@ const __vite__mapDeps = (
       "@rchunk/layout",
     ]),
 ) => i.map((i) => d[i]);
+import { initializeMountedState as et, useIsMounted as Ne } from "../app-shared/runtime/mounted-state";
 import { gitSettings as m } from "../app-shared/runtime/git-settings";
 import { parseGitRemoteUrl as ve } from "../app-shared/runtime/parse-git-remote-url";
 import { createCommandQueryKey as pt } from "../app-initial/runtime/create-command-query-key";
@@ -123,7 +124,6 @@ import {
   em as ke,
   f$ as Ae,
   iL as Me,
-  if as Ne,
   ig as Pe,
   ip as Fe,
   jT as Ie,
@@ -143,7 +143,6 @@ import {
   qT as Ze,
   rL as Qe,
   rZ as $e,
-  rf as et,
   tm as tt,
   tp as nt,
   ug as rt,

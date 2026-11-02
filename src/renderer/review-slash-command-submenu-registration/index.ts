@@ -1,8 +1,8 @@
 // @ts-nocheck
+import { createPermissionStateForPreset as n, getPermissionRuntimeSelector as S, getRuntimeWorkspaceRoots as g } from "../app-shared/runtime/permission-profiles";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
-  $Y as n,
   $h as r,
   C_ as i,
   FX as a,
@@ -20,14 +20,12 @@ import {
   ZI as ne,
   ZP as re,
   Zh as h,
-  aX as g,
   fI as _,
   iL as v,
   iz as ie,
   lk as y,
   mo as b,
   n4 as x,
-  oX as S,
   pk as ae,
   po as oe,
   rL as C,
@@ -83,7 +81,10 @@ import {
   ypn as J,
   zhn as Y,
 } from "@rchunk/app-initial";
-import { dp as Ae, fp as je } from "@rchunk/app-primary";
+import {
+  dp as Ae,
+  fp as je,
+} from "@rchunk/app-primary";
 import { i as Me, n as Ne, r as X, t as Z } from "@rchunk/use-git-recent-branches";
 var Q;
 function Pe() {

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { queryOptions as pe } from "../app-shared/runtime/query-options";
 import { classNames as ue, initializeClassNames as ce } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -27,7 +28,6 @@ import {
   lw as m,
   my as de,
   n4 as fe,
-  pL as pe,
   yb as me,
   zh as h,
 } from "@rchunk/app-shared";

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isHeartbeatAutomation as f } from "../app-shared/runtime/automation-models";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -12,7 +13,6 @@ import {
   n4 as l,
   wL as u,
   wy as d,
-  zY as f,
 } from "@rchunk/app-shared";
 import {
   Ctt as p,

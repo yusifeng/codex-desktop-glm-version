@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { queryOptions as u } from "../app-shared/runtime/query-options";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -10,7 +11,6 @@ import {
   Z3 as s,
   e6 as c,
   lw as l,
-  pL as u,
 } from "@rchunk/app-shared";
 import { n as d, t as f } from "@rchunk/browser-profile-import-cookies-icon";
 import { n as p, t as m } from "@rchunk/browser-profile-import-history-icon";

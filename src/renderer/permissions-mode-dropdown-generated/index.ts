@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isGuardianApprovalEnabled as j } from "../app-shared/runtime/permission-profiles";
 import { classNames as I, initializeClassNames as re } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -33,7 +34,6 @@ import {
   e6 as A,
   em as ee,
   fI as te,
-  fX as j,
   fg as ne,
   jf as M,
   jh as N,

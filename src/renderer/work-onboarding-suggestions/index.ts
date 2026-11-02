@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { queryOptions as A } from "../app-shared/runtime/query-options";
 import { classNames as D, initializeClassNames as C } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -30,7 +31,6 @@ import {
   my as O,
   n4 as ee,
   oZ as k,
-  pL as A,
   pk as j,
   q4 as M,
   qQ as N,

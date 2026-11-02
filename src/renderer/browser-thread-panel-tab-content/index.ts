@@ -27,6 +27,7 @@ const __vite__mapDeps = (
       "@rchunk/browser-site-annotation-permission-dialog",
     ]),
 ) => i.map((i) => d[i]);
+import { sitesSharingSources as l } from "../app-shared/runtime/sites-sharing-source";
 import { setBrowserTabUrlState as Fr } from "../app-primary-browser-comment-runtime/index";
 import { isBrowserCommentForTab as Lr } from "../app-primary/runtime/is-browser-comment-for-tab";
 import { parseUrlOrFallback as Vr } from "../app-primary/runtime/parse-url-or-fallback";
@@ -44,7 +45,6 @@ import {
   CJ as o,
   C_ as s,
   Ch as c,
-  DF as l,
   E4 as d,
   EJ as f,
   FX as m,

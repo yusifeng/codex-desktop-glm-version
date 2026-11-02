@@ -12,6 +12,7 @@ const __vite__mapDeps = (
       "./app-initial-e8ceb32eb626.css",
     ]),
 ) => i.map((i) => d[i]);
+import { sitesSharingSources as c } from "../app-shared/runtime/sites-sharing-source";
 import { createPrefilledPluginPrompt as lt } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 import { extractSiteSubdomain as dt } from "../app-primary/runtime/extract-site-subdomain";
 import { formatBrowserUrl as ft } from "../app-primary/runtime/format-browser-url";
@@ -24,7 +25,6 @@ import {
   BX as a,
   CL as o,
   C_ as s,
-  DF as c,
   FX as l,
   FZ as u,
   F_ as d,

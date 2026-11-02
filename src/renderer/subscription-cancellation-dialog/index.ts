@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { queryOptions as A } from "../app-shared/runtime/query-options";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -33,7 +34,6 @@ import {
   lk as O,
   lw as k,
   n4 as ne,
-  pL as A,
   pk as j,
   q4 as M,
   rL as N,
