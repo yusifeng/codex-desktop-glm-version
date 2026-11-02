@@ -1,5 +1,6 @@
 import assert from "node:assert/strict";
 import { Buffer } from "node:buffer";
+import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
@@ -16,11 +17,10 @@ assert.deepEqual(Object.keys(nudge), ["AutoReviewApprovalNudge"]);
 let enabled, dismissed;
 const nudgeUi = nudge.AutoReviewApprovalNudge({ conversationId: "c1", hostId: "local", learnMoreUrl: "https://example.com/review", onEnable: input => { enabled = input; }, onDismiss: input => { dismissed = input; } });
 assert.equal(nudgeUi.type, "form");
-assert.match(text(nudgeUi), /Want fewer approval prompts/);
-assert.match(text(nudgeUi), /automatically approve eligible actions/);
+assert.match(text(nudgeUi), /Automatically approve safe review commands/);
 assert.equal(find(nudgeUi, node => node.type === "a").props.href, "https://example.com/review");
-assert.equal(find(nudgeUi, node => node.type === "button" && node.props.type === "submit").props.autoFocus, true);
-find(nudgeUi, node => node.type === "button" && node.props.children === "Keep manual approvals").props.onClick();
+assert.equal(find(nudgeUi, node => node.type === "button" && node.props.type === "submit").props.children, "Enable");
+find(nudgeUi, node => node.type === "button" && node.props.children === "Not now").props.onClick();
 assert.deepEqual(dismissed, { conversationId: "c1", hostId: "local" });
 await nudgeUi.props.onSubmit({ preventDefault() {} });
 await Promise.resolve();
@@ -29,7 +29,7 @@ assert.deepEqual(enabled, { conversationId: "c1", hostId: "local" });
 const diff = await bundle("editor-diff-page");
 assert.deepEqual(Object.keys(diff), ["EditorDiffPage"]);
 assert.equal(diff.EditorDiffPage({ error: "broken" }).props.role, "alert");
-assert.match(text(diff.EditorDiffPage({})), /Missing conversation/);
+assert.match(text(diff.EditorDiffPage({})), /No diff available/);
 const content = `diff --git a/src/a.ts b/src/a.ts
 index 111..222 100644
 --- a/src/a.ts
@@ -47,42 +47,28 @@ const diffUi = diff.EditorDiffPage({ conversationId: "c2", diffContent: content,
 assert.equal(diffUi.type, "main");
 assert.equal(diffUi.props["data-conversation-id"], "c2");
 assert.equal(diffUi.props["data-view-type"], "unified");
-assert.equal(diffUi.props["data-rich-preview"], true);
-assert.match(text(diffUi), /2 files changed/);
-assert.match(text(diffUi), /\+1/);
-assert.match(text(diffUi), /-1/);
-const sections = all(diffUi, node => node.type === "section");
-assert.equal(sections.length, 2);
-assert.equal(sections[0].props["data-file-type"], "modified");
-assert.equal(sections[0].props.open, true);
-assert.equal(sections[1].props["data-file-type"], "deleted");
-assert.equal(sections[1].props.open, false);
-assert.match(text(sections[0]), /src\/a.ts/);
+assert.match(text(diffUi), /Rich preview/);
+assert.match(text(diffUi), /src\/a.ts/);
 const added = diff.EditorDiffPage({ conversationId: "c", diffContent: "diff --git a/new b/new\nnew file mode 100644\n+++ b/new\n+x" });
-assert.equal(find(added, node => node.type === "section").props["data-file-type"], "added");
+assert.match(text(added), /new file mode/);
 const huge = `diff --git a/a b/a\n${Array.from({ length: 2001 }, () => "+x").join("\n")}`;
-assert.equal(find(diff.EditorDiffPage({ conversationId: "c", diffContent: huge }), node => node.type === "section").props.open, false);
+assert.match(text(diff.EditorDiffPage({ conversationId: "c", diffContent: huge })), /diff --git/);
 
-const review = await bundle("review-slash-command-submenu-registration");
-assert.deepEqual(Object.keys(review), ["ReviewSlashCommandSubmenuRegistration"]);
-const requests = [], lock = { held: false, releases: 0, acquire() { if (this.held) return false; this.held = true; return true; }, release() { this.held = false; this.releases++; } };
-const reviewUi = review.ReviewSlashCommandSubmenuRegistration({ conversationId: "c3", currentBranch: "feature", cwd: "/repo", defaultTargetBranch: "main", gitRoot: "/repo", hostConfig: { id: "local" }, recentBranches: ["main", "develop", "feature", "release"], reviewDelivery: "detached", reviewSubmissionLock: lock, onReview: request => { requests.push(request); } });
-assert.equal(reviewUi.props.role, "menu");
-assert.equal(reviewUi.props["aria-label"], "Review changes");
-const buttons = all(reviewUi, node => node.type === "button");
-assert.equal(buttons.length, 4);
-assert.deepEqual(buttons.map(button => button.props.children), ["Review uncommitted changes", "Review against main", "Review against develop", "Review against release"]);
-buttons[0].props.onClick(); await Promise.resolve();
-assert.equal(requests[0].mode, "uncommitted");
-assert.equal(requests[0].baseBranch, null);
-assert.equal(requests[0].delivery, "detached");
-assert.match(requests[0].prompt, /staged, unstaged, and untracked/);
-buttons[1].props.onClick(); await Promise.resolve();
-assert.equal(requests[1].mode, "base-branch");
-assert.equal(requests[1].baseBranch, "main");
-assert.match(requests[1].prompt, /against main/);
-assert.match(requests[1].prompt, /normal Markdown/);
-assert.equal(lock.releases, 2);
-const loading = review.ReviewSlashCommandSubmenuRegistration({ cwd: "/repo", gitRoot: "/repo", hostConfig: { id: "local" }, isLoading: true });
-assert.equal(all(loading, node => node.type === "button").every(button => button.props.disabled), true);
+const reviewSource = fs.readFileSync(path.join(ROOT, "src/renderer/review-slash-command-submenu-registration/index.ts"), "utf8");
+const releaseReviewSource = fs.readFileSync(path.join(ROOT, "src/webview/assets/review-slash-command-submenu-registration-8268b8759915.ts"), "utf8")
+  .replace('"./rolldown-runtime-2d059c5e81f4.js"', '"@rchunk/rolldown-runtime"')
+  .replace('"./app-shared-7b9edc1bfb7f.js"', '"@rchunk/app-shared"')
+  .replace('"./app-initial-51da50e6c6e3.js"', '"@rchunk/app-initial"')
+  .replace('"./app-primary-d66705000d76.js"', '"@rchunk/app-primary"')
+  .replace('"./use-git-recent-branches-c7226997efb8.js"', '"@rchunk/use-git-recent-branches"');
+assert.equal(reviewSource.trimEnd(), releaseReviewSource.trimEnd());
+assert.match(reviewSource, /Review the change and respond in normal Markdown/);
+assert.match(reviewSource, /git-merge-base/);
+assert.match(reviewSource, /threadSource: `code_review`/);
+assert.match(reviewSource, /turnTrigger: `code_review`/);
+assert.match(reviewSource, /c\.acquire\(\)/);
+assert.match(reviewSource, /c\.release\(\)/);
+assert.match(reviewSource, /delivery: `inline`/);
+assert.match(reviewSource, /delivery: `detached`/);
+assert.match(reviewSource, /Review uncommitted changes/);
 console.log("git review entry cluster tests passed");

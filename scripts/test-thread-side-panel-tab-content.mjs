@@ -300,10 +300,10 @@ assert.deepEqual(state.actions.at(-1), { action: "unstage", file: "" });
 
 tabState = { ...baseState(), source: "pr", selectedPullRequest: "pr-1" };
 view = render(true).result;
-assert.equal(
-  find(view, (node) => node.type === "pull-request-review").props.headBranch,
-  "feature",
-);
+const pullRequestReview = find(view, (node) => node.type === "pull-request-review");
+assert.equal(pullRequestReview.props.headBranch, "feature");
+assert.equal(pullRequestReview.props.request.files.length, 2);
+assert.equal(pullRequestReview.props.onRefresh, tabState.onRefresh);
 tabState = { ...baseState(), source: "pr", pullRequests: [], files: [] };
 view = render(true).result;
 assert.equal(text(view).includes("No open pull requests"), true);

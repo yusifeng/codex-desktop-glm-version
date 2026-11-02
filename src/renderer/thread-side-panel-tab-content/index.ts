@@ -39,8 +39,12 @@ interface ReviewFile {
 }
 interface PullRequest {
   baseBranch?: string;
+  error?: unknown;
+  files?: ReviewFile[];
   headBranch?: string;
+  headRevision?: string | null;
   id: string;
+  isLoading?: boolean;
   number?: number;
   title?: string;
 }
@@ -445,9 +449,15 @@ function ReviewContent({
       (candidate) => candidate.id === tabState.selectedPullRequest,
     );
     body = jsx.jsx(PullRequestCodeReview, {
-      request: pullRequest,
+      request:
+        pullRequest == null
+          ? null
+          : { ...pullRequest, files: pullRequest.files ?? files },
       baseBranch: pullRequest?.baseBranch,
       headBranch: pullRequest?.headBranch,
+      headRevision: pullRequest?.headRevision,
+      isRefreshing: operationPending,
+      onRefresh: tabState.onRefresh,
     });
   } else
     body = jsx.jsxs("div", {

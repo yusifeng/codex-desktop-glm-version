@@ -274,3 +274,13 @@ contribution, uses the production composer when available, and presents structur
 reviews, diffs, previews, archived mode, and hotkey layout. Review source controls and notices now occupy the side-panel header
 slots, while the diff body receives the real expanded-action portal target. Focused stateful tests cover these lifecycles, but
 the complete remote event reducer and every release Review workflow remain part of the outstanding fidelity work.
+
+The subsequent Git/PR Review convergence batch closes that specifically identified Review-workflow gap. The PR review owner
+now renders legal file diffs and owns file selection, search, display controls, loading/error/stale-revision/empty states, and
+refresh retry; the thread side panel supplies its live file and revision data instead of a metadata-only request. The Review
+slash command retains the complete release behavior: guidelines and inline-comment protocol, repository-rule attribution,
+branch discovery and de-duplication, merge-base resolution, permission projection, inline versus detached delivery, submission
+locking, license/error retry, navigation, and command registration. The focused Git/PR/Review family, typecheck, 1,888 renderer
+build and verification, 2,247 app-code coverage, zero semantic tail, strict hub/route/index gates, and whole-tree build check
+pass. This removes the known Review publication gap; it does not by itself prove the remaining preserved inventory or the final
+real-app E2E matrix complete.

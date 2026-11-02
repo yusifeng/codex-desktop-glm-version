@@ -6,12 +6,20 @@ import * as esbuild from "esbuild";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
+const hooks = [];
+let hookIndex = 0;
 const react = {
+  __clear() { hooks.length = 0; hookIndex = 0; },
+  __reset() { hookIndex = 0; },
   createContext: (value) => ({ value, Provider: "ContextProvider", Consumer: "ContextConsumer" }),
   useContext: (context) => context.value,
   useEffect: (effect) => { globalThis.__effects.push(effect); },
   useInsertionEffect: (effect) => { globalThis.__insertions.push(effect); },
-  useState: (initial) => [typeof initial === "function" ? initial() : initial, () => {}],
+  useState(initial) {
+    const index = hookIndex++;
+    if (!(index in hooks)) hooks[index] = typeof initial === "function" ? initial() : initial;
+    return [hooks[index], (next) => { hooks[index] = typeof next === "function" ? next(hooks[index]) : next; }];
+  },
 };
 globalThis.__jsx = jsx;
 globalThis.__react = react;
@@ -66,6 +74,17 @@ void terminated;
 
 const review = await loadModule("pull-request-code-review-core");
 review.n();
+function walk(value, output = []) {
+  if (value == null || typeof value !== "object") return output;
+  if (Array.isArray(value)) { for (const item of value) walk(item, output); return output; }
+  output.push(value); walk(value.props?.children, output); return output;
+}
+function text(value) {
+  if (value == null || typeof value === "boolean") return "";
+  if (typeof value === "string" || typeof value === "number") return String(value);
+  if (Array.isArray(value)) return value.map(text).join(" ");
+  return text(value.props?.children);
+}
 const calls = [];
 const controls = {
   diffMode: "unified", expanded: true, hideWhitespace: false, loadFullFilesEnabled: false, richPreviewEnabled: true, wordDiffsEnabled: true, wrap: false,
@@ -93,9 +112,10 @@ options.props.children[5].props.onClick();
 assert.deepEqual(calls.at(-1), ["full"]);
 
 const unifiedDiff = review.r({ diff: { metadata: { additionLines: [1] }, name: "a.ts" }, id: "diff-1" });
-assert.equal(unifiedDiff.type, "div");
+assert.equal(unifiedDiff.type, "article");
 assert.equal(unifiedDiff.props["data-hunk-separators"], "line-info");
-assert.equal(unifiedDiff.props.children.name, "a.ts");
+assert.equal(unifiedDiff.props["data-path"], "a.ts");
+assert.equal(text(unifiedDiff).includes("No patch content available"), true);
 const metadataDiff = review.r({ diff: { metadata: {}, name: "b.ts" } });
 assert.equal(metadataDiff.props["data-hunk-separators"], "metadata");
 
@@ -109,8 +129,55 @@ const surface = review.t({ baseBranch: "main", headBranch: "feature", request: {
 assert.equal(surface.type, "section");
 assert.equal(surface.props["data-base-branch"], "main");
 assert.equal(surface.props["data-head-branch"], "feature");
-assert.equal(surface.props.children[0].type, review.a);
-assert.equal(surface.props.children[1].type, review.s);
-assert.equal(surface.props.children[1].props.bottomInset, "actions");
+assert.equal(surface.props.children[1].type, review.a);
+assert.equal(surface.props.children[2], "files");
+
+react.__clear();
+const request = { headRevision: "abc", files: [
+  { path: "src/a.ts", patch: "-old\n+new", comments: [{ id: 1 }], status: "modified" },
+  { path: "src/b.ts", patch: "+second", generated: true, status: "added" },
+] };
+let live = review.t({ baseBranch: "main", headBranch: "feature", headRevision: "abc", request, onRefresh: () => {} });
+assert.equal(text(live).includes("feature"), true);
+assert.equal(text(live).includes("into main"), true);
+assert.equal(text(live).includes("src/a.ts"), true);
+assert.equal(text(live).includes("src/b.ts"), true);
+let liveOptions = review.a(live.props.children[1].props);
+liveOptions.props.children[1].props.onClick();
+liveOptions.props.children[2].props.onClick();
+liveOptions.props.children[3].props.onClick();
+liveOptions.props.children[4].props.onClick();
+liveOptions.props.children[5].props.onClick();
+react.__reset();
+live = review.t({ baseBranch: "main", headBranch: "feature", headRevision: "abc", request, onRefresh: () => {} });
+assert.equal(live.props["data-hide-whitespace"], true);
+assert.equal(live.props["data-load-full-files"], true);
+liveOptions = review.a(live.props.children[1].props);
+assert.equal(liveOptions.props.children[1].props.children, "Disable word wrap");
+assert.equal(liveOptions.props.children[2].props.children, "Expand all diffs");
+assert.equal(liveOptions.props.children[3].props.children, "Diff mode: right");
+const filter = walk(live).find((node) => node.props?.["aria-label"] === "Filter files");
+filter.props.onChange({ currentTarget: { value: "b.ts" } });
+react.__reset();
+live = review.t({ baseBranch: "main", headBranch: "feature", headRevision: "abc", request, onRefresh: () => {} });
+assert.equal(text(live).includes("src/a.ts"), false);
+assert.equal(text(live).includes("src/b.ts"), true);
+
+react.__clear();
+const loading = review.t({ request: { isLoading: true } });
+assert.equal(loading.props.role, "status");
+assert.equal(text(loading), "Loading pull request changes…");
+const failed = review.t({ request: { error: "network failed" } });
+assert.equal(failed.props.role, "alert");
+assert.equal(text(failed).includes("network failed"), true);
+react.__clear();
+const stale = review.t({ headRevision: "new", request: { headRevision: "old", files: [] } });
+assert.equal(stale.props.role, "alert");
+assert.equal(text(stale).includes("changed while its diff was loading"), true);
+let capturedSlots;
+react.__clear();
+const slotted = review.t({ request, sourceControl: "source", renderSlots: (slots) => { capturedSlots = slots; return "slotted"; } });
+assert.equal(slotted, "slotted");
+assert.deepEqual(capturedSlots.headerRows.map((row) => row.id), ["review-pull-request-source", "review-pull-request-toolbar"]);
 
 console.log("pull request review and theme cluster: 44 assertions");

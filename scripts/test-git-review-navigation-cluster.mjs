@@ -23,6 +23,9 @@ state.jsx = {
   jsxs: (type, props, key) => ({ type, props: props ?? {}, key }),
 };
 state.react = {
+  createElement(type, props) {
+    return { type, props: props ?? {} };
+  },
   useState(initial) {
     let value = typeof initial === "function" ? initial() : initial;
     return [
@@ -44,8 +47,11 @@ for (const directory of MODULES) {
     /import\s*{([\s\S]*?)}\s*from\s*"@rchunk\/([^"]+)";/g,
   )) {
     const names = imports.get(match[2]) ?? new Set();
-    for (const item of match[1].split(","))
-      names.add(item.trim().split(/\s+as\s+/)[0]);
+    for (const item of match[1].split(",")) {
+      const imported = item.trim();
+      if (imported.startsWith("type ")) continue;
+      names.add(imported.split(/\s+as\s+/)[0]);
+    }
     imports.set(match[2], names);
   }
 }
@@ -64,21 +70,28 @@ const overrides = {
     qm: "()=>{}",
   },
   "app-initial": {
+    Dyt: "'currentHostId'",
     FDt: "()=>{}",
     Gvt: "(scope,_definition,tab)=>scope.openTab(tab)",
     IDt: "(_kind,_component,options)=>({...options,dropDestinations:['right','bottom']})",
+    Syt: "'currentCwd'",
     Wvt: "()=>{}",
-    X8t: "pr=>`${pr.hostname}/${pr.owner}/${pr.repository}#${pr.number}`",
+    Xy: "async (_operation,input)=>({status:'success',items:[{cwd:input.cwd,headBranch:'feature',number:Number(input.searchQuery),state:'open',title:`PR ${input.searchQuery}`,url:`https://github.com/o/r/pull/${input.searchQuery}`}]})",
+    X8t: "pr=>pr==null?'':`${pr.hostname}/${pr.owner}/${pr.repository}#${pr.number}`",
     Z8t: "value=>value.toLowerCase()",
     _vt: "()=>{}",
+    a5t: "(candidate,pr)=>candidate.url?.endsWith(`/pull/${pr.number}`)===true",
     by: "'query'",
     e5t: "value=>value",
     gvt: "scope=>scope.existingPlacement",
+    hdt: "'repository-root-query'",
     hvt: "placement=>({updateTabState:(scope,id,updater)=>scope.resets?.push([placement,id,updater()])})",
     i5t: "()=>{}",
     mpn: "'intl'",
     ppn: "()=>{}",
+    s5t: "url=>({hostname:'github.com',owner:'o',repository:'r',number:Number(url.split('/').pop())})",
     vvt: "(scope,placement)=>scope.focusPanel(placement)",
+    xdt: "target=>target",
     yy: "()=>{}",
   },
   "file-diff-alt": { t: "globalThis.__gitReviewNavigationTest.FileDiff" },
@@ -365,22 +378,61 @@ sideTab.t();
 const sideTabs = [];
 const sideStore = {
   value: { routeKind: "local-thread" },
+  get: (signal) => signal === "currentCwd" ? "/repo" : "local",
+  query: {
+    getOrFetch: async (query) =>
+      query === "repository-root-query" ? { root: "/repo" } : null,
+  },
   openTab: (tab) => sideTabs.push(tab),
   focusPanel: (panel) => focused.push(panel),
 };
 assert.equal(
   sideTab.n(sideStore, {
-    request: { id: "pr" },
+    request: {
+      account: { hostId: "local" },
+      provider: "github",
+      pullRequest: {
+        hostname: "github.com",
+        owner: "o",
+        repository: "r",
+        number: 7,
+      },
+    },
     title: "PR 7",
-    url: "https://github.com/o/r/pull/7",
   }),
   true,
 );
-assert.equal(sideTabs[0].kind, "pull-request");
+assert.match(sideTabs[0].id, /^pull-request:/);
+assert.equal(sideTabs[0].props.request.provider, "github");
 assert.equal(sideTabs[0].target, "right");
 assert.equal(sideTabs[0].title, "PR 7");
 assert.equal(
-  sideTab.r(sideStore, { request: {}, title: "Board PR" }, false, "bottom"),
+  sideTab.r(
+    sideStore,
+    {
+      hostId: "local",
+      item: {
+        cwd: "/repo",
+        headBranch: "feature",
+        number: 8,
+        state: "open",
+        title: "Board PR",
+        url: "https://github.com/o/r/pull/8",
+      },
+      provider: "github",
+      repo: "github.com/o/r",
+      repositoryTarget: { cwd: "/repo", hostId: "local", root: "/repo" },
+      statusKey: {
+        cwd: "/repo",
+        headBranch: "feature",
+        hostId: "local",
+        operationSource: "test",
+        url: "https://github.com/o/r/pull/8",
+      },
+    },
+    false,
+    "bottom",
+  ),
   true,
 );
 assert.equal(sideTabs[1].target, "bottom");
