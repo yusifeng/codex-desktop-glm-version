@@ -9,7 +9,10 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
     jsx: (type, props, key) => ({ type, props: props ?? {}, key }),
     jsxs: (type, props, key) => ({ type, props: props ?? {}, key }),
   };
+let activeHooks = [], hookCursor = 0;
+const React = { useState(initial) { const hooks = activeHooks, index = hookCursor++; if (!(index in hooks)) hooks[index] = typeof initial === "function" ? initial() : initial; return [hooks[index], value => { hooks[index] = typeof value === "function" ? value(hooks[index]) : value; }]; } };
 globalThis.__jsx = jsx;
+globalThis.__secretScopeReact = React;
 async function load(name) {
   const result = await esbuild.build({
     entryPoints: [path.join(ROOT, `src/renderer/${name}/index.ts`)],
@@ -41,9 +44,10 @@ async function load(name) {
 }
 function pathModule(name) {
   return name === "app-shared"
-    ? { loader: "js", contents: "export const I3=()=>globalThis.__jsx;" }
+    ? { loader: "js", contents: "export const I3=()=>globalThis.__jsx;export const e6=globalThis.__secretScopeReact;" }
     : { loader: "js", contents: "export default {};" };
 }
+function mount(Component, props) { const hooks = []; return { render() { activeHooks = hooks; hookCursor = 0; return Component(props); } }; }
 
 const validation = await load("validation-message");
 validation.r();
@@ -102,7 +106,7 @@ const optionalInput = scope.s({
 });
 assert.equal(optionalInput.props.placeholder, "Your value (optional)");
 let secretValue = null;
-const reveal = scope.a({
+const revealMount = mount(scope.a, {
   id: "secret",
   value: "hidden",
   ariaLabel: "Secret",
@@ -111,6 +115,7 @@ const reveal = scope.a({
     secretValue = value;
   },
 });
+let reveal = revealMount.render();
 assert.equal(reveal.props.children[0].props.type, "password");
 assert.equal(
   reveal.props.children[1].props["aria-label"],
@@ -120,6 +125,10 @@ reveal.props.children[0].props.onChange({
   currentTarget: { value: "changed" },
 });
 assert.equal(secretValue, "changed");
+reveal.props.children[1].props.onClick();
+reveal = revealMount.render();
+assert.equal(reveal.props.children[0].props.type, "text");
+assert.equal(reveal.props.children[1].props["aria-label"], "Hide secret value");
 let retried = 0;
 const unavailable = scope.r({
   id: "personal",

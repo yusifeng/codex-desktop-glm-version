@@ -10,6 +10,9 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
     jsxs: (type, props, key) => ({ type, props: props ?? {}, key }),
   };
 globalThis.__jsx = jsx;
+let activeHooks = [], hookCursor = 0;
+const React = { useState(initial) { const hooks = activeHooks, index = hookCursor++; if (!(index in hooks)) hooks[index] = typeof initial === "function" ? initial() : initial; return [hooks[index], value => { hooks[index] = typeof value === "function" ? value(hooks[index]) : value; }]; } };
+globalThis.__environmentEditorReact = React;
 globalThis.__parseEnvironment = () => ({ ok: true, entries: new Map() });
 globalThis.__preflight = async () => null;
 async function load(name) {
@@ -43,7 +46,7 @@ async function load(name) {
 }
 function mock(name) {
   if (name === "app-shared")
-    return { loader: "js", contents: "export const I3=()=>globalThis.__jsx;" };
+    return { loader: "js", contents: "export const I3=()=>globalThis.__jsx;export const e6=globalThis.__environmentEditorReact;" };
   if (name === "environment-entry-input")
     return {
       loader: "js",
@@ -61,6 +64,7 @@ function mock(name) {
     };
   return { loader: "js", contents: "export default {};" };
 }
+function mount(Component, props) { const hooks = []; return { render() { activeHooks = hooks; hookCursor = 0; return Component(props); } }; }
 
 const entry = await load("environment-entry-input");
 entry.i();
@@ -227,7 +231,7 @@ assert.equal(
 globalThis.__parseEnvironment = entry.n;
 const variables = await load("environment-variables-batch-dialog");
 let savedVariables = null;
-const variablesView = variables.EnvironmentVariablesBatchDialog({
+const variablesMount = mount(variables.EnvironmentVariablesBatchDialog, {
   initialVariables: [{ name: "A", value: "1" }],
   unavailableNames: [],
   onClose() {},
@@ -235,6 +239,7 @@ const variablesView = variables.EnvironmentVariablesBatchDialog({
     savedVariables = value;
   },
 });
+let variablesView = variablesMount.render();
 assert.equal(
   variablesView.props.children.props.children[0].props.children,
   "Manage environment variables",
@@ -244,12 +249,13 @@ assert.equal(
   1,
 );
 variablesView.props.children.props.children[3].props.onAddKey("B");
+variablesView = variablesMount.render();
 variablesView.props.children.props.onSubmit({ preventDefault() {} });
 assert.deepEqual(savedVariables, [
   { name: "A", value: "1" },
   { name: "B", value: "", optional: false },
 ]);
-const conflictVariables = variables.EnvironmentVariablesBatchDialog({
+const conflictVariables = mount(variables.EnvironmentVariablesBatchDialog, {
   initialVariables: [],
   unavailableNames: [],
   hasConflict: true,
@@ -257,7 +263,7 @@ const conflictVariables = variables.EnvironmentVariablesBatchDialog({
   onSave() {
     throw new Error("must not save");
   },
-});
+}).render();
 assert.equal(
   conflictVariables.props.children.props.children[1].props.role,
   "alert",
@@ -306,7 +312,7 @@ assert.equal(secretsClosed, 2);
 const personal = await load("personal-secrets-dialog");
 let requestedInput = null,
   personalClosed = 0;
-const personalView = personal.PersonalSecretsDialog({
+const personalMount = mount(personal.PersonalSecretsDialog, {
   selection: {
     accountId: "a",
     userId: "u",
@@ -327,6 +333,7 @@ const personalView = personal.PersonalSecretsDialog({
     return true;
   },
 });
+let personalView = personalMount.render();
 assert.equal(
   personalView.props.children.props.children[0].props.children,
   "Add personal secrets",
@@ -342,6 +349,7 @@ assert.equal(
 personalView.props.children.props.children[3].props.children[0].props.children[1].props.onChange(
   { currentTarget: { value: "secret" } },
 );
+personalView = personalMount.render();
 await personalView.props.children.props.onSubmit({ preventDefault() {} });
 assert.equal(requestedInput.namespace, "sensitive");
 assert.equal(requestedInput.secrets[0].value, "secret");
