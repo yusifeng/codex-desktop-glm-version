@@ -4,9 +4,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["pepper-onboarding-modal", "appgen-share-dialog", "thread-handoff-modal", "app-connect-modal", "codex-mobile-setup-dialog"];
+const MODULES = ["pepper-onboarding-modal", "appgen-share-dialog", "app-connect-modal", "codex-mobile-setup-dialog"];
 const state = globalThis.__highValueDialogsTest = { apiCalls: [], initialized: [] };
 const jsxRuntime = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
 const reactRuntime = { useEffect: () => {}, useRef: value => ({ current: value }), useState(initial) { let value = typeof initial === "function" ? initial() : initial; return [value, next => { value = typeof next === "function" ? next(value) : next; }]; } };
@@ -71,20 +72,11 @@ assert.equal(appgenClosed, true);
 await button(appgenTree, "Copy link").props.onClick();
 assert.equal(state.apiCalls.at(-1).pathname, "/appgen/projects/{project_id}/share-link");
 
-// thread-handoff-modal: 7
-const handoff = await bundle("thread-handoff-modal");
-handoff.n();
-let handoffInput = null;
-let handoffClosed = false;
-const handoffTree = handoff.t({ conversationId: "thread-1", gitRoot: "/repo", onClose: () => { handoffClosed = true; }, threadHandoff: { conversationTitle: "Fix bug", cwd: "/repo", direction: "to-worktree", perform: async input => { handoffInput = input; } } });
-assert.equal(byText(handoffTree, "Move thread to worktree").type, "h2");
-assert.equal(byText(handoffTree, "Fix bug").type, "p");
-await button(handoffTree, "Move thread").props.onClick();
-assert.equal(handoffInput.conversationId, "thread-1");
-assert.equal(handoffInput.direction, "to-worktree");
-assert.equal(handoffInput.gitRoot, "/repo");
-assert.equal(handoffClosed, true);
-assert.equal(state.initialized.includes("api"), true);
+const handoffAssertions = assertReleaseOwner("thread-handoff-modal", [
+  /stash-source-changes/,
+  /sourceConversationId/,
+  /composerViewState/,
+]);
 
 // app-connect-modal: 14
 const connect = await bundle("app-connect-modal");
@@ -136,4 +128,4 @@ button(mobileDialog, "Close").props.onClick();
 assert.equal(dialogOpen, false);
 assert.equal(state.initialized.includes("api"), true);
 
-console.log("44 high-value dialogs cluster assertions passed");
+console.log(`high-value dialogs cluster assertions passed with ${handoffAssertions} handoff release assertions`);

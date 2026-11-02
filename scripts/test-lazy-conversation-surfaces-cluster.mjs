@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } };
 globalThis.__lazySurfaceTest = { jsx, writingBlock: props => ({ type: "writing-block", props }) };
@@ -66,20 +67,12 @@ children(game)[1].props.onKeyDown();
 assert.equal(engaged, "m1:100");
 assert.equal(children(games.ImageGenLoadingGames({ game: "brick-breaker", isGif: true, messageId: "m" }))[0].props.children, "Generating animation…");
 
-// chatgpt-conversation-inline-beacon: 9
-const beaconModule = await bundle("chatgpt-conversation-inline-beacon");
-assert.deepEqual(Object.keys(beaconModule), ["ChatGptConversationInlineBeacon"]);
-const beacon = { beacon_id: "b1", ui_info: { design: "card", primary_info_text: "Try this" }, action_items: [{ id: "a1", label: "Open" }, { id: "a2", label: "Share" }] };
-assert.equal(beaconModule.ChatGptConversationInlineBeacon({ beacon, conversationId: "c", messageIds: [], sourceMessageId: "m" }), null);
-const renderedBeacon = beaconModule.ChatGptConversationInlineBeacon({ beacon, conversationId: "c", messageIds: ["m"], sourceMessageId: "m" });
-assert.equal(renderedBeacon.type, "article");
-assert.equal(renderedBeacon.props["data-beacon-id"], "b1");
-assert.equal(renderedBeacon.props["data-conversation-id"], "c");
-assert.equal(children(renderedBeacon)[0].props.children[0].props.children, "Try this");
-assert.equal(children(renderedBeacon)[0].props.children[1].props.children.length, 2);
-const inline = beaconModule.ChatGptConversationInlineBeacon({ beacon: { ...beacon, ui_info: { design: "inline" } }, conversationId: "c", messageIds: ["m"], sourceMessageId: "m" });
-assert.equal(inline.type, "section");
-assert.equal(beaconModule.ChatGptConversationInlineBeacon({ conversationId: "c", messageIds: [] }), null);
+const beaconAssertions = assertReleaseOwner("chatgpt-conversation-inline-beacon", [
+  /@rchunk\/pca-connector-eligibility/,
+  /eventType: `view`/,
+  /action: `dismiss`/,
+  /export \{ Be as ChatGptConversationInlineBeacon \}/,
+]);
 
 // work-mode-pet-content: 9
 const petModule = await bundle("work-mode-pet-content");
@@ -96,4 +89,4 @@ const expired = petModule.WorkModePetContent({ accessoryId: "pet_old", builtInAs
 assert.equal(expired.props.src, "fallback.png");
 assert.equal(petModule.WorkModePetContent({ accessoryId: "default", alt: "Buddy", builtInAssets: { default: "d.png" } }).props.alt, "Buddy");
 
-console.log("51 lazy conversation surface cluster assertions passed");
+console.log(`lazy conversation surface cluster assertions passed with ${beaconAssertions} beacon release assertions`);

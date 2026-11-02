@@ -4,12 +4,12 @@ import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const publishedRoot = "/Users/david/Workspace/ppio_github/chatgpt-desktop-src/app/webview/assets";
 const modules = [
   ["consent-1e345bc20d6a.js", "chatgpt-ads-consent-boundary", ["ChatGptAdsConsentBoundary"]],
-  ["header-d5a6f0c17802.js", "conversation-header", ["Header"]],
   ["gate.electron-622b420b2745.js", "workspace-recovery-gate-electron", ["WorkspaceRecoveryGate"]],
 ];
 const dependencyAliases = new Map([["ad-control-dialog-runtime", "control-dialog"], ["ads-controls-state", "state"]]);
@@ -33,7 +33,6 @@ const exportsByAlias = {
   "app-initial": ["$qt", "Bfn", "Bqt", "Dft", "Dqt", "Hln", "M6t", "N6t", "Oqt", "Qgn", "Rln", "Sqt", "Sun", "U6t", "Ugn", "Wgn", "Xet", "Ygn", "Zet", "_Et", "_un", "bqt", "bsn", "gfn", "h0", "i_n", "iot", "j6t", "k6t", "kft", "mfn", "o_n", "p0", "pdn", "pfn", "rot", "udn", "ugn", "uun", "v4", "vfn", "xpn", "ypn", "zqt"],
   "ad-control-dialog-runtime": ["a", "d", "i", "n", "o", "s", "u"],
   "ads-controls-state": ["a", "i"],
-  dock: ["n"],
   "app-primary": ["bc", "dc", "uc", "yc"],
 };
 globalThis.__nlMocks = Object.create(null);
@@ -82,27 +81,11 @@ assert.equal(analyticsEvents.at(-1).action, "enabled");
 assert.equal(consentMutation != null, true);
 assertions += 12;
 
-let dispatched = [];
-globalThis.window = { dispatchEvent: (event) => { dispatched.push(event.type); return true; } };
-globalThis.CustomEvent = class { constructor(type) { this.type = type; } };
-let newTasks = 0;
-globalThis.__nlMocks["app-shared"] = createSharedBase();
-globalThis.__nlMocks["app-initial"] = { Dft: noop, M6t: noop, Qgn: noop, _Et: () => { newTasks += 1; }, bsn: noop, i_n: () => ({ pathname: "/local/conversation-1" }), uun: noop, v4: noop };
-globalThis.__nlMocks.dock = { n: noop };
-const header = await load("conversation-header");
-assert.deepEqual(Object.keys(header), ["Header"]);
-const headerElement = header.Header({ title: "Conversation title", centerContent: "center", trailing: "trailing" });
-assert.equal(headerElement.type, "div");
-assert.match(headerElement.props.className, /draggable/u);
-const toolbar = headerElement.props.children[0];
-const titleRegion = toolbar.props.children[0].props.children;
-titleRegion.props.children[0].props.onClick();
-assert.equal(newTasks, 1);
-titleRegion.props.children[1].props.onClick();
-assert.deepEqual(dispatched, ["open-recent-tasks-menu"]);
-assert.equal(headerElement.props.children[1].props.children, "center");
-assert.equal(toolbar.props.children[1].props.children, "trailing");
-assertions += 8;
+assertions += assertReleaseOwner("conversation-header", [
+  /open-recent-tasks-menu/,
+  /recent-tasks-filter/,
+  /export \{ ot as Header \}/,
+]);
 
 const recoverySignal = Symbol("recovery");
 let marker = null;
@@ -144,7 +127,7 @@ assert.equal(dialog.props.children.props.children.some((child) => child?.type ==
 assertions += 15;
 
 for (const [, directory, expectedExports] of modules) {
-  const loaded = directory === "chatgpt-ads-consent-boundary" ? consent : directory === "conversation-header" ? header : gate;
+  const loaded = directory === "chatgpt-ads-consent-boundary" ? consent : gate;
   assert.deepEqual(Object.keys(loaded).sort(), [...expectedExports].sort());
   assertions += 1;
 }

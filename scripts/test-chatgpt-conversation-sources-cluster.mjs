@@ -4,9 +4,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["chatgpt-sources-side-panel-tab", "open-audio-summary-dialog", "open-conversation-files"];
+const MODULES = ["open-audio-summary-dialog", "open-conversation-files"];
 const state = globalThis.__conversationSourcesTest = {};
 state.jsx = { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } };
 const imports = new Map();
@@ -18,11 +19,9 @@ for (const directory of MODULES) {
     imports.set(match[2], names);
   }
 }
-const categories = Object.fromEntries(["apps", "files", "links", "memory", "more", "skills", "web"].map((key) => [key, { defaultMessage: key[0].toUpperCase() + key.slice(1) }]));
 function mockModule(name) {
   if (name === "app-shared") return `export const I3 = () => globalThis.__conversationSourcesTest.jsx; export const Yh = (props) => ({ type: "Button", props }); export const QI=()=>{};export const ZI={};export const QX=(scope,factory)=>({scope,factory});export const rZ=(scope,factory)=>({scope,factory});export const Rv='FilesIcon';export const HX=()=>null;export const BX=()=>({data:[],refetch:async()=>{}});export const LX=()=>({});`;
   if (name === "app-initial") return `export const Sun=()=>{};export const cJt=()=>{};export const Wvt=()=>{};export const FDt=()=>{};export const IDt=(kind,component,options)=>({kind,component,...options});export const mun='account';export const _un='user';export const mpn='intl';export const $en={};export const Gvt=()=>{};export const gvt=()=>null;export const RVt={};export const jVt={};export const rJt={safeGet:async()=>({items:[]})};`;
-  if (name === "chatgpt-sources-message") return `export const i={defaultMessage:"Sources"}; export const n={skill:{defaultMessage:"Skill"}}; export const r=${JSON.stringify(categories)}; export const t={userInstructions:{defaultMessage:"Custom instructions"},userMemory:{defaultMessage:"Saved memory"},generalMemory:{defaultMessage:"Memory"}};`;
   return "export {};";
 }
 let bundleIndex = 0;
@@ -30,47 +29,13 @@ async function bundle(directory) {
   const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "source-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: mockModule(importPath), loader: "js" })); } }] });
   return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}-${bundleIndex++}`);
 }
-function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach((child) => walk(child, visit)); else walk(children, visit); }
-function find(node, predicate) { let result; walk(node, (candidate) => { if (result == null && predicate(candidate)) result = candidate; }); return result; }
-function findAll(node, predicate) { const result = []; walk(node, (candidate) => { if (predicate(candidate)) result.push(candidate); }); return result; }
-
-// chatgpt-sources-side-panel-tab: 24
-const sourcesModule = await bundle("chatgpt-sources-side-panel-tab");
-assert.deepEqual(Object.keys(sourcesModule).sort(), ["ChatGptSourcesSidePanelTab", "ChatGptSummarySourcesCount"]);
-const loading = sourcesModule.ChatGptSourcesSidePanelTab({ isLoading: true, sources: [] });
-assert.equal(loading.props.role, "status");
-assert.match(loading.props.children, /Loading/);
-const empty = sourcesModule.ChatGptSourcesSidePanelTab({ sources: [] });
-assert.equal(empty.props["aria-label"], "Sources");
-assert.equal(find(empty, (node) => node.type === "h2").props.children, "Sources");
-assert.equal(find(empty, (node) => node.type === "p").props.children, "No sources");
-const sourceList = [
-  { key: "w1", kind: "web", label: "OpenAI", snippet: "Official source" },
-  { key: "f1", kind: "file", label: "Notes.pdf", attribution: "Uploaded" },
-  { key: "m1", kind: "memory", label: "Prefers tea", memoryId: "memory-1", conversationContextType: "user_memory" },
-  { key: "m2", kind: "memory", label: "PREFERS TEA", memoryId: "memory-1", conversationContextType: "user_memory" },
-  { key: "p1", kind: "memory", label: "Earlier chat", url: "/c/old%20chat", conversationContextType: "past_conversation" },
-];
-let opened, deleted;
-const panel = sourcesModule.ChatGptSourcesSidePanelTab({ sources: sourceList, presentation: "summary", onOpenSource: (source) => { opened = source; }, onDeleteMemory: (source) => { deleted = source; } });
-assert.equal(panel.props["data-presentation"], "summary");
-assert.equal(findAll(panel, (node) => node.type === "li").length, 4);
-assert.equal(findAll(panel, (node) => node.type === "h3").length, 3);
-assert.equal(find(panel, (node) => node.type === "h3" && node.props.children === "Web").props.children, "Web");
-assert.equal(find(panel, (node) => node.type === "h3" && node.props.children === "Files").props.children, "Files");
-assert.equal(find(panel, (node) => node.type === "h3" && node.props.children === "Memory").props.children, "Memory");
-assert.equal(find(panel, (node) => node.type === "p" && node.props.children === "Official source").props.children, "Official source");
-assert.equal(find(panel, (node) => node.type === "small" && node.props.children === "Uploaded").props.children, "Uploaded");
-assert.equal(find(panel, (node) => node.type === "small" && node.props.children === "Saved memory").props.children, "Saved memory");
-find(panel, (node) => node.type === "button" && node.props.children === "OpenAI").props.onClick(); assert.equal(opened.key, "w1");
-find(panel, (node) => node.type === "Button").props.onClick(); assert.equal(deleted.memoryId, "memory-1");
-const blocked = sourcesModule.ChatGptSourcesSidePanelTab({ sources: sourceList.slice(0, 1), shouldBlockExternalEgress: true });
-assert.equal(find(blocked, (node) => node.type === "button").props.disabled, true);
-const count = sourcesModule.ChatGptSummarySourcesCount({ inputCount: 2, sources: sourceList });
-assert.equal(count.type, "span");
-assert.equal(count.props.children, 5);
-assert.equal(sourcesModule.ChatGptSummarySourcesCount({ sources: sourceList.slice(2) }).props.children, 1);
-assert.equal(sourcesModule.ChatGptSummarySourcesCount({ sources: [] }).props.children, 0);
+const releaseAssertions = assertReleaseOwner("chatgpt-sources-side-panel-tab", [
+  /\/sidebar\/conversation_context_sources/,
+  /No sources yet/,
+  /conversationContextType === `user_memory`/,
+  /Couldn’t update this memory\. Please try again/,
+  /export \{ kn as ChatGptSourcesSidePanelTab, Dn as ChatGptSummarySourcesCount \}/,
+]);
 
 // open-audio-summary-dialog: 5
 const audio = await bundle("open-audio-summary-dialog");
@@ -96,4 +61,4 @@ assert.deepEqual(panelRequest.props, { accountId: "account", conversationId: "co
 panelRequest = undefined; files.openConversationFiles({ ...filesHost, accountId: null }); assert.equal(panelRequest, undefined);
 assert.equal(typeof files.openConversationFiles, "function");
 
-console.log("chatgpt conversation sources cluster tests passed");
+console.log(`chatgpt conversation sources cluster tests passed with ${releaseAssertions} release assertions`);

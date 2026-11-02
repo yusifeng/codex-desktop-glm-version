@@ -4,9 +4,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["conversation-screen", "conversation-summary", "archived-conversation-preview-footer", "chatgpt-sources-message", "chatgpt-entity-side-panel-tab"];
+const MODULES = ["conversation-summary", "archived-conversation-preview-footer", "chatgpt-sources-message", "chatgpt-entity-side-panel-tab"];
 const state = globalThis.__chatGptConversationSupportTest = { stateUpdates: [] };
 state.jsx = {
   Fragment: "Fragment",
@@ -50,23 +51,10 @@ async function bundle(directory) {
 }
 function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach((child) => walk(child, visit)); else walk(children, visit); }
 function find(node, predicate) { let result; walk(node, (candidate) => { if (result == null && predicate(candidate)) result = candidate; }); return result; }
-function findAll(node, predicate) { const result = []; walk(node, (candidate) => { if (predicate(candidate)) result.push(candidate); }); return result; }
-
-// conversation-screen: 11
-const screen = await bundle("conversation-screen");
-assert.deepEqual(Object.keys(screen).sort(), ["n", "r", "t"]);
-screen.r(); assert.equal(screen.n({ status: "allowed" }), null);
-let requestCount = 0, switchCount = 0;
-const restricted = screen.n({ status: "restricted", email: "person@example.com", canSwitchToWork: true, onRequestAccess: () => requestCount++, onSwitchToWork: () => switchCount++ });
-assert.match(find(restricted, (node) => node.type === "h1").props.children, /don’t have access/);
-assert.equal(find(restricted, (node) => node.type === "p").props.children, "person@example.com");
-assert.equal(findAll(restricted, (node) => node.type === "Button").length, 2);
-findAll(restricted, (node) => node.type === "Button")[0].props.onClick(); assert.equal(requestCount, 1);
-findAll(restricted, (node) => node.type === "Button")[1].props.onClick(); assert.equal(switchCount, 1);
-assert.equal(screen.t({ enabled: false, children: "chat" }), "chat");
-assert.equal(screen.t({ enabled: true, isLoading: true, children: "chat" }), null);
-assert.equal(screen.t({ enabled: true, isCapable: false, children: "chat" }), "chat");
-assert.equal(find(screen.t({ enabled: true, isCapable: true, status: "restricted" }), (node) => node.type === "h1").type, "h1");
+const screenAssertions = assertReleaseOwner("conversation-screen", [
+  /chatSeatAccess\.reviewAccess/,
+  /export \{ J as n, be as r, X as t \}/,
+]);
 
 // conversation-summary: 18
 const summary = await bundle("conversation-summary");
@@ -138,4 +126,4 @@ assert.match(find(entityPanel, (node) => node.props?.children === "entity").prop
 const memoryPanel = entity.ChatGptEntitySidePanelTab({ conversationId: "c8", params: { memorySource: "saved" }, renderEntity: (input) => input.flushTop ? "memory" : null });
 assert.match(find(memoryPanel, (node) => node.props?.className?.includes("p-panel")).props.className, /p-panel/);
 
-console.log("chatgpt conversation support cluster tests passed");
+console.log(`chatgpt conversation support cluster tests passed with ${screenAssertions} screen release assertions`);

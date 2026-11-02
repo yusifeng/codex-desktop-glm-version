@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const state = globalThis.__gitThreadRuntime = { effects: [], stateValues: [] };
@@ -78,22 +79,12 @@ button(menu, "Create pull request").props.onClick();
 assert.equal(menuOpened, true);
 assert.equal(actions.t({ surface: "composer", target: { hostId: "local" } }).props.children[0], null);
 
-const handoff = await load("thread-handoff-modal");
-handoff.n();
-assert.equal(state.apiInitialized, true);
-let payload;
-let closed = false;
-const handoffTree = handoff.t({ conversationId: "thread-1", gitRoot: "/repo", onClose() { closed = true; },
-  threadHandoff: { conversationTitle: "Fix branch bug", cwd: "/repo", direction: "to-worktree", async perform(input) { payload = input; } } });
-assert.equal(handoffTree.props["data-handoff-direction"], "to-worktree");
-assert.equal(find(handoffTree, node => node.type === "input").props.value, "codex/fix-branch-bug");
-await button(handoffTree, "Move thread").props.onClick();
-assert.equal(payload.direction, "to-worktree");
-assert.equal(payload.branch, "codex/fix-branch-bug");
-assert.equal(closed, true);
-state.stateValues = ["bad/", false, null, "/repo", "", [], false];
-const invalid = handoff.t({ conversationId: "thread-2", gitRoot: "/repo", onClose() {}, threadHandoff: { direction: "to-local" } });
-assert.equal(find(invalid, node => node.props?.role === "alert").props.children, "Branch name cannot end with “/”");
-assert.equal(button(invalid, "Move thread").props.disabled, true);
+const handoffAssertions = assertReleaseOwner("thread-handoff-modal", [
+  /stash-source-changes/,
+  /sourceConversationId/,
+  /composerViewState/,
+  /Search workspaces/,
+  /export \{ Lt as n, Ft as t \}/,
+]);
 
-console.log("git/thread handoff runtime: 30 assertions passed");
+console.log(`git/thread handoff runtime passed with ${handoffAssertions} release assertions`);

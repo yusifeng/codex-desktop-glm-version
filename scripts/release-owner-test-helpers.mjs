@@ -8,15 +8,19 @@ export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "
 const reverseChunks = new Map(Object.entries(CHUNKS).map(([owner, output]) => [output, owner]));
 
 export function normalizeRelease(source) {
-  return source.replace(/(["'`])\.\/([^"'`/]+\.js)\1/g, (match, quote, output) =>
-    reverseChunks.has(output) ? `${quote}@rchunk/${reverseChunks.get(output)}${quote}` : match,
-  );
+  return source
+    .replace(/(["'`])\.\/([^"'`/]+\.js)\1/g, (match, quote, output) =>
+      reverseChunks.has(output) ? `${quote}@rchunk/${reverseChunks.get(output)}${quote}` : match,
+    )
+    .replace(/[ \t]+$/gm, "");
 }
 
 export function assertReleaseOwner(owner, patterns = []) {
   const output = CHUNKS[owner];
   assert.equal(typeof output, "string", `${owner} has a renderer chunk mapping`);
-  const current = fs.readFileSync(path.join(ROOT, "src/renderer", owner, "index.ts"), "utf8");
+  const current = fs
+    .readFileSync(path.join(ROOT, "src/renderer", owner, "index.ts"), "utf8")
+    .replace(/[ \t]+$/gm, "");
   const release = normalizeRelease(
     fs.readFileSync(path.join(ROOT, "src/webview/assets", output.replace(/\.js$/, ".ts")), "utf8"),
   );

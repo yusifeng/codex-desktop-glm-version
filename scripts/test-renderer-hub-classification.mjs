@@ -26,15 +26,12 @@ assert.ok(results[1].consumedAliases.includes("Ewt"), "sidebar view telemetry mu
 assert.ok(results[1].consumedAliases.includes("o_n"), "beacon navigation must use the published o_n alias");
 assert.ok(primary.consumedAliases.includes("dr"), "announcement entries must use the published dr alias");
 // Some generated aliases overlap across aggregate hubs. Release-faithful
-// Writing Block evidence imports Du/Rf from app-primary explicitly; Jm still
-// has no such primary consumer and remains a useful cross-hub leak sentinel.
+// Writing Block evidence imports Du/Rf from app-primary explicitly, while the
+// promoted conversation page, sources panel, and inline beacon evidence all
+// import Jm from app-primary explicitly.
 assert.ok(primary.consumedAliases.includes("Du"), "Writing Block capabilities must consume app-primary.Du");
 assert.ok(primary.consumedAliases.includes("Rf"), "Writing Block capabilities must consume app-primary.Rf");
-assert.equal(
-  primary.consumedAliases.includes("Jm"),
-  false,
-  "Jm belongs to an earlier hub destructuring and must not leak into app-primary consumption",
-);
+assert.ok(primary.consumedAliases.includes("Jm"), "conversation surfaces must consume app-primary.Jm");
 // Namespace imports are frequently narrowed through a destructuring binding
 // (`const { Sm: AnnouncementShell } = appPrimaryChunk`).  The audit must count
 // the public alias on the left-hand side as a real consumer, not classify it as
