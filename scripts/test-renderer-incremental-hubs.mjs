@@ -135,7 +135,7 @@ assert.ok(checkoutSession.imports.some((item) => item.clause == null));
 const checkoutSessionConsumers = checkoutSession.imports.filter(
   (item) => item.clause != null,
 );
-assert.equal(checkoutSessionConsumers.length, 2);
+assert.equal(checkoutSessionConsumers.length, 3);
 assert.ok(
   checkoutSessionConsumers.some((item) =>
     item.clause?.includes("* as checkoutSessionChunk"),
@@ -144,6 +144,11 @@ assert.ok(
       (item) =>
         /checkout-success-page/.test(item.file) &&
         item.clause?.includes("c as Bt"),
+    ) &&
+    checkoutSessionConsumers.some(
+      (item) =>
+        /checkout-page-core/.test(item.file) &&
+        item.clause?.includes("_ as gn"),
     ),
 );
 for (const { file } of checkoutSessionConsumers.filter((item) =>

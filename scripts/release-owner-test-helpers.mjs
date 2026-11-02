@@ -13,7 +13,9 @@ for (const [owner, output] of Object.entries(IMPORT_ALIASES)) {
 export function normalizeRelease(source) {
   return source
     .replace(/(["'`])\.\/([^"'`/]+\.js)\1/g, (match, quote, output) =>
-      reverseChunks.has(output) ? `${quote}@rchunk/${reverseChunks.get(output)}${quote}` : match,
+      reverseChunks.has(output)
+        ? `${quote}@rchunk/${reverseChunks.get(output)}${quote}`
+        : `${quote}@exact-chunk/${output}${quote}`,
     )
     .replace(/[ \t]+$/gm, "");
 }

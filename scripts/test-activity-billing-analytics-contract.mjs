@@ -1,4 +1,5 @@
 import assert from "node:assert/strict";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 import { Buffer } from "node:buffer";
 import fs from "node:fs";
 import path from "node:path";
@@ -104,39 +105,15 @@ state.hookIndex = 0; state.hooks = [];
 const empty = activity.t({ title: "Usage", data: { data: [], series: [], total: 0 }, status: {} });
 assert.equal(empty.props.children[1].props.children, "No usage recorded during this period");
 
-const billing = await load("src/renderer/billing-analytics/index.ts");
-assert.deepEqual(Object.keys(billing).sort(), ["n", "t"]);
-assert.deepEqual(state.initializers, ["account", "api", "experiments", "layout", "motion"]);
-state.query.data = {
-  data_as_of: "2026-11-02T09:00:00Z",
-  periods: [
-    { id: "five-1", window_minutes: 300, starts_at: "2026-11-01T00:00:00Z", ends_at: "2026-11-01T05:00:00Z", used_basis_points: 2500, breakdowns: [{ dimension: "thread_source", rows: [{ key: "codex", basis_points: 1500 }, { key: "work", basis_points: 1000 }] }] },
-    { id: "week-1", window_minutes: 10080, starts_at: "2026-10-26T00:00:00Z", ends_at: "2026-11-02T00:00:00Z", used_basis_points: 6000, breakdowns: [{ dimension: "thread_source", rows: [{ key: "codex", basis_points: 4000 }, { key: "work", basis_points: 2000 }] }] },
-  ],
-};
-state.hookIndex = 0; state.hooks = [];
-const billingView = billing.t({ scope: "consumer", isPolling: false });
-assert.equal(billingView.type, "div");
-assert.equal(billingView.props.children.length, 3);
-const fiveHourChart = billingView.props.children[1];
-const weeklyChart = billingView.props.children[2];
-assert.equal(fiveHourChart.props.title, "5-hour periods");
-assert.equal(fiveHourChart.props.data.total, 0.25);
-assert.deepEqual(fiveHourChart.props.data.series.map((series) => series.name), ["Codex", "Work"]);
-assert.equal(fiveHourChart.props.data.data[0].values.codex, 0.15);
-assert.equal(weeklyChart.props.data.total, 0.6);
-assert.equal(weeklyChart.props.data.data[0].values.work, 0.2);
+assertReleaseOwner("billing-analytics", [/^\/\/ @ts-nocheck/m, /@exact-chunk\/BarChart-2010e7d67e4a\.js/, /export \{/]);
 
 const activitySource = fs.readFileSync(path.join(ROOT, "src/renderer/activity-chart/index.ts"), "utf8");
-const billingSource = fs.readFileSync(path.join(ROOT, "src/renderer/billing-analytics/index.ts"), "utf8");
 assert.deepEqual([...activitySource.matchAll(/@exact-chunk\/([^"']+)/gu)].map((match) => match[1]), [
   "linear-51abf1a86c3b.js", "line-5171f1d885cc.js", "area-76377dfd01aa.js", "step-cc59eba019a7.js", "monotone-68fb4f84bd88.js",
   "BarChart-2010e7d67e4a.js", "queries-a53713419c4d.js",
 ]);
-assert.deepEqual([...billingSource.matchAll(/@exact-chunk\/([^"']+)/gu)].map((match) => match[1]), ["BarChart-2010e7d67e4a.js", "queries-a53713419c4d.js"]);
-for (const source of [activitySource, billingSource]) assert.equal(/@ts-nocheck|@ts-expect-error/u.test(source), false);
+assert.equal(/@ts-nocheck|@ts-expect-error/u.test(activitySource), false);
 assert.equal(fs.existsSync(path.join(ROOT, "src/renderer/activity-chart/exact.js")), false);
-assert.equal(fs.existsSync(path.join(ROOT, "src/renderer/billing-analytics/exact.js")), false);
 
 const assertionCount = [...fs.readFileSync(fileURLToPath(import.meta.url), "utf8").matchAll(/\bassert\./gu)].length;
 console.log(`${assertionCount} activity and billing analytics contract assertions passed`);

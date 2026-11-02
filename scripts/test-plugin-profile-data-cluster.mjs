@@ -1,11 +1,12 @@
 import assert from "node:assert/strict";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),"..");
 const jsx={Fragment:Symbol("Fragment"),jsx:(type,props,key)=>({type,props:props??{},key}),jsxs:(type,props,key)=>({type,props:props??{},key})};globalThis.__jsx=jsx;
-async function load(name){const result=await esbuild.build({entryPoints:[path.join(ROOT,`src/renderer/${name}/index.ts`)],bundle:true,format:"esm",platform:"node",target:"node22",write:false,logLevel:"silent",plugins:[{name:"mocks",setup(build){build.onResolve({filter:/^@rchunk\/plugin-detail-view$/},()=>({path:path.join(ROOT,"src/renderer/plugin-detail-view/index.ts")}));build.onResolve({filter:/^@rchunk\//},({path:modulePath})=>({path:modulePath.slice(8),namespace:"mock"}));build.onLoad({filter:/.*/,namespace:"mock"},({path:modulePath})=>modulePath==="app-shared"?{loader:"js",contents:"export const I3=()=>globalThis.__jsx;"}:{loader:"js",contents:"export {};"});}}]});return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${name}`)}
+async function load(name){const result=await esbuild.build({entryPoints:[path.join(ROOT,`src/renderer/${name}/index.ts`)],bundle:true,format:"esm",platform:"node",target:"node22",write:false,logLevel:"silent",plugins:[{name:"mocks",setup(build){build.onResolve({filter:/^@rchunk\//},({path:modulePath})=>({path:modulePath.slice(8),namespace:"mock"}));build.onLoad({filter:/.*/,namespace:"mock"},({path:modulePath})=>modulePath==="app-shared"?{loader:"js",contents:"export const I3=()=>globalThis.__jsx;"}:modulePath==="plugin-detail-view"?{loader:"js",contents:"function PluginDetailView(props){return {type:PluginDetailView,props}}export{PluginDetailView as t};"}:{loader:"js",contents:"export {};"});}}]});return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${name}`)}
 
 const connection=await load("requested-plugin-connection");connection.t();
 assert.deepEqual(await connection.n({requiresAppSetup:false}),{kind:"ready"});
@@ -51,4 +52,5 @@ assert.equal(skillDialog.type,"dialog");assert.equal(skillDialog.props.children[
 const blocked=showcase.PluginShowcaseSkillDetails({item:{pin:{artifact_id:"unsafe"}},skill:{id:"unsafe",files:{"SKILL.md":{}},safetyStatus:"blocked"},onClose(){}});assert.equal(blocked.props.children[2].props.role,"alert");assert.match(blocked.props.children[2].props.children,/blocked/);assert.equal(blocked.props.children[4].props.disabled,true);
 const unreadable=showcase.PluginShowcaseSkillDetails({item:{pin:{artifact_id:"private"}},skill:{id:"private",files:{"SKILL.md":{}},permissions:{can_read:false}},onClose(){}});assert.equal(unreadable.props.children[3].props.role,"status");
 const already=showcase.PluginShowcaseSkillDetails({item:{pin:{artifact_id:"ready"}},skill:{id:"ready",enabled:true,files:{"SKILL.md":{}}},onClose(){}});assert.equal(already.props.children[4].props.children,"Installed");assert.equal(already.props.children[4].props.disabled,true);
+assertReleaseOwner("plugin-detail-view", [/^\/\/ @ts-nocheck/m, /export \{/]);
 console.log("plugin profile data cluster complete");
