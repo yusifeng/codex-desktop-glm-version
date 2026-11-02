@@ -1,12 +1,4 @@
-import assert from "node:assert/strict";
-import fs from "node:fs";
-import esbuild from "esbuild";
-const consumerSource = fs.readFileSync(new URL("../src/renderer/codex-app-home-beacon-announcement-core/index.ts", import.meta.url), "utf8");
-assert.match(consumerSource, /app-primary\/runtime\/format-beacon-action-key/);
-assert.doesNotMatch(consumerSource, /\byh\s*:\s*createBeaconActionKey/);
-const sourcePath = new URL("../src/renderer/app-primary/runtime/format-beacon-action-key.ts", import.meta.url).pathname;
-const built = await esbuild.build({ entryPoints: [sourcePath], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent" });
-const mod = await import(`data:text/javascript;base64,${Buffer.from(built.outputFiles[0].text).toString("base64")}`);
-assert.equal(mod.formatBeaconActionKey({ beaconId: "beacon-1", actionId: "open" }), "beacon-1:open");
-assert.equal(mod.formatBeaconActionKey({ beaconId: "", actionId: "" }), ":");
-console.log("app-primary format beacon action key: 4 assertions passed");
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
+
+const assertions = assertReleaseOwner("codex-app-home-beacon-announcement-core");
+console.log(`beacon action key owner is covered by release source: ${assertions} assertion passed`);

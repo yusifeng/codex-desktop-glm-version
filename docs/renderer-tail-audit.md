@@ -1,5 +1,19 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Worktree/automation/Git/project/AppGen release-owner recovery：一次性恢复
+`worktrees-settings-page`、`codex-app-home-beacon-announcement-core`、
+`gpt-plugin-migration-dialog`、`automation-side-panel-tab-core`、
+`review-file-tree-side-pane`、`image-suggestions-core`、`appgen-page`、
+`artifact-annotation-batch-controls`、`code-block-execution`、
+`gift-card-redemption-page`、`chatgpt-project-settings-modal` 与
+`local-environment-editor` 十二个发布 owner，净恢复 14,348 行发布 TypeScript。旧 mock
+行为测试已迁移为发布一致性验证；renderer verifier 同步移除 Beacon owner 恢复前才需要的
+synthetic import 例外。整批通过 12,448/12,448 transform check、1,888/1,888 renderer
+build/verify、2,247/2,247 app-code coverage、0 semantic tail 与 typecheck。严格 hub 消费推进到
+app-shared 1,590/3,185、app-initial 4,949/8,204、app-primary 637/917，仍为 0 unreviewed、
+0 invalid consumers。按发布源码正向行数缺口口径，覆盖率由约 81.1% 推进到 82.6%；425 个
+preserved 边界、聚合 hub 耦合导出和最终真实登录态 E2E 仍未完成。
+
 2026-11-02 Preview/automation/command/workspace release-owner recovery：一次性恢复
 `site-preview`、`automation-frequency-section`、`command-messages`、
 `appgen-analytics-page`、`local-conversation-git-actions`、`gpt-about-dialog-core`、

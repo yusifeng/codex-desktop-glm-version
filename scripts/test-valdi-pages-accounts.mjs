@@ -88,32 +88,7 @@ function assertSource(directory, dependencies, dynamic = []) {
   assertSource("personal-finance-account-detail", ["rolldown-runtime", "app-shared", "app-initial", "chatgpt-ecosystem-widget-queries", "conversation"]);
 }
 
-// Sites page
-{
-  const state = { requests: [], items: [{ id: "site-1", title: "Team dashboard", slug: "team-dashboard", description: "Metrics", current_user_role: "owner", access_policy: { access_mode: "custom" } }], starts: [] };
-  const hooks = createHooks();
-  const module = await buildModule("appgen-page", {
-    "rolldown-runtime": "export {};",
-    "app-shared": `export const $3=()=>{},FX=()=>{},K2=()=>{},I3=()=>globalThis.__sites.jsx,e6=()=>globalThis.__sites.React,Qh="Spinner",Y2="Message",Yh="Button",n4=()=>({formatMessage:m=>m.defaultMessage});`,
-    "app-initial": `export const Qgn=()=>{},fdn=()=>{},lnn=()=>{},o_n=()=>path=>globalThis.__sites.state.navigated=path,_dn={safeGet:async path=>{globalThis.__sites.state.requests.push(path);return {items:globalThis.__sites.state.items}}};`,
-    "app-primary": "export {};",
-    "appgen-access": `export const r=()=>({accessMode:"custom",groupCount:0,userCount:0}),s=()=>{};`,
-    "appgen-disabled-tooltip": `export const n=()=>{},t="DisabledTooltip";`,
-    "start-appgen-conversation": `export const n=(scope,launcher,request)=>globalThis.__sites.state.starts.push(request),t=()=>{};`,
-    "appgen-automations-state": `export const r=()=>{};`,
-    "use-searchable-page-title-visibility": `export const n=()=>({scrollContainerRef(){},showTitleInToolbar:true,titleRef(){}}),t=()=>{};`,
-    "appgen-access-state-messages": `export const n=()=>{},t="AccessState";`,
-    "open-appgen-share-dialog": `export const n=()=>{},t=()=>{};`,
-    "sites-default-thumbnail": `export const n=()=>{},t="Thumbnail";`,
-  }, "__sites", { state, React: hooks.React, jsx });
-  hooks.reset(); let view = module.AppgenPage(); hooks.runEffects(); await settle(); hooks.reset(); view = module.AppgenPage();
-  check(text(view).includes("Team dashboard"), "sites page loads owned sites");
-  find(view, (node) => node.type === "Button" && text(node) === "Create").props.onClick();
-  check(state.starts.at(-1).type === "create", "sites page starts site creation");
-  find(view, (node) => node.type === "button" && text(node) === "Team dashboard").props.onClick();
-  check(state.starts.at(-1).type === "edit" && state.starts.at(-1).projectId === "site-1", "sites page starts site editing");
-  assertSource("appgen-page", ["rolldown-runtime", "app-shared", "app-initial", "app-primary", "appgen-access", "appgen-disabled-tooltip", "start-appgen-conversation", "appgen-automations-state", "use-searchable-page-title-visibility", "appgen-access-state-messages", "open-appgen-share-dialog", "sites-default-thumbnail"]);
-}
+assertions += assertReleaseOwner("appgen-page");
 
 // Environment review entry
 {

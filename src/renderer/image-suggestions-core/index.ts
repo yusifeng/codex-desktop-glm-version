@@ -1,158 +1,1490 @@
-// Images/Home prompt suggestions: account-scoped catalog, generated draft
-// identity, prompt-card analytics and selection/sketch/upload transitions.
-import "@rchunk/rolldown-runtime";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as imageHomeChunk from "@rchunk/chatgpt-image-home";
-import * as recentUploadsChunk from "@rchunk/recent-uploads";
-import "@rchunk/option-carousel";
-import "@rchunk/tabs";
-import type { JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
-
-type Surface = "home" | "images";
-type Presentation = "icon_pill" | "image_card" | "portrait" | "text_pill";
-interface Action { input_requirements?: { min_count?: number; source?: string | null }; strategy?: string }
-interface Prompt { action?: Action; id: string; image_alt?: string | null; image_url?: string | null; image_variant_urls?: string[] | null; image_variants?: string[] | null; prompt_text: string; section?: string | null; system_hints?: string[] | null; title: string }
-interface Group { action?: Action; id: string; items?: Prompt[]; kind?: "prompt_collection" | string | null; presentation: Presentation; title?: string | null }
-interface Selection { accountId?: string; baseSystemHints?: string[]; group: Group; item: Prompt; surface?: Surface; userId?: string }
-interface Controller { focus(): void; getPersistedText(): string; setPromptText(text: string): void; view: { dom?: { scrollIntoView(options: { behavior: "auto"; block: "center" }): void }; isDestroyed: boolean; state?: { doc?: unknown } } }
-interface Composer { canOpenImagePicker?: boolean; isSketchOpen?(): boolean; openFileDialog?(imagesOnly?: boolean): void; openSketch?(options: { isRequestCurrent(): boolean; onSave(): void }): boolean }
-interface Props { composer?: Composer | null; composerController: Controller; conversationId: string; disabled?: boolean; excludedPromptId?: string | null; groups?: Group[]; isConversationCurrent?(): boolean; onBeforeSelectPrompt?(): boolean | void; onReferenceImageSelected?(): void; onUploadSelectionChange?(selection: Selection | null): void; surface?: Surface }
-interface Query<Value> { data?: Value; isError?: boolean; isPending?: boolean; isSuccess?: boolean; refetch?(): Promise<unknown> | unknown }
-interface Scope { get<Value>(signal: unknown, parameter?: unknown): Value; set(signal: unknown, parameter: unknown, value?: unknown): void }
-interface Shared { BX<Value>(family: unknown, parameter: unknown): Value; FX?(): void; HX<Value>(signal: unknown): Value; I3: JsxRuntime | (() => JsxRuntime); LX(scope: unknown): Scope; QI?(): void; ZI: unknown; e6: ReactRuntime | (() => ReactRuntime); eZ?(scope: unknown, factory: (context: { get<Value>(signal: unknown): Value }) => Record<string, unknown>): unknown; oZ?(scope: unknown, factory: (key: string, context: { scope: Scope }) => { conversationId: string }): unknown; pk?: unknown; rZ?(scope: unknown, derive: (key: string, context: { get<Value>(signal: unknown, parameter?: unknown): Value }) => string): unknown; sZ?(scope: unknown, derive: (context: { get<Value>(signal: unknown): Value }) => unknown): unknown }
-interface Initial { GIt?(scope: Scope, conversationId: string, types: string[]): void; RIt?(): void; Sun?(): void; _un: unknown; kht: unknown; mun: unknown; rJt?: { safeGet(path: string, options: Record<string, unknown>): Promise<Record<string, unknown>> }; rqt?(): string; xpn?(scope: Scope, event: unknown, payload: Record<string, unknown>): void }
-interface Primary { au?(): void; ou?(scope: Scope, conversationId: string, item: Prompt, group: Group, surface: Surface): Selection | null; su?(scope: Scope, conversationId: string, controller: Controller, selection: Selection): void; tu: unknown }
-interface Recent { n?(): void; r?: unknown }
-interface ImageHome { a?: Record<string, string>; i?: unknown; n?: unknown; o?(): void; r?: unknown; t?: Record<string, string> }
-
-const shared = appSharedChunk as unknown as Shared;
-const initial = appInitialChunk as unknown as Initial;
-const primary = appPrimaryChunk as unknown as Primary;
-const recent = recentUploadsChunk as unknown as Recent;
-const imageHome = imageHomeChunk as unknown as ImageHome;
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let imageSuggestionSelectionFamily: unknown;
-let imageSuggestionConversationIdFamily: unknown;
-let catalogQuery: unknown;
-let stylesQuery: unknown;
-let mergedGroupsSignal: unknown;
-let initializedState = false;
-let initializedAnalytics = false;
-let initialized = false;
-
-function createImageSuggestionConversationState(scope: Scope): { conversationId: string } {
-  const conversationId = initial.rqt?.() ?? globalThis.crypto?.randomUUID?.() ?? `image-${Date.now().toString(36)}`;
-  initial.GIt?.(scope, conversationId, ["picture_v2"]);
-  return { conversationId };
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  $3 as n,
+  $_ as r,
+  BX as i,
+  E4 as a,
+  FX as o,
+  HX as s,
+  I3 as c,
+  K2 as l,
+  LX as u,
+  QI as d,
+  Y2 as f,
+  Yh as p,
+  ZI as m,
+  Zh as h,
+  bS as g,
+  e6 as _,
+  eZ as v,
+  g4 as y,
+  h4 as b,
+  lk as x,
+  lw as S,
+  m4 as C,
+  n4 as w,
+  oZ as T,
+  pk as E,
+  q4 as D,
+  rS as O,
+  rZ as k,
+  sZ as A,
+} from "@rchunk/app-shared";
+import {
+  Aet as j,
+  GIt as M,
+  Gat as N,
+  HGt as P,
+  HIt as F,
+  Hkt as I,
+  RIt as L,
+  Rhn as R,
+  Rht as z,
+  Sun as B,
+  Ukt as ee,
+  VIt as te,
+  WGt as ne,
+  Wat as V,
+  XGt as re,
+  _un as H,
+  cJt as ie,
+  ket as ae,
+  kht as oe,
+  m0t as se,
+  mun as U,
+  oqt as ce,
+  p0t as le,
+  qGt as ue,
+  rJt as de,
+  rqt as fe,
+  v2 as pe,
+  xpn as me,
+  y2 as he,
+  yIt as W,
+  ypn as ge,
+} from "@rchunk/app-initial";
+import { au as _e, ou as ve, su as ye, tu as be } from "@rchunk/app-primary";
+import { n as xe, t as Se } from "@rchunk/security-tabs";
+import { n as Ce, t as we } from "@rchunk/option-carousel";
+import { n as Te, r as Ee, t as De } from "@rchunk/recent-uploads";
+import {
+  a as G,
+  i as Oe,
+  n as ke,
+  o as Ae,
+  r as je,
+  t as K,
+} from "@rchunk/chatgpt-image-home";
+function Me(e) {
+  let t = fe();
+  return (M(e, t, [`picture_v2`]), { conversationId: t });
 }
-function initializeImageSuggestionState(): void {
-  if (initializedState) return;
-  shared.FX?.(); initial.RIt?.(); shared.QI?.();
-  imageSuggestionSelectionFamily = shared.oZ?.(shared.ZI, (_key, { scope }) => createImageSuggestionConversationState(scope)) ?? { kind: "image-suggestion-conversation" };
-  imageSuggestionConversationIdFamily = shared.rZ?.(shared.ZI, (key, { get }) => get<{ conversationId: string }>(imageSuggestionSelectionFamily, key).conversationId) ?? { kind: "image-suggestion-conversation-id" };
-  initializedState = true;
+var q, Ne;
+function Pe() {
+  return (Pe = e(() => {
+    (o(),
+      L(),
+      ce(),
+      d(),
+      (q = T(m, (e, { scope: t }) => Me(t))),
+      (Ne = k(m, (e, { get: t }) => t(q, e).conversationId)));
+  }))();
 }
-function presentationValue(presentation: Presentation): string | undefined {
-  const names: Record<Presentation, string> = { icon_pill: "CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_ICON_PILL", image_card: "CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_IMAGE_CARD", portrait: "CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_PORTRAIT", text_pill: "CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_TEXT_PILL" };
-  return imageHome.t?.[names[presentation]];
-}
-function analyticsPayload(item: Prompt, group: Group): Record<string, unknown> {
-  const position = group.items?.findIndex((candidate) => candidate.id === item.id);
-  return { position: position != null && position >= 0 ? position : undefined, promptGroupId: group.id, promptGroupPresentation: presentationValue(group.presentation), promptId: item.id };
-}
-function trackImageSuggestionSent(scope: Scope, item: Prompt, group: Group, imageSendUuid: string): void {
-  initial.xpn?.(scope, imageHome.i, { ...analyticsPayload(item, group), imageSendUuid, surface: imageHome.a?.CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_IMAGES });
-}
-function initializeImageSuggestionAnalytics(): void { if (!initializedAnalytics) { imageHome.o?.(); initializedAnalytics = true; } }
-function collectSections(groups: readonly Group[], preferred: readonly string[] = []): string[] {
-  return [...new Set(groups.flatMap((group) => group.kind == null || group.kind === "prompt_collection" ? group.items?.map((item) => item.section ?? "") ?? [] : []))].sort((left, right) => {
-    const leftIndex = preferred.indexOf(left || "trending"); const rightIndex = preferred.indexOf(right || "trending");
-    return (leftIndex < 0 ? preferred.length : leftIndex) - (rightIndex < 0 ? preferred.length : rightIndex);
+function Fe(e, t, n, r, i) {
+  me(e, t === `impression` ? ke : je, {
+    ...Le(n, r),
+    surface:
+      i === `home`
+        ? G.CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_CHATGPT_HOME
+        : G.CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_IMAGES,
   });
 }
-function mergeHomePromptText(existing: string, next: string, previous?: string): string {
-  if (existing.trim() === "") return next;
-  if (previous != null) { const index = existing.toLocaleLowerCase().indexOf(previous.toLocaleLowerCase()); if (index >= 0) return `${existing.slice(0, index)}${next}${existing.slice(index + previous.length)}`; }
-  return `${next}\n\n${existing}`;
+function Ie(e, t, n, r) {
+  me(e, Oe, {
+    ...Le(t, n),
+    imageSendUuid: r,
+    surface: G.CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_IMAGES,
+  });
 }
-function initializeSuggestionQueries(): void {
-  if (catalogQuery != null) return;
-  const common = { staleTime: 300_000, refetchInterval: 300_000, refetchOnMount: "always", refetchOnWindowFocus: "always", refetchOnReconnect: "always" };
-  catalogQuery = shared.eZ?.(shared.ZI, ({ get }) => { const accountId = get<string | null>(initial.mun); const userId = get<string | null>(initial._un); return { ...common, enabled: accountId != null && userId != null, queryKey: ["chatgpt-images", "catalog", accountId, userId], queryFn: ({ signal }: { signal?: AbortSignal }) => initial.rJt?.safeGet("/images/init", { additionalHeaders: accountId == null ? undefined : { "ChatGPT-Account-ID": accountId }, signal }) }; }) ?? { kind: "image-catalog" };
-  stylesQuery = shared.eZ?.(shared.ZI, ({ get }) => { const accountId = get<string | null>(initial.mun); const userId = get<string | null>(initial._un); return { ...common, enabled: accountId != null && userId != null, queryKey: ["chatgpt-images", "styles", accountId, userId], queryFn: ({ signal }: { signal?: AbortSignal }) => initial.rJt?.safeGet("/images/styles", { additionalHeaders: accountId == null ? undefined : { "ChatGPT-Account-ID": accountId }, parameters: { query: { include_image_suggestions: true } }, signal }) }; }) ?? { kind: "image-styles" };
-  mergedGroupsSignal = shared.sZ?.(shared.ZI, ({ get }) => {
-    const catalog = get<Query<{ groups?: Group[] }>>(catalogQuery); const styles = get<Query<{ image_suggestions?: Prompt[]; styles?: { id: string }[] }>>(stylesQuery);
-    if (catalog.isPending || styles.isPending) return undefined;
-    const groups = catalog.data?.groups; if (catalog.isSuccess && groups == null) return [];
-    const suggestions = styles.data?.image_suggestions; if (groups == null || suggestions == null || suggestions.length === 0) return groups;
-    const ids = new Set(styles.data?.styles?.map((style) => style.id));
-    const destination = groups.find((group) => (group.kind == null || group.kind === "prompt_collection") && group.items?.some((item) => ids.has(item.id)));
-    return groups.map((group) => group === destination ? { ...group, items: suggestions } : group);
-  }) ?? { kind: "merged-image-groups" };
-}
-function trackCard(scope: Scope, interaction: "impression" | "selected", item: Prompt, group: Group, surface: Surface): void {
-  initial.xpn?.(scope, interaction === "impression" ? imageHome.n : imageHome.r, { ...analyticsPayload(item, group), surface: surface === "home" ? imageHome.a?.CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_CHATGPT_HOME : imageHome.a?.CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_IMAGES });
-}
-function imageSource(item: Prompt): string | undefined { return [item.image_url, ...(item.image_variant_urls ?? []), ...(item.image_variants ?? [])].find((value): value is string => value?.trim() !== ""); }
-function PromptImage({ src }: { src?: string }): unknown {
-  const [failed, setFailed] = React.useState(false);
-  return src != null && !failed ? jsx.jsx("img", { alt: "", className: "h-full w-full object-cover", draggable: false, loading: "lazy", onError: () => setFailed(true), src }) : jsx.jsx("div", { "aria-hidden": true, className: "flex h-full w-full items-center justify-center text-tertiary", children: "✦" });
-}
-function SuggestionCard(props: { disabled?: boolean; group: Group; item: Prompt; onBeforeSelect?(): boolean | void; onSelect(): void; surface: Surface; visible: boolean }): unknown {
-  const scope = shared.LX(shared.ZI); const impressed = React.useRef(false);
-  React.useEffect(() => { if (props.surface === "home" && props.visible && !impressed.current) { impressed.current = true; trackCard(scope, "impression", props.item, props.group, props.surface); } }, [props.group, props.item, props.surface, props.visible]);
-  const select = () => { if (props.onBeforeSelect?.() === false) return; trackCard(scope, "selected", props.item, props.group, props.surface); props.onSelect(); };
-  const label = [...new Set([props.item.title, props.item.image_alt].filter((value): value is string => Boolean(value)))].join(", ");
-  if (props.group.presentation === "text_pill") return jsx.jsx("button", { "aria-label": label, className: "max-w-full rounded-full px-4 py-2 text-sm", disabled: props.disabled, onClick: select, type: "button", children: props.item.title });
-  if (props.group.presentation === "icon_pill") return jsx.jsxs("button", { "aria-label": label, className: "group/use flex w-full items-center gap-3 rounded-xl text-start", disabled: props.disabled, onClick: select, type: "button", children: [jsx.jsx("div", { className: "size-12 shrink-0 overflow-hidden rounded-xl bg-surface-secondary", children: jsx.jsx(PromptImage, { src: imageSource(props.item) }) }), jsx.jsx("span", { className: "line-clamp-2 text-sm text-secondary", children: props.item.title })] });
-  return jsx.jsxs("button", { "aria-label": label, className: "group/use relative flex aspect-[4/5] w-full overflow-hidden rounded-2xl bg-surface-secondary text-start", disabled: props.disabled, onClick: select, type: "button", children: [jsx.jsx(PromptImage, { src: imageSource(props.item) }), jsx.jsx("div", { className: "pointer-events-none absolute inset-x-0 bottom-0 bg-linear-to-t from-media-background/80 to-transparent px-3 pt-8 pb-3 text-media-foreground", children: jsx.jsx("span", { className: "line-clamp-2 text-sm font-medium", children: props.item.title }) })] });
-}
-function UploadCard({ disabled, onUpload }: { disabled: boolean; onUpload(): void }): unknown { return jsx.jsxs("button", { className: "relative flex aspect-[4/5] w-full items-center justify-center rounded-3xl bg-primary-ghost-hover", disabled, onClick: onUpload, type: "button", children: [jsx.jsx("span", { "aria-hidden": true, children: "+" }), jsx.jsx("span", { className: "absolute inset-x-0 bottom-0 p-3 text-start text-sm", children: "Upload a photo" })] }); }
-function Catalog(props: { disabled?: boolean; excludedPromptId?: string | null; groups?: Group[]; hidden: boolean; onBeforeSelectPrompt?(): boolean | void; onSelectPrompt(item: Prompt, group: Group): void; surface: Surface; uploadCard?: unknown }): unknown {
-  const remoteGroups = shared.HX<Group[] | undefined>(mergedGroupsSignal);
-  const groups = (props.groups ?? remoteGroups)?.flatMap((group) => { const items = group.items?.filter((item) => item.id !== props.excludedPromptId); return items?.length === 0 ? [] : [{ ...group, items }]; });
-  const catalogState = shared.HX<Query<unknown>>(catalogQuery) ?? {}; const stylesState = shared.HX<Query<unknown>>(stylesQuery) ?? {};
-  const sections = collectSections(groups ?? []); const [selectedSection, setSelectedSection] = React.useState<string | null>(null); const active = selectedSection != null && sections.includes(selectedSection) ? selectedSection : sections[0] ?? ""; const hasSections = sections.some(Boolean);
-  const visibleGroups = groups?.flatMap((group) => { if (group.kind != null && group.kind !== "prompt_collection" || group.items == null) return []; const items = group.items.filter((item) => !hasSections || (item.section ?? "") === active); return items.length === 0 ? [] : [{ ...group, items }]; });
-  const retry = () => void Promise.all([catalogState.refetch?.(), stylesState.refetch?.()]);
-  return jsx.jsxs("div", { className: "flex min-w-0 flex-col gap-4", hidden: props.hidden, children: [
-    sections.length > 1 ? jsx.jsx("div", { "aria-label": "Image prompt categories", role: "tablist", children: sections.map((section) => jsx.jsx("button", { "aria-selected": section === active, onClick: () => setSelectedSection(section), role: "tab", type: "button", children: section || "Trending" }, section || "trending")) }) : null,
-    jsx.jsxs("div", { "aria-busy": groups == null && !catalogState.isError && !stylesState.isError, role: "tabpanel", tabIndex: 0, children: [
-      catalogState.isError || stylesState.isError ? jsx.jsxs("div", { role: "alert", children: ["Some image prompts couldn't be loaded", jsx.jsx("button", { onClick: retry, type: "button", children: "Retry" })] }) : null,
-      groups == null && !catalogState.isError && !stylesState.isError ? jsx.jsx("div", { "aria-hidden": true, className: "grid grid-cols-4 gap-2", children: Array.from({ length: 12 }, (_value, index) => jsx.jsx("div", { className: "aspect-[4/5] rounded-2xl bg-surface-secondary" }, String(index))) }) : null,
-      visibleGroups?.length === 0 && !catalogState.isError && !stylesState.isError ? jsx.jsxs("div", { children: [jsx.jsx("strong", { children: "Start with your own idea" }), jsx.jsx("p", { children: "Describe the image you want to create above" })] }) : null,
-      visibleGroups?.map((group, groupIndex) => jsx.jsxs("section", { "aria-label": group.title ?? undefined, className: "flex min-w-0 flex-col gap-4", children: [groupIndex > 0 && group.title ? jsx.jsx("h2", { children: group.title }) : null, jsx.jsxs("div", { className: group.presentation === "text_pill" ? "flex flex-col items-start gap-2" : group.presentation === "icon_pill" ? "grid grid-cols-2 gap-4" : "grid grid-cols-4 gap-2", children: [groupIndex === 0 ? props.uploadCard : null, group.items?.map((item) => jsx.jsx(SuggestionCard, { disabled: props.disabled, group, item, onBeforeSelect: props.onBeforeSelectPrompt, onSelect: () => props.onSelectPrompt(item, group), surface: props.surface, visible: !props.hidden }, item.id))] })] }, group.id)),
-    ] }),
-  ] });
-}
-function RecentUploadSelection(props: { disabled?: boolean; onBack(): void; onSelected(): void; onUpload(): void; uploadDisabled: boolean }): unknown {
-  const query = recent.r == null ? undefined : shared.BX<Query<{ file_id: string }[]>>(recent.r, true);
-  return jsx.jsxs("section", { "aria-label": "Reference photos", className: "mx-auto flex w-full max-w-3xl flex-col gap-4", children: [jsx.jsxs("div", { children: [jsx.jsx("button", { onClick: props.onBack, type: "button", children: "Back" }), jsx.jsx("h2", { children: "Choose a reference photo" })] }), query?.isError ? jsx.jsx("div", { role: "alert", children: jsx.jsx("button", { onClick: () => query.refetch?.(), type: "button", children: "Retry loading photos" }) }) : null, jsx.jsxs("div", { className: "grid grid-cols-5 gap-3", children: [jsx.jsx(UploadCard, { disabled: props.disabled === true || props.uploadDisabled, onUpload: props.onUpload }), query?.data?.map((record, index) => jsx.jsx("button", { "aria-label": `Recent upload ${index + 1}`, disabled: props.disabled, onClick: props.onSelected, type: "button", children: record.file_id }, record.file_id))] })] });
-}
-function ImageSuggestions(props: Props): unknown {
-  initializeImageSuggestions(); const surface = props.surface ?? "images"; const scope = shared.LX(initial.kht); const selected = shared.BX<Selection | null>(primary.tu, props.conversationId); const latestSelection = React.useRef<Selection | symbol | null>(selected); const [showCatalogAfterBack, setShowCatalogAfterBack] = React.useState(false);
-  const action = selected == null ? null : selected.item.action ?? selected.group.action; const showRecentUploads = action?.input_requirements?.source != null && action.input_requirements.source !== "prompt_only" && action.input_requirements.source !== "sketch" && !showCatalogAfterBack;
-  const select = (item: Prompt, group: Group): Selection | null => { const next = primary.ou?.(scope, props.conversationId, item, group, surface) ?? null; if (next == null) return null; setShowCatalogAfterBack(false); props.composerController.setPromptText(surface === "home" ? mergeHomePromptText(props.composerController.getPersistedText(), item.prompt_text, selected?.item.prompt_text) : item.prompt_text); props.onUploadSelectionChange?.(next); return next; };
-  const focus = () => { props.composerController.focus(); props.composerController.view.dom?.scrollIntoView({ behavior: "auto", block: "center" }); };
-  const choose = (item: Prompt, group: Group) => {
-    if (props.disabled) return;
-    if ((item.action ?? group.action)?.input_requirements?.source !== "sketch") { const next = select(item, group); if (next != null) { latestSelection.current = next; focus(); } return; }
-    const accountId = scope.get<string | null>(initial.mun); const userId = scope.get<string | null>(initial._un); const request = Symbol("sketch-request"); const document = props.composerController.view.state?.doc;
-    const current = () => !props.composerController.view.isDestroyed && scope.get(initial.mun) === accountId && scope.get(initial._un) === userId && latestSelection.current === request && (props.isConversationCurrent?.() ?? true);
-    const opened = props.composer?.openSketch?.({ isRequestCurrent: current, onSave: () => { if (!current() || props.composerController.view.state?.doc !== document) return; select(item, group); requestAnimationFrame(() => { if (current() && props.composer?.isSketchOpen?.() === false) focus(); }); } });
-    if (opened) { latestSelection.current = request; props.onUploadSelectionChange?.(null); return; }
-    scope.get<{ danger?(message: string, options?: unknown): void } | undefined>(shared.pk)?.danger?.("Sketch is unavailable right now", { errorAnalytics: { toastId: "images.sketch.unavailable" } });
+function Le(e, t) {
+  let n = t.items?.findIndex((t) => t.id === e.id);
+  return {
+    promptId: e.id,
+    promptGroupId: t.id,
+    promptGroupPresentation: Re(t.presentation),
+    position: n != null && n >= 0 ? n : void 0,
   };
-  const recentNode = showRecentUploads ? jsx.jsx(RecentUploadSelection, { disabled: props.disabled, onBack: () => setShowCatalogAfterBack(true), onSelected: () => { if (latestSelection.current !== selected || selected == null) return; if (props.onReferenceImageSelected != null) props.onReferenceImageSelected(); else primary.su?.(scope, props.conversationId, props.composerController, selected); }, onUpload: () => props.composer?.openFileDialog?.(true), uploadDisabled: !props.composer?.canOpenImagePicker }) : null;
-  const uploadCard = surface === "home" ? jsx.jsx(UploadCard, { disabled: props.disabled === true || !props.composer?.canOpenImagePicker, onUpload: () => props.composer?.openFileDialog?.(true) }) : undefined;
-  return jsx.jsxs("div", { className: "flex min-w-0 flex-col gap-8", children: [recentNode, jsx.jsx(Catalog, { disabled: props.disabled, excludedPromptId: props.excludedPromptId, groups: props.groups, hidden: showRecentUploads, onBeforeSelectPrompt: props.onBeforeSelectPrompt, onSelectPrompt: choose, surface, uploadCard })] });
 }
-function initializeImageSuggestions(): void {
-  if (initialized) return;
-  React = typeof shared.e6 === "function" ? shared.e6() : shared.e6; jsx = typeof shared.I3 === "function" ? shared.I3() : shared.I3;
-  initial.Sun?.(); primary.au?.(); initializeImageSuggestionState(); initializeImageSuggestionAnalytics(); initializeSuggestionQueries(); recent.n?.(); initialized = true;
+function Re(e) {
+  switch (e) {
+    case `image_card`:
+      return K.CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_IMAGE_CARD;
+    case `portrait`:
+      return K.CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_PORTRAIT;
+    case `text_pill`:
+      return K.CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_TEXT_PILL;
+    case `icon_pill`:
+      return K.CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_ICON_PILL;
+  }
 }
-export { createImageSuggestionConversationState as a, initializeImageSuggestionState as c, trackImageSuggestionSent as i, initializeImageSuggestions as n, imageSuggestionSelectionFamily as o, initializeImageSuggestionAnalytics as r, imageSuggestionConversationIdFamily as s, ImageSuggestions as t };
+function ze() {
+  return (ze = e(() => {
+    (Ae(), ge());
+  }))();
+}
+function Be(e, t = []) {
+  return [
+    ...new Set(
+      e.flatMap((e) =>
+        e.kind == null || e.kind === `prompt_collection`
+          ? (e.items?.map((e) => e.section || ``) ?? [])
+          : [],
+      ),
+    ),
+  ].sort((e, n) => {
+    let r = t.indexOf(e || `trending`),
+      i = t.indexOf(n || `trending`);
+    return (r === -1 ? t.length : r) - (i === -1 ? t.length : i);
+  });
+}
+function Ve(e, t, n) {
+  if (e.trim() === ``) return t;
+  let r = n ? e.match(new RegExp((0, He.default)(n), `i`)) : null;
+  return r?.index == null
+    ? `${t}\n\n${e}`
+    : `${e.slice(0, r.index)}${t}${e.slice(r.index + r[0].length)}`;
+}
+var He;
+function Ue() {
+  return (Ue = e(() => {
+    He = t(R(), 1);
+  }))();
+}
+var We, Ge, Ke, qe, Je, Ye;
+function Xe() {
+  return (Xe = e(() => {
+    (o(),
+      y(),
+      B(),
+      ie(),
+      d(),
+      le(),
+      (We = 3e5),
+      (Ge = {
+        staleTime: We,
+        refetchInterval: We,
+        refetchOnMount: `always`,
+        refetchOnWindowFocus: `always`,
+        refetchOnReconnect: `always`,
+      }),
+      (Ke = v(m, ({ get: e }) => {
+        let t = e(U),
+          n = e(H);
+        return {
+          ...Ge,
+          enabled: t != null && n != null,
+          queryKey: [`chatgpt-images`, `catalog`, t, n],
+          queryFn: ({ signal: e }) =>
+            de.safeGet(`/images/init`, {
+              additionalHeaders: t == null ? void 0 : { "ChatGPT-Account-ID": t },
+              signal: e,
+            }),
+        };
+      })),
+      (qe = v(m, ({ get: e }) => {
+        let t = e(U),
+          n = e(H);
+        return {
+          ...Ge,
+          enabled: t != null && n != null,
+          queryKey: [`chatgpt-images`, `styles`, t, n],
+          queryFn: ({ signal: e }) =>
+            de.safeGet(`/images/styles`, {
+              additionalHeaders: t == null ? void 0 : { "ChatGPT-Account-ID": t },
+              parameters: { query: { include_image_suggestions: !0 } },
+              signal: e,
+            }),
+        };
+      })),
+      (Je = A(m, ({ get: e }) => {
+        let t = e(Ke),
+          n = e(qe);
+        if (t.isPending || n.isPending) return;
+        let r = t.data?.groups;
+        if (t.isSuccess && r == null) return [];
+        let i = n.data?.image_suggestions;
+        if (r == null || i == null || i.length === 0) return r;
+        let a = new Set(n.data?.styles?.map((e) => e.id)),
+          o = r.find(
+            (e) =>
+              (e.kind == null || e.kind === `prompt_collection`) &&
+              e.items?.some((e) => a.has(e.id)),
+          );
+        return r.map((e) => (e === o ? { ...e, items: i } : e));
+      })),
+      (Ye = A(m, ({ get: e }) => {
+        let t = e(se, `3939855767`),
+          n = a(D()).safeParse(t?.value.section_order);
+        return n.success ? n.data : void 0;
+      })));
+  }))();
+}
+function Ze(e) {
+  let t = (0, J.c)(17),
+    {
+      disabled: n,
+      excludedPromptId: r,
+      hidden: i,
+      onBeforeSelectPrompt: a,
+      onSelectPrompt: o,
+      surface: c,
+      uploadCard: l,
+    } = e,
+    u = s(Je),
+    d = s(Ye),
+    { isError: f, refetch: p } = s(Ke),
+    { isError: m, refetch: h } = s(qe),
+    g;
+  t[0] !== r || t[1] !== u
+    ? ((g =
+        r == null
+          ? u
+          : u?.flatMap((e) => {
+              let t = e.items?.filter((e) => e.id !== r);
+              return t?.length === 0 ? [] : [{ ...e, items: t }];
+            })),
+      (t[0] = r),
+      (t[1] = u),
+      (t[2] = g))
+    : (g = t[2]);
+  let _ = f || m,
+    v;
+  t[3] !== p || t[4] !== h
+    ? ((v = () => {
+        Promise.all([p(), h()]);
+      }),
+      (t[3] = p),
+      (t[4] = h),
+      (t[5] = v))
+    : (v = t[5]);
+  let y;
+  return (
+    t[6] !== n ||
+    t[7] !== i ||
+    t[8] !== a ||
+    t[9] !== o ||
+    t[10] !== d ||
+    t[11] !== c ||
+    t[12] !== g ||
+    t[13] !== _ ||
+    t[14] !== v ||
+    t[15] !== l
+      ? ((y = (0, X.jsx)(Qe, {
+          disabled: n,
+          groups: g,
+          hidden: i,
+          isError: _,
+          sectionOrder: d,
+          surface: c,
+          uploadCard: l,
+          onRetry: v,
+          onBeforeSelectPrompt: a,
+          onSelectPrompt: o,
+        })),
+        (t[6] = n),
+        (t[7] = i),
+        (t[8] = a),
+        (t[9] = o),
+        (t[10] = d),
+        (t[11] = c),
+        (t[12] = g),
+        (t[13] = _),
+        (t[14] = v),
+        (t[15] = l),
+        (t[16] = y))
+      : (y = t[16]),
+    y
+  );
+}
+function Qe(e) {
+  let t = (0, J.c)(54),
+    {
+      disabled: n,
+      groups: r,
+      hidden: i,
+      isError: a,
+      onBeforeSelectPrompt: o,
+      onRetry: s,
+      onSelectPrompt: c,
+      sectionOrder: l,
+      surface: u,
+      uploadCard: d,
+    } = e,
+    m = w(),
+    h = (0, Y.useId)(),
+    [g, _] = (0, Y.useState)(null),
+    v,
+    y,
+    b,
+    x,
+    S,
+    T,
+    E,
+    D,
+    O,
+    k,
+    A,
+    j,
+    M;
+  if (
+    t[0] !== n ||
+    t[1] !== r ||
+    t[2] !== i ||
+    t[3] !== m ||
+    t[4] !== a ||
+    t[5] !== o ||
+    t[6] !== s ||
+    t[7] !== c ||
+    t[8] !== h ||
+    t[9] !== l ||
+    t[10] !== g ||
+    t[11] !== u ||
+    t[12] !== d
+  ) {
+    let e = r == null ? [] : Be(r, l),
+      w = g != null && e.includes(g) ? g : (e[0] ?? ``),
+      N = e.some(et),
+      P = r?.flatMap((e) => {
+        if ((e.kind != null && e.kind !== `prompt_collection`) || e.items == null) return [];
+        let t = e.items.filter((e) => !N || (e.section || ``) === w);
+        return t.length === 0 ? [] : [{ ...e, items: t }];
+      });
+    ((b = `flex min-w-0 flex-col gap-4`), (x = i));
+    let F;
+    t[26] === m
+      ? (F = t[27])
+      : ((F = m.formatMessage({
+          id: `imagesApp.promptSections.tabs.ariaLabel`,
+          defaultMessage: `Image prompt categories`,
+          description: `Accessible name for image prompt category tabs below the image composer on the ChatGPT Images page. Includes Trending and any additional categories provided by the server.`,
+        })),
+        (t[26] = m),
+        (t[27] = F));
+    let I = (e.length === 0 ? [``] : e).map((e) => ({
+      key: e,
+      panelId: e === w ? h : void 0,
+      name:
+        e ||
+        (0, X.jsx)(f, {
+          id: `imagesApp.promptSections.tab.trending`,
+          defaultMessage: `Trending`,
+          description: `Short tab label below the image composer on the ChatGPT Images page. Selecting it shows uncategorized popular image creation prompts; neighboring tabs show other available prompt categories.`,
+        }),
+    }));
+    (t[28] !== w || t[29] !== F || t[30] !== I
+      ? ((S = (0, X.jsx)(Se, {
+          ariaLabel: F,
+          variant: `browse`,
+          scrollable: !0,
+          selectedKey: w,
+          onSelect: _,
+          tabs: I,
+        })),
+        (t[28] = w),
+        (t[29] = F),
+        (t[30] = I),
+        (t[31] = S))
+      : (S = t[31]),
+      (v = h),
+      (T = `flex min-w-0 flex-col gap-8`),
+      (E = `tabpanel`),
+      (D = `${h}-tab`),
+      (O = r == null && !a),
+      (k = 0),
+      t[32] !== a || t[33] !== s
+        ? ((A = a
+            ? (0, X.jsxs)(`div`, {
+                role: `alert`,
+                className: `flex flex-wrap items-center gap-2 text-sm text-secondary`,
+                children: [
+                  (0, X.jsx)(f, {
+                    id: `images.catalog.loadError`,
+                    defaultMessage: `Some image prompts couldn't be loaded`,
+                    description: `Error above image creation prompt cards when the catalog or styles request fails. The neighboring Retry button reloads the missing prompts.`,
+                  }),
+                  (0, X.jsx)(p, {
+                    color: `secondary`,
+                    onClick: s,
+                    children: (0, X.jsx)(f, {
+                      id: `images.catalog.retry`,
+                      defaultMessage: `Retry`,
+                      description: `Button on the Images page that retries loading failed image creation prompt collections.`,
+                    }),
+                  }),
+                ],
+              })
+            : null),
+          (t[32] = a),
+          (t[33] = s),
+          (t[34] = A))
+        : (A = t[34]),
+      t[35] !== r || t[36] !== a
+        ? ((j =
+            r == null && !a
+              ? (0, X.jsx)(`div`, {
+                  className: `grid grid-cols-4 gap-2`,
+                  "aria-hidden": !0,
+                  children: Array.from({ length: 12 }, $e),
+                })
+              : null),
+          (t[35] = r),
+          (t[36] = a),
+          (t[37] = j))
+        : (j = t[37]),
+      (M =
+        P?.length === 0 && !a
+          ? (0, X.jsx)(ae, {
+              title: (0, X.jsx)(f, {
+                id: `images.catalog.empty`,
+                defaultMessage: `Start with your own idea`,
+                description: `Empty state on the Images page when no image creation prompts are available. Users can still create images by writing in the composer above.`,
+              }),
+              description: (0, X.jsx)(f, {
+                id: `images.catalog.emptyDescription`,
+                defaultMessage: `Describe the image you want to create above`,
+                description: `Instruction below the Images page's empty prompt catalog, directing the user to the image creation composer above.`,
+              }),
+            })
+          : null),
+      (y = P?.map((e, t) => {
+        let r = e.presentation === `image_card` || e.presentation === `portrait`;
+        return (0, X.jsxs)(
+          `section`,
+          {
+            className: `flex min-w-0 flex-col gap-4`,
+            "aria-label": e.title,
+            children: [
+              t > 0 && e.title
+                ? (0, X.jsx)(`h2`, {
+                    className: `text-base font-medium text-default select-none`,
+                    children: e.title,
+                  })
+                : null,
+              t === 0 && d != null && !r
+                ? (0, X.jsx)(`div`, { className: `grid grid-cols-4 gap-2`, children: d })
+                : null,
+              (0, X.jsxs)(`div`, {
+                className: C(
+                  e.presentation === `text_pill` && `flex flex-col items-start gap-2`,
+                  e.presentation === `icon_pill` && `grid grid-cols-2 gap-4`,
+                  r && `grid grid-cols-4 gap-2`,
+                ),
+                children: [
+                  t === 0 && r ? d : null,
+                  e.items.map((t) =>
+                    (0, X.jsx)(
+                      tt,
+                      {
+                        disabled: n,
+                        item: t,
+                        group: e,
+                        visible: !i,
+                        surface: u,
+                        onBeforeSelect: o,
+                        onSelect: () => c(t, e),
+                      },
+                      t.id,
+                    ),
+                  ),
+                ],
+              }),
+            ],
+          },
+          e.id,
+        );
+      })),
+      (t[0] = n),
+      (t[1] = r),
+      (t[2] = i),
+      (t[3] = m),
+      (t[4] = a),
+      (t[5] = o),
+      (t[6] = s),
+      (t[7] = c),
+      (t[8] = h),
+      (t[9] = l),
+      (t[10] = g),
+      (t[11] = u),
+      (t[12] = d),
+      (t[13] = v),
+      (t[14] = y),
+      (t[15] = b),
+      (t[16] = x),
+      (t[17] = S),
+      (t[18] = T),
+      (t[19] = E),
+      (t[20] = D),
+      (t[21] = O),
+      (t[22] = k),
+      (t[23] = A),
+      (t[24] = j),
+      (t[25] = M));
+  } else
+    ((v = t[13]),
+      (y = t[14]),
+      (b = t[15]),
+      (x = t[16]),
+      (S = t[17]),
+      (T = t[18]),
+      (E = t[19]),
+      (D = t[20]),
+      (O = t[21]),
+      (k = t[22]),
+      (A = t[23]),
+      (j = t[24]),
+      (M = t[25]));
+  let N;
+  t[38] !== v ||
+  t[39] !== y ||
+  t[40] !== T ||
+  t[41] !== E ||
+  t[42] !== D ||
+  t[43] !== O ||
+  t[44] !== k ||
+  t[45] !== A ||
+  t[46] !== j ||
+  t[47] !== M
+    ? ((N = (0, X.jsxs)(`div`, {
+        id: v,
+        className: T,
+        role: E,
+        "aria-labelledby": D,
+        "aria-busy": O,
+        tabIndex: k,
+        children: [A, j, M, y],
+      })),
+      (t[38] = v),
+      (t[39] = y),
+      (t[40] = T),
+      (t[41] = E),
+      (t[42] = D),
+      (t[43] = O),
+      (t[44] = k),
+      (t[45] = A),
+      (t[46] = j),
+      (t[47] = M),
+      (t[48] = N))
+    : (N = t[48]);
+  let P;
+  return (
+    t[49] !== b || t[50] !== x || t[51] !== S || t[52] !== N
+      ? ((P = (0, X.jsxs)(`div`, { className: b, hidden: x, children: [S, N] })),
+        (t[49] = b),
+        (t[50] = x),
+        (t[51] = S),
+        (t[52] = N),
+        (t[53] = P))
+      : (P = t[53]),
+    P
+  );
+}
+function $e(e, t) {
+  return (0, X.jsx)(V, { className: `aspect-[4/5] rounded-2xl` }, t);
+}
+function et(e) {
+  return !!e;
+}
+function tt(e) {
+  let t = (0, J.c)(59),
+    { disabled: n, item: r, group: i, onBeforeSelect: a, onSelect: o, surface: s, visible: c } = e,
+    l = s === void 0 ? `images` : s,
+    d = u(m),
+    f = (0, Y.useRef)(!1),
+    h;
+  t[0] !== i || t[1] !== r || t[2] !== d || t[3] !== l
+    ? ((h = () => {
+        l === `home` && !f.current && ((f.current = !0), Fe(d, `impression`, r, i, l));
+      }),
+      (t[0] = i),
+      (t[1] = r),
+      (t[2] = d),
+      (t[3] = l),
+      (t[4] = h))
+    : (h = t[4]);
+  let g = (0, Y.useEffectEvent)(h),
+    _;
+  t[5] !== g || t[6] !== c
+    ? ((_ = () => {
+        c && g();
+      }),
+      (t[5] = g),
+      (t[6] = c),
+      (t[7] = _))
+    : (_ = t[7]);
+  let v;
+  (t[8] !== l || t[9] !== c ? ((v = [l, c]), (t[8] = l), (t[9] = c), (t[10] = v)) : (v = t[10]),
+    (0, Y.useEffect)(_, v));
+  let y;
+  t[11] !== i || t[12] !== r || t[13] !== a || t[14] !== o || t[15] !== d || t[16] !== l
+    ? ((y = () => {
+        a?.() !== !1 && (Fe(d, `selected`, r, i, l), o());
+      }),
+      (t[11] = i),
+      (t[12] = r),
+      (t[13] = a),
+      (t[14] = o),
+      (t[15] = d),
+      (t[16] = l),
+      (t[17] = y))
+    : (y = t[17]);
+  let b = y,
+    x;
+  t[18] !== r.image_alt || t[19] !== r.title
+    ? ((x = new Set([r.title, r.image_alt].filter(rt))),
+      (t[18] = r.image_alt),
+      (t[19] = r.title),
+      (t[20] = x))
+    : (x = t[20]);
+  let S;
+  t[21] === x ? (S = t[22]) : ((S = [...x]), (t[21] = x), (t[22] = S));
+  let w = S.join(`, `),
+    T;
+  t[23] !== r.image_url || t[24] !== r.image_variant_urls || t[25] !== r.image_variants
+    ? ((T = [r.image_url, ...(r.image_variant_urls ?? []), ...(r.image_variants ?? [])].find(nt)),
+      (t[23] = r.image_url),
+      (t[24] = r.image_variant_urls),
+      (t[25] = r.image_variants),
+      (t[26] = T))
+    : (T = t[26]);
+  let E = T;
+  if (i.presentation === `text_pill`) {
+    let e;
+    t[27] === r.title
+      ? (e = t[28])
+      : ((e = (0, X.jsx)(`span`, { className: `truncate`, children: r.title })),
+        (t[27] = r.title),
+        (t[28] = e));
+    let i;
+    return (
+      t[29] !== n || t[30] !== b || t[31] !== w || t[32] !== e
+        ? ((i = (0, X.jsx)(p, {
+            className: `max-w-full`,
+            color: `secondary`,
+            radius: `full`,
+            size: `medium`,
+            allowShrink: !0,
+            "aria-label": w,
+            disabled: n,
+            onClick: b,
+            children: e,
+          })),
+          (t[29] = n),
+          (t[30] = b),
+          (t[31] = w),
+          (t[32] = e),
+          (t[33] = i))
+        : (i = t[33]),
+      i
+    );
+  }
+  if (i.presentation === `icon_pill`) {
+    let e;
+    t[34] === E
+      ? (e = t[35])
+      : ((e = (0, X.jsx)(`div`, {
+          className: `size-12 shrink-0 overflow-hidden rounded-xl bg-surface-secondary`,
+          children: (0, X.jsx)(it, { src: E }, E),
+        })),
+        (t[34] = E),
+        (t[35] = e));
+    let i;
+    t[36] === r.title
+      ? (i = t[37])
+      : ((i = (0, X.jsx)(`span`, {
+          className: `line-clamp-2 text-sm text-secondary group-hover/use:text-default`,
+          children: r.title,
+        })),
+        (t[36] = r.title),
+        (t[37] = i));
+    let a;
+    return (
+      t[38] !== n || t[39] !== b || t[40] !== w || t[41] !== i || t[42] !== e
+        ? ((a = (0, X.jsxs)(`button`, {
+            type: `button`,
+            className: `group/use flex w-full cursor-interaction items-center gap-3 rounded-xl text-start outline-none select-none focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring`,
+            "aria-label": w,
+            disabled: n,
+            onClick: b,
+            children: [e, i],
+          })),
+          (t[38] = n),
+          (t[39] = b),
+          (t[40] = w),
+          (t[41] = i),
+          (t[42] = e),
+          (t[43] = a))
+        : (a = t[43]),
+      a
+    );
+  }
+  let D;
+  t[44] === E ? (D = t[45]) : ((D = (0, X.jsx)(it, { src: E }, E)), (t[44] = E), (t[45] = D));
+  let O = r.section
+      ? `from-media-background/20 via-media-background/10`
+      : `from-media-background/80 via-media-background/30`,
+    k;
+  t[46] === O
+    ? (k = t[47])
+    : ((k = C(
+        `pointer-events-none absolute inset-x-0 bottom-0 flex min-h-14 items-end bg-linear-to-t to-transparent px-3 pt-8 pb-3 text-media-foreground`,
+        O,
+      )),
+      (t[46] = O),
+      (t[47] = k));
+  let A;
+  t[48] === r.title
+    ? (A = t[49])
+    : ((A = (0, X.jsx)(`span`, {
+        className: `line-clamp-2 w-full text-start text-sm leading-5 font-medium wrap-break-word [text-box-trim:trim-both]`,
+        children: r.title,
+      })),
+      (t[48] = r.title),
+      (t[49] = A));
+  let j;
+  t[50] !== k || t[51] !== A
+    ? ((j = (0, X.jsx)(`div`, { className: k, children: A })),
+      (t[50] = k),
+      (t[51] = A),
+      (t[52] = j))
+    : (j = t[52]);
+  let M;
+  return (
+    t[53] !== n || t[54] !== b || t[55] !== w || t[56] !== j || t[57] !== D
+      ? ((M = (0, X.jsxs)(`button`, {
+          type: `button`,
+          className: `group/use relative flex aspect-[4/5] w-full cursor-interaction flex-col overflow-hidden rounded-2xl bg-surface-secondary text-start outline-none select-none focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring`,
+          "aria-label": w,
+          disabled: n,
+          onClick: b,
+          children: [D, j],
+        })),
+        (t[53] = n),
+        (t[54] = b),
+        (t[55] = w),
+        (t[56] = j),
+        (t[57] = D),
+        (t[58] = M))
+      : (M = t[58]),
+    M
+  );
+}
+function nt(e) {
+  return e?.trim();
+}
+function rt(e) {
+  return !!e;
+}
+function it(e) {
+  let t = (0, J.c)(3),
+    { src: n } = e,
+    [r, i] = (0, Y.useState)(!1),
+    a;
+  return (
+    t[0] !== r || t[1] !== n
+      ? ((a =
+          n && !r
+            ? (0, X.jsx)(`img`, {
+                className: `h-full w-full object-cover`,
+                src: n,
+                alt: ``,
+                loading: `lazy`,
+                draggable: !1,
+                onError: () => i(!0),
+              })
+            : (0, X.jsx)(`div`, {
+                className: `flex h-full w-full items-center justify-center text-tertiary`,
+                children: (0, X.jsx)(O, {}),
+              })),
+        (t[0] = r),
+        (t[1] = n),
+        (t[2] = a))
+      : (a = t[2]),
+    a
+  );
+}
+var J, Y, X;
+function at() {
+  return (at = e(() => {
+    ((J = n()),
+      b(),
+      o(),
+      (Y = _()),
+      l(),
+      h(),
+      S(),
+      j(),
+      N(),
+      xe(),
+      d(),
+      Xe(),
+      ze(),
+      Ue(),
+      (X = c()));
+  }))();
+}
+function ot(e) {
+  let t = (0, st.c)(8),
+    { disabled: n, layout: r, onUpload: i } = e,
+    a = r === `carousel` ? `w-[calc((100%-3rem)/5)] shrink-0 snap-start` : `w-full`,
+    o;
+  t[0] === a
+    ? (o = t[1])
+    : ((o = C(
+        `relative flex aspect-[4/5] cursor-interaction items-center justify-center rounded-3xl bg-primary-ghost-hover text-secondary outline-none select-none focus-visible:outline-2 focus-visible:outline-ring enabled:hover:bg-primary-ghost-focus disabled:cursor-default disabled:opacity-40`,
+        a,
+      )),
+      (t[0] = a),
+      (t[1] = o));
+  let s;
+  t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((s = (0, Z.jsx)(g, {})), (t[2] = s))
+    : (s = t[2]);
+  let c;
+  t[3] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((c = (0, Z.jsx)(`span`, {
+        className: `absolute inset-x-0 bottom-0 p-3 text-start text-sm leading-5`,
+        children: (0, Z.jsx)(f, {
+          id: `images.reference.upload`,
+          defaultMessage: `Upload a photo`,
+          description: `Button to choose a new reference photo from the device for image creation`,
+        }),
+      })),
+      (t[3] = c))
+    : (c = t[3]);
+  let l;
+  return (
+    t[4] !== n || t[5] !== i || t[6] !== o
+      ? ((l = (0, Z.jsxs)(`button`, {
+          type: `button`,
+          className: o,
+          disabled: n,
+          onClick: i,
+          children: [s, c],
+        })),
+        (t[4] = n),
+        (t[5] = i),
+        (t[6] = o),
+        (t[7] = l))
+      : (l = t[7]),
+    l
+  );
+}
+var st, Z;
+function ct() {
+  return (ct = e(() => {
+    ((st = n()), b(), l(), S(), (Z = c()));
+  }))();
+}
+function lt(e) {
+  let t = (0, pt.c)(45),
+    {
+      conversationId: n,
+      disabled: a,
+      uploadDisabled: o,
+      onBack: c,
+      onUpload: l,
+      onRecentImageSelected: d,
+    } = e,
+    h = u(m),
+    g = w(),
+    _ = s(ee),
+    { data: v, isPending: y, isError: b, refetch: x } = i(Ee, !0),
+    S = i(W, n),
+    C;
+  t[0] !== n || t[1] !== a || t[2] !== g || t[3] !== d || t[4] !== h
+    ? ((C = async (e, t) => {
+        let r = `image-reference:${e.file_id}:`,
+          i = `${r}${crypto.randomUUID()}`,
+          o = h.get(W, n);
+        if (
+          a ||
+          o.some(
+            (t) =>
+              (t.status === `ready` && t.id === e.file_id) ||
+              (t.uploadId.startsWith(r) && t.status === `uploading`),
+          )
+        )
+          return;
+        let s = h.get(U),
+          c = h.get(H),
+          l = g.formatMessage(
+            {
+              id: `images.reference.photoName`,
+              defaultMessage: `Photo {position}`,
+              description: `Temporary name for a recently uploaded reference photo on the Images page while its original filename loads. Position is its one-based position in the recent photos list.`,
+            },
+            { position: t + 1 },
+          );
+        h.set(W, n, (e) => [
+          ...e.filter((e) => !e.uploadId.startsWith(r)),
+          {
+            uploadId: i,
+            status: `uploading`,
+            name: l,
+            mimeType: null,
+            source: `library`,
+            progress: 0,
+          },
+        ]);
+        let u = await De(e).catch(dt);
+        if (s !== h.get(U) || c !== h.get(H)) {
+          h.set(W, n, (e) => e.filter((e) => e.uploadId !== i));
+          return;
+        }
+        h.get(W, n).some((e) => e.uploadId === i && e.status === `uploading`) &&
+          (u == null ? te(h, n, i, l) : (F(h, n, i, u), d()));
+      }),
+      (t[0] = n),
+      (t[1] = a),
+      (t[2] = g),
+      (t[3] = d),
+      (t[4] = h),
+      (t[5] = C))
+    : (C = t[5]);
+  let T = C,
+    E;
+  t[6] !== b || t[7] !== x
+    ? ((E = b
+        ? (0, Q.jsxs)(`div`, {
+            role: `alert`,
+            className: `flex flex-wrap items-center gap-2 text-sm text-secondary`,
+            children: [
+              (0, Q.jsx)(f, {
+                id: `images.reference.loadError`,
+                defaultMessage: `Recent photos couldn't be loaded`,
+                description: `Error above the recent reference-photo list on the Images page when fetching photo history fails. Uploading a new image remains available.`,
+              }),
+              (0, Q.jsx)(p, {
+                color: `ghostSecondary`,
+                onClick: () => void x(),
+                children: (0, Q.jsx)(f, {
+                  id: `images.reference.retry`,
+                  defaultMessage: `Retry`,
+                  description: `Retry loading recent reference photos on the Images creation page`,
+                }),
+              }),
+            ],
+          })
+        : null),
+      (t[6] = b),
+      (t[7] = x),
+      (t[8] = E))
+    : (E = t[8]);
+  let D;
+  t[9] === g
+    ? (D = t[10])
+    : ((D = g.formatMessage({
+        id: `images.reference.photos`,
+        defaultMessage: `Reference photos`,
+        description: `Accessible label for the image creation photo upload carousel`,
+      })),
+      (t[9] = g),
+      (t[10] = D));
+  let O;
+  t[11] === g
+    ? (O = t[12])
+    : ((O = g.formatMessage({
+        id: `images.reference.previous`,
+        defaultMessage: `Previous photos`,
+        description: `Show the previous page of recent reference photos`,
+      })),
+      (t[11] = g),
+      (t[12] = O));
+  let k;
+  t[13] === g
+    ? (k = t[14])
+    : ((k = g.formatMessage({
+        id: `images.reference.next`,
+        defaultMessage: `Next photos`,
+        description: `Show the next page of recent reference photos`,
+      })),
+      (t[13] = g),
+      (t[14] = k));
+  let A;
+  t[15] === g
+    ? (A = t[16])
+    : ((A = g.formatMessage({
+        id: `images.reference.back`,
+        defaultMessage: `Back to suggestions`,
+        description: `Return from reference photos to image prompt suggestions without clearing the composer`,
+      })),
+      (t[15] = g),
+      (t[16] = A));
+  let j;
+  t[17] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((j = (0, Q.jsx)(r, {})), (t[17] = j))
+    : (j = t[17]);
+  let M;
+  t[18] !== c || t[19] !== A
+    ? ((M = (0, Q.jsx)(p, {
+        color: `outlineSurface`,
+        size: `dialog`,
+        radius: `full`,
+        uniform: !0,
+        "aria-label": A,
+        onClick: c,
+        children: j,
+      })),
+      (t[18] = c),
+      (t[19] = A),
+      (t[20] = M))
+    : (M = t[20]);
+  let N;
+  t[21] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((N = (0, Q.jsx)(`h2`, {
+        className: `text-base font-medium text-default`,
+        children: (0, Q.jsx)(f, {
+          id: `images.reference.attach`,
+          defaultMessage: `Attach a photo`,
+          description: `Heading above the photo upload carousel on the Images page`,
+        }),
+      })),
+      (t[21] = N))
+    : (N = t[21]);
+  let P;
+  t[22] === M
+    ? (P = t[23])
+    : ((P = (0, Q.jsxs)(`div`, {
+        className: `flex items-center gap-3 select-none`,
+        children: [M, N],
+      })),
+      (t[22] = M),
+      (t[23] = P));
+  let I = a || o,
+    L;
+  t[24] !== l || t[25] !== I
+    ? ((L = (0, Q.jsx)(ot, { disabled: I, layout: `carousel`, onUpload: l })),
+      (t[24] = l),
+      (t[25] = I),
+      (t[26] = L))
+    : (L = t[26]);
+  let R;
+  t[27] !== v?.items || t[28] !== a || t[29] !== g || t[30] !== y || t[31] !== T || t[32] !== S
+    ? ((R = y
+        ? Array.from({ length: 4 }, ut)
+        : v?.items.map((e, t) => {
+            let n = S.find(
+                (t) =>
+                  t.uploadId.startsWith(`image-reference:${e.file_id}:`) ||
+                  (t.status === `ready` && t.id === e.file_id),
+              ),
+              r = g.formatMessage(
+                {
+                  id: `imagegen.composer.suggestions.upload.aria_label`,
+                  defaultMessage: `Recent upload {index}`,
+                  description: `Accessible label for a recent upload thumbnail in the image generation composer suggestions uploads tab.`,
+                },
+                { index: t + 1 },
+              );
+            return (0, Q.jsxs)(
+              `div`,
+              {
+                className: `flex w-[calc((100%-3rem)/5)] shrink-0 snap-start flex-col gap-1`,
+                children: [
+                  (0, Q.jsx)(`button`, {
+                    type: `button`,
+                    className: `relative flex aspect-[4/5] w-full cursor-interaction items-center justify-center overflow-hidden rounded-2xl bg-surface-secondary text-tertiary outline-none focus-visible:outline-2 focus-visible:outline-ring disabled:cursor-default`,
+                    "aria-label": r,
+                    disabled: a || (n != null && n.status !== `error`),
+                    onClick: () => void T(e, t),
+                    children: (0, Q.jsx)(ft, { image: e }),
+                  }),
+                  n?.status === `error`
+                    ? (0, Q.jsx)(`span`, {
+                        role: `alert`,
+                        className: `text-xs text-secondary`,
+                        children: (0, Q.jsx)(f, {
+                          id: `images.reference.photoError`,
+                          defaultMessage: `Couldn't attach photo`,
+                          description: `Short error below a recent reference photo when retrieving its attachment details fails. Selecting the photo retries.`,
+                        }),
+                      })
+                    : null,
+                ],
+              },
+              e.file_id,
+            );
+          })),
+      (t[27] = v?.items),
+      (t[28] = a),
+      (t[29] = g),
+      (t[30] = y),
+      (t[31] = T),
+      (t[32] = S),
+      (t[33] = R))
+    : (R = t[33]);
+  let z;
+  t[34] !== _ ||
+  t[35] !== P ||
+  t[36] !== L ||
+  t[37] !== R ||
+  t[38] !== D ||
+  t[39] !== O ||
+  t[40] !== k
+    ? ((z = (0, Q.jsxs)(we, {
+        layout: `gallery`,
+        ariaLabel: D,
+        backLabel: O,
+        forwardLabel: k,
+        shouldUseReducedMotion: _,
+        header: P,
+        children: [L, R],
+      })),
+      (t[34] = _),
+      (t[35] = P),
+      (t[36] = L),
+      (t[37] = R),
+      (t[38] = D),
+      (t[39] = O),
+      (t[40] = k),
+      (t[41] = z))
+    : (z = t[41]);
+  let B;
+  return (
+    t[42] !== z || t[43] !== E
+      ? ((B = (0, Q.jsxs)(`section`, {
+          className: `flex min-w-0 flex-col gap-3`,
+          children: [E, z],
+        })),
+        (t[42] = z),
+        (t[43] = E),
+        (t[44] = B))
+      : (B = t[44]),
+    B
+  );
+}
+function ut(e, t) {
+  return (0, Q.jsx)(
+    V,
+    { className: `aspect-[4/5] w-[calc((100%-3rem)/5)] shrink-0 rounded-2xl` },
+    t,
+  );
+}
+function dt() {
+  return null;
+}
+function ft(e) {
+  let t = (0, pt.c)(12),
+    { image: n } = e,
+    r = s(U),
+    i = s(H),
+    a = r ?? `unscoped`,
+    o = i ?? `unscoped`,
+    c;
+  t[0] !== a || t[1] !== o
+    ? ((c = [`chatgpt-images-recent-upload`, a, o]), (t[0] = a), (t[1] = o), (t[2] = c))
+    : (c = t[2]);
+  let l;
+  t[3] === n.download_url
+    ? (l = t[4])
+    : ((l = async () => ({ kind: `available`, ...ue({ download_url: n.download_url }) })),
+      (t[3] = n.download_url),
+      (t[4] = l));
+  let u;
+  t[5] !== c || t[6] !== l
+    ? ((u = { cacheKey: c, resolveAsset: l, useDownloadUrlAsImageSrc: !0 }),
+      (t[5] = c),
+      (t[6] = l),
+      (t[7] = u))
+    : (u = t[7]);
+  let { src: d, isError: f } = ne(n.download_url, u);
+  if (d == null) {
+    let e;
+    return (
+      t[8] === f
+        ? (e = t[9])
+        : ((e = f ? (0, Q.jsx)(O, {}) : (0, Q.jsx)(V, { className: `size-full` })),
+          (t[8] = f),
+          (t[9] = e)),
+      e
+    );
+  }
+  let p;
+  return (
+    t[10] === d
+      ? (p = t[11])
+      : ((p = (0, Q.jsx)(`img`, {
+          className: `absolute inset-0 size-full object-cover`,
+          src: d,
+          alt: ``,
+          loading: `lazy`,
+        })),
+        (t[10] = d),
+        (t[11] = p)),
+    p
+  );
+}
+var pt, Q;
+function mt() {
+  return (mt = e(() => {
+    ((pt = n()),
+      o(),
+      l(),
+      B(),
+      L(),
+      re(),
+      Te(),
+      h(),
+      S(),
+      N(),
+      Ce(),
+      d(),
+      I(),
+      P(),
+      ct(),
+      (Q = c()));
+  }))();
+}
+function ht(e) {
+  let t = (0, gt.c)(46),
+    {
+      conversationId: n,
+      composerController: r,
+      composer: a,
+      disabled: o,
+      excludedPromptId: s,
+      isConversationCurrent: c,
+      onBeforeSelectPrompt: l,
+      onReferenceImageSelected: d,
+      onUploadSelectionChange: f,
+      surface: p,
+    } = e,
+    m = p === void 0 ? `images` : p,
+    h = u(oe),
+    g = w(),
+    _ = i(be, n),
+    v = (0, _t.useRef)(_),
+    [y, b] = (0, _t.useState)(!1),
+    x = _ == null ? null : (_.item.action ?? _.group.action),
+    S =
+      x?.input_requirements?.source != null &&
+      x.input_requirements.source !== `prompt_only` &&
+      x.input_requirements.source !== `sketch` &&
+      !y,
+    C;
+  t[0] !== r || t[1] !== n || t[2] !== f || t[3] !== h || t[4] !== _?.item || t[5] !== m
+    ? ((C = function (e, t) {
+        let i = ve(h, n, e, t, m);
+        return i == null
+          ? null
+          : (b(!1),
+            r.setPromptText(
+              m === `home`
+                ? Ve(r.getPersistedText(), e.prompt_text, _?.item.prompt_text)
+                : e.prompt_text,
+            ),
+            f?.(i),
+            i);
+      }),
+      (t[0] = r),
+      (t[1] = n),
+      (t[2] = f),
+      (t[3] = h),
+      (t[4] = _?.item),
+      (t[5] = m),
+      (t[6] = C))
+    : (C = t[6]);
+  let T = C,
+    D;
+  t[7] === r
+    ? (D = t[8])
+    : ((D = function () {
+        (r.focus(), r.view.dom.scrollIntoView({ block: `center`, behavior: `auto` }));
+      }),
+      (t[7] = r),
+      (t[8] = D));
+  let O = D,
+    k;
+  t[9] !== a ||
+  t[10] !== r ||
+  t[11] !== n ||
+  t[12] !== o ||
+  t[13] !== d ||
+  t[14] !== h ||
+  t[15] !== _ ||
+  t[16] !== S
+    ? ((k = S
+        ? (0, $.jsx)(`div`, {
+            className: `mx-auto w-full max-w-3xl`,
+            children: (0, $.jsx)(lt, {
+              conversationId: n,
+              disabled: o,
+              onBack: () => b(!0),
+              uploadDisabled: !a?.canOpenImagePicker,
+              onUpload: () => a?.openFileDialog(!0),
+              onRecentImageSelected: () => {
+                if (v.current === _) {
+                  if (d != null) {
+                    d();
+                    return;
+                  }
+                  ye(h, n, r, _);
+                }
+              },
+            }),
+          })
+        : null),
+      (t[9] = a),
+      (t[10] = r),
+      (t[11] = n),
+      (t[12] = o),
+      (t[13] = d),
+      (t[14] = h),
+      (t[15] = _),
+      (t[16] = S),
+      (t[17] = k))
+    : (k = t[17]);
+  let A;
+  t[18] !== a || t[19] !== o || t[20] !== m
+    ? ((A =
+        m === `home`
+          ? (0, $.jsx)(ot, {
+              disabled: o || !a?.canOpenImagePicker,
+              layout: `grid`,
+              onUpload: () => a?.openFileDialog(!0),
+            })
+          : void 0),
+      (t[18] = a),
+      (t[19] = o),
+      (t[20] = m),
+      (t[21] = A))
+    : (A = t[21]);
+  let j;
+  t[22] !== a ||
+  t[23] !== r.view.isDestroyed ||
+  t[24] !== r.view.state ||
+  t[25] !== n ||
+  t[26] !== o ||
+  t[27] !== O ||
+  t[28] !== g ||
+  t[29] !== c ||
+  t[30] !== f ||
+  t[31] !== T ||
+  t[32] !== h ||
+  t[33] !== m
+    ? ((j = (e, t) => {
+        if (o) return;
+        if ((e.action ?? t.action).input_requirements?.source !== `sketch`) {
+          let n = T(e, t);
+          n != null && ((v.current = n), O());
+          return;
+        }
+        let i = h.get(U),
+          s = h.get(H),
+          l = Symbol(),
+          u = r.view.state.doc,
+          d = () =>
+            !r.view.isDestroyed &&
+            h.get(U) === i &&
+            h.get(H) === s &&
+            v.current === l &&
+            (c?.() ??
+              (m === `home`
+                ? h.get(pe) === n
+                : h.get(q, JSON.stringify([i, s])).conversationId === n));
+        a?.openSketch({
+          isRequestCurrent: d,
+          onSave: () => {
+            d() &&
+              r.view.state.doc === u &&
+              (T(e, t),
+              requestAnimationFrame(() => {
+                d() && a?.isSketchOpen() === !1 && O();
+              }));
+          },
+        })
+          ? ((v.current = l), f?.(null))
+          : h
+              .get(E)
+              .danger(
+                g.formatMessage({
+                  id: `images.sketch.unavailable`,
+                  defaultMessage: `Sketch is unavailable right now`,
+                  description: `Error toast when an Images sketch card cannot open the drawing editor because the composer is not ready or cannot accept a sketch attachment. The user can select the card again to retry.`,
+                }),
+                { errorAnalytics: { toastId: `images.sketch.unavailable` } },
+              );
+      }),
+      (t[22] = a),
+      (t[23] = r.view.isDestroyed),
+      (t[24] = r.view.state),
+      (t[25] = n),
+      (t[26] = o),
+      (t[27] = O),
+      (t[28] = g),
+      (t[29] = c),
+      (t[30] = f),
+      (t[31] = T),
+      (t[32] = h),
+      (t[33] = m),
+      (t[34] = j))
+    : (j = t[34]);
+  let M;
+  t[35] !== o ||
+  t[36] !== s ||
+  t[37] !== l ||
+  t[38] !== S ||
+  t[39] !== m ||
+  t[40] !== A ||
+  t[41] !== j
+    ? ((M = (0, $.jsx)(Ze, {
+        disabled: o,
+        excludedPromptId: s,
+        hidden: S,
+        surface: m,
+        uploadCard: A,
+        onBeforeSelectPrompt: l,
+        onSelectPrompt: j,
+      })),
+      (t[35] = o),
+      (t[36] = s),
+      (t[37] = l),
+      (t[38] = S),
+      (t[39] = m),
+      (t[40] = A),
+      (t[41] = j),
+      (t[42] = M))
+    : (M = t[42]);
+  let N;
+  return (
+    t[43] !== k || t[44] !== M
+      ? ((N = (0, $.jsxs)(`div`, { className: `flex min-w-0 flex-col gap-8`, children: [k, M] })),
+        (t[43] = k),
+        (t[44] = M),
+        (t[45] = N))
+      : (N = t[45]),
+    N
+  );
+}
+var gt, _t, $;
+function vt() {
+  return (vt = e(() => {
+    ((gt = n()),
+      o(),
+      (_t = _()),
+      l(),
+      B(),
+      he(),
+      _e(),
+      x(),
+      z(),
+      Pe(),
+      Ue(),
+      at(),
+      ct(),
+      mt(),
+      ($ = c()));
+  }))();
+}
+export { Me as a, Pe as c, Ie as i, vt as n, q as o, ze as r, Ne as s, ht as t };

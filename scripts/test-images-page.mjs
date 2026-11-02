@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const sourcePath = path.join(ROOT, "src/renderer/images-page/index.ts");
@@ -323,109 +324,6 @@ check(
   "keeps the published composer and suggestions layout",
 );
 
-// image-suggestions-core owner: scoped draft family, account-isolated catalog,
-// prompt replacement, analytics and real React card selection.
-const coreState = {
-  accountId: "account-1",
-  analytics: [],
-  focused: false,
-  queryOptions: [],
-  queryStates: [{ data: { groups: [] }, isSuccess: true }, { data: { image_suggestions: [], styles: [] }, isSuccess: true }],
-  registered: [],
-  selection: { item: { id: "old", title: "Old", prompt_text: "old", action: { input_requirements: { source: "prompt_only" } } }, group: { id: "old-group", presentation: "text_pill" } },
-  userId: "user-1",
-};
-coreState.jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
-coreState.scope = {
-  get(signal) {
-    if (signal === "account") return coreState.accountId;
-    if (signal === "user") return coreState.userId;
-    if (signal === "toast") return { danger(message) { coreState.toast = message; } };
-    return undefined;
-  },
-  set() {},
-};
-globalThis.__imageSuggestionsCoreTest = coreState;
-const coreMocks = {
-  "rolldown-runtime": "export {};",
-  "app-shared": `
-    const s=globalThis.__imageSuggestionsCoreTest;
-    export const ZI='app'; export const pk='toast'; export const FX=()=>{}; export const QI=()=>{};
-    export const I3=()=>s.jsx; export const e6=()=>({useEffect:fn=>{fn();},useRef:value=>({current:value}),useState:value=>{let current=typeof value==='function'?value():value;return[current,next=>{current=typeof next==='function'?next(current):next;}];}});
-    export const LX=()=>s.scope;
-    export const oZ=(_scope,factory)=>({kind:'family',factory});
-    export const rZ=(_scope,derive)=>({kind:'derived-family',derive});
-    export const eZ=(_scope,factory)=>{const options=factory({get:signal=>signal==='account'?s.accountId:s.userId});s.queryOptions.push(options);return{kind:'query',index:s.queryOptions.length-1};};
-    export const sZ=(_scope,derive)=>({kind:'derived',derive});
-    const read=signal=>signal?.kind==='query'?s.queryStates[signal.index]:signal?.kind==='derived'?signal.derive({get:read}):undefined;
-    export const HX=read;
-    export const BX=(family,key)=>family==='primary-selection'?s.selection:family==='recent'?{data:[]}:family?.kind==='derived-family'?family.derive(key,{get:(signal,param)=>signal.factory(param,{scope:s.scope})}):undefined;
-  `,
-  "app-initial": `
-    const s=globalThis.__imageSuggestionsCoreTest;
-    export const mun='account'; export const _un='user'; export const kht='images';
-    export const rqt=()=> 'image-draft-1'; export const GIt=(_scope,id,types)=>s.registered.push({id,types});
-    export const RIt=()=>{}; export const Sun=()=>{};
-    export const rJt={safeGet:async(path,options)=>{s.lastRequest={path,options};return{};}};
-    export const xpn=(_scope,event,payload)=>s.analytics.push({event,payload});
-  `,
-  "app-primary": `
-    const s=globalThis.__imageSuggestionsCoreTest; export const tu='primary-selection'; export const au=()=>{};
-    export const ou=(_scope,_id,item,group,surface)=>{s.selection={item,group,surface};return s.selection;};
-    export const su=()=>{s.uploadSelected=true;};
-  `,
-  "chatgpt-image-home": `
-    export const a={CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_IMAGES:'images',CHATGPT_IMAGE_PROMPT_SENT_SURFACE_TYPE_CHATGPT_HOME:'home'};
-    export const i='sent';export const n='impression';export const r='selected';export const o=()=>{};
-    export const t={CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_TEXT_PILL:'text-pill',CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_IMAGE_CARD:'image-card',CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_PORTRAIT:'portrait',CHATGPT_IMAGE_PROMPT_GROUP_PRESENTATION_TYPE_ICON_PILL:'icon-pill'};
-  `,
-  "recent-uploads": "export const n=()=>{};export const r='recent';",
-};
-const coreResult = await esbuild.build({
-  entryPoints: [path.join(ROOT, "src/renderer/image-suggestions-core/index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent",
-  plugins: [{ name: "image-suggestions-core-mocks", setup(build) {
-    build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "core-mock" }));
-    build.onLoad({ filter: /.*/, namespace: "core-mock" }, ({ path: importPath }) => ({ loader: "js", contents: coreMocks[importPath] ?? "export {};" }));
-  } }],
-});
-const core = await import("data:text/javascript;base64," + Buffer.from(coreResult.outputFiles[0].text).toString("base64") + "#core");
-const coreNodes = (root) => {
-  const output = [];
-  const visit = (value) => {
-    if (value == null || typeof value !== "object") return;
-    if (Array.isArray(value)) return value.forEach(visit);
-    if ("type" in value && "props" in value) output.push(value);
-    visit(value.props?.children);
-  };
-  visit(root);
-  return output;
-};
-core.n();
-check(core.o?.kind === "family" && core.s?.kind === "derived-family", "uses scoped signal families instead of module Maps");
-const created = core.a(coreState.scope);
-check(created.conversationId === "image-draft-1", "creates a stable image draft conversation identity");
-check(coreState.registered.at(-1).types[0] === "picture_v2", "registers the picture_v2 content type");
-check(coreState.queryOptions.length === 2, "creates catalog and style query owners");
-await coreState.queryOptions[0].queryFn({ signal: new AbortController().signal });
-check(coreState.lastRequest.path === "/images/init", "loads the published image catalog endpoint");
-check(coreState.lastRequest.options.additionalHeaders["ChatGPT-Account-ID"] === "account-1", "isolates catalog requests by account");
-await coreState.queryOptions[1].queryFn({ signal: new AbortController().signal });
-check(coreState.lastRequest.path === "/images/styles", "loads style suggestions separately");
-check(coreState.lastRequest.options.parameters.query.include_image_suggestions === true, "requests image suggestions with styles");
-const controller = { text: "prefix OLD suffix", view: { isDestroyed: false, state: { doc: {} }, dom: { scrollIntoView() { coreState.scrolled = true; } } }, focus() { coreState.focused = true; }, getPersistedText() { return this.text; }, setPromptText(value) { this.text = value; } };
-const nextPrompt = { id: "new", title: "New idea", prompt_text: "NEW", action: { input_requirements: { source: "prompt_only" } } };
-const group = { id: "group", presentation: "text_pill", items: [nextPrompt] };
-const coreRoot = core.t({ conversationId: "conversation-1", composerController: controller, groups: [group], surface: "home" });
-const catalogNode = coreRoot.props.children[1];
-const catalogTree = catalogNode.type(catalogNode.props);
-const cardNode = coreNodes(catalogTree).find((node) => typeof node.type === "function" && node.props.item?.id === "new");
-const cardTree = cardNode.type(cardNode.props);
-cardTree.props.onClick();
-check(controller.text === "prefix NEW suffix", "replaces the prior prompt case-insensitively in place");
-check(coreState.focused === true && coreState.scrolled === true, "focuses and reveals the composer after selection");
-check(coreState.analytics.some((entry) => entry.event === "impression"), "records a Home-card impression once visible");
-check(coreState.analytics.some((entry) => entry.event === "selected"), "records card selection analytics");
-core.i(coreState.scope, nextPrompt, group, "send-1");
-check(coreState.analytics.at(-1).payload.imageSendUuid === "send-1", "records image-send UUID with the selected prompt");
+assertReleaseOwner("image-suggestions-core");
 
 console.log(assertions + " Images page assertions passed");

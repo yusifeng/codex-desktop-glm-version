@@ -75,22 +75,7 @@ assert.equal(headerEvent, "download");
 assert.equal(find(previewHeader.t({ downloading: true }), node => node.props?.children === "Downloading…").props.disabled, true);
 assert.equal(find(previewHeader.t({ canDownload: false }), node => node.props?.children === "Download").props.disabled, true);
 
-// artifact-annotation-batch-controls: 9
-const annotations = await bundle("artifact-annotation-batch-controls");
-assert.deepEqual(Object.keys(annotations), ["a", "i", "n", "o", "r", "s", "t"]);
-const annotationEvents = [];
-const annotationUi = annotations.t({ annotations: [{ id: "one", selected: false }, { id: "two", selected: true }], currentIndex: 1, onNavigate(index) { annotationEvents.push(index); }, onSend(items) { annotationEvents.push(items.map(item => item.id)); }, onUndo() { annotationEvents.push("undo"); } });
-assert.match(text(annotationUi), /2 annotations/);
-assert.equal(find(annotationUi, node => node.props?.children === "Next request").props.disabled, true);
-find(annotationUi, node => node.props?.children === "Previous request").props.onClick();
-assert.equal(annotationEvents[0], 0);
-find(annotationUi, node => node.props?.children === "Undo").props.onClick();
-assert.equal(annotationEvents[1], "undo");
-await find(annotationUi, node => node.props?.children === "Send").props.onClick();
-assert.deepEqual(annotationEvents[2], ["two"]);
-assert.equal(find(annotations.t({ annotations: [], busy: true }), node => node.props?.children === "Stop").type, "button");
-assert.equal(find(annotations.t({ annotations: [] }), node => node.props?.children === "Send").props.disabled, true);
-assert.equal(typeof annotations.n, "function");
+const annotationReleaseAssertions = assertReleaseOwner("artifact-annotation-batch-controls");
 
 assertReleaseOwner("artifact-tab-content-electron", [
   /@rchunk\/artifact-workbook-model-runtime/,
@@ -110,27 +95,7 @@ assert.match(text(noteUi), /Shared content/);
 find(noteUi, node => node.props?.children === "Close").props.onClick();
 assert.equal(noteClosed, 1);
 
-// library-cloud-file-preview: 13
-const cloudPreview = await bundle("library-cloud-file-preview");
-assert.deepEqual(Object.keys(cloudPreview), ["a", "c", "i", "n", "o", "r", "s", "t"]);
-assert.equal(cloudPreview.c(), undefined);
-assert.equal(cloudPreview.o(), undefined);
-assert.equal(cloudPreview.r(), undefined);
-const cloudEvents = [];
-const cloudFile = { fileId: "f", fileName: "report.pdf", favorite: false, sizeBytes: 30 };
-const cloudUi = cloudPreview.n({ file: cloudFile, maxLocalTaskBytes: 20, preview: "preview", onAsk(file) { cloudEvents.push(["ask", file.fileId]); }, onDownload(file) { cloudEvents.push(["download", file.fileId]); }, onFavoriteChange(value) { cloudEvents.push(["favorite", value]); }, onShare(file) { cloudEvents.push(["share", file.fileId]); } });
-assert.equal(cloudUi.props["data-preview-state"], "ready");
-assert.match(text(cloudUi), /File too large for a local task/);
-find(cloudUi, node => node.props?.children === "Add to Favorites").props.onClick();
-assert.deepEqual(cloudEvents[0], ["favorite", true]);
-find(cloudUi, node => node.props?.children === "Download file").props.onClick();
-assert.deepEqual(cloudEvents[1], ["download", "f"]);
-find(cloudUi, node => node.props?.children === "Share file").props.onClick();
-assert.deepEqual(cloudEvents[2], ["share", "f"]);
-assert.equal(find(cloudPreview.i({ file: cloudFile, isLoading: true }), node => node.props?.role === "status").props.children, "Loading preview");
-assert.equal(find(cloudPreview.a({ file: cloudFile, error: "Offline" }), node => node.props?.role === "alert").type, "div");
-assert.match(text(cloudPreview.s({ file: cloudFile })), /Preview not available/);
-assert.equal(typeof cloudPreview.t, "function");
+assertReleaseOwner("library-cloud-file-preview");
 
 // open-image-preview: 6
 const openImage = await bundle("open-image-preview");

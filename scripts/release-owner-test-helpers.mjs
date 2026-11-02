@@ -23,9 +23,9 @@ export function normalizeRelease(source) {
 export function assertReleaseOwner(owner, patterns = []) {
   const output = CHUNKS[owner];
   assert.equal(typeof output, "string", `${owner} has a renderer chunk mapping`);
-  const current = fs
-    .readFileSync(path.join(ROOT, "src/renderer", owner, "index.ts"), "utf8")
-    .replace(/[ \t]+$/gm, "");
+  const current = normalizeRelease(
+    fs.readFileSync(path.join(ROOT, "src/renderer", owner, "index.ts"), "utf8"),
+  ).replace(/[ \t]+$/gm, "");
   const release = normalizeRelease(
     fs.readFileSync(path.join(ROOT, "src/webview/assets", output.replace(/\.js$/, ".ts")), "utf8"),
   );

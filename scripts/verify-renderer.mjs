@@ -37,10 +37,6 @@ const EXPECTED_IMPORT_CHANGES = new Map([
     { missing: new Set([`./${CHUNKS["app-primary"]}`]), extra: new Set() },
   ],
   [
-    CHUNKS["codex-app-home-beacon-announcement-core"],
-    { missing: new Set(), extra: new Set([`./${CHUNKS["home-announcement-state"]}`]) },
-  ],
-  [
     CHUNKS["realtime-voice-home-announcement"],
     {
       missing: new Set([`./${CHUNKS["app-primary"]}`]),

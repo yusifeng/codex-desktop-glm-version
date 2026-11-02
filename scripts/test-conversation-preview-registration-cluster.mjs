@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MODULES = ["open-pending-site-preview", "site-preview-persistence-bridge", "registered-conversation-thumbnail-core", "registered-sources", "automation-side-panel-tab-core"];
@@ -150,46 +151,6 @@ assert.equal(sourcesNode.props.sections[3].content.props.children[2].props.child
 state.signalValue = { totalCount: 0, sources: [] };
 assert.equal(sourcesThumbnail.RegisteredLocalSourcesThumbnail({ conversationId: "c1", title: "Sources" }), null);
 
-// Automation side-panel routing and mutations
-const automation = await bundle("automation-side-panel-tab-core");
-assert.deepEqual(Object.keys(automation).sort(), ["AutomationSidePanelTabContent", "AutomationSidePanelTabIcon"]);
-assert.equal(automation.AutomationSidePanelTabIcon().type, "AutomationIcon");
-let tabState = { draftInstanceId: "draft-1" };
-const setTabState = (update) => { tabState = update(tabState); };
-let automationNode = automation.AutomationSidePanelTabContent({ request: { isLoading: true, type: "automation" }, setTabState, tabId: "tab-1", tabState });
-assert.equal(find(automationNode, (node) => node.type === "LoadingSpinner").type, "LoadingSpinner");
-automationNode = automation.AutomationSidePanelTabContent({ request: { type: "automation" }, setTabState, tabId: "tab-1", tabState });
-assert.equal(find(automationNode, (node) => node.type === "FormattedMessage").props.defaultMessage, "Scheduled task unavailable");
-automationNode = automation.AutomationSidePanelTabContent({ request: { error: new Error("offline"), type: "automation" }, setTabState, tabId: "tab-1", tabState });
-assert.equal(find(automationNode, (node) => node.props?.role === "alert") != null, true);
-assert.equal(find(automationNode, (node) => node.type === "FormattedMessage").props.defaultMessage, "Cloud scheduled tasks could not be loaded");
-automationNode = automation.AutomationSidePanelTabContent({ request: { proposal: { projectId: "p1", prompt: "Build", title: "Nightly" }, type: "site" }, setTabState, tabId: "tab-1", tabState });
-assert.equal(automationNode.type, "section");
-find(automationNode, (node) => node.type === "Button").props.onClick();
-assert.equal(tabState.savedAutomationId, "site:p1");
-automationNode = automation.AutomationSidePanelTabContent({ request: { automation: { id: "a1", name: "Daily" }, type: "automation" }, setTabState, tabId: "tab-1", tabState });
-assert.equal(automationNode.type, "LocalAutomationEditor");
-automationNode.props.onClose();
-assert.equal(state.closedTab, "tab-1");
-automationNode.props.onSaved({ id: "a2", name: "Weekly" });
-assert.equal(tabState.savedAutomationId, "a2");
-assert.deepEqual(state.updatedTab, ["tab-1", { title: "Weekly", tooltip: "Weekly" }]);
-automationNode = automation.AutomationSidePanelTabContent({ request: { seed: { directiveKey: "weekly", prompt: "Summarize", title: "Weekly digest" }, type: "suggestion" }, setTabState, tabId: "tab-1", tabState });
-assert.equal(automationNode.type, "LocalAutomationEditor");
-assert.equal(automationNode.props.initialDraft.name, "Weekly digest");
-state.signals = {
-  automations: { data: { items: [] } },
-  "automation-detail": { data: { automation: { id: "cloud-1", name: "Cloud daily", prompt: "Report" }, teamId: "team-1" } },
-  "cloud-update": { mutate(input, options) { state.cloudUpdate = input; options.onSuccess({ id: "cloud-1", name: "Cloud weekly" }); } },
-  "cloud-delete": { mutate(input, options) { state.cloudDelete = input; options.onSuccess({ id: "cloud-1", name: "Cloud daily" }); } },
-};
-automationNode = automation.AutomationSidePanelTabContent({ request: { automationId: "cloud-1", type: "persisted" }, setTabState, tabId: "tab-1", tabState });
-assert.equal(automationNode.type, "AutomationEditorPanel");
-assert.equal(automationNode.props.item.teamId, "team-1");
-await automationNode.props.onSave({ name: "Cloud weekly", prompt: "Report", executionLocation: "cloud" });
-assert.equal(state.cloudUpdate.automationId, "cloud-1");
-assert.equal(state.cloudUpdate.teamId, "team-1");
-await automationNode.props.onDelete();
-assert.deepEqual(state.cloudDelete, { automationId: "cloud-1", teamId: "team-1" });
+assertReleaseOwner("automation-side-panel-tab-core");
 
 console.log("conversation preview registration cluster tests passed");
