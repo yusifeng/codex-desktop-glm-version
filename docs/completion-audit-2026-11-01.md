@@ -241,3 +241,12 @@ app-shared 375/3,185, app-initial 1,484/8,204, and app-primary 170/917 consumed;
 are unreviewed. Renderer verification passes 1,888/1,888 with intentional dependency migrations enumerated per chunk. These
 figures measure aggregate-hub consumption, not a linear percentage of implementation effort, and must not be presented as
 proof of full decompilation.
+
+The following settings-lifecycle batch replaces three renderer shells whose controls existed but whose mutations lived in
+ordinary function-local variables and therefore could not survive a React render. ChatGPT project settings now owns a
+controlled name/instructions/memory draft, permission and Work-chat validation, dirty-close interception, save failure
+preservation, and confirmed asynchronous deletion. AppGen site settings now owns a project-scoped baseline, normalized build
+environment draft, save validation/error recovery, discard interception, and confirmed deletion. Personal Vault now separates
+environment-variable and network-secret creation and retains a failed asynchronous delete inside its confirmation dialog.
+Stateful hook tests exercise rerenders and failure paths. This closes these three presentation owners only; it does not reduce
+the remaining conversation-route fallback or preserved inventories by itself.

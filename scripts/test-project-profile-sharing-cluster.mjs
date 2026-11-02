@@ -4,8 +4,15 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-globalThis.__projectProfileSharingTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "project-profile-sharing-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__projectProfileSharingTest.jsx;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+const hookState = { effects: [], hooks: [], index: 0 };
+const ReactRuntime = {
+  useState(initialValue) { const index = hookState.index++; if (!(index in hookState.hooks)) hookState.hooks[index] = typeof initialValue === "function" ? initialValue() : initialValue; return [hookState.hooks[index], value => { hookState.hooks[index] = typeof value === "function" ? value(hookState.hooks[index]) : value; }]; },
+  useEffect(callback, dependencies) { const index = hookState.index++; const previous = hookState.effects[index]; if (previous == null || dependencies.some((value, dependencyIndex) => value !== previous[dependencyIndex])) { hookState.effects[index] = dependencies; callback(); } },
+};
+globalThis.__projectProfileSharingTest = { ReactRuntime, jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
+async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "project-profile-sharing-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__projectProfileSharingTest.jsx;export const e6=globalThis.__projectProfileSharingTest.ReactRuntime;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+function resetHooks() { hookState.effects = []; hookState.hooks = []; hookState.index = 0; }
+function render(component, props) { hookState.index = 0; return component(props); }
 function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(child => walk(child, visit)); else walk(children, visit); }
 function find(node, predicate) { let result; walk(node, value => { if (result == null && predicate(value)) result = value; }); return result; }
 function all(node, predicate) { const result = []; walk(node, value => { if (predicate(value)) result.push(value); }); return result; }
@@ -69,18 +76,47 @@ assert.equal(find(publishedUi, node => node.props?.children === "Edit").type, "b
 const settings = await bundle("chatgpt-project-settings-modal");
 assert.deepEqual(Object.keys(settings), ["ChatGptProjectSettingsModal"]);
 const project = { gizmo: { id: "p1", display: { name: "Alpha" }, instructions: "Be concise", current_user_permission: { can_write: true, can_delete: true } } };
-assert.equal(settings.ChatGptProjectSettingsModal({ accountId: "a", activeAccountId: "b", project, onClose() {} }), null);
-let savedSettings, settingsClosed = 0;
-const settingsUi = settings.ChatGptProjectSettingsModal({ accountId: "a", project, onClose() { settingsClosed++; }, onSave(value, update) { savedSettings = `${value.gizmo.id}:${update.name}:${update.memoryScope}`; } });
+resetHooks();
+assert.equal(render(settings.ChatGptProjectSettingsModal, { accountId: "a", activeAccountId: "b", project, onClose() {} }), null);
+resetHooks();
+let savedSettings, deletedProject, settingsClosed = 0;
+const settingsProps = { accountId: "a", project, onClose() { settingsClosed++; }, onDelete(value) { deletedProject = value.gizmo.id; }, onSave(value, update) { savedSettings = `${value.gizmo.id}:${update.name}:${update.memoryScope}`; } };
+let settingsUi = render(settings.ChatGptProjectSettingsModal, settingsProps);
 assert.match(text(settingsUi), /Project settings/);
+assert.equal(find(settingsUi, node => node.props?.children === "Save").props.disabled, true);
 find(settingsUi, node => node.props?.name === "project-name").props.onChange({ currentTarget: { value: "Beta" } });
 find(settingsUi, node => node.type === "select").props.onChange({ currentTarget: { value: "project_v2" } });
-find(settingsUi, node => node.type === "form").props.onSubmit({ preventDefault() {} });
+settingsUi = render(settings.ChatGptProjectSettingsModal, settingsProps);
+assert.equal(find(settingsUi, node => node.props?.children === "Save").props.disabled, false);
+await find(settingsUi, node => node.type === "form").props.onSubmit({ preventDefault() {} });
 await Promise.resolve();
 assert.equal(savedSettings, "p1:Beta:project_v2");
 assert.equal(settingsClosed, 1);
-assert.equal(find(settingsUi, node => node.props?.children === "Delete project").type, "button");
-const blockedMemory = settings.ChatGptProjectSettingsModal({ accountId: "a", project, workChatStatus: "has-work-chats", onClose() {} });
+settingsUi = render(settings.ChatGptProjectSettingsModal, settingsProps);
+find(settingsUi, node => node.props?.children === "Delete project").props.onClick();
+settingsUi = render(settings.ChatGptProjectSettingsModal, settingsProps);
+assert.match(text(find(settingsUi, node => node.props?.role === "alertdialog")), /permanently deleted/);
+await find(settingsUi, node => node.props?.children === "Delete").props.onClick();
+await Promise.resolve();
+assert.equal(deletedProject, "p1");
+resetHooks();
+let failedSaveAttempts = 0, failedClose = 0;
+const failedSettingsProps = { accountId: "a", project, onClose() { failedClose++; }, async onSave() { failedSaveAttempts++; throw new Error("Save unavailable"); } };
+settingsUi = render(settings.ChatGptProjectSettingsModal, failedSettingsProps);
+find(settingsUi, node => node.props?.name === "project-name").props.onChange({ currentTarget: { value: "Unsaved name" } });
+settingsUi = render(settings.ChatGptProjectSettingsModal, failedSettingsProps);
+find(settingsUi, node => node.type === "form").props.onSubmit({ preventDefault() {} });
+await new Promise(resolve => setTimeout(resolve, 0));
+settingsUi = render(settings.ChatGptProjectSettingsModal, failedSettingsProps);
+assert.equal(find(settingsUi, node => node.props?.name === "project-name").props.value, "Unsaved name");
+assert.match(text(find(settingsUi, node => node.props?.role === "alert")), /Save unavailable/);
+find(settingsUi, node => node.props?.children === "Cancel").props.onClick();
+settingsUi = render(settings.ChatGptProjectSettingsModal, failedSettingsProps);
+assert.match(text(find(settingsUi, node => node.props?.role === "alertdialog")), /lost/);
+assert.equal(failedSaveAttempts, 1);
+assert.equal(failedClose, 0);
+resetHooks();
+const blockedMemory = render(settings.ChatGptProjectSettingsModal, { accountId: "a", project, workChatStatus: "has-work-chats", onClose() {} });
 assert.match(text(find(blockedMemory, node => node.props?.role === "alert")), /Not supported/);
 assert.equal(find(blockedMemory, node => node.type === "option" && node.props?.value === "project_v2").props.disabled, true);
 

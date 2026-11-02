@@ -9,6 +9,7 @@ const state = globalThis.__settingsDeviceTest = {
   accountId: "account-1",
   featureGate: true,
   hooks: [],
+  effects: [],
   hookIndex: 0,
   personalization: true,
   service: null,
@@ -23,6 +24,14 @@ const ReactRuntime = {
     const index = state.hookIndex++;
     if (!(index in state.hooks)) state.hooks[index] = typeof initialValue === "function" ? initialValue() : initialValue;
     return [state.hooks[index], (value) => { state.hooks[index] = typeof value === "function" ? value(state.hooks[index]) : value; }];
+  },
+  useEffect(callback, dependencies) {
+    const index = state.hookIndex++;
+    const previous = state.effects[index];
+    if (previous == null || dependencies.some((value, dependencyIndex) => value !== previous[dependencyIndex])) {
+      state.effects[index] = dependencies;
+      callback();
+    }
   },
 };
 
@@ -108,6 +117,7 @@ const appgen = await load("appgen-settings-page");
 assert.deepEqual(Object.keys(appgen), ["n", "r", "t"]);
 assert.equal(appgen.n({ projectId: "", onDeleted() {} }).props["data-redirect"], "/sites");
 state.hooks = [];
+state.effects = [];
 state.hookIndex = 0;
 let deleted = 0;
 let savedInput;
@@ -121,7 +131,29 @@ appgenUi = appgen.t(appgenProps);
 appgenNodes = walk(appgenUi);
 await appgenNodes.find((node) => node.type === "button" && text(node) === "Save").props.onClick();
 appgenNodes.find((node) => node.type === "button" && text(node) === "Delete site").props.onClick();
+state.hookIndex = 0;
+appgenUi = appgen.t(appgenProps);
+appgenNodes = walk(appgenUi);
+assert.match(text(appgenNodes.find((node) => node.props?.role === "alertdialog")), /permanently deleted/);
+appgenNodes.find((node) => node.type === "button" && text(node) === "Delete").props.onClick();
+await Promise.resolve();
 assert.deepEqual(savedInput, { title: "New title", environment: { buildCommand: "npm run build", outputDirectory: "dist" } });
 assert.equal(deleted, 1);
+state.hooks = [];
+state.effects = [];
+state.hookIndex = 0;
+let failedAppgenAttempts = 0;
+const failingAppgenProps = { ...appgenProps, async onSave() { failedAppgenAttempts++; throw new Error("Deploy config rejected"); } };
+appgenUi = appgen.t(failingAppgenProps);
+walk(appgenUi).find((node) => node.props?.name === "title").props.onChange({ currentTarget: { value: "Still here" } });
+state.hookIndex = 0;
+appgenUi = appgen.t(failingAppgenProps);
+walk(appgenUi).find((node) => node.type === "button" && text(node) === "Save").props.onClick();
+await new Promise(resolve => setTimeout(resolve, 0));
+state.hookIndex = 0;
+appgenUi = appgen.t(failingAppgenProps);
+assert.equal(walk(appgenUi).find((node) => node.props?.name === "title").props.value, "Still here");
+assert.match(text(walk(appgenUi).find((node) => node.props?.role === "alert")), /Deploy config rejected/);
+assert.equal(failedAppgenAttempts, 1);
 
 console.log("31 device, personalization and AppGen settings assertions passed");
