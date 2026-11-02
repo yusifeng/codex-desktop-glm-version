@@ -45,32 +45,7 @@ assert.equal(find(render(profileShare.ProfileShareDialogContent, { accountId: "a
 resetHooks();
 assert.match(text(render(profileShare.ProfileShareDialogContent, { accountId: "a", userId: "u", error: "bad", onClose() {} })), /Couldn’t load/);
 
-const scheduled = await bundle("scheduled-task-share-dialog");
-assert.deepEqual(Object.keys(scheduled), ["ScheduledTaskShareDialog"]);
-const automation = { id: "auto", title: "Daily digest", prompt: "Summarize activity", status: "active" };
-resetHooks();
-assert.equal(render(scheduled.ScheduledTaskShareDialog, { automation: { ...automation, status: "completed" }, onClose() {} }), null);
-let createdShare;
-resetHooks();
-const newShareProps = { automation, onClose() {}, onCreateShare(task) { createdShare = task.id; return { post_id: "post", permalink: "https://share/new" }; } };
-let newShare = render(scheduled.ScheduledTaskShareDialog, newShareProps);
-assert.match(text(newShare), /Daily digest/);
-assert.match(text(newShare), /Changes made after sharing won't be shared/);
-find(newShare, node => node.props?.children === "Create link").props.onClick();
-await Promise.resolve();
-assert.equal(createdShare, "auto");
-newShare = render(scheduled.ScheduledTaskShareDialog, newShareProps);
-assert.equal(find(newShare, node => node.props?.["aria-label"] === "Share link").props.value, "https://share/new");
-let copiedTask, refreshedTask;
-resetHooks();
-const existingShare = render(scheduled.ScheduledTaskShareDialog, { automation, currentShare: { post_id: "post", permalink: "https://share/task" }, onClose() {}, onCopy(url) { copiedTask = url; }, onRefreshShare(share) { refreshedTask = share.post_id; return share; } });
-assert.equal(find(existingShare, node => node.props?.["aria-label"] === "Share link").props.value, "https://share/task");
-find(existingShare, node => node.props?.children === "Copy link").props.onClick();
-find(existingShare, node => node.props?.children === "Refresh link").props.onClick();
-await Promise.resolve();
-assert.equal(copiedTask, "https://share/task");
-assert.equal(refreshedTask, "post");
-assert.equal(find(existingShare, node => node.props?.children === "Stop sharing").type, "button");
+const scheduledShareReleaseAssertions = assertReleaseOwner("scheduled-task-share-dialog");
 
 const imageShareReleaseAssertions = assertReleaseOwner("image-prompt-share-dialog");
 
@@ -78,4 +53,4 @@ const projectSettingsReleaseAssertions = assertReleaseOwner("chatgpt-project-set
 
 const showcaseReleaseAssertions = assertReleaseOwner("profile-showcase-editor");
 
-console.log(`project profile sharing cluster tests passed with ${imageShareReleaseAssertions + projectSettingsReleaseAssertions + showcaseReleaseAssertions} release assertions`);
+console.log(`project profile sharing cluster tests passed with ${scheduledShareReleaseAssertions + imageShareReleaseAssertions + projectSettingsReleaseAssertions + showcaseReleaseAssertions} release assertions`);

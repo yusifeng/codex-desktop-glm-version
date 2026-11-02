@@ -1,706 +1,1444 @@
-import "@rchunk/rolldown-runtime";
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
-  $3 as initializeJsxRuntime,
-  I3 as getJsxRuntime,
-  Qh as LoadingSpinner,
-  Yh as Button,
-  e6 as getReactRuntime,
-  fW as attachAuthHeader,
-  type JsxRuntime,
-  type ReactRuntime,
+  $3 as n,
+  $I as r,
+  $O as i,
+  FX as a,
+  FZ as o,
+  G2 as s,
+  HX as c,
+  I3 as l,
+  If as u,
+  K2 as d,
+  LX as f,
+  Ly as p,
+  QI as m,
+  XQ as h,
+  Xv as g,
+  Y2 as _,
+  YQ as v,
+  Yh as y,
+  ZI as b,
+  Zh as x,
+  _L as S,
+  cy as C,
+  e6 as w,
+  eL as T,
+  ek as E,
+  fW as D,
+  gL as O,
+  jZ as k,
+  jf as A,
+  kf as j,
+  lw as M,
+  n4 as N,
+  tb as P,
+  wL as F,
 } from "@rchunk/app-shared";
 import {
-  type Account,
-  i_n as useLocation,
-  o_n as useNavigate,
-  ofn as useGate,
-  uht as useAccount,
-  ytn as gptChatPath,
+  $W as I,
+  $d as L,
+  Aet as R,
+  Cht as z,
+  Dft as B,
+  F7 as V,
+  FS as H,
+  Het as U,
+  Jet as W,
+  Oft as ee,
+  P7 as G,
+  PS as te,
+  QW as ne,
+  Qd as re,
+  Qgn as K,
+  Sht as q,
+  cJt as J,
+  cT as ie,
+  dx as ae,
+  edn as oe,
+  f7 as se,
+  fx as ce,
+  gmn as le,
+  i_n as ue,
+  ifn as de,
+  ket as fe,
+  lT as pe,
+  mnt as me,
+  n7 as he,
+  o_n as ge,
+  odn as _e,
+  ofn as ve,
+  p7 as ye,
+  pnt as be,
+  r7 as xe,
+  rJt as Se,
+  rdn as Ce,
+  rht as we,
+  uT as Te,
+  uht as Ee,
+  vtn as De,
+  xtn as Oe,
+  ytn as ke,
 } from "@rchunk/app-initial";
-import { n as initializeTabs, t as Tabs } from "@rchunk/security-tabs";
+import { n as Ae, t as je } from "@rchunk/security-tabs";
+import { n as Me, r as Ne, t as Pe } from "@rchunk/skills-page-grid";
+import { n as Fe, t as Ie } from "@rchunk/card-tile";
 import {
-  n as LoadingGrid,
-  r as initializeSkillsGrid,
-  t as SkillsGrid,
-} from "@rchunk/skills-page-grid";
-import { n as initializeCardTile, t as CardTile } from "@rchunk/card-tile";
-// @ts-expect-error The recovered direct edge has no shared declaration yet.
-import "@rchunk/directory-banner";
-import {
-  n as initializeGptAboutDialog,
-  t as GptAboutDialog,
-} from "@rchunk/gpt-about-dialog-core";
-// @ts-expect-error The recovered direct edge has no shared declaration yet.
-import "@rchunk/gpt-management-access";
-import {
-  n as initializeManagementUrl,
-  t as gptManagementUrl,
-} from "@rchunk/gpt-management-url";
-
-interface GptAuthor {
-  display_name?: string | null;
-  name?: string | null;
-}
-
-interface GptItem {
-  author?: GptAuthor | null;
-  category?: string | null;
-  conversation_count?: number | null;
-  description?: string | null;
-  display_name?: string | null;
-  id: string;
-  name?: string | null;
-  profile_picture_url?: string | null;
-  short_url?: string | null;
-}
-
-interface PublicResource {
-  gizmo?: GptItem & { gizmo_type?: string | null };
-}
-
-interface DiscoveryCut {
-  display_group?: string | null;
-  items?: readonly PublicResource[];
-  name?: string | null;
-}
-
-interface DiscoveryResponse {
-  cuts?: readonly DiscoveryCut[];
-  list?: { cursor?: string | null };
-  workspace_filtered?: boolean;
-}
-
-interface WorkspacePage {
-  gizmos?: readonly GptItem[];
-  query_continuation?: string | null;
-}
-
-interface Creator {
-  account_user_id: string;
-  name?: string | null;
-}
-
-interface CreatorPage {
-  items?: readonly Creator[];
-  total?: number;
-}
-
-interface QuerySnapshot<Data> {
-  data?: Data;
-  error?: string | null;
-  loading?: boolean;
-}
-
-interface WorkspaceSnapshot extends QuerySnapshot<WorkspacePage> {
-  pages?: readonly WorkspacePage[];
-}
-
-interface GptDiscoveryService {
-  loadCreators(
-    accountId: string,
-    query: string,
-    offset: number,
-  ): Promise<CreatorPage>;
-  loadPublic(accountId: string): Promise<DiscoveryResponse>;
-  loadWorkspace(input: {
-    accountId: string;
-    categories: readonly string[];
-    continuation?: string;
-    creatorIds: readonly string[];
-    search: string;
-  }): Promise<WorkspacePage>;
-}
-
-interface GptDiscoveryPageProps {
-  account?: Account;
-  creatorsSnapshot?: QuerySnapshot<CreatorPage>;
-  gateEnabled?: boolean;
-  location?: { pathname: string; search: string };
-  navigate?: ReturnType<typeof useNavigate>;
-  publicSnapshot?: QuerySnapshot<DiscoveryResponse>;
-  service?: GptDiscoveryService;
-  workspaceSnapshot?: WorkspaceSnapshot;
-}
-
-const categories = [
-  "research",
-  "writing",
-  "programming",
-  "education",
-  "productivity",
-  "lifestyle",
-  "other",
-] as const;
-
-const defaultService: GptDiscoveryService = {
-  async loadCreators(accountId, query, offset) {
-    const parameters = new URLSearchParams({
-      limit: "30",
-      offset: String(offset),
-    });
-    if (query) parameters.set("query", query);
-    return requestJson<CreatorPage>(
-      `/accounts/${accountId}/users?${parameters}`,
-    );
-  },
-  async loadPublic() {
-    return requestJson<DiscoveryResponse>("/public-api/gizmos/discovery", {
-      [attachAuthHeader]: "1",
-    });
-  },
-  async loadWorkspace(input) {
-    const parameters = new URLSearchParams({ limit: "10" });
-    if (input.continuation)
-      parameters.set("query_continuation", input.continuation);
-    if (input.search) parameters.set("search", input.search);
-    for (const category of input.categories)
-      parameters.append("categories", category);
-    for (const creatorId of input.creatorIds)
-      parameters.append("user_ids", creatorId);
-    return requestJson<WorkspacePage>(
-      `/workspace-resources/${input.accountId}/gizmos?${parameters}`,
-    );
-  },
-};
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-
-async function requestJson<Data>(
-  url: string,
-  headers?: Record<string, string>,
-): Promise<Data> {
-  const response = await fetch(url, { headers });
-  if (!response.ok) throw new Error(`Request failed (${response.status})`);
-  return (await response.json()) as Data;
-}
-
-function message(error: unknown): string {
-  return error instanceof Error ? error.message : "Something went wrong";
-}
-
-function updateSearch(
-  pathname: string,
-  currentSearch: string,
-  navigate: ReturnType<typeof useNavigate>,
-  updates: Record<string, string | null>,
-): void {
-  const parameters = new URLSearchParams(currentSearch);
-  for (const [key, value] of Object.entries(updates)) {
-    if (value == null || value === "") parameters.delete(key);
-    else parameters.set(key, value);
-  }
-  const search = parameters.toString();
-  navigate(
-    { hash: "", pathname, search: search ? `?${search}` : "" },
-    { replace: true },
-  );
-}
-
-function statusPanel(text: string, retry?: () => void): unknown {
-  return jsx.jsxs("div", {
-    className: "gpt-discovery-status",
-    children: [
-      jsx.jsx("p", { children: text }),
-      retry == null
-        ? null
-        : jsx.jsx(Button, { children: "Retry", onClick: retry }),
-    ],
-  });
-}
-
-function GptCard(props: {
-  gpt: GptItem;
-  navigate: ReturnType<typeof useNavigate>;
-}): unknown {
-  const [open, setOpen] = React.useState(false);
-  const title = props.gpt.display_name ?? props.gpt.name ?? "Untitled GPT";
-  const creator = props.gpt.author?.display_name ?? props.gpt.author?.name;
-  const description = [
-    props.gpt.description,
-    creator ? `By ${creator}` : null,
-    props.gpt.conversation_count == null
-      ? null
-      : `${props.gpt.conversation_count.toLocaleString()} conversations`,
-  ]
-    .filter((value): value is string => Boolean(value))
-    .join(" · ");
-  const startChat = (): void => {
-    const destination = props.gpt.short_url?.trim() || props.gpt.id;
-    setOpen(false);
-    props.navigate(gptChatPath(destination));
-  };
-  return jsx.jsxs(React.Fragment, {
-    children: [
-      jsx.jsx(CardTile, {
-        description,
-        icon: props.gpt.profile_picture_url
-          ? jsx.jsx("img", { alt: "", src: props.gpt.profile_picture_url })
-          : null,
-        onClick: () => setOpen(true),
-        presentation: "catalog",
-        title,
-      }),
-      open
-        ? jsx.jsx(GptAboutDialog, {
-            gizmo: props.gpt,
-            onClose: () => setOpen(false),
-            onOpenChange: setOpen,
-            onStartChat: startChat,
-            open,
-          })
-        : null,
-    ],
-  });
-}
-
-function PublicCatalog(props: {
-  account: Account;
-  navigate: ReturnType<typeof useNavigate>;
-  search: string;
-  service: GptDiscoveryService;
-  snapshot?: QuerySnapshot<DiscoveryResponse>;
-}): unknown {
-  const [data, setData] = React.useState(props.snapshot?.data);
-  const [loading, setLoading] = React.useState(
-    props.snapshot?.loading ?? props.snapshot == null,
-  );
-  const [error, setError] = React.useState<string | null>(
-    props.snapshot?.error ?? null,
-  );
-  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
-    null,
-  );
-  const load = (): void => {
-    setLoading(true);
-    setError(null);
-    props.service
-      .loadPublic(props.account.id)
-      .then(setData)
-      .catch((reason: unknown) => setError(message(reason)))
-      .finally(() => setLoading(false));
-  };
-  React.useEffect(() => {
-    if (props.snapshot == null) load();
-  }, [props.account.id, props.service, props.snapshot]);
-
-  if (props.search.trim()) {
-    return jsx.jsxs("section", {
-      "data-testid": "public-search-results",
-      children: [
-        jsx.jsx("h2", {
-          children: `Search results for “${props.search.trim()}”`,
-        }),
-        jsx.jsx("p", { children: "Search across public GPTs" }),
-      ],
-    });
-  }
-  if (loading) return jsx.jsx(LoadingGrid, { label: "Loading GPTs" });
-  if (error) return statusPanel(error, load);
-
-  const cuts = (data?.cuts ?? [])
-    .map((cut) => ({
-      ...cut,
-      items: (cut.items ?? []).filter(
-        (resource) => resource.gizmo?.gizmo_type !== "snorlax",
-      ),
-    }))
-    .filter((cut) => cut.items.length > 0 || data?.list?.cursor != null);
-  if (cuts.length === 0) return statusPanel("No GPTs available");
-  const categoryTabs = [
-    ...new Set(cuts.map((cut) => cut.display_group).filter(Boolean)),
-  ] as string[];
-
-  return jsx.jsxs("div", {
-    children: [
-      data?.workspace_filtered
-        ? jsx.jsx("div", {
-            role: "status",
-            children: "Your workspace only allows approved third-party GPTs.",
-          })
-        : null,
-      categoryTabs.length === 0
-        ? null
-        : jsx.jsx(Tabs, {
-            ariaLabel: "GPT categories",
-            onSelect: (key: string) => {
-              setSelectedCategory(key);
-              if (typeof document !== "undefined") {
-                document
-                  .getElementById(`gpt-category-${key}`)
-                  ?.scrollIntoView({ behavior: "smooth" });
-              }
-            },
-            selectedKey: selectedCategory ?? categoryTabs[0],
-            tabs: categoryTabs.map((name) => ({ key: name, name })),
-            variant: "browse",
-          }),
-      ...cuts.map((cut, index) =>
-        jsx.jsxs(
-          "section",
-          {
-            id: `gpt-category-${cut.display_group ?? index}`,
-            children: [
-              jsx.jsx("h2", {
-                children: cut.name ?? cut.display_group ?? "Featured",
+  a as Le,
+  c as Re,
+  i as ze,
+  l as Be,
+  n as Ve,
+  o as He,
+  r as Ue,
+  s as We,
+  t as Ge,
+} from "@rchunk/gpt-directory-banner-runtime";
+import { i as Ke, n as qe, t as Je } from "@rchunk/gpt-about-dialog-core";
+import { n as Ye, t as Xe } from "@rchunk/gpt-management-access";
+import { t as Ze } from "@rchunk/gpt-management-url";
+function Qe(e) {
+  let t = (0, at.c)(36),
+    { account: n, search: r } = e,
+    a = f(b),
+    s = c(oe),
+    l = N(),
+    u = h(),
+    d = (0, st.useRef)(new Map()),
+    [m, g] = (0, st.useState)(null),
+    v;
+  t[0] === n.id ? (v = t[1]) : ((v = Ke(n.id)), (t[0] = n.id), (t[1] = v));
+  let y;
+  t[2] === v
+    ? (y = t[3])
+    : ((y = { queryFn: it, queryKey: v, staleTime: i.ONE_MINUTE }), (t[2] = v), (t[3] = y));
+  let { data: x, isError: C, isPending: w, refetch: T } = S(y),
+    E = n.structure === `workspace` && n.account_user_role === `account-owner` ? n.id : null,
+    D;
+  t[4] !== a || t[5] !== E || t[6] !== s
+    ? ((D =
+        E == null
+          ? o
+          : async (e) => {
+              let { signal: t } = e;
+              if (s) throw Error(`Account input subscription unavailable`);
+              return (await _e(a, t), ae(E, { signal: t }));
+            }),
+      (t[4] = a),
+      (t[5] = E),
+      (t[6] = s),
+      (t[7] = D))
+    : (D = t[7]);
+  let O;
+  t[8] === E ? (O = t[9]) : ((O = [`accounts`, `settings`, E]), (t[8] = E), (t[9] = O));
+  let k;
+  t[10] !== D || t[11] !== O
+    ? ((k = { queryFn: D, queryKey: O, staleTime: be?.accessInputs == null ? i.ONE_MINUTE : 0 }),
+      (t[10] = D),
+      (t[11] = O),
+      (t[12] = k))
+    : (k = t[12]);
+  let { data: A } = S(k),
+    j = A?.allow_third_party_gpts === `allow_specific`,
+    M = x?.cuts.filter(nt),
+    P = (0, ot.default)(M?.filter(tt).map(et) ?? [], `name`),
+    F;
+  t[13] === r ? (F = t[14]) : ((F = r.trim()), (t[13] = r), (t[14] = F));
+  let I = z(F, 250),
+    L =
+      I.length === 0 && P.length > 0
+        ? (0, Y.jsx)(ie, {
+            children: (0, Y.jsx)(je, {
+              ariaLabel: l.formatMessage({
+                id: `chatgptConversations.gpts.catalog.categories`,
+                defaultMessage: `GPT categories`,
+                description: `Accessible name for the horizontal navigation that scrolls to sections of the public GPT catalog`,
               }),
-              jsx.jsx(SkillsGrid, {
-                children: (cut.items ?? []).map((resource) =>
-                  resource.gizmo == null
-                    ? null
-                    : jsx.jsx(
-                        GptCard,
-                        { gpt: resource.gizmo, navigate: props.navigate },
-                        resource.gizmo.id,
-                      ),
-                ),
-              }),
-            ],
-          },
-          cut.name ?? String(index),
-        ),
-      ),
-    ],
-  });
-}
-
-function WorkspaceFilters(props: {
-  accountId: string;
-  categories: readonly string[];
-  creators: readonly Creator[];
-  creatorsSnapshot?: QuerySnapshot<CreatorPage>;
-  onCategoriesChange(value: readonly string[]): void;
-  onCreatorsChange(value: readonly Creator[]): void;
-  service: GptDiscoveryService;
-}): unknown {
-  const [creatorMenuOpen, setCreatorMenuOpen] = React.useState(false);
-  const [creatorSearch, setCreatorSearch] = React.useState("");
-  const [creatorPage, setCreatorPage] = React.useState(
-    props.creatorsSnapshot?.data,
-  );
-  const [creatorLoading, setCreatorLoading] = React.useState(
-    props.creatorsSnapshot?.loading ?? false,
-  );
-  const [creatorError, setCreatorError] = React.useState<string | null>(
-    props.creatorsSnapshot?.error ?? null,
-  );
-  const loadCreators = (offset = 0): void => {
-    setCreatorLoading(true);
-    setCreatorError(null);
-    props.service
-      .loadCreators(props.accountId, creatorSearch.trim(), offset)
-      .then((page) =>
-        setCreatorPage((current) => ({
-          items:
-            offset === 0
-              ? page.items
-              : [...(current?.items ?? []), ...(page.items ?? [])],
-          total: page.total,
+              onSelect: (e) => {
+                (g(e),
+                  d.current
+                    .get(e)
+                    ?.scrollIntoView({ behavior: u ? `instant` : `smooth`, block: `start` }));
+              },
+              scrollable: !0,
+              selectedKey: m ?? P[0].id,
+              tabs: P.map($e),
+              variant: `page`,
+            }),
+          })
+        : null;
+  if (I.length > 0) {
+    let e;
+    t[15] !== n.id || t[16] !== j || t[17] !== I
+      ? ((e = (0, Y.jsx)(Re, {
+          accountId: n.id,
+          isOwnerAndWorkspaceAllowsSpecific: j,
+          query: I,
+          workspaceOnly: !1,
         })),
-      )
-      .catch((reason: unknown) => setCreatorError(message(reason)))
-      .finally(() => setCreatorLoading(false));
-  };
-  React.useEffect(() => {
-    if (creatorMenuOpen && props.creatorsSnapshot == null) loadCreators();
-  }, [
-    creatorMenuOpen,
-    creatorSearch,
-    props.accountId,
-    props.creatorsSnapshot,
-    props.service,
-  ]);
-  const toggleCategory = (category: string): void => {
-    props.onCategoriesChange(
-      props.categories.includes(category)
-        ? props.categories.filter((value) => value !== category)
-        : [...props.categories, category],
+        (t[15] = n.id),
+        (t[16] = j),
+        (t[17] = I),
+        (t[18] = e))
+      : (e = t[18]);
+    let r;
+    return (
+      t[19] !== L || t[20] !== e
+        ? ((r = (0, Y.jsxs)(Y.Fragment, { children: [L, e] })),
+          (t[19] = L),
+          (t[20] = e),
+          (t[21] = r))
+        : (r = t[21]),
+      r
     );
-  };
-  const toggleCreator = (creator: Creator): void => {
-    props.onCreatorsChange(
-      props.creators.some(
-        (value) => value.account_user_id === creator.account_user_id,
-      )
-        ? props.creators.filter(
-            (value) => value.account_user_id !== creator.account_user_id,
-          )
-        : [...props.creators, creator],
-    );
-  };
-  const creatorItems = creatorPage?.items ?? [];
-  const canLoadMore =
-    creatorPage?.total != null && creatorItems.length < creatorPage.total;
-  return jsx.jsxs("aside", {
-    "aria-label": "Workspace GPT filters",
-    children: [
-      jsx.jsx("strong", { children: "Categories" }),
-      ...categories.map((category) =>
-        jsx.jsxs(
-          "label",
-          {
-            children: [
-              jsx.jsx("input", {
-                checked: props.categories.includes(category),
-                onChange: () => toggleCategory(category),
-                type: "checkbox",
-              }),
-              category,
-            ],
-          },
-          category,
-        ),
-      ),
-      jsx.jsx(Button, {
-        children: "Creators",
-        onClick: () => setCreatorMenuOpen((open) => !open),
-      }),
-      creatorMenuOpen
-        ? jsx.jsxs("div", {
-            children: [
-              jsx.jsx("input", {
-                "aria-label": "Search creators",
-                onChange: (event: { target: { value: string } }) =>
-                  setCreatorSearch(event.target.value),
-                placeholder: "Search creators",
-                value: creatorSearch,
-              }),
-              creatorLoading
-                ? jsx.jsx(LoadingSpinner, { label: "Loading creators" })
-                : null,
-              creatorError
-                ? statusPanel(creatorError, () => loadCreators())
-                : null,
-              !creatorLoading && !creatorError && creatorItems.length === 0
-                ? jsx.jsx("p", { children: "No creators found" })
-                : null,
-              ...creatorItems.map((creator) =>
-                jsx.jsxs(
-                  "label",
-                  {
-                    children: [
-                      jsx.jsx("input", {
-                        checked: props.creators.some(
-                          (value) =>
-                            value.account_user_id === creator.account_user_id,
-                        ),
-                        onChange: () => toggleCreator(creator),
-                        type: "checkbox",
-                      }),
-                      creator.name ?? creator.account_user_id,
-                    ],
-                  },
-                  creator.account_user_id,
-                ),
-              ),
-              canLoadMore
-                ? jsx.jsx(Button, {
-                    children: "Load more creators",
-                    disabled: creatorLoading,
-                    onClick: () => loadCreators(creatorItems.length),
-                  })
-                : null,
-              props.creators.length > 0
-                ? jsx.jsx(Button, {
-                    children: "Clear creators",
-                    onClick: () => props.onCreatorsChange([]),
-                  })
-                : null,
-            ],
-          })
-        : null,
-    ],
-  });
-}
-
-function WorkspaceCatalog(props: {
-  account: Account;
-  creatorsSnapshot?: QuerySnapshot<CreatorPage>;
-  navigate: ReturnType<typeof useNavigate>;
-  search: string;
-  service: GptDiscoveryService;
-  snapshot?: WorkspaceSnapshot;
-}): unknown {
-  const [selectedCategories, setSelectedCategories] = React.useState<
-    readonly string[]
-  >([]);
-  const [selectedCreators, setSelectedCreators] = React.useState<
-    readonly Creator[]
-  >([]);
-  const [pages, setPages] = React.useState<readonly WorkspacePage[]>(
-    props.snapshot?.pages ??
-      (props.snapshot?.data == null ? [] : [props.snapshot.data]),
-  );
-  const [loading, setLoading] = React.useState(
-    props.snapshot?.loading ?? props.snapshot == null,
-  );
-  const [error, setError] = React.useState<string | null>(
-    props.snapshot?.error ?? null,
-  );
-  const creatorIds = selectedCreators.map((creator) => creator.account_user_id);
-  const load = (continuation?: string): void => {
-    setLoading(true);
-    setError(null);
-    props.service
-      .loadWorkspace({
-        accountId: props.account.id,
-        categories: selectedCategories,
-        continuation,
-        creatorIds,
-        search: props.search.trim(),
-      })
-      .then((page) =>
-        setPages((current) => (continuation ? [...current, page] : [page])),
-      )
-      .catch((reason: unknown) => setError(message(reason)))
-      .finally(() => setLoading(false));
-  };
-  React.useEffect(() => {
-    if (props.snapshot == null) load();
-  }, [
-    props.account.id,
-    props.search,
-    props.service,
-    selectedCategories.join(","),
-    creatorIds.join(","),
-  ]);
-  const items = pages.flatMap((page) => page.gizmos ?? []);
-  const continuation = pages.at(-1)?.query_continuation ?? undefined;
-  return jsx.jsxs("div", {
-    className: "workspace-gpt-catalog",
-    children: [
-      jsx.jsx(WorkspaceFilters, {
-        accountId: props.account.id,
-        categories: selectedCategories,
-        creators: selectedCreators,
-        creatorsSnapshot: props.creatorsSnapshot,
-        onCategoriesChange: setSelectedCategories,
-        onCreatorsChange: setSelectedCreators,
-        service: props.service,
-      }),
-      loading && items.length === 0
-        ? jsx.jsx(LoadingGrid, { label: "Loading workspace GPTs" })
-        : null,
-      error && items.length === 0 ? statusPanel(error, () => load()) : null,
-      !loading && !error && items.length === 0
-        ? statusPanel("No GPTs found")
-        : null,
-      items.length === 0
-        ? null
-        : jsx.jsx(SkillsGrid, {
-            children: items.map((gpt) =>
-              jsx.jsx(GptCard, { gpt, navigate: props.navigate }, gpt.id),
-            ),
-          }),
-      error && items.length > 0
-        ? statusPanel(error, () => load(continuation))
-        : null,
-      continuation
-        ? jsx.jsx(Button, {
-            children: loading ? "Loading more…" : "Load more",
-            disabled: loading,
-            onClick: () => load(continuation),
-          })
-        : null,
-    ],
-  });
-}
-
-function GptDiscoveryPage(props: GptDiscoveryPageProps = {}): unknown {
-  const accountQuery = useAccount();
-  const runtimeNavigate = useNavigate();
-  const runtimeLocation = useLocation();
-  const runtimeGateEnabled = useGate("2160578039");
-  const account = props.account ?? accountQuery.data;
-  const navigate = props.navigate ?? runtimeNavigate;
-  const location = props.location ?? runtimeLocation;
-  const service = props.service ?? defaultService;
-  if (account == null) {
-    return jsx.jsx("main", {
-      children: jsx.jsx(LoadingSpinner, { label: "Loading GPTs" }),
-    });
   }
-  const workspaceAvailable =
-    account.structure === "workspace" && account.plan_type !== "quorum";
-  const parameters = new URLSearchParams(location.search);
-  const search = parameters.get("search") ?? "";
-  const view =
-    workspaceAvailable && parameters.get("view") !== "public"
-      ? "workspace"
-      : "public";
-  const setSearch = (value: string): void =>
-    updateSearch(location.pathname, location.search, navigate, {
-      search: value.trim() || null,
-    });
-  const openMyGpts = (): void => {
-    if (props.gateEnabled ?? runtimeGateEnabled) navigate("/gpts/mine");
-    else if (typeof globalThis.open === "function")
-      globalThis.open(
-        gptManagementUrl("/gpts/mine"),
-        "_blank",
-        "noopener,noreferrer",
-      );
-  };
-  return jsx.jsxs("main", {
-    className: "gpt-discovery-page",
-    children: [
-      jsx.jsxs("header", {
-        children: [
-          jsx.jsx("h1", { children: "Explore GPTs" }),
-          jsx.jsx("p", { children: "Discover and use GPTs for your work." }),
-          jsx.jsx("input", {
-            "aria-label": "Search GPTs",
-            id: "gpt-search",
-            onChange: (event: { target: { value: string } }) =>
-              setSearch(event.target.value),
-            placeholder: "Search GPTs",
-            value: search,
-          }),
-          jsx.jsx(Button, { children: "My GPTs", onClick: openMyGpts }),
-          workspaceAvailable
-            ? jsx.jsx(Tabs, {
-                ariaLabel: "GPT directory",
-                onSelect: (key: string) =>
-                  updateSearch(location.pathname, location.search, navigate, {
-                    view: key,
-                  }),
-                selectedKey: view,
-                tabs: [
-                  { key: "workspace", name: "Workspace" },
-                  { key: "public", name: "Public" },
-                ],
-                variant: "segmented",
-              })
-            : null,
-        ],
-      }),
-      view === "workspace"
-        ? jsx.jsx(WorkspaceCatalog, {
-            account,
-            creatorsSnapshot: props.creatorsSnapshot,
-            navigate,
-            search,
-            service,
-            snapshot: props.workspaceSnapshot,
+  let R;
+  t[22] === x?.workspace_filtered
+    ? (R = t[23])
+    : ((R = x?.workspace_filtered
+        ? (0, Y.jsx)(he, {
+            type: `infoAccent`,
+            content: (0, Y.jsx)(_, {
+              id: `chatgptConversations.gpts.discovery.workspaceFiltered`,
+              defaultMessage: `Your workspace's GPT settings limit which GPTs appear here`,
+              description: `Informational notice explaining that administrator policy has filtered GPTs from the directory`,
+            }),
           })
-        : jsx.jsx(PublicCatalog, {
-            account,
-            navigate,
-            search,
-            service,
-            snapshot: props.publicSnapshot,
-          }),
-    ],
-  });
+        : null),
+      (t[22] = x?.workspace_filtered),
+      (t[23] = R));
+  let B;
+  t[24] === w ? (B = t[25]) : ((B = w ? (0, Y.jsx)(He, {}) : null), (t[24] = w), (t[25] = B));
+  let V;
+  t[26] !== C || t[27] !== T
+    ? ((V = C
+        ? (0, Y.jsx)(Le, {
+            onRetry: () => {
+              T();
+            },
+          })
+        : null),
+      (t[26] = C),
+      (t[27] = T),
+      (t[28] = V))
+    : (V = t[28]);
+  let H =
+      !C && M?.length === 0
+        ? (0, Y.jsx)(fe, {
+            illustration: (0, Y.jsx)(p, {}),
+            illustrationSize: `icon`,
+            layout: `page`,
+            title: (0, Y.jsx)(_, {
+              id: `chatgptConversations.gpts.discovery.emptyCatalog`,
+              defaultMessage: `No GPTs available`,
+              description: `Empty state when the public GPT catalog has no accessible discovery sections for the current account`,
+            }),
+          })
+        : null,
+    U =
+      x != null && !C
+        ? M?.map((e) =>
+            (0, Y.jsx)(
+              `div`,
+              {
+                ref: (t) => {
+                  t == null ? d.current.delete(e.info.id) : d.current.set(e.info.id, t);
+                },
+                className: `scroll-mt-40`,
+                children: (0, Y.jsx)(We, {
+                  accountId: n.id,
+                  cut: e,
+                  isOwnerAndWorkspaceAllowsSpecific: j,
+                  locale: e.info.locale ?? x.locale,
+                }),
+              },
+              e.info.id,
+            ),
+          )
+        : null,
+    W;
+  return (
+    t[29] !== L || t[30] !== V || t[31] !== H || t[32] !== U || t[33] !== R || t[34] !== B
+      ? ((W = (0, Y.jsxs)(`div`, {
+          className: `flex flex-col gap-8`,
+          children: [L, R, B, V, H, U],
+        })),
+        (t[29] = L),
+        (t[30] = V),
+        (t[31] = H),
+        (t[32] = U),
+        (t[33] = R),
+        (t[34] = B),
+        (t[35] = W))
+      : (W = t[35]),
+    W
+  );
 }
-
-initializeJsxRuntime();
-initializeTabs();
-initializeSkillsGrid();
-initializeCardTile();
-initializeGptAboutDialog();
-initializeManagementUrl();
-React = getReactRuntime();
-jsx = getJsxRuntime();
-
-export { GptDiscoveryPage };
+function $e(e) {
+  return { key: e.id, name: e.name };
+}
+function et(e) {
+  return { id: e.info.id, name: e.info.display_group };
+}
+function tt(e) {
+  return e.info.display_group != null;
+}
+function nt(e) {
+  return e.list.cursor != null || e.list.items.some(rt);
+}
+function rt(e) {
+  let { resource: t } = e;
+  return t.gizmo.gizmo_type !== `snorlax`;
+}
+function it() {
+  return Se.safeGet(`/public-api/gizmos/discovery`, { additionalHeaders: { [D]: `1` } });
+}
+var at, ot, st, Y;
+function ct() {
+  return (ct = e(() => {
+    ((at = n()),
+      k(),
+      O(),
+      v(),
+      (ot = t(le(), 1)),
+      a(),
+      F(),
+      (st = w()),
+      d(),
+      Ce(),
+      J(),
+      ce(),
+      xe(),
+      M(),
+      R(),
+      Te(),
+      Ae(),
+      me(),
+      m(),
+      E(),
+      q(),
+      Be(),
+      (Y = l()));
+  }))();
+}
+function lt(e) {
+  let t = (0, ht.c)(82),
+    { accountId: n, categories: r, creators: a, onCategoriesChange: s, onCreatorsChange: c } = e,
+    l = N(),
+    [u, d] = (0, gt.useState)(!1),
+    [f, p] = (0, gt.useState)(``),
+    m;
+  t[0] === f ? (m = t[1]) : ((m = f.trim()), (t[0] = f), (t[1] = m));
+  let h = z(m, 300),
+    g;
+  t[2] !== n || t[3] !== h
+    ? ((g = [`chatgpt-gizmos`, n, `creators`, h]), (t[2] = n), (t[3] = h), (t[4] = g))
+    : (g = t[4]);
+  let v;
+  t[5] !== n || t[6] !== u || t[7] !== h
+    ? ((v = u
+        ? (e) => {
+            let { pageParam: t } = e;
+            return Se.safeGet(`/accounts/{account_id}/users`, {
+              parameters: {
+                path: { account_id: n },
+                query: { limit: 30, offset: t, query: h || void 0 },
+              },
+            });
+          }
+        : o),
+      (t[5] = n),
+      (t[6] = u),
+      (t[7] = h),
+      (t[8] = v))
+    : (v = t[8]);
+  let b;
+  t[9] !== g || t[10] !== v
+    ? ((b = {
+        initialPageParam: 0,
+        queryKey: g,
+        queryFn: v,
+        getNextPageParam: mt,
+        staleTime: i.ONE_MINUTE,
+      }),
+      (t[9] = g),
+      (t[10] = v),
+      (t[11] = b))
+    : (b = t[11]);
+  let {
+      data: x,
+      isPending: S,
+      isError: w,
+      refetch: E,
+      hasNextPage: D,
+      fetchNextPage: O,
+      isFetchingNextPage: k,
+    } = T(b),
+    M,
+    P,
+    F,
+    I,
+    L;
+  if (t[12] !== r || t[13] !== a[0] || t[14] !== a.length || t[15] !== l || t[16] !== s) {
+    let e = [
+        { value: `research`, label: Z.research },
+        { value: `writing`, label: Z.writing },
+        { value: `programming`, label: Z.programming },
+        { value: `education`, label: Z.education },
+        { value: `productivity`, label: Z.productivity },
+        { value: `lifestyle`, label: Z.lifestyle },
+        { value: `other`, label: Z.other },
+      ],
+      n = e.find((e) => e.value === r[0]),
+      i;
+    t[22] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((i = (0, X.jsx)(_, {
+          id: `chatgptConversations.gpts.workspace.allCategories`,
+          defaultMessage: `All categories`,
+          description: `Workspace GPT category filter label when no category is selected and every category is included`,
+        })),
+        (t[22] = i))
+      : (i = t[22]);
+    let o = i;
+    if (r.length === 1 && n) o = (0, X.jsx)(_, { ...n.label });
+    else if (r.length > 1) {
+      let e;
+      (t[23] === r.length
+        ? (e = t[24])
+        : ((e = (0, X.jsx)(_, {
+            id: `chatgptConversations.gpts.workspace.categoryCount`,
+            defaultMessage: `{count, plural, one {# category} other {# categories}}`,
+            description: `Workspace GPT filter summary; count is the number of selected categories`,
+            values: { count: r.length },
+          })),
+          (t[23] = r.length),
+          (t[24] = e)),
+        (o = e));
+    }
+    let c;
+    if (
+      (t[25] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((c = (0, X.jsx)(_, {
+            id: `chatgptConversations.gpts.workspace.anyCreator`,
+            defaultMessage: `Created by anyone`,
+            description: `Workspace GPT creator filter label when no creator is selected`,
+          })),
+          (t[25] = c))
+        : (c = t[25]),
+      (P = c),
+      a.length === 1)
+    )
+      P = a[0].name ?? a[0].email;
+    else if (a.length > 1) {
+      let e;
+      (t[26] === a.length
+        ? (e = t[27])
+        : ((e = (0, X.jsx)(_, {
+            id: `chatgptConversations.gpts.workspace.creatorCount`,
+            defaultMessage: `{count, plural, one {# creator} other {# creators}}`,
+            description: `Workspace GPT filter summary; count is the number of selected creators`,
+            values: { count: a.length },
+          })),
+          (t[26] = a.length),
+          (t[27] = e)),
+        (P = e));
+    }
+    ((L = `flex flex-wrap items-center gap-4 select-none`), (M = j));
+    let u;
+    t[28] === l
+      ? (u = t[29])
+      : ((u = l.formatMessage({
+          id: `chatgptConversations.gpts.workspace.categoryFilter`,
+          defaultMessage: `Filter GPTs by category`,
+          description: `Accessible name of the workspace GPT category filter menu`,
+        })),
+        (t[28] = l),
+        (t[29] = u));
+    let d;
+    (t[30] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((d = (0, X.jsx)(C, {})), (t[30] = d))
+      : (d = t[30]),
+      t[31] !== o || t[32] !== u
+        ? ((F = (0, X.jsxs)(y, {
+            "aria-label": u,
+            color: `ghost`,
+            size: `toolbar`,
+            children: [o, d],
+          })),
+          (t[31] = o),
+          (t[32] = u),
+          (t[33] = F))
+        : (F = t[33]),
+      (I = e.map((e) =>
+        (0, X.jsx)(
+          A.CheckboxItem,
+          {
+            checked: r.includes(e.value),
+            onSelect: pt,
+            onCheckedChange: () =>
+              s(r.includes(e.value) ? r.filter((t) => t !== e.value) : [...r, e.value]),
+            children: (0, X.jsx)(_, { ...e.label }),
+          },
+          e.value,
+        ),
+      )),
+      (t[12] = r),
+      (t[13] = a[0]),
+      (t[14] = a.length),
+      (t[15] = l),
+      (t[16] = s),
+      (t[17] = M),
+      (t[18] = P),
+      (t[19] = F),
+      (t[20] = I),
+      (t[21] = L));
+  } else ((M = t[17]), (P = t[18]), (F = t[19]), (I = t[20]), (L = t[21]));
+  let R;
+  t[34] !== M || t[35] !== F || t[36] !== I
+    ? ((R = (0, X.jsx)(M, { triggerButton: F, children: I })),
+      (t[34] = M),
+      (t[35] = F),
+      (t[36] = I),
+      (t[37] = R))
+    : (R = t[37]);
+  let B;
+  t[38] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((B = (0, X.jsx)(C, {})), (t[38] = B))
+    : (B = t[38]);
+  let V;
+  t[39] === P
+    ? (V = t[40])
+    : ((V = (0, X.jsxs)(y, { color: `ghost`, size: `toolbar`, children: [P, B] })),
+      (t[39] = P),
+      (t[40] = V));
+  let H;
+  t[41] === l ? (H = t[42]) : ((H = l.formatMessage(Z.searchCreators)), (t[41] = l), (t[42] = H));
+  let U;
+  t[43] === l ? (U = t[44]) : ((U = l.formatMessage(Z.searchCreators)), (t[43] = l), (t[44] = U));
+  let W;
+  t[45] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((W = (e) => p(e.target.value)), (t[45] = W))
+    : (W = t[45]);
+  let ee;
+  t[46] !== f || t[47] !== H || t[48] !== U
+    ? ((ee = (0, X.jsx)(A.SearchInput, { "aria-label": H, placeholder: U, value: f, onChange: W })),
+      (t[46] = f),
+      (t[47] = H),
+      (t[48] = U),
+      (t[49] = ee))
+    : (ee = t[49]);
+  let G;
+  t[50] === S
+    ? (G = t[51])
+    : ((G = S
+        ? (0, X.jsx)(A.Message, {
+            children: (0, X.jsx)(_, {
+              id: `chatgptConversations.gpts.workspace.loadingCreators`,
+              defaultMessage: `Loading creators…`,
+              description: `Status while the workspace GPT creator filter loads matching users`,
+            }),
+          })
+        : null),
+      (t[50] = S),
+      (t[51] = G));
+  let te;
+  t[52] !== w || t[53] !== E
+    ? ((te = w
+        ? (0, X.jsx)(A.Item, {
+            onSelect: () => {
+              E();
+            },
+            children: (0, X.jsx)(_, {
+              id: `chatgptConversations.gpts.workspace.retryCreators`,
+              defaultMessage: `Couldn't load creators. Try again`,
+              description: `Retry action shown when the workspace GPT creator filter cannot load users`,
+            }),
+          })
+        : null),
+      (t[52] = w),
+      (t[53] = E),
+      (t[54] = te))
+    : (te = t[54]);
+  let ne;
+  t[55] !== a || t[56] !== x?.pages || t[57] !== c
+    ? ((ne = x?.pages
+        .flatMap(ft)
+        .map((e) =>
+          (0, X.jsx)(
+            A.CheckboxItem,
+            {
+              checked: a.some((t) => t.account_user_id === e.account_user_id),
+              onSelect: dt,
+              onCheckedChange: () =>
+                c(
+                  a.some((t) => t.account_user_id === e.account_user_id)
+                    ? a.filter((t) => t.account_user_id !== e.account_user_id)
+                    : [...a, e],
+                ),
+              children: e.name ?? e.email,
+            },
+            e.account_user_id,
+          ),
+        )),
+      (t[55] = a),
+      (t[56] = x?.pages),
+      (t[57] = c),
+      (t[58] = ne))
+    : (ne = t[58]);
+  let re;
+  t[59] === x?.pages
+    ? (re = t[60])
+    : ((re = x?.pages.every(ut)
+        ? (0, X.jsx)(A.Message, {
+            children: (0, X.jsx)(_, {
+              id: `chatgptConversations.gpts.workspace.noCreators`,
+              defaultMessage: `No creators found`,
+              description: `Empty state in the workspace GPT creator filter when no users match the search`,
+            }),
+          })
+        : null),
+      (t[59] = x?.pages),
+      (t[60] = re));
+  let K;
+  t[61] !== O || t[62] !== D || t[63] !== k
+    ? ((K = D
+        ? (0, X.jsx)(A.Item, {
+            disabled: k,
+            onSelect: (e) => {
+              (e.preventDefault(), O());
+            },
+            children: (0, X.jsx)(_, {
+              id: `chatgptConversations.gpts.workspace.moreCreators`,
+              defaultMessage: `Load more`,
+              description: `Action to load another page of users in the workspace GPT creator filter`,
+            }),
+          })
+        : null),
+      (t[61] = O),
+      (t[62] = D),
+      (t[63] = k),
+      (t[64] = K))
+    : (K = t[64]);
+  let q;
+  t[65] !== a.length || t[66] !== c
+    ? ((q =
+        a.length > 0
+          ? (0, X.jsxs)(X.Fragment, {
+              children: [
+                (0, X.jsx)(A.Separator, {}),
+                (0, X.jsx)(A.Item, {
+                  onSelect: () => c([]),
+                  children: (0, X.jsx)(_, {
+                    id: `chatgptConversations.gpts.workspace.clearCreators`,
+                    defaultMessage: `Clear creator filter`,
+                    description: `Action clearing all selected users from the workspace GPT creator filter`,
+                  }),
+                }),
+              ],
+            })
+          : null),
+      (t[65] = a.length),
+      (t[66] = c),
+      (t[67] = q))
+    : (q = t[67]);
+  let J;
+  t[68] !== u ||
+  t[69] !== V ||
+  t[70] !== ee ||
+  t[71] !== G ||
+  t[72] !== te ||
+  t[73] !== ne ||
+  t[74] !== re ||
+  t[75] !== K ||
+  t[76] !== q
+    ? ((J = (0, X.jsxs)(j, {
+        contentVariant: `picker`,
+        open: u,
+        onOpenChange: d,
+        triggerButton: V,
+        children: [ee, G, te, ne, re, K, q],
+      })),
+      (t[68] = u),
+      (t[69] = V),
+      (t[70] = ee),
+      (t[71] = G),
+      (t[72] = te),
+      (t[73] = ne),
+      (t[74] = re),
+      (t[75] = K),
+      (t[76] = q),
+      (t[77] = J))
+    : (J = t[77]);
+  let ie;
+  return (
+    t[78] !== J || t[79] !== L || t[80] !== R
+      ? ((ie = (0, X.jsxs)(`div`, { className: L, children: [R, J] })),
+        (t[78] = J),
+        (t[79] = L),
+        (t[80] = R),
+        (t[81] = ie))
+      : (ie = t[81]),
+    ie
+  );
+}
+function ut(e) {
+  return e.items.length === 0;
+}
+function dt(e) {
+  return e.preventDefault();
+}
+function ft(e) {
+  return e.items;
+}
+function pt(e) {
+  return e.preventDefault();
+}
+function mt(e, t) {
+  let n = t.length * 30;
+  return n < e.total ? n : void 0;
+}
+var ht, gt, X, Z;
+function _t() {
+  return (_t = e(() => {
+    ((ht = n()),
+      k(),
+      r(),
+      (gt = w()),
+      d(),
+      J(),
+      x(),
+      u(),
+      M(),
+      E(),
+      q(),
+      (X = l()),
+      (Z = s({
+        research: {
+          id: `chatgptConversations.gpts.category.research`,
+          defaultMessage: `Research`,
+          description: `Category option in the workspace GPT discovery filter for research assistants`,
+        },
+        writing: {
+          id: `chatgptConversations.gpts.category.writing`,
+          defaultMessage: `Writing`,
+          description: `Category option in the workspace GPT discovery filter for writing assistants`,
+        },
+        programming: {
+          id: `chatgptConversations.gpts.category.programming`,
+          defaultMessage: `Programming`,
+          description: `Category option in the workspace GPT discovery filter for programming assistants`,
+        },
+        education: {
+          id: `chatgptConversations.gpts.category.education`,
+          defaultMessage: `Education`,
+          description: `Category option in the workspace GPT discovery filter for learning assistants`,
+        },
+        productivity: {
+          id: `chatgptConversations.gpts.category.productivity`,
+          defaultMessage: `Productivity`,
+          description: `Category option in the workspace GPT discovery filter for productivity assistants`,
+        },
+        lifestyle: {
+          id: `chatgptConversations.gpts.category.lifestyle`,
+          defaultMessage: `Lifestyle`,
+          description: `Category option in the workspace GPT discovery filter for lifestyle assistants`,
+        },
+        other: {
+          id: `chatgptConversations.gpts.category.other`,
+          defaultMessage: `Other`,
+          description: `Category option in the workspace GPT discovery filter for GPTs outside the named categories`,
+        },
+        searchCreators: {
+          id: `chatgptConversations.gpts.workspace.searchCreators`,
+          defaultMessage: `Search creators`,
+          description: `Accessible label and placeholder for searching workspace members in the GPT creator filter`,
+        },
+      })));
+  }))();
+}
+function vt(e) {
+  let t = (0, Tt.c)(54),
+    { account: n, search: r } = e,
+    a;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`) ? ((a = []), (t[0] = a)) : (a = t[0]);
+  let [o, s] = (0, Et.useState)(a),
+    c;
+  t[1] === Symbol.for(`react.memo_cache_sentinel`) ? ((c = []), (t[1] = c)) : (c = t[1]);
+  let [l, u] = (0, Et.useState)(c),
+    d;
+  t[2] === r ? (d = t[3]) : ((d = r.trim()), (t[2] = r), (t[3] = d));
+  let f = z(d, 300),
+    p = n.id,
+    m;
+  t[4] === l ? (m = t[5]) : ((m = l.map(Ct)), (t[4] = l), (t[5] = m));
+  let h;
+  t[6] !== n.id || t[7] !== o || t[8] !== f || t[9] !== m
+    ? ((h = [`chatgpt-gizmos`, p, `workspace`, f, o, m]),
+      (t[6] = n.id),
+      (t[7] = o),
+      (t[8] = f),
+      (t[9] = m),
+      (t[10] = h))
+    : (h = t[10]);
+  let g;
+  t[11] !== n.id || t[12] !== o || t[13] !== l || t[14] !== f
+    ? ((g = (e) => {
+        let { pageParam: t } = e;
+        return Se.safeGet(`/workspace-resources/{account_id}/gizmos`, {
+          parameters: {
+            path: { account_id: n.id },
+            query: {
+              query_continuation: t,
+              limit: 10,
+              search: f || void 0,
+              categories: o.length ? o : void 0,
+              user_ids: l.length ? l.map(St) : void 0,
+            },
+          },
+        });
+      }),
+      (t[11] = n.id),
+      (t[12] = o),
+      (t[13] = l),
+      (t[14] = f),
+      (t[15] = g))
+    : (g = t[15]);
+  let v;
+  t[16] !== h || t[17] !== g
+    ? ((v = {
+        initialPageParam: void 0,
+        queryKey: h,
+        queryFn: g,
+        getNextPageParam: xt,
+        staleTime: i.ONE_MINUTE,
+      }),
+      (t[16] = h),
+      (t[17] = g),
+      (t[18] = v))
+    : (v = t[18]);
+  let {
+      data: b,
+      isPending: x,
+      isError: S,
+      refetch: C,
+      hasNextPage: w,
+      fetchNextPage: E,
+      isFetchingNextPage: D,
+      isFetchNextPageError: O,
+    } = T(v),
+    k,
+    A,
+    j,
+    M,
+    N;
+  if (
+    t[19] !== n.id ||
+    t[20] !== o ||
+    t[21] !== l ||
+    t[22] !== b?.pages ||
+    t[23] !== S ||
+    t[24] !== O ||
+    t[25] !== x ||
+    t[26] !== C
+  ) {
+    let e = b?.pages.flatMap(bt);
+    (t[32] !== n.id || t[33] !== o || t[34] !== l
+      ? ((N = (0, Q.jsx)(ie, {
+          children: (0, Q.jsx)(lt, {
+            accountId: n.id,
+            categories: o,
+            creators: l,
+            onCategoriesChange: s,
+            onCreatorsChange: u,
+          }),
+        })),
+        (t[32] = n.id),
+        (t[33] = o),
+        (t[34] = l),
+        (t[35] = N))
+      : (N = t[35]),
+      t[36] === x ? (k = t[37]) : ((k = x ? (0, Q.jsx)(He, {}) : null), (t[36] = x), (t[37] = k)),
+      t[38] !== S || t[39] !== O || t[40] !== C
+        ? ((A =
+            S && !O
+              ? (0, Q.jsx)(Le, {
+                  onRetry: () => {
+                    C();
+                  },
+                })
+              : null),
+          (t[38] = S),
+          (t[39] = O),
+          (t[40] = C),
+          (t[41] = A))
+        : (A = t[41]),
+      (j =
+        e?.length === 0
+          ? (0, Q.jsx)(`div`, {
+              className: `py-12 text-center text-secondary`,
+              children: (0, Q.jsx)(_, {
+                id: `chatgptConversations.gpts.workspace.empty`,
+                defaultMessage: `No GPTs found`,
+                description: `Empty workspace GPT catalog state after searching or filtering; no accessible GPTs match the selected criteria`,
+              }),
+            })
+          : null),
+      (M =
+        e != null && e.length > 0
+          ? (0, Q.jsx)(Me, {
+              gap: `catalog`,
+              children: e.map((e) => (0, Q.jsx)(wt, { accountId: n.id, gizmo: e }, e.id)),
+            })
+          : null),
+      (t[19] = n.id),
+      (t[20] = o),
+      (t[21] = l),
+      (t[22] = b?.pages),
+      (t[23] = S),
+      (t[24] = O),
+      (t[25] = x),
+      (t[26] = C),
+      (t[27] = k),
+      (t[28] = A),
+      (t[29] = j),
+      (t[30] = M),
+      (t[31] = N));
+  } else ((k = t[27]), (A = t[28]), (j = t[29]), (M = t[30]), (N = t[31]));
+  let P;
+  t[42] !== E || t[43] !== w || t[44] !== O || t[45] !== D
+    ? ((P = w
+        ? (0, Q.jsx)(`div`, {
+            className: `flex justify-center py-6`,
+            ref: (e) => {
+              if (e == null || D || O) return;
+              let t = new IntersectionObserver(
+                (e) => {
+                  e.some(yt) && E();
+                },
+                { rootMargin: `0px 0px 400px 0px` },
+              );
+              return (t.observe(e), () => t.disconnect());
+            },
+            children: (0, Q.jsx)(y, {
+              color: `secondary`,
+              loading: D,
+              onClick: () => {
+                E();
+              },
+              size: `toolbar`,
+              children: (0, Q.jsx)(_, {
+                id: `chatgptConversations.gpts.workspace.more`,
+                defaultMessage: `See more`,
+                description: `Button loading the next page of workspace GPTs, also available when automatic scrolling pagination fails`,
+              }),
+            }),
+          })
+        : null),
+      (t[42] = E),
+      (t[43] = w),
+      (t[44] = O),
+      (t[45] = D),
+      (t[46] = P))
+    : (P = t[46]);
+  let F;
+  return (
+    t[47] !== k || t[48] !== A || t[49] !== j || t[50] !== M || t[51] !== P || t[52] !== N
+      ? ((F = (0, Q.jsxs)(Q.Fragment, { children: [N, k, A, j, M, P] })),
+        (t[47] = k),
+        (t[48] = A),
+        (t[49] = j),
+        (t[50] = M),
+        (t[51] = P),
+        (t[52] = N),
+        (t[53] = F))
+      : (F = t[53]),
+    F
+  );
+}
+function yt(e) {
+  return e.isIntersecting;
+}
+function bt(e) {
+  return e.gizmos;
+}
+function xt(e) {
+  return e.query_continuation ?? void 0;
+}
+function St(e) {
+  return e.account_user_id;
+}
+function Ct(e) {
+  return e.account_user_id;
+}
+function wt(e) {
+  let t = (0, Tt.c)(26),
+    { accountId: n, gizmo: r } = e,
+    i = f(b),
+    a = ge(),
+    [o, s] = (0, Et.useState)(!1),
+    c = r.creator_name ?? r.creator_email,
+    l = r.accurate_num_paid_conversations ?? r.num_paid_conversations,
+    u;
+  t[0] !== r.avatar_url || t[1] !== r.id || t[2] !== r.name
+    ? ((u = { id: r.id, name: r.name, iconUrl: r.avatar_url }),
+      (t[0] = r.avatar_url),
+      (t[1] = r.id),
+      (t[2] = r.name),
+      (t[3] = u))
+    : (u = t[3]);
+  let d = u,
+    p;
+  t[4] !== a || t[5] !== i
+    ? ((p = (e) => {
+        (V(i, null), W(i, `chat`), a(ke(e.gizmo.short_url?.trim() || e.gizmo.id)));
+      }),
+      (t[4] = a),
+      (t[5] = i),
+      (t[6] = p))
+    : (p = t[6]);
+  let m = p,
+    h;
+  t[7] !== l || t[8] !== c || t[9] !== r.description
+    ? ((h =
+        r.description == null && c == null && l == null
+          ? void 0
+          : (0, Q.jsxs)(Q.Fragment, {
+              children: [
+                r.description
+                  ? (0, Q.jsx)(`div`, { className: `line-clamp-1`, children: r.description })
+                  : null,
+                c == null && l == null
+                  ? null
+                  : (0, Q.jsxs)(`div`, {
+                      className: `flex items-center text-xs text-codex-description`,
+                      children: [
+                        c == null
+                          ? null
+                          : (0, Q.jsx)(_, {
+                              id: `chatgptConversations.gpts.workspace.creator`,
+                              defaultMessage: `Created by {creator}`,
+                              description: `Byline in a workspace GPT card; creator is the creator's display name or email supplied by the workspace catalog`,
+                              values: { creator: c },
+                            }),
+                        c == null || l == null ? null : (0, Q.jsx)(te, { className: `mx-1` }),
+                        l == null
+                          ? null
+                          : (0, Q.jsxs)(`span`, {
+                              className: `flex items-center gap-1`,
+                              children: [
+                                (0, Q.jsx)(g, { "aria-hidden": !0 }),
+                                (0, Q.jsx)(_, {
+                                  id: `chatgptConversations.gpts.workspace.conversations`,
+                                  defaultMessage: `{count, plural, one {# conversation} other {# conversations}}`,
+                                  description: `Usage count in a workspace GPT row; count is the number of conversations`,
+                                  values: { count: l },
+                                }),
+                              ],
+                            }),
+                      ],
+                    }),
+              ],
+            })),
+      (t[7] = l),
+      (t[8] = c),
+      (t[9] = r.description),
+      (t[10] = h))
+    : (h = t[10]);
+  let v;
+  t[11] === d
+    ? (v = t[12])
+    : ((v = (0, Q.jsx)(re, { className: `size-9`, customGpt: d, presentation: `avatar` })),
+      (t[11] = d),
+      (t[12] = v));
+  let y;
+  t[13] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((y = () => s(!0)), (t[13] = y))
+    : (y = t[13]);
+  let x;
+  t[14] !== r.name || t[15] !== h || t[16] !== v
+    ? ((x = (0, Q.jsx)(Ie, {
+        className: `group justify-center border-none text-base select-none`,
+        description: h,
+        descriptionClassName: `flex flex-col gap-0.5 text-codex-description`,
+        icon: v,
+        iconContainer: !1,
+        title: r.name,
+        onClick: y,
+      })),
+      (t[14] = r.name),
+      (t[15] = h),
+      (t[16] = v),
+      (t[17] = x))
+    : (x = t[17]);
+  let S;
+  t[18] !== n || t[19] !== r.id || t[20] !== o || t[21] !== m
+    ? ((S = o
+        ? (0, Q.jsx)(Je, {
+            accountId: n,
+            gizmo: r.id,
+            isOwnerAndWorkspaceAllowsSpecific: !1,
+            onClose: () => s(!1),
+            onStartChat: m,
+          })
+        : null),
+      (t[18] = n),
+      (t[19] = r.id),
+      (t[20] = o),
+      (t[21] = m),
+      (t[22] = S))
+    : (S = t[22]);
+  let C;
+  return (
+    t[23] !== x || t[24] !== S
+      ? ((C = (0, Q.jsxs)(Q.Fragment, { children: [x, S] })), (t[23] = x), (t[24] = S), (t[25] = C))
+      : (C = t[25]),
+    C
+  );
+}
+var Tt, Et, Q;
+function Dt() {
+  return (Dt = e(() => {
+    ((Tt = n()),
+      r(),
+      a(),
+      (Et = w()),
+      d(),
+      K(),
+      J(),
+      U(),
+      H(),
+      x(),
+      M(),
+      Te(),
+      Fe(),
+      G(),
+      m(),
+      Ne(),
+      E(),
+      q(),
+      L(),
+      Be(),
+      qe(),
+      Oe(),
+      _t(),
+      (Q = l()));
+  }))();
+}
+function Ot() {
+  let e = (0, At.c)(2),
+    { data: t } = Ee(),
+    n;
+  return (
+    e[0] === t
+      ? (n = e[1])
+      : ((n = t == null ? (0, $.jsx)(He, {}) : (0, $.jsx)(kt, { account: t }, t.id)),
+        (e[0] = t),
+        (e[1] = n)),
+    n
+  );
+}
+function kt(e) {
+  let t = (0, At.c)(61),
+    { account: n } = e,
+    r = N(),
+    i = ue(),
+    a = ge(),
+    o = ve(`2160578039`),
+    [s, c] = (0, jt.useState)(!1),
+    l = n.structure === `workspace` && n.plan_type !== `quorum`,
+    u,
+    d;
+  if (t[0] !== i.search || t[1] !== l) {
+    let e = new URLSearchParams(i.search);
+    ((u = l && e.get(`view`) !== `public` ? `workspace` : `public`),
+      (d = e.get(`search`) ?? ``),
+      (t[0] = i.search),
+      (t[1] = l),
+      (t[2] = u),
+      (t[3] = d));
+  } else ((u = t[2]), (d = t[3]));
+  let f = d,
+    p;
+  t[4] === r
+    ? (p = t[5])
+    : ((p = r.formatMessage({
+        id: `chatgptConversations.gpts.discovery.searchLabel`,
+        defaultMessage: `Search GPTs`,
+        description: `Accessible label and placeholder for the search field in the GPT catalog`,
+      })),
+      (t[4] = r),
+      (t[5] = p));
+  let m = p,
+    h;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((h = (0, $.jsx)(_, {
+        id: `chatgptConversations.gpts.discovery.myGpts`,
+        defaultMessage: `My GPTs`,
+        description: `Action on the GPT discovery page that opens the user's created GPTs and GPTs shared with them`,
+      })),
+      (t[6] = h))
+    : (h = t[6]);
+  let g = h,
+    v;
+  t[7] !== o || t[8] !== a
+    ? ((v = (e) => {
+        (o
+          ? a(De)
+          : ee({
+              disposition: `current-tab`,
+              event: e,
+              href: Ze(`/gpts/mine`),
+              initiator: `open_in_browser_bridge`,
+            }),
+          c(!1));
+      }),
+      (t[7] = o),
+      (t[8] = a),
+      (t[9] = v))
+    : (v = t[9]);
+  let b = v,
+    x;
+  t[10] !== u ||
+  t[11] !== r ||
+  t[12] !== i.pathname ||
+  t[13] !== i.search ||
+  t[14] !== a ||
+  t[15] !== l
+    ? ((x = l
+        ? (0, $.jsx)(ne, {
+            ariaLabel: r.formatMessage({
+              id: `chatgptConversations.gpts.catalog.tabs`,
+              defaultMessage: `GPT catalog`,
+              description: `Accessible name for the Workspace and Public tabs on the GPT discovery page`,
+            }),
+            onSelect: (e) => {
+              let t = new URLSearchParams(i.search);
+              (t.set(`view`, e), a({ pathname: i.pathname, search: `?${t}` }));
+            },
+            options: [
+              {
+                id: `workspace`,
+                label: (0, $.jsx)(_, {
+                  id: `chatgptConversations.gpts.catalog.workspace`,
+                  defaultMessage: `Workspace`,
+                  description: `GPT catalog tab showing GPTs shared within the user's current workspace`,
+                }),
+              },
+              {
+                id: `public`,
+                label: (0, $.jsx)(_, {
+                  id: `chatgptConversations.gpts.catalog.public`,
+                  defaultMessage: `Public`,
+                  description: `GPT catalog tab showing public discovery sections and search`,
+                }),
+              },
+            ],
+            selectedId: u,
+            size: `toolbar`,
+          })
+        : null),
+      (t[10] = u),
+      (t[11] = r),
+      (t[12] = i.pathname),
+      (t[13] = i.search),
+      (t[14] = a),
+      (t[15] = l),
+      (t[16] = x))
+    : (x = t[16]);
+  let S = x,
+    C;
+  t[17] === b
+    ? (C = t[18])
+    : ((C = (0, $.jsx)(y, { color: `ghostActive`, size: `toolbar`, onClick: b, children: g })),
+      (t[17] = b),
+      (t[18] = C));
+  let w;
+  t[19] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((w = (0, $.jsx)(Ue, {})), (t[19] = w))
+    : (w = t[19]);
+  let T;
+  t[20] === C
+    ? (T = t[21])
+    : ((T = (0, $.jsxs)($.Fragment, { children: [C, w] })), (t[20] = C), (t[21] = T));
+  let E;
+  t[22] === r
+    ? (E = t[23])
+    : ((E = r.formatMessage({
+        id: `chatgptConversations.gpts.discovery.actions`,
+        defaultMessage: `GPT actions`,
+        description: `Accessible label for the GPT discovery menu containing My GPTs and Create actions`,
+      })),
+      (t[22] = r),
+      (t[23] = E));
+  let D;
+  t[24] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((D = (0, $.jsx)(P, {})), (t[24] = D))
+    : (D = t[24]);
+  let O;
+  t[25] === E
+    ? (O = t[26])
+    : ((O = (0, $.jsx)(y, {
+        className: `@2xl/app-shell-header-toolbar:hidden`,
+        "aria-label": E,
+        color: `ghostActive`,
+        size: `toolbar`,
+        uniform: !0,
+        children: D,
+      })),
+      (t[25] = E),
+      (t[26] = O));
+  let k;
+  t[27] === b
+    ? (k = t[28])
+    : ((k = (0, $.jsx)(A.Item, { onClick: b, children: g })), (t[27] = b), (t[28] = k));
+  let M;
+  t[29] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((M = (0, $.jsx)(Ue, { asMenuItem: !0, onNavigate: () => c(!1) })), (t[29] = M))
+    : (M = t[29]);
+  let F;
+  t[30] !== s || t[31] !== O || t[32] !== k
+    ? ((F = (0, $.jsxs)(j, {
+        align: `end`,
+        contentWidth: `menu`,
+        open: s,
+        onOpenChange: c,
+        triggerButton: O,
+        children: [k, M],
+      })),
+      (t[30] = s),
+      (t[31] = O),
+      (t[32] = k),
+      (t[33] = F))
+    : (F = t[33]);
+  let I;
+  t[34] !== F || t[35] !== T
+    ? ((I = (0, $.jsx)(Xe, {
+        children: (0, $.jsx)(se.HeaderToolbar.Actions, { secondary: T, children: F }),
+      })),
+      (t[34] = F),
+      (t[35] = T),
+      (t[36] = I))
+    : (I = t[36]);
+  let L;
+  t[37] !== S || t[38] !== I
+    ? ((L = (0, $.jsx)(se.Header, {
+        className: `flex shrink-0 px-panel`,
+        children: (0, $.jsxs)(se.HeaderToolbar, { children: [S, I] }),
+      })),
+      (t[37] = S),
+      (t[38] = I),
+      (t[39] = L))
+    : (L = t[39]);
+  let R;
+  t[40] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((R = (0, $.jsx)(Ge, {})), (t[40] = R))
+    : (R = t[40]);
+  let z;
+  t[41] !== i.pathname || t[42] !== i.search || t[43] !== a
+    ? ((z = (e) => {
+        let t = new URLSearchParams(i.search);
+        (e ? t.set(`search`, e) : t.delete(`search`),
+          a({ pathname: i.pathname, search: `?${t}` }, { replace: !0 }));
+      }),
+      (t[41] = i.pathname),
+      (t[42] = i.search),
+      (t[43] = a),
+      (t[44] = z))
+    : (z = t[44]);
+  let B;
+  t[45] !== f || t[46] !== m || t[47] !== z
+    ? ((B = { id: `gpt-search`, label: m, onSearchQueryChange: z, placeholder: m, searchQuery: f }),
+      (t[45] = f),
+      (t[46] = m),
+      (t[47] = z),
+      (t[48] = B))
+    : (B = t[48]);
+  let V, H;
+  t[49] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((V = (0, $.jsx)(_, {
+        id: `chatgptConversations.gpts.discovery.subtitle`,
+        defaultMessage: `Discover custom versions of ChatGPT that combine instructions, extra knowledge, and any combination of skills`,
+        description: `Subtitle on the GPT catalog page describing the custom assistants users can discover`,
+      })),
+      (H = (0, $.jsx)(_, {
+        id: `chatgptConversations.gpts.discovery.title`,
+        defaultMessage: `GPTs`,
+        description: `Title of the GPT discovery page where ChatGPT users browse and search for custom GPTs`,
+      })),
+      (t[49] = V),
+      (t[50] = H))
+    : ((V = t[49]), (H = t[50]));
+  let U;
+  t[51] !== n || t[52] !== u || t[53] !== f
+    ? ((U =
+        u === `workspace`
+          ? (0, $.jsx)(vt, { account: n, search: f })
+          : (0, $.jsx)(Qe, { account: n, search: f })),
+      (t[51] = n),
+      (t[52] = u),
+      (t[53] = f),
+      (t[54] = U))
+    : (U = t[54]);
+  let W;
+  t[55] !== B || t[56] !== U
+    ? ((W = (0, $.jsx)(Pe, {
+        className: `flex h-full w-full flex-1 flex-col gap-8`,
+        children: (0, $.jsx)(pe, {
+          animateContentLayout: !1,
+          banner: R,
+          headerVariant: `inset`,
+          searchPlacement: `page`,
+          search: B,
+          subtitle: V,
+          title: H,
+          children: U,
+        }),
+      })),
+      (t[55] = B),
+      (t[56] = U),
+      (t[57] = W))
+    : (W = t[57]);
+  let G;
+  return (
+    t[58] !== L || t[59] !== W
+      ? ((G = (0, $.jsxs)(`div`, {
+          className: `flex h-full min-h-0 flex-col bg-surface text-default`,
+          children: [L, W],
+        })),
+        (t[58] = L),
+        (t[59] = W),
+        (t[60] = G))
+      : (G = t[60]),
+    G
+  );
+}
+var At, jt, $;
+function Mt() {
+  return (Mt = e(() => {
+    ((At = n()),
+      (jt = w()),
+      d(),
+      K(),
+      ye(),
+      we(),
+      x(),
+      u(),
+      B(),
+      M(),
+      Te(),
+      I(),
+      Ne(),
+      de(),
+      Be(),
+      ze(),
+      Ye(),
+      Ve(),
+      ct(),
+      Oe(),
+      Dt(),
+      ($ = l()));
+  }))();
+}
+Mt();
+export { Ot as GptDiscoveryPage };

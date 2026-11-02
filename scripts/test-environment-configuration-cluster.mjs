@@ -149,87 +149,8 @@ assert.equal(expanded.props.children[1].props.children, "details");
 
 const environmentFieldsReleaseAssertions = assertReleaseOwner("environment-configuration-fields");
 
-const publishActions = await load("publish-actions");
-publishActions.n();
-publishActions.i();
-const button = publishActions.r({
-  children: "Publish",
-  disabled: true,
-  tooltipContent: "Wait",
-});
-assert.equal(button.props["aria-disabled"], true);
-assert.equal(button.props.children[0].props.disabled, true);
-assert.equal(button.props.children[1].props.children, "Wait");
-
-let publishedInput = null;
-globalThis.__scopedValues = {
-  panel: false,
-  setup: { phase: "ready" },
-  configuration: {
-    configId: "config",
-    promotedVersionId: null,
-    approval: null,
-  },
-  queryConfig: {
-    data: { id: "config", version_id: "v2", draft: { revision: 1 } },
-  },
-  publish: {
-    isPending: false,
-    error: null,
-    mutate: (input) => {
-      publishedInput = input;
-    },
-  },
-  save: false,
-  review: false,
-  task: { id: "task", isActive: false },
-  operation: null,
-  draftSave: { isPending: false },
-};
-const readyActions = publishActions.t({ conversationId: "conversation" });
-assert.equal(
-  readyActions.props.children[0].props.children,
-  "Your configuration is saved and ready to publish",
-);
-const readyButtonElement = readyActions.props.children[1].props.children[1];
-assert.equal(readyButtonElement.props.children, "Publish");
-readyButtonElement.props.onClick();
-assert.equal(publishedInput.config.id, "config");
-
-let reviewed = 0;
-globalThis.__scopedValues.review = true;
-const reviewActions = publishActions.t({
-  conversationId: "conversation",
-  onReview: () => reviewed++,
-});
-const reviewButtonElement = reviewActions.props.children[1].props.children[1];
-assert.equal(reviewButtonElement.props.children, "Review");
-reviewButtonElement.props.onClick();
-assert.equal(reviewed, 1);
-
-globalThis.__scopedValues.review = false;
-globalThis.__scopedValues.publish = {
-  isPending: false,
-  error: null,
-  mutate() {},
-};
-globalThis.__scopedValues.queryConfig = {
-  data: { id: "config", version_id: "v2", draft: null },
-};
-globalThis.__scopedValues.configuration = {
-  promotedVersionId: "v2",
-  approval: null,
-};
-const published = publishActions.t({
-  conversationId: "conversation",
-  children: "next",
-});
-assert.equal(
-  published.props.children[0].props.children,
-  "Environment published",
-);
-assert.equal(published.props.children[1], "next");
+const publishActionsReleaseAssertions = assertReleaseOwner("publish-actions");
 
 const setupPanelReleaseAssertions = assertReleaseOwner("environment-setup-tab-panel");
 
-console.log(`environment configuration cluster with ${environmentFieldsReleaseAssertions} fields and ${setupPanelReleaseAssertions} setup panel release assertions complete`);
+console.log(`environment configuration cluster with ${environmentFieldsReleaseAssertions} fields, ${publishActionsReleaseAssertions} publish actions, and ${setupPanelReleaseAssertions} setup panel release assertions complete`);

@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__libraryActionsHistoryTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return { type, props: props ?? {}, key }; } } };
 async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", treeShaking: false, plugins: [{ name: "library-actions-history-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: path.basename(importPath) === "app-shared" ? "export const I3=()=>globalThis.__libraryActionsHistoryTest.jsx;" : path.basename(importPath) === "library-file-download" ? "export const t=async()=>{};" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
@@ -91,4 +92,6 @@ find(previewUi, node => node.props?.children === "Close").props.onClick();
 assert.equal(closed, 1);
 assert.equal(previewUi.props.children[1], "Rendered");
 
-console.log("47 library actions and history cluster assertions passed");
+const historyReleaseAssertions = assertReleaseOwner("history");
+
+console.log(`47 library actions and history cluster assertions plus ${historyReleaseAssertions} history release assertions passed`);

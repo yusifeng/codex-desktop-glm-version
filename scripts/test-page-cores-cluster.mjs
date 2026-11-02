@@ -87,4 +87,8 @@ const skillsReleaseAssertions = assertReleaseOwner("skills-page-core");
 
 const mcpReleaseAssertions = assertReleaseOwner("mcp-extension-view-page-core");
 
-console.log(`21 page core assertions, ${skillsReleaseAssertions} skills release assertions, and ${mcpReleaseAssertions} MCP release assertions passed`);
+const homeTaskSuggestionsReleaseAssertions = assertReleaseOwner("home-task-suggestions-core");
+
+const viewFrameReleaseAssertions = assertReleaseOwner("view-frame");
+
+console.log(`21 page core assertions, ${skillsReleaseAssertions} skills, ${mcpReleaseAssertions} MCP, ${homeTaskSuggestionsReleaseAssertions} home task suggestions, and ${viewFrameReleaseAssertions} view frame release assertions passed`);

@@ -26,31 +26,11 @@ function walk(node, visit) { if (node == null || typeof node !== "object") retur
 function find(node, predicate) { let result; walk(node, value => { if (result == null && predicate(value)) result = value; }); return result; }
 function text(node) { const parts = []; walk(node, value => { const children = value.props?.children; if (typeof children === "string") parts.push(children); }); return parts.join(" "); }
 
-const share = await bundle("automation-share-dialog");
-assert.deepEqual(Object.keys(share), ["ScheduledTaskShareDialog"]);
-let copied, refreshed = 0, deleted = 0;
-const shareUi = share.ScheduledTaskShareDialog({ automationName: "Daily brief", shareLink: "https://example/task", onClose() {}, onCopy(value) { copied = value; }, onRefresh() { refreshed++; }, onDelete() { deleted++; } });
-assert.match(text(shareUi), /Share Daily brief.*Copy link.*Refresh link.*Delete link/);
-find(shareUi, node => node.props?.children === "Copy link").props.onClick();
-find(shareUi, node => node.props?.children === "Refresh link").props.onClick();
-find(shareUi, node => node.props?.children === "Delete link").props.onClick();
-assert.equal(copied, "https://example/task");
-assert.equal(refreshed, 1);
-assert.equal(deleted, 1);
+const shareAssertions = assertReleaseOwner("automation-share-dialog");
 
 const frequencyAssertions = assertReleaseOwner("automation-frequency-section");
 
-const automationDialog = await bundle("automation-dialog");
-assert.deepEqual(Object.keys(automationDialog), ["a", "i", "n", "r", "t"]);
-automationDialog.a();
-assert.equal(globalThis.__automationInfrastructureTest.initialized.includes("automation-api"), true);
-let selectedModel;
-const modelPicker = automationDialog.n({ field: "model", selectedModel: null, onSelect(model, effort) { selectedModel = [model, effort]; } });
-find(modelPicker, node => node.type === "select").props.onChange({ currentTarget: { value: "gpt-5" } });
-assert.deepEqual(selectedModel, ["gpt-5", "medium"]);
-const reasoningPicker = automationDialog.n({ field: "reasoning", selectedModel: "gpt-5", reasoningEffort: "medium", onSelect(model, effort) { selectedModel = [model, effort]; } });
-find(reasoningPicker, node => node.type === "select").props.onChange({ currentTarget: { value: "high" } });
-assert.deepEqual(selectedModel, ["gpt-5", "high"]);
+const automationDialogAssertions = assertReleaseOwner("automation-dialog");
 
 const migration = await bundle("habitat-automation-migration-state");
 assert.deepEqual(Object.keys(migration), ["n", "r", "t"]);
@@ -74,6 +54,8 @@ assert.equal(blocked.state, "proceeding");
 const restoredOwnerAssertions =
   assertReleaseOwner("platform-ui-kit-provider") +
   assertReleaseOwner("cloud-automation-detail-panel") +
-  frequencyAssertions;
+  frequencyAssertions +
+  shareAssertions +
+  automationDialogAssertions;
 
 console.log(`automation infrastructure cluster tests passed with ${restoredOwnerAssertions} release assertions`);

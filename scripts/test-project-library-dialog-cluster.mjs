@@ -49,28 +49,7 @@ find(failedDictionary, node => node.props?.children === "Try again").props.onCli
 assert.equal(dictionaryRetried, 1);
 
 const libraryItemReleaseAssertions = assertReleaseOwner("library-item-dialogs");
-const fileEntry = { node: { id: "f1", kind: "file", name: "notes.txt" } };
-
-const move = await bundle("library-move-dialog");
-assert.deepEqual(Object.keys(move), ["MoveLibraryItemsDialog"]);
-let movedIds, moveClosed = 0, moveRetried = 0;
-const moveMount = mount(move.MoveLibraryItemsDialog, { accountId: "a", userId: "u", entries: [fileEntry], destinations: [{ id: "d1", name: "Research" }], onClose() { moveClosed++; }, onMoved(ids) { movedIds = ids; }, onMove(entries, directoryId) { return entries.map(entry => `${entry.node.id}@${directoryId}`); } });
-let moveUi = moveMount.render();
-assert.match(text(moveUi), /Move to…/);
-assert.match(text(moveUi), /Research/);
-find(moveUi, node => node.props?.children === "Research").props.onClick();
-moveUi = moveMount.render();
-find(moveUi, node => node.type === "button" && node.props?.children === "Move").props.onClick();
-await Promise.resolve();
-assert.deepEqual(movedIds, ["f1@d1"]);
-assert.equal(moveClosed, 1);
-assert.equal(find(moveUi, node => node.props?.children === "New folder").type, "button");
-const moveLoading = mount(move.MoveLibraryItemsDialog, { accountId: "a", userId: "u", entries: [], isLoading: true, onClose() {}, onMoved() {} }).render();
-assert.equal(find(moveLoading, node => node.props?.role === "status").props.children, "Loading folders");
-const moveError = mount(move.MoveLibraryItemsDialog, { accountId: "a", userId: "u", entries: [], error: "No folders", onClose() {}, onMoved() {}, onRetry() { moveRetried++; } }).render();
-assert.match(text(find(moveError, node => node.props?.role === "alert")), /No folders/);
-find(moveError, node => node.props?.children === "Try again").props.onClick();
-assert.equal(moveRetried, 1);
+const libraryMoveReleaseAssertions = assertReleaseOwner("library-move-dialog");
 
 const create = await bundle("chatgpt-project-create-dialog");
 assert.deepEqual(Object.keys(create), ["ChatGptProjectCreateDialog"]);
@@ -95,6 +74,7 @@ assert.equal(find(cloudOnly, node => node.type === "select"), undefined);
 
 const restoredOwnerAssertions =
   libraryItemReleaseAssertions +
+  libraryMoveReleaseAssertions +
   assertReleaseOwner("chatgpt-project-add-sources-dialog") +
   assertReleaseOwner("create-project-dialog-core");
 

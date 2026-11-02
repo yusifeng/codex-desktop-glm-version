@@ -1,5 +1,19 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Automation/subscription/history/command release-owner recovery：一次性恢复
+`local-conversation-side-chat`、`automation-dialog`、`open-in-google-drive-menu-item`、
+`history`、`publish-actions`、`subscription-recovery-dialog`、`subscription-onboarding`、
+`gpt-discovery-page`、`automation-share-dialog`、`library-move-dialog`、
+`scheduled-task-share-dialog`、`design-editor-state`、`home-task-suggestions-core`、
+`view-frame` 与 `command-menu-queries` 十五个发布 owner，净恢复 11,169 行发布 TypeScript。
+绑定旧手写 ABI 的 side chat、automation、Google Drive、environment publish、subscription、
+GPT discovery、Library、sharing 与 command query 测试已迁移为发布一致性验证，并保留同簇
+其他行为覆盖。整批通过 12,448/12,448 transform check、1,888/1,888 renderer build/verify、
+2,247/2,247 app-code coverage、0 semantic tail 与 typecheck。严格 hub 消费推进到 app-shared
+1,705/3,185、app-initial 5,360/8,204、app-primary 677/917，仍为 0 unreviewed、0 invalid
+consumers。按发布源码正向行数缺口口径，覆盖率由约 88.4% 推进到约 89.5%；425 个
+preserved 边界、三个聚合 hub 的耦合导出与最终真实登录态 E2E 仍未完成。
+
 2026-11-02 Library/browser/chart/thread/terminal release-owner recovery：一次性恢复
 `library-item-dialogs`、`image-prompt-share-dialog`、`chart-content-reference`、
 `allowed-domains-input`、`checkout-dialog-fields`、`cloud-browser-side-panel`、

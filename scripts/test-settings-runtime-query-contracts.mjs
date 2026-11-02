@@ -88,14 +88,6 @@ assert.equal(state.apiCalls.at(-1).path, "/trusted_contact/enabled");
 assert.equal(state.apiCalls.at(-1).options.additionalHeaders["ChatGPT-Account-ID"], "account-9");
 assert.equal(state.apiCalls.at(-1).options.additionalHeaders["X-OpenAI-Expected-Account-Id"], "account-9");
 
-const queries = await bundle("command-menu-queries");
-const codeReview = queries.n({ auth: state.auth, days: 30, enabled: true, isPolling: false, scope: "consumer" });
-assert.equal(codeReview.enabled, true);
-assert.equal(codeReview.refetchInterval, false);
-assert.equal(typeof codeReview.queryFn, "function");
-await codeReview.queryFn();
-assert.equal(state.apiCalls.at(-1).path, "/wham/analytics/daily-code-review-metrics");
-assert.equal(state.apiCalls.at(-1).options.parameters.query.group_by, "day");
-assert.equal(state.apiCalls.at(-1).options.parameters.query.workspace_user, true);
+const commandMenuQueryReleaseAssertions = assertReleaseOwner("command-menu-queries");
 
-console.log(`8 settings runtime/query contract assertions and ${visibleSettingsReleaseAssertions} visible settings release assertions passed`);
+console.log(`settings runtime/query contracts passed with ${visibleSettingsReleaseAssertions} visible settings and ${commandMenuQueryReleaseAssertions} command query release assertions`);

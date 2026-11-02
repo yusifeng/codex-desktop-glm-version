@@ -33,25 +33,9 @@ assert.match(text(cadenceUi), /November 2, 2026/);
 assert.equal(find(mount(cadence.BillingCadenceDialog, { accountId: "a", entryPoint: "manage_billing_schedule", state: cadenceState, isLoading: true, onClose() {} }).render(), node => node.props?.role === "status").props.children, "Checking your billing details…");
 assert.equal(find(mount(cadence.BillingCadenceDialog, { accountId: "a", entryPoint: "annual_offer", state: cadenceState, error: "stale", onClose() {} }).render(), node => node.props?.role === "alert").type, "div");
 
-const recovery = await bundle("subscription-recovery-dialog");
-assert.deepEqual(Object.keys(recovery), ["RecoveryDialog"]);
-let paidMethod, paymentCompleted = 0, recoveryClosed = 0;
-const recoveryUi = mount(recovery.RecoveryDialog, { accountId: "a", planName: "Plus", amountDue: 20, walletBalanceApplied: 5, paymentMethods: [{ id: "card", brand: "Visa", last4: "4242" }], onClose() { recoveryClosed++; }, onComplete() { paymentCompleted++; }, onPay(method) { paidMethod = method.id; return "succeeded"; } }).render();
-assert.match(text(recoveryUi), /Renew your ChatGPT Plus plan/);
-assert.match(text(recoveryUi), /Due today: \$20\.00/);
-assert.match(text(recoveryUi), /Wallet balance applied: 5/);
-assert.match(text(recoveryUi), /Visa •••• 4242/);
-find(recoveryUi, node => node.props?.children === "Pay now").props.onClick();
-await Promise.resolve();
-assert.equal(paidMethod, "card");
-assert.equal(paymentCompleted, 1);
-find(recoveryUi, node => node.props?.children === "Close").props.onClick();
-assert.equal(recoveryClosed, 1);
-const missingMethod = mount(recovery.RecoveryDialog, { accountId: "a", planName: "Plus", onClose() {}, onComplete() {} }).render();
-assert.equal(find(missingMethod, node => node.props?.children === "Pay now").props.disabled, true);
-assert.equal(find(missingMethod, node => node.props?.children === "Add payment method").type, "button");
+const recoveryAssertions = assertReleaseOwner("subscription-recovery-dialog");
 
 assertReleaseOwner("subscription-cancellation-dialog", [/^\/\/ @ts-nocheck/m, /export \{/]);
 assertReleaseOwner("credit-reload-dialog-host", [/^\/\/ @ts-nocheck/m, /export \{/]);
 
-console.log("subscription billing lifecycle cluster tests passed");
+console.log(`subscription billing lifecycle cluster tests passed with ${recoveryAssertions + 6} release assertions`);

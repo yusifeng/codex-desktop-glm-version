@@ -1,520 +1,1267 @@
-// subscription-onboarding —— 根据账户、路由与实验状态承载订阅升级导览。
-// 原版：app/webview/assets/subscription-onboarding-bdae6e918350.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as queriesChunk from "@rchunk/queries";
-import * as contentChunk from "@rchunk/subscription-onboarding-content";
-
-void runtimeChunk;
-const {
-  $3: initializeRuntimeLazy,
-  I3: getJsxRuntime,
-  Ih: Dialog,
-  K2: initializeSharedComponents,
-  e6: getReactRuntime,
-  n4: useIntl,
-} = appSharedChunk;
-const { _L: useQuery } = appSharedChunk;
-const {
-  Gzt: isSubscriptionOnboardingSuppressed,
-  N6t: useAuthenticatedAccount,
-  i_n: useRouterLocation,
-  lfn: useExperimentContext,
-  o_n: useRouterNavigate,
-  rfn: getExperiment,
-} = appInitialChunk;
-const { i: initializeSubscriptionQueries, n: subscriptionAccountQueryOptions } =
-  queriesChunk;
-const {
-  a: markStudentOnboardingShown,
-  d: CheckoutThemeFrame,
-  g: proMobileFeatureIds,
-  h: proDesktopFeatureIds,
-  l: Student2026Tour,
-  n: shouldShowStudentOnboarding,
-  p: ProTour,
-  r: consumePendingStudentOnboarding,
-  s: StudentTour,
-  t: initializeSubscriptionOnboardingContent,
-  v: PlusTour,
-} = contentChunk;
-
-type JsxRuntime = import("@rchunk/app-shared").JsxRuntime;
-type ReactRuntime = import("@rchunk/app-shared").ReactRuntime;
-
-interface LocationState {
-  hash: string;
-  pathname: string;
-  search: string;
-  state: unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  HQ as r,
+  HX as i,
+  I3 as a,
+  Ih as o,
+  JQ as s,
+  K2 as c,
+  LX as l,
+  QI as u,
+  VQ as d,
+  ZI as f,
+  _L as p,
+  a$ as m,
+  c$ as h,
+  cw as g,
+  dg as _,
+  e6 as v,
+  fg as y,
+  gL as b,
+  h4 as x,
+  if as S,
+  lw as C,
+  m4 as w,
+  n$ as T,
+  n4 as E,
+  o$ as D,
+  qQ as O,
+  rf as k,
+  s$ as A,
+  t$ as j,
+  x_ as M,
+  y_ as N,
+  zh as P,
+} from "@rchunk/app-shared";
+import {
+  $9t as ee,
+  $Bt as F,
+  Bfn as I,
+  CFt as L,
+  Dft as R,
+  Gzt as z,
+  Het as B,
+  Jet as V,
+  LBt as H,
+  M6t as U,
+  M9 as W,
+  N6t as G,
+  N9 as te,
+  Q9t as K,
+  Qgn as q,
+  SFt as J,
+  Vzt as ne,
+  Yet as re,
+  b6t as ie,
+  bFt as Y,
+  cJt as ae,
+  i_n as X,
+  ifn as oe,
+  kft as se,
+  lfn as ce,
+  o_n as Z,
+  ofn as le,
+  pIt as ue,
+  rJt as de,
+  rfn as fe,
+  sxt as pe,
+  ugn as me,
+  xFt as he,
+  xpn as ge,
+  y6t as _e,
+  yFt as Q,
+  ypn as ve,
+} from "@rchunk/app-initial";
+import { i as ye, n as be } from "@rchunk/queries";
+import {
+  a as xe,
+  d as Se,
+  g as Ce,
+  h as we,
+  l as Te,
+  n as Ee,
+  p as De,
+  r as Oe,
+  s as ke,
+  t as Ae,
+  v as je,
+} from "@rchunk/subscription-onboarding-content";
+function Me(e) {
+  return e.includes(`Windows NT`) || e.includes(`Windows_NT`)
+    ? `windows`
+    : e.includes(`Mac OS X`) && !/iPad|iPhone|iPod/.test(e)
+      ? `macos`
+      : null;
 }
-
-interface SubscriptionDiscount extends Record<string, unknown> {
-  promo_campaign_id?: string;
-}
-
-interface SubscriptionAccount extends Record<string, unknown> {
-  account_id: string;
-  plan_type?: string;
-  structure?: string;
-}
-
-interface SubscriptionAccountResult extends Record<string, unknown> {
-  account?: SubscriptionAccount | null;
-  can_access_with_session?: boolean;
-  entitlement?: {
-    discount?: SubscriptionDiscount | null;
-    has_active_subscription?: boolean;
-  } | null;
-}
-
-interface StudentAccount {
-  accountUserId: string;
-  discount?: SubscriptionDiscount | null;
-  id: string;
-  isPaidPlus: boolean;
-}
-
-interface OnboardingAction {
-  action?: string;
-  pageId: string;
-  [key: string]: unknown;
-}
-
-interface HomeCandidate {
-  content: unknown;
-  id: "subscription-onboarding";
-  isEligible: boolean;
-  isLoading: boolean;
-  trackVisibility: boolean;
-}
-
-type RenderCandidates = (candidates: HomeCandidate[]) => unknown;
-
-interface SubscriptionOnboardingProps {
-  canCreateImage?: boolean;
-  canPresent: boolean;
-  canStartConversation: boolean;
-  homeCandidates?: (renderCandidates: RenderCandidates) => unknown;
-  onAction?(event: OnboardingAction): void;
-  onClosed?(): void;
-  onCreateImage?(): void;
-  onInteraction?(event: OnboardingAction): void;
-  onOpenFileDialog?(): void;
-  onPresented?(): void;
-  onSelectIntelligence?(level: "pro" | "standard"): void;
-  onStartConversation?(
-    initialStage: string,
-    onComplete: () => void,
-  ): Promise<unknown> | unknown;
-  onStartSite?(): void;
-  onStartVoice?(): void;
-  renderCandidates: RenderCandidates;
-}
-
-interface SubscriptionOnboardingFrameProps {
-  children: unknown;
-  closeButtonClassName?: string;
-  descriptionId?: string;
-  onCloseComplete?(): void;
-  onOpenChange(open: boolean): void;
-  open: boolean;
-  titleId?: string;
-}
-
-interface ConversationalOnboardingProps {
-  canStart: boolean;
-  initialStage: string;
-  onStart: NonNullable<SubscriptionOnboardingProps["onStartConversation"]>;
-}
-
-interface StudentOnboardingHostProps extends SubscriptionOnboardingProps {
-  account: StudentAccount;
-  automatic: boolean;
-}
-
-interface PlanOnboardingProps extends SubscriptionOnboardingProps {
-  hasPaidSubscription: boolean;
-  plan: "plus" | "pro";
-}
-
-const MAC_ARM_URL =
-  "https://persistent.oaistatic.com/codex-app-prod/ChatGPT.dmg";
-const MAC_X64_URL =
-  "https://persistent.oaistatic.com/codex-app-prod/ChatGPT-latest-x64.dmg";
-const WINDOWS_URL =
-  "https://get.microsoft.com/installer/download/9PLM9XGG6VKS?cid=website_cta_psi";
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let initialized = false;
-function initializeSubscriptionOnboarding(): void {
-  if (initialized) return;
-  initializeRuntimeLazy();
-  initializeSharedComponents();
-  initializeSubscriptionQueries();
-  initializeSubscriptionOnboardingContent();
-  React = getReactRuntime();
-  jsx = getJsxRuntime();
-  initialized = true;
-}
-
-function platformFromUserAgent(userAgent: string): "macos" | "windows" | null {
-  if (userAgent.includes("Windows NT") || userAgent.includes("Windows_NT"))
-    return "windows";
-  if (userAgent.includes("Mac OS X") && !/iPad|iPhone|iPod/.test(userAgent))
-    return "macos";
-  return null;
-}
-function downloadForPlatform(
-  platform: "macos" | "windows" | null,
-  architecture?: string | null,
-): { type: string; url?: string } {
-  if (platform === "windows") return { type: "download_url", url: WINDOWS_URL };
-  if (platform !== "macos") return { type: "unavailable" };
-  switch (architecture?.toLowerCase()) {
-    case "apple_silicon":
-    case "arm":
-    case "arm64":
-    case "aarch64":
-      return { type: "download_url", url: MAC_ARM_URL };
-    case "x64":
-    case "x86":
-    case "x86_64":
-    case "amd64":
-      return { type: "download_url", url: MAC_X64_URL };
-    default:
-      return { type: "mac_download_options" };
-  }
-}
-async function detectDownload(): Promise<{ type: string; url?: string }> {
-  const nav = navigator as Navigator & {
-    userAgentData?: {
-      getHighEntropyValues(keys: string[]): Promise<{ architecture?: string }>;
-    };
-  };
-  const platform = platformFromUserAgent(nav.userAgent);
-  if (platform !== "macos" || nav.userAgentData?.getHighEntropyValues == null)
-    return downloadForPlatform(platform);
-  try {
-    const values = await nav.userAgentData.getHighEntropyValues([
-      "architecture",
-    ]);
-    return downloadForPlatform(platform, values.architecture);
-  } catch {
-    return downloadForPlatform(platform);
-  }
-}
-
-function SubscriptionOnboardingFrame({
-  children,
-  closeButtonClassName,
-  descriptionId,
-  onCloseComplete,
-  onOpenChange,
-  open,
-  titleId,
-}: SubscriptionOnboardingFrameProps): unknown {
-  const intl = useIntl();
-  return jsx.jsx(Dialog, {
-    open,
-    onOpenChange,
-    onCloseComplete,
-    unstyledContent: true,
-    showDialogClose: false,
-    contentPosition: "anchored",
-    contentClassName:
-      "max-h-[calc(100dvh-16px)] w-[calc(100vw-16px)] max-w-[480px] overflow-hidden rounded-2xl shadow-elevation-03",
-    contentProps: {
-      "aria-labelledby": titleId,
-      "aria-describedby": descriptionId,
-    },
-    children: jsx.jsxs(CheckoutThemeFrame, {
-      className: "max-h-[calc(100dvh-16px)] overflow-y-auto",
-      children: [
-        jsx.jsx("button", {
-          type: "button",
-          className:
-            closeButtonClassName ??
-            "absolute end-1.5 top-1.5 z-10 flex size-8 items-center justify-center rounded-full",
-          "aria-label":
-            intl.formatMessage({
-              id: "codex.dialog.closeButton",
-              defaultMessage: "Close dialog",
-              description:
-                "Accessible label for the button that closes a dialog",
-            }) ?? "Close dialog",
-          onClick: () => onOpenChange(false),
-          children: "×",
-        }),
-        children,
-      ],
-    }),
-  });
-}
-
-function addCandidate(
-  props: SubscriptionOnboardingProps,
-  candidate: HomeCandidate,
-): unknown {
-  const append = (existing: HomeCandidate[]) =>
-    props.renderCandidates([...existing, candidate]);
-  return props.homeCandidates == null
-    ? append([])
-    : props.homeCandidates(append);
-}
-function renderEmpty(props: SubscriptionOnboardingProps): unknown {
-  return props.homeCandidates == null
-    ? props.renderCandidates([])
-    : props.homeCandidates(props.renderCandidates);
-}
-
-function useLocation(): LocationState {
-  return (
-    useRouterLocation() ?? {
-      pathname: window.location?.pathname ?? "/",
-      search: window.location?.search ?? "",
-      hash: window.location?.hash ?? "",
-      state: null,
+function Ne(e, t) {
+  if (e === `windows`) return { type: `download_url`, url: ze };
+  if (e === `macos`)
+    switch (t?.toLowerCase()) {
+      case `apple_silicon`:
+      case `arm`:
+      case `arm64`:
+      case `aarch64`:
+        return { type: `download_url`, url: Ie };
+      case `x64`:
+      case `x86`:
+      case `x86_64`:
+      case `amd64`:
+        return { type: `download_url`, url: Le };
+      default:
+        return { type: `mac_download_options` };
     }
+  return { type: `unavailable` };
+}
+async function Pe(e) {
+  let t = Me(e.userAgent);
+  if (t !== `macos` || e.userAgentData?.getHighEntropyValues == null) return Ne(t, null);
+  try {
+    let { architecture: n } = await e.userAgentData.getHighEntropyValues([`architecture`]);
+    return Ne(t, n ?? null);
+  } catch {
+    return Ne(t, null);
+  }
+}
+function Fe(e) {
+  switch (e) {
+    case Re:
+      return { platform: `macos`, destination: `mac_universal_installer` };
+    case Ie:
+      return { platform: `macos`, destination: `mac_arm64` };
+    case Le:
+      return { platform: `macos`, destination: `mac_x64` };
+    case ze:
+      return { platform: `windows`, destination: `windows` };
+    default:
+      return null;
+  }
+}
+var Ie, Le, Re, ze;
+function Be() {
+  return (Be = e(() => {
+    ((Ie = `https://persistent.oaistatic.com/codex-app-prod/ChatGPT.dmg`),
+      (Le = `https://persistent.oaistatic.com/codex-app-prod/ChatGPT-latest-x64.dmg`),
+      (Re = `https://persistent.oaistatic.com/codex-app-prod/ChatGPTInstaller.dmg`),
+      (ze = `https://get.microsoft.com/installer/download/9PLM9XGG6VKS?cid=website_cta_psi`));
+  }))();
+}
+var Ve, He;
+function Ue() {
+  return (Ue = e(() => {
+    ((Ve = `_overlay_9urpw_2`), (He = { overlay: Ve }));
+  }))();
+}
+function We(e) {
+  let t = (0, Ge.c)(75),
+    {
+      open: n,
+      onOpenChange: i,
+      onCloseComplete: a,
+      onPresented: s,
+      titleId: c,
+      descriptionId: l,
+      closeButtonClassName: u,
+      children: d,
+    } = e,
+    f = E(),
+    p = M(),
+    m = y(),
+    h = te(`(min-width: 640px)`),
+    _ = te(`(prefers-reduced-motion: reduce)`),
+    v = r(),
+    b = T(0),
+    x = (0, Ke.useRef)(null),
+    S = (0, Ke.useRef)(null),
+    C = (0, Ke.useRef)(!1),
+    k;
+  t[0] === _ ? (k = t[1]) : ((k = _ ? { duration: 0 } : Je), (t[0] = _), (t[1] = k));
+  let j = k,
+    N,
+    P;
+  (t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((N = () => () => {
+        S.current?.stop();
+      }),
+      (P = []),
+      (t[2] = N),
+      (t[3] = P))
+    : ((N = t[2]), (P = t[3])),
+    (0, Ke.useEffect)(N, P));
+  let ee;
+  t[4] !== h || t[5] !== b || t[6] !== i || t[7] !== j
+    ? ((ee = async () => {
+        C.current ||
+          ((C.current = !0),
+          !h &&
+            x.current != null &&
+            ((S.current = O(b, x.current.offsetHeight, j)), await S.current),
+          i(!1));
+      }),
+      (t[4] = h),
+      (t[5] = b),
+      (t[6] = i),
+      (t[7] = j),
+      (t[8] = ee))
+    : (ee = t[8]);
+  let F = ee,
+    I;
+  t[9] === p
+    ? (I = t[10])
+    : ((I = (e) => {
+        let { x: t, y: n } = e;
+        return { x: t / p, y: n / p };
+      }),
+      (t[9] = p),
+      (t[10] = I));
+  let L;
+  t[11] === F
+    ? (L = t[12])
+    : ((L = (e) => {
+        e || F();
+      }),
+      (t[11] = F),
+      (t[12] = L));
+  let R = h
+      ? `left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-2xl`
+      : `bottom-2 left-1/2 -translate-x-1/2 rounded-[36px_36px_55px_55px]`,
+    z;
+  t[13] === R
+    ? (z = t[14])
+    : ((z = w(
+        `max-h-[calc(100dvh-16px)] w-[calc(100vw-16px)] max-w-[480px] overflow-hidden shadow-elevation-03`,
+        R,
+      )),
+      (t[13] = R),
+      (t[14] = z));
+  let B;
+  t[15] !== s || t[16] !== c
+    ? ((B = (e) => {
+        ((C.current = !1),
+          e.preventDefault(),
+          document.getElementById(c)?.focus({ preventScroll: !0 }),
+          s());
+      }),
+      (t[15] = s),
+      (t[16] = c),
+      (t[17] = B))
+    : (B = t[17]);
+  let V;
+  t[18] === a ? (V = t[19]) : ((V = () => a()), (t[18] = a), (t[19] = V));
+  let H;
+  t[20] !== l || t[21] !== V || t[22] !== B || t[23] !== c
+    ? ((H = {
+        asChild: !0,
+        "aria-labelledby": c,
+        "aria-describedby": l,
+        onOpenAutoFocus: B,
+        onCloseAutoFocus: V,
+      }),
+      (t[20] = l),
+      (t[21] = V),
+      (t[22] = B),
+      (t[23] = c),
+      (t[24] = H))
+    : (H = t[24]);
+  let U;
+  t[25] !== h || t[26] !== _
+    ? ((U = !_ && (h ? { opacity: 0 } : { y: `100%` })), (t[25] = h), (t[26] = _), (t[27] = U))
+    : (U = t[27]);
+  let W;
+  t[28] === h ? (W = t[29]) : ((W = h ? { opacity: 1 } : { y: 0 }), (t[28] = h), (t[29] = W));
+  let G;
+  t[30] !== h || t[31] !== b
+    ? ((G = h ? void 0 : { y: b }), (t[30] = h), (t[31] = b), (t[32] = G))
+    : (G = t[32]);
+  let K = !h && `y`,
+    q;
+  t[33] === Symbol.for(`react.memo_cache_sentinel`) ? ((q = { top: 0 }), (t[33] = q)) : (q = t[33]);
+  let J;
+  t[34] !== h || t[35] !== v
+    ? ((J = (e) => {
+        !h &&
+          e.isPrimary &&
+          !(e.target instanceof Element && e.target.closest(`button,a,input,select,textarea`)) &&
+          v.start(e);
+      }),
+      (t[34] = h),
+      (t[35] = v),
+      (t[36] = J))
+    : (J = t[36]);
+  let ne;
+  t[37] !== F || t[38] !== b || t[39] !== j
+    ? ((ne = (e, t) => {
+        b.get() > (x.current?.offsetHeight ?? 0) / 2 || t.velocity.y > 500
+          ? F()
+          : (S.current = O(b, 0, j));
+      }),
+      (t[37] = F),
+      (t[38] = b),
+      (t[39] = j),
+      (t[40] = ne))
+    : (ne = t[40]);
+  let re = !!m,
+    ie;
+  t[41] === F
+    ? (ie = t[42])
+    : ((ie = () => {
+        F();
+      }),
+      (t[41] = F),
+      (t[42] = ie));
+  let Y;
+  t[43] === f
+    ? (Y = t[44])
+    : ((Y = f.formatMessage({
+        id: `codex.dialog.closeButton`,
+        defaultMessage: `Close dialog`,
+        description: `Accessible label for the button that closes a dialog`,
+      })),
+      (t[43] = f),
+      (t[44] = Y));
+  let ae = u ?? `max-sm:bg-token-bg-tertiary`,
+    X;
+  t[45] === ae
+    ? (X = t[46])
+    : ((X = w(
+        `absolute end-1.5 top-1.5 z-10 flex size-8 items-center justify-center rounded-full max-sm:end-5 max-sm:top-5 max-sm:size-7`,
+        ae,
+      )),
+      (t[45] = ae),
+      (t[46] = X));
+  let oe;
+  t[47] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((oe = (0, qe.jsx)(g, {})), (t[47] = oe))
+    : (oe = t[47]);
+  let se;
+  t[48] !== ie || t[49] !== Y || t[50] !== X
+    ? ((se = (0, qe.jsx)(`button`, {
+        type: `button`,
+        onClick: ie,
+        "aria-label": Y,
+        className: X,
+        children: oe,
+      })),
+      (t[48] = ie),
+      (t[49] = Y),
+      (t[50] = X),
+      (t[51] = se))
+    : (se = t[51]);
+  let ce;
+  t[52] !== d || t[53] !== re || t[54] !== se
+    ? ((ce = (0, qe.jsxs)(Se, {
+        isDarkMode: re,
+        className: `max-h-[calc(100dvh-16px)] overflow-y-auto`,
+        children: [se, d],
+      })),
+      (t[52] = d),
+      (t[53] = re),
+      (t[54] = se),
+      (t[55] = ce))
+    : (ce = t[55]);
+  let Z;
+  t[56] !== v ||
+  t[57] !== U ||
+  t[58] !== W ||
+  t[59] !== G ||
+  t[60] !== K ||
+  t[61] !== J ||
+  t[62] !== ne ||
+  t[63] !== ce ||
+  t[64] !== j
+    ? ((Z = (0, qe.jsx)(D.div, {
+        ref: x,
+        initial: U,
+        animate: W,
+        transition: j,
+        style: G,
+        drag: K,
+        dragControls: v,
+        dragConstraints: q,
+        dragElastic: 0,
+        dragListener: !1,
+        dragMomentum: !1,
+        onPointerDown: J,
+        onDragEnd: ne,
+        children: ce,
+      })),
+      (t[56] = v),
+      (t[57] = U),
+      (t[58] = W),
+      (t[59] = G),
+      (t[60] = K),
+      (t[61] = J),
+      (t[62] = ne),
+      (t[63] = ce),
+      (t[64] = j),
+      (t[65] = Z))
+    : (Z = t[65]);
+  let le;
+  t[66] !== n || t[67] !== H || t[68] !== Z || t[69] !== L || t[70] !== z
+    ? ((le = (0, qe.jsx)(o, {
+        open: n,
+        onOpenChange: L,
+        unstyledContent: !0,
+        showDialogClose: !1,
+        contentPosition: `anchored`,
+        overlayClassName: He.overlay,
+        contentClassName: z,
+        contentProps: H,
+        children: Z,
+      })),
+      (t[66] = n),
+      (t[67] = H),
+      (t[68] = Z),
+      (t[69] = L),
+      (t[70] = z),
+      (t[71] = le))
+    : (le = t[71]);
+  let ue;
+  return (
+    t[72] !== le || t[73] !== I
+      ? ((ue = (0, qe.jsx)(A, { transformPagePoint: I, children: le })),
+        (t[72] = le),
+        (t[73] = I),
+        (t[74] = ue))
+      : (ue = t[74]),
+    ue
   );
 }
-function useNavigate(): (
-  destination: string | Pick<LocationState, "hash" | "pathname" | "search">,
-  options?: { replace?: boolean; state?: unknown },
-) => void {
-  return useRouterNavigate();
+var Ge, Ke, qe, Je;
+function Ye() {
+  return (Ye = e(() => {
+    ((Ge = t()),
+      Ae(),
+      x(),
+      s(),
+      m(),
+      h(),
+      d(),
+      j(),
+      (Ke = v()),
+      c(),
+      N(),
+      P(),
+      C(),
+      W(),
+      _(),
+      Ue(),
+      (qe = a()),
+      (Je = { type: `spring`, stiffness: 350, damping: 28, mass: 0.65 }));
+  }))();
 }
-function experiment(id: string): {
-  get<Value>(key: string, fallback: Value): Value;
-} {
-  const context = useExperimentContext();
-  return getExperiment(context, id);
-}
-
-function ConversationalOnboarding({
-  canStart,
-  initialStage,
-  onStart,
-}: ConversationalOnboardingProps): null {
-  const started = React.useRef(false);
-  const location = useLocation();
-  const navigate = useNavigate();
-  React.useEffect(() => {
-    if (!canStart || started.current) return;
-    started.current = true;
-    Promise.resolve(
-      onStart(initialStage, () =>
-        navigate(
-          { pathname: location.pathname, search: "", hash: "" },
-          { replace: true, state: location.state },
-        ),
-      ),
-    ).catch(() => {});
-  }, [canStart]);
-  return null;
-}
-
-function StudentOnboardingHost(props: StudentOnboardingHostProps): unknown {
-  const [open, setOpen] = React.useState(true);
-  const pendingAction = React.useRef(null as string | null);
-  const location = useLocation();
-  const navigate = useNavigate();
-  const automatic =
-    props.automatic || consumePendingStudentOnboarding(props.account);
-  const showModern = experiment("2272277762").get<boolean>("enabled", false);
-  const common = {
-    Frame: SubscriptionOnboardingFrame,
-    direction: "ltr",
-    isScreenAtLeastSm: true,
-    open,
-    onOpenChange: setOpen,
-    onAction: (event: OnboardingAction) => {
-      pendingAction.current = event.pageId;
-    },
-    onInteraction: (event: OnboardingAction) => {
-      if (event.action === "step_viewed") {
-        markStudentOnboardingShown(props.account);
-        props.onPresented?.();
-      }
-      props.onInteraction?.(event);
-    },
-    onCloseComplete: () => {
-      props.onClosed?.();
-      navigate(
-        { pathname: location.pathname, search: "", hash: "" },
-        { replace: true, state: location.state },
-      );
-      const action = pendingAction.current;
-      pendingAction.current = null;
-      if (action === "plugins") navigate("/plugins");
-      else if (action === "work")
-        props.onStartConversation?.("welcome", () => {});
-      else if (action === "sites") props.onStartSite?.();
-      else if (action === "images") props.onCreateImage?.();
-      else if (action === "voice") props.onStartVoice?.();
-    },
-  };
-  if (!automatic) return null;
-  return showModern
-    ? jsx.jsx(Student2026Tour, {
-        ...common,
-        showPluginsAction: true,
-        showWorkAction: props.canStartConversation,
-        showSitesAction: props.onStartSite != null,
-        showVoiceAction: props.onStartVoice != null,
-      })
-    : jsx.jsx(StudentTour, {
-        ...common,
-        showWorkAction: props.canStartConversation,
-        showFilesAction: props.onOpenFileDialog != null,
-        showImagesAction: props.canCreateImage,
-        showVoiceAction: props.onStartVoice != null,
-      });
-}
-
-function PlanOnboarding(props: PlanOnboardingProps): unknown {
-  const [open, setOpen] = React.useState(true);
-  const pendingAction = React.useRef(null as string | null);
-  const navigate = useNavigate();
-  const plan = props.plan;
-  const proEnabled =
-    experiment("1895559448").get<"carousel_v1" | "off">(
-      "onboarding_variant",
-      "off",
-    ) === "carousel_v1";
-  const plusConfig = experiment("3081805378");
-  const plusVariant = plusConfig.get<
-    | "carousel_v1"
-    | "conversational_personalized"
-    | "conversational_static"
-    | "off"
-  >("carousel_onboarding_variant", "off");
-  const conversational =
-    plan === "plus" &&
-    props.hasPaidSubscription &&
-    (plusVariant === "conversational_static" ||
-      plusVariant === "conversational_personalized") &&
-    plusConfig.get<boolean>("enabled", false);
-  const eligible = plan === "pro" ? proEnabled : plusVariant !== "off";
-  const common = {
-    Frame: SubscriptionOnboardingFrame,
-    direction: "ltr",
-    isScreenAtLeastSm: true,
-    open,
-    onOpenChange: setOpen,
-    onAction: (event: OnboardingAction) => {
-      pendingAction.current = event.pageId;
-      props.onAction?.(event);
-    },
-    onInteraction: props.onInteraction,
-    onCloseComplete: () => {
-      const action = pendingAction.current;
-      pendingAction.current = null;
-      if (action === "intelligence")
-        props.onSelectIntelligence?.(plan === "pro" ? "pro" : "standard");
-      else if (action === "images") props.onCreateImage?.();
-      else if (action === "personalization") navigate("/plugins");
-      else if (action === "voice") props.onStartVoice?.();
-      props.onClosed?.();
-    },
-  };
-  const contentNode = conversational
-    ? jsx.jsx(ConversationalOnboarding, {
-        canStart: props.canStartConversation,
-        initialStage: plusConfig.get<string>("web_initial_stage", "welcome"),
-        onStart: props.onStartConversation,
-      })
-    : plan === "plus"
-      ? jsx.jsx(PlusTour, common)
-      : jsx.jsx(ProTour, {
-          ...common,
-          featurePageIds:
-            platformFromUserAgent(navigator.userAgent) == null
-              ? proMobileFeatureIds
-              : proDesktopFeatureIds,
-          canStartVoice: props.onStartVoice != null,
-          canStartWork: props.canStartConversation,
-        });
-  return addCandidate(props, {
-    id: "subscription-onboarding",
-    isEligible: eligible,
-    isLoading: false,
-    content: eligible ? contentNode : null,
-    trackVisibility: true,
-  });
-}
-
-function SubscriptionOnboarding(props: SubscriptionOnboardingProps): unknown {
-  initializeSubscriptionOnboarding();
-  const auth = useAuthenticatedAccount();
-  const accountId = auth.accountId ?? "";
-  const queryOptions = {
-    ...subscriptionAccountQueryOptions<SubscriptionAccountResult>(accountId),
-    staleTime: 0,
-    enabled: auth.accountId != null,
-  };
-  const query = useQuery<SubscriptionAccountResult>(queryOptions);
-  const result = query.data;
-  const account = result?.account;
-  const location = useLocation();
-  const isStudentAccount = {
-    id: account?.account_id ?? "",
-    accountUserId: auth.userId ?? "",
-    isPaidPlus:
-      account?.structure === "personal" &&
-      account?.plan_type === "plus" &&
-      result?.entitlement?.has_active_subscription === true,
-    discount: result?.entitlement?.discount,
-  };
-  const automaticStudent =
-    (location.search === "" || location.search === "?refresh_account=true") &&
-    shouldShowStudentOnboarding(isStudentAccount);
-  const campaignStudent =
-    (location.search === "?refresh_account=true&campaign=students_2026" ||
-      location.search === "?campaign=students_2026") &&
-    location.hash === "#plus_onboarding";
-  const student =
-    isStudentAccount.isPaidPlus && (automaticStudent || campaignStudent);
-  const plan = location.hash === "#plus_onboarding" ? "plus" : "pro";
-  const routeEligible =
-    location.search === "" || location.search === "?refresh_account=true";
-  const validPlan =
-    plan === "plus"
-      ? account?.plan_type === "plus"
-      : account?.plan_type === "pro" || account?.plan_type === "prolite";
-  const ready =
-    !query.isPending &&
-    !query.isError &&
-    result?.can_access_with_session !== false &&
-    auth.userId != null &&
-    account?.account_id === auth.accountId &&
-    account?.structure === "personal" &&
-    props.canPresent &&
-    !isSubscriptionOnboardingSuppressed();
-
-  if (!ready || (!student && !(routeEligible && validPlan)))
-    return renderEmpty(props);
-  if (student)
-    return addCandidate(props, {
-      id: "subscription-onboarding",
-      isEligible: true,
-      isLoading: false,
-      trackVisibility: true,
-      content: jsx.jsx(StudentOnboardingHost, {
-        ...props,
-        account: isStudentAccount,
-        automatic: automaticStudent,
+function Xe(e) {
+  let t = (0, et.c)(13),
+    { canStart: n, initialStage: r, onStart: i } = e,
+    a = l(f),
+    o = X(),
+    s = Z(),
+    c = (0, $.useRef)(!1),
+    u;
+  t[0] !== n || t[1] !== r || t[2] !== o || t[3] !== s || t[4] !== i
+    ? ((u = () => {
+        n &&
+          !c.current &&
+          ((c.current = !0),
+          i(r, () => {
+            s({ pathname: o.pathname, search: ``, hash: `` }, { replace: !0, state: o.state });
+          }).catch(Ze));
       }),
-    });
-  return jsx.jsx(PlanOnboarding, {
-    ...props,
-    plan,
-    hasPaidSubscription: result?.entitlement?.has_active_subscription === true,
-  });
+      (t[0] = n),
+      (t[1] = r),
+      (t[2] = o),
+      (t[3] = s),
+      (t[4] = i),
+      (t[5] = u))
+    : (u = t[5]);
+  let d = (0, $.useEffectEvent)(u),
+    p,
+    m;
+  (t[6] === a
+    ? ((p = t[7]), (m = t[8]))
+    : ((p = () => {
+        V(a, `chat`);
+      }),
+      (m = [a]),
+      (t[6] = a),
+      (t[7] = p),
+      (t[8] = m)),
+    (0, $.useEffect)(p, m));
+  let h;
+  t[9] === d
+    ? (h = t[10])
+    : ((h = () => {
+        d();
+      }),
+      (t[9] = d),
+      (t[10] = h));
+  let g;
+  return (
+    t[11] === n ? (g = t[12]) : ((g = [n]), (t[11] = n), (t[12] = g)),
+    (0, $.useEffect)(h, g),
+    null
+  );
 }
-
-initializeSubscriptionOnboarding();
-export { SubscriptionOnboarding };
+function Ze() {}
+function Qe(e) {
+  let t = (0, et.c)(53),
+    {
+      account: n,
+      automatic: r,
+      onCreateImage: a,
+      canCreateImage: o,
+      onStartVoice: s,
+      onOpenFileDialog: c,
+      onStartSite: u,
+      onPrefill: d,
+      onPresented: m,
+      onClosed: h,
+    } = e,
+    g = l(f),
+    _ = E(),
+    v = X(),
+    y = Z(),
+    b = le(`2272277762`),
+    x = te(`(min-width: 640px)`),
+    S;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((S =
+        !/Android|iPhone|iPad|iPod/i.test(navigator.userAgent) &&
+        !(/Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1)),
+      (t[0] = S))
+    : (S = t[0]);
+  let C = S,
+    w = i(re),
+    T;
+  t[1] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((T = { hostId: me }), (t[1] = T))
+    : (T = t[1]);
+  let D = ie(T),
+    O;
+  t[2] !== n.accountUserId || t[3] !== n.id
+    ? ((O = [`student-onboarding-handoff`, n.id, n.accountUserId]),
+      (t[2] = n.accountUserId),
+      (t[3] = n.id),
+      (t[4] = O))
+    : (O = t[4]);
+  let k;
+  t[5] !== n || t[6] !== r
+    ? ((k = () => r || Oe(n)), (t[5] = n), (t[6] = r), (t[7] = k))
+    : (k = t[7]);
+  let A;
+  t[8] !== O || t[9] !== k
+    ? ((A = {
+        queryKey: O,
+        queryFn: k,
+        staleTime: 1 / 0,
+        gcTime: 0,
+        retry: !1,
+        refetchOnWindowFocus: !1,
+        refetchOnReconnect: !1,
+      }),
+      (t[8] = O),
+      (t[9] = k),
+      (t[10] = A))
+    : (A = t[10]);
+  let { data: j } = p(A),
+    [M, N] = (0, $.useState)(!0),
+    P = (0, $.useRef)(!1),
+    F = (0, $.useRef)(null),
+    I;
+  t[11] !== v.pathname || t[12] !== v.state || t[13] !== y
+    ? ((I = () => {
+        y({ pathname: v.pathname, search: ``, hash: `` }, { replace: !0, state: v.state });
+      }),
+      (t[11] = v.pathname),
+      (t[12] = v.state),
+      (t[13] = y),
+      (t[14] = I))
+    : (I = t[14]);
+  let L = (0, $.useEffectEvent)(I),
+    R;
+  t[15] !== L || t[16] !== j
+    ? ((R = () => {
+        j === !1 && L();
+      }),
+      (t[15] = L),
+      (t[16] = j),
+      (t[17] = R))
+    : (R = t[17]);
+  let z;
+  (t[18] === j ? (z = t[19]) : ((z = [j]), (t[18] = j), (t[19] = z)), (0, $.useEffect)(R, z));
+  let B;
+  t[20] !== D ||
+  t[21] !== _ ||
+  t[22] !== v.pathname ||
+  t[23] !== v.state ||
+  t[24] !== y ||
+  t[25] !== h ||
+  t[26] !== a ||
+  t[27] !== d ||
+  t[28] !== u ||
+  t[29] !== s ||
+  t[30] !== g
+    ? ((B = () => {
+        h();
+        let e = F.current;
+        switch (
+          ((F.current = null),
+          y({ pathname: v.pathname, search: ``, hash: `` }, { replace: !0, state: v.state }),
+          e)
+        ) {
+          case `plugins`:
+            D && y(`/plugins`);
+            return;
+          case `work`:
+            g.get(re)
+              ? V(g, `work`)
+              : C &&
+                d(
+                  _.formatMessage({
+                    id: `chatgpt.students.back_to_school_2026.onboarding.work.fallback_prompt`,
+                    defaultMessage: `Help me plan a presentation about ...`,
+                    description: `Prefilled normal-chat prompt after a college student selects Try ChatGPT Work from the 2026 student Plus onboarding carousel when ChatGPT Work is temporarily unavailable. It gives the student an actionable school-project starting point without implying access to the Work product.`,
+                  }),
+                  `chat`,
+                );
+            return;
+          case `sites`:
+            u?.() !== !0 &&
+              C &&
+              d(
+                _.formatMessage({
+                  id: `chatgpt.students.back_to_school_2026.onboarding.sites.fallback_prompt`,
+                  defaultMessage: `Help me plan a website about ...`,
+                  description: `Prefilled normal-chat prompt after a college student selects Build a site from the 2026 student Plus onboarding carousel when the ChatGPT Sites website-building tool is unavailable. It asks ChatGPT to help plan a website without selecting or implying access to the Sites tool.`,
+                }),
+                `chat`,
+              );
+            return;
+          case `images`:
+            a();
+            return;
+          case `voice`:
+            s?.();
+            return;
+          case `files`:
+          case null:
+            return;
+        }
+      }),
+      (t[20] = D),
+      (t[21] = _),
+      (t[22] = v.pathname),
+      (t[23] = v.state),
+      (t[24] = y),
+      (t[25] = h),
+      (t[26] = a),
+      (t[27] = d),
+      (t[28] = u),
+      (t[29] = s),
+      (t[30] = g),
+      (t[31] = B))
+    : (B = t[31]);
+  let H = B,
+    U;
+  t[32] !== n || t[33] !== m || t[34] !== g
+    ? ((U = (e) => {
+        (!P.current && e.action === `step_viewed` && ((P.current = !0), xe(n), m()),
+          ge(g, he, {
+            action: nt[e.action],
+            step: rt[e.pageId],
+            entryPoint: Y.CHATGPT_SUBSCRIPTION_ONBOARDING_ENTRY_POINT_STUDENTS_2026,
+            stepPosition: ee(e.pageIndex + 1),
+            presentedSteps: e.presentedPageIds.map($e),
+          }));
+      }),
+      (t[32] = n),
+      (t[33] = m),
+      (t[34] = g),
+      (t[35] = U))
+    : (U = t[35]);
+  let W = U,
+    G;
+  t[36] === _.locale ? (G = t[37]) : ((G = pe(_.locale)), (t[36] = _.locale), (t[37] = G));
+  let K;
+  t[38] !== H || t[39] !== W || t[40] !== x || t[41] !== M || t[42] !== G
+    ? ((K = {
+        Frame: We,
+        isScreenAtLeastSm: x,
+        direction: G,
+        open: M,
+        onOpenChange: N,
+        onCloseComplete: H,
+        onInteraction: W,
+      }),
+      (t[38] = H),
+      (t[39] = W),
+      (t[40] = x),
+      (t[41] = M),
+      (t[42] = G),
+      (t[43] = K))
+    : (K = t[43]);
+  let q = K;
+  if (j !== !0) return null;
+  let J;
+  return (
+    t[44] !== o ||
+    t[45] !== D ||
+    t[46] !== w ||
+    t[47] !== q ||
+    t[48] !== c ||
+    t[49] !== u ||
+    t[50] !== s ||
+    t[51] !== b
+      ? ((J = b
+          ? (0, tt.jsx)(Te, {
+              ...q,
+              showPluginsAction: D,
+              showWorkAction: C || w,
+              showSitesAction: C || u != null,
+              showVoiceAction: s != null,
+              onAction: (e) => {
+                F.current = e;
+              },
+            })
+          : (0, tt.jsx)(ke, {
+              ...q,
+              showWorkAction: w,
+              showFilesAction: c != null,
+              showImagesAction: o,
+              showVoiceAction: s != null,
+              onAction: (e) => {
+                e === `files` ? c?.() : (F.current = e);
+              },
+            })),
+        (t[44] = o),
+        (t[45] = D),
+        (t[46] = w),
+        (t[47] = q),
+        (t[48] = c),
+        (t[49] = u),
+        (t[50] = s),
+        (t[51] = b),
+        (t[52] = J))
+      : (J = t[52]),
+    J
+  );
+}
+function $e(e) {
+  return rt[e];
+}
+var et, $, tt, nt, rt;
+function it() {
+  return (it = e(() => {
+    ((et = t()),
+      Ae(),
+      K(),
+      ue(),
+      b(),
+      n(),
+      ($ = v()),
+      c(),
+      q(),
+      B(),
+      Ye(),
+      _e(),
+      W(),
+      ve(),
+      u(),
+      I(),
+      oe(),
+      (tt = a()),
+      (nt = {
+        step_viewed: Q.CHATGPT_SUBSCRIPTION_ONBOARDING_ACTION_STEP_VIEWED,
+        continue_tapped: Q.CHATGPT_SUBSCRIPTION_ONBOARDING_ACTION_CONTINUE_TAPPED,
+        try_feature_tapped: Q.CHATGPT_SUBSCRIPTION_ONBOARDING_ACTION_TRY_FEATURE_TAPPED,
+        close_tapped: Q.CHATGPT_SUBSCRIPTION_ONBOARDING_ACTION_CLOSE_TAPPED,
+        completed: Q.CHATGPT_SUBSCRIPTION_ONBOARDING_ACTION_COMPLETED,
+      }),
+      (rt = {
+        welcome: J.CHATGPT_SUBSCRIPTION_ONBOARDING_STEP_WELCOME,
+        files: J.CHATGPT_SUBSCRIPTION_ONBOARDING_STEP_FILES,
+        images: J.CHATGPT_SUBSCRIPTION_ONBOARDING_STEP_IMAGE_GENERATION,
+        plugins: J.CHATGPT_SUBSCRIPTION_ONBOARDING_STEP_PLUGINS,
+        work: J.CHATGPT_SUBSCRIPTION_ONBOARDING_STEP_WORK,
+        sites: J.CHATGPT_SUBSCRIPTION_ONBOARDING_STEP_SITES,
+        voice: J.CHATGPT_SUBSCRIPTION_ONBOARDING_STEP_VOICE,
+      }));
+  }))();
+}
+function at(e) {
+  let t = (0, dt.c)(32),
+    n = G(),
+    r = n.accountId ?? ``,
+    i;
+  t[0] === r ? (i = t[1]) : ((i = be(r)), (t[0] = r), (t[1] = i));
+  let a = n.accountId != null,
+    o;
+  t[2] !== i || t[3] !== a
+    ? ((o = { ...i, staleTime: 0, enabled: a }), (t[2] = i), (t[3] = a), (t[4] = o))
+    : (o = t[4]);
+  let { data: s, isPending: c, isError: l } = p(o),
+    u = X(),
+    [d, f] = (0, ft.useState)(null),
+    m = `${n.userId}:${n.accountId}`,
+    h = z(),
+    g = s?.account,
+    _ = u.search === `` || u.search === `?refresh_account=true`,
+    v =
+      u.search === `?refresh_account=true&campaign=students_2026` ||
+      u.search === `?campaign=students_2026`,
+    y = g?.account_id ?? ``,
+    b = n.userId ?? ``,
+    x =
+      g?.structure === `personal` &&
+      g.plan_type === `plus` &&
+      s?.entitlement.has_active_subscription === !0,
+    S = s?.entitlement.discount,
+    C,
+    w;
+  t[5] !== u.hash ||
+  t[6] !== u.search ||
+  t[7] !== _ ||
+  t[8] !== y ||
+  t[9] !== b ||
+  t[10] !== x ||
+  t[11] !== S
+    ? ((C = { id: y, accountUserId: b, isPaidPlus: x, discount: S }),
+      (w =
+        _ &&
+        (u.hash === `` ||
+          (u.hash === `#plus_onboarding` && u.search === `?refresh_account=true`)) &&
+        Ee(C)),
+      (t[5] = u.hash),
+      (t[6] = u.search),
+      (t[7] = _),
+      (t[8] = y),
+      (t[9] = b),
+      (t[10] = x),
+      (t[11] = S),
+      (t[12] = C),
+      (t[13] = w))
+    : ((C = t[12]), (w = t[13]));
+  let T = w,
+    E = C.isPaidPlus && (d === m || T || (v && u.hash === `#plus_onboarding`)),
+    D = u.hash === `#plus_onboarding` ? `plus` : `pro`;
+  if (!(
+    !c &&
+    !l &&
+    s?.can_access_with_session !== !1 &&
+    n.userId != null &&
+    g?.account_id === n.accountId &&
+    g?.structure === `personal` &&
+    ((E && d === m) || (e.canPresent && !h)) &&
+    (E ||
+      (_ &&
+        (u.hash === `#plus_onboarding` || u.hash === `#pro_onboarding`) &&
+        (D === `plus`
+          ? g.plan_type === `plus`
+          : g.plan_type === `pro` || g.plan_type === `prolite`)))
+  )) {
+    let n;
+    return (
+      t[14] !== e.homeCandidates || t[15] !== e.renderCandidates
+        ? ((n =
+            e.homeCandidates == null
+              ? e.renderCandidates([])
+              : e.homeCandidates(e.renderCandidates)),
+          (t[14] = e.homeCandidates),
+          (t[15] = e.renderCandidates),
+          (t[16] = n))
+        : (n = t[16]),
+      n
+    );
+  }
+  if (E) {
+    let r;
+    t[17] !== g.account_id ||
+    t[18] !== n.userId ||
+    t[19] !== T ||
+    t[20] !== e ||
+    t[21] !== C ||
+    t[22] !== m
+      ? ((r = (t) =>
+          e.renderCandidates([
+            ...t,
+            {
+              id: `subscription-onboarding`,
+              isEligible: !0,
+              isLoading: !1,
+              trackVisibility: !0,
+              content: (0, pt.jsx)(
+                Qe,
+                {
+                  ...e,
+                  account: C,
+                  automatic: T,
+                  onPresented: () => f(m),
+                  onClosed: () => f(null),
+                },
+                `${n.userId}:${g.account_id}`,
+              ),
+            },
+          ])),
+        (t[17] = g.account_id),
+        (t[18] = n.userId),
+        (t[19] = T),
+        (t[20] = e),
+        (t[21] = C),
+        (t[22] = m),
+        (t[23] = r))
+      : (r = t[23]);
+    let i = r,
+      a;
+    return (
+      t[24] !== e.homeCandidates || t[25] !== i
+        ? ((a = e.homeCandidates == null ? i([]) : e.homeCandidates(i)),
+          (t[24] = e.homeCandidates),
+          (t[25] = i),
+          (t[26] = a))
+        : (a = t[26]),
+      a
+    );
+  }
+  let O = `${n.userId}:${g.account_id}:${D}`,
+    k = s?.entitlement.has_active_subscription === !0,
+    A;
+  return (
+    t[27] !== D || t[28] !== e || t[29] !== k || t[30] !== O
+      ? ((A = (0, pt.jsx)(ot, { ...e, plan: D, hasPaidSubscription: k }, O)),
+        (t[27] = D),
+        (t[28] = e),
+        (t[29] = k),
+        (t[30] = O),
+        (t[31] = A))
+      : (A = t[31]),
+    A
+  );
+}
+function ot(e) {
+  let t = (0, dt.c)(57),
+    {
+      renderCandidates: n,
+      homeCandidates: r,
+      onSelectIntelligence: a,
+      onCreateImage: o,
+      onStartVoice: s,
+      onStartConversation: c,
+      canStartConversation: u,
+      hasPaidSubscription: d,
+      plan: m,
+    } = e,
+    h = l(f),
+    g = ce(),
+    _ = E(),
+    v = X(),
+    y = Z(),
+    b = i(re),
+    x = te(`(min-width: 640px)`),
+    [C, w] = (0, ft.useState)(!0),
+    T = S(),
+    D = (0, ft.useRef)(!1),
+    O;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((O = /Macintosh/.test(navigator.userAgent) && navigator.maxTouchPoints > 1), (t[0] = O))
+    : (O = t[0]);
+  let k = O,
+    A;
+  t[1] !== x || t[2] !== m
+    ? ((A = m === `pro` && x && !k && Me(navigator.userAgent) != null),
+      (t[1] = x),
+      (t[2] = m),
+      (t[3] = A))
+    : (A = t[3]);
+  let j = A,
+    M;
+  t[4] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((M = [`subscription-onboarding`, `codex-app-download`]), (t[4] = M))
+    : (M = t[4]);
+  let N;
+  t[5] === j
+    ? (N = t[6])
+    : ((N = { queryKey: M, queryFn: ut, enabled: j, staleTime: 1 / 0 }), (t[5] = j), (t[6] = N));
+  let { data: P } = p(N),
+    F = (0, ft.useRef)(null),
+    I;
+  if (
+    t[7] !== u ||
+    t[8] !== b ||
+    t[9] !== P ||
+    t[10] !== d ||
+    t[11] !== r ||
+    t[12] !== _.locale ||
+    t[13] !== T ||
+    t[14] !== x ||
+    t[15] !== v ||
+    t[16] !== y ||
+    t[17] !== o ||
+    t[18] !== a ||
+    t[19] !== c ||
+    t[20] !== s ||
+    t[21] !== C ||
+    t[22] !== m ||
+    t[23] !== n ||
+    t[24] !== h ||
+    t[25] !== j ||
+    t[26] !== g
+  ) {
+    let e,
+      i = !1,
+      l = `welcome`;
+    if (m === `pro`) {
+      let n;
+      (t[28] === g
+        ? (n = t[29])
+        : ((n = fe(g, `1895559448`).get(`onboarding_variant`, `off`)), (t[28] = g), (t[29] = n)),
+        (e = n === `carousel_v1`));
+    } else if (fe(g, `823322201`).get(`enabled`, !1)) {
+      let t = fe(g, `3081805378`),
+        n = t.get(`carousel_onboarding_variant`, `off`);
+      ((i =
+        d &&
+        (n === `conversational_static` || n === `conversational_personalized`) &&
+        t.get(`enabled`, !1)),
+        (l = t.get(`web_initial_stage`, `welcome`)),
+        (e =
+          i ||
+          (n !== `off` && n !== `conversational_static` && n !== `conversational_personalized`)));
+    } else e = !1;
+    let f;
+    t[30] !== m || t[31] !== h
+      ? ((f = (e) => {
+          ge(h, he, {
+            action: mt[e.action],
+            step: ht[e.pageId],
+            entryPoint: Y.CHATGPT_SUBSCRIPTION_ONBOARDING_ENTRY_POINT_ACCOUNT_PLAN_TRANSITION,
+            stepPosition: ee(e.pageIndex + 1),
+            presentedSteps: e.presentedPageIds.map(lt),
+            ...(m === `pro` ? { variant: L.CHATGPT_SUBSCRIPTION_ONBOARDING_VARIANT_PRO } : {}),
+          });
+        }),
+        (t[30] = m),
+        (t[31] = h),
+        (t[32] = f))
+      : (f = t[32]);
+    let p = f,
+      S;
+    t[33] !== P || t[34] !== T || t[35] !== h || t[36] !== j
+      ? ((S = (e) => {
+          let { action: t, pageId: n } = e;
+          if (t === `try_feature` && T()) {
+            if (n === `codex` && j && P?.type === `download_url`) {
+              ((D.current = se({
+                href: P.url,
+                initiator: `open_in_browser_bridge`,
+                openTarget: `external-browser`,
+                disposition: `new-tab`,
+              })),
+                H(h, `oai/apps/hasSeenCodexAppHomeBanner`).catch(ct));
+              let e = Fe(P.url);
+              e != null &&
+                de
+                  .safePost(`/codex/app-download-signal`, {
+                    requestBody: {
+                      client_event_id: crypto.randomUUID(),
+                      surface: `codex_app_download_button`,
+                      ...e,
+                      route_path: window.location.pathname,
+                    },
+                  })
+                  .catch(st);
+            }
+            F.current = n;
+          }
+        }),
+        (t[33] = P),
+        (t[34] = T),
+        (t[35] = h),
+        (t[36] = j),
+        (t[37] = S))
+      : (S = t[37]);
+    let E = S,
+      O;
+    t[38] !== T ||
+    t[39] !== v ||
+    t[40] !== y ||
+    t[41] !== o ||
+    t[42] !== a ||
+    t[43] !== s ||
+    t[44] !== m ||
+    t[45] !== h ||
+    t[46] !== j
+      ? ((O = () => {
+          if (!T()) return;
+          let e = F.current;
+          switch (
+            ((F.current = null),
+            y({ pathname: v.pathname, search: ``, hash: `` }, { replace: !0, state: v.state }),
+            e)
+          ) {
+            case `intelligence`:
+              a(m === `pro` ? `pro` : `standard`);
+              return;
+            case `images`:
+              o();
+              return;
+            case `personalization`:
+              y(`/plugins`);
+              return;
+            case `work`:
+              h.get(re) && V(h, `work`);
+              return;
+            case `voice`:
+              s?.();
+              return;
+            case `codex`:
+              j &&
+                !D.current &&
+                se({
+                  href: new URL(`/codex/open-app`, window.location.origin).href,
+                  initiator: `open_in_browser_bridge`,
+                });
+              return;
+            case null:
+              return;
+          }
+        }),
+        (t[38] = T),
+        (t[39] = v),
+        (t[40] = y),
+        (t[41] = o),
+        (t[42] = a),
+        (t[43] = s),
+        (t[44] = m),
+        (t[45] = h),
+        (t[46] = j),
+        (t[47] = O))
+      : (O = t[47]);
+    let k = O,
+      A;
+    t[48] === _.locale ? (A = t[49]) : ((A = pe(_.locale)), (t[48] = _.locale), (t[49] = A));
+    let M;
+    t[50] !== x || t[51] !== E || t[52] !== k || t[53] !== p || t[54] !== C || t[55] !== A
+      ? ((M = {
+          Frame: We,
+          isScreenAtLeastSm: x,
+          direction: A,
+          open: C,
+          onOpenChange: w,
+          onCloseComplete: k,
+          onAction: E,
+          onInteraction: p,
+        }),
+        (t[50] = x),
+        (t[51] = E),
+        (t[52] = k),
+        (t[53] = p),
+        (t[54] = C),
+        (t[55] = A),
+        (t[56] = M))
+      : (M = t[56]);
+    let N = M,
+      R;
+    R = i
+      ? (0, pt.jsx)(Xe, { canStart: u, initialStage: l, onStart: c })
+      : m === `plus`
+        ? (0, pt.jsx)(je, { ...N })
+        : (0, pt.jsx)(De, {
+            ...N,
+            featurePageIds: j ? we : Ce,
+            canStartVoice: s != null,
+            canStartWork: b,
+          });
+    let z = (t) =>
+      n([
+        ...t,
+        {
+          id: `subscription-onboarding`,
+          isEligible: e,
+          isLoading: !1,
+          content: e ? R : null,
+          trackVisibility: !0,
+        },
+      ]);
+    ((I = r == null ? z([]) : r(z)),
+      (t[7] = u),
+      (t[8] = b),
+      (t[9] = P),
+      (t[10] = d),
+      (t[11] = r),
+      (t[12] = _.locale),
+      (t[13] = T),
+      (t[14] = x),
+      (t[15] = v),
+      (t[16] = y),
+      (t[17] = o),
+      (t[18] = a),
+      (t[19] = c),
+      (t[20] = s),
+      (t[21] = C),
+      (t[22] = m),
+      (t[23] = n),
+      (t[24] = h),
+      (t[25] = j),
+      (t[26] = g),
+      (t[27] = I));
+  } else I = t[27];
+  return I;
+}
+function st() {}
+function ct() {}
+function lt(e) {
+  return ht[e];
+}
+function ut() {
+  return Pe(navigator);
+}
+var dt, ft, pt, mt, ht;
+function gt() {
+  return (gt = e(() => {
+    ((dt = t()),
+      Be(),
+      Ae(),
+      K(),
+      ue(),
+      b(),
+      n(),
+      (ft = v()),
+      c(),
+      q(),
+      U(),
+      F(),
+      ae(),
+      B(),
+      R(),
+      ne(),
+      ye(),
+      Ye(),
+      W(),
+      ve(),
+      u(),
+      oe(),
+      k(),
+      it(),
+      (pt = a()),
+      (mt = {
+        step_viewed: Q.CHATGPT_SUBSCRIPTION_ONBOARDING_ACTION_STEP_VIEWED,
+        continue_tapped: Q.CHATGPT_SUBSCRIPTION_ONBOARDING_ACTION_CONTINUE_TAPPED,
+        try_feature_tapped: Q.CHATGPT_SUBSCRIPTION_ONBOARDING_ACTION_TRY_FEATURE_TAPPED,
+        close_tapped: Q.CHATGPT_SUBSCRIPTION_ONBOARDING_ACTION_CLOSE_TAPPED,
+        completed: Q.CHATGPT_SUBSCRIPTION_ONBOARDING_ACTION_COMPLETED,
+      }),
+      (ht = {
+        welcome: J.CHATGPT_SUBSCRIPTION_ONBOARDING_STEP_WELCOME,
+        intelligence: J.CHATGPT_SUBSCRIPTION_ONBOARDING_STEP_INTELLIGENCE,
+        images: J.CHATGPT_SUBSCRIPTION_ONBOARDING_STEP_IMAGE_GENERATION,
+        personalization: J.CHATGPT_SUBSCRIPTION_ONBOARDING_STEP_PERSONALIZATION,
+        work: J.CHATGPT_SUBSCRIPTION_ONBOARDING_STEP_WORK,
+        codex: J.CHATGPT_SUBSCRIPTION_ONBOARDING_STEP_UNSPECIFIED,
+        voice: J.CHATGPT_SUBSCRIPTION_ONBOARDING_STEP_VOICE,
+      }));
+  }))();
+}
+gt();
+export { at as SubscriptionOnboarding };

@@ -1,224 +1,993 @@
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import * as primaryChunk from "@rchunk/app-primary";
-import * as connectModalChunk from "@rchunk/app-connect-modal";
-import type { JsxRuntime } from "@rchunk/app-shared";
-import { getPathBasename } from "../app-shared/runtime/get-path-basename";
-
-export type GoogleWorkspaceTarget = "document" | "presentation" | "spreadsheet";
-type Callable = (...args: unknown[]) => unknown;
-interface AppRecord { id: string; isAccessible?: boolean; isEnabled?: boolean; name?: string; pluginDisplayNames?: string[] }
-export interface GoogleDrivePlugin {
-  displayName?: string;
-  plugin: { enabled?: boolean; id: string; installed?: boolean; name?: string };
-  [key: string]: unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $h as n,
+  BX as r,
+  CL as i,
+  FX as a,
+  Fj as o,
+  G2 as s,
+  HI as ee,
+  HX as c,
+  I3 as l,
+  II as u,
+  If as d,
+  K2 as f,
+  LX as te,
+  Mj as ne,
+  NB as re,
+  Pj as p,
+  QI as ie,
+  Qh as ae,
+  RI as m,
+  SB as h,
+  SL as g,
+  Y2 as oe,
+  ZI as _,
+  fI as v,
+  jf as se,
+  lk as ce,
+  n4 as le,
+  pk as y,
+  wL as ue,
+} from "@rchunk/app-shared";
+import {
+  $2t as b,
+  Cpn as de,
+  D3t as fe,
+  Dft as x,
+  E3t as pe,
+  E4t as S,
+  G6t as me,
+  GEt as he,
+  HEt as ge,
+  L2 as C,
+  N2 as w,
+  N4t as _e,
+  Non as ve,
+  O3t as T,
+  P2 as ye,
+  Qgn as E,
+  Qln as D,
+  Rht as O,
+  Rwt as k,
+  T3t as A,
+  TDt as j,
+  U2 as be,
+  U3 as xe,
+  VEt as M,
+  Vwt as Se,
+  W6t as Ce,
+  Z$ as we,
+  _dn as N,
+  ait as Te,
+  b6t as Ee,
+  c4t as De,
+  e4t as Oe,
+  h4t as ke,
+  i4t as P,
+  ifn as Ae,
+  k3t as je,
+  kft as Me,
+  kht as Ne,
+  l4t as F,
+  nun as Pe,
+  o1 as Fe,
+  o4t as Ie,
+  o_n as Le,
+  ofn as Re,
+  ont as ze,
+  sit as I,
+  snt as L,
+  u4t as Be,
+  w3t as Ve,
+  wDt as He,
+  wft as Ue,
+  x3 as R,
+  y6t as z,
+  ydn as We,
+  ypn as Ge,
+} from "@rchunk/app-initial";
+import { Xh as Ke, Zh as qe } from "@rchunk/app-primary";
+import { n as Je, t as Ye } from "@rchunk/app-connect-modal";
+function Xe({ clickAction: e, clickSource: t, context: n, productLogger: r, resourceKind: i }) {
+  let a = Ze(i);
+  a != null &&
+    r.logProductEvent(p, {
+      threadId: n.threadId ?? void 0,
+      turnId: n.turnId ?? void 0,
+      inputMessageId: n.inputMessageId ?? void 0,
+      messageId: n.messageId ?? void 0,
+      resourceKind: a,
+      clickAction: e,
+      clickSource: t,
+    });
 }
-interface AnalyticsContext { inputMessageId?: string | null; messageId?: string | null; threadId?: string | null; turnId?: string | null }
-interface ProductLogger { logProductEvent(name: unknown, payload: Record<string, unknown>): void }
-interface UploadResult { connector_result: { _meta?: unknown; content?: unknown[]; isError?: boolean; structuredContent?: unknown } }
-interface BaseProps {
-  analyticsClickSource?: unknown; analyticsContext?: AnalyticsContext; getAnalyticsContext?(): AnalyticsContext | null;
-  handleConnectApp?(app: AppRecord): Promise<unknown> | unknown; hostId: string; iconSize?: string; isOpening?: boolean;
-  keepOpenWhileOpening?: boolean; onBeforeFileRead?(): Promise<boolean> | boolean; onCloseDropdown?(): void;
-  onOpeningChange(opening: boolean): void; targetType: GoogleWorkspaceTarget; title?: string;
-}
-interface PathProps extends BaseProps { cwd?: string; path: string }
-interface UploadProps extends BaseProps { readUploadFile(): Promise<{ bytes: Uint8Array; contentType: string; fileName: string }>; sourceId: string }
-type Props = PathProps | UploadProps;
-
-const shared = sharedChunk as unknown as Record<string, unknown>;
-const initial = initialChunk as unknown as Record<string, unknown>;
-const primary = primaryChunk as unknown as Record<string, unknown>;
-const connectModal = connectModalChunk as unknown as Record<string, unknown>;
-let jsx: JsxRuntime;
-let messages: Record<string, { defaultMessage: string; description: string; id: string }>;
-const GOOGLE_DRIVE_CONNECTOR_ID = "connector_5f3c8c41a1e54ad7a76272c89e2554fa";
-const GOOGLE_DRIVE_UPLOAD_PATH = "/wham/apps/google_drive/upload";
-const GOOGLE_URL = /https?:\/\/(?:docs|drive)\.google\.com\/[^\s"'<>),]+/i;
-
-function invoke<T>(value: unknown, ...args: unknown[]): T { return (value as Callable)(...args) as T; }
-function element(type: unknown, props: Record<string, unknown>): unknown { return jsx.jsx(type as never, props); }
-function fileName(path: string): string { return getPathBasename(path); }
-function extension(path: string): string { const name = fileName(path); const dot = name.lastIndexOf("."); return dot < 0 ? "" : name.slice(dot + 1).toLowerCase(); }
-function targetForPath(path: string): GoogleWorkspaceTarget | null {
-  switch (extension(path)) { case "docx": return "document"; case "xlsx": return "spreadsheet"; case "pptx": return "presentation"; default: return null; }
-}
-function normalized(value: string): string { return value.trim().toLowerCase().replace(/[^a-z0-9]+/g, "-"); }
-function googleApp(apps: AppRecord[]): AppRecord | null {
-  return apps.find((app) => app.id === GOOGLE_DRIVE_CONNECTOR_ID || [app.id, app.name, ...(app.pluginDisplayNames ?? [])].some((value) => value != null && normalized(value) === "google-drive")) ?? null;
-}
-function googleDriveReady(apps: AppRecord[]): boolean { const app = googleApp(apps); return app?.isAccessible === true && app.isEnabled === true; }
-function googlePlugin(plugins: GoogleDrivePlugin[]): GoogleDrivePlugin | null {
-  return plugins.find((plugin) => [plugin.plugin.id.split("@")[0], plugin.plugin.name, plugin.displayName].some((value) => value != null && normalized(value) === "google-drive")) ?? null;
-}
-function nextAction(apps: AppRecord[] | null | undefined, plugin: GoogleDrivePlugin | null):
-  | { kind: "upload" | "refresh" } | { kind: "installPlugin" | "enablePlugin"; plugin: GoogleDrivePlugin }
-  | { app: AppRecord; kind: "connectApp" | "openPluginDetail"; plugin?: GoogleDrivePlugin } {
-  if (apps != null && googleDriveReady(apps)) return { kind: "upload" };
-  if (plugin == null) return { kind: "refresh" };
-  if (!plugin.plugin.installed) return { kind: "installPlugin", plugin };
-  if (!plugin.plugin.enabled) return { kind: "enablePlugin", plugin };
-  if (apps == null) return { kind: "refresh" };
-  const app = googleApp(apps);
-  if (app == null) return { kind: "refresh" };
-  return app.isAccessible === true && app.isEnabled === false ? { app, kind: "openPluginDetail", plugin } : { app, kind: "connectApp" };
-}
-function resourceKind(target: GoogleWorkspaceTarget): unknown {
-  const kinds = (shared.Fj ?? {}) as Record<string, unknown>;
-  return (target === "document" ? kinds.CODEX_GOOGLE_WORKSPACE_RESOURCE_KIND_DOCUMENT : target === "spreadsheet" ? kinds.CODEX_GOOGLE_WORKSPACE_RESOURCE_KIND_SPREADSHEET : kinds.CODEX_GOOGLE_WORKSPACE_RESOURCE_KIND_PRESENTATION) ?? target;
-}
-function logDriveClick(input: { clickAction: unknown; clickSource: unknown; context: AnalyticsContext; productLogger: ProductLogger; resourceKind: GoogleWorkspaceTarget }): void {
-  input.productLogger.logProductEvent(shared.Pj ?? "google_workspace_open", { threadId: input.context.threadId ?? undefined, turnId: input.context.turnId ?? undefined,
-    inputMessageId: input.context.inputMessageId ?? undefined, messageId: input.context.messageId ?? undefined,
-    resourceKind: resourceKind(input.resourceKind), clickAction: input.clickAction, clickSource: input.clickSource });
-}
-function contentType(path: string): string {
-  switch (extension(path)) { case "docx": return "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
-    case "pptx": return "application/vnd.openxmlformats-officedocument.presentationml.presentation";
-    case "xlsx": return "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"; default: return "application/octet-stream"; }
-}
-function safeHeader(value: string): string { return value.replace(/[\r\n"]/g, "_"); }
-function joinBytes(parts: Uint8Array[]): Uint8Array { const result = new Uint8Array(parts.reduce((total, part) => total + part.length, 0)); let offset = 0; for (const part of parts) { result.set(part, offset); offset += part.length; } return result; }
-function multipart(input: { fileBytes: Uint8Array; filename: string; mimeType: string; title: string }): { body: Uint8Array; boundary: string } {
-  const boundary = `----codex-google-drive-${Math.random().toString(36).slice(2)}`;
-  const parts: Uint8Array[] = []; const text = (value: string) => parts.push(new TextEncoder().encode(value));
-  text(`--${boundary}\r\nContent-Disposition: form-data; name="arguments"\r\n\r\n${JSON.stringify({ title: input.title })}\r\n`);
-  text(`--${boundary}\r\nContent-Disposition: form-data; name="file"; filename="${safeHeader(input.filename)}"\r\nContent-Type: ${input.mimeType}\r\n\r\n`);
-  parts.push(input.fileBytes); text(`\r\n--${boundary}--\r\n`); return { body: joinBytes(parts), boundary };
-}
-class GoogleDriveConnectorAuthError extends Error { constructor() { super("Google Drive connector authentication is required."); this.name = "GoogleDriveConnectorAuthError"; } }
-function hasAuthFailure(result: UploadResult["connector_result"]): boolean {
-  if (typeof result._meta !== "object" || result._meta == null || Array.isArray(result._meta)) return false;
-  const apps = (result._meta as Record<string, unknown>)._codex_apps;
-  if (typeof apps !== "object" || apps == null || Array.isArray(apps)) return false;
-  const failure = (apps as Record<string, unknown>).connector_auth_failure;
-  return typeof failure === "object" && failure != null && !Array.isArray(failure) && (failure as Record<string, unknown>).is_auth_failure === true;
-}
-function extractGoogleUrl(value: unknown): string | null { return typeof value === "string" ? (value.match(GOOGLE_URL)?.[0]?.replace(/[.;:!?]+$/, "") ?? null) : null; }
-function resultUrl(result: UploadResult): string | null {
-  const structured = result.connector_result.structuredContent;
-  if (typeof structured === "object" && structured != null && !Array.isArray(structured)) {
-    const url = extractGoogleUrl((structured as Record<string, unknown>).url) ?? extractGoogleUrl((structured as Record<string, unknown>).webViewLink); if (url != null) return url;
+function Ze(e) {
+  switch (e) {
+    case `document`:
+      return o.CODEX_GOOGLE_WORKSPACE_RESOURCE_KIND_DOCUMENT;
+    case `spreadsheet`:
+      return o.CODEX_GOOGLE_WORKSPACE_RESOURCE_KIND_SPREADSHEET;
+    case `presentation`:
+      return o.CODEX_GOOGLE_WORKSPACE_RESOURCE_KIND_PRESENTATION;
+    default:
+      return null;
   }
-  for (const item of result.connector_result.content ?? []) if (typeof item === "object" && item != null && !Array.isArray(item) && (item as Record<string, unknown>).type === "text") {
-    const url = extractGoogleUrl((item as Record<string, unknown>).text); if (url != null) return url;
+}
+function B() {
+  return (B = e(() => {
+    v();
+  }))();
+}
+function V(e) {
+  switch (U(e)) {
+    case `docx`:
+      return `document`;
+    case `xlsx`:
+      return `spreadsheet`;
+    case `pptx`:
+      return `presentation`;
+    default:
+      return null;
+  }
+}
+function Qe(e) {
+  return (
+    e.find(
+      (e) =>
+        e.id === `connector_5f3c8c41a1e54ad7a76272c89e2554fa` ||
+        [e.id, e.name, ...e.pluginDisplayNames].some((e) => W(e) === `google-drive`),
+    ) ?? null
+  );
+}
+function $e(e) {
+  let t = Qe(e);
+  return t?.isAccessible === !0 && t.isEnabled;
+}
+function et(e) {
+  return (
+    e.find((e) =>
+      [e.plugin.id.split(`@`)[0], e.plugin.name, e.displayName].some(
+        (e) => e != null && W(e) === `google-drive`,
+      ),
+    ) ?? null
+  );
+}
+function tt({ apps: e, plugin: t }) {
+  if (e != null && $e(e)) return { kind: `upload` };
+  if (t == null) return { kind: `refresh` };
+  if (!t.plugin.installed) return { kind: `installPlugin`, plugin: t };
+  if (!t.plugin.enabled) return { kind: `enablePlugin`, plugin: t };
+  if (e == null) return { kind: `refresh` };
+  let n = Qe(e);
+  return n == null
+    ? { kind: `refresh` }
+    : n.isAccessible === !0 && n.isEnabled === !1
+      ? { app: n, kind: `openPluginDetail`, plugin: t }
+      : { app: n, kind: `connectApp` };
+}
+async function nt({ hostId: e, path: t, title: n }) {
+  if (V(t) == null) throw Error(q);
+  let r = await D(`read-file-binary`, { params: { hostId: e, path: t } });
+  if (r.contentsBase64 == null) throw Error(`File contents are unavailable.`);
+  return rt({ bytes: ve(r.contentsBase64), contentType: st(t), fileName: u(t), title: n });
+}
+async function rt({ bytes: e, contentType: t, fileName: n, title: r }) {
+  if (V(n) == null) throw Error(q);
+  let i = at({ fileBytes: e, filename: n, mimeType: t, title: r ?? n }),
+    a = await (
+      await N.getInstance().fetch(K, {
+        method: `POST`,
+        body: i.body,
+        headers: { "Content-Type": `multipart/form-data; boundary=${i.boundary}` },
+      })
+    ).json(),
+    o = a.connector_result;
+  if (ot(o)) throw new lt();
+  if (o.isError === !0) throw Error(`Google Drive could not open this file.`);
+  return a;
+}
+function it(e) {
+  let t = e.connector_result,
+    n = t.structuredContent;
+  if (typeof n == `object` && n && !Array.isArray(n)) {
+    let e = H(n.url) ?? H(n.webViewLink);
+    if (e != null) return e;
+  }
+  for (let e of t.content) {
+    if (typeof e != `object` || !e || Array.isArray(e) || e.type !== `text`) continue;
+    let t = H(e.text);
+    if (t != null) return t;
   }
   return null;
 }
-async function uploadBytes(input: { bytes: Uint8Array; contentType: string; fileName: string; title?: string }): Promise<UploadResult> {
-  if (targetForPath(input.fileName) == null) throw new Error("Unsupported file type. Expected one of: .docx, .pptx, .xlsx.");
-  const form = multipart({ fileBytes: input.bytes, filename: input.fileName, mimeType: input.contentType, title: input.title ?? input.fileName });
-  const client = (initial._dn as { getInstance(): { fetch(path: string, init: Record<string, unknown>): Promise<{ json(): Promise<UploadResult> }> } }).getInstance();
-  const result = await (await client.fetch(GOOGLE_DRIVE_UPLOAD_PATH, { method: "POST", body: form.body, headers: { "Content-Type": `multipart/form-data; boundary=${form.boundary}` } })).json();
-  if (hasAuthFailure(result.connector_result)) throw new GoogleDriveConnectorAuthError();
-  if (result.connector_result.isError === true) throw new Error("Google Drive could not open this file.");
-  return result;
+function at({ fileBytes: e, filename: t, mimeType: n, title: r }) {
+  let i = `----codex-google-drive-${Math.random().toString(36).slice(2)}`,
+    a = [],
+    o = (e) => {
+      a.push(new TextEncoder().encode(e));
+    };
+  return (
+    ((e, t) => {
+      o(`--${i}\r\nContent-Disposition: form-data; name="${ct(e)}"\r\n\r\n${t}\r\n`);
+    })(`arguments`, JSON.stringify({ title: r })),
+    o(
+      `--${i}\r\nContent-Disposition: form-data; name="file"; filename="${ct(t)}"\r\nContent-Type: ${n}\r\n\r\n`,
+    ),
+    a.push(e),
+    o(`\r\n--${i}--\r\n`),
+    { body: G(a), boundary: i }
+  );
 }
-async function uploadPath(input: { hostId: string; path: string; title?: string }): Promise<UploadResult> {
-  if (targetForPath(input.path) == null) throw new Error("Unsupported file type. Expected one of: .docx, .pptx, .xlsx.");
-  const response = await invoke<Promise<{ contentsBase64?: string }>>(initial.Qln, "read-file-binary", { params: { hostId: input.hostId, path: input.path } });
-  if (response.contentsBase64 == null) throw new Error("File contents are unavailable.");
-  return uploadBytes({ bytes: invoke<Uint8Array>(initial.Non, response.contentsBase64), contentType: contentType(input.path), fileName: fileName(input.path), title: input.title });
+function ot(e) {
+  let t = e._meta;
+  if (typeof t != `object` || !t || Array.isArray(t)) return !1;
+  let n = t._codex_apps;
+  if (typeof n != `object` || !n || Array.isArray(n)) return !1;
+  let r = n.connector_auth_failure;
+  return typeof r == `object` && !!r && !Array.isArray(r) && r.is_auth_failure === !0;
 }
-function appName(target: GoogleWorkspaceTarget): string { return target === "document" ? "Google Docs" : target === "spreadsheet" ? "Google Sheets" : "Google Slides"; }
-function targetLabel(target: GoogleWorkspaceTarget): string { return `Export to ${appName(target)}`; }
-
-function OpenInGoogleDriveMenuItem(input: Props | ({ path: string; targetType?: GoogleWorkspaceTarget } & Partial<BaseProps>)): unknown {
-  initialize();
-  const target = "path" in input ? targetForPath(input.path) : input.targetType;
-  if (target == null) return null;
-  if (input.hostId == null || input.onOpeningChange == null) return jsx.jsx("button", { type: "button", role: "menuitem", onClick: (input as { onOpen?(): void }).onOpen, children: targetLabel(target) });
-  return GoogleDriveMenuItem({ ...(input as Props), targetType: target });
+function H(e) {
+  return typeof e == `string`
+    ? ((e.match(J)?.[0] ?? null)?.replace(/[.;:!?]+$/, ``) ?? null)
+    : null;
 }
-
-function GoogleDriveMenuItem(props: Props): unknown {
-  const scope = invoke<{ get(signal: unknown, parameter?: unknown): unknown }>(shared.LX, initial.kht);
-  const productLogger = invoke<ProductLogger>(shared.HX, initial.Cpn);
-  const intl = invoke<{ formatMessage(descriptor: { defaultMessage: string; description?: string; id?: string }, values?: Record<string, unknown>): string }>(shared.n4);
-  const appsQuery = invoke<{ data?: AppRecord[]; hardRefetchAppsList(): Promise<AppRecord[]> }>(initial.GEt, { hostId: props.hostId });
-  const useNewLifecycle = invoke<boolean>(initial.ofn, "3350594701");
-  const pluginsQuery = invoke<{ availablePlugins?: GoogleDrivePlugin[]; refetch(): Promise<{ availablePlugins?: GoogleDrivePlugin[] }> }>(initial.N4t, props.hostId, undefined, { enabled: !useNewLifecycle });
-  const pluginAvailable = invoke<boolean>(initial.b6t, { hostId: props.hostId, enabled: useNewLifecycle });
-  const installedQuery = invoke<{ data?: GoogleDrivePlugin[]; refetch(): Promise<{ data?: GoogleDrivePlugin[] }> }>(initial.c4t, { hostId: props.hostId, roots: undefined, resolveActiveRoots: true, enabled: pluginAvailable });
-  const plugin = useNewLifecycle ? googlePlugin(installedQuery.data ?? []) : googlePlugin(pluginsQuery.availablePlugins ?? []);
-  const installation = invoke<{ installPlugin(plugin: GoogleDrivePlugin, options: Record<string, unknown>): void; status?: { pluginId?: string } }>(initial.U2);
-  const enablement = invoke<{ pendingPluginId?: string; setPluginEnabled(input: Record<string, unknown>): Promise<unknown> }>(initial.Vwt, { hostId: props.hostId });
-  const openPluginDetail = invoke<(plugin: GoogleDrivePlugin) => void>(initial.o_n);
-  const MenuItem = (shared.jf as { Item: unknown }).Item;
-  const currentApps = appsQuery.data;
-  const opening = props.isOpening === true;
-  const refreshPlugin = async (): Promise<GoogleDrivePlugin | null> => {
-    if (!useNewLifecycle) return googlePlugin((await pluginsQuery.refetch()).availablePlugins ?? []);
-    if (!pluginAvailable) return null;
-    return googlePlugin((await installedQuery.refetch()).data ?? []);
+function U(e) {
+  let t = u(e),
+    n = t.lastIndexOf(`.`);
+  return n < 0 ? `` : t.slice(n + 1).toLowerCase();
+}
+function W(e) {
+  return e
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, `-`);
+}
+function st(e) {
+  switch (U(e)) {
+    case `docx`:
+      return `application/vnd.openxmlformats-officedocument.wordprocessingml.document`;
+    case `pptx`:
+      return `application/vnd.openxmlformats-officedocument.presentationml.presentation`;
+    case `xlsx`:
+      return `application/vnd.openxmlformats-officedocument.spreadsheetml.sheet`;
+    default:
+      return `application/octet-stream`;
+  }
+}
+function ct(e) {
+  return e.replace(/[\r\n"]/g, `_`);
+}
+function G(e) {
+  let t = e.reduce((e, t) => e + t.length, 0),
+    n = new Uint8Array(t),
+    r = 0;
+  for (let t of e) (n.set(t, r), (r += t.length));
+  return n;
+}
+var lt, K, q, J;
+function Y() {
+  return (Y = e(() => {
+    (m(),
+      Pe(),
+      We(),
+      (lt = class extends Error {
+        constructor() {
+          (super(`Google Drive connector authentication is required.`),
+            (this.name = `GoogleDriveConnectorAuthError`));
+        }
+      }),
+      (K = `/wham/apps/google_drive/upload`),
+      (q = `Unsupported file type. Expected one of: .docx, .pptx, .xlsx.`),
+      (J = /https?:\/\/(?:docs|drive)\.google\.com\/[^\s"'<>),]+/i));
+  }))();
+}
+function X(e) {
+  let t = (0, Z.c)(5),
+    n;
+  t[0] === e ? (n = t[1]) : ((n = `path` in e ? V(e.path) : e.targetType), (t[0] = e), (t[1] = n));
+  let r = n;
+  if (r == null) return null;
+  let i;
+  return (
+    t[2] !== e || t[3] !== r
+      ? ((i = (0, Q.jsx)(ft, { ...e, targetType: r })), (t[2] = e), (t[3] = r), (t[4] = i))
+      : (i = t[4]),
+    i
+  );
+}
+function ut(e) {
+  let t = (0, Z.c)(13),
+    { app: n, hostId: r, onClose: a, onOAuthStarted: o } = e,
+    s = te(_),
+    ee = i(),
+    c = Re(`403472035`),
+    l;
+  t[0] === a
+    ? (l = t[1])
+    : ((l = (e) => {
+        e || a();
+      }),
+      (t[0] = a),
+      (t[1] = l));
+  let u;
+  t[2] !== r || t[3] !== ee || t[4] !== s || t[5] !== c
+    ? ((u = async () => {
+        await M({
+          scope: s,
+          accountId: Ce(s),
+          hostId: r,
+          queryClient: ee,
+          shouldUseNewAppLifecycle: c,
+        });
+      }),
+      (t[2] = r),
+      (t[3] = ee),
+      (t[4] = s),
+      (t[5] = c),
+      (t[6] = u))
+    : (u = t[6]);
+  let d;
+  return (
+    t[7] !== n || t[8] !== r || t[9] !== o || t[10] !== l || t[11] !== u
+      ? ((d = (0, Q.jsx)(Ye, {
+          app: n,
+          hostId: r,
+          onOpenChange: l,
+          onConnected: u,
+          onOAuthStarted: o,
+        })),
+        (t[7] = n),
+        (t[8] = r),
+        (t[9] = o),
+        (t[10] = l),
+        (t[11] = u),
+        (t[12] = d))
+      : (d = t[12]),
+    d
+  );
+}
+function dt() {
+  let e = (0, Z.c)(1),
+    t;
+  return (
+    e[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, Q.jsxs)(`span`, {
+          className: `pointer-events-auto inline-flex h-token-button-composer shrink-0 cursor-default items-center gap-1.5 text-base leading-[18px] text-secondary`,
+          role: `status`,
+          children: [
+            (0, Q.jsx)(ae, { className: `icon-s` }),
+            (0, Q.jsx)(oe, {
+              id: `connectedApps.googleDrive.openingStatus`,
+              defaultMessage: `Opening`,
+              description: `Status shown in place of the open button while exporting a file to a Google app`,
+            }),
+          ],
+        })),
+        (e[0] = t))
+      : (t = e[0]),
+    t
+  );
+}
+function ft(e) {
+  let t = (0, Z.c)(100),
+    n = te(Ne),
+    i = c(de),
+    {
+      analyticsClickSource: a,
+      analyticsContext: o,
+      getAnalyticsContext: s,
+      handleConnectApp: l,
+      hostId: u,
+      iconSize: d,
+      isOpening: f,
+      keepOpenWhileOpening: re,
+      onCloseDropdown: p,
+      onBeforeFileRead: ie,
+      onOpeningChange: m,
+      targetType: h,
+      title: g,
+    } = e,
+    _ = re !== void 0 && re,
+    v = le(),
+    ce = Le(),
+    ue;
+  t[0] === u ? (ue = t[1]) : ((ue = { hostId: u }), (t[0] = u), (t[1] = ue));
+  let { data: b, hardRefetchAppsList: fe } = he(ue),
+    x = Re(`3350594701`),
+    pe = !x,
+    S;
+  t[2] === pe ? (S = t[3]) : ((S = { enabled: pe }), (t[2] = pe), (t[3] = S));
+  let { availablePlugins: me, refetch: ge } = _e(u, void 0, S),
+    C;
+  t[4] !== u || t[5] !== x
+    ? ((C = { hostId: u, enabled: x }), (t[4] = u), (t[5] = x), (t[6] = C))
+    : (C = t[6]);
+  let w = Ee(C),
+    ve;
+  t[7] !== u || t[8] !== w
+    ? ((ve = { hostId: u, roots: void 0, resolveActiveRoots: !0, enabled: w }),
+      (t[7] = u),
+      (t[8] = w),
+      (t[9] = ve))
+    : (ve = t[9]);
+  let { data: T, refetch: ye } = De(ve),
+    E;
+  t[10] === T ? (E = t[11]) : ((E = T == null ? null : et(T)), (t[10] = T), (t[11] = E));
+  let D = E,
+    O = r(Be, u),
+    k,
+    A,
+    j,
+    M;
+  if (t[12] !== u || t[13] !== O) {
+    k = Ie(u);
+    let e = k || O === !0;
+    ((A = r),
+      (j = Oe),
+      (M = mt(u, e)),
+      (t[12] = u),
+      (t[13] = O),
+      (t[14] = k),
+      (t[15] = A),
+      (t[16] = j),
+      (t[17] = M));
+  } else ((k = t[14]), (A = t[15]), (j = t[16]), (M = t[17]));
+  let Ce = w && T != null && D == null && (k || O != null),
+    N;
+  t[18] === Ce ? (N = t[19]) : ((N = { enabled: Ce }), (t[18] = Ce), (t[19] = N));
+  let { data: P } = A(j, M, N),
+    { installPlugin: Ae, status: je } = be(),
+    F;
+  t[20] === u ? (F = t[21]) : ((F = { hostId: u }), (t[20] = u), (t[21] = F));
+  let { pendingPluginId: Pe, setPluginEnabled: Fe } = Se(F),
+    I;
+  t[22] !== me || t[23] !== P || t[24] !== D || t[25] !== x
+    ? ((I = x ? (D ?? (P == null ? null : ke(P))) : et(me)),
+      (t[22] = me),
+      (t[23] = P),
+      (t[24] = D),
+      (t[25] = x),
+      (t[26] = I))
+    : (I = t[26]);
+  let L = I,
+    Ve = Pe === L?.plugin.id,
+    R;
+  t[27] !== u ||
+  t[28] !== k ||
+  t[29] !== w ||
+  t[30] !== ge ||
+  t[31] !== ye ||
+  t[32] !== n ||
+  t[33] !== x
+    ? ((R = async () => {
+        if (!x) return et((await ge()).availablePlugins);
+        if (!w) return null;
+        let { data: e } = await ye(),
+          t = e == null ? null : et(e);
+        if (t != null) return t;
+        !k && n.get(Be, u) == null && (await n.query.getOrFetch(ze, u));
+        let r = await n.query.fetch(Oe, mt(u, k || n.get(Be, u) === !0)).catch(pt);
+        return r == null ? null : ke(r);
+      }),
+      (t[27] = u),
+      (t[28] = k),
+      (t[29] = w),
+      (t[30] = ge),
+      (t[31] = ye),
+      (t[32] = n),
+      (t[33] = x),
+      (t[34] = R))
+    : (R = t[34]);
+  let z = R,
+    We;
+  t[35] !== u || t[36] !== ce
+    ? ((We = (e) => {
+        ce(we(e, { hostId: u }));
+      }),
+      (t[35] = u),
+      (t[36] = ce),
+      (t[37] = We))
+    : (We = t[37]);
+  let Ge = We,
+    Ke;
+  t[38] !== u || t[39] !== Ae || t[40] !== z
+    ? ((Ke = (e) => {
+        Ae(e, {
+          hostId: u,
+          marketplaceAnalytics: qe.composer,
+          onSuccess: async () => {
+            await z();
+          },
+        });
+      }),
+      (t[38] = u),
+      (t[39] = Ae),
+      (t[40] = z),
+      (t[41] = Ke))
+    : (Ke = t[41]);
+  let Je = Ke,
+    Ye;
+  t[42] !== v || t[43] !== Je || t[44] !== n
+    ? ((Ye = (e) => {
+        let t = n.get(y).warning(v.formatMessage($.installRequired), {
+          primaryAction: {
+            label: v.formatMessage($.installAction),
+            onClick: () => {
+              (t.close(), Je(e));
+            },
+          },
+        });
+      }),
+      (t[42] = v),
+      (t[43] = Je),
+      (t[44] = n),
+      (t[45] = Ye))
+    : (Ye = t[45]);
+  let Ze = Ye,
+    B;
+  t[46] !== l || t[47] !== v || t[48] !== n
+    ? ((B = (e) => {
+        let t = n.get(y).warning(v.formatMessage($.authFailure), {
+          primaryAction: {
+            label: v.formatMessage($.connectAction),
+            onClick: async () => {
+              (t.close(), await l(e));
+            },
+          },
+        });
+      }),
+      (t[46] = l),
+      (t[47] = v),
+      (t[48] = n),
+      (t[49] = B))
+    : (B = t[49]);
+  let V = B,
+    at;
+  t[50] !== a ||
+  t[51] !== o ||
+  t[52] !== s ||
+  t[53] !== u ||
+  t[54] !== v ||
+  t[55] !== ie ||
+  t[56] !== i ||
+  t[57] !== e ||
+  t[58] !== n ||
+  t[59] !== h ||
+  t[60] !== g
+    ? ((at = async (t) => {
+        if (ie != null && (await ie()) === !1) return;
+        let r = s == null ? o : s();
+        Xe({
+          clickAction: ne.CODEX_GOOGLE_WORKSPACE_RESOURCE_CLICK_ACTION_UPLOAD_LOCAL_FILE,
+          clickSource: a,
+          context: {
+            threadId: r?.threadId ?? null,
+            turnId: r?.turnId ?? null,
+            inputMessageId: r?.inputMessageId ?? null,
+            messageId: r?.messageId ?? null,
+          },
+          productLogger: i,
+          resourceKind: h,
+        });
+        let c, l, d;
+        if (`path` in e) {
+          let t = e.cwd == null ? e.path : ee(e.cwd, e.path);
+          ((c = t), (l = t), (d = await nt({ hostId: u, path: t, title: g })));
+        } else {
+          let t = await e.readUploadFile();
+          ((c = e.sourceId), (l = t.fileName), (d = await rt({ ...t, title: g })));
+        }
+        let f = it(d);
+        if (f != null) {
+          let e = _t(h),
+            r = g?.trim(),
+            i = {
+              id: `google-drive-open:${h}:${c}`,
+              imageAttachments: [],
+              text: `The user uploaded ${r == null || r.length === 0 ? l : `${r} from ${l}`} to ${e}.\n${e} link: ${f}`,
+              title: `Opened in ${e}`,
+            };
+          (xe(n, (e) => {
+            let t = e.mcpAppModelContextAttachments.findIndex((e) => e.id === i.id);
+            if (t === -1) {
+              e.mcpAppModelContextAttachments.push(i);
+              return;
+            }
+            e.mcpAppModelContextAttachments[t] = i;
+          }),
+            Me({ disposition: t, href: f, initiator: `mcp_app_resource` }));
+          return;
+        }
+        n.get(y).success(
+          v.formatMessage(
+            {
+              id: `connectedApps.googleDrive.opened`,
+              defaultMessage: `Opened in {app}`,
+              description: `Toast shown after a file was opened in a connected Google app but no URL was returned.`,
+            },
+            { app: _t(h) },
+          ),
+        );
+      }),
+      (t[50] = a),
+      (t[51] = o),
+      (t[52] = s),
+      (t[53] = u),
+      (t[54] = v),
+      (t[55] = ie),
+      (t[56] = i),
+      (t[57] = e),
+      (t[58] = n),
+      (t[59] = h),
+      (t[60] = g),
+      (t[61] = at))
+    : (at = t[61]);
+  let ot = at,
+    H;
+  t[62] === Fe
+    ? (H = t[63])
+    : ((H = async (e) => {
+        try {
+          await Fe({ pluginDisplayName: He(e), pluginId: e.plugin.id, enabled: !0 });
+        } catch {
+          return;
+        }
+      }),
+      (t[62] = Fe),
+      (t[63] = H));
+  let U = H,
+    W;
+  t[64] !== b ||
+  t[65] !== U ||
+  t[66] !== L ||
+  t[67] !== fe ||
+  t[68] !== v ||
+  t[69] !== f ||
+  t[70] !== m ||
+  t[71] !== Ge ||
+  t[72] !== z ||
+  t[73] !== n ||
+  t[74] !== V ||
+  t[75] !== Ze ||
+  t[76] !== h ||
+  t[77] !== ot
+    ? ((W = async (e) => {
+        f ||
+          (m(!0),
+          await (async () => {
+            let t = b == null ? null : Qe(b);
+            try {
+              let r = tt({ apps: b, plugin: L });
+              switch (r.kind) {
+                case `upload`:
+                  await ot(e);
+                  return;
+                case `installPlugin`:
+                  Ze(r.plugin);
+                  return;
+                case `enablePlugin`:
+                  await U(r.plugin);
+                  return;
+                case `connectApp`:
+                  V(r.app);
+                  return;
+                case `openPluginDetail`:
+                  Ge(r.plugin);
+                  return;
+              }
+              let [i, a] = await Promise.all([fe(), z()]),
+                o = Qe(i);
+              if (((t = o), $e(i))) {
+                await ot(e);
+                return;
+              }
+              if (a?.plugin.installed !== !0) {
+                if (a != null) {
+                  Ze(a);
+                  return;
+                }
+                n.get(y).warning(v.formatMessage($.authFailure));
+                return;
+              }
+              if (!a.plugin.enabled) {
+                await U(a);
+                return;
+              }
+              if (o?.isAccessible === !0 && o.isEnabled === !1) {
+                Ge(a);
+                return;
+              }
+              if (o != null) {
+                V(o);
+                return;
+              }
+              n.get(y).warning(v.formatMessage($.authFailure));
+            } catch (e) {
+              e instanceof lt
+                ? t == null
+                  ? n.get(y).warning(v.formatMessage($.authFailure))
+                  : V(t)
+                : n
+                    .get(y)
+                    .danger(
+                      v.formatMessage(
+                        {
+                          id: `connectedApps.googleDrive.openFailed`,
+                          defaultMessage: `Could not open in {app}`,
+                          description: `Toast shown when opening a local file in a connected Google app fails.`,
+                        },
+                        { app: _t(h) },
+                      ),
+                      { errorAnalytics: { toastId: `connectedApps.googleDrive.openFailed` } },
+                    );
+            }
+          })().finally(() => {
+            m(!1);
+          }));
+      }),
+      (t[64] = b),
+      (t[65] = U),
+      (t[66] = L),
+      (t[67] = fe),
+      (t[68] = v),
+      (t[69] = f),
+      (t[70] = m),
+      (t[71] = Ge),
+      (t[72] = z),
+      (t[73] = n),
+      (t[74] = V),
+      (t[75] = Ze),
+      (t[76] = h),
+      (t[77] = ot),
+      (t[78] = W))
+    : (W = t[78]);
+  let st = W,
+    ct = f || je != null || Ve,
+    G;
+  t[79] !== f || t[80] !== h
+    ? ((G = f ? (0, Q.jsx)(ae, {}) : (0, Q.jsx)(gt, { targetType: h })),
+      (t[79] = f),
+      (t[80] = h),
+      (t[81] = G))
+    : (G = t[81]);
+  let K;
+  t[82] !== d || t[83] !== G
+    ? ((K = (0, Q.jsx)(Te, { size: d, children: G })), (t[82] = d), (t[83] = G), (t[84] = K))
+    : (K = t[84]);
+  let q, J;
+  t[85] !== _ || t[86] !== p || t[87] !== st
+    ? ((q = (e) => {
+        let t = Ue(e);
+        t != null &&
+          (e.preventDefault(),
+          e.stopPropagation(),
+          st(t).finally(() => {
+            _ && p?.();
+          }),
+          _ || p?.());
+      }),
+      (J = (e) => {
+        (_ && e.preventDefault(),
+          st().finally(() => {
+            _ && p?.();
+          }),
+          _ || p?.());
+      }),
+      (t[85] = _),
+      (t[86] = p),
+      (t[87] = st),
+      (t[88] = q),
+      (t[89] = J))
+    : ((q = t[88]), (J = t[89]));
+  let Y;
+  t[90] !== f || t[91] !== h
+    ? ((Y = f
+        ? (0, Q.jsx)(`span`, {
+            role: `status`,
+            children: (0, Q.jsx)(oe, {
+              id: `connectedApps.googleDrive.exporting`,
+              defaultMessage: `Exporting to {app}…`,
+              description: `Loading state in the Google export menu item while uploading an artifact`,
+              values: { app: _t(h) },
+            }),
+          })
+        : (0, Q.jsx)(ht, { targetType: h })),
+      (t[90] = f),
+      (t[91] = h),
+      (t[92] = Y))
+    : (Y = t[92]);
+  let X;
+  return (
+    t[93] !== f || t[94] !== ct || t[95] !== K || t[96] !== q || t[97] !== J || t[98] !== Y
+      ? ((X = (0, Q.jsx)(se.Item, {
+          "aria-busy": f,
+          disabled: ct,
+          leftIcon: K,
+          onClickCapture: q,
+          onSelect: J,
+          children: Y,
+        })),
+        (t[93] = f),
+        (t[94] = ct),
+        (t[95] = K),
+        (t[96] = q),
+        (t[97] = J),
+        (t[98] = Y),
+        (t[99] = X))
+      : (X = t[99]),
+    X
+  );
+}
+function pt() {
+  return null;
+}
+function mt(e, t) {
+  return {
+    hostId: e,
+    marketplacePath: null,
+    pluginName: t ? (w[`google-drive`] ?? null) : `google-drive`,
+    remoteMarketplaceName: t ? h : null,
+    localMarketplaceName: t ? null : re,
   };
-  const toast = scope.get(shared.pk) as { danger(message: string, options?: unknown): void; success(message: string): void; warning(message: string, options?: unknown): { close(): void } };
-  const warnInstall = (candidate: GoogleDrivePlugin) => { const notification = toast.warning(intl.formatMessage(messages.installRequired), { primaryAction: { label: intl.formatMessage(messages.installAction), onClick: () => { notification.close(); installation.installPlugin(candidate, { hostId: props.hostId, marketplaceAnalytics: primary.Zh, onSuccess: refreshPlugin }); } } }); };
-  const connect = async (app: AppRecord) => { if (props.handleConnectApp != null) await props.handleConnectApp(app); };
-  const warnConnect = (app: AppRecord) => { const notification = toast.warning(intl.formatMessage(messages.authFailure), { primaryAction: { label: intl.formatMessage(messages.connectAction), onClick: async () => { notification.close(); await connect(app); } } }); };
-  const upload = async (disposition?: unknown) => {
-    if (props.onBeforeFileRead != null && await props.onBeforeFileRead() === false) return;
-    const context = props.getAnalyticsContext?.() ?? props.analyticsContext ?? {};
-    logDriveClick({ clickAction: (shared.Mj as Record<string, unknown>).CODEX_GOOGLE_WORKSPACE_RESOURCE_CLICK_ACTION_UPLOAD_LOCAL_FILE,
-      clickSource: props.analyticsClickSource, context, productLogger, resourceKind: props.targetType });
-    let sourceId: string; let fileName: string; let result: UploadResult;
-    if ("path" in props) { const path = props.cwd == null ? props.path : invoke<string>(shared.HI, props.cwd, props.path); sourceId = path; fileName = path; result = await uploadPath({ hostId: props.hostId, path, title: props.title }); }
-    else { const file = await props.readUploadFile(); sourceId = props.sourceId; fileName = file.fileName; result = await uploadBytes({ ...file, title: props.title }); }
-    const url = resultUrl(result);
-    if (url != null) {
-      const displayName = appName(props.targetType); const title = props.title?.trim();
-      const attachment = { id: `google-drive-open:${props.targetType}:${sourceId}`, imageAttachments: [],
-        text: `The user uploaded ${title == null || title.length === 0 ? fileName : `${title} from ${fileName}`} to ${displayName}.\n${displayName} link: ${url}`, title: `Opened in ${displayName}` };
-      invoke(initial.U3, scope, (draft: { mcpAppModelContextAttachments: Array<{ id: string }> }) => { const index = draft.mcpAppModelContextAttachments.findIndex((item) => item.id === attachment.id); if (index < 0) draft.mcpAppModelContextAttachments.push(attachment); else draft.mcpAppModelContextAttachments[index] = attachment; });
-      invoke(initial.kft, { disposition, href: url, initiator: "mcp_app_resource" }); return;
+}
+function ht(e) {
+  let t = (0, Z.c)(3),
+    { targetType: n } = e;
+  switch (n) {
+    case `document`: {
+      let e;
+      return (
+        t[0] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Q.jsx)(oe, {
+              id: `connectedApps.googleDrive.openInDocs`,
+              defaultMessage: `Export to Google Docs`,
+              description: `Dropdown item for exporting a file to Google Docs`,
+            })),
+            (t[0] = e))
+          : (e = t[0]),
+        e
+      );
     }
-    toast.success(intl.formatMessage({ id: "connectedApps.googleDrive.opened", defaultMessage: "Opened in {app}" }, { app: appName(props.targetType) }));
-  };
-  const run = async (disposition?: unknown) => {
-    if (opening) return; props.onOpeningChange(true); let app = currentApps == null ? null : googleApp(currentApps);
-    try {
-      const action = nextAction(currentApps, plugin);
-      if (action.kind === "upload") return await upload(disposition);
-      if (action.kind === "installPlugin") return warnInstall(action.plugin);
-      if (action.kind === "enablePlugin") { await enablement.setPluginEnabled({ pluginDisplayName: action.plugin.displayName, pluginId: action.plugin.plugin.id, enabled: true }); return; }
-      if (action.kind === "connectApp") return await connect(action.app);
-      if (action.kind === "openPluginDetail") return openPluginDetail(action.plugin as GoogleDrivePlugin);
-      const [apps, refreshedPlugin] = await Promise.all([appsQuery.hardRefetchAppsList(), refreshPlugin()]); app = googleApp(apps);
-      if (googleDriveReady(apps)) return await upload(disposition);
-      if (refreshedPlugin?.plugin.installed !== true) return refreshedPlugin == null ? toast.warning(intl.formatMessage(messages.authFailure)) : warnInstall(refreshedPlugin);
-      if (!refreshedPlugin.plugin.enabled) { await enablement.setPluginEnabled({ pluginDisplayName: refreshedPlugin.displayName, pluginId: refreshedPlugin.plugin.id, enabled: true }); return; }
-      if (app?.isAccessible === true && app.isEnabled === false) return openPluginDetail(refreshedPlugin);
-      if (app != null) return await connect(app);
-      toast.warning(intl.formatMessage(messages.authFailure));
-    } catch (error) {
-      if (error instanceof GoogleDriveConnectorAuthError) { if (app == null) toast.warning(intl.formatMessage(messages.authFailure)); else warnConnect(app); }
-      else toast.danger(intl.formatMessage({ id: "connectedApps.googleDrive.openFailed", defaultMessage: "Could not open in {app}" }, { app: appName(props.targetType) }), { errorAnalytics: { toastId: "connectedApps.googleDrive.openFailed" } });
-    } finally { props.onOpeningChange(false); }
-  };
-  const disabled = opening || installation.status != null || enablement.pendingPluginId === plugin?.plugin.id;
-  const close = () => { if (!props.keepOpenWhileOpening) props.onCloseDropdown?.(); };
-  return element(MenuItem, { "aria-busy": opening, disabled, onClickCapture: (event: { preventDefault(): void; stopPropagation(): void }) => { const disposition = invoke(initial.wft, event); if (disposition != null) { event.preventDefault(); event.stopPropagation(); void run(disposition).finally(close); close(); } },
-    onSelect: () => { void run().finally(close); close(); }, children: opening ? `Exporting to ${appName(props.targetType)}…` : targetLabel(props.targetType) });
+    case `spreadsheet`: {
+      let e;
+      return (
+        t[1] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Q.jsx)(oe, {
+              id: `connectedApps.googleDrive.openInSheets`,
+              defaultMessage: `Export to Google Sheets`,
+              description: `Dropdown item for exporting a file to Google Sheets`,
+            })),
+            (t[1] = e))
+          : (e = t[1]),
+        e
+      );
+    }
+    case `presentation`: {
+      let e;
+      return (
+        t[2] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Q.jsx)(oe, {
+              id: `connectedApps.googleDrive.openInSlides`,
+              defaultMessage: `Export to Google Slides`,
+              description: `Dropdown item for exporting a file to Google Slides`,
+            })),
+            (t[2] = e))
+          : (e = t[2]),
+        e
+      );
+    }
+  }
 }
-
-function GoogleDriveConnectDialog(props: { app: AppRecord; hostId: string; onClose(): void; onOAuthStarted?(): void }): unknown {
-  initialize(); const scope = invoke(shared.LX, shared.ZI); const queryClient = invoke(shared.CL); const shouldUseNew = invoke<boolean>(initial.ofn, "403472035");
-  return element(connectModal.t, { app: props.app, hostId: props.hostId, onOpenChange: (open: boolean) => { if (!open) props.onClose(); }, onOAuthStarted: props.onOAuthStarted,
-    onConnected: async () => invoke(initial.VEt, { scope, accountId: invoke(initial.W6t, scope), hostId: props.hostId, queryClient, shouldUseNewAppLifecycle: shouldUseNew }) });
+function gt(e) {
+  let t = (0, Z.c)(3),
+    { targetType: n } = e;
+  switch (n) {
+    case `document`: {
+      let e;
+      return (
+        t[0] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Q.jsx)(T, { "aria-hidden": !0, className: `size-full` })), (t[0] = e))
+          : (e = t[0]),
+        e
+      );
+    }
+    case `spreadsheet`: {
+      let e;
+      return (
+        t[1] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Q.jsx)(pe, { "aria-hidden": !0, className: `size-full` })), (t[1] = e))
+          : (e = t[1]),
+        e
+      );
+    }
+    case `presentation`: {
+      let e;
+      return (
+        t[2] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((e = (0, Q.jsx)(Ve, { "aria-hidden": !0, className: `size-full` })), (t[2] = e))
+          : (e = t[2]),
+        e
+      );
+    }
+  }
 }
-function OpeningStatus(): unknown { initialize(); return jsx.jsxs("span", { className: "pointer-events-auto inline-flex h-token-button-composer shrink-0 cursor-default items-center gap-1.5 text-base leading-[18px] text-secondary", role: "status", children: [element(shared.Qh, { className: "icon-s" }), "Opening"] }); }
-
-const initializeAnalytics = (): void => { if (typeof shared.fI === "function") invoke(shared.fI); };
-const initializeUtilities = (): void => { for (const value of [shared.RI, initial.nun, initial.ydn]) if (typeof value === "function") invoke(value); };
-let initialized = false;
-function initialize(): void {
-  if (initialized) return; initialized = true; initializeAnalytics(); initializeUtilities();
-  for (const value of [shared.FX, shared.K2, shared.wL, initial.TDt, initial.Qgn, initial.G6t, initial.x3, initial.Dft, initial.sit, initial.y6t, initial.k3t, initial.D3t, initial.P2, initial.o1, initial.Rwt, initial.i4t, initial.l4t, initial.E4t, initial.ypn, initial.HEt, initial.snt, initial.$2t, shared.QI, initial.Rht, connectModal.n, initial.ifn]) if (typeof value === "function") invoke(value);
-  jsx = invoke<JsxRuntime>(shared.I3);
-  messages = { authFailure: { id: "connectedApps.googleDrive.authFailure", defaultMessage: "Connect Google Drive to open this file", description: "Google Drive needs authentication" },
-    connectAction: { id: "connectedApps.googleDrive.connectAction", defaultMessage: "Connect", description: "Connect Google Drive" },
-    installAction: { id: "connectedApps.googleDrive.installAction", defaultMessage: "Install", description: "Install Google Drive" },
-    installRequired: { id: "connectedApps.googleDrive.installRequired", defaultMessage: "Install Google Drive to open this file", description: "Google Drive must be installed" } };
+function _t(e) {
+  switch (e) {
+    case `document`:
+      return `Google Docs`;
+    case `spreadsheet`:
+      return `Google Sheets`;
+    case `presentation`:
+      return `Google Slides`;
+  }
 }
-
-export { targetForPath as a, logDriveClick as c, initialize as i, OpeningStatus as n, initializeUtilities as o, OpenInGoogleDriveMenuItem as r, initializeAnalytics as s, GoogleDriveConnectDialog as t };
+var Z, Q, $;
+function vt() {
+  return (vt = e(() => {
+    ((Z = t()),
+      v(),
+      g(),
+      a(),
+      ue(),
+      j(),
+      f(),
+      E(),
+      me(),
+      R(),
+      d(),
+      x(),
+      n(),
+      ce(),
+      z(),
+      je(),
+      fe(),
+      A(),
+      ye(),
+      Ke(),
+      C(),
+      Fe(),
+      k(),
+      P(),
+      F(),
+      S(),
+      Ge(),
+      ge(),
+      L(),
+      b(),
+      ie(),
+      O(),
+      Je(),
+      Ae(),
+      m(),
+      I(),
+      B(),
+      Y(),
+      (Q = l()),
+      ($ = s({
+        authFailure: {
+          id: `connectedApps.googleDrive.authFailure`,
+          defaultMessage: `Connect Google Drive to open this file`,
+          description: `Toast shown when the Google Drive connector needs authentication before opening a file.`,
+        },
+        connectAction: {
+          id: `connectedApps.googleDrive.connectAction`,
+          defaultMessage: `Connect`,
+          description: `Button label that connects Google Drive before opening a file`,
+        },
+        installAction: {
+          id: `connectedApps.googleDrive.installAction`,
+          defaultMessage: `Install`,
+          description: `Button label that installs Google Drive before opening a file`,
+        },
+        installRequired: {
+          id: `connectedApps.googleDrive.installRequired`,
+          defaultMessage: `Install Google Drive to open this file`,
+          description: `Toast shown when Google Drive must be installed before opening a file`,
+        },
+      })));
+  }))();
+}
+export { V as a, Xe as c, vt as i, dt as n, Y as o, X as r, B as s, ut as t };

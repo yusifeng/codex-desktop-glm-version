@@ -49,4 +49,6 @@ assertReleaseOwner("artifact-viewer", [
   /export \{/,
 ]);
 
+assertReleaseOwner("design-editor-state");
+
 console.log("preview interaction surfaces and release owner assertions passed");

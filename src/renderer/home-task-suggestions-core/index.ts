@@ -1,318 +1,1043 @@
-// ChatGPT Work task suggestions below the Home composer. The release owner
-// combines the account-scoped native query, composer activation, background
-// task submission, interaction recording, and the Home suggestion surface.
-
-import "@rchunk/rolldown-runtime";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as homeStarterPromptsChunk from "@rchunk/home-starter-prompts";
-import * as homeSuggestionSurfaceChunk from "@rchunk/home-suggestion-surface";
-import type { JsxRuntime, MaitaiScopeApi, ReactRuntime } from "@rchunk/app-shared";
-
-type HomeTaskSuggestionMode = "chat" | "local" | string;
-type WorkRunLocation = "cloud" | "local" | null;
-type Scope = MaitaiScopeApi<Record<string, unknown>>;
-
-interface PromptDestinationMetadata {
-  auto_send?: boolean;
-  auto_send_in_background?: boolean;
-  entrypoint?: string;
-  prompt: string;
-  show_prompt_on_hover?: boolean;
-  type: "prompt";
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/home-starter-prompts",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/shuffle",
+      "@rchunk/values",
+      "@rchunk/departments",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  $3 as n,
+  $O as r,
+  BM as i,
+  BX as a,
+  Ck as o,
+  Ek as s,
+  FX as c,
+  H3 as l,
+  HX as u,
+  I3 as d,
+  Jm as f,
+  K2 as p,
+  LX as m,
+  MM as ee,
+  NM as te,
+  P3 as h,
+  PM as ne,
+  Q3 as re,
+  QI as g,
+  QX as _,
+  Sk as ie,
+  Ty as v,
+  Tz as y,
+  V3 as b,
+  Y2 as x,
+  Z3 as S,
+  ZI as C,
+  e6 as w,
+  ek as T,
+  fI as ae,
+  if as oe,
+  l3 as E,
+  lk as se,
+  lw as ce,
+  n4 as le,
+  pZ as D,
+  pk as ue,
+  qm as O,
+  rC as de,
+  rZ as k,
+  rf as fe,
+  sZ as pe,
+  wL as me,
+  zM as he,
+} from "@rchunk/app-shared";
+import {
+  $4 as ge,
+  $Bt as _e,
+  $et as ve,
+  Bnt as ye,
+  CIt as A,
+  DBt as be,
+  Dlt as xe,
+  ERt as j,
+  F4 as M,
+  F_n as Se,
+  G4 as N,
+  G6t as P,
+  HZ as Ce,
+  J6 as F,
+  JAt as I,
+  K4 as L,
+  Kcn as we,
+  Kgn as R,
+  MVt as Te,
+  Mln as z,
+  N4 as Ee,
+  Nht as B,
+  Oln as V,
+  Olt as De,
+  PIt as Oe,
+  P_n as ke,
+  Qet as Ae,
+  Qgn as je,
+  RIt as H,
+  Rht as U,
+  S2 as W,
+  SB as G,
+  Sln as K,
+  Sqt as q,
+  Sx as J,
+  TRt as Me,
+  U4 as Ne,
+  UBt as Pe,
+  UZ as Fe,
+  VZ as Ie,
+  Vcn as Le,
+  Vnt as Re,
+  X4 as ze,
+  Xet as Be,
+  Xnt as Ve,
+  Y6 as He,
+  YAt as Ue,
+  YVt as We,
+  Ynt as Ge,
+  ZBt as Ke,
+  Zet as qe,
+  _Vt as Je,
+  _w as Ye,
+  aJ as Xe,
+  b2 as Ze,
+  bqt as Qe,
+  cJt as $e,
+  dHt as et,
+  ddn as tt,
+  dfn as nt,
+  g3 as rt,
+  gln as it,
+  hBt as at,
+  iJ as ot,
+  ifn as st,
+  kIt as ct,
+  kht as lt,
+  mnt as ut,
+  mpn as dt,
+  o3 as ft,
+  oJt as pt,
+  o_n as mt,
+  oqt as ht,
+  pdn as gt,
+  pnt as _t,
+  ppn as vt,
+  rqt as yt,
+  u3 as bt,
+  uHt as xt,
+  ufn as St,
+  v2 as Ct,
+  vB as wt,
+  vBt as Tt,
+  vln as Et,
+  vw as Dt,
+  wBt as Ot,
+  wVt as kt,
+  x2 as At,
+  x3 as jt,
+  xIt as Mt,
+  xpn as Nt,
+  xx as Pt,
+  y2 as Ft,
+  yIt as It,
+  ypn as Lt,
+} from "@rchunk/app-initial";
+import {
+  $l as Rt,
+  Jh as zt,
+  Rp as Bt,
+  Sg as Vt,
+  Uh as Ht,
+  Yh as Ut,
+  au as Wt,
+  eu as Gt,
+  nu as Kt,
+  qh as qt,
+  xg as Jt,
+} from "@rchunk/app-primary";
+import { n as Yt, t as Xt } from "@rchunk/home-suggestion-surface";
+var Zt, Qt;
+function $t() {
+  return ($t = e(() => {
+    ((Zt = t(E(), 1)),
+      c(),
+      He(),
+      jt(),
+      U(),
+      H(),
+      Ft(),
+      (Qt = pe(
+        lt,
+        ({ get: e, scope: t }) => {
+          let n = e(Ct);
+          return {
+            uploadIds: e(It, n).map(({ uploadId: e }) => e),
+            selectedText: e(Oe, n),
+            comments: e(F, n),
+            localComments: e(F, B(t.value)),
+            imageIds: e(N).map(({ id: e }) => e),
+            imageComments: e(L),
+            appshots: e(M),
+            files: e(Ne),
+            addedFiles: e(Ee),
+            pastedText: e(ge),
+            uploadedFiles: e(rt),
+            localSelectedText: e(bt),
+            modelContext: e(ze),
+            annotations: e(ft),
+          };
+        },
+        { isEqual: Zt.default },
+      )));
+  }))();
 }
-interface ConnectorDestinationMetadata { type: "connector" }
-interface RawHomeTaskSuggestion {
-  action_metadata?: { prompt?: string; system_hints?: unknown[] } | null;
-  destination_metadata?: PromptDestinationMetadata | ConnectorDestinationMetadata | null;
-  emoji?: string | null;
-  icon_paths?: Record<string, string | undefined>;
-  id: string;
-  item_type: string;
-  logging_metadata?: { app_id?: string; suggestion_id?: string } | null;
-  title: string;
+function en(e) {
+  let t = (0, an.c)(5),
+    { prompt: n } = e,
+    r;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((r = { kind: `small` }), (t[0] = r))
+    : (r = t[0]);
+  let i;
+  t[1] === n ? (i = t[2]) : ((i = Se.lexer(n, { gfm: !1 })), (t[1] = n), (t[2] = i));
+  let a;
+  return (
+    t[3] === i
+      ? (a = t[4])
+      : ((a = (0, on.jsx)(`div`, {
+          className: `vertical-scroll-fade-mask max-h-50 overflow-hidden`,
+          children: (0, on.jsx)(ye, {
+            externalResourcePolicy: `restricted`,
+            textStyle: r,
+            tokens: i,
+            getDefaultComponents: tn,
+          }),
+        })),
+        (t[3] = i),
+        (t[4] = a)),
+    a
+  );
 }
-interface HomeTaskSuggestion {
-  emoji?: string | null;
-  iconDarkUrl?: string;
-  iconUrl?: string;
-  id: string;
-  isScheduledAutomation: boolean;
-  item: RawHomeTaskSuggestion;
-  prompt: string;
-  title: string;
-}
-interface QueryResult<Value> { data?: Value; isLoading?: boolean }
-interface ComposerController {
-  cancelPendingSubmit?(): void;
-  focus(): void;
-  hasText(): boolean;
-  requestSubmitWhenReady?(ready: () => boolean): void;
-  setPromptText(text: string): void;
-  view?: { isDestroyed?: boolean };
-}
-interface HomeTaskSuggestionsProps {
-  generatedSuggestionsEnabled?: boolean;
-  hostId: string;
-  mode: HomeTaskSuggestionMode;
-  onSelect?(suggestion: HomeTaskSuggestion): void;
-  prepareDestination?(destination: string): void | Promise<void>;
-  projectId?: string | null;
-  showClinicalHomeSuggestions?: boolean;
-  showGenericSuggestions?: boolean;
-  workRunLocation?: WorkRunLocation;
-}
-interface ScopeWithQuery extends Scope {
-  queryClient: {
-    cancelQueries(input: { queryKey: unknown[] }): Promise<unknown> | void;
-    invalidateQueries(input: { queryKey: unknown[] }): Promise<unknown> | void;
-    setQueriesData(input: { queryKey: unknown[] }, update: (value: RawHomeTaskSuggestion[] | undefined) => RawHomeTaskSuggestion[] | undefined): void;
+function tn() {
+  return {
+    ...Ge({ allowWideBlocks: !1, mediaComponent: void 0 }),
+    a: Y,
+    blockquote: Y,
+    code: Y,
+    h1: Y,
+    h2: Y,
+    h3: Y,
+    h4: Y,
+    h5: Y,
+    h6: Y,
+    hr: rn,
+    img: nn,
+    pre: Y,
   };
 }
-interface SharedBindings {
-  BX<Value>(family: unknown, parameter: unknown, options?: { enabled?: boolean }): QueryResult<Value>;
-  HX<Value>(signal: unknown): Value;
-  I3: JsxRuntime | (() => JsxRuntime);
-  LX(scope: unknown): ScopeWithQuery;
-  QX?(scope: unknown, factory: (parameter: { hostId: string; mode: string }, context: { get<Value>(signal: unknown): Value }) => Record<string, unknown>): unknown;
-  ZI: unknown;
-  e6: ReactRuntime | (() => ReactRuntime);
-  n4?(): { formatMessage(descriptor: { defaultMessage: string; id?: string }): string };
-  pZ?<Value>(scope: unknown, initialValue: Value): unknown;
-  pk?: unknown;
-  sZ?<Value>(scope: unknown, derive: (context: { get<T>(signal: unknown): T }) => Value): unknown;
+function nn() {
+  return null;
 }
-interface InitialBindings {
-  HZ?(): ComposerController;
-  Sln?: unknown;
-  b2?(scope: Scope, conversationId: string, hints: string[]): void;
-  gln?(conversation: unknown): string;
-  gln?(conversation: unknown): string;
-  kht?: unknown;
-  o_n?(): (destination: string) => void;
-  pnt?: {
-    ambientSuggestions?: {
-      getChatGptComposerItems(input: { entrypoint: string; hostId: string }): Promise<RawHomeTaskSuggestion[]>;
-      recordChatGptComposerItemInteraction(input: { entrypoint: string; hostId: string; interactionType: string; item: RawHomeTaskSuggestion }): Promise<unknown>;
+function rn() {
+  return null;
+}
+function Y({ children: e }) {
+  return e;
+}
+var an, on;
+function sn() {
+  return (sn = e(() => {
+    ((an = n()), ke(), Ve(), Re(), (on = d()));
+  }))();
+}
+async function cn(e, t, n, r, i) {
+  let a = [`chatgpt-task-suggestions`, e.get(X), t],
+    o = () => {
+      (e.queryClient.cancelQueries({ queryKey: a }),
+        e.queryClient.setQueriesData({ queryKey: a }, (e) => e?.filter(({ id: e }) => e !== n.id)));
     };
-  };
-  xpn?(scope: Scope, event: unknown, payload: Record<string, unknown>): void;
-  v2?: unknown;
+  if ((r === `select` && o(), _t.ambientSuggestions == null))
+    throw Error(`ChatGPT task suggestions are unavailable on this host`);
+  (await _t.ambientSuggestions.recordChatGptComposerItemInteraction({
+    entrypoint: i,
+    hostId: t,
+    interactionType: un[r],
+    item: n.item,
+  }),
+    r === `dismiss` && o(),
+    r !== `view` && e.queryClient.invalidateQueries({ queryKey: a }));
 }
-interface PrimaryBindings {
-  Sg?(): { headline?: { message_body?: string } | null };
-  eu?(scope: Scope, input: Record<string, unknown>): Promise<unknown>;
-}
-
-const shared = appSharedChunk as unknown as SharedBindings;
-const initial = appInitialChunk as unknown as InitialBindings;
-const primary = appPrimaryChunk as unknown as PrimaryBindings;
-const HomeSuggestionSurface = (homeSuggestionSurfaceChunk as unknown as { t?: unknown }).t;
-const ClinicalStarterPrompts = (homeStarterPromptsChunk as unknown as { ClinicalStarterPrompts?: unknown }).ClinicalStarterPrompts;
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let taskSuggestionAccountIdSignal: unknown;
-let pendingSuggestionKeysSignal: unknown;
-let taskSuggestionQueryFamily: unknown;
-let initialized = false;
-
-function normalizeTaskSuggestions(items: readonly RawHomeTaskSuggestion[]): HomeTaskSuggestion[] {
-  return items.flatMap((item) => {
-    const destination = item.destination_metadata;
-    let prompt = destination?.type === "prompt" ? destination.prompt : undefined;
-    if (destination?.type === "connector") prompt = item.action_metadata?.prompt;
-    if (item.item_type === "chat_home_curated" || item.title.trim() === "" || !prompt?.trim()) return [];
-    return [{
-      item,
-      emoji: item.emoji,
-      iconDarkUrl: item.icon_paths?.["64_1x_dark"],
-      iconUrl: item.icon_paths?.["64_1x"],
-      id: item.logging_metadata?.suggestion_id ?? item.id,
-      isScheduledAutomation: item.item_type === "automation_suggestion",
-      prompt,
-      title: item.title,
-    }];
+function ln(e) {
+  return e.flatMap((e) => {
+    let t = e.destination_metadata,
+      n = t?.type === `prompt` ? t.prompt : void 0;
+    return (
+      t?.type === `connector` && (n = e.action_metadata?.prompt),
+      e.item_type === `chat_home_curated` || e.title.trim() === `` || !n?.trim()
+        ? []
+        : [
+            {
+              item: e,
+              emoji: e.emoji,
+              iconDarkUrl: e.icon_paths?.[`64_1x_dark`],
+              iconUrl: e.icon_paths?.[`64_1x`],
+              id: e.logging_metadata?.suggestion_id ?? e.id,
+              isScheduledAutomation: e.item_type === `automation_suggestion`,
+              prompt: n,
+              title: e.title,
+            },
+          ]
+    );
   });
 }
-
-function startsInBackground(suggestion: HomeTaskSuggestion): boolean {
-  const destination = suggestion.item.destination_metadata;
-  return (suggestion.item.item_type === "task_suggestion" || suggestion.item.item_type === "automation_suggestion") &&
-    destination?.type === "prompt" && destination.auto_send_in_background === true;
+var un, X, Z, dn;
+function fn() {
+  return (fn = e(() => {
+    (c(),
+      me(),
+      P(),
+      V(),
+      ut(),
+      g(),
+      T(),
+      gt(),
+      $e(),
+      new tt({ getAdditionalHeaders: pt }),
+      (un = { dismiss: `dismissed`, select: `clicked`, view: `viewed` }),
+      (X = pe(C, ({ get: e }) => e(K).accountId)),
+      (Z = D(C, new Set())),
+      (dn = _(C, ({ hostId: e, mode: t }, { get: n }) => {
+        let i = n(X);
+        return {
+          queryKey: [`chatgpt-task-suggestions`, i, e, t],
+          enabled: i != null,
+          queryFn: async ({ signal: n }) =>
+            ln(
+              (await _t.ambientSuggestions?.getChatGptComposerItems({
+                entrypoint: t,
+                hostId: e,
+              })) ?? [],
+            ),
+          retry: !1,
+          staleTime: r.ONE_MINUTE,
+        };
+      })));
+  }))();
 }
-
-function normalizeIconUrl(url: string | undefined): string | undefined {
-  return url?.startsWith("/") ? new URL(url, "https://chatgpt.com").href : url;
+async function pn(e, t, n) {
+  let r = e.get(X);
+  if (
+    r == null ||
+    (await Promise.all([e.query.getOrFetch(Ke), e.query.getOrFetch(Qe)]),
+    await e.when(
+      ({ get: e }) =>
+        e(X) !== r || (e(z).status !== `loading` && e(Ke).data != null && e(at) !== `loading`),
+    ),
+    e.get(X) !== r || e.get(z).status !== `allowed`)
+  )
+    return null;
+  let i = yt(),
+    a = t.item.action_metadata?.system_hints?.find(be);
+  return (
+    a != null && Ze(e, i, [a]),
+    (await Gt(e, {
+      conversationId: i,
+      conversationOrigin: `tpp`,
+      prompt: t.prompt,
+      projectId: n,
+      suggestedAutomationType: t.isScheduledAutomation ? t.id : void 0,
+      selectedModel: e.get(Me, `tpp`),
+      submitErrorFallback: e.get(dt).formatMessage(I.submitError),
+    }))
+      ? (await e.when(
+          ({ get: e }) => e(X) !== r || e(kt, i) != null || e(Te, i) != null || !et(e(We, i)),
+        ),
+        e.get(X) === r ? e.get(kt, i) : null)
+      : null
+  );
 }
-
-function initializeTaskSuggestionQueries(): void {
-  if (taskSuggestionAccountIdSignal != null) return;
-  taskSuggestionAccountIdSignal = shared.sZ?.(shared.ZI, ({ get }) => get<{ accountId?: string | null }>(initial.Sln).accountId) ?? { key: "chatgpt-task-suggestions-account-id" };
-  pendingSuggestionKeysSignal = shared.pZ?.(shared.ZI, new Set<string>()) ?? { key: "chatgpt-task-suggestions-pending" };
-  taskSuggestionQueryFamily = shared.QX?.(shared.ZI, ({ hostId, mode }, { get }) => {
-    const accountId = get<string | null>(taskSuggestionAccountIdSignal);
-    return {
-      enabled: accountId != null,
-      queryKey: ["chatgpt-task-suggestions", accountId, hostId, mode],
-      queryFn: async () => normalizeTaskSuggestions(await initial.pnt?.ambientSuggestions?.getChatGptComposerItems({ entrypoint: mode, hostId }) ?? []),
-      retry: false,
-      staleTime: 60_000,
-    };
-  }) ?? { key: "chatgpt-task-suggestions-query" };
+function mn() {
+  return (mn = e(() => {
+    (V(), vt(), Tt(), Rt(), Ue(), _e(), Ft(), j(), Ot(), ht(), xt(), q(), fn());
+  }))();
 }
-
-function initializeHomeTaskSuggestions(): void {
-  if (initialized) return;
-  initializeTaskSuggestionQueries();
-  React = typeof shared.e6 === "function" ? shared.e6() : shared.e6;
-  jsx = typeof shared.I3 === "function" ? shared.I3() : shared.I3;
-  (homeSuggestionSurfaceChunk as unknown as { n?(): void }).n?.();
-  initialized = true;
+function hn(e) {
+  let t = (0, Dn.c)(24),
+    {
+      generatedSuggestionsEnabled: n,
+      hostId: r,
+      mode: i,
+      onSelect: o,
+      projectId: s,
+      prepareDestination: c,
+      workRunLocation: l,
+      showGenericSuggestions: d,
+      showClinicalHomeSuggestions: f,
+    } = e,
+    p = n === void 0 || n,
+    m = d === void 0 || d,
+    ee = f !== void 0 && f,
+    te = (0, Q.useContext)(zt),
+    h = (0, Q.useContext)(R),
+    ne = u(Ct),
+    re = a(Kt, ne),
+    g = i === `chat` && re,
+    _ = a(It, ne),
+    ie = a(Mt, ne),
+    v = u(Je),
+    y = _.length > 0 || v || ie || (h != null && h.navigation.state !== `idle`),
+    b = a(Nn, ee && !g);
+  if (g) return null;
+  let x;
+  t[0] !== v || t[1] !== i || t[2] !== _
+    ? ((x = !v && _.some(gn) ? (0, $.jsx)(Mn, { mode: i }) : null),
+      (t[0] = v),
+      (t[1] = i),
+      (t[2] = _),
+      (t[3] = x))
+    : (x = t[3]);
+  let S;
+  t[4] !== b ||
+  t[5] !== p ||
+  t[6] !== r ||
+  t[7] !== i ||
+  t[8] !== o ||
+  t[9] !== c ||
+  t[10] !== s ||
+  t[11] !== m ||
+  t[12] !== y ||
+  t[13] !== l
+    ? ((S = m
+        ? (0, $.jsx)(_n, {
+            generatedSuggestionsEnabled: p && !b,
+            suggestionsDisabled: y,
+            hostId: r,
+            mode: i,
+            onSelect: o,
+            projectId: s,
+            prepareDestination: c,
+            workRunLocation: l,
+          })
+        : null),
+      (t[4] = b),
+      (t[5] = p),
+      (t[6] = r),
+      (t[7] = i),
+      (t[8] = o),
+      (t[9] = c),
+      (t[10] = s),
+      (t[11] = m),
+      (t[12] = y),
+      (t[13] = l),
+      (t[14] = S))
+    : (S = t[14]);
+  let C;
+  t[15] !== b || t[16] !== te || t[17] !== ee || t[18] !== y
+    ? ((C =
+        ee && te?.followUpSuggestionsPortalTarget != null
+          ? (0, On.createPortal)(
+              (0, $.jsxs)($.Fragment, {
+                children: [
+                  (0, $.jsx)(Pt, { name: `chatgpt.cme`, children: (0, $.jsx)(jn, {}) }),
+                  b && !y
+                    ? (0, $.jsx)(Pt, {
+                        name: `chatgpt.clinical-starter-prompts`,
+                        children: (0, $.jsx)(An, {}),
+                      })
+                    : null,
+                ],
+              }),
+              te.followUpSuggestionsPortalTarget,
+            )
+          : null),
+      (t[15] = b),
+      (t[16] = te),
+      (t[17] = ee),
+      (t[18] = y),
+      (t[19] = C))
+    : (C = t[19]);
+  let w;
+  return (
+    t[20] !== x || t[21] !== S || t[22] !== C
+      ? ((w = (0, $.jsxs)($.Fragment, { children: [x, S, C] })),
+        (t[20] = x),
+        (t[21] = S),
+        (t[22] = C),
+        (t[23] = w))
+      : (w = t[23]),
+    w
+  );
 }
-
-async function recordInteraction(scope: ScopeWithQuery, hostId: string, mode: string, suggestion: HomeTaskSuggestion, interaction: "dismiss" | "select" | "view"): Promise<void> {
-  const accountId = scope.get<string | null>(taskSuggestionAccountIdSignal);
-  const queryKey = ["chatgpt-task-suggestions", accountId, hostId, mode];
-  const remove = () => {
-    void scope.queryClient.cancelQueries({ queryKey });
-    scope.queryClient.setQueriesData({ queryKey }, (items) => items?.filter((item) => item.id !== suggestion.item.id));
-  };
-  if (interaction === "select") remove();
-  const bridge = initial.pnt?.ambientSuggestions;
-  if (bridge == null) throw new Error("ChatGPT task suggestions are unavailable on this host");
-  await bridge.recordChatGptComposerItemInteraction({
-    entrypoint: mode,
-    hostId,
-    interactionType: { dismiss: "dismissed", select: "clicked", view: "viewed" }[interaction],
-    item: suggestion.item,
-  });
-  if (interaction === "dismiss") remove();
-  if (interaction !== "view") void scope.queryClient.invalidateQueries({ queryKey });
+function gn(e) {
+  return e.sketchId != null;
 }
-
-function HomeTaskSuggestions(props: HomeTaskSuggestionsProps): unknown {
-  initializeHomeTaskSuggestions();
-  const scope = shared.LX(initial.kht ?? shared.ZI);
-  const composer = initial.HZ?.();
-  const accountId = shared.HX<string | null>(taskSuggestionAccountIdSignal);
-  const pending = shared.HX<Set<string>>(pendingSuggestionKeysSignal) ?? new Set<string>();
-  const generatedEnabled = props.generatedSuggestionsEnabled !== false && props.showGenericSuggestions !== false;
-  const query = shared.BX<HomeTaskSuggestion[]>(taskSuggestionQueryFamily, { hostId: props.hostId, mode: props.mode }, {
-    enabled: generatedEnabled && accountId != null && composer?.hasText() === false,
-  });
-  const suggestions = query.data?.slice(0, 3);
-  const viewed = React.useRef(new Set<string>());
-  React.useEffect(() => {
-    for (const suggestion of suggestions ?? []) {
-      const key = `${accountId}:${props.hostId}:${props.mode}:${suggestion.item.id}`;
-      if (viewed.current.has(key)) continue;
-      viewed.current.add(key);
-      void recordInteraction(scope, props.hostId, props.mode, suggestion, "view").catch(() => undefined);
-    }
-  }, [accountId, props.hostId, props.mode, scope, suggestions]);
-
-  const headline = primary.Sg?.().headline?.message_body;
-  const showClinical = props.showClinicalHomeSuggestions === true && ClinicalStarterPrompts != null;
-  if (composer == null || composer.hasText() || (suggestions?.length ?? 0) === 0 && headline == null && !showClinical) return null;
-
-  const activate = async (suggestion: HomeTaskSuggestion, index: number) => {
-    const pendingKey = `${accountId}:${props.hostId}:${suggestion.item.id}`;
-    if (pending.has(pendingKey) || composer.hasText()) return;
-    const background = startsInBackground(suggestion);
-    const toast = scope.get<{ success?(message: string, options?: unknown): void; warning?(message: string): void } | undefined>(shared.pk);
-    if (background && props.workRunLocation !== "cloud") {
-      toast?.warning?.("Background suggestions are only available in Cloud");
-      return;
-    }
-    scope.set(pendingSuggestionKeysSignal, new Set([...pending, pendingKey]));
-    try {
-      if (background && primary.eu != null) {
-        const created = await primary.eu(scope, {
-          hostId: props.hostId,
-          projectId: props.projectId,
-          prompt: suggestion.prompt,
-          suggestedAutomationType: suggestion.isScheduledAutomation ? suggestion.id : undefined,
-          threadSource: "ambient_suggestion_task",
-          turnTrigger: "ambient_suggestion_task",
+function _n(e) {
+  let t = (0, Dn.c)(71),
+    {
+      generatedSuggestionsEnabled: n,
+      suggestionsDisabled: r,
+      hostId: c,
+      mode: l,
+      onSelect: d,
+      projectId: f,
+      prepareDestination: p,
+      workRunLocation: h,
+    } = e,
+    g = m(lt),
+    _ = m(C),
+    b = le(),
+    S = mt(),
+    w = oe(),
+    T = (0, Q.useRef)(0),
+    ae = u(Z),
+    E;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`) ? ((E = []), (t[0] = E)) : (E = t[0]);
+  let [se, ce] = (0, Q.useState)(E),
+    D = Ce(),
+    O = Fe(D, wn, `document`),
+    k = u(X),
+    { headline: fe } = Vt(),
+    pe = we(y.enabled),
+    me = u(At),
+    ge = St(`4030542669`),
+    _e = nt(),
+    ve = n && pe && me.status === `enabled` && O && !r,
+    ye = ve && k != null && (l !== `chat` || !_e);
+  ye && l === `chat` && ge.get(`use_home_curated_services`, !1);
+  let j;
+  t[1] !== c || t[2] !== l
+    ? ((j = { hostId: c, mode: l }), (t[1] = c), (t[2] = l), (t[3] = j))
+    : (j = t[3]);
+  let M;
+  t[4] === ye ? (M = t[5]) : ((M = { enabled: ye }), (t[4] = ye), (t[5] = M));
+  let { data: Se } = a(dn, j, M),
+    N;
+  t[6] !== ve || t[7] !== Se
+    ? ((N = ve ? Se?.slice(0, 3) : void 0), (t[6] = ve), (t[7] = Se), (t[8] = N))
+    : (N = t[8]);
+  let P = N,
+    [F] = (0, Q.useState)(Cn),
+    I,
+    L;
+  (t[9] !== k ||
+  t[10] !== _ ||
+  t[11] !== F ||
+  t[12] !== b.locale ||
+  t[13] !== O ||
+  t[14] !== l ||
+  t[15] !== r ||
+  t[16] !== P
+    ? ((I = () => {}),
+      (L = [k, _, F, b.locale, O, l, r, P]),
+      (t[9] = k),
+      (t[10] = _),
+      (t[11] = F),
+      (t[12] = b.locale),
+      (t[13] = O),
+      (t[14] = l),
+      (t[15] = r),
+      (t[16] = P),
+      (t[17] = I),
+      (t[18] = L))
+    : ((I = t[17]), (L = t[18])),
+    (0, Q.useEffect)(I, L));
+  let R;
+  t[19] === Symbol.for(`react.memo_cache_sentinel`) ? ((R = new Set()), (t[19] = R)) : (R = t[19]);
+  let Te = (0, Q.useRef)(R),
+    z;
+  t[20] === Symbol.for(`react.memo_cache_sentinel`) ? ((z = new Set()), (t[20] = z)) : (z = t[20]);
+  let Ee = (0, Q.useRef)(z),
+    B = `${k}:${c}:${l}:`,
+    V = s.CODEX_AMBIENT_SUGGESTION_SURFACE_CHATGPT_WORK,
+    De;
+  t[21] === D
+    ? (De = t[22])
+    : ((De = () => () => {
+        ((T.current += 1), D.cancelPendingSubmit());
+      }),
+      (t[21] = D),
+      (t[22] = De));
+  let Oe;
+  (t[23] !== D || t[24] !== c || t[25] !== l || t[26] !== f || t[27] !== h
+    ? ((Oe = [D, c, l, f, h]),
+      (t[23] = D),
+      (t[24] = c),
+      (t[25] = l),
+      (t[26] = f),
+      (t[27] = h),
+      (t[28] = Oe))
+    : (Oe = t[28]),
+    (0, Q.useLayoutEffect)(De, Oe));
+  let ke, Ae;
+  (t[29] !== D || t[30] !== g
+    ? ((ke = () => {
+        let e = g.get(Qt);
+        return g.watch((t) => {
+          let { get: n } = t,
+            r = n(Qt);
+          r !== e && ((e = r), (T.current += 1), D.cancelPendingSubmit());
         });
-        if (created == null) throw new Error("Background suggestion did not start");
-        const conversationId = (created as { conversationId?: string }).conversationId;
-        toast?.success?.("Task started", conversationId == null ? undefined : {
-          primaryAction: {
-            label: "Open chat",
-            onClick: () => initial.o_n?.()(initial.gln?.({ id: conversationId }) ?? `/c/${conversationId}`),
-          },
-        });
-      } else {
-        const destination = suggestion.item.destination_metadata?.type === "prompt"
-          ? suggestion.item.destination_metadata.entrypoint ?? props.mode
-          : props.mode;
-        await props.prepareDestination?.(destination);
-        composer.cancelPendingSubmit?.();
-        composer.setPromptText(suggestion.prompt);
-        const systemHint = suggestion.item.action_metadata?.system_hints?.find((value): value is string => typeof value === "string" && value.length > 0);
-        const conversationId = initial.v2 == null ? null : scope.get<string | null>(initial.v2);
-        if (systemHint != null && conversationId != null) initial.b2?.(scope, conversationId, [systemHint]);
-        composer.focus();
-        if (suggestion.item.destination_metadata?.type === "prompt" && suggestion.item.destination_metadata.auto_send === true) {
-          composer.requestSubmitWhenReady?.(() => accountId === scope.get(taskSuggestionAccountIdSignal));
-        }
+      }),
+      (Ae = [D, g]),
+      (t[29] = D),
+      (t[30] = g),
+      (t[31] = ke),
+      (t[32] = Ae))
+    : ((ke = t[31]), (Ae = t[32])),
+    (0, Q.useLayoutEffect)(ke, Ae));
+  let je, H;
+  if (
+    (t[33] !== k || t[34] !== c || t[35] !== B || t[36] !== l || t[37] !== g || t[38] !== P
+      ? ((je = () => {
+          if (k == null || P == null) return;
+          for (let e of P) {
+            let t = `${B}${e.item.id}`;
+            Ee.current.has(t) || (Ee.current.add(t), cn(g, c, e, `view`, l).catch(Sn));
+          }
+          let e = P.filter((e) => {
+            let { id: t } = e;
+            return !Te.current.has(`${B}${t}`);
+          });
+          if (e.length === 0) return;
+          for (let t of e)
+            (Te.current.add(`${B}${t.id}`),
+              Nt(g, o, {
+                source: `generated`,
+                action: Tn(t) ? `start-thread` : `fill-composer`,
+                threadAction: `new-thread`,
+                surface: V,
+              }));
+          let t = P.map(xn);
+          Nt(g, i, {
+            promptIds: t.join(`,`),
+            promptTypes: t.map(bn).join(`,`),
+            promptCount: t.length,
+            surface: V,
+          });
+        }),
+        (H = [k, c, B, l, g, V, P]),
+        (t[33] = k),
+        (t[34] = c),
+        (t[35] = B),
+        (t[36] = l),
+        (t[37] = g),
+        (t[38] = P),
+        (t[39] = je),
+        (t[40] = H))
+      : ((je = t[39]), (H = t[40])),
+    (0, Q.useEffect)(je, H),
+    !O || r || k == null || ((P == null || P.length === 0) && fe == null))
+  )
+    return null;
+  let U, W, G, K, q, J;
+  if (
+    t[41] !== k ||
+    t[42] !== _ ||
+    t[43] !== D ||
+    t[44] !== se ||
+    t[45] !== fe?.message_body ||
+    t[46] !== c ||
+    t[47] !== b ||
+    t[48] !== w ||
+    t[49] !== l ||
+    t[50] !== S ||
+    t[51] !== d ||
+    t[52] !== ae ||
+    t[53] !== p ||
+    t[54] !== f ||
+    t[55] !== g ||
+    t[56] !== P ||
+    t[57] !== h
+  ) {
+    let e = (e, t) => {
+      let { id: n, prompt: r } = e,
+        i = e.item.destination_metadata,
+        a = `${k}:${c}:${e.item.id}`;
+      if (g.get(X) !== k || D.hasText() || g.get(Z).has(a)) return;
+      let o = Tn(e);
+      if (o && h !== `cloud`) {
+        _.get(ue).warning(
+          (0, $.jsx)(x, {
+            id: `home.taskSuggestions.backgroundRequiresCloud`,
+            defaultMessage: `Background suggestions are only available in Cloud`,
+            description: `Toast when a user tries to start a background suggestion with Local selected or no Work execution location available. No task is started.`,
+          }),
+        );
+        return;
       }
-      await recordInteraction(scope, props.hostId, props.mode, suggestion, "select");
-      initial.xpn?.(scope, "chatgpt_task_suggestion_selected", {
-        action: background ? "start-thread" : "fill-composer",
-        promptId: suggestion.id,
-        promptIndex: index,
-        surface: "chatgpt_work",
-      });
-      props.onSelect?.(suggestion);
-    } catch {
-      toast?.warning?.("Couldn't start suggestion. Please try again");
-    } finally {
-      scope.set(pendingSuggestionKeysSignal, (current: Set<string>) => {
-        const next = new Set(current);
-        next.delete(pendingKey);
-        return next;
-      });
-    }
-  };
-
-  const items = suggestions?.map((suggestion, index) => {
-    const destination = suggestion.item.destination_metadata;
-    const emoji = suggestion.emoji?.trim();
-    return {
-      id: suggestion.id,
-      label: suggestion.title,
-      disabled: pending.has(`${accountId}:${props.hostId}:${suggestion.item.id}`),
-      icon: emoji || normalizeIconUrl(suggestion.iconUrl) || null,
-      logoUrl: normalizeIconUrl(suggestion.iconUrl),
-      logoDarkUrl: normalizeIconUrl(suggestion.iconDarkUrl),
-      tooltipContent: destination?.type === "prompt" && destination.show_prompt_on_hover === true ? suggestion.prompt : undefined,
-      onClick: () => void activate(suggestion, index),
-      onDismiss: () => void recordInteraction(scope, props.hostId, props.mode, suggestion, "dismiss").catch(() => undefined),
+      g.set(Z, (e) => new Set([...e, a]));
+      let s = i?.type === `prompt` ? (i.entrypoint ?? l) : l,
+        u = () => {
+          (cn(_, c, e, `select`, l).catch(yn),
+            o
+              ? Nt(_, te, {
+                  action: ee.CODEX_NEW_CHAT_SUGGESTION_ACTION_MESSAGE_SENT,
+                  categoryId: `generated`,
+                  suggestionLevel: ne.CODEX_NEW_CHAT_SUGGESTION_LEVEL_TASK,
+                  surface: V,
+                })
+              : qt(g, {
+                  categoryId: `generated`,
+                  prompt: r,
+                  suggestionLevel: ne.CODEX_NEW_CHAT_SUGGESTION_LEVEL_TASK,
+                  surface: V,
+                }),
+            Nt(_, he, {
+              promptId: n,
+              promptIndex: t,
+              promptType: `generated`,
+              mode: `local`,
+              surface: V,
+            }),
+            Nt(_, ie, {
+              source: `generated`,
+              action: o ? `start-thread` : `fill-composer`,
+              threadAction: `new-thread`,
+              surface: V,
+            }));
+        },
+        m = g.get(Ct),
+        v = D.view.state.doc,
+        y = g.get(A, m),
+        b = (T.current += 1);
+      (D.cancelPendingSubmit(),
+        o || g.set(ct, m, null),
+        (async () => {
+          if (o) {
+            let t = await pn(_, e, f);
+            if (_.get(X) !== k) return;
+            if (t == null) throw Error(`Background suggestion did not start`);
+            (u(),
+              _.get(ue).success(
+                (0, $.jsx)(x, {
+                  id: `home.taskSuggestions.taskStarted`,
+                  defaultMessage: `Task started`,
+                  description: `Success toast after a Home suggestion starts a new Work task in the background`,
+                }),
+                {
+                  primaryAction: {
+                    label: (0, $.jsx)(x, {
+                      id: `home.taskSuggestions.openChat`,
+                      defaultMessage: `Open chat`,
+                      description: `Action in the task-started toast that opens the Work conversation created by a Home suggestion`,
+                    }),
+                    onClick: () => {
+                      _.get(X) === k && S(it(t));
+                    },
+                  },
+                },
+              ));
+            return;
+          }
+          if (s !== l && d == null) throw Error(`Suggestion destination is unavailable`);
+          let t = i?.type === `prompt` && i.auto_send === !0;
+          if (t) {
+            let e = s === `chat` ? Pe : Ke;
+            (await Promise.all([
+              p?.(s),
+              s === `chat` || h === `cloud` ? g.query.getOrFetch(e) : void 0,
+              g.query.getOrFetch(Qe),
+            ]),
+              await g.when((t) => {
+                let { get: n } = t;
+                return (
+                  n(X) !== k ||
+                  n(A, m) !== y ||
+                  (n(at) !== `loading` &&
+                    !n(It, m).some(vn) &&
+                    ((s !== `chat` && h !== `cloud`) || n(e).data != null))
+                );
+              }));
+          }
+          if (
+            !w() ||
+            T.current !== b ||
+            g.get(X) !== k ||
+            g.get(Ct) !== m ||
+            D.view.isDestroyed ||
+            D.view.state.doc !== v ||
+            g.get(A, m) !== y
+          )
+            return;
+          let n = e.item.action_metadata?.system_hints?.find(be);
+          if (
+            ((0, On.flushSync)(() => {
+              (d?.(s), D.setPromptText(r), n != null && Ze(g, m, [n]));
+            }),
+            u(),
+            D.focus(),
+            t)
+          ) {
+            let e = g.get(A, m);
+            D.requestSubmitWhenReady(() => _.get(X) === k && g.get(Ct) === m && g.get(A, m) === e);
+          }
+        })()
+          .catch((e) => {
+            (re.warning(`Failed to activate ChatGPT task suggestion`, {
+              safe: {},
+              sensitive: { error: e },
+            }),
+              _.get(X) === k &&
+                _.get(ue).warning(
+                  (0, $.jsx)(x, {
+                    id: `home.taskSuggestions.startFailed`,
+                    defaultMessage: `Couldn't start suggestion. Please try again`,
+                    description: `Error toast when a Home suggestion cannot load its destination or start a background task; the user can retry`,
+                  }),
+                ));
+          })
+          .finally(() => {
+            _.set(Z, (e) => {
+              let t = new Set(e);
+              return (t.delete(a), t);
+            });
+          }));
     };
-  }) ?? [];
-  const surface = HomeSuggestionSurface == null
-    ? jsx.jsx("div", { "data-home-task-suggestions": true, children: items.map((item) => jsx.jsx("button", { disabled: item.disabled, onClick: item.onClick, children: item.label }, item.id)) })
-    : jsx.jsx(HomeSuggestionSurface, {
-        composerMode: props.mode,
-        headline,
-        items,
-        layout: "list",
-        showCloseAction: false,
-      });
-  return showClinical
-    ? jsx.jsxs(jsx.Fragment, { children: [surface, jsx.jsx(ClinicalStarterPrompts, {})] })
-    : surface;
+    ((U = Xt),
+      (W = l),
+      (G = fe?.message_body),
+      (K = `list`),
+      (q = !1),
+      (J =
+        P?.map((t, n) => {
+          let { id: r, prompt: i } = t,
+            a = t.item.destination_metadata,
+            o = t.item.item_type === `task_suggestion` || t.isScheduledAutomation,
+            s = t.emoji?.trim(),
+            u = `${k}:${c}:${t.item.id}`,
+            d;
+          return (
+            (d = t.isScheduledAutomation
+              ? s && kn.test(s)
+                ? (0, $.jsx)(`span`, {
+                    "aria-hidden": `true`,
+                    className: `flex size-5 items-center justify-center text-lg leading-none`,
+                    children: s,
+                  })
+                : (0, $.jsx)(v, {})
+              : (0, $.jsx)(xe, {
+                  alt: ``,
+                  className: `size-5 object-contain browser:size-6`,
+                  knownAppId:
+                    t.item.item_type === `task_suggestion`
+                      ? t.item.logging_metadata?.app_id
+                      : void 0,
+                  logoUrl: En(t.iconUrl),
+                  logoDarkUrl: En(t.iconDarkUrl),
+                  fallback: (0, $.jsx)(`span`, {
+                    className: `flex items-center justify-center`,
+                    children: (0, $.jsx)(de, {}),
+                  }),
+                })),
+            {
+              id: r,
+              label: t.title,
+              tooltipContent:
+                o && a?.type === `prompt` && a.show_prompt_on_hover === !0
+                  ? (0, $.jsx)(en, { prompt: i })
+                  : void 0,
+              disabled: se.includes(r) || ae.has(u),
+              icon: d,
+              onClick: () => e(t, n),
+              onDismiss: () => {
+                g.get(X) === k &&
+                  (ce((e) => [...e, r]),
+                  cn(g, c, t, `dismiss`, l)
+                    .catch((e) => {
+                      (re.warning(`Failed to dismiss ChatGPT task suggestion`, {
+                        safe: {},
+                        sensitive: { error: e },
+                      }),
+                        g
+                          .get(ue)
+                          .warning(
+                            b.formatMessage({
+                              id: `home.taskSuggestions.dismissFailed`,
+                              defaultMessage: `Couldn't dismiss suggestion`,
+                              description: `Error toast shown when removing a suggested task below the Home composer fails. The suggestion remains available so the user can try again.`,
+                            }),
+                          ));
+                    })
+                    .finally(() => {
+                      ce((e) => e.filter((e) => e !== r));
+                    }));
+              },
+            }
+          );
+        }) ?? []),
+      (t[41] = k),
+      (t[42] = _),
+      (t[43] = D),
+      (t[44] = se),
+      (t[45] = fe?.message_body),
+      (t[46] = c),
+      (t[47] = b),
+      (t[48] = w),
+      (t[49] = l),
+      (t[50] = S),
+      (t[51] = d),
+      (t[52] = ae),
+      (t[53] = p),
+      (t[54] = f),
+      (t[55] = g),
+      (t[56] = P),
+      (t[57] = h),
+      (t[58] = U),
+      (t[59] = W),
+      (t[60] = G),
+      (t[61] = K),
+      (t[62] = q),
+      (t[63] = J));
+  } else ((U = t[58]), (W = t[59]), (G = t[60]), (K = t[61]), (q = t[62]), (J = t[63]));
+  let Me;
+  return (
+    t[64] !== U || t[65] !== W || t[66] !== G || t[67] !== K || t[68] !== q || t[69] !== J
+      ? ((Me = (0, $.jsx)(U, {
+          composerMode: W,
+          headline: G,
+          layout: K,
+          showCloseAction: q,
+          items: J,
+        })),
+        (t[64] = U),
+        (t[65] = W),
+        (t[66] = G),
+        (t[67] = K),
+        (t[68] = q),
+        (t[69] = J),
+        (t[70] = Me))
+      : (Me = t[70]),
+    Me
+  );
 }
-
-initializeHomeTaskSuggestions();
-
-export {
-  taskSuggestionAccountIdSignal as i,
-  initializeHomeTaskSuggestions as n,
-  initializeTaskSuggestionQueries as r,
-  HomeTaskSuggestions as t,
-};
+function vn(e) {
+  return e.status === `uploading`;
+}
+function yn(e) {
+  re.warning(`Failed to mark ChatGPT task suggestion selected`, {
+    safe: {},
+    sensitive: { error: e },
+  });
+}
+function bn() {
+  return `generated`;
+}
+function xn(e) {
+  let { id: t } = e;
+  return t;
+}
+function Sn(e) {
+  re.warning(`Failed to record ChatGPT task suggestion view`, {
+    safe: {},
+    sensitive: { error: e },
+  });
+}
+function Cn() {
+  return crypto.randomUUID();
+}
+function wn(e) {
+  return !e.hasText();
+}
+function Tn(e) {
+  let { item_type: t, destination_metadata: n } = e.item;
+  return (
+    (t === `task_suggestion` || t === `automation_suggestion`) &&
+    n?.type === `prompt` &&
+    n.auto_send_in_background === !0
+  );
+}
+function En(e) {
+  return e?.startsWith(`/`) ? new URL(e, `https://chatgpt.com`).href : e;
+}
+var Dn, Q, On, $, kn, An, jn, Mn, Nn;
+function Pn() {
+  return (Pn = e(() => {
+    ((Dn = n()),
+      Ye(),
+      wt(),
+      ae(),
+      Xe(),
+      c(),
+      me(),
+      (Q = w()),
+      (On = h()),
+      p(),
+      je(),
+      Ut(),
+      Yt(),
+      Ht(),
+      W(),
+      Jt(),
+      J(),
+      qe(),
+      Ie(),
+      De(),
+      ce(),
+      O(),
+      se(),
+      Lt(),
+      ve(),
+      Bt(),
+      g(),
+      U(),
+      Le(),
+      st(),
+      S(),
+      fe(),
+      Tt(),
+      H(),
+      _e(),
+      Ft(),
+      Wt(),
+      Ot(),
+      q(),
+      Et(),
+      $t(),
+      sn(),
+      fn(),
+      mn(),
+      ($ = d()),
+      l(),
+      (kn = RegExp(`^(?:${ot().source})$`, `u`)),
+      (An = f(
+        async () =>
+          (
+            await b(
+              async () => {
+                let { ClinicalStarterPrompts: e } = await import(
+                  `@rchunk/home-starter-prompts`
+                );
+                return { ClinicalStarterPrompts: e };
+              },
+              __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7, 8]),
+              import.meta.url,
+            )
+          ).ClinicalStarterPrompts,
+      )),
+      (jn = f(Dt)),
+      (Mn = f(G)),
+      (Nn = k(C, (e, { get: t }) => {
+        if (!e) return !1;
+        let n = t(Be, { name: `chatgpt.clinical-starter-prompts` });
+        return n.isError ? !1 : t(Ae).enabled || n.isLoading;
+      })));
+  }))();
+}
+export { X as i, Pn as n, fn as r, hn as t };
