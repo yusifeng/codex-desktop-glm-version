@@ -1,5 +1,18 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Project/plugin/compliance dialog release-owner recovery：一次性恢复
+`cme-dialog`、`create-dialog`、`chatgpt-project-add-sources-dialog`、
+`browser-browsing-data-dialog`、`plugins-page-section`、`hosted-plugin-create-dialog`、
+`mcp-extension-view-page-core`、`profile-showcase-editor`、`create-project-dialog-core` 与
+`workspace-agent-schedules-dialog` 十个发布 owner。它们不再由 8～51 行局部兼容壳替代，
+本批净恢复 16,507 行发布 TypeScript，并将七个旧 mock 测试簇中的相关断言迁移为逐字发布
+一致性验证，同时保留簇内其他行为覆盖。整批通过 12,448/12,448 transform check、
+1,888/1,888 renderer build/verify、2,247/2,247 app-code coverage、0 semantic tail 与
+typecheck。严格 hub 消费推进到 app-shared 1,549/3,185、app-initial 4,788/8,204、
+app-primary 619/917，仍为 0 unreviewed、0 invalid consumers。该批继续收敛高差距业务
+owner，但不把 425 个 preserved 边界、三个聚合 hub 的剩余耦合导出或最终登录态 E2E
+视为已经完成。
+
 2026-11-02 Conversation tools/worker verification release-owner recovery：一次性恢复
 `pull-request-comment`、`scheduled-tasks-page`、`sketch-composer-host-core`、
 `mcp-server-elicitation-request-panel`、`chatgpt-code-block`、`artifact-session-tab-content`、

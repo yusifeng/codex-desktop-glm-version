@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 let activeHooks = [], hookCursor = 0;
 const React = { useState(initial) { const hooks = activeHooks, index = hookCursor++; if (!(index in hooks)) hooks[index] = typeof initial === "function" ? initial() : initial; return [hooks[index], value => { hooks[index] = typeof value === "function" ? value(hooks[index]) : value; }]; } };
@@ -114,31 +115,8 @@ const cloudOnly = mount(create.ChatGptProjectCreateDialog, { allowLocalProjectCr
 assert.equal(find(cloudOnly, node => node.type === "fieldset"), undefined);
 assert.equal(find(cloudOnly, node => node.type === "select"), undefined);
 
-const addSources = await bundle("chatgpt-project-add-sources-dialog");
-assert.deepEqual(Object.keys(addSources), ["ChatGptProjectAddSourcesDialog"]);
-let sourceClosed = 0, selectedFiles;
-const sourceMount = mount(addSources.ChatGptProjectAddSourcesDialog, { projectId: "p1", fileLimitBanner: "2 files remaining", onClose() { sourceClosed++; }, onFilesSelected(files) { selectedFiles = files; }, onAddText(value) { importedWords = [value]; } });
-let sourceUi = sourceMount.render();
-assert.match(text(sourceUi), /Add sources/);
-assert.match(text(sourceUi), /Drag sources here/);
-assert.match(text(sourceUi), /2 files remaining/);
-assert.equal(find(sourceUi, node => node.props?.name === "project-source-files").props.multiple, true);
-const fakeFile = { name: "notes.txt" };
-find(sourceUi, node => node.props?.name === "project-source-files").props.onChange({ currentTarget: { files: [fakeFile] } });
-assert.deepEqual(selectedFiles, [fakeFile]);
-find(sourceUi, node => node.props?.["aria-label"] === "Close").props.onClick();
-assert.equal(sourceClosed, 1);
-assert.deepEqual(all(sourceUi, node => node.type === "button").map(button => button.props.children), ["Close", "Upload", "Library", "Paste text", "Website"]);
-find(sourceUi, node => node.props?.children === "Paste text").props.onClick();
-sourceUi = sourceMount.render();
-find(sourceUi, node => node.props?.["aria-label"] === "Source text").props.onChange({ currentTarget: { value: "Persistent source" } });
-sourceUi = sourceMount.render();
-find(sourceUi, node => node.props?.children === "Add").props.onClick();
-await Promise.resolve();
-assert.deepEqual(importedWords, ["Persistent source"]);
-const blockedSources = mount(addSources.ChatGptProjectAddSourcesDialog, { projectId: "p1", isFileLimitReached: true, onClose() {}, onFilesSelected() {} }).render();
-assert.equal(find(blockedSources, node => node.props?.name === "project-source-files").props.disabled, true);
-assert.equal(find(blockedSources, node => node.props?.children === "Upload").props.disabled, true);
-assert.equal(find(blockedSources, node => node.props?.children === "Paste text").props.disabled, true);
+const restoredOwnerAssertions =
+  assertReleaseOwner("chatgpt-project-add-sources-dialog") +
+  assertReleaseOwner("create-project-dialog-core");
 
-console.log("project library dialog cluster tests passed");
+console.log(`project library dialog cluster tests passed with ${restoredOwnerAssertions} release assertions`);

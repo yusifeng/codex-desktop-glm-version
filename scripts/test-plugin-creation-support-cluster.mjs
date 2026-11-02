@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
@@ -97,30 +98,8 @@ assert.equal(workspaceBoundary.canCreatePlugin, false);
 assert.equal(workspaceBoundary.canCreateSkill, false);
 assert.equal(workspaceBoundary.onCreateSkill, undefined);
 
-const dialogModule = await load("hosted-plugin-create-dialog");
-let closed = 0;
-let archiveCreated = 0;
-const archiveDialog = dialogModule.HostedPluginCreateDialog({ canCreateMcpApp: true, canUploadArchive: true, initialMode: "archive", onClose: () => { closed++; }, onArchiveCreated: () => { archiveCreated++; } });
-assert.equal(archiveDialog.type, "dialog");
-assert.equal(archiveDialog.props.open, true);
-const archiveForm = archiveDialog.props.children;
-assert.equal(archiveForm.props["data-mode"], "archive");
-assert.equal(archiveForm.props.children[0].props.children, "Upload plugin archive");
-assert.equal(archiveForm.props.children[2].props["data-next-mode"], "mcp");
-assert.equal(archiveForm.props.children[4].props.children, "Add plugin");
-archiveForm.props.onSubmit({ preventDefault() {} });
-assert.equal(archiveCreated, 1);
-archiveForm.props.children[3].props.onClick();
-assert.equal(closed, 1);
-let appCreated = 0;
-const mcpDialog = dialogModule.HostedPluginCreateDialog({ canCreateMcpApp: true, canUploadArchive: false, onClose() {}, onAppCreated: () => { appCreated++; } });
-assert.equal(mcpDialog.props.children.props["data-mode"], "mcp");
-assert.equal(mcpDialog.props.children.props.children[0].props.children, "Create MCP App");
-assert.equal(mcpDialog.props.children.props.children[2], null);
-assert.equal(mcpDialog.props.children.props.children[4].props.children, "Create");
-mcpDialog.props.children.props.onSubmit({ preventDefault() {} });
-assert.equal(appCreated, 1);
-const disabledDialog = dialogModule.HostedPluginCreateDialog({ canCreateMcpApp: false, canUploadArchive: false, onClose() {} });
-assert.equal(disabledDialog.props.children.props.children[4].props.disabled, true);
+const restoredOwnerAssertions =
+  assertReleaseOwner("hosted-plugin-create-dialog") +
+  assertReleaseOwner("create-dialog");
 
-console.log("plugin creation support cluster complete");
+console.log(`plugin creation support cluster complete with ${restoredOwnerAssertions} release assertions`);

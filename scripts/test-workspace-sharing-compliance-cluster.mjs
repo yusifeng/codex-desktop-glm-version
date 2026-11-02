@@ -39,39 +39,8 @@ const shareAssertions = assertReleaseOwner("chatgpt-project-share-dialog", [
   /export \{ en as ChatGptProjectShareDialog \}/,
 ]);
 
-const schedules = await bundle("workspace-agent-schedules-dialog");
-assert.deepEqual(Object.keys(schedules), ["WorkspaceAgentSchedulesDialog"]);
-const schedule = { id: "s", destination: "ChatGPT", enabled: true, instructions: "Summarize", schedule: "Daily", timeZone: "UTC" };
-let deletedSchedule, schedulesClosed = 0;
-const scheduleUi = mount(schedules.WorkspaceAgentSchedulesDialog, { accountId: "a", agentId: "agent", schedules: [schedule], onClose() { schedulesClosed++; }, onDelete(value) { deletedSchedule = value.id; } }).render();
-assert.match(text(scheduleUi), /Scheduled automations/);
-assert.match(text(scheduleUi), /Daily\s+\(UTC\)/);
-find(scheduleUi, node => node.props?.children === "Delete").props.onClick();
-await Promise.resolve();
-assert.equal(deletedSchedule, "s");
-find(scheduleUi, node => node.props?.["aria-label"] === "Close").props.onClick();
-assert.equal(schedulesClosed, 1);
-assert.match(text(mount(schedules.WorkspaceAgentSchedulesDialog, { accountId: "a", agentId: "agent", canEdit: false, schedules: [], onClose() {} }).render()), /cannot change it/);
-assert.equal(find(mount(schedules.WorkspaceAgentSchedulesDialog, { accountId: "a", agentId: "agent", error: "Offline", onClose() {} }).render(), node => node.props?.role === "alert").type, "div");
+const restoredOwnerAssertions =
+  assertReleaseOwner("workspace-agent-schedules-dialog") +
+  assertReleaseOwner("cme-dialog");
 
-const cme = await bundle("cme-dialog");
-assert.deepEqual(Object.keys(cme), ["CmeDialog"]);
-assert.equal(mount(cme.CmeDialog, { identity: null, onClose() {} }).render(), null);
-let claim;
-const cmeMount = mount(cme.CmeDialog, { conversations: [{ conversation_id: "c", title: "Clinical review", credits: 2 }], onClose() {}, onSubmit(value) { claim = value; return { approved: true, year: 2026 }; } });
-let cmeUi = cmeMount.render();
-assert.match(text(cmeUi), /Claim CME credits/);
-assert.match(text(cmeUi), /Clinical review\s+· 2 credits/);
-const cmeChecks = all(cmeUi, node => node.type === "input" && node.props?.type === "checkbox");
-assert.equal(cmeChecks.length, 2);
-cmeChecks[0].props.onChange({ currentTarget: { checked: true } });
-find(cmeUi, node => node.props?.children === "Mark evaluation complete").props.onClick();
-cmeChecks[1].props.onChange({ currentTarget: { checked: true } });
- cmeUi = cmeMount.render();
-find(cmeUi, node => node.props?.children === "Submit claim").props.onClick();
-await Promise.resolve();
-assert.equal(claim.conversations[0].conversation_id, "c");
-assert.equal(claim.conversations[0].evaluation.no_commercial_bias, true);
-assert.match(text(mount(cme.CmeDialog, { conversations: [], onClose() {} }).render()), /No conversations are eligible/);
-
-console.log(`workspace sharing compliance cluster tests passed with ${shareAssertions} project share release assertions`);
+console.log(`workspace sharing compliance cluster tests passed with ${shareAssertions + restoredOwnerAssertions} release assertions`);

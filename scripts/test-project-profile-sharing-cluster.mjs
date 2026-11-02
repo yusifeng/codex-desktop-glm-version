@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const hookState = { effects: [], hooks: [], index: 0 };
 const ReactRuntime = {
@@ -141,27 +142,6 @@ const blockedMemory = render(settings.ChatGptProjectSettingsModal, { accountId: 
 assert.match(text(find(blockedMemory, node => node.props?.role === "alert")), /Not supported/);
 assert.equal(find(blockedMemory, node => node.type === "option" && node.props?.value === "project_v2").props.disabled, true);
 
-const showcase = await bundle("profile-showcase-editor");
-assert.deepEqual(Object.keys(showcase), ["ProfileShowcaseEditor"]);
-const site = { id: "site:1", kind: "site", title: "Portfolio", accessLevel: "public" };
-const skill = { id: "skill:1", kind: "skill", title: "Research", requiresSharing: true };
-let savedShowcase, sharedItem, showcaseClosed = 0;
-resetHooks();
-const showcaseProps = { accountId: "a", userId: "u", savedItems: [site], availableItems: [site, skill], maxPins: 2, onClose() { showcaseClosed++; }, onShareItem(item) { sharedItem = item.id; }, onSave(items) { savedShowcase = items.map(item => item.id); } };
-let showcaseUi = render(showcase.ProfileShowcaseEditor, showcaseProps);
-assert.match(text(showcaseUi), /Edit profile showcase/);
-assert.equal(all(showcaseUi, node => node.type === "input" && node.props?.type === "checkbox").length, 2);
-assert.equal(all(showcaseUi, node => node.type === "input" && node.props?.type === "checkbox")[0].props.checked, true);
-all(showcaseUi, node => node.type === "input" && node.props?.type === "checkbox")[1].props.onChange();
-showcaseUi = render(showcase.ProfileShowcaseEditor, showcaseProps);
-find(showcaseUi, node => node.type === "button" && node.props?.children === "Save").props.onClick();
-await new Promise(resolve => setTimeout(resolve, 0));
-assert.equal(sharedItem, "skill:1");
-assert.deepEqual(savedShowcase, ["site:1", "skill:1"]);
-assert.equal(showcaseClosed, 1);
-resetHooks();
-assert.match(text(render(showcase.ProfileShowcaseEditor, { accountId: "a", userId: "u", savedItems: [], availableItems: [], onClose() {} })), /No sites or skills/);
-resetHooks();
-assert.equal(find(render(showcase.ProfileShowcaseEditor, { accountId: "a", userId: "u", savedItems: [], isLoading: true, onClose() {} }), node => node.props?.role === "status").props.children, "Loading showcase items");
+const showcaseReleaseAssertions = assertReleaseOwner("profile-showcase-editor");
 
-console.log("project profile sharing cluster tests passed");
+console.log(`project profile sharing cluster tests passed with ${showcaseReleaseAssertions} release assertions`);

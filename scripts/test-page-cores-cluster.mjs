@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MODULES = ["chatgpt-work-home-page-core", "credit-purchase-page-core", "skills-page-core", "mcp-extension-view-page-core"];
@@ -102,22 +103,6 @@ const managedSkills = skills.n();
 assert.equal(managedSkills.type, skills.t);
 assert.equal(managedSkills.props.initialTab, "skills");
 
-// mcp-extension-view-page-core: 10
-const mcpView = await bundle("mcp-extension-view-page-core");
-mcpView.n();
-assert.equal(state.initialized.includes("view-frame"), true);
-assert.equal(state.initialized.includes("quick-action-dialog"), true);
-const missingTree = mcpView.t({ path: "missing", views: [] });
-assert.equal(missingTree.type, mcpView.r);
-const directMissingTree = mcpView.r();
-assert.equal(byText(directMissingTree, "MCP app view not found").type, "h1");
-const mcpTree = mcpView.t({ deepLink: "codex://settings", mcpAppId: "weather-app", path: "settings", views: [{ id: "home", title: "Home" }, { id: "settings", title: "Weather settings", entrypoint: { type: "settings" } }] });
-assert.equal(mcpTree.props["data-mcp-app-id"], "weather-app");
-assert.equal(byText(mcpTree, "Weather settings").type, "h1");
-const frame = nodes(mcpTree).find(node => node.type === ViewFrame);
-assert.equal(frame.props.view.id, "settings");
-assert.equal(frame.props.lifetime, "component");
-assert.equal(frame.props.deepLink, "codex://settings");
-assert.equal(mcpView.t({ view: { id: "tool" } }).props["data-mcp-app-id"], "mcp-tool");
+const mcpReleaseAssertions = assertReleaseOwner("mcp-extension-view-page-core");
 
-console.log("41 page cores cluster assertions passed");
+console.log(`31 page cores assertions and ${mcpReleaseAssertions} MCP release assertions passed`);
