@@ -386,11 +386,9 @@ export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
   ["local-conversation-page", "local-conversation-page-bcc7eca0b3ab.js"],
   ["local-conversation-thread", "local-conversation-thread-c6e40fdd6d59.js"],
   ["local-conversation-turn", "local-conversation-turn-14bf296d5217.js"],
-  ["user-message", "user-message-e36f9e2dfe24.js"],
   // Review annotations and file-tree preferences still used a compact model
   // that replaced the release comment cards and draft interaction surface.
   ["review-preferences-model", "review-preferences-model-677402e96a42.js"],
-  ["detached-entry", "entry-d8508ad25dff.js"],
 ]);
 
 export const SEMANTIC_ROUTE_OVERRIDES = new Set([

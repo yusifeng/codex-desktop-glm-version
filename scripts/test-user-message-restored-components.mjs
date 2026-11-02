@@ -90,6 +90,8 @@ assert.equal(all.some(node => node.props?.["data-user-message-bubble"] === true)
 assert.equal(all.some(node => node.props?.defaultMessage === "References prior conversation"), true);
 assert.equal(all.some(node => node.props?.id === "codex.userMessage.commentCount" && node.props?.values?.count === 2), true);
 const copyButton = all.find(node => node.type === "Button" && node.props?.["aria-label"] === "Copy message");
+assert.match(copyButton.props.className, /focus-visible:ring-2/);
+assert.equal(all.some(node => String(node.props?.className).includes("group-hover:opacity-100") && node.type === "span"), true);
 copyButton.props.onClick();
 await Promise.resolve();
 assert.deepEqual(state.copied, ["Hello world"]);
@@ -130,6 +132,7 @@ walkAeon(aeonTree);
 assert.equal(aeonNodes.some(node => String(node.props?.className).includes("grid-cols-[auto_minmax(0,max-content)]")), true);
 assert.equal(aeonNodes.some(node => String(node.props?.className).includes("_otherUserMessage_149ln_35")), true);
 assert.equal(aeonNodes.some(node => String(node.props?.className).includes("_compactMessageReaction_149ln_7")), true);
+assert.equal(aeonNodes.some(node => String(node.props?.className).includes("[&_button]:cursor-default")), true);
 
 state.aeon = false;
 const compactTree = mod.t({ compactActions: true, message: "Compact", turnId: "turn-c" });
@@ -143,6 +146,12 @@ const attachmentNodes = [];
 const walkAttachment = (node) => { if (node == null || typeof node !== "object") return; attachmentNodes.push(node); const children=node.props?.children; (Array.isArray(children)?children.flat(Infinity):[children]).forEach(walkAttachment); };
 walkAttachment(attachmentOnlyTree);
 assert.equal(attachmentNodes.some(node => node.props?.["data-user-message-bubble"] === true), false);
+
+const hiddenMetadataTree = mod.t({ compactActions: true, hideActions: true, message: "No metadata", turnId: "turn-hidden" });
+const hiddenMetadataNodes = [];
+const walkHiddenMetadata = (node) => { if (node == null || typeof node !== "object") return; hiddenMetadataNodes.push(node); const children=node.props?.children; (Array.isArray(children)?children.flat(Infinity):[children]).forEach(walkHiddenMetadata); };
+walkHiddenMetadata(hiddenMetadataTree);
+assert.equal(hiddenMetadataNodes.some(node => String(node.props?.className).includes("flex-row-reverse") && String(node.props?.className).includes("hidden")), true);
 
 mod.f(); mod.c(); mod.i(); mod.u(); mod.n();
 for (const dependency of ["analytics-init", "body-state", "composer", "hook-context", "plan-init", "primary-state", "react-cache", "timestamps"]) assert.equal(state.initialized.includes(dependency), true);

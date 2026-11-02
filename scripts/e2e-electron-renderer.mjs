@@ -134,17 +134,22 @@ if (mode === "smoke-readonly") {
     await command('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...point });
   };
   const openMenuBySelector = async (selector, timeoutMs = 10_000) => {
-    const point = await evaluate(`(() => {
+    const deadline = Date.now() + timeoutMs;
+    let point = null;
+    do {
+      point = await evaluate(`(() => {
       const target = document.querySelector(${JSON.stringify(selector)});
-      if (target == null) throw new Error('Menu trigger not found: ' + ${JSON.stringify(selector)});
+      if (target == null) return null;
       target.scrollIntoView({ block: 'center', inline: 'nearest' });
       const rect = target.getBoundingClientRect();
       return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
     })()`);
+      if (point == null) await new Promise((resolve) => setTimeout(resolve, 100));
+    } while (point == null && Date.now() < deadline);
+    if (point == null) throw new Error(`Menu trigger not found: ${selector}`);
     await command('Input.dispatchMouseEvent', { type: 'mouseMoved', ...point });
     await command('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...point });
     await command('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...point });
-    const deadline = Date.now() + timeoutMs;
     do {
       const open = await evaluate(`(() => {
         const target = document.querySelector(${JSON.stringify(selector)});
@@ -488,15 +493,14 @@ if (mode === "smoke-readonly") {
       })()`);
       await waitForSelector('[aria-label="打开个人资料菜单"], [aria-label="Open profile menu"]');
     }
-    const profileMenuLabel = await evaluate(`
-      document.querySelector('[aria-label="打开个人资料菜单"]') != null ? '打开个人资料菜单' : 'Open profile menu'
-    `);
     const settingsMenuVisible = await evaluate(`
       [...document.querySelectorAll('[role="menuitem"]')].some((element) =>
         ['设置', 'Settings'].includes(element.innerText?.trim().split('\\n')[0])
       )
     `);
-    if (!settingsMenuVisible) await clickAriaWithMouse(profileMenuLabel);
+    if (!settingsMenuVisible) {
+      await openMenuBySelector('[aria-label="打开个人资料菜单"], [aria-label="Open profile menu"]', 20_000);
+    }
     const settingsDeadline = Date.now() + 20_000;
     let settingsClicked = false;
     let attempt = 0;

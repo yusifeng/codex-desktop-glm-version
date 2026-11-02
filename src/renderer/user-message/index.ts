@@ -537,18 +537,45 @@ function UserMessage(props: UserMessageProps): unknown {
           body,
         ],
       }) : null;
-  const copyLabel = copied ? "Copied" : "Copy message";
-  const copyButton = jsx().jsx(Tooltip, { tooltipContent: copyLabel, children: jsx().jsx(Button, { color: "ghost", size: "icon", "aria-label": copyLabel, onClick: copied ? undefined : copy, children: jsx().jsx(copied ? (sharedChunk as any).em : (sharedChunk as any).af, { className: "icon-xs" }) }) });
+  const copyLabel = copied
+    ? intl.formatMessage({ id: "codex.userMessage.copiedAriaLabel", defaultMessage: "Copied", description: "Aria label for the copy button after the content has been copied" })
+    : intl.formatMessage({ id: "codex.userMessage.copyAriaLabel", defaultMessage: "Copy message", description: "Aria label for the button that copies the user's message" });
+  const copyButton = jsx().jsx(Tooltip, {
+    tooltipContent: copyLabel,
+    children: jsx().jsx(Button, {
+      className: "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0",
+      color: "ghost",
+      size: "icon",
+      "aria-label": copyLabel,
+      onClick: copied ? undefined : copy,
+      children: jsx().jsx(copied ? (sharedChunk as any).em : (sharedChunk as any).af, { className: "icon-xs" }),
+    }),
+  });
   const canEdit = props.onEditMessage != null && props.turnId != null && !syntheticPlan;
   const actions = (hasContent || canEdit) && editDraft == null && !props.compactActions && !props.hideActions && !isAeonFormatted
     ? jsx().jsxs("div", {
         className: classNames("me-1 ms-1 flex items-center gap-2", !props.alwaysShowActions && "opacity-0 group-focus-within:opacity-100 group-hover:opacity-100"),
         children: [
-          props.sentAtMs == null ? null : jsx().jsx(Timestamp, { sentAtMs: props.sentAtMs }),
-          props.hookStats == null ? null : jsx().jsx(HookStatsBadge, { stats: props.hookStats, threadDetailLevel: props.threadDetailLevel }),
-          hasContent ? copyButton : null,
-          props.additionalActions,
-          canEdit ? jsx().jsx(Button, { color: "ghost", size: "icon", "aria-label": "Edit message", onClick: startEditing, children: jsx().jsx((sharedChunk as any).Lu, { className: "icon-xs" }) }) : null,
+          props.sentAtMs == null ? null : jsx().jsx("span", {
+            className: "flex opacity-0 group-focus-within:opacity-100 group-hover:opacity-100",
+            children: jsx().jsx(Timestamp, { sentAtMs: props.sentAtMs }),
+          }),
+          jsx().jsxs("div", {
+            className: "flex turn-action-controls items-center gap-0.5",
+            children: [
+              props.hookStats == null ? null : jsx().jsx(HookStatsBadge, { stats: props.hookStats, threadDetailLevel: props.threadDetailLevel }),
+              hasContent ? copyButton : null,
+              props.additionalActions,
+              canEdit ? jsx().jsx(Button, {
+                className: "focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-0",
+                color: "ghost",
+                size: "icon",
+                "aria-label": intl.formatMessage({ id: "codex.userMessage.editAriaLabel", defaultMessage: "Edit message", description: "Aria label for the button that edits the previous user message" }),
+                onClick: startEditing,
+                children: jsx().jsx((sharedChunk as any).Lu, { className: "icon-xs" }),
+              }) : null,
+            ],
+          }),
         ],
       })
     : null;
@@ -567,7 +594,7 @@ function UserMessage(props: UserMessageProps): unknown {
     : null;
   let renderedBubble: unknown = jsx().jsxs("div", { className: classNames("relative flex w-full justify-end", reactionPlacement === "corner" && reaction != null && "mb-2"), children: [bubble, reaction] });
   if (isAeonFormatted) {
-    const compactReaction = reaction == null ? null : jsx().jsx("div", { className: classNames("_compactMessageReaction_149ln_7 relative flex size-7 items-center justify-center rounded-full border-2 border-surface", isOtherUser && "_otherUserMessage_149ln_35"), children: props.messageReaction });
+    const compactReaction = reaction == null ? null : jsx().jsx("div", { className: classNames("_compactMessageReaction_149ln_7 relative flex size-7 items-center justify-center rounded-full border-2 border-surface [&_button]:absolute [&_button]:-inset-0.5 [&_button]:size-auto [&_button]:cursor-default [&_button]:text-sm [&_button]:drop-shadow-none", isOtherUser && "_otherUserMessage_149ln_35"), children: props.messageReaction });
     renderedBubble = jsx().jsxs("div", {
       className: classNames(editDraft != null ? "flex w-full flex-col items-end gap-1" : "grid max-w-full grid-cols-[auto_minmax(0,max-content)] items-center gap-x-2 gap-y-1", props.additionalActions == null && "gap-x-0", reaction != null && props.messageHeader == null && "pt-5"),
       children: [
@@ -583,12 +610,13 @@ function UserMessage(props: UserMessageProps): unknown {
   if (props.compactActions && !props.hideActions && hasContent && editDraft == null && !isAeonFormatted) {
     renderedBubble = jsx().jsxs("div", { className: "flex w-full items-center justify-end gap-1", children: [jsx().jsx("div", { className: "turn-action-controls opacity-0 group-focus-within:opacity-100 group-hover:opacity-100", children: copyButton }), renderedBubble] });
   }
+  const showMetadataRow = hasBadges || props.messageStatus != null || (!props.compactActions && !props.hideActions && !isAeonFormatted);
   return jsx().jsxs("div", {
     className: "group flex w-full flex-col items-end justify-end gap-1",
     children: [
       isAeonFormatted ? null : props.messageHeader,
       renderedBubble,
-      jsx().jsxs("div", { className: classNames("flex flex-row-reverse items-center gap-1", reactionPlacement === "below" && reaction != null && "me-12"), children: [...badges, actions] }),
+      jsx().jsxs("div", { className: classNames("flex flex-row-reverse items-center gap-1", reactionPlacement === "below" && reaction != null && "me-12", !showMetadataRow && "hidden"), children: [...badges, actions] }),
     ],
   });
 }

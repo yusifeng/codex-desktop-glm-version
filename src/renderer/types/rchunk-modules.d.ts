@@ -2728,6 +2728,11 @@ declare module "@rchunk/app-shared" {
   export const _any: any;
 }
 
+declare module "@exact-chunk/app-shared-7b9edc1bfb7f.js" {
+  export const h4: () => void;
+  export const m4: (...classNames: Array<string | false | null | undefined>) => string;
+}
+
 declare module "@rchunk/portable-attachment-thumbnail" {
   export type PortableAttachmentImportKind =
     | "csv"
@@ -16202,3 +16207,17 @@ declare module "@exact-chunk/monotone-68fb4f84bd88.js";
 declare module "@exact-chunk/BarChart-2010e7d67e4a.js";
 declare module "@exact-chunk/queries-a53713419c4d.js";
 declare module "@exact-chunk/visualization-directive-renderer-59d128f8ff01.js";
+// Detached-window entry aliases recovered from app-shared-7b9edc1bfb7f.js.
+// These are public ESM aliases consumed by the readable detached-entry owner.
+declare module "@rchunk/app-shared" {
+  export const GI: () => string;
+  export const Td: () => void;
+  export const Ws: () => void;
+  export const Xv: (props: Record<string, unknown>) => unknown;
+  export const jm: () => void;
+  export const qI: () => void;
+  export const s_: (props: { children?: unknown }) => unknown;
+  export const wd: () => Disposable;
+  export const xd: unknown;
+  export const yd: () => void;
+}
