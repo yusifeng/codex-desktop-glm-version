@@ -41,6 +41,13 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
+The current Codex Home announcement batch removes a synthetic recap candidate and restores the published global-disable,
+focused-source, and ordered gift/voice/import/worktree/history/replay gates. Product Beacon candidates now precede vanilla
+promos, honor suppression and post-onboarding metadata, and retain composer-text/voice actions. Fast Mode no longer depends
+on a test-only override: its production candidate reads the model query/settings, service-tier policy, persisted seen state,
+personalized estimate, and real tier mutation. Focused coverage increased from 12 to 18 assertions; typecheck and strict
+public-ABI gates pass. Special Beacon modal classification and the full release visual composition remain follow-up work.
+
 The in-progress Automations/settings live-state batch removes two more synthetic runtime assumptions. The Automations page
 now consumes the published local/cloud capability, signed-in account, local/cloud task query, and run-history ABIs instead of
 rendering an empty production presentation; history is joined by automation id and retry/mark-all-read actions are live.

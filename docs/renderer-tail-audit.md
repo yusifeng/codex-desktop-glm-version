@@ -1,5 +1,15 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Codex Home announcements runtime recovery：`codex-home-announcements-current` 不再把
+`D0t` initializer 误当生产 override hook，也不再插入发布候选序列不存在的 synthetic recap entry。
+Home 候选现在执行全局 disabled signal、focused-source context、gift/voice/import/worktree/history/replay
+串行门控；产品 Beacon 会排在六个 vanilla candidates 之前，并按 `shouldSuppressVanillaPromos` 及
+`show_after_onboarding` 控制后续展示，同时恢复 composer-text/voice actions。Codex Home Fast Mode
+会从真实 model query、model settings、tier policy、persisted seen-state 和 personalized estimate ABI
+构造候选并调用真实 tier mutation。focused suite 由 12 增至 18 项；typecheck 与 strict hub gate
+（新增公开消费 app-shared 1、app-initial 6、app-primary 1，0 invalid）通过。该批恢复候选状态机和
+生产行为，不把尚未恢复的特殊 Beacon modal 分类/完整发布视觉组合计作完成。
+
 2026-11-02 Automations/settings live-state recovery batch（进行中）：`automations-page` 的生产路径不再
 默认落到空 `presentation`。页面现在通过发布 ABI `app-shared.BX/HX` 与
 `app-initial.Xet/yun/QCt/itt/MC` 读取 local/cloud capability、当前 account、本地/云端任务、

@@ -6,6 +6,10 @@ import * as esbuild from "esbuild";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__homeAnnouncementsTest = {
+  beacon: null,
+  candidateInputs: [],
+  signals: new Map(),
+  sourceContext: "default",
   override: {
     homeAnnouncementCandidates: [
       { isEligible: true, isLoading: false, content: "override-content" },
@@ -30,6 +34,7 @@ globalThis.__homeAnnouncementsTest = {
     jsxs: (type, props, key) => ({ type, props, key }),
   },
   react: {
+    useContext: () => globalThis.__homeAnnouncementsTest.sourceContext,
     useState: (value) => [value, () => {}],
   },
 };
@@ -63,7 +68,9 @@ const result = await esbuild.build({
                   export const n4 = () => ({ formatMessage: descriptor => "localized:" + descriptor.defaultMessage });
                   export const m4 = (...values) => values.filter(Boolean).join(" ");
                   export const Y2 = "FormattedMessage"; export const ig = "DismissIcon";
-                  export const LX = () => ({}); export const kz = model => model;
+                  export const HX = signal => globalThis.__homeAnnouncementsTest.signals.get(signal);
+                  export const LX = () => ({ set: (signal, value) => globalThis.__homeAnnouncementsTest.signals.set(signal, value) }); export const kz = model => model;
+                  export const ZI = "scope";
                   export const $3 = () => {}; export const K2 = () => {}; export const h4 = () => {};
                 `,
                 "app-initial": `
@@ -72,11 +79,24 @@ const result = await esbuild.build({
                   export const sbt = () => false;
                   export const xpn = () => {};
                   export const CNt = () => ({ isEligible: true, isLoading: false, content: "usage" });
+                  export const Fk = () => globalThis.__homeAnnouncementsTest.voiceStart;
+                  export const qk = () => globalThis.__homeAnnouncementsTest.voiceAvailable;
+                  export const qNt = "announcements-disabled";
+                  export const Xyt = "hide-first-new-thread-promos";
+                  export const QZ = "announcement-source-context";
+                  export const dun = () => "fast-mode-seen";
+                  export const s8 = () => ({ isServiceTierAllowed: true });
+                  export const w8 = () => ({ data: { models: [{ id: "production-fast" }] } });
+                  export const f8 = () => ({ modelSettings: { model: "auto" } });
+                  export const w0t = models => models[0];
+                  export const J2 = () => ({ serviceTierSettings: { selectedServiceTier: null, isLoading: false }, setServiceTier: (tier, source) => { globalThis.__homeAnnouncementsTest.productionTier = [tier, source]; return Promise.resolve(); } });
                   export const vN = "FastIcon";
                 `,
                 "app-primary": `
                   export const dr = "AnnouncementEntries";
                   export const $p = input => input.isLoading ? "loading" : input.isEligible ? "eligible" : "ineligible";
+                  export const Ch = () => globalThis.__homeAnnouncementsTest.beacon;
+                  export const Zp = enabled => enabled ? ({ estimateStatus: "ready", estimate: { savedHours: 2, savedMinutes: 15, threadCount: 8 } }) : ({ estimateStatus: "failed", estimate: null });
                 `,
                 "home-announcement-state": `
                   const initialize = () => {};
@@ -84,9 +104,19 @@ const result = await esbuild.build({
                   export { initialize as t };
                   export const u = () => ({ isEligible: false, isLoading: false, content: null });
                 `,
-                "announcement-entry-points": `export const t = () => {};`,
+                "announcement-entry-points": `
+                  const state = globalThis.__homeAnnouncementsTest;
+                  export const y = () => {};
+                  export const g = "history-status"; export const h = "history-dismissed";
+                  export const i = input => (state.candidateInputs.push(["gift", input]), state.gift ?? { dismiss() {}, isEligible: false, isLoading: false, openGiftCredits() {} });
+                  export const o = input => (state.candidateInputs.push(["import", input]), state.externalImport ?? { dismiss() {}, isEligible: false, isLoading: false, markShown() {}, openImport() {} });
+                  export const f = input => (state.candidateInputs.push(["replay", input]), state.replay ?? { dismiss() {}, isEligible: false, isLoading: false, markShown() {}, replay() {} });
+                  export const t = "GiftAnnouncement"; export const s = "ImportAnnouncement"; export const p = "ReplayAnnouncement"; export const v = "HistoryAnnouncement";
+                  export const u = async () => {};
+                `,
                 "home-announcement-slot": `export const n = () => {};`,
                 "codex-app-home-beacon-announcement-core": `export const r = () => {}; export const t = "Beacon";`,
+                "worktree-onboarding-state": `export const n = input => (globalThis.__homeAnnouncementsTest.candidateInputs.push(["worktree", input]), globalThis.__homeAnnouncementsTest.worktree ?? { isEligible: false, isLoading: false });`,
                 banner: `export const t = "CustomGptBanner";`,
                 "realtime-voice-home-announcement": `export const RealtimeVoiceHomeAnnouncementContent = "VoiceAnnouncement";`,
                 "worktree-onboarding-banner-controller": `export const WorktreeOnboardingBannerController = "WorktreeAnnouncement";`,
@@ -175,5 +205,32 @@ check(
   "enables the selected Fast mode tier and persists banner completion",
 );
 
-assert.equal(assertions, 12);
+globalThis.__homeAnnouncementsTest.override = {};
+globalThis.__homeAnnouncementsTest.signals.set("fast-mode-seen", false);
+const productionCodex = announcements.t({}).type(announcements.t({}).props);
+const productionEntries = productionCodex.type(productionCodex.props).props.entries;
+check(productionEntries[3].isEligible && productionEntries[3].content.props.content.props.values.savedHours === 2, "derives the production Fast candidate from model, tier, seen-state, and estimate ABIs");
+globalThis.__homeAnnouncementsTest.sourceContext = "focused-modal";
+const focusedModalHome = announcements.n({ entryPoint: "codex", homeComposerMode: "chat" });
+check(focusedModalHome.props.children[1] == null, "does not compete with a focused announcement source");
+
+globalThis.__homeAnnouncementsTest.sourceContext = "default";
+globalThis.__homeAnnouncementsTest.signals.set("announcements-disabled", true);
+let gatedHome = announcements.n({ entryPoint: "codex", homeComposerMode: "chat" });
+check(gatedHome.props.children[1].type(gatedHome.props.children[1].props) == null, "honors the global announcements-disabled signal");
+
+globalThis.__homeAnnouncementsTest.signals.set("announcements-disabled", false);
+globalThis.__homeAnnouncementsTest.gift = { dismiss() {}, isEligible: true, isLoading: false, openGiftCredits() {} };
+globalThis.__homeAnnouncementsTest.candidateInputs.length = 0;
+gatedHome = announcements.n({ entryPoint: "codex", homeComposerMode: "chat" });
+const gatedCandidates = gatedHome.props.children[1].type(gatedHome.props.children[1].props);
+check(gatedCandidates.props.entries.length === 7, "adds the product Beacon ahead of the six published vanilla groups without a synthetic recap entry");
+check(globalThis.__homeAnnouncementsTest.candidateInputs.find(([name]) => name === "worktree")[1].enabled === false, "defers worktree onboarding while a higher-priority gift candidate is active");
+
+globalThis.__homeAnnouncementsTest.beacon = { accountId: "account-1", beacon: { custom_fields: {} }, isEligible: true, isLoading: false, shouldSuppressVanillaPromos: true };
+const suppressedCodex = announcements.t({}).type(announcements.t({}).props);
+const suppressedEntries = suppressedCodex.type(suppressedCodex.props).props.entries;
+check(suppressedEntries[1].isEligible && !suppressedEntries[2].isEligible && !suppressedEntries[3].isEligible, "lets a suppressing Beacon hide vanilla multi-agent and Fast promos");
+
+assert.equal(assertions, 18);
 console.log(`${assertions} current Codex Home announcement assertions passed`);

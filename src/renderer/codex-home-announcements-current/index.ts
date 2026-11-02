@@ -17,7 +17,6 @@ import * as worktreeControllerChunk from "@rchunk/worktree-onboarding-banner-con
 import type { ServiceTierModel } from "@rchunk/app-shared";
 
 void runtimeChunk;
-void modalSourceChunk;
 void worktreeStateChunk;
 
 const {
@@ -43,7 +42,6 @@ const {
   Fk: useRealtimeVoiceStart,
   F$: useNavigateToLocalConversation,
   HZ: useComposerEditor,
-  Nk: useWeeklyRecapCandidate,
   i_n: useRouterLocation,
   kNt: getBeaconTreatment,
   qk: useRealtimeVoiceAvailability,
@@ -52,6 +50,41 @@ const {
   xpn: logAnalyticsEvent,
   U2: usePluginInstallDetails,
 } = appInitialChunk;
+interface AnnouncementInitialBindings {
+  QZ?: unknown;
+  Xyt?: unknown;
+  J2?: () => {
+    serviceTierSettings?: { isLoading?: boolean; selectedServiceTier?: unknown };
+    setServiceTier?(tier: string, source: "home_banner"): Promise<unknown> | unknown;
+  };
+  dun?: (key: string, fallback: boolean) => unknown;
+  f8?: () => { modelSettings?: { model?: unknown } };
+  qNt?: unknown;
+  s8?: () => { isServiceTierAllowed?: boolean };
+  w0t?: (models: unknown, selectedModel: unknown, predicate?: unknown) => ServiceTierModel | null;
+  w8?: () => { data?: { models?: unknown } };
+}
+const {
+  J2: useServiceTierSettings,
+  QZ: homeAnnouncementSourceContext,
+  Xyt: hideFirstNewThreadOnboardingPromosSignal,
+  dun: createPersistedBooleanSignal,
+  f8: useModelSettings,
+  qNt: announcementsDisabledSignal,
+  s8: useServiceTierPolicy,
+  w0t: selectFastModeModel,
+  w8: useModelsQuery,
+} = appInitialChunk as unknown as AnnouncementInitialBindings;
+interface AnnouncementSharedBindings { Dz?: unknown }
+const { Dz: fastModeModelPredicate } = appSharedChunk as unknown as AnnouncementSharedBindings;
+interface AnnouncementPrimaryBindings {
+  Zp?: (enabled: boolean) => {
+    estimate?: { savedHours?: number; savedMinutes?: number; threadCount?: number } | null;
+    estimateStatus?: "failed" | "loading" | "ready" | string;
+  };
+}
+const { Zp: useFastModeEstimate } = appPrimaryChunk as unknown as AnnouncementPrimaryBindings;
+let fastModeSeenSignal: unknown;
 const {
   $p: getAnnouncementStatus,
   Ch: useHomeBeaconCandidate,
@@ -61,6 +94,9 @@ const {
   r: initializeBeaconAnnouncement,
   t: BeaconAnnouncement,
 } = beaconChunk;
+const {
+  n: initializeAnnouncementModalSource,
+} = modalSourceChunk;
 const {
   f: useReplayCandidate,
   g: computerHistoryStatusSignal,
@@ -80,7 +116,6 @@ const { RealtimeVoiceHomeAnnouncementContent } = realtimeVoiceChunk;
 const { WorktreeOnboardingBannerController } = worktreeControllerChunk;
 const { n: useWorktreeOnboardingCandidate } = worktreeStateChunk;
 const {
-  r: RateLimitResetHomeAnnouncement,
   t: initializeRateLimitResetAnnouncementState,
   u: useMultiAgentAnnouncementEligibility,
 } = announcementStateChunk;
@@ -91,6 +126,7 @@ const { Banner: AnnouncementShell } = (
 ).presentation;
 
 interface ReactRuntime {
+  useContext<Value>(context: unknown): Value;
   useState<Value>(initialValue: Value): [
     Value,
     (value: Value | ((current: Value) => Value)) => void,
@@ -143,7 +179,7 @@ interface FastModeCandidate extends AnnouncementEntry {
 
 interface BeaconCandidate {
   accountId?: string | null;
-  beacon?: unknown;
+  beacon?: { custom_fields?: { show_after_onboarding?: boolean } } | null;
   isEligible: boolean;
   isLoading: boolean;
   shouldSuppressVanillaPromos?: boolean;
@@ -184,9 +220,12 @@ function initializeCodexHomeAnnouncements(): void {
   initializeIntl?.();
   initializeClassNames?.();
   initializeHomeAnnouncementSlot?.();
+  initializeAnnouncementModalSource?.();
   initializeRateLimitResetAnnouncementState();
   initializeAnnouncementEntryPoints?.();
   initializeBeaconAnnouncement?.();
+  useHomeAnnouncementOverrides?.();
+  fastModeSeenSignal = createPersistedBooleanSignal?.("has-seen-fast-mode-home-banner", false);
   React = (typeof reactRuntime === "function"
     ? reactRuntime()
     : reactRuntime) as ReactRuntime;
@@ -292,16 +331,41 @@ function useFastModeCandidate(): FastModeCandidate {
       isSubmitting,
       setIsSubmitting,
     };
+  const scope = useSignalScope?.(applicationScope);
+  const policy = useServiceTierPolicy?.() ?? {};
+  const models = useModelsQuery?.().data?.models;
+  const modelSettings = useModelSettings?.().modelSettings ?? {};
+  const tier = useServiceTierSettings?.() ?? {};
+  const seen = fastModeSeenSignal == null ? false : useSignalValue?.(fastModeSeenSignal) === true;
+  const fastModeModel = selectFastModeModel?.(models, modelSettings.model, fastModeModelPredicate) ?? null;
+  const canEstimate = policy.isServiceTierAllowed === true && fastModeModel != null && !seen &&
+    tier.serviceTierSettings?.selectedServiceTier == null && tier.serviceTierSettings?.isLoading !== true;
+  const estimateState = useFastModeEstimate?.(canEstimate) ?? {};
+  const estimate = estimateState.estimate;
+  const isEligible = canEstimate && estimateState.estimateStatus === "ready" && estimate != null;
+  const isLoading = canEstimate && estimateState.estimateStatus !== "ready" && estimateState.estimateStatus !== "failed";
+  const content = !isEligible || estimate == null ? null : jsx.jsx(FormattedMessage, {
+    id: "codex.fastModeHomeBanner.body.personalizedEstimate",
+    defaultMessage: "Based on your work last week across {threadCount, plural, one {# chat} other {# chats}}, Fast could have saved about {savedHours} hours and {savedMinutes} minutes. Increases plan usage.",
+    description: "Personalized estimate shown in the Fast mode home banner",
+    values: {
+      savedHours: estimate.savedHours ?? 0,
+      savedMinutes: estimate.savedMinutes ?? 0,
+      threadCount: estimate.threadCount ?? 0,
+    },
+  });
   return {
-    content: null,
+    content,
     intl,
-    isEligible: false,
-    isLoading: false,
+    isEligible,
+    isLoading,
     isSubmitting,
-    fastModeModel: null,
-    setHasSeenFastModeHomeBanner() {},
+    fastModeModel,
+    setHasSeenFastModeHomeBanner(value) {
+      if (fastModeSeenSignal != null) scope?.set?.(fastModeSeenSignal, value);
+    },
     setIsSubmitting,
-    setServiceTier: async () => {},
+    setServiceTier: tier.setServiceTier ?? (async () => {}),
   };
 }
 
@@ -321,10 +385,14 @@ function useBeaconCandidate(product?: string): BeaconCandidate {
 }
 function BeaconContent({
   candidate,
+  editor,
   product,
+  startRealtimeVoice,
 }: {
   candidate: BeaconCandidate;
+  editor?: { focus?(): void; setText?(value: string): void; setPromptText?(value: string): void };
   product?: string;
+  startRealtimeVoice?: (() => unknown) | null;
 }): unknown {
   const Component = BeaconAnnouncement;
   if (
@@ -347,6 +415,12 @@ function BeaconContent({
       treatment: getBeaconTreatment?.(candidate.beacon),
     },
     beacon: candidate.beacon,
+    onComposerText: (value: string) => {
+      editor?.focus?.();
+      if (editor?.setText != null) editor.setText(value);
+      else editor?.setPromptText?.(value);
+    },
+    onStartVoice: startRealtimeVoice == null ? undefined : () => void startRealtimeVoice(),
   });
 }
 
@@ -364,32 +438,33 @@ function HomeAnnouncementCandidates({
       entries: candidateOverride,
       trackVisibility: false,
     });
-  const worktree = useWorktreeOnboardingCandidate?.({
-    enabled: !shouldHideOnboardingPromos,
-    entryPoint,
-    isLocalModeRemote,
-  }) ?? { isEligible: false, isLoading: false };
-  const recap = useWeeklyRecapCandidate?.() ?? {
-    isEligible: false,
-    isLoading: false,
-    availableCount: 0,
-    dismiss() {},
-  };
+  const announcementsDisabled = useSignalValue?.(announcementsDisabledSignal) === true;
   const voiceStart = useRealtimeVoiceStart?.(
     beaconProduct === "work_tab" ? "work" : entryPoint,
   );
   const voiceAvailable = useRealtimeVoiceAvailability?.();
-  const gift = (useGiftCreditsCandidate?.({ enabled: !shouldHideOnboardingPromos }) ?? {
+  const gift = (useGiftCreditsCandidate?.({ enabled: !announcementsDisabled && !shouldHideOnboardingPromos }) ?? {
     dismiss() {}, isEligible: false, isLoading: false, openGiftCredits() {},
   }) as EntryPointCandidate;
-  const externalImport = (useBrowserProfileImportCandidate?.({ enabled: true }) ?? {
+  const externalImportEnabled = !announcementsDisabled && (voiceStart == null || voiceAvailable === false);
+  const externalImport = (useBrowserProfileImportCandidate?.({ enabled: externalImportEnabled }) ?? {
     dismiss() {}, isEligible: false, isLoading: false, markShown() {}, openImport() {},
   }) as EntryPointCandidate & { providerId?: string };
-  const replay = (useReplayCandidate?.({ enabled: true }) ?? {
+  const replay = (useReplayCandidate?.({ enabled: !announcementsDisabled }) ?? {
     dismiss() {}, isEligible: false, isLoading: false, markShown() {}, replay() {},
   }) as EntryPointCandidate;
+  const worktreeEnabled = !announcementsDisabled && !shouldHideOnboardingPromos &&
+    !gift.isEligible && !gift.isLoading &&
+    (voiceStart == null || voiceAvailable === false) &&
+    !externalImport.isEligible && !externalImport.isLoading;
+  const worktree = useWorktreeOnboardingCandidate?.({
+    enabled: worktreeEnabled,
+    entryPoint,
+    isLocalModeRemote,
+  }) ?? { isEligible: false, isLoading: false };
   const historyStatus = computerHistoryStatusSignal == null ? "ineligible" : useSignalValue?.(computerHistoryStatusSignal);
   const editor = useComposerEditor?.();
+  const beaconCandidate = useBeaconCandidate(beaconProduct);
   const navigateToLocalConversation = useNavigateToLocalConversation?.();
   const pluginInstall = usePluginInstallDetails?.();
   const voiceEntry: AnnouncementEntry = {
@@ -410,22 +485,6 @@ function HomeAnnouncementCandidates({
     content: worktree.isEligible
       ? jsx.jsx(WorktreeOnboardingBannerController, {})
       : null,
-  };
-  const recapEntry: AnnouncementEntry = {
-    isEligible:
-      !shouldHideOnboardingPromos &&
-      !isLocalModeRemote &&
-      beaconProduct !== "chatgpt" &&
-      recap.isEligible,
-    isLoading:
-      !shouldHideOnboardingPromos &&
-      !isLocalModeRemote &&
-      beaconProduct !== "chatgpt" &&
-      recap.isLoading,
-    content: jsx.jsx(RateLimitResetHomeAnnouncement ?? "div", {
-      availableCount: recap.availableCount,
-      onDismiss: recap.dismiss,
-    }),
   };
   const giftEntry: AnnouncementEntry = {
     isEligible: !shouldHideOnboardingPromos && gift.isEligible,
@@ -481,11 +540,30 @@ function HomeAnnouncementCandidates({
     voiceEntry,
     importEntry,
     worktreeEntry,
-    recapEntry,
     historyEntry,
     replayEntry,
   ];
-  return jsx.jsx(AnnouncementEntries, { entries, trackVisibility: false });
+  if (announcementsDisabled) return null;
+  if (beaconProduct == null) return jsx.jsx(AnnouncementEntries, { entries, trackVisibility: false });
+  const allowBeaconAfterOnboarding = !shouldHideOnboardingPromos ||
+    beaconCandidate.beacon?.custom_fields?.show_after_onboarding === true;
+  const beaconEntry: AnnouncementEntry = {
+    isEligible: allowBeaconAfterOnboarding && beaconCandidate.isEligible,
+    isLoading: allowBeaconAfterOnboarding && beaconCandidate.isLoading,
+    content: jsx.jsx(BeaconContent, {
+      candidate: beaconCandidate,
+      editor,
+      product: beaconProduct,
+      startRealtimeVoice: voiceStart,
+    }),
+  };
+  const vanillaEntries = beaconCandidate.shouldSuppressVanillaPromos === true
+    ? entries.map((entry) => ({ ...entry, isEligible: false, isLoading: false }))
+    : entries;
+  return jsx.jsx(AnnouncementEntries, {
+    entries: [beaconEntry, ...vanillaEntries],
+    trackVisibility: false,
+  });
 }
 
 function HomeComposerAnnouncements({
@@ -497,8 +575,14 @@ function HomeComposerAnnouncements({
 }: HomeComposerAnnouncementsProps): unknown {
   void hasSeparateCodexAnnouncements;
   const source = useRouterLocation?.()?.pathname ?? "/";
+  const sourceContext = homeAnnouncementSourceContext == null
+    ? "default"
+    : React.useContext<string>(homeAnnouncementSourceContext);
+  const hideFirstNewThreadOnboardingPromos = hideFirstNewThreadOnboardingPromosSignal == null
+    ? false
+    : useSignalValue?.(hideFirstNewThreadOnboardingPromosSignal) === true;
   const hidePromos = shouldHideHomePromos?.({
-    hideFirstNewThreadOnboardingPromos: false,
+    hideFirstNewThreadOnboardingPromos,
     pathname: source,
   });
   const beaconProduct =
@@ -519,12 +603,14 @@ function HomeComposerAnnouncements({
     ),
     children: [
       customGpt,
-      jsx.jsx(HomeAnnouncementCandidates, {
-        beaconProduct,
-        entryPoint,
-        isLocalModeRemote,
-        shouldHideOnboardingPromos: hidePromos,
-      }),
+      sourceContext === "default"
+        ? jsx.jsx(HomeAnnouncementCandidates, {
+            beaconProduct,
+            entryPoint,
+            isLocalModeRemote,
+            shouldHideOnboardingPromos: hidePromos,
+          })
+        : null,
     ],
   });
 }
@@ -537,7 +623,11 @@ function CodexHomeAnnouncementEntries({
   void homeRunLocationRemoteProject;
   void includeGitCheckoutWarning;
   const fastMode = useFastModeCandidate();
+  const multiAgent = useMultiAgentAnnouncementEligibility();
   const beaconCandidate = useBeaconCandidate("codex");
+  const allowVanillaPromos = beaconCandidate.shouldSuppressVanillaPromos !== true;
+  const allowBeaconAfterOnboarding = !shouldHideOnboardingPromos ||
+    beaconCandidate.beacon?.custom_fields?.show_after_onboarding === true;
   const beaconContent = jsx.jsx(BeaconContent, {
     candidate: beaconCandidate,
     product: "codex",
@@ -549,14 +639,18 @@ function CodexHomeAnnouncementEntries({
       content: null,
     },
     {
-      isEligible: !shouldHideOnboardingPromos && beaconCandidate.isEligible,
-      isLoading: !shouldHideOnboardingPromos && beaconCandidate.isLoading,
+      isEligible: allowBeaconAfterOnboarding && beaconCandidate.isEligible,
+      isLoading: allowBeaconAfterOnboarding && beaconCandidate.isLoading,
       content: beaconContent,
     },
-    useMultiAgentAnnouncementEligibility(),
     {
-      isEligible: !shouldHideOnboardingPromos && fastMode.isEligible,
-      isLoading: !shouldHideOnboardingPromos && fastMode.isLoading,
+      ...multiAgent,
+      isEligible: !shouldHideOnboardingPromos && allowVanillaPromos && multiAgent.isEligible,
+      isLoading: !shouldHideOnboardingPromos && allowVanillaPromos && multiAgent.isLoading,
+    },
+    {
+      isEligible: !shouldHideOnboardingPromos && allowVanillaPromos && fastMode.isEligible,
+      isLoading: !shouldHideOnboardingPromos && allowVanillaPromos && fastMode.isLoading,
       content:
         fastMode.content == null
           ? null
