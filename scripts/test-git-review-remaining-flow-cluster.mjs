@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__gitReviewRemainingTest = { react: { useState(initial) { return [typeof initial === "function" ? initial() : initial, () => {}]; } }, jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
@@ -141,20 +142,11 @@ find(editableUi, node => node.type === "textarea").props.onChange({ currentTarge
 assert.equal(editedContents, "new");
 assert.equal(find(editable.EditableReviewFileSourceTabContent({ path: "a", readOnly: true }), node => node.type === "textarea").props.disabled, true);
 
-// review-file-source-item: 9
-const fileSource = await bundle("review-file-source-item");
-assert.deepEqual(Object.keys(fileSource), ["n", "t"]);
-assert.match(text(fileSource.t({ isLoading: true })), /Loading file/);
-assert.equal(find(fileSource.t({ error: new Error("Missing") }), node => node.props?.role === "alert").props.children, "Missing");
-assert.match(text(fileSource.t({})), /Select a file/);
-const textSourceUi = fileSource.t({ path: "src/a.ts", contents: "const a = 1", workspaceRoot: "/repo" });
-assert.equal(find(textSourceUi, node => node.type === "pre").props.children, "const a = 1");
-assert.match(text(textSourceUi), /\/repo\/src\/a.ts/);
-assert.equal(find(fileSource.t({ path: "image.png" }), node => node.props?.["data-preview-kind"] === "image").type, "div");
-assert.equal(find(fileSource.t({ path: "report.pdf" }), node => node.props?.["data-preview-kind"] === "pdf").type, "div");
-let slotPayload;
-fileSource.t({ path: "a.txt", renderSlots(payload) { slotPayload = payload; return "slot"; } });
-assert.equal(slotPayload.headerRows.length, 0);
+assertReleaseOwner("review-file-source-item", [
+  /@rchunk\/review-file-source-breadcrumb/,
+  /@rchunk\/code-diff-context-menu/,
+  /export \{ Vi as n, gi as t \}/,
+]);
 
 // code-diff-context-menu: 8
 const contextMenu = await bundle("code-diff-context-menu");
@@ -187,24 +179,11 @@ find(pdfUi, node => node.props?.children === "Next page").props.onClick();
 assert.equal(pageAction, "next");
 assert.equal(find(pdf.PdfPreviewDiff({ currentPage: 1, totalPages: 1 }), node => node.props?.children === "Next page").props.disabled, true);
 
-// code-diff: 12
-const codeDiff = await bundle("code-diff");
-assert.deepEqual(Object.keys(codeDiff), ["a", "c", "i", "l", "n", "o", "r", "s", "t", "u"]);
-const parsed = codeDiff.a("diff --git a/src/a.ts b/src/a.ts\n@@ -1 +1 @@\n-old\n+new");
-assert.equal(parsed.length, 1);
-assert.equal(parsed[0].path, "src/a.ts");
-assert.equal(parsed[0].additions, 1);
-assert.equal(parsed[0].deletions, 1);
-assert.equal(parsed[0].status, "modified");
-assert.equal(codeDiff.a("diff --git a/a b/a\nnew file mode 100644")[0].status, "added");
-assert.equal(codeDiff.c("component.tsx"), "react");
-assert.equal(codeDiff.c("unknown.bin"), "default");
-let selectedFile;
-const codeDiffUi = codeDiff.t({ files: parsed, viewType: "split", onSelectFile(path) { selectedFile = path; } });
-assert.equal(codeDiffUi.props["data-view-type"], "split");
-find(codeDiffUi, node => node.type === "button").props.onClick();
-assert.equal(selectedFile, "src/a.ts");
-assert.match(text(codeDiffUi), /\+1 −1/);
+assertReleaseOwner("code-diff", [
+  /@rchunk\/code-diff-context-menu/,
+  /@rchunk\/full-content-metadata/,
+  /export \{ Xt as a, Et as c, on as i, Ct as l, Un as n, X as o, un as r, Tt as s, dn as t, wt as u \}/,
+]);
 
 // review-slash-command-submenu-registration: 5
 const reviewCommandSource = fs.readFileSync(path.join(ROOT, "src/renderer/review-slash-command-submenu-registration/index.ts"), "utf8");

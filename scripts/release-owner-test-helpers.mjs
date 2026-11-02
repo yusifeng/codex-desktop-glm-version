@@ -2,10 +2,13 @@ import assert from "node:assert/strict";
 import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
-import { CHUNKS } from "./renderer-chunk-manifest.mjs";
+import { CHUNKS, IMPORT_ALIASES } from "./renderer-chunk-manifest.mjs";
 
 export const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const reverseChunks = new Map(Object.entries(CHUNKS).map(([owner, output]) => [output, owner]));
+for (const [owner, output] of Object.entries(IMPORT_ALIASES)) {
+  if (!reverseChunks.has(output)) reverseChunks.set(output, owner);
+}
 
 export function normalizeRelease(source) {
   return source

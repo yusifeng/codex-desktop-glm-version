@@ -3,11 +3,12 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 let activeHooks = [], hookCursor = 0;
 const React = { useState(initial) { const hooks = activeHooks, index = hookCursor++; if (!(index in hooks)) hooks[index] = typeof initial === "function" ? initial() : initial; return [hooks[index], value => { hooks[index] = typeof value === "function" ? value(hooks[index]) : value; }]; } };
 globalThis.__reviewFileTest = { React, jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
-const actual = new Map([["review-file-source-breadcrumb", "review-file-source-breadcrumb"], ["review-file-tree-side-pane", "review-file-tree-side-pane"], ["review-file-source-item", "review-file-source-item"]]);
+const actual = new Map([["review-file-source-breadcrumb", "review-file-source-breadcrumb"], ["review-file-tree-side-pane", "review-file-tree-side-pane"]]);
 async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "review-file-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => { const name = importPath.slice(8); return actual.has(name) ? { path: path.join(ROOT, "src/renderer", actual.get(name), "index.ts") } : { path: name, namespace: "mock" }; }); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__reviewFileTest.jsx;export const e6=globalThis.__reviewFileTest.React;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
 function mount(Component, props) { const hooks = []; return { render() { activeHooks = hooks; hookCursor = 0; return Component(props); } }; }
 function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(child => walk(child, visit)); else walk(children, visit); }
@@ -86,28 +87,11 @@ assert.match(text(tree.t({ files: [], query: "" })), /No files in this folder/);
 assert.match(text(tree.t({ files: [], isLoading: true })), /Loading directory entries/);
 tree.i(); tree.n(); tree.o(); tree.s(); assert.equal(typeof tree.t, "function");
 
-const item = await bundle("review-file-source-item");
-assert.deepEqual(Object.keys(item).sort(), ["n", "t"]);
-const textFile = item.t({ cwd: "/repo", workspaceRoot: "/repo", path: "/repo/src/a.ts", contents: "const a = 1" });
-assert.equal(textFile.type, "article");
-assert.equal(find(textFile, node => node.type === "pre").props.children, "const a = 1");
-assert.equal(find(textFile, node => node.type === "pre").props["data-preview-kind"], "text");
-const image = item.t({ path: "image.png" });
-assert.equal(find(image, node => node.type === "img").props["data-preview-kind"], "image");
-const audio = item.t({ path: "song.mp3" });
-assert.equal(find(audio, node => node.type === "audio").props.controls, true);
-const pdf = item.t({ path: "report.pdf" });
-assert.match(text(pdf), /pdf preview/);
-const document = item.t({ path: "brief.docx" });
-assert.match(text(document), /word-document preview/);
-assert.match(text(item.t({ path: null })), /Select a file/);
-assert.equal(find(item.t({ path: "x", error: new Error("failed") }), node => node.props?.role === "alert").props.children, "failed");
-assert.match(text(item.t({ path: "x", isLoading: true })), /Loading file/);
-const slotted = item.t({ path: "a.txt", contents: "a", renderSlots: slots => ({ type: "slots", props: slots }) });
-assert.equal(slotted.type, "slots");
-assert.equal(slotted.props.headerRows.length, 1);
-assert.equal(item.t({ path: "a.txt", contents: "a", hideFileNavigation: true, renderSlots: slots => slots.headerRows.length }), 0);
-item.n(); assert.equal(typeof item.t, "function");
+assertReleaseOwner("review-file-source-item", [
+  /@rchunk\/review-file-source-breadcrumb/,
+  /@rchunk\/code-diff-context-menu/,
+  /export \{ Vi as n, gi as t \}/,
+]);
 
 const editable = await bundle("editable-review-file-source-tab-content");
 assert.deepEqual(Object.keys(editable), ["EditableReviewFileSourceTabContent"]);

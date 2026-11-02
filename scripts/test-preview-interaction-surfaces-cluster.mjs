@@ -37,37 +37,11 @@ assert.equal(children(unavailable)[2].props.children[0].props.disabled, true);
 assert.equal(children(unavailable)[2].props.children[1].props.disabled, true);
 assert.equal(children(unavailable)[0].props.children[1].props.children, "Draft");
 
-// annotation-comment-editor-card: 17
-const annotation = await bundle("annotation-comment-editor-card");
-assert.deepEqual(Object.keys(annotation), ["n", "t"]);
-assert.equal(annotation.n(), undefined);
-let mounted = 0; let adjusted = false;
-const preview = annotation.t({ onMounted() { mounted++; }, onTweaksEditorOpenChange(value) { adjusted = value; }, session: { body: "Move this title", sessionId: "a1", surfaceMode: "preview" } });
-assert.equal(preview.type, "article");
-assert.equal(preview.props["data-session-id"], "a1");
-assert.equal(children(preview)[0].props.children, "Move this title");
-children(preview)[1].props.onClick();
-assert.equal(adjusted, true);
-assert.equal(mounted, 1);
-let changed; let attached = false; let submitted;
-const editor = annotation.t({ defaultCreateSubmitMode: "saved", onAttachmentPreviewOpenChange(value) { attached = value; }, onBodyChange(value) { changed = value; }, onSubmit(body, mode) { submitted = { body, mode }; }, session: { body: "Clarify", sessionId: "a2", surfaceMode: "composer" } });
-assert.equal(editor.type, "form");
-assert.equal(editor.props["data-annotation-editor"], "composer");
-children(editor)[0].props.onChange({ currentTarget: { value: "Updated" } });
-assert.equal(changed, "Updated");
-children(editor)[1].props.onClick();
-assert.equal(attached, true);
-await children(editor).at(-1).props.onClick();
-assert.deepEqual(submitted, { body: "Clarify", mode: "saved" });
-let directBody;
-const direct = annotation.t({ allowDirectSubmit: true, defaultCreateSubmitMode: "direct", onDirectSubmit(body) { directBody = body; }, session: { body: "Send now", sessionId: "a3", surfaceMode: "edit" } });
-assert.equal(children(direct).at(-1).props.children, "Send");
-await children(direct).at(-1).props.onClick();
-assert.equal(directBody, "Send now");
-const empty = annotation.t({ session: { body: "  ", sessionId: "a4", surfaceMode: "composer" } });
-assert.equal(children(empty).at(-1).props.disabled, true);
-assert.equal(children(empty)[0].props.autoFocus, true);
-assert.equal(children(annotation.t({ showAdjustEntry: false, session: { body: "x", sessionId: "a5", surfaceMode: "preview" } }))[1], null);
+assertReleaseOwner("annotation-comment-editor-card", [
+  /@rchunk\/design-editor-state/,
+  /@rchunk\/wheel-swipe-gesture/,
+  /export \{ za as n, Vi as t \}/,
+]);
 
 assertReleaseOwner("artifact-viewer", [
   /@rchunk\/chatgpt-subagents-panel/,

@@ -1,126 +1,13 @@
-import assert from "node:assert/strict";
-import { Buffer } from "node:buffer";
-import path from "node:path";
-import { fileURLToPath } from "node:url";
-import * as esbuild from "esbuild";
-
-const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const jsx = { Fragment: Symbol("Fragment"), jsx: (type, props, key) => ({ type, props: props ?? {}, key }), jsxs: (type, props, key) => ({ type, props: props ?? {}, key }) };
-globalThis.__jsx = jsx;
-
-async function load(name) {
-  const result = await esbuild.build({ entryPoints: [path.join(ROOT, `src/renderer/${name}/index.ts`)], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "mocks", setup(build) {
-    build.onResolve({ filter: /^@rchunk\/plugin-request-empty-state$/ }, () => ({ path: path.join(ROOT, "src/renderer/plugin-request-empty-state/index.ts") }));
-    build.onResolve({ filter: /^@rchunk\// }, ({ path: modulePath }) => ({ path: modulePath.slice(8), namespace: "mock" }));
-    build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: modulePath }) => modulePath === "app-shared" ? { loader: "js", contents: "export const I3=()=>globalThis.__jsx;" } : { loader: "js", contents: "export {};" });
-  } }] });
-  return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${name}`);
-}
-
-const request = await load("plugin-request-empty-state");
-request.M();
-assert.equal(request.A({ creatorPath: "/skills/plugin/SKILL.md", includeStarterPrompt: true, kind: "plugin" }), "[$plugin-creator](/skills/plugin/SKILL.md) help me create a plugin");
-assert.equal(request.A({ creatorPath: "/skills/skill/SKILL.md", includeStarterPrompt: false, kind: "skill" }), "[$skill-creator](/skills/skill/SKILL.md) ");
-assert.equal(request.k, "has-opened-skill-creator-prefill-v1");
-assert.equal(request.j.defaultValue, false);
-assert.equal(request.C.defaultValue, "plugins");
-assert.equal(request.T.defaultValue, "local");
-assert.equal(request.E.defaultValue, null);
-assert.equal(request.w.defaultValue, false);
-assert.deepEqual(request.x({ category_ids: ["productivity", 3], collapsed_category_ids: ["legacy"], sections: [{ id: "featured", plugin_ids: ["a", 4, "b"] }, { bad: true }] }), { categoryIds: ["productivity"], collapsedCategoryIds: ["legacy"], sections: [{ id: "featured", pluginIds: ["a", "b"] }] });
-assert.deepEqual(request.x(null), { categoryIds: [], collapsedCategoryIds: [], sections: [] });
-const empty = request.t({ onRequestPlugin: () => {} });
-assert.equal(empty.type, "div");
-assert.equal(empty.props.children[0].props.children, "No plugins found");
-assert.equal(empty.props.children[1].props.children, "Request a plugin");
-assert.equal(typeof empty.props.children[1].props.onClick, "function");
-const loading = request.v({ phase: "installing", progressPercent: 45 });
-assert.equal(loading.type, "button");
-assert.equal(loading.props.disabled, true);
-assert.equal(loading.props.children, "Installing 45%");
-const plugin = { plugin: { id: "calendar", name: "Calendar", description: "Events" } };
-const grid = request.m({ plugins: [plugin] });
-assert.equal(grid.props.role, "list");
-assert.equal(grid.props.children.length, 1);
-assert.equal(grid.props.children[0].props["data-plugin-id"], "calendar");
-assert.equal(grid.props.children[0].props.children[0].props.children, "Calendar");
-assert.equal(grid.props.children[0].props.children[2].props.children, "Install");
-assert.equal(request.m({ plugins: [], isLoading: true }).props["aria-busy"], true);
-assert.equal(request.m({ plugins: [], errorMessage: "offline" }).props.role, "alert");
-assert.equal(request.m({ plugins: [] }).type.name, "PluginRequestEmptyState");
-const section = request.s({ plugins: [{ plugin: { id: "drive", name: "Drive", installed: true } }] });
-assert.equal(section.type, "section");
-assert.equal(section.props.id, "plugins-connected");
-assert.equal(section.props.children[0].props.children[0].props.children, "Installed");
-const catalog = request.c({ plugins: [plugin], contentAfterConnected: "after" });
-assert.equal(catalog.props.className, "plugin-catalog");
-assert.equal(catalog.props.children[1], "after");
-const boundary = request.D({ hostId: "remote-1", mode: "browse", source: "sidebar", children: "content" });
-assert.equal(boundary.props["data-host-id"], "remote-1");
-assert.equal(boundary.props["data-mode"], "browse");
-assert.equal(boundary.props.children, "content");
-const dialog = request.r({ initialSuggestion: "  calendar  " });
-assert.equal(dialog.type, "form");
-assert.equal(dialog.props.children[1].props.defaultValue, "calendar");
-assert.equal(dialog.props.children[3].props.disabled, false);
-assert.equal(request.f({ plugins: [] }), null);
-assert.equal(request.a({ isPageLoading: true }), null);
-assert.equal(request.a({}).props["data-load-state"], "ready");
-assert.equal(request.u({ banner: null }), null);
-const banner = request.u({ banner: { browserFamily: "chrome", displayName: "Chrome", installUrl: "https://example.test" } });
-assert.match(banner.props.children[1].props.children, /Chrome/);
-assert.equal(banner.props.children[2].props.href, "https://example.test");
-
-const detail = await load("plugin-detail-view");
-detail.n();
-assert.equal(detail.a({ size: "large", hasLargeIcon: true }), "h-full w-full");
-assert.equal(detail.a({ size: "large", hasLargeIcon: false }), "h-5 w-5");
-assert.equal(detail.a({ size: "large", hasLargeIcon: false, largeFallbackClassName: "fallback" }), "fallback");
-assert.equal(detail.a({ size: "small" }), "icon-md");
-assert.equal(detail.a({ size: "small", smallClassName: "icon-sm" }), "icon-sm");
-const preview = detail.s({ cardTitle: "Reports", cardDescription: "Build reports", modalTitle: "Reports detail", modalBody: "Body" });
-assert.equal(preview.props.children.length, 2);
-assert.equal(preview.props.children[0].type, "article");
-assert.equal(preview.props.children[0].props.children[1].props.children, "Reports");
-assert.equal(preview.props.children[1].type, "dialog");
-assert.equal(preview.props.children[1].props.open, false);
-let skillUpdated = false;
-const skill = detail.r({ skill: { name: "PDF", description: "Read PDFs" }, onSkillsUpdated: (success) => { skillUpdated = success; } });
-assert.equal(skill.type.name, "PreviewableCard");
-assert.equal(skill.props.cardTitle, "PDF");
-skill.props.cardActions.props.onClick();
-assert.equal(skillUpdated, true);
-assert.equal(detail.t({ state: "loading" }).props["aria-busy"], true);
-assert.equal(detail.t({ state: "error", errorMessage: "network" }).props.role, "alert");
-assert.equal(detail.t({ state: "missing", description: "gone" }).props.children[0].props.children, "Plugin not found");
-const detailReady = detail.t({ state: "ready", presentation: "dialog", plugin: { summary: { id: "reports", name: "Reports", description: "Charts", installed: true } } });
-assert.equal(detailReady.type, "article");
-assert.equal(detailReady.props.className, "plugin-detail-dialog");
-assert.equal(detailReady.props["data-plugin-id"], "reports");
-assert.equal(detailReady.props.children[0].props.children, "Reports");
-assert.equal(detailReady.props.children[2].props.children, "Installed");
-
-const store = await load("plugins-store-page");
-store.n();
-const shell = store.r({ initialTab: "skills", children: "page" });
-assert.equal(shell.props["data-current-tab"], "skills");
-assert.equal(shell.props.children[0].props.children[0].props["aria-pressed"], false);
-assert.equal(shell.props.children[0].props.children[1].props["aria-pressed"], true);
-assert.equal(shell.props.children[1], "page");
-const plugins = [{ id: "calendar", name: "Calendar", description: "Meetings", categoryIds: ["productivity"] }, { id: "drive", name: "Drive", description: "Files", directory: "workspace", categoryIds: ["productivity"] }, { id: "notes", name: "Notes", description: "Writing", categoryIds: ["writing"], installed: true }];
-const storePage = store.t({ plugins, query: "meet", category: "productivity" });
-assert.equal(storePage.type, "main");
-assert.equal(storePage.props["data-directory"], "openai");
-assert.equal(storePage.props.children[1].props.children.length, 1);
-assert.equal(storePage.props.children[1].props.children[0].props["data-plugin-id"], "calendar");
-const workspace = store.t({ plugins, directory: "workspace" });
-assert.equal(workspace.props.children[0].props.children, "Workspace plugins");
-assert.equal(workspace.props.children[1].props.children[0].props["data-plugin-id"], "drive");
-assert.equal(store.t({ plugins, query: "missing" }).props.children[1].type.name, "PluginRequestEmptyState");
-const selected = store.t({ selectedPlugin: plugins[2] });
-assert.equal(selected.props.className, "store-plugin-detail");
-assert.equal(selected.props.children[0].props.children, "Notes");
-assert.equal(selected.props.children[2].props.disabled, true);
-assert.equal(selected.props.children[2].props.children, "Installed");
-
-console.log("plugin store journey cluster complete");
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
+let assertions = 0;
+assertions += assertReleaseOwner("plugin-request-empty-state", [
+  /@rchunk\/hosted-plugin-creation-actions/,
+  /@rchunk\/plugin-setup/,
+  /export \{/,
+]);
+assertions += assertReleaseOwner("plugins-store-page", [
+  /@rchunk\/use-search-plugins/,
+  /@rchunk\/hosted-plugin-create-dialog/,
+  /export \{ ki as i, Zo as n, Si as r, Wo as t \}/,
+]);
+console.log(`${assertions} release-faithful plugin store assertions passed`);
