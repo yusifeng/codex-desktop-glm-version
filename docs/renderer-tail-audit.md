@@ -1,5 +1,17 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Automations/environment/settings release-owner recovery：一次性将
+`automations-page`、`automation-editor-dialog`、`pending-request-item-panel`、
+`environment-configuration-fields`、`local-environments-settings-page`、`app-connect-modal`、
+`codex-mobile-setup-dialog`、`health-page`、`projects-index-page` 与
+`appgen-settings-page` 十个 owner 从局部手写兼容实现恢复为发布源码，约 3.9 万行，并把相应
+owner 测试迁移为发布一致性验证；automation cloud detail 的独立行为覆盖继续保留。整批通过
+12,448/12,448 transform check、1,888/1,888 renderer build/verify、2,247/2,247 app-code coverage、
+0 semantic tail 与 TypeScript typecheck。严格 hub 消费推进为 app-shared 1,362/3,185、
+app-initial 4,416/8,204、app-primary 547/917，仍为 0 unreviewed、0 invalid consumers。
+该批证明这些 owner 已恢复发布实现，不代表 conversation-route 原始回退、main runtime 契约或最终
+E2E 已完成。
+
 2026-11-02 Schedule draft/fields fidelity recovery：`schedule-draft` 与 `schedule-fields` 不再只覆盖
 常见 daily/weekly 表单。Draft 现按发布行为区分 `exact_schedule`，拒绝非法 weekday/hourly 结构，
 从未来 target/next-run 恢复 one-time 日期，按 automation timezone 解析无 `Z` 的 UNTIL，并在 mode
