@@ -41,6 +41,15 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
+The schedule draft/fields fidelity pass restores behavior that was still hidden behind the earlier common-case form.
+`exact_schedule` classification, invalid weekday/hourly rejection, future one-time candidate selection, timezone-aware
+UNTIL parsing, and mode-switch baselines now follow the published owner. Update serialization preserves DTSTART and unknown
+RRULE extensions, patches hourly interval and UNTIL in place, avoids rewriting unchanged schedules, and projects timing mode
+for standard versus custom/hourly schedules. The fields surface now covers one-time, condition-watch, period presets,
+weekly/monthly, structured custom RRULE editing, future-time filtering, end-repeat, and shared-preview states through the
+recovered frequency controls. Focused contracts exercise the exact/custom/timezone/preservation and UI branches. This
+narrows the Automations scheduling gap but leaves separately tracked editor-dialog and cloud-detail presentation work.
+
 The Automations scheduling-infrastructure follow-up replaces the former thin frequency compatibility shell with a
 source-owned implementation of the published export ABI, standard/cloud schedule modes, quarter-hour time choices,
 weekday selection invariants, hourly/weekly/monthly/custom controls, and timezone-correct date bounds. It also corrects

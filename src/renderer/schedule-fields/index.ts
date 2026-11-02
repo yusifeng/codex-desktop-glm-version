@@ -1,7 +1,13 @@
 import "@rchunk/rolldown-runtime";
 import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
 import "@rchunk/app-initial";
-import "@rchunk/automation-frequency-section";
+import {
+  c as ScheduleModeSelect,
+  i as FrequencySection,
+  n as DateInput,
+  o as WeekdayPicker,
+  u as TimePicker,
+} from "@rchunk/automation-frequency-section";
 import "@rchunk/chatgpt-tasks-runtime";
 import { a as getTimePeriod, c as initializeScheduleDraft, l as switchScheduleMode, n as automationToDraft, r as draftToUpdateRequest, t as TIME_PRESETS, type AutomationDraft, type AutomationRecord, type ScheduleMode, type Weekday } from "@rchunk/schedule-draft";
 
@@ -22,6 +28,78 @@ export interface AutomationOperationScope {
 export interface ScheduleFieldsProps { automation: AutomationRecord; draft: AutomationDraft; onChange(draft: AutomationDraft): void; sharedPreview?: boolean }
 let runtime: JsxRuntime | undefined;
 function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
+
+interface CustomRule {
+  frequency: "daily" | "monthly" | "weekly";
+  interval: number;
+  monthDays: number[];
+  time: string;
+  weekdays: Weekday[];
+}
+
+const WEEKDAYS: Weekday[] = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"];
+const REPEAT_OPTIONS: Array<{ id: ScheduleMode; label: string }> = [
+  { id: "hourly", label: "Hourly" },
+  { id: "daily", label: "Daily" },
+  { id: "weekdays", label: "Weekdays" },
+  { id: "weekly", label: "Weekly" },
+  { id: "monthly", label: "Monthly" },
+  { id: "custom", label: "Custom" },
+];
+const PERIOD_OPTIONS = Object.entries(TIME_PRESETS).map(([id, time]) => ({ id, label: `${id[0].toUpperCase()}${id.slice(1)} (${time})` }));
+
+function clampInteger(value: number, minimum: number, maximum: number): number {
+  if (!Number.isFinite(value)) return minimum;
+  return Math.min(maximum, Math.max(minimum, Math.trunc(value)));
+}
+
+function parseRule(rule: string): Map<string, string> {
+  const result = new Map<string, string>();
+  const value = rule.replace(/^RRULE:/i, "").trim();
+  for (const field of value.split(";")) {
+    const separator = field.indexOf("=");
+    if (separator > 0) result.set(field.slice(0, separator).toUpperCase(), field.slice(separator + 1));
+  }
+  return result;
+}
+
+function parseCustomRule(rule: string): CustomRule | null {
+  const fields = parseRule(rule);
+  const rawFrequency = fields.get("FREQ")?.toLowerCase();
+  if (rawFrequency !== "daily" && rawFrequency !== "weekly" && rawFrequency !== "monthly") return null;
+  const hour = clampInteger(Number(fields.get("BYHOUR") ?? 9), 0, 23);
+  const minute = clampInteger(Number(fields.get("BYMINUTE") ?? 0), 0, 59);
+  const weekdays = (fields.get("BYDAY") ?? "MO").split(",").filter((day): day is Weekday => WEEKDAYS.includes(day as Weekday));
+  const monthDays = (fields.get("BYMONTHDAY") ?? "1").split(",").map(Number).filter((day) => Number.isInteger(day) && day >= 1 && day <= 31);
+  return {
+    frequency: rawFrequency,
+    interval: clampInteger(Number(fields.get("INTERVAL") ?? 1), 1, 99),
+    monthDays: monthDays.length === 0 ? [1] : monthDays,
+    time: `${String(hour).padStart(2, "0")}:${String(minute).padStart(2, "0")}`,
+    weekdays: weekdays.length === 0 ? ["MO"] : WEEKDAYS.filter((day) => weekdays.includes(day)),
+  };
+}
+
+function serializeCustomRule(rule: CustomRule): string {
+  const [hour, minute] = rule.time.split(":").map(Number);
+  const fields = [`FREQ=${rule.frequency.toUpperCase()}`, `INTERVAL=${rule.interval}`];
+  if (rule.frequency === "weekly") fields.push(`BYDAY=${rule.weekdays.join(",")}`);
+  if (rule.frequency === "monthly") fields.push(`BYMONTHDAY=${rule.monthDays.join(",")}`);
+  fields.push(`BYHOUR=${hour}`, `BYMINUTE=${minute}`);
+  return fields.join(";");
+}
+
+function dateAfterMonths(months: number): string {
+  const date = new Date();
+  date.setMonth(date.getMonth() + months);
+  const parts = new Intl.DateTimeFormat("en-CA", { year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(date);
+  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find((candidate) => candidate.type === type)?.value ?? "";
+  return `${part("year")}-${part("month")}-${part("day")}`;
+}
+
+function ScheduleRow({ control, label }: { control: unknown; label: unknown }): unknown {
+  return jsx().jsxs("div", { className: "flex min-h-8 items-center justify-between gap-4", children: [jsx().jsx("span", { className: "text-tertiary", children: label }), control] });
+}
 
 function trackTaskOpened(scope: AutomationOperationScope, { item, destination, source }: { item: AutomationItem; destination: "conversation" | "editor"; source: "editor" | "scheduled_page" }): void { scope.logEvent?.({ type: "task_opened", taskId: item.automation.id, conversationId: destination === "conversation" ? item.automation.conversation_id ?? undefined : undefined, destination, source }); }
 function trackScheduledPageViewed(scope: AutomationOperationScope): void { scope.logEvent?.({ type: "scheduled_page_viewed", destination: "scheduled_page" }); }
@@ -55,19 +133,153 @@ async function runAutomationNow(scope: AutomationOperationScope, { automation, c
 async function saveAutomation(scope: AutomationOperationScope, { automation, draft, signal }: { automation: AutomationRecord & { canManage?: boolean; status?: string }; draft: AutomationDraft; signal: AbortSignal }): Promise<AutomationRecord> { if (automation.canManage === false || automation.status === "completed") throw Error("This task cannot be edited"); const operation = accountBoundAbort(scope, signal); try { if (scope.updateAutomation == null) throw Error("Automation update is unavailable"); const result = await scope.updateAutomation(automation.id, draftToUpdateRequest(automation, draft), operation.signal); operation.signal.throwIfAborted(); return result; } finally { operation.dispose(); } }
 
 function ScheduleFields({ automation, draft, onChange, sharedPreview = false }: ScheduleFieldsProps): unknown {
-  const view = jsx(), config = draft.scheduleConfig;
-  const update = (patch: Partial<typeof config>) => onChange({ ...draft, scheduleConfig: { ...config, ...patch }, scheduleDirty: true, rawRrule: null });
-  const modes: ScheduleMode[] = ["hourly", "daily", "weekdays", "weekly", "monthly", "custom"];
-  return view.jsxs("fieldset", { className: "automation-schedule-fields", disabled: sharedPreview, children: [
-    view.jsx("legend", { children: "Frequency" }),
-    view.jsx("select", { "aria-label": "Frequency", value: config.mode, onChange: (event: { currentTarget: { value: string } }) => onChange({ ...draft, scheduleConfig: switchScheduleMode(automation, config, event.currentTarget.value as ScheduleMode), scheduleDirty: true, rawRrule: null }), children: modes.map((mode) => view.jsx("option", { value: mode, children: mode }, mode)) }),
-    config.mode === "hourly" ? view.jsx("input", { "aria-label": "Interval hours", type: "number", min: 1, max: 23, value: config.intervalHours, onChange: (event: { currentTarget: { valueAsNumber: number } }) => update({ intervalHours: event.currentTarget.valueAsNumber }) }) : null,
-    config.mode !== "hourly" ? view.jsx("input", { "aria-label": "Time", type: "time", value: config.time, onChange: (event: { currentTarget: { value: string } }) => update({ time: event.currentTarget.value }) }) : null,
-    config.mode === "weekly" ? view.jsx("div", { children: (["MO", "TU", "WE", "TH", "FR", "SA", "SU"] as Weekday[]).map((day) => view.jsx("label", { children: [view.jsx("input", { type: "checkbox", checked: config.weekdays.includes(day), onChange: () => update({ weekdays: config.weekdays.includes(day) ? config.weekdays.filter((value) => value !== day) : [...config.weekdays, day] }) }), day] }, day)) }) : null,
-    config.mode === "monthly" ? view.jsx("input", { "aria-label": "Day of month", type: "number", min: 1, max: 31, value: config.monthDay, onChange: (event: { currentTarget: { valueAsNumber: number } }) => update({ monthDay: event.currentTarget.valueAsNumber }) }) : null,
-    config.mode === "custom" ? view.jsx("textarea", { "aria-label": "Custom RRULE", value: config.customRrule, onChange: (event: { currentTarget: { value: string } }) => update({ customRrule: event.currentTarget.value }) }) : null,
-    view.jsx("input", { "aria-label": "End repeat", type: "date", value: config.untilDate ?? "", onChange: (event: { currentTarget: { value: string } }) => update({ untilDate: event.currentTarget.value || undefined }) }),
-  ] });
+  const view = jsx();
+  const config = draft.scheduleConfig;
+  const updateConfig = (next: typeof config): void => onChange({ ...draft, scheduleConfig: next, scheduleDirty: true, rawRrule: null });
+  const update = (patch: Partial<typeof config>): void => updateConfig({ ...config, ...patch });
+  const conditionWatch = automation.timing_mode === "condition_watch";
+  const selectedOption = REPEAT_OPTIONS.find((option) => option.id === config.mode) ?? REPEAT_OPTIONS[0];
+  const selectedPeriod = getTimePeriod(config.time);
+  const customRule = config.mode === "custom" ? parseCustomRule(config.customRrule) : null;
+  const now = new Intl.DateTimeFormat("sv-SE", { year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23" }).format(new Date());
+  const rows: unknown[] = [];
+
+  if (conditionWatch) {
+    rows.push(view.jsx(ScheduleRow, {
+      label: "Repeat",
+      control: view.jsx("span", { children: automation.schedule_components.frequency === "custom" ? "Custom" : automation.schedule_components.frequency }),
+    }, "condition-repeat"));
+  } else {
+    if (config.oneTimeDate == null) {
+      rows.push(view.jsx(ScheduleRow, {
+        label: "Repeat",
+        control: view.jsx(ScheduleModeSelect, {
+          ariaLabel: "Frequency",
+          options: REPEAT_OPTIONS,
+          selectedId: config.mode,
+          selectedLabel: selectedOption.label,
+          onSelect: (mode: string) => mode !== config.mode && updateConfig(switchScheduleMode(automation, config, mode as ScheduleMode)),
+        }),
+      }, "repeat"));
+    } else {
+      rows.push(view.jsx(ScheduleRow, {
+        label: "Date",
+        control: view.jsx(DateInput, {
+          ariaLabel: "Date",
+          value: config.oneTimeDate,
+          onChange: (oneTimeDate: string) => update({ oneTimeDate }),
+        }),
+      }, "once-date"));
+    }
+
+    if (config.oneTimeDate == null && config.mode === "hourly") {
+      rows.push(view.jsx(ScheduleRow, {
+        label: "Every",
+        control: view.jsx("input", {
+          "aria-label": "Interval hours",
+          type: "number",
+          min: 1,
+          max: 23,
+          value: config.intervalHours,
+          onChange: (event: { currentTarget: { valueAsNumber: number } }) => update({ intervalHours: clampInteger(event.currentTarget.valueAsNumber, 1, 23), intervalMinutes: null }),
+        }),
+      }, "hourly"));
+    }
+
+    if (config.oneTimeDate == null && config.mode === "weekly") {
+      rows.push(view.jsx(ScheduleRow, {
+        label: "Days of the week",
+        control: view.jsx(WeekdayPicker, { value: config.weekdays, onChange: (weekdays: Weekday[]) => update({ weekdays }) }),
+      }, "weekdays"));
+    }
+
+    if (config.oneTimeDate == null && config.mode === "monthly") {
+      rows.push(view.jsx(ScheduleRow, {
+        label: "Day of month",
+        control: view.jsx("input", {
+          "aria-label": "Day of month",
+          type: "number",
+          min: 1,
+          max: 31,
+          value: config.monthDay,
+          onChange: (event: { currentTarget: { valueAsNumber: number } }) => update({ monthDay: clampInteger(event.currentTarget.valueAsNumber, 1, 31) }),
+        }),
+      }, "month-day"));
+    }
+
+    if (config.oneTimeDate == null && customRule != null) {
+      const updateCustom = (patch: Partial<CustomRule>) => update({ customRrule: serializeCustomRule({ ...customRule, ...patch }) });
+      rows.push(view.jsx(ScheduleRow, {
+        label: "Frequency",
+        control: view.jsx(ScheduleModeSelect, {
+          ariaLabel: "Custom frequency",
+          options: REPEAT_OPTIONS.filter((option) => option.id === "daily" || option.id === "weekly" || option.id === "monthly"),
+          selectedId: customRule.frequency,
+          selectedLabel: customRule.frequency,
+          onSelect: (frequency: string) => updateCustom({ frequency: frequency as CustomRule["frequency"], interval: 1 }),
+        }),
+      }, "custom-frequency"));
+      if (customRule.frequency === "weekly") rows.push(view.jsx(ScheduleRow, { label: "Days of the week", control: view.jsx(WeekdayPicker, { value: customRule.weekdays, onChange: (weekdays: Weekday[]) => updateCustom({ weekdays }) }) }, "custom-weekdays"));
+      if (customRule.frequency === "monthly") rows.push(view.jsx(ScheduleRow, { label: "Day of month", control: view.jsx("input", { "aria-label": "Custom day of month", type: "number", min: 1, max: 31, value: customRule.monthDays[0], onChange: (event: { currentTarget: { valueAsNumber: number } }) => updateCustom({ monthDays: [clampInteger(event.currentTarget.valueAsNumber, 1, 31)] }) }) }, "custom-month-day"));
+      rows.push(view.jsx(ScheduleRow, { label: "Time", control: view.jsx(TimePicker, { value: customRule.time, onChange: (time: string) => updateCustom({ time }) }) }, "custom-time"));
+    } else if (config.mode === "custom" && config.oneTimeDate == null) {
+      rows.push(view.jsx(ScheduleRow, {
+        label: "Rule",
+        control: view.jsx("textarea", { "aria-label": "Custom RRULE", value: config.customRrule, onChange: (event: { currentTarget: { value: string } }) => update({ customRrule: event.currentTarget.value }) }),
+      }, "custom-rule"));
+    }
+
+    const usesPeriod = config.oneTimeDate == null && ["daily", "weekdays", "weekly", "monthly"].includes(config.mode);
+    if (usesPeriod) {
+      rows.push(view.jsx(ScheduleRow, {
+        label: "Time",
+        control: view.jsx(ScheduleModeSelect, {
+          ariaLabel: "Time",
+          options: PERIOD_OPTIONS,
+          selectedId: selectedPeriod,
+          selectedLabel: PERIOD_OPTIONS.find((option) => option.id === selectedPeriod)?.label ?? selectedPeriod,
+          onSelect: (period: string) => update({ time: TIME_PRESETS[period as keyof typeof TIME_PRESETS], oneTimeSeconds: 0 }),
+        }),
+      }, "period"));
+    }
+    if (config.oneTimeDate != null) {
+      rows.push(view.jsx(ScheduleRow, {
+        label: "Time",
+        control: view.jsx(TimePicker, {
+          value: config.time,
+          isOptionVisible: (time: string) => `${config.oneTimeDate} ${time}` >= now,
+          onChange: (time: string) => update({ time, oneTimeSeconds: 0 }),
+        }),
+      }, "once-time"));
+    }
+
+    if (config.oneTimeDate == null) {
+      rows.push(view.jsx(ScheduleRow, {
+        label: "End repeat",
+        control: view.jsx(ScheduleModeSelect, {
+          ariaLabel: "End repeat",
+          options: [{ id: "never", label: "Never" }, { id: "on-date", label: "On date" }],
+          selectedId: config.untilDate == null ? "never" : "on-date",
+          selectedLabel: config.untilDate == null ? "Never" : "On date",
+          onSelect: (value: string) => value === "never"
+            ? update({ untilDate: undefined, untilTime: undefined })
+            : config.untilDate == null && update({ untilDate: dateAfterMonths(1), untilTime: "23:59:59" }),
+        }),
+      }, "end-repeat"));
+      if (config.untilDate != null) rows.push(view.jsx(ScheduleRow, {
+        label: "Date",
+        control: view.jsx(DateInput, { ariaLabel: "End repeat date", value: config.untilDate, onChange: (untilDate: string) => update({ untilDate, untilTime: "23:59:59" }) }),
+      }, "end-date"));
+    }
+  }
+
+  const content = view.jsx("fieldset", {
+    className: "automation-schedule-fields flex flex-col gap-5",
+    disabled: sharedPreview,
+    "data-shared-preview": sharedPreview || undefined,
+    children: rows,
+  });
+  return sharedPreview ? content : view.jsx(FrequencySection, { title: view.jsx("span", { className: "text-xs uppercase select-none", children: "Frequency" }), children: content });
 }
 function initializeScheduleOperations(): void { initializeScheduleDraft(); void getTimePeriod; void automationToDraft; void TIME_PRESETS; }
 function initializeScheduleFields(): void { jsx(); initializeScheduleOperations(); }

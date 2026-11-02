@@ -5417,7 +5417,24 @@ declare module "@rchunk/schedule-fields" {
   export const t: (props: { automation: AutomationRecord; draft: AutomationDraft; onChange(draft: AutomationDraft): void; sharedPreview?: boolean }) => unknown;
   export const u: () => void;
 }
-declare module "@rchunk/automation-frequency-section";
+declare module "@rchunk/automation-frequency-section" {
+  export const a: () => void;
+  export const c: (props: { ariaLabel?: string; options: Array<{ id: string; label: string }>; selectedId: string; selectedLabel?: unknown; onSelect(id: string): void }) => unknown;
+  export const d: () => void;
+  export const f: ReadonlyArray<{ id: string; label: string }>;
+  export const g: () => void;
+  export const h: (value: string, intl?: { formatTime?(date: Date, options: Record<string, unknown>): string }) => string;
+  export const i: (props: { actions?: unknown; children?: unknown; title?: unknown }) => unknown;
+  export const l: () => void;
+  export const m: ReadonlyArray<{ id: string; label: string; longLabel: string }>;
+  export const n: (props: { ariaLabel?: string; timeZone?: string; value: string; onChange(value: string): void }) => unknown;
+  export const o: (props: { value: Array<"FR" | "MO" | "SA" | "SU" | "TH" | "TU" | "WE">; onChange(value: Array<"FR" | "MO" | "SA" | "SU" | "TH" | "TU" | "WE">): void }) => unknown;
+  export const p: ReadonlyArray<{ id: string; label: string }>;
+  export const r: () => void;
+  export const s: () => void;
+  export const t: (props: Record<string, unknown>) => unknown;
+  export const u: (props: { isOptionVisible?(value: string): boolean; value: string; onChange(value: string): void }) => unknown;
+}
 declare module "@rchunk/platform-ui-kit-provider";
 declare module "@rchunk/navigation-blocker";
 declare module "@rchunk/automation-share-dialog";

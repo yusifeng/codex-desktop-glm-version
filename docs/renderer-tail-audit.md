@@ -1,5 +1,15 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Schedule draft/fields fidelity recovery：`schedule-draft` 与 `schedule-fields` 不再只覆盖
+常见 daily/weekly 表单。Draft 现按发布行为区分 `exact_schedule`，拒绝非法 weekday/hourly 结构，
+从未来 target/next-run 恢复 one-time 日期，按 automation timezone 解析无 `Z` 的 UNTIL，并在 mode
+切换时从原 automation 基线恢复字段、生成可编辑 custom RRULE。更新请求会保留原 DTSTART、未知 RRULE
+扩展字段和未变化 schedule，仅原位替换 hourly interval/UNTIL，并按 standard 与 custom/hourly 恢复
+timing mode。Schedule fields 恢复 one-time、condition-watch、period preset、weekly/monthly、结构化 custom
+rule、未来时间过滤、never/on-date end-repeat 和 shared-preview 分支，复用已恢复的 frequency controls。
+Focused suite 新增 exact/custom/timezone/preservation/one-time/UI 分支覆盖；该批仍不把 editor dialog 与
+cloud detail 的剩余 presentation 差异算作完成。
+
 2026-11-02 Automations scheduling infrastructure recovery：`automation-frequency-section` 不再用
 15 行兼容壳伪装 1,823 行发布 owner。当前 TypeScript owner 已恢复真实公开 ABI、标准/云端频率选项、
 96 个十五分钟时间点、星期多选且禁止清空最后一天、hourly/weekly/monthly/custom 分支、时区日期下限与
