@@ -33,12 +33,27 @@ const pageSection=section.F({id:"featured",title:"Featured",count:2,children:"ca
 const expand=section.t({children:"Show more",isExpanded:false});assert.equal(expand.props["aria-expanded"],false);assert.equal(expand.props.children,"Show more");
 const progressive=section.n({items:[1,2,3],visibleItemLimit:2,children:(items)=>items,renderExpandRow:({hiddenItems})=>hiddenItems});assert.deepEqual(progressive.props.children[0],[1,2]);assert.deepEqual(progressive.props.children[1],[3]);
 
-const detail=await load("plugin-detail-page-core");detail.a();const plugin={id:"acme/tools",name:"Acme Tools",description:"Useful",installed:true};
-assert.equal(detail.g(plugin),"acme/tools");assert.equal(detail.g({name:"My Plugin"}),"my-plugin");assert.equal(detail.l(plugin),"/plugins/acme%2Ftools");assert.equal(detail.b(plugin),"/plugins/acme%2Ftools/settings");assert.equal(detail.d(plugin),true);assert.equal(detail.d({name:"x",installed:true}),false);
-let backed=0;const detailView=detail.t({plugin,onBack:()=>{backed++}});assert.equal(detailView.type,"article");assert.equal(detailView.props["data-plugin-id"],"acme/tools");assert.equal(detailView.props.children[1].props.children,"Acme Tools");assert.equal(detailView.props.children[3].props.children,"Settings");assert.equal(detailView.props.children[4].props.children,"Share");detailView.props.children[0].props.onClick();assert.equal(backed,1);
-assert.equal(detail.t({isLoading:true}).props["aria-busy"],true);assert.equal(detail.t({plugin:null}).props.role,"alert");assert.equal(detail.o({id:"connections"}).props["aria-label"],"Plugin connections");
+const detail=await load("plugin-detail-page-core");detail.r();const plugin={id:"acme/tools",name:"Acme Tools",description:"Useful",installed:true,apps:[{id:"drive",name:"Drive",connected:true}],skills:[{id:"pdf",name:"PDF",installed:true}],sharePrincipals:[{principalId:"user-1",principalType:"user",role:"owner",name:"A"}]};
+assert.deepEqual(Object.keys(detail),["_","a","b","c","d","f","g","h","i","l","m","n","o","p","r","s","t","u","v","x","y"]);
+assert.deepEqual(detail._(plugin),[{principal_id:"user-1",principal_type:"user",role:"owner",name:"A"}]);
+assert.equal(detail.i({localVersion:"2.0.0",shareContext:{remotePluginId:"remote",remoteVersion:"1.9.0"}}),true);
+assert.equal(detail.i({localVersion:"1.0.0",shareContext:{remotePluginId:"remote",remoteVersion:"1.0.0"}}),false);
+assert.deepEqual(detail.f("/home/test"),{canInstallRecommendedSkills:true,defaultRecommendedRepoRoot:"/home/test/vendor_imports/skills",skillCreatorPath:"/home/test/skills/.system/skill-creator/SKILL.md"});
+assert.equal(detail.o("remote/id","https://chatgpt.com/path"),"https://chatgpt.com/plugins/share/remote/id");
+const calls=[];let invalidated=0;const transport={async sendRequest(method,payload){calls.push([method,payload]);if(method==="plugin/share/list")return{data:["share"]};if(method==="plugin/share/get")return{shareUrl:"https://share",summary:{shareContext:{remotePluginId:"r"}}};if(method==="plugin/share/updateTargets")return{principals:[{principalId:"u",principalType:"user",role:"viewer"}]};return{ok:true};}};
+assert.deepEqual(await detail.y({transport}).queryFn(),["share"]);
+assert.deepEqual(await detail.g({transport,params:{pluginName:"Acme"}}),{pluginShareUrl:"https://share",shareContext:{remotePluginId:"r"}});
+await detail.b({transport,invalidate(){invalidated++}}).mutate({remotePluginId:"r"});
+await detail.x({transport,invalidate(){invalidated++}}).mutate({remotePluginId:"r",targets:[{principal_type:"workspace",principal_id:"w",role:"owner"},{principal_type:"user",principal_id:"u",role:"viewer"}]});
+assert.equal(invalidated,2);assert.equal(calls.at(-1)[0],"plugin/share/updateTargets");assert.equal(calls.at(-1)[1].discoverability,"UNLISTED");assert.deepEqual(calls.at(-1)[1].shareTargets,[{principalId:"u",principalType:"user",role:"viewer"}]);
+let installedCount=0;const installer=detail.l({async install(){installedCount++}});await installer.installRecommendedSkill({id:"pdf",name:"PDF"},"/skills");assert.equal(installedCount,1);assert.equal(installer.installedRecommendedSkillIds.has("pdf"),true);
+assert.equal(detail.d({load:false,skills:[1]}).skills.length,0);assert.equal(detail.u({installed:[{skill:{id:"PDF",name:"Pdf Skill"}}]}).installedSkillMatchKeys.has("pdf"),true);
+let backed=0;const detailView=detail.n({plugin,onBack:()=>{backed++}});assert.equal(detailView.type,"article");assert.equal(detailView.props["data-plugin-id"],"acme/tools");assert.equal(detailView.props.children[1].props.children,"Acme Tools");assert.equal(detailView.props.children[3].props.children,"Settings");assert.equal(detailView.props.children[4].props.children,"Share");detailView.props.children[0].props.onClick();assert.equal(backed,1);assert.equal(detailView.props.children[5].props.children[0].props.children,"Drive");assert.equal(detailView.props.children[6].props.children[0].props.children,"PDF");
+assert.equal(detail.n({isLoading:true}).props["aria-busy"],true);assert.equal(detail.n({plugin:null}).props.role,"alert");assert.equal(detail.t({plugin}).props.parentPage,"manage");assert.equal(detail.p({app:{id:"drive",name:"Drive"}}).type,"dialog");
 
-const pages=await load("plugins-page");pages.n();const pluginsPage=pages.r({query:"image",plugins:[{name:"Image Plugin"},{name:"Other"}],apps:[{name:"Images App"},{name:"Mail"}],skills:recommended});
+const pages=await load("plugins-page");pages.n();let selectedPluginName;const pluginsPage=pages.r({query:"image",plugins:[{name:"Image Plugin",installed:true},{name:"Other"}],apps:[{name:"Images App"},{name:"Mail"}],skills:recommended,onSelectPlugin:plugin=>{selectedPluginName=plugin.name}});
 assert.equal(pluginsPage.type.name,"SectionedPage");assert.equal(pluginsPage.props.sections.length,3);const content=pluginsPage.props.children.props.children;assert.equal(content[0].props.children.length,1);assert.equal(content[1].props.children.length,1);assert.equal(content[2].props.children.length,1);
+assert.equal(content[0].props.children[0].props.children[2].props.children,"Manage");content[0].props.children[0].props.children[2].props.onClick();assert.equal(selectedPluginName,"Image Plugin");
+assert.equal(pages.r({isLoading:true}).props["aria-busy"],true);assert.equal(pages.r({error:"Failed"}).props.role,"alert");assert.match(pages.r({plugins:[]}).props.children.props.children[0].props.children.props.children,/No plugins/);
 const selected=pages.r({selectedPlugin:plugin});assert.equal(selected.type.name,"PluginDetailPage");assert.equal(pages.t({query:""}).type.name,"PluginsPage");
-console.log("plugins pages cluster: 53 assertions");
+console.log("plugins pages cluster: 71 assertions");

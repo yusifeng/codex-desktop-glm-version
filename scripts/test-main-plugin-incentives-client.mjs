@@ -1,7 +1,24 @@
 import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
 import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import * as esbuild from "esbuild";
 import { z } from "zod";
-import { createPluginIncentivesClientRuntime } from "../src/main/main-app/plugins/incentives-client.ts";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const incentivesBuild = await esbuild.build({
+  bundle: true,
+  entryPoints: [path.join(root, "src/main/main-app/plugins/incentives-client.ts")],
+  format: "esm",
+  logLevel: "silent",
+  platform: "node",
+  target: "node22",
+  write: false,
+});
+const { createPluginIncentivesClientRuntime } = await import(
+  `data:text/javascript;base64,${Buffer.from(incentivesBuild.outputFiles[0].text).toString("base64")}#plugin-incentives`
+);
 
 const identity = { accountId: "account-1", userId: "user-1" };
 const token = (overrides = {}) => {
