@@ -41,6 +41,18 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
+The Automations detail/editor follow-up restores the confirmation boundary between delete requests and the real local/cloud
+mutations, including source-qualified targets, cancel/confirm state, and pending-state projection across rerenders. Run history
+is newest-first and retains last-run timestamps, unread presentation, safe conversation actions, and mutation pending states.
+The editor now owns a controlled draft, unsaved-change detection, discard confirmation, and edit-mode delete. Release-source
+comparison also corrected two public-export mapping errors hidden by earlier shape tests: cloud detail export `t` is the
+detail/editor composition while `n` is only its initializer, and automation editor exports `o/i/r` are the action bar, detail
+shell, and automation detail rather than compatibility identities. The 44-assertion page suite now exercises confirmed local
+and cloud deletion through stateful rerenders; the complete automation test family, typecheck, strict hub gate, 2,417 semantic
+override assertions, the 1,912-script index, and 1,888/1,888 renderer build/verification pass. This closes the principal
+Automations detail/editor runtime gap but does not prove the remaining Settings/Home presentation gaps or the three aggregate
+hubs are fully migrated.
+
 The settings plan/query follow-up removes the remaining synthetic defaults for Usage, Analytics, Profile, and Trusted
 Contact navigation. Usage visibility and loading now come from the live usage-plan hook and credit query; Analytics and the
 enterprise label apply the published plan predicates and experiment gates; Profile consumes its live visibility/loading

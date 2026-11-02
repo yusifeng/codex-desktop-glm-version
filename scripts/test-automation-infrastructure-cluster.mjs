@@ -61,16 +61,22 @@ assert.equal(providerUi.props["data-time-zone"], "Asia/Shanghai");
 
 const detail = await bundle("cloud-automation-detail-panel");
 assert.deepEqual(Object.keys(detail).sort(), ["a", "c", "i", "n", "o", "r", "s", "t"]);
-assert.equal(find(detail.n({ isLoading: true }), node => node.props?.role === "status").props.children, "Loading scheduled task…");
-assert.equal(find(detail.n({ error: "Offline" }), node => node.props?.role === "alert").props.children, "Offline");
-let edited = 0, ran = 0;
-const detailUi = detail.n({ automation: { id: "task", name: "Daily report", instructions: "Summarize", schedule: "Daily", destination: "Email" }, onEdit() { edited++; }, onRunNow() { ran++; } });
+let edited = 0, ran = 0, paused = 0, detailDeleted = 0;
+const detailUi = detail.t({ automation: { id: "task", name: "Daily report", instructions: "Summarize", schedule: "Daily", destination: "Email", status: "ACTIVE" }, onEdit() { edited++; }, onRunNow() { ran++; }, onPause() { paused++; }, onDelete() { detailDeleted++; } });
 assert.match(text(detailUi), /Daily report.*Summarize.*Daily.*Email/);
 find(detailUi, node => node.props?.children === "Edit").props.onClick();
 find(detailUi, node => node.props?.children === "Run now").props.onClick();
+find(detailUi, node => node.props?.children === "Pause").props.onClick();
+find(detailUi, node => node.props?.children === "Delete").props.onClick();
 assert.equal(edited, 1);
 assert.equal(ran, 1);
-assert.equal(detail.o({ id: "x", name: "  " }), "Scheduled task");
-assert.equal(detail.r({ id: "x", status: "paused" }), false);
+assert.equal(paused, 1);
+assert.equal(detailDeleted, 1);
+const pausedDetail = detail.t({ automation: { id: "task", status: "PAUSED" }, onPause() {}, onRunNow() {} });
+assert.equal(find(pausedDetail, node => node.props?.children === "Resume") != null, true);
+assert.equal(find(pausedDetail, node => node.props?.children === "Run now").props.disabled, true);
+assert.equal(find(detail.t({ automation: { id: "task" } }), node => node.props?.children === "Run now"), undefined);
+detail.c(); detail.i(); detail.n(); detail.o();
+assert.equal(typeof detail.r, "function");
 
 console.log("automation infrastructure cluster tests passed");

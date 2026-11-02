@@ -76,19 +76,28 @@ interface AutomationsPresentation {
   canCreateLocal?: boolean;
   cloudError?: string | null;
   cloudLoading?: boolean;
+  deleteDialogOpen?: boolean;
+  deleteMutationPending?: boolean;
   deletePending?: boolean;
+  deleteTargetId?: string | null;
+  deleteTargetSource?: AutomationSource | null;
   draft?: AutomationDraft | null;
   hostId?: string;
   migration?: MigrationState | null;
   mode?: PageMode;
   pluginTasks?: AutomationItem[];
   query?: string;
+  runMutationPending?: boolean;
+  saveMutationPending?: boolean;
   selectedAutomationId?: string | null;
   selectedSource?: AutomationSource | null;
   statusFilter?: StatusFilter;
+  statusMutationPending?: boolean;
   onArchiveAll?(runs: AutomationRun[]): Promise<void> | void;
   onArchiveRun?(run: AutomationRun): Promise<void> | void;
   onCloseEditor?(): void;
+  onCancelDelete?(): void;
+  onConfirmDelete?(automation: AutomationItem): Promise<void> | void;
   onCreate?(source: AutomationSource): void;
   onDelete?(automation: AutomationItem): Promise<void> | void;
   onEdit?(automation: AutomationItem): void;
@@ -99,6 +108,7 @@ interface AutomationsPresentation {
   onOpenPlugin?(automation: AutomationItem): void;
   onPause?(automation: AutomationItem): Promise<void> | void;
   onQueryChange?(query: string): void;
+  onRequestDelete?(automation: AutomationItem): void;
   onRetryCloud?(): void;
   onRun?(automation: AutomationItem): Promise<void> | void;
   onSave?(draft: AutomationDraft): Promise<void> | void;
@@ -247,8 +257,8 @@ interface InitializerBindings {
 }
 
 interface CloudDetailBindings {
-  n?: (props: Record<string, unknown>) => unknown;
-  t?(): void;
+  n?(): void;
+  t?: (props: Record<string, unknown>) => unknown;
 }
 
 interface FrequencyBindings {
@@ -324,7 +334,7 @@ const {
 const { n: initializePrimary } = appPrimaryChunk as unknown as InitializerBindings;
 const { n: initializeElicitationEvents, t: initializeElicitationRuntime } =
   elicitationEventsChunk as unknown as InitializerBindings;
-const { n: CloudAutomationDetail, t: initializeCloudDetail } =
+const { n: initializeCloudDetail, t: CloudAutomationDetail } =
   cloudDetailChunk as unknown as CloudDetailBindings;
 const { i: initializeFrequency, l: FrequencySection } =
   frequencySectionChunk as unknown as FrequencyBindings;
@@ -429,6 +439,7 @@ function runtimePresentation(react?: ReactRuntime): AutomationsPresentation {
   const [statusFilter, setStatusFilter] = react?.useState<StatusFilter>("all") ?? ["all" as StatusFilter, () => undefined];
   const [mode, setMode] = react?.useState<PageMode>("list") ?? ["list" as PageMode, () => undefined];
   const [draft, setDraft] = react?.useState<AutomationDraft | null>(null) ?? [null, () => undefined];
+  const [deleteKey, setDeleteKey] = react?.useState<string | null>(null) ?? [null, () => undefined];
   const scope = useRuntimeScope?.(runtimeScopeSignal);
   const queryClient = useRuntimeQueryClient?.();
   const localCapability = queryCapability("automations.local");
@@ -461,7 +472,13 @@ function runtimePresentation(react?: ReactRuntime): AutomationsPresentation {
   };
   const createMutation = useAutomationMutation?.("automation-create", mutationOptions) ?? {};
   const updateMutation = useAutomationMutation?.("automation-update", mutationOptions) ?? {};
-  const deleteMutation = useAutomationMutation?.("automation-delete", mutationOptions) ?? {};
+  const deleteMutation = useAutomationMutation?.("automation-delete", {
+    onSuccess: () => {
+      setDeleteKey(null);
+      void localQuery.refetch?.();
+      setMode("detail");
+    },
+  }) ?? {};
   const runMutation = useAutomationMutation?.("automation-run-now", mutationOptions) ?? {};
   const runsByAutomationId = new Map<string, AutomationRun[]>();
   for (const [index, rawRun] of (history.items ?? []).entries()) {
@@ -530,6 +547,15 @@ function runtimePresentation(react?: ReactRuntime): AutomationsPresentation {
   const archiveRuns = async (runs: AutomationRun[]): Promise<void> => {
     await Promise.allSettled(runs.map((run) => archiveRun(run, true)));
   };
+  const deleteTarget = automations.find((item) => `${item.source}:${item.id}` === deleteKey);
+  const performDelete = (item: AutomationItem): void => {
+    const complete = (): void => { setDeleteKey(null); };
+    if (item.source === "local") {
+      deleteMutation.mutate?.({ id: item.id }, { onSuccess: complete });
+      return;
+    }
+    cloudDeleteMutation.mutate?.({ automationId: item.id }, { onSuccess: complete });
+  };
   return {
     ...EMPTY_PRESENTATION,
     automations,
@@ -537,24 +563,30 @@ function runtimePresentation(react?: ReactRuntime): AutomationsPresentation {
     canCreateLocal: localCapability.isCapable === true,
     cloudError: cloudQuery.error == null ? null : "Cloud scheduled tasks could not be loaded",
     cloudLoading: cloudQuery.isFetching === true,
+    deleteDialogOpen: deleteTarget != null,
+    deleteMutationPending: deleteMutation.isPending === true || cloudDeleteMutation.isPending === true,
+    deleteTargetId: deleteTarget?.id ?? null,
+    deleteTargetSource: deleteTarget?.source ?? null,
     draft,
     mode: mode === "list" && selected != null ? "detail" : mode,
     migration: migrationQuery.data ?? null,
     query,
+    runMutationPending: runMutation.isPending === true,
+    saveMutationPending: createMutation.isPending === true || updateMutation.isPending === true || cloudCreateMutation.isPending === true || cloudUpdateMutation.isPending === true,
     selectedAutomationId: selected?.id ?? null,
     selectedSource: selected?.source ?? null,
     statusFilter,
+    statusMutationPending: updateMutation.isPending === true || cloudUpdateMutation.isPending === true,
     onArchiveAll: archiveRuns,
     onArchiveRun: (run) => archiveRun(run, true),
     onCloseEditor: () => setMode(selected == null ? "list" : "detail"),
+    onCancelDelete: () => { if (deleteMutation.isPending !== true && cloudDeleteMutation.isPending !== true) setDeleteKey(null); },
+    onConfirmDelete: performDelete,
     onCreate: (source) => {
       setDraft({ kind: "cron", name: "", prompt: "", scheduleConfig: { mode: "daily", time: "09:00" }, source, status: "ACTIVE" });
       setMode("create");
     },
-    onDelete: (item) => {
-      if (item.source === "local") deleteMutation.mutate?.({ id: item.id });
-      else cloudDeleteMutation.mutate?.({ automationId: item.id });
-    },
+    onDelete: performDelete,
     onEdit: (item) => {
       setDraft({ id: item.id, kind: item.kind ?? "cron", name: item.name, prompt: item.prompt ?? "", scheduleConfig: {}, source: item.source, status: item.status });
       setMode("edit");
@@ -570,6 +602,7 @@ function runtimePresentation(react?: ReactRuntime): AutomationsPresentation {
       if (run.threadId != null) openConversation?.(run.threadId);
     },
     onQueryChange: setQuery,
+    onRequestDelete: (item) => setDeleteKey(`${item.source}:${item.id}`),
     onRetryCloud: () => { void cloudQuery.refetch?.(); },
     onRun: (item) => {
       if (item.source === "local") runMutation.mutate?.({ id: item.id, collaborationMode: null, permissions: null });
@@ -756,7 +789,7 @@ function PluginWarning({ item, presentation }: { item: AutomationItem; presentat
 }
 
 function RunHistory({ item, presentation }: { item: AutomationItem; presentation: AutomationsPresentation }): unknown {
-  const runs = item.runs ?? [];
+  const runs = [...(item.runs ?? [])].sort((left, right) => new Date(right.createdAt).getTime() - new Date(left.createdAt).getTime());
   const archiveable = runs.filter((run) => run.status !== "ARCHIVED" && run.status !== "IN_PROGRESS" && run.threadId != null);
   return jsx().jsxs("section", {
     className: "mt-6",
@@ -776,11 +809,15 @@ function RunHistory({ item, presentation }: { item: AutomationItem; presentation
       runs.length === 0
         ? jsx().jsx("p", { children: "No updates available" })
         : jsx().jsx("ul", {
-            children: runs.map((run) =>
+            children: runs.map((run, index) =>
               jsx().jsx("li", {
                 children: jsx().jsxs("article", {
+                  className: run.unread === true ? "rounded-lg border border-token-border-default bg-token-main-surface-secondary p-3" : "rounded-lg border border-token-border-default p-3",
                   children: [
-                    jsx().jsx("button", { type: "button", onClick: () => presentation.onOpenChat?.(run), children: run.title ?? "Untitled" }),
+                    jsx().jsxs("header", { className: "flex items-center justify-between gap-3", children: [
+                      jsx().jsx("button", { type: "button", disabled: run.threadId == null || run.status === "ARCHIVED", onClick: () => presentation.onOpenChat?.(run), children: run.title ?? "Untitled" }),
+                      jsx().jsxs("span", { className: "text-xs text-token-text-secondary", children: [index === 0 ? "Last run · " : "", jsx().jsx("time", { dateTime: new Date(run.createdAt).toISOString(), children: new Date(run.createdAt).toLocaleString() })] }),
+                    ] }),
                     jsx().jsx("p", { children: run.description ?? (run.status === "IN_PROGRESS" ? "Run in progress" : "No update from this run") }),
                     run.unread === true
                       ? jsx().jsx("button", { type: "button", onClick: () => presentation.onMarkRunRead?.(run, true), children: "Mark as read" })
@@ -810,10 +847,10 @@ function LocalDetail({ item, presentation }: { item: AutomationItem; presentatio
       jsx().jsxs("div", {
         "aria-label": "Scheduled task actions",
         children: [
-          jsx().jsx("button", { type: "button", disabled: item.canManage === false, onClick: () => presentation.onEdit?.(item), children: "Edit" }),
-          jsx().jsx("button", { type: "button", disabled: item.status !== "ACTIVE", onClick: () => presentation.onRun?.(item), children: "Run now" }),
-          jsx().jsx("button", { type: "button", onClick: () => presentation.onPause?.(item), children: item.status === "PAUSED" ? "Resume" : "Pause" }),
-          jsx().jsx("button", { type: "button", onClick: () => presentation.onDelete?.(item), children: "Delete" }),
+          jsx().jsx("button", { type: "button", disabled: item.canManage === false || presentation.saveMutationPending === true, onClick: () => presentation.onEdit?.(item), children: "Edit" }),
+          jsx().jsx("button", { type: "button", disabled: item.status !== "ACTIVE" || presentation.runMutationPending === true, onClick: () => presentation.onRun?.(item), children: presentation.runMutationPending === true ? "Running…" : "Run now" }),
+          jsx().jsx("button", { type: "button", disabled: presentation.statusMutationPending === true, onClick: () => presentation.onPause?.(item), children: presentation.statusMutationPending === true ? "Saving…" : item.status === "PAUSED" ? "Resume" : "Pause" }),
+          jsx().jsx("button", { type: "button", disabled: presentation.deleteMutationPending === true, onClick: () => presentation.onRequestDelete == null ? presentation.onDelete?.(item) : presentation.onRequestDelete(item), children: "Delete" }),
         ],
       }),
       jsx().jsx(RunHistory, { item, presentation }),
@@ -824,12 +861,13 @@ function LocalDetail({ item, presentation }: { item: AutomationItem; presentatio
 function CloudDetail({ item, presentation }: { item: AutomationItem; presentation: AutomationsPresentation }): unknown {
   if (CloudAutomationDetail == null) return jsx().jsx(LocalDetail, { item, presentation });
   return jsx().jsx(CloudAutomationDetail, {
-    automation: item,
+    item: { automation: { ...item, instructions: item.prompt, schedule: item.scheduleLabel ?? undefined }, teamId: null },
+    isPending: presentation.runMutationPending === true || presentation.saveMutationPending === true || presentation.statusMutationPending === true || presentation.deleteMutationPending === true,
     onClose: () => presentation.onSelect?.({ ...item, id: "" }),
-    onDelete: () => presentation.onDelete?.(item),
+    onDelete: () => presentation.onRequestDelete == null ? presentation.onDelete?.(item) : presentation.onRequestDelete(item),
     onEdit: () => presentation.onEdit?.(item),
     onPause: () => presentation.onPause?.(item),
-    onRunNow: () => presentation.onRun?.(item),
+    onRunNow: item.source === "local" && presentation.onRun != null ? () => presentation.onRun?.(item) : undefined,
   });
 }
 
@@ -844,7 +882,11 @@ function AutomationEditor({ presentation }: { presentation: AutomationsPresentat
     source: selected?.source ?? (presentation.canCreateLocal !== false ? "local" : "cloud"),
     status: selected?.status ?? "ACTIVE",
   };
-  const draft: AutomationDraft = { ...initial, scheduleConfig: { ...initial.scheduleConfig } };
+  const React = getReactRuntime?.();
+  const [draft, setDraft] = React?.useState<AutomationDraft>({ ...initial, scheduleConfig: { ...initial.scheduleConfig } }) ?? [{ ...initial, scheduleConfig: { ...initial.scheduleConfig } }, () => undefined];
+  const [discardOpen, setDiscardOpen] = React?.useState(false) ?? [false, () => undefined];
+  const changed = draft.name !== initial.name || draft.prompt !== initial.prompt || JSON.stringify(draft.scheduleConfig) !== JSON.stringify(initial.scheduleConfig);
+  const close = (): void => { if (changed) setDiscardOpen(true); else presentation.onCloseEditor?.(); };
   return jsx().jsxs("form", {
     className: "flex h-full flex-col gap-4 p-6",
     onSubmit: (event: { preventDefault(): void }) => { event.preventDefault(); void presentation.onSave?.(draft); },
@@ -852,26 +894,36 @@ function AutomationEditor({ presentation }: { presentation: AutomationsPresentat
       jsx().jsx("h2", { children: selected == null ? "New scheduled task" : "Edit scheduled task" }),
       jsx().jsx("input", {
         "aria-label": "Task name",
-        defaultValue: draft.name,
-        onChange: (event: { currentTarget: { value: string } }) => { draft.name = event.currentTarget.value; },
+        value: draft.name,
+        disabled: presentation.saveMutationPending === true,
+        onChange: (event: { currentTarget: { value: string } }) => { draft.name = event.currentTarget.value; setDraft({ ...draft }); },
       }),
       jsx().jsx("textarea", {
         "aria-label": "Instructions",
-        defaultValue: draft.prompt,
-        onChange: (event: { currentTarget: { value: string } }) => { draft.prompt = event.currentTarget.value; },
+        value: draft.prompt,
+        disabled: presentation.saveMutationPending === true,
+        onChange: (event: { currentTarget: { value: string } }) => { draft.prompt = event.currentTarget.value; setDraft({ ...draft }); },
       }),
       FrequencySection == null
         ? null
         : jsx().jsx(FrequencySection, {
             draft: { frequency: draft.scheduleConfig.mode ?? "daily", time: draft.scheduleConfig.time ?? "09:00", timeZone: draft.scheduleConfig.timeZone ?? "UTC" },
-            onChange: (schedule: ScheduleConfig) => { draft.scheduleConfig = { ...draft.scheduleConfig, ...schedule }; },
+            disabled: presentation.saveMutationPending === true,
+            onChange: (schedule: ScheduleConfig) => { draft.scheduleConfig = { ...draft.scheduleConfig, ...schedule }; setDraft({ ...draft, scheduleConfig: { ...draft.scheduleConfig } }); },
           }),
       jsx().jsxs("footer", {
         children: [
-          jsx().jsx("button", { type: "button", onClick: presentation.onCloseEditor, children: "Cancel" }),
-          jsx().jsx("button", { type: "submit", disabled: draft.name.trim().length === 0 || draft.prompt.trim().length === 0, children: "Save" }),
+          jsx().jsx("button", { type: "button", disabled: presentation.saveMutationPending === true, onClick: close, children: "Cancel" }),
+          selected == null ? null : jsx().jsx("button", { type: "button", disabled: presentation.deleteMutationPending === true || presentation.saveMutationPending === true, onClick: () => presentation.onRequestDelete == null ? presentation.onDelete?.(selected) : presentation.onRequestDelete(selected), children: "Delete" }),
+          jsx().jsx("button", { type: "submit", disabled: presentation.saveMutationPending === true || draft.name.trim().length === 0 || draft.prompt.trim().length === 0, children: presentation.saveMutationPending === true ? "Saving…" : "Save" }),
         ],
       }),
+      discardOpen ? jsx().jsx("div", { role: "dialog", "aria-label": "Discard scheduled task changes?", children: jsx().jsxs("div", { children: [
+        jsx().jsx("h3", { children: "Discard scheduled task changes?" }),
+        jsx().jsx("p", { children: "Your changes to this scheduled task will be lost" }),
+        jsx().jsx("button", { type: "button", onClick: () => setDiscardOpen(false), children: "Keep editing" }),
+        jsx().jsx("button", { type: "button", onClick: presentation.onCloseEditor, children: "Discard" }),
+      ] }) }) : null,
     ],
   });
 }
@@ -886,14 +938,16 @@ function DetailSurface({ items, presentation }: { items: AutomationItem[]; prese
 }
 
 function DeleteDialog({ items, presentation }: { items: AutomationItem[]; presentation: AutomationsPresentation }): unknown {
-  if (AutomationDeleteConfirmationDialog == null || presentation.deletePending !== true) return null;
-  const selected = items.find((item) => item.id === presentation.selectedAutomationId && (presentation.selectedSource == null || item.source === presentation.selectedSource));
+  if (AutomationDeleteConfirmationDialog == null || (presentation.deleteDialogOpen !== true && presentation.deletePending !== true)) return null;
+  const targetId = presentation.deleteTargetId ?? presentation.selectedAutomationId;
+  const targetSource = presentation.deleteTargetSource ?? presentation.selectedSource;
+  const selected = items.find((item) => item.id === targetId && (targetSource == null || item.source === targetSource));
   if (selected == null) return null;
   return jsx().jsx(AutomationDeleteConfirmationDialog, {
-    isPending: false,
+    isPending: presentation.deleteMutationPending === true,
     name: displayName(selected),
-    onCancel: presentation.onCloseEditor ?? (() => undefined),
-    onConfirm: () => presentation.onDelete?.(selected),
+    onCancel: presentation.onCancelDelete ?? presentation.onCloseEditor ?? (() => undefined),
+    onConfirm: () => presentation.onConfirmDelete == null ? presentation.onDelete?.(selected) : presentation.onConfirmDelete(selected),
     open: true,
   });
 }

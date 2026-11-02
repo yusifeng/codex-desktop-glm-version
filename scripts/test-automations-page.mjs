@@ -42,6 +42,7 @@ const state = {
     navigation: [],
     readChanges: [],
     refetches: 0,
+    reactHooks: { cursor: 0, values: [] },
   },
   jsx: {
     Fragment: "Fragment",
@@ -58,8 +59,8 @@ const mocks = {
     export const $3 = () => state.initialized.push("app-shared:$3");
     export const K2 = () => state.initialized.push("app-shared:K2");
     export const BX = (signal, input) => signal === "capability" ? ({ isCapable: input.name === "automations.local" || input.name === "automations.cloud" }) : false;
-    export const HX = signal => signal === "account" ? state.runtime.account : signal === "user" ? "user-1" : signal === "migration-query" ? state.runtime.migration : signal === "local" ? ({ data: state.runtime.local, isLoading: false, refetch: () => {} }) : signal.startsWith?.("cloud-") ? ({ mutate: variables => state.runtime.cloudMutations.push([signal, variables]) }) : ({ data: state.runtime.cloud, isFetching: false, refetch: () => { state.runtime.refetches += 1; } });
-    const react = { useState: initial => [initial, () => {}] };
+    export const HX = signal => signal === "account" ? state.runtime.account : signal === "user" ? "user-1" : signal === "migration-query" ? state.runtime.migration : signal === "local" ? ({ data: state.runtime.local, isLoading: false, refetch: () => {} }) : signal.startsWith?.("cloud-") ? ({ mutate: (variables, options) => { state.runtime.cloudMutations.push([signal, variables]); options?.onSuccess?.({ success: true }, variables); } }) : ({ data: state.runtime.cloud, isFetching: false, refetch: () => { state.runtime.refetches += 1; } });
+    const react = { useState: initial => { const hooks = state.runtime.reactHooks; const index = hooks.cursor++; if (!(index in hooks.values)) hooks.values[index] = typeof initial === "function" ? initial() : initial; return [hooks.values[index], value => { hooks.values[index] = typeof value === "function" ? value(hooks.values[index]) : value; }]; } };
     export const e6 = Object.assign(() => react, react);
     export const LX = () => ({ get: () => true, set: (signal, value) => state.runtime.migrationVisibility.push([signal, value]) });
     export const CL = () => ({ invalidateQueries: input => state.runtime.invalidations.push(input) });
@@ -72,7 +73,7 @@ const mocks = {
     export const itt = "cloud";
     export const MC = () => globalThis.__automationsPageTest.runtime.history;
     export const F$ = () => threadId => globalThis.__automationsPageTest.runtime.navigation.push(threadId);
-    export const iun = (operation, options) => ({ mutate: variables => { globalThis.__automationsPageTest.runtime.mutations.push([operation, variables]); options?.onSuccess?.({ success: true }, variables); } });
+    export const iun = (operation, options) => ({ mutate: (variables, callOptions) => { globalThis.__automationsPageTest.runtime.mutations.push([operation, variables]); options?.onSuccess?.({ success: true }, variables); callOptions?.onSuccess?.({ success: true }, variables); } });
     export const Ftt = input => ({ contract: "create", ...input });
     export const Vtt = input => ({ contract: "update", ...input });
     export const Btt = (automation, status) => ({ contract: "status", id: automation.id, status });
@@ -89,7 +90,7 @@ const mocks = {
   `,
   "app-primary": `export const n = () => globalThis.__automationsPageTest.initialized.push("app-primary");`,
   "elicitation-events": `export const n = () => globalThis.__automationsPageTest.initialized.push("elicitation:n"); export const t = () => globalThis.__automationsPageTest.initialized.push("elicitation:t");`,
-  "cloud-automation-detail-panel": `export const t = () => globalThis.__automationsPageTest.initialized.push("cloud-detail"); export const n = props => ({ type: "CloudDetail", props });`,
+  "cloud-automation-detail-panel": `export const n = () => globalThis.__automationsPageTest.initialized.push("cloud-detail"); export const t = props => ({ type: "CloudDetail", props });`,
   "automation-frequency-section": `export const i = () => globalThis.__automationsPageTest.initialized.push("frequency"); export const l = props => ({ type: "Frequency", props });`,
   "editor-dialog": `export const a = () => globalThis.__automationsPageTest.initialized.push("editor:a"); export const h = () => globalThis.__automationsPageTest.initialized.push("editor:h"); export const i = () => globalThis.__automationsPageTest.initialized.push("editor:i"); export const m = () => globalThis.__automationsPageTest.initialized.push("editor:m");`,
   "automation-delete-confirmation-dialog": `export const n = () => globalThis.__automationsPageTest.initialized.push("delete"); export const t = props => ({ type: "DeleteDialog", props });`,
@@ -131,6 +132,11 @@ const findAll = (node, predicate, found = []) => {
   return found;
 };
 const findButton = (node, label) => findAll(node, (entry) => entry.type === "button" && entry.props.children === label)[0];
+const renderRuntime = (clear = false) => {
+  if (clear) state.runtime.reactHooks.values = [];
+  state.runtime.reactHooks.cursor = 0;
+  return page.AutomationsLayoutPage();
+};
 
 const calls = [];
 const local = {
@@ -219,7 +225,7 @@ node = page.AutomationsLayoutPage({ presentation: { ...base, automations: [], mi
 const empty = findAll(node, (entry) => entry.type === "DocumentSearch")[0];
 check(empty.props.emptyMessage === "No scheduled tasks found", "uses document search for empty results");
 
-node = page.AutomationsLayoutPage();
+node = renderRuntime(true);
 check(findAll(node, (entry) => entry.type === "span" && entry.props.children === "Runtime brief").length > 0, "loads local scheduled tasks from the production runtime signals");
 check(findAll(node, (entry) => entry.type === "span" && entry.props.children === "Cloud monitor").length > 0, "loads account-scoped cloud scheduled tasks from the production runtime signals");
 check(findButton(node, "Runtime result") != null, "attaches runtime history items to their local automation");
@@ -236,24 +242,34 @@ findButton(node, "Pause").props.onClick();
 findButton(node, "Delete").props.onClick();
 check(state.runtime.mutations.some(([operation, input]) => operation === "automation-run-now" && input.id === "runtime-local"), "uses the published run-now mutation contract");
 check(state.runtime.mutations.some(([operation, input]) => operation === "automation-update" && input.contract === "status" && input.status === "PAUSED"), "uses the published status-update request builder");
-check(state.runtime.mutations.some(([operation, input]) => operation === "automation-delete" && input.id === "runtime-local"), "uses the published delete mutation contract");
+check(!state.runtime.mutations.some(([operation]) => operation === "automation-delete"), "does not delete a local task before confirmation");
+node = renderRuntime();
+const runtimeDeleteDialog = findAll(node, (entry) => entry.type === "DeleteDialog")[0];
+check(runtimeDeleteDialog.props.name === "Runtime brief", "opens confirmation for the requested local task");
+runtimeDeleteDialog.props.onConfirm();
+check(state.runtime.mutations.some(([operation, input]) => operation === "automation-delete" && input.id === "runtime-local"), "uses the published delete mutation contract after confirmation");
 check(source.includes('useAutomationMutation?.("automation-create"') && source.includes("buildCreateAutomationRequest?.(input)"), "wires create and update request builders into the live page");
 await findButton(node, "Archive all").props.onClick();
 await findButton(node, "Archive").props.onClick();
 check(state.runtime.archives.some(([operation, id, options]) => operation === "archive" && id === "conversation:runtime-thread" && options.source === "automation_history"), "archives automation conversations through the published service contract");
 state.runtime.history.items[0].status = "ARCHIVED";
 state.runtime.history.items[0].archived = true;
-node = page.AutomationsLayoutPage();
+node = renderRuntime();
 await findButton(node, "Unarchive").props.onClick();
 check(state.runtime.archives.some(([operation, id]) => operation === "unarchive" && id === "conversation:runtime-thread"), "unarchives automation conversations through the published service contract");
 check(state.runtime.invalidations.some(input => input.queryKey[0] === "inbox-items"), "invalidates the inbox history query after archive changes");
 
 state.runtime.local.items = [];
-node = page.AutomationsLayoutPage();
+node = renderRuntime();
 const runtimeCloudDetail = findAll(node, (entry) => entry.type === "CloudDetail")[0];
 runtimeCloudDetail.props.onPause();
 runtimeCloudDetail.props.onDelete();
 check(state.runtime.cloudMutations.some(([operation, input]) => operation === "cloud-update" && input.automationId === "runtime-cloud" && input.isEnabled === true), "uses the published cloud enable mutation contract");
-check(state.runtime.cloudMutations.some(([operation, input]) => operation === "cloud-delete" && input.automationId === "runtime-cloud"), "uses the published cloud delete mutation contract");
+check(!state.runtime.cloudMutations.some(([operation]) => operation === "cloud-delete"), "does not delete a cloud task before confirmation");
+node = renderRuntime();
+const cloudDeleteDialog = findAll(node, (entry) => entry.type === "DeleteDialog")[0];
+check(cloudDeleteDialog.props.name === "Cloud monitor", "opens confirmation for the requested cloud task");
+cloudDeleteDialog.props.onConfirm();
+check(state.runtime.cloudMutations.some(([operation, input]) => operation === "cloud-delete" && input.automationId === "runtime-cloud"), "uses the published cloud delete mutation contract after confirmation");
 
 console.log(`automations page: ${assertions} assertions passed`);

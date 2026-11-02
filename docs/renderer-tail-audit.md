@@ -1,5 +1,17 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Automations detail/editor release recovery：`automations-page` 现已恢复删除请求与真实
+mutation 之间的确认状态，本地与云端任务都不再首次点击就直接删除；确认目标按
+source/id 隔离，cancel/confirm 与 pending 状态保持到重渲染。详情页恢复运行历史倒序、最近运行时间、
+未读样式、无会话时的安全禁用，以及保存/运行/暂停/删除的 mutation pending 投影。编辑器恢复
+controlled draft、未保存变更检测、discard confirmation 和 edit-mode delete。同批修正了两个曾被
+“导出存在”掩盖的公开 ABI 错位：`cloud-automation-detail-panel.t` 才是云端详情/编辑组合，`r`
+是 detail panel，`n` 只是 initializer；`automation-editor-dialog.o/i/r` 分别是 action bar、detail shell 和
+automation detail，不再是无关 identity/empty initializer。focused Automations 页扩到 44 项，全部
+automation test family、typecheck、strict hub gate、2,417 项 semantic overrides、1,912-script index 与
+1,888/1,888 renderer build/verify 通过。这一批收敛了 Automations 主要 detail/editor 运行缺口，
+但不把其他 settings/home 组合差异或三个大型 hub 误报为已完成。
+
 2026-11-02 Settings plan/query runtime recovery：Usage 不再依赖默认隐藏或静态 plan，现从真实 usage
 query、credit balance 与 `dS` plan hook 读取 visible/loading/plan；Analytics、enterprise label、Consumer
 View 和 Code Review 按发布版 plan predicate、experiment gate 与 activity query 组合。Profile 接回实时
