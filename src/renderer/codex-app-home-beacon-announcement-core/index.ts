@@ -20,6 +20,7 @@ const __vite__mapDeps = (
       "@rchunk/plaid-link",
     ]),
 ) => i.map((i) => d[i]);
+import { isAbsoluteHttpUrl as He } from "../app-primary/runtime/action-url-policy";
 import { isAllowedActionUrl as Ze, isTasksLocalAction as at } from "../app-primary/runtime/action-url-policy";
 import { formatBeaconActionKey as ft } from "../app-primary/runtime/format-beacon-action-key";
 import { isDisplayableAction as Je } from "../app-primary/runtime/is-displayable-action";
@@ -118,7 +119,6 @@ import {
   zW as Ve,
 } from "@rchunk/app-initial";
 import {
-  $m as He,
   Bp as Ue,
   Cm as We,
   Dh as Ge,

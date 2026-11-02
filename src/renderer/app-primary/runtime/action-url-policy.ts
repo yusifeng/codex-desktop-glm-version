@@ -17,3 +17,8 @@ export function isAllowedActionUrl(value: string): boolean {
     value.startsWith("codex://") ||
     (value.startsWith("/") && !value.startsWith("//"));
 }
+
+/** Return whether a foreground action asset uses an absolute HTTP(S) URL. */
+export function isAbsoluteHttpUrl(value: string): boolean {
+  return value.startsWith("https://") || value.startsWith("http://");
+}

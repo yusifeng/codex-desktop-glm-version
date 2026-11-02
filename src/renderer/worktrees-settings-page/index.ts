@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isWindowsDrivePath as d } from "../app-shared/runtime/path-key-policy";
 import { gitSettings as l } from "../app-shared/runtime/git-settings";
 import { worktreeSettings as A } from "../app-shared/runtime/worktree-settings";
 import { formatErrorMessage as m } from "../app-shared/runtime/format-error-message";
@@ -12,7 +13,6 @@ import {
   BX as s,
   C_ as c,
   FX as u,
-  HK as d,
   HX as f,
   I3 as p,
   Ih as h,

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isGitBackedProjectTarget as _t } from "../app-primary/runtime/project-target-policy";
 import { initializeMountedState as le, useIsMounted as oe } from "../app-shared/runtime/mounted-state";
 import { deriveLayoutMotionVariant as Ft } from "../app-primary/runtime/derive-layout-motion-variant";
 import { formatComposerPlaceholder as ot } from "../app-primary/runtime/format-composer-placeholder";
@@ -102,7 +103,6 @@ import {
   Ri as D,
   Rp as ht,
   S as gt,
-  T as _t,
   Th as vt,
   U as yt,
   X as bt,

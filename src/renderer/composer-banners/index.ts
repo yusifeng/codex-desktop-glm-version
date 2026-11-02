@@ -18,6 +18,7 @@ const __vite__mapDeps = (
       "@rchunk/task-announcement-state",
     ]),
 ) => i.map((i) => d[i]);
+import { getMaxConcurrentThreadsPerSession as ue } from "../app-primary/runtime/multi-agent-config";
 import { selectHandoffBranch as we } from "../app-primary/runtime/select-handoff-branch";
 import { selectModelReasoningEfforts as _e } from "../app-primary/runtime/select-model-reasoning-efforts";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -74,7 +75,6 @@ import {
   x3 as le,
 } from "@rchunk/app-initial";
 import {
-  Cp as ue,
   Dp as de,
   Hf as fe,
   Jp as pe,

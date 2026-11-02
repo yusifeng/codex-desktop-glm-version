@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getPlatformCommandShortcutLabel as Se } from "../app-primary/runtime/platform-shortcut-label";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -72,7 +73,6 @@ import {
   Ac as G,
   al as be,
   cl as xe,
-  jc as Se,
   kc as Ce,
   nl as we,
   ol as Te,

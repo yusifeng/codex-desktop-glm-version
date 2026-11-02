@@ -1,9 +1,9 @@
 // @ts-nocheck
+import { createCaseInsensitivePathKey as n } from "../app-shared/runtime/path-key-policy";
 import { unescapeMarkdownPunctuation as F } from "../app-initial/runtime/markdown-links";
 import { getPathBasename as r } from "../app-shared/runtime/get-path-basename";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
-  BI as n,
   PI as i,
   Q3 as a,
   RI as o,

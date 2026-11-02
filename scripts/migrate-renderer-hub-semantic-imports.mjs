@@ -14,6 +14,10 @@ const HUBS = ["app-shared", "app-initial", "app-primary"];
 const WRITE = process.argv.includes("--write");
 const CHECK = process.argv.includes("--check");
 const EXPLICIT_EXPORTS = new Map([
+  ["app-shared:EJ", ["src/renderer/app-shared/runtime/non-empty-collection.ts", "hasItems"]],
+  ["app-shared:HK", ["src/renderer/app-shared/runtime/path-key-policy.ts", "isWindowsDrivePath"]],
+  ["app-shared:BI", ["src/renderer/app-shared/runtime/path-key-policy.ts", "createCaseInsensitivePathKey"]],
+  ["app-shared:Hp", ["src/renderer/app-shared/runtime/shortcut-scope-policy.ts", "isOsGlobalShortcut"]],
   ["app-initial:w$t", ["src/renderer/app-initial/runtime/flatten-conversation-items.ts", "flattenConversationItems"]],
   ["app-initial:Asn", ["src/renderer/app-initial/runtime/parse-http-url.ts", "parseHttpUrl"]],
   ["app-initial:Fsn", ["src/renderer/app-initial/runtime/parse-origin-pattern.ts", "domainMatchesPattern"]],
@@ -74,6 +78,15 @@ const EXPLICIT_EXPORTS = new Map([
   ["app-primary:yg", ["src/renderer/app-primary/runtime/extract-skill-kind.ts", "extractSkillKindFromPrompt"]],
   ["app-primary:Qm", ["src/renderer/app-primary/runtime/action-url-policy.ts", "isAllowedActionUrl"]],
   ["app-primary:Zm", ["src/renderer/app-primary/runtime/action-url-policy.ts", "isTasksLocalAction"]],
+  ["app-primary:$m", ["src/renderer/app-primary/runtime/action-url-policy.ts", "isAbsoluteHttpUrl"]],
+  ["app-primary:T", ["src/renderer/app-primary/runtime/project-target-policy.ts", "isGitBackedProjectTarget"]],
+  ["app-primary:Cl", ["src/renderer/app-primary/runtime/thread-navigation-keys.ts", "getThreadSearchKey"]],
+  ["app-primary:Ih", ["src/renderer/app-primary/runtime/thread-navigation-keys.ts", "createNavigationCacheKey"]],
+  ["app-primary:Gl", ["src/renderer/app-primary/runtime/mcp-extension-policy.ts", "isMcpExtensionKind"]],
+  ["app-primary:Tc", ["src/renderer/app-primary/runtime/device-onboarding-policy.ts", "shouldShowDeviceOnboarding"]],
+  ["app-primary:$c", ["src/renderer/app-primary/runtime/annotation-anchor-point.ts", "getAnnotationAnchorPoint"]],
+  ["app-primary:jc", ["src/renderer/app-primary/runtime/platform-shortcut-label.ts", "getPlatformCommandShortcutLabel"]],
+  ["app-primary:Cp", ["src/renderer/app-primary/runtime/multi-agent-config.ts", "getMaxConcurrentThreadsPerSession"]],
   ["app-primary:$p", ["src/renderer/app-primary/runtime/availability-status.ts", "getEligibilityStatus"]],
   ["app-primary:Eh", ["src/renderer/app-primary/runtime/availability-status.ts", "getTakeoverAvailabilityStatus"]],
   ["app-primary:Ig", ["src/renderer/app-primary/runtime/cyclic-selection.ts", "selectCyclicItem"]],

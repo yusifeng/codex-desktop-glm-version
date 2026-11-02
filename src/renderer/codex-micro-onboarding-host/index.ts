@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { shouldShowDeviceOnboarding as he } from "../app-primary/runtime/device-onboarding-policy";
 import { statusToColor as i } from "../app-shared/runtime/status-to-color";
 import { classNames as O, initializeClassNames as D } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -58,7 +59,6 @@ import {
 } from "@rchunk/app-initial";
 import {
   Sc as me,
-  Tc as he,
   xc as B,
 } from "@rchunk/app-primary";
 import { o as ge, r as _e } from "@rchunk/codex-micro-layout";

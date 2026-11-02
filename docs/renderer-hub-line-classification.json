@@ -93,11 +93,11 @@
     "hub": "app-primary",
     "alias": "$m",
     "sourceSymbol": "rA",
-    "startLine": 5762,
-    "endLine": 5764,
-    "classification": "zero-consumer-scope-aware-formatter",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The absolute-URL predicate is only consumed by the adjacent foreground-image selector tAe; no renderer module imports the public alias, so extracting it would create a facade without a real named consumer."
+    "startLine": 5775,
+    "endLine": 5777,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/action-url-policy.ts",
+    "evidence": "Absolute HTTP(S) URL recognition now belongs to the typed action URL policy and is imported directly by its renderer consumer."
   },
   {
     "hub": "app-primary",
@@ -145,11 +145,11 @@
     "hub": "app-primary",
     "alias": "T",
     "sourceSymbol": "f9",
-    "startLine": 114934,
-    "endLine": 114942,
-    "classification": "zero-consumer-project-kind-predicate",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The predicate checks whether a selected creation target is Git-backed by consulting the project list and project kind. The published alias has no named renderer consumer (only the generated hub scope owns it), so extracting it now would create an unowned project-target facade; preserve the exact line-level implementation until a renderer boundary establishes the target contract."
+    "startLine": 114916,
+    "endLine": 114924,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/project-target-policy.ts",
+    "evidence": "Git-backed creation-target selection now has a typed project descriptor contract and a direct named renderer consumer."
   },
   {
     "hub": "app-primary",
@@ -256,11 +256,11 @@
     "hub": "app-primary",
     "alias": "Cl",
     "sourceSymbol": "wRe",
-    "startLine": 27431,
-    "endLine": 27440,
-    "classification": "generated-local-thread-key-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The helper normalizes local, remote, and ChatGPT thread identities for the adjacent generated search projection. It has no independent renderer consumer or thread-store lifecycle, so retaining the local projection avoids an unowned identity facade."
+    "startLine": 27444,
+    "endLine": 27453,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/thread-navigation-keys.ts",
+    "evidence": "Local, remote, and ChatGPT search identity projection now has a discriminated typed owner and is consumed without the compressed hub alias."
   },
   {
     "hub": "app-primary",
@@ -276,11 +276,11 @@
     "hub": "app-primary",
     "alias": "$c",
     "sourceSymbol": "yBe",
-    "startLine": 30221,
-    "endLine": 30224,
-    "classification": "generated-local-annotation-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The helper chooses an annotation anchor point from an explicit edit anchor or rectangle center for the adjacent generated overlay interaction. It has no independent renderer consumer or overlay lifecycle, so extracting it would create an unowned geometry facade."
+    "startLine": 30234,
+    "endLine": 30236,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/annotation-anchor-point.ts",
+    "evidence": "Explicit-anchor and top-center rectangle projection now has a typed geometry contract with direct renderer ownership."
   },
   {
     "hub": "app-primary",
@@ -435,11 +435,11 @@
     "hub": "app-primary",
     "alias": "Ih",
     "sourceSymbol": "kO",
-    "startLine": 4569,
-    "endLine": 4572,
-    "classification": "generated-local-navigation-key-helper",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The helper serializes account, locale, product, path, and navigation state into the adjacent generated navigation cache key. Its key schema is local to that cache and is not independently consumed by renderer code."
+    "startLine": 4582,
+    "endLine": 4584,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/thread-navigation-keys.ts",
+    "evidence": "The ordered account/locale/product/path/navigation tuple is now an explicit cache-key ABI with a typed runtime owner."
   },
   {
     "hub": "app-primary",
@@ -495,11 +495,11 @@
     "hub": "app-primary",
     "alias": "Tc",
     "sourceSymbol": "OVe",
-    "startLine": 31465,
-    "endLine": 31471,
-    "classification": "generated-local-device-onboarding-predicate",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The predicate decides whether the adjacent generated device-onboarding announcement should be shown from pending/idle state, prior detection, and detected/connected status. Its state vocabulary is owned by the neighboring EVe/DVe signal transitions and has no independent renderer consumer or teardown boundary."
+    "startLine": 31478,
+    "endLine": 31484,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/device-onboarding-policy.ts",
+    "evidence": "Device onboarding visibility is now a pure typed state policy imported directly by the onboarding renderer surface."
   },
   {
     "hub": "app-primary",
@@ -646,11 +646,11 @@
     "hub": "app-primary",
     "alias": "jc",
     "sourceSymbol": "vVe",
-    "startLine": 31362,
-    "endLine": 31364,
-    "classification": "generated-local-platform-shortcut-label",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The helper chooses the platform-specific keyboard shortcut label for the generated composer. The label is local presentation policy with no standalone lifecycle or renderer owner."
+    "startLine": 31375,
+    "endLine": 31377,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/platform-shortcut-label.ts",
+    "evidence": "Windows/Linux versus macOS shortcut labeling now has a named platform policy and direct preview consumers."
   },
   {
     "hub": "app-primary",
@@ -1137,11 +1137,11 @@
     "hub": "app-primary",
     "alias": "Gl",
     "sourceSymbol": "OV",
-    "startLine": 23903,
-    "endLine": 23905,
-    "classification": "generated-local-mcp-extension-kind-predicate",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The predicate narrows mention submenu providers to the generated MCP-extension kind used by the neighboring composer list. It is a local discriminant with no independent renderer contract."
+    "startLine": 23916,
+    "endLine": 23918,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/mcp-extension-policy.ts",
+    "evidence": "MCP-extension discriminant checking now has a null-safe typed policy consumed directly by the composer mention list."
   },
   {
     "hub": "app-primary",
@@ -1249,11 +1249,11 @@
     "hub": "app-primary",
     "alias": "Cp",
     "sourceSymbol": "WM",
-    "startLine": 11043,
-    "endLine": 11048,
-    "classification": "generated-local-auth-config-projection",
-    "module": "src/webview/assets/app-primary-d66705000d76.ts",
-    "evidence": "The projection validates the ChatGPT auth configuration and extracts the multi-agent concurrency limit for the adjacent account/runtime surface. It is a route-local generated policy read rather than an independently consumed renderer service."
+    "startLine": 11056,
+    "endLine": 11060,
+    "classification": "semantic-business-logic",
+    "module": "src/renderer/app-primary/runtime/multi-agent-config.ts",
+    "evidence": "ChatGPT multi-agent concurrency extraction now has a typed runtime validator preserving the release integer/minimum constraints."
   },
   {
     "hub": "app-primary",
@@ -2681,17 +2681,17 @@
   { "hub": "app-shared", "alias": "EG", "sourceSymbol": "sRe", "startLine": 63491, "endLine": 63491, "classification": "semantic-business-logic", "module": "src/renderer/app-shared/runtime/get-query-priority.ts", "evidence": "The search query priority policy assigns the lower priority to blank/whitespace queries and the higher priority to substantive queries; it is deterministic and side-effect free with focused coverage." },
   { "hub": "app-shared", "alias": "Gf", "sourceSymbol": "Odt", "startLine": 103765, "endLine": 103768, "classification": "semantic-business-logic", "module": "src/renderer/app-shared/runtime/normalize-dropdown-overlay-side.ts", "evidence": "The dropdown overlay side policy retains only top and bottom values from the DOM attribute; the DOM lookup remains at the hub boundary while the value normalization is deterministic and focused-tested." },
   { "hub": "app-shared", "alias": "II", "sourceSymbol": "DJe", "startLine": 70115, "endLine": 70118, "classification": "semantic-business-logic", "module": "src/renderer/app-shared/runtime/get-path-basename.ts", "evidence": "The path projection normalizes extended Windows/UNC paths and separators before returning the final segment; artifacts, source-summary, workspace-selection, terminal, image-restoration, and text-thumbnail consumers now import it directly instead of reading app-shared II." },
-  { "hub": "app-shared", "alias": "EJ", "sourceSymbol": "KPe", "startLine": 61332, "endLine": 61332, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "The exported non-empty predicate is a generic generated-schema/collection helper with no stable renderer business owner or independent consumer; preserving the generated contract avoids inventing a facade." },
+  { "hub": "app-shared", "alias": "EJ", "sourceSymbol": "KPe", "startLine": 61332, "endLine": 61334, "classification": "semantic-business-logic", "module": "src/renderer/app-shared/runtime/non-empty-collection.ts", "evidence": "The non-empty collection predicate now has a structural typed owner and direct renderer consumers instead of the compressed shared hub alias." },
   { "hub": "app-shared", "alias": "CJ", "sourceSymbol": "UPe", "startLine": 61319, "endLine": 61319, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "The exported lookup maps a generated annotation batch enum with a generated fallback; without a renderer consumer or stable semantic owner, extraction would duplicate generated contract surface." },
   { "hub": "app-shared", "alias": "G2", "sourceSymbol": "oae", "startLine": 29102, "endLine": 29102, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "The exported identity helper is generic infrastructure with no renderer business semantics or independent consumer; preserving the generated contract avoids inventing a facade for an identity function." },
   { "hub": "app-shared", "alias": "Fz", "sourceSymbol": "UGe", "startLine": 68071, "endLine": 68071, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "The exported constant-false predicate is generated feature wiring with no independent renderer semantic owner or consumer; preserving the generated contract avoids inventing a facade." },
-  { "hub": "app-shared", "alias": "HK", "sourceSymbol": "Iz", "startLine": 62197, "endLine": 62197, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "The exported Windows drive-path regex wrapper is a low-level path normalization helper already coupled to adjacent generated path utilities; no independent renderer business owner exists, so the generated contract remains preserved." },
-  { "hub": "app-shared", "alias": "BI", "sourceSymbol": "wJe", "startLine": 70096, "endLine": 70096, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "The exported lowercased path-key wrapper delegates to generated path normalization (`QW`) and has no independent renderer business owner; preserving the coupled generated contract avoids duplicating path semantics." },
+  { "hub": "app-shared", "alias": "HK", "sourceSymbol": "Iz", "startLine": 62197, "endLine": 62199, "classification": "semantic-business-logic", "module": "src/renderer/app-shared/runtime/path-key-policy.ts", "evidence": "Absolute Windows drive-path detection now has a named cross-platform path policy and direct renderer consumers." },
+  { "hub": "app-shared", "alias": "BI", "sourceSymbol": "wJe", "startLine": 70096, "endLine": 70098, "classification": "semantic-business-logic", "module": "src/renderer/app-shared/runtime/path-key-policy.ts", "evidence": "Case-insensitive path keys now preserve extended Windows prefix and separator normalization in a typed runtime owner." },
   { "hub": "app-shared", "alias": "GJ", "sourceSymbol": "vPe", "startLine": 61097, "endLine": 61099, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "The exported app-server version status wrapper delegates to adjacent generated parsers/comparators (`hPe`/`_Pe`) and has no independent renderer consumer; preserving the coupled version-contract surface avoids a partial facade." },
   { "hub": "app-shared", "alias": "HJ", "sourceSymbol": "wPe", "startLine": 61129, "endLine": 61129, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "The exported app-server compatibility predicate depends on generated version constants and semantic-version helpers; without an independent renderer consumer, preserving the coupled generated contract is safer than a partial facade." },
   { "hub": "app-shared", "alias": "Gq", "sourceSymbol": "TFe", "startLine": 61728, "endLine": 61739, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "The artifact-annotation comment builder is coupled to generated annotation constructors, origin enums, and content schemas; with no independent renderer consumer, preserve the generated contract rather than split a partial facade." },
   { "hub": "app-shared", "alias": "I_", "sourceSymbol": "H4", "startLine": 89448, "endLine": 89448, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "The exported SVG data-URI encoder is generic generated utility code with no independent renderer business owner or consumer; preserve the generated contract rather than create a duplicate facade." },
-  { "hub": "app-shared", "alias": "Hp", "sourceSymbol": "mut", "startLine": 103043, "endLine": 103043, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "The shortcut-scope predicate reads generated command metadata and has no independent renderer consumer or stable business owner; preserve the generated command contract rather than split a partial facade." },
+  { "hub": "app-shared", "alias": "Hp", "sourceSymbol": "mut", "startLine": 103043, "endLine": 103045, "classification": "semantic-business-logic", "module": "src/renderer/app-shared/runtime/shortcut-scope-policy.ts", "evidence": "OS-global shortcut metadata narrowing now has a typed policy imported directly by keyboard settings and command surfaces." },
   { "hub": "app-shared", "alias": "Im", "sourceSymbol": "Zct", "startLine": 100305, "endLine": 100305, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "The exported nullable collection helper delegates to generated normalization (`LIe`) and has no independent renderer business owner; preserve the coupled generated utility contract." },
   { "hub": "app-shared", "alias": "Ip", "sourceSymbol": "fut", "startLine": 103032, "endLine": 103032, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "The exported descriptionIntlId field guard is generated command-schema introspection with no independent renderer business owner; preserve the generated metadata contract." },
   { "hub": "app-shared", "alias": "G4", "sourceSymbol": "Bp", "startLine": 24068, "endLine": 24068, "classification": "preserved-coupled", "module": "src/webview/assets/app-shared-7b9edc1bfb7f.ts", "evidence": "The exported schema-record constructor is generated validation infrastructure with no independent renderer business owner; preserving the generated contract avoids duplicating schema semantics." },

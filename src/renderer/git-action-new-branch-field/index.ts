@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createCaseInsensitivePathKey as i } from "../app-shared/runtime/path-key-policy";
 import { getBooleanFeatureFlag as ae } from "../app-shared/runtime/permission-profiles";
 import { gitSettings as o } from "../app-shared/runtime/git-settings";
 import { parseGitRemoteUrl as ie } from "../app-shared/runtime/parse-git-remote-url";
@@ -7,7 +8,6 @@ import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
   $O as r,
-  BI as i,
   Dj as a,
   FX as s,
   G2 as c,

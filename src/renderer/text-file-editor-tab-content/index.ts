@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isWindowsDrivePath as g } from "../app-shared/runtime/path-key-policy";
 import { classNames as Me, initializeClassNames as we } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -16,7 +17,6 @@ import {
   FX as p,
   FZ as m,
   HI as h,
-  HK as g,
   HX as _,
   I3 as v,
   Ih as y,

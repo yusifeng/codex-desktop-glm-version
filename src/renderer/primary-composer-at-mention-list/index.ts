@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isMcpExtensionKind as g } from "../app-primary/runtime/mcp-extension-policy";
 import { appgenInteractionActions as n } from "../app-shared/runtime/appgen-interaction-action";
 import { appgenInteractionSources as a } from "../app-shared/runtime/appgen-interaction-source";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -24,7 +25,6 @@ import {
 } from "@rchunk/app-initial";
 import {
   Al as h,
-  Gl as g,
   Hl as _,
   Sl as v,
   Ul as y,

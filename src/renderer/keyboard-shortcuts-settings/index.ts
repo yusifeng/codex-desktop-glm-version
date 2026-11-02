@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isOsGlobalShortcut as l } from "../app-shared/runtime/shortcut-scope-policy";
 import { createCommandQueryKey as ye } from "../app-initial/runtime/create-command-query-key";
 import { formatKeyboardShortcut as tt } from "../app-primary/runtime/format-keyboard-shortcut";
 import { isCapabilitySupported as nt } from "../app-primary/runtime/is-capability-supported";
@@ -13,7 +14,6 @@ import {
   FX as o,
   G2 as s,
   HX as c,
-  Hp as l,
   I3 as u,
   If as d,
   Ih as f,

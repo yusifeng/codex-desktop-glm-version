@@ -1,10 +1,10 @@
 // @ts-nocheck
+import { hasItems as ee } from "../app-shared/runtime/non-empty-collection";
 import { hasQueuedDesignChange as n } from "../app-shared/runtime/has-queued-design-change";
 import { classNames as p, initializeClassNames as f } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
-  EJ as ee,
   Hm as r,
   I3 as i,
   Jq as a,

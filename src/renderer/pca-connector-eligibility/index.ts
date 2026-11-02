@@ -20,6 +20,7 @@ const __vite__mapDeps = (
       "@rchunk/app-connect-availability",
     ]),
 ) => i.map((i) => d[i]);
+import { isAbsoluteHttpUrl as se } from "../app-primary/runtime/action-url-policy";
 import { extractActionLabel as ue } from "../app-primary/runtime/extract-action-label";
 import { hasDisplayableAction as J } from "../app-primary/runtime/has-displayable-action";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
@@ -77,7 +78,6 @@ import {
   z2t as oe,
 } from "@rchunk/app-initial";
 import {
-  $m as se,
   Gm as ce,
   Gp as le,
   Hm as W,

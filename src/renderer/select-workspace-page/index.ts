@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createCaseInsensitivePathKey as a } from "../app-shared/runtime/path-key-policy";
 import { getPathBasename as d } from "../app-shared/runtime/get-path-basename";
 import { isPathWithinRoots as i } from "../app-shared/runtime/is-path-within-roots";
 import { classNames as ae, initializeClassNames as A } from "../app-shared/ui/class-names";
@@ -6,7 +7,6 @@ import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
   $h as r,
-  BI as a,
   BX as o,
   FX as s,
   G3 as c,

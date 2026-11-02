@@ -24,6 +24,7 @@ const __vite__mapDeps = (
       "@rchunk/import-settings-gate",
     ]),
 ) => i.map((i) => d[i]);
+import { getThreadSearchKey as ir } from "../app-primary/runtime/thread-navigation-keys";
 import { hasRequiredCommandAccess as Ge } from "../app-shared/runtime/command-visibility-predicates";
 import { isElectronCommandEnabled as Nn } from "../app-initial/runtime/electron-command-policy";
 import { deriveBranchSearchPreview as ur } from "../app-primary/runtime/derive-branch-search-preview";
@@ -244,7 +245,6 @@ import {
   zo as rr,
 } from "@rchunk/app-initial";
 import {
-  Cl as ir,
   Dl as ar,
   El as or,
   Ol as sr,

@@ -4,6 +4,8 @@ const __vite__mapDeps = (
   m = __vite__mapDeps,
   d = m.f || (m.f = ["@rchunk/docx-preview-runtime", "@rchunk/rolldown-runtime"]),
 ) => i.map((i) => d[i]);
+import { getPlatformCommandShortcutLabel as We } from "../app-primary/runtime/platform-shortcut-label";
+import { getAnnotationAnchorPoint as Re } from "../app-primary/runtime/annotation-anchor-point";
 import { getRectangleBottomRight as Ke } from "../app-primary/runtime/get-rectangle-bottom-right";
 import { classNames as E, initializeClassNames as S } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -86,13 +88,11 @@ import {
   wat as Le,
 } from "@rchunk/app-initial";
 import {
-  $c as Re,
   Ac as ze,
   Qc as Be,
   Zc as Ve,
   al as He,
   el as Ue,
-  jc as We,
   kc as Ge,
   ol as qe,
   sl as Je,

@@ -1,11 +1,11 @@
 // @ts-nocheck
+import { createCaseInsensitivePathKey as a } from "../app-shared/runtime/path-key-policy";
 import { gitSettings as c } from "../app-shared/runtime/git-settings";
 import { isPathWithinRoots as i } from "../app-shared/runtime/is-path-within-roots";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
   $h as r,
-  BI as a,
   BX as o,
   C_ as s,
   FX as l,

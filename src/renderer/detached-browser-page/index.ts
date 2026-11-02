@@ -16,6 +16,7 @@ const __vite__mapDeps = (
       "./tweaks-toolbar-view-7c0f5f44eb6e.css",
     ]),
 ) => i.map((i) => d[i]);
+import { hasItems as u } from "../app-shared/runtime/non-empty-collection";
 import { classNames as pe, initializeClassNames as X } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -28,7 +29,6 @@ import {
   CL as s,
   CZ as c,
   EI as l,
-  EJ as u,
   H3 as d,
   Hm as f,
   I3 as p,

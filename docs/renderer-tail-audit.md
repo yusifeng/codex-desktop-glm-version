@@ -1,5 +1,19 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Cross-hub navigation/path policy batch：以一个大批次迁移 13 个公开压缩别名、
+25 个 renderer 调用绑定。app-primary 范围包括 HTTP(S) asset URL、Git-backed project target、
+local/remote/ChatGPT thread search key、navigation cache tuple、annotation anchor、device onboarding、
+MCP-extension discriminant、平台快捷键标签和 ChatGPT multi-agent 并发配置；app-shared 范围包括
+非空集合、Windows drive path、extended-prefix/case-insensitive path key 以及 OS-global shortcut
+scope。新增 8 个具名 TypeScript owner，并将聚合回归扩至 45 条断言、test-index 1,919。
+app-shared 直接 hub 消费由 1,859 降至 1,855，app-primary 由 744 降至 735；三 hub 继续保持
+0 unreviewed、0 invalid consumers，迁移检查为 0 个遗漏绑定。typecheck、严格 ABI、全量
+`npm run check`（12,464 transform、11 main roots、1,916 renderer chunks、33 preserved
+vendor/generated route sources）均通过。最终当前构建通过真实登录态 `npm run e2e:critical`，
+覆盖 settings/general、Git、worktrees、Browser/IAB、conversation history/add-context，并实际
+发送 `E2E_REPLY_20261102081238`、收到 assistant 同 marker。该批继续减少压缩 hub 运行依赖，
+但不把批次通过等同于整个反编译目标完成。
+
 2026-11-02 App-primary semantic policy batch：一次性将 14 个仍由压缩 hub 直出的纯业务
 契约迁移到 6 个具名 TypeScript owner，覆盖 action URL 安全与 `/tasks` 判定、资格/接管状态、
 循环选择、消息发送状态与 `senderLinkId`、prompt/Markdown 文件名，以及邮件收件人的解析、

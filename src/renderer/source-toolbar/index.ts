@@ -51,6 +51,7 @@ const __vite__mapDeps = (
       "@rchunk/permission-dropdown",
     ]),
 ) => i.map((i) => d[i]);
+import { hasItems as o } from "../app-shared/runtime/non-empty-collection";
 import { sitesSharingSources as n } from "../app-shared/runtime/sites-sharing-source";
 import { resolveBrowserContext as ze, subscribeBrowserCommentReadiness as Le } from "../app-primary-browser-comment-runtime/index";
 import { isBrowserCommentForTab as Re } from "../app-primary/runtime/is-browser-comment-for-tab";
@@ -61,7 +62,6 @@ import {
   $j as t,
   EF as i,
   EI as a,
-  EJ as o,
   G3 as s,
   H3 as c,
   Hj as l,

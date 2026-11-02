@@ -20,8 +20,19 @@
 // 预算系统：budget {limit, remainingChars, truncated}——assistant 内容
 // 先占位扣减（用户内容优先），超限走 CenterTruncator / S（JSON 流式截断）。
 
-import { BI as comparePaths, RI as splitAgentItems, VI as normalizeSeparatorsImport, iW as processOutputs, wL as initializeRuntime, zI as isAbsolutePathLikeImport } from "@rchunk/app-shared";
-import { $en as appInitialLazy, bS as appInitialSurface, CS as appInitialComponent } from "@rchunk/app-initial";
+import { createCaseInsensitivePathKey as comparePaths } from "../app-shared/runtime/path-key-policy";
+import {
+  RI as splitAgentItems,
+  VI as normalizeSeparatorsImport,
+  iW as processOutputs,
+  wL as initializeRuntime,
+  zI as isAbsolutePathLikeImport,
+} from "@rchunk/app-shared";
+import {
+  $en as appInitialLazy,
+  bS as appInitialSurface,
+  CS as appInitialComponent,
+} from "@rchunk/app-initial";
 void appInitialLazy; void appInitialSurface; void appInitialComponent;
 import { n as splitItemsIntoRenderGroups, t as renderGroupsInit } from "@rchunk/split-items-into-render-groups";
 import { S as agentActivityInit, c as agentActivityCount, d as agentActivityList, f as renderableAgentItems, l as agentActivitySummary, r as includeGeneratedImages } from "@rchunk/agent-activity-units";
