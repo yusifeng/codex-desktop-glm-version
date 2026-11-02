@@ -224,6 +224,22 @@ if (mode === "smoke-readonly") {
     } while (Date.now() < deadline);
     throw new Error(`Timed out waiting for body text: ${texts.join(' | ')}`);
   };
+  const waitForBodyTextAbsentStable = async (forbidden, timeoutMs = 60_000, stableMs = 2_000) => {
+    const texts = Array.isArray(forbidden) ? forbidden : [forbidden];
+    const deadline = Date.now() + timeoutMs;
+    let absentSince = null;
+    do {
+      const bodyText = await evaluate(`document.body?.innerText ?? ''`);
+      if (texts.some((text) => bodyText.includes(text))) {
+        absentSince = null;
+      } else {
+        absentSince ??= Date.now();
+        if (Date.now() - absentSince >= stableMs) return;
+      }
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    } while (Date.now() < deadline);
+    throw new Error(`Timed out waiting for body text to remain absent: ${texts.join(' | ')}`);
+  };
   const waitForAppReady = async (timeoutMs = 60_000) => {
     const deadline = Date.now() + timeoutMs;
     do {
@@ -361,6 +377,7 @@ if (mode === "smoke-readonly") {
     const screenshot = await command('Page.captureScreenshot', { format: 'png', fromSurface: true });
     const screenshotPath = path.join(screenshotDirectory, `${name.replaceAll('/', '-')}.png`);
     fs.writeFileSync(screenshotPath, Buffer.from(screenshot.data, 'base64'));
+    const bodyTextAfterScreenshot = await evaluate(`document.body?.innerText ?? ''`);
     for (const text of expectations.text) {
       if (!result.visibleText.includes(text) && (expectations.textRootSelector == null && !result.controlText.includes(text))) {
         throw new Error(`${name} is missing visual content: ${text}`);
@@ -376,7 +393,9 @@ if (mode === "smoke-readonly") {
       }
     }
     for (const text of expectations.forbidden ?? []) {
-      if (result.bodyText.includes(text)) throw new Error(`${name} still contains the skeletal placeholder: ${text}`);
+      if (result.bodyText.includes(text) || bodyTextAfterScreenshot.includes(text)) {
+        throw new Error(`${name} still contains the skeletal placeholder: ${text}`);
+      }
     }
     if (result.interactiveCount < expectations.minimumInteractive) {
       throw new Error(`${name} has only ${result.interactiveCount} visible controls; expected at least ${expectations.minimumInteractive}`);
@@ -524,7 +543,7 @@ if (mode === "smoke-readonly") {
   }
   await waitForBodyText('搜索设置');
   const coveredSettingsNavigationLabels = new Set([
-    '常规', '通知', '导入', '个人资料', '外观', '家长控制', 'Trusted contact', '语音',
+    '常规', '通知', '导入', '个人资料', '外观', '家长控制', '受信任联系人', '语音',
     '配置', '个性化', '宠物', '键盘快捷键', '使用情况和计费', '电脑操控',
     '计算机历史记录', '应用快照', '插件', '浏览器', '钩子', '连接', 'Git', '环境',
     'Worktrees', '已归档的聊天',
@@ -579,12 +598,26 @@ if (mode === "smoke-readonly") {
   await waitForBodyText(['Codex 说明', 'Codex instructions']);
   await waitForSettingsPageToSettle();
   await assertVisualPage('settings/personalization', {
-    text: ['Codex 说明', 'Codex 记忆', '保存'],
-    forbidden: ['Personalization\nInstructions\nMemory'],
+    text: ['Codex 说明', 'Codex 记忆', '启用 Codex 记忆', '删除 Codex 记忆', '保存'],
+    forbidden: [
+      'Personalization\nInstructions\nMemory',
+      'Configure how Codex manages memory for',
+      'Enable Codex memories',
+      'Create memories from chats on',
+      'Delete Codex memories',
+      'Delete all Codex memories for',
+    ],
     minimumInteractive: 4,
   });
   await assertCompactVisualPage('settings/personalization', {
-    text: ['Codex 说明', 'Codex 记忆', '保存'],
+    text: ['Codex 说明', 'Codex 记忆', '启用 Codex 记忆', '删除 Codex 记忆', '保存'],
+    forbidden: [
+      'Configure how Codex manages memory for',
+      'Enable Codex memories',
+      'Create memories from chats on',
+      'Delete Codex memories',
+      'Delete all Codex memories for',
+    ],
     minimumInteractive: 4,
   });
 
@@ -626,7 +659,14 @@ if (mode === "smoke-readonly") {
     { label: '导入', name: 'import', text: ['自动同步', '从其他 AI 应用导入', '导入历史'], minimumInteractive: 3 },
     { label: '个人资料', name: 'profile', readyText: ['邀请好友', 'Invite friends'], text: ['Token 活动', '活动洞察', '最常用的插件'], minimumInteractive: 5 },
     { label: '家长控制', name: 'parental-controls', text: ['Add family member'], unavailableText: ['无法加载你的家庭信息', '重试'], minimumInteractive: 2 },
-    { label: 'Trusted contact', name: 'trusted-contact', text: ['Add contact'], unavailableText: ['Trusted contact', '重试'], minimumInteractive: 2 },
+    {
+      label: '受信任联系人',
+      name: 'trusted-contact',
+      text: ['受信任联系人', '添加联系人'],
+      unavailableText: ['无法加载受信任联系人', '重试'],
+      forbidden: ['Trusted contact', 'Having a trusted contact', 'Add contact'],
+      minimumInteractive: 2,
+    },
     { label: '语音', name: 'voice', text: ['麦克风', '语音聊天', '听写'], minimumInteractive: 8 },
     { label: '宠物', name: 'pets', text: ['我的宠物', '创建虚拟宠物'], minimumInteractive: 8 },
     { label: '键盘快捷键', name: 'keyboard-shortcuts', text: ['搜索快捷键', '全部重置为默认值'], minimumInteractive: 12 },
@@ -637,8 +677,18 @@ if (mode === "smoke-readonly") {
     {
       label: '使用情况和计费',
       name: 'usage-and-billing',
-      readyText: ['当前套餐', 'Your plan', 'Plan limits'],
-      text: ['额度余额', '当前余额', '使用限额重置'],
+      readyText: ['当前套餐', '套餐限额'],
+      text: ['使用情况', '概览', '套餐限额', '每周限额', '额度余额', '当前余额', '使用限额重置'],
+      forbidden: [
+        'Usage\nOverview',
+        'Plan limits',
+        'Weekly limit',
+        'Resets in ',
+        'Buy credits to continue using Work and Codex',
+        'credits remaining',
+        'Use a reset to restore your 5-hour limit',
+        'Expires ',
+      ],
       minimumInteractive: 10,
       readyTimeoutMs: 60_000,
     },
@@ -683,11 +733,13 @@ if (mode === "smoke-readonly") {
     await assertVisualPage(`settings/${page.name}`, {
       text: [page.label, ...(page.alternativeTextSets == null ? page.text : [])],
       alternativeTextSets: page.alternativeTextSets,
+      forbidden: page.forbidden,
       minimumInteractive: page.minimumInteractive,
     });
     if (page.name === 'usage-and-billing') {
       await assertCompactVisualPage('settings/usage-and-billing', {
-        text: ['额度余额', '当前余额', '使用限额重置'],
+        text: ['使用情况', '概览', '套餐限额', '每周限额', '额度余额', '当前余额', '使用限额重置'],
+        forbidden: page.forbidden,
         minimumInteractive: 8,
       });
       await clickText('分析');
@@ -699,8 +751,8 @@ if (mode === "smoke-readonly") {
         minimumInteractive: 12,
         allowHorizontalOverflow: true,
       });
-      await clickText('Overview');
-      await waitForBodyText(['当前套餐', 'Your plan', 'Plan limits'], 60_000);
+      await clickText('概览');
+      await waitForBodyText(['当前套餐', '套餐限额'], 60_000);
     }
   }
 
@@ -762,9 +814,16 @@ if (mode === "smoke-readonly") {
   });
 
   await clickText('环境');
+  await waitForBodyText(['个人保管库', 'Personal vault'], 30_000);
+  await waitForBodyTextAbsentStable(
+    ['正在加载已保存的环境', 'Loading saved environments'],
+    60_000,
+    2_000,
+  );
   await waitForSettingsPageToSettle();
   await assertVisualPage('settings/environment', {
-    text: ['环境', 'Cloud', 'Local', 'Personal vault', 'Create'],
+    text: ['环境', '云端', '本地', '个人保管库', '创建'],
+    forbidden: ['Cloud\nLocal', 'Personal vault', 'Loading saved environments', '正在加载已保存的环境', 'Create'],
     minimumInteractive: 5,
   });
 
@@ -949,7 +1008,7 @@ if (mode === "smoke-readonly") {
           allowHorizontalOverflow: true,
         });
         await assertCompactVisualPage('app/chatgpt-chat-tab', {
-          text: ['聊天', '新对话'],
+          text: ['聊天'],
           minimumInteractive: 8,
         });
         await selectChatGptHomeTab('工作');
@@ -992,9 +1051,9 @@ if (mode === "smoke-readonly") {
   await command('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...explorePoint });
   await command('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...explorePoint });
   await waitForSelector('[role="menu"]');
-  await waitForBodyText(['Pull Request', '定时任务'], 30_000);
+  await waitForBodyText(['拉取请求', '定时任务'], 30_000);
   await assertVisualPage('app/explore', {
-    text: ['Pull Request', '站点', '定时任务', '插件'],
+    text: ['拉取请求', '站点', '定时任务', '插件'],
     minimumInteractive: 10,
     allowHorizontalOverflow: true,
     preservePointer: true,
@@ -1020,13 +1079,21 @@ if (mode === "smoke-readonly") {
     await command('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...point });
     await command('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...point });
     await waitForSelector('[role="menu"]');
-    await waitForBodyText(['Pull Request', '定时任务'], 30_000);
+    await waitForBodyText(['拉取请求', '定时任务'], 30_000);
   };
   const explorePages = [
     // Meetings is account/feature-flag gated and is absent for some signed-in users.
-    { label: 'Meetings', name: 'meetings', readyText: 'Connect Google Calendar', text: ['Connect Google Calendar'], minimumInteractive: 2, optional: true },
+    {
+      label: '会议',
+      name: 'meetings',
+      readyText: '连接 Google 日历',
+      text: ['会议', '连接 Google 日历', '过去的笔记'],
+      forbidden: ['Connect Google Calendar', 'Past notes', 'No meeting notes found', 'Take notes', 'Codex feedback'],
+      minimumInteractive: 2,
+      optional: true,
+    },
     { label: '站点', name: 'sites', readyText: '“站点”使用前须知', text: ['创建并发布网站时', '继续'], minimumInteractive: 3 },
-    { label: 'Pull Request', name: 'pull-requests', readyText: '搜索 Pull Request', text: ['全部', '正在审查', '由我创建'], minimumInteractive: 6, compact: true },
+    { label: '拉取请求', name: 'pull-requests', readyText: '搜索 Pull Request', text: ['全部', '正在审查', '由我创建'], minimumInteractive: 6, compact: true },
     { label: '定时任务', name: 'automations', readyText: '搜索已安排任务', text: ['全部', '已开启', '已暂停', '已完成'], minimumInteractive: 7, compact: true },
     { label: '插件', name: 'plugins', readyText: '热门', text: ['已安装', '公开', '个人'], minimumInteractive: 10, compact: true },
   ];
@@ -1046,7 +1113,7 @@ if (mode === "smoke-readonly") {
     await clickText('自定义');
     await waitForSelectorGone('[role="menu"]');
     await waitForBodyText('调整活动的顺序');
-    await assertReversibleListControl({ itemText: 'Pull Request', role: 'checkbox' });
+    await assertReversibleListControl({ itemText: '拉取请求', role: 'checkbox' });
     await assertVisualPage('app/explore-customize', {
       text: ['自定义', '完成', '调整活动的顺序', '调整项目的顺序'],
       minimumInteractive: 8,
@@ -1062,12 +1129,12 @@ if (mode === "smoke-readonly") {
     await waitForSelectorGone('[role="menu"]');
     await waitForBodyText(page.readyText, 30_000);
     if (page.name === 'meetings') {
-      await waitForBodyText(['No meeting notes found', "Couldn't load meetings"], 60_000);
+      await waitForBodyText(['未找到会议笔记', '无法加载会议。请重试。'], 60_000);
     }
     await waitForSettingsPageToSettle();
     await assertVisualPage(`app/${page.name}`, {
-      text: [page.label, ...page.text],
-      forbidden: page.name === 'meetings' ? ['Loading meetings', '正在加载会议'] : [],
+      text: page.name === 'meetings' ? page.text : [page.label, ...page.text],
+      forbidden: page.name === 'meetings' ? ['正在加载会议', ...page.forbidden] : (page.forbidden ?? []),
       minimumInteractive: page.minimumInteractive,
       allowHorizontalOverflow: true,
     });

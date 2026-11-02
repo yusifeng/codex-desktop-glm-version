@@ -5,7 +5,7 @@ import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const state = globalThis.__userMessageTest = { analytics: [], copied: [], effects: [], initialized: [], submitted: [], writes: [] };
+const state = globalThis.__userMessageTest = { analytics: [], copied: [], effects: [], initialized: [], reads: [], submitted: [], writes: [] };
 state.jsx = {
   Fragment: "Fragment",
   jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; },
@@ -32,7 +32,7 @@ const modules = {
     `export const Y2="FormattedMessage"; export const Yh="Button"; export const o_="Tooltip";`,
     `export const m4=(...values)=>values.flat().filter(Boolean).join(" "); export const n4=()=>globalThis.__userMessageTest.intl;`,
     `export const LX=()=>globalThis.__userMessageTest.scope; export const HX=value=>value==null?globalThis.__userMessageTest.account:{submitCodexAnalyticsEvent:event=>globalThis.__userMessageTest.analytics.push(event)};`,
-    `export const BX=(signal)=>signal?.id==="capability"?{isCapable:true}:signal?.id==="edit-state"?globalThis.__userMessageTest.editDraft:signal?.id==="aeon"?globalThis.__userMessageTest.aeon:null; export const oZ=()=>({id:"edit-state"});`,
+    `export const BX=(signal,key)=>{globalThis.__userMessageTest.reads.push([signal,key]);return signal?.id==="capability"?{isCapable:true}:signal?.id==="edit-state"?globalThis.__userMessageTest.editDraft:signal?.id==="aeon"?globalThis.__userMessageTest.aeon:null}; export const oZ=()=>({id:"edit-state"});`,
     `export const iz={composerEnterBehavior:"enter",composerPlainTextMode:"plain"}; export const vs="MentionPopover";`,
     `export const Ym=async text=>{globalThis.__userMessageTest.copied.push(text);return true};`,
   ].join("\n"),
@@ -152,6 +152,10 @@ const hiddenMetadataNodes = [];
 const walkHiddenMetadata = (node) => { if (node == null || typeof node !== "object") return; hiddenMetadataNodes.push(node); const children=node.props?.children; (Array.isArray(children)?children.flat(Infinity):[children]).forEach(walkHiddenMetadata); };
 walkHiddenMetadata(hiddenMetadataTree);
 assert.equal(hiddenMetadataNodes.some(node => String(node.props?.className).includes("flex-row-reverse") && String(node.props?.className).includes("hidden")), true);
+
+state.reads.length = 0;
+mod.t({ message: "Optimistic message" });
+assert.equal(state.reads.some(([signal, key]) => signal?.id === "edit-state" && key === undefined), true);
 
 mod.f(); mod.c(); mod.i(); mod.u(); mod.n();
 for (const dependency of ["analytics-init", "body-state", "composer", "hook-context", "plan-init", "primary-state", "react-cache", "timestamps"]) assert.equal(state.initialized.includes(dependency), true);

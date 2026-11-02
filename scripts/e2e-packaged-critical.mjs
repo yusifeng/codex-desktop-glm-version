@@ -18,6 +18,25 @@ if (await endpointIsReady()) {
   throw new Error(`A renderer is already listening at ${endpoint}; close it before the managed packaged E2E run`);
 }
 
+async function runPack() {
+  await new Promise((resolve, reject) => {
+    const pack = spawn("./scripts/pack.sh", [], {
+      cwd: root,
+      env: process.env,
+      stdio: "inherit",
+    });
+    pack.once("error", reject);
+    pack.once("exit", (code, signal) => {
+      if (code === 0) resolve();
+      else reject(new Error(`Packaged app build failed with ${signal ?? `exit ${code}`}`));
+    });
+  });
+}
+
+// A packaged E2E run must exercise the current source tree.  The shell can
+// otherwise retain an older app.asar and produce a misleading pass or failure.
+if (process.env.CODEX_E2E_SKIP_PACK !== "1") await runPack();
+
 let outputTail = "";
 const app = spawn("./scripts/run.sh", [`--remote-debugging-port=${port}`], {
   cwd: root,

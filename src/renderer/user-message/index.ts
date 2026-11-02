@@ -477,9 +477,10 @@ function UserMessage(props: UserMessageProps): unknown {
   const isOtherUser = currentAccount != null && props.senderAccountUserId !== currentAccount.accountUserId && props.senderAccountUserId !== currentAccount.email;
   const [copied, setCopied] = react.useState(false);
   const copying = react.useRef(false);
-  const editDraft = props.turnId == null || editStateFamily == null
-    ? null
-    : (sharedChunk as any).BX(editStateFamily, props.turnId);
+  // BX is a React-backed signal hook. It must run on every render even while
+  // an optimistic message has no turn id yet; skipping it until hydration
+  // changes the hook count and crashes the completed turn with React #310.
+  const editDraft = (sharedChunk as any).BX(editStateFamily, props.turnId);
   const setEditDraft = (value: string | null): void => {
     if (props.turnId != null && editStateFamily != null) scope.set(editStateFamily, props.turnId, value);
   };
