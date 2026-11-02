@@ -12,6 +12,7 @@ const __vite__mapDeps = (
       "./app-initial-e8ceb32eb626.css",
     ]),
 ) => i.map((i) => d[i]);
+import { createCommandQueryKey as Pe } from "../app-initial/runtime/create-command-query-key";
 import { isCapabilitySupported as Qt } from "../app-primary/runtime/is-capability-supported";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -96,7 +97,6 @@ import {
 import {
   $at as Me,
   $k as Ne,
-  $ln as Pe,
   Ayt as Fe,
   E6t as Ie,
   Eln as Le,

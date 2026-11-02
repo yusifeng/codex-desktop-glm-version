@@ -12,6 +12,7 @@ const __vite__mapDeps = (
       "@rchunk/three.module",
     ]),
 ) => i.map((i) => d[i]);
+import { createCommandQueryKey as st } from "../app-initial/runtime/create-command-query-key";
 import { classNames as Le, initializeClassNames as Oe } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -123,7 +124,6 @@ import {
 import {
   $2t as at,
   $6t as ot,
-  $ln as st,
   $mt as ct,
   $sn as lt,
   $t as ut,

@@ -51,6 +51,7 @@ const __vite__mapDeps = (
       "@rchunk/codex-pet-assets",
     ]),
 ) => i.map((i) => d[i]);
+import { isTerminalConversationStatus as ys } from "../app-initial/runtime/is-terminal-conversation-status";
 import { classNames as ot, initializeClassNames as Ge } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -498,7 +499,6 @@ import {
   cjt as gs,
   ckt as _s,
   d0 as vs,
-  dHt as ys,
   dL as bs,
   dUt as xs,
   dYt as Ss,

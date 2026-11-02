@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isTerminalConversationStatus as N } from "../app-initial/runtime/is-terminal-conversation-status";
 import { classNames as ae, initializeClassNames as g } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -62,7 +63,6 @@ import {
   aRt as Te,
   bz as Ee,
   cJt as De,
-  dHt as N,
   fRt as P,
   gYt as F,
   gln as Oe,

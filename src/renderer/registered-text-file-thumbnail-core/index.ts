@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createCommandQueryKey as l } from "../app-initial/runtime/create-command-query-key";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -10,7 +11,11 @@ import {
   lW as s,
   wL as c,
 } from "@rchunk/app-shared";
-import { $ln as l, cet as u, let as d, nun as f } from "@rchunk/app-initial";
+import {
+  cet as u,
+  let as d,
+  nun as f,
+} from "@rchunk/app-initial";
 import { n as p, t as m } from "@rchunk/text-file-thumbnail";
 function h(e) {
   let t = (0, g.c)(11),

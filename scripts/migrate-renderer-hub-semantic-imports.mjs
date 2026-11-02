@@ -14,6 +14,17 @@ const HUBS = ["app-shared", "app-initial", "app-primary"];
 const WRITE = process.argv.includes("--write");
 const CHECK = process.argv.includes("--check");
 const EXPLICIT_EXPORTS = new Map([
+  ["app-initial:w$t", ["src/renderer/app-initial/runtime/flatten-conversation-items.ts", "flattenConversationItems"]],
+  ["app-initial:Asn", ["src/renderer/app-initial/runtime/parse-http-url.ts", "parseHttpUrl"]],
+  ["app-initial:Fsn", ["src/renderer/app-initial/runtime/parse-origin-pattern.ts", "domainMatchesPattern"]],
+  ["app-initial:ksn", ["src/renderer/app-initial/runtime/parse-origin-pattern.ts", "originPatternsMatch"]],
+  ["app-initial:Nsn", ["src/renderer/app-initial/runtime/parse-origin-pattern.ts", "parseOriginPattern"]],
+  ["app-initial:$ln", ["src/renderer/app-initial/runtime/create-command-query-key.ts", "createCommandQueryKey"]],
+  ["app-initial:mEt", ["src/renderer/app-initial/runtime/electron-command-policy.ts", "isElectronCommandEnabled"]],
+  ["app-initial:Kdn", ["src/renderer/app-initial/runtime/select-writable-configuration-layer.ts", "selectWritableConfigurationLayer"]],
+  ["app-initial:Jsn", ["src/renderer/app-initial/runtime/configuration-query-key.ts", "configurationQueryKey"]],
+  ["app-initial:Dhn", ["src/renderer/app-initial/runtime/canonical-history.ts", "getCanonicalHistoryEntries"]],
+  ["app-initial:dHt", ["src/renderer/app-initial/runtime/is-terminal-conversation-status.ts", "isTerminalConversationStatus"]],
   ["app-shared:h4", ["src/renderer/app-shared/ui/class-names.ts", "initializeClassNames"]],
   ["app-shared:m4", ["src/renderer/app-shared/ui/class-names.ts", "classNames"]],
   ["app-primary:yf", ["src/renderer/app-primary/runtime/is-site-url-match.ts", "isSiteUrlMatch"]],

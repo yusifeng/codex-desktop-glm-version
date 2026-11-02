@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isTerminalConversationStatus as x } from "../app-initial/runtime/is-terminal-conversation-status";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -22,7 +23,6 @@ import {
   Y0 as v,
   YVt as y,
   cet as b,
-  dHt as x,
   ehn as S,
   iWt as C,
   izt as w,

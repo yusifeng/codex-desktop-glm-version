@@ -1,10 +1,16 @@
 // @ts-nocheck
+import { createCommandQueryKey as l } from "../app-initial/runtime/create-command-query-key";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
-import { FX as n, JX as r, QI as i, ZI as a, rZ as o } from "@rchunk/app-shared";
+import {
+  FX as n,
+  JX as r,
+  QI as i,
+  ZI as a,
+  rZ as o,
+} from "@rchunk/app-shared";
 import {
   $en as s,
   $fn as c,
-  $ln as l,
   $nn as u,
   Dy as d,
   Hy as f,

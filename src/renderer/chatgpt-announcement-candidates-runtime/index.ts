@@ -30,6 +30,7 @@ const __vite__mapDeps = (
       "@rchunk/app-info",
     ]),
 ) => i.map((i) => d[i]);
+import { isTerminalConversationStatus as me } from "../app-initial/runtime/is-terminal-conversation-status";
 import { lookupConnectorId as Ye } from "../app-primary/runtime/lookup-connector-id";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -96,7 +97,6 @@ import {
   bqt as de,
   czt as fe,
   d0t as pe,
-  dHt as me,
   f0t as he,
   fNt as ge,
   fgn as _e,

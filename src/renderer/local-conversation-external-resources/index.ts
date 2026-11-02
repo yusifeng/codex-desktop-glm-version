@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { flattenConversationItems as _ } from "../app-initial/runtime/flatten-conversation-items";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   E4 as t,
@@ -24,7 +25,6 @@ import {
   j9t as re,
   non as ie,
   ton as g,
-  w$t as _,
 } from "@rchunk/app-initial";
 function v(e) {
   return b(e)?.identity ?? null;

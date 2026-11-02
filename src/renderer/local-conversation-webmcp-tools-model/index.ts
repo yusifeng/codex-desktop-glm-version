@@ -1,7 +1,11 @@
 // @ts-nocheck
+import { flattenConversationItems as r } from "../app-initial/runtime/flatten-conversation-items";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { hq as t, wL as n } from "@rchunk/app-shared";
-import { w$t as r } from "@rchunk/app-initial";
+import {
+  hq as t,
+  wL as n,
+} from "@rchunk/app-shared";
+
 import { n as i, t as a } from "@rchunk/webmcp-tool-calls";
 function o(e) {
   let n = [];

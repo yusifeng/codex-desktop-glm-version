@@ -24,6 +24,7 @@ const __vite__mapDeps = (
       "@rchunk/import-settings-gate",
     ]),
 ) => i.map((i) => d[i]);
+import { isElectronCommandEnabled as Nn } from "../app-initial/runtime/electron-command-policy";
 import { deriveBranchSearchPreview as ur } from "../app-primary/runtime/derive-branch-search-preview";
 import { classNames as Te, initializeClassNames as xe } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
@@ -217,7 +218,6 @@ import {
   l0t as An,
   lUt as jn,
   lZ as Mn,
-  mEt as Nn,
   myt as Pn,
   net as Fn,
   nxt as In,

@@ -1,8 +1,12 @@
 // @ts-nocheck
+import { getCanonicalHistoryEntries as i } from "../app-initial/runtime/canonical-history";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { HI as t, IK as n, RI as r } from "@rchunk/app-shared";
 import {
-  Dhn as i,
+  HI as t,
+  IK as n,
+  RI as r,
+} from "@rchunk/app-shared";
+import {
   Dpn as a,
   Fin as o,
   HZt as s,

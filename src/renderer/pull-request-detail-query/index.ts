@@ -45,6 +45,7 @@ const __vite__mapDeps = (
       "@rchunk/layout",
     ]),
 ) => i.map((i) => d[i]);
+import { createCommandQueryKey as pt } from "../app-initial/runtime/create-command-query-key";
 import { classNames as We, initializeClassNames as je } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -157,7 +158,6 @@ import {
 } from "@rchunk/app-shared";
 import {
   $en as ft,
-  $ln as pt,
   A$ as mt,
   AXt as ht,
   Aet as gt,

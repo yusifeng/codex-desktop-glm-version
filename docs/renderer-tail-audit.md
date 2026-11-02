@@ -1250,7 +1250,7 @@ state-queries` 的 3 个调用点已切换到语义导入；该函数无 hub 初
 protocol、port 并复用 hostname pattern 匹配，不携带 hub 生命周期；测试扩展为 9 项
 断言，覆盖协议/端口不匹配拒绝。
 
-同模块的 `Nsn`（内部 `wWt`，`parseNetworkPattern`）暂不直接复制：虽然主体无
+同模块的 `Msn`（内部 `wWt`，`parseNetworkPattern`）暂不直接复制：虽然主体无
 副作用，但它同时执行 scheme/authority 分隔、IPv6 bracket 与端口合法性、URL
 协议检查、`%2a` wildcard 解码，以及返回 `canonicalKey`、`canonicalPattern`、
 嵌套 hostname pattern 的兼容对象组装。当前网络规则读取会把该对象再交给既有
@@ -1258,11 +1258,11 @@ protocol、port 并复用 hostname pattern 匹配，不携带 hub 生命周期�
 复制函数体容易保留字符串结果却改变嵌套字段形状，故登记为 `protocol-parser`
 分类，后续需以对象契约测试驱动迁移。
 
-同一策略模块中的 `Msn`（内部 `uWt`）也已迁为
+同一策略模块中的 `Nsn`（内部 `uWt`）也已迁为
 `src/renderer/app-initial/runtime/parse-origin-pattern.ts` 的 `parseOriginPattern`。
 该函数及其 hostname/wildcard 规范化链只做确定性字符串解析，不触碰 signal、query
 或持久化 runtime；策略模块的 5 个调用点已切换到语义导入，并由
-`scripts/test-app-initial-parse-origin-pattern.mjs` 的 4 项断言覆盖。原 hub 导出仍
+`scripts/test-app-initial-parse-origin-pattern.mjs` 的 9 项断言覆盖。原 hub 导出仍
 保留，供其他尚未迁移的消费面使用。
 
 另审计 `Ydn`（内部 `Qh`，`configurationLayerPath`）：实现本身是纯映射，但其

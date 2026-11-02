@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { configurationQueryKey as w } from "../app-initial/runtime/configuration-query-key";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -26,7 +27,6 @@ import {
   Gsn as x,
   H6t as S,
   HEt as C,
-  Jsn as w,
   Ksn as T,
   LEt as E,
   Qsn as D,

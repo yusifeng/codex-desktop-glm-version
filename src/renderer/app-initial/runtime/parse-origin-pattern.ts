@@ -68,9 +68,7 @@ export function parseOriginPattern(value: string): OriginPattern | null {
   return {
     canonicalPattern: pattern,
     hostnamePattern: pattern,
-    kind: pattern === "localhost" || isValidIpLiteral(pattern)
-      ? "exact"
-      : "apex-and-subdomains",
+    kind: "exact",
   };
 }
 

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { configurationQueryKey as at } from "../app-initial/runtime/configuration-query-key";
 import { classNames as ve, initializeClassNames as oe } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -110,7 +111,6 @@ import {
   HEt as nt,
   I5t as rt,
   Jat as it,
-  Jsn as at,
   Kwt as ot,
   L2 as st,
   M7 as ct,

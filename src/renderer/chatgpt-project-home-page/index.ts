@@ -27,6 +27,7 @@ const __vite__mapDeps = (
       "@rchunk/source-file-delete-dialog",
     ]),
 ) => i.map((i) => d[i]);
+import { isTerminalConversationStatus as bn } from "../app-initial/runtime/is-terminal-conversation-status";
 import { classNames as Ce, initializeClassNames as V } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -201,7 +202,6 @@ import {
   cjt as _n,
   cp as vn,
   d3t as yn,
-  dHt as bn,
   d_n as xn,
   djt as Sn,
   dp as Cn,

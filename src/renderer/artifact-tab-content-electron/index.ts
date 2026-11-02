@@ -110,6 +110,7 @@ const __vite__mapDeps = (
       "./pdf-preview-panel-cc39ef9f5913.css",
     ]),
 ) => i.map((i) => d[i]);
+import { createCommandQueryKey as ke } from "../app-initial/runtime/create-command-query-key";
 import { getPathBasename as g } from "../app-shared/runtime/get-path-basename";
 import { classNames as de, initializeClassNames as oe } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
@@ -182,7 +183,6 @@ import {
   $Wt as Ee,
   $at as De,
   $en as Oe,
-  $ln as ke,
   $lt as Ae,
   $rt as je,
   Aut as Me,

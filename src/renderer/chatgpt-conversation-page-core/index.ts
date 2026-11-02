@@ -28,6 +28,7 @@ const __vite__mapDeps = (
       "./app-primary-484df789f2f5.css",
     ]),
 ) => i.map((i) => d[i]);
+import { isTerminalConversationStatus as Ki } from "../app-initial/runtime/is-terminal-conversation-status";
 import { classNames as je, initializeClassNames as Se } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -338,7 +339,6 @@ import {
   cJ as Ui,
   cL as Wi,
   cjt as Gi,
-  dHt as Ki,
   dY as qi,
   dkt as Ji,
   dm as Yi,

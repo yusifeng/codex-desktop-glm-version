@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createCommandQueryKey as g } from "../app-initial/runtime/create-command-query-key";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -17,7 +18,12 @@ import {
   rL as m,
   wL as h,
 } from "@rchunk/app-shared";
-import { $ln as g, Con as _, _on as v, nun as y, won as b } from "@rchunk/app-initial";
+import {
+  Con as _,
+  _on as v,
+  nun as y,
+  won as b,
+} from "@rchunk/app-initial";
 function x(e) {
   let t = (0, S.c)(31),
     { cwd: r, hostConfig: i, onErrorMessage: o, showErrorToast: s } = e,

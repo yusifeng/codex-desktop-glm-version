@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { configurationQueryKey as ue } from "../app-initial/runtime/configuration-query-key";
 import { createPrefilledPluginPrompt as Ke } from "../app-primary/runtime/create-prefilled-plugin-prompt";
 import { classNames as H, initializeClassNames as R } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -61,7 +62,6 @@ import {
 import {
   $sn as ce,
   Gv as le,
-  Jsn as ue,
   Kcn as de,
   Nrt as fe,
   Prt as pe,

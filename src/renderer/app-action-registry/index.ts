@@ -4,6 +4,7 @@ const __vite__mapDeps = (
   m = __vite__mapDeps,
   d = m.f || (m.f = ["@rchunk/cannon", "@rchunk/rolldown-runtime"]),
 ) => i.map((i) => d[i]);
+import { createCommandQueryKey as ee } from "../app-initial/runtime/create-command-query-key";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   Cz as t,
@@ -25,7 +26,6 @@ import {
   x4 as _,
 } from "@rchunk/app-shared";
 import {
-  $ln as ee,
   AE as te,
   Bfn as ne,
   Cgn as v,
@@ -108,7 +108,10 @@ import {
   ygn as R,
   yk as ot,
 } from "@rchunk/app-initial";
-import { Af as st, kf as ct } from "@rchunk/app-primary";
+import {
+  Af as st,
+  kf as ct,
+} from "@rchunk/app-primary";
 import { c as lt, n as z, p as ut, u as dt } from "@rchunk/thread-shell-runtime";
 var B, V;
 function H() {

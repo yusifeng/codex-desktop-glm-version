@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isElectronCommandEnabled as I } from "../app-initial/runtime/electron-command-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -47,7 +48,6 @@ import {
   iZ as oe,
   ifn as se,
   kC as ce,
-  mEt as I,
   oa as L,
   ofn as R,
   ret as z,

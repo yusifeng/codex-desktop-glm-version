@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { flattenConversationItems as w } from "../app-initial/runtime/flatten-conversation-items";
 import { getPathBasename as a } from "../app-shared/runtime/get-path-basename";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -42,7 +43,6 @@ import {
   lQt as C,
   mnn as he,
   tin as ge,
-  w$t as w,
   yhn as _e,
 } from "@rchunk/app-initial";
 import {

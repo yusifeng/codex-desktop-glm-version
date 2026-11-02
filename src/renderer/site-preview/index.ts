@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { flattenConversationItems as Pt } from "../app-initial/runtime/flatten-conversation-items";
 import { formatBrowserUrl as Zt } from "../app-primary/runtime/format-browser-url";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -142,7 +143,6 @@ import {
   uHt as jt,
   ugn as Mt,
   vln as Nt,
-  w$t as Pt,
   x3 as Ft,
   xIt as It,
   xpn as Lt,

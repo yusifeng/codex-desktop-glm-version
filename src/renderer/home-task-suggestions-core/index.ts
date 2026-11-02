@@ -15,6 +15,7 @@ const __vite__mapDeps = (
       "@rchunk/departments",
     ]),
 ) => i.map((i) => d[i]);
+import { isTerminalConversationStatus as et } from "../app-initial/runtime/is-terminal-conversation-status";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
   $3 as n,
@@ -120,7 +121,6 @@ import {
   b2 as Ze,
   bqt as Qe,
   cJt as $e,
-  dHt as et,
   ddn as tt,
   dfn as nt,
   g3 as rt,

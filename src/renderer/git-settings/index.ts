@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createCommandQueryKey as ne } from "../app-initial/runtime/create-command-query-key";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -36,7 +37,6 @@ import {
 } from "@rchunk/app-shared";
 import {
   $W as j,
-  $ln as ne,
   I7 as M,
   Jat as N,
   Kcn as P,

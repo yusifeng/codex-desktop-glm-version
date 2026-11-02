@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isTerminalConversationStatus as X } from "../app-initial/runtime/is-terminal-conversation-status";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -72,7 +73,6 @@ import {
   a8t as _e,
   c8t as ve,
   d8t as ye,
-  dHt as X,
   egt as Z,
   f8t as be,
   g8t as xe,
@@ -89,7 +89,13 @@ import {
   zrt as Me,
 } from "@rchunk/app-initial";
 import { I as Ne, d as Pe, g as Fe } from "@rchunk/popcorn-icons";
-import { lf as Ie, nf as Le, of as Re, rf as ze, sf as Be } from "@rchunk/app-primary";
+import {
+  lf as Ie,
+  nf as Le,
+  of as Re,
+  rf as ze,
+  sf as Be,
+} from "@rchunk/app-primary";
 import { n as Ve, t as He } from "@rchunk/arrow-rotate-ccw";
 function Ue({
   annotationCount: e,

@@ -1,8 +1,14 @@
 // @ts-nocheck
+import { createCommandQueryKey as o } from "../app-initial/runtime/create-command-query-key";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { FX as t, QI as n, QX as r, ZI as i, rZ as a } from "@rchunk/app-shared";
 import {
-  $ln as o,
+  FX as t,
+  QI as n,
+  QX as r,
+  ZI as i,
+  rZ as a,
+} from "@rchunk/app-shared";
+import {
   Gy as s,
   Xy as c,
   Yy as l,
