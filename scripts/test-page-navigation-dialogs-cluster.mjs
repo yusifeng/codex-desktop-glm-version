@@ -73,24 +73,6 @@ assert.equal(scrolled.at(-1).page, 1);
 
 assertReleaseOwner("keyboard-shortcuts-dialog");
 
-const changelog = await load("changelog-modal");
-let closed = false;
-const modal = changelog.ChangelogModal({
-  onClose: () => { closed = true; },
-  post: {
-    bodyMarkdown: "# Faster Codex\nA quicker start.\n\nMore details here.",
-    date: "2026-09-27",
-    summary: "A quicker start.",
-    title: "Faster Codex",
-    url: "https://developers.openai.com/codex/changelog",
-    version: "1.2.3",
-  },
-});
-assert.equal(modal.type, "dialog");
-assert.equal(modal.props.children[2].props.children[1].props.children, "Faster Codex");
-assert.equal(modal.props.children[2].props.children[0].props.children[1].props.children, "v1.2.3");
-assert.equal(modal.props.children[2].props.children[3].props.children, "More details here.");
-modal.props.children[0].props.onClick();
-assert.equal(closed, true);
+assertReleaseOwner("changelog-modal");
 
 console.log("page navigation and dialogs cluster complete");

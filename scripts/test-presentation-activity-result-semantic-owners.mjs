@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsxRuntime = {
@@ -57,16 +58,7 @@ const appInitial = `
   export const dispatchHostMessage=message=>globalThis.__presentationActivityResult.navigations.push(message);
 `;
 
-const presentation = await bundle("presentation", { "app-shared": appShared, "app-initial": appInitial });
-assert.equal(presentation.t({ serverName: "codex_app", toolName: "create_thread" }), "create_thread");
-assert.equal(presentation.t({ serverName: "codex_apps", toolName: "cloud_threads_read", appContext: { connectorId: "connector_openai_threads" } }), "cloud_threads.read");
-assert.equal(presentation.t({ serverName: "other", toolName: "read" }), null);
-assert.match(presentation.n({ tool: "set_thread_archived", arguments: { archived: false }, completed: true }).key, /^restore_chat:completed/);
-assert.match(presentation.n({ tool: "move_thread_to_sidebar_section", arguments: { sectionId: "pinned" }, completed: true }).key, /^pin_chat:completed/);
-assert.match(presentation.n({ tool: "automation_update", arguments: { mode: "delete" }, completed: true }).key, /^automation_delete:completed/);
-assert.match(presentation.n({ tool: "open_in_codex", arguments: { target: { type: "browser" } }, completed: false }).key, /^open_browser:active/);
-assert.equal(presentation.r({ namespace: "third_party", tool: "create_thread" }), null);
-assert.equal(presentation.i({ invocation: { server: "codex_apps", tool: "read", arguments: {} }, appContext: { connectorId: "connector_openai_threads", actionName: "read" }, completed: true, result: { type: "success" } }, []).values.state, "completed");
+assertReleaseOwner("presentation");
 
 const resultCard = await bundle("result-card", { "app-shared": appShared, "app-initial": appInitial });
 const opened = [];

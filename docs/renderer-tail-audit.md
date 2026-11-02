@@ -1,5 +1,20 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Announcement/purchase/secrets/queue/browser release-owner recovery：一次性恢复
+`thread-usage-breakdown`、`create-pull-request-modal-content`、`codex-home-announcements`、
+`tax-types`、`codex-home-announcements-current`、`purchase-page`、
+`personal-secrets-dialog`、`presentation`、`catalog`、`changelog-modal`、
+`library-item-actions`、`subscription-renewal-dialog`、`queued-message-list`、
+`browser-auth-error-page` 与 `cfc-plan-page` 十五个发布 owner，净恢复 6,401 行发布
+TypeScript。旧精简 ABI 测试已迁移为发布一致性验证；`design-editor-state` 本已发布一致但旧
+mock 同样失效，也一并收口。`codex-home-announcements` 恢复官方 `app-primary` 依赖后，删除
+verifier 中“该依赖应被移除”的过时语义重写豁免。整批通过 12,448/12,448 transform check、
+1,888/1,888 renderer build/verify、2,247/2,247 app-code coverage、0 semantic tail 与
+typecheck。严格 hub 消费推进到 app-shared 1,772/3,185、app-initial 5,627/8,204、
+app-primary 734/917，仍为 0 unreviewed、0 invalid consumers。按发布源码正向行数缺口口径，
+剩余由 72,960 行降至 66,559 行，覆盖率约由 92.9% 推进到 93.5%；425 个 preserved 边界、
+三个聚合 hub 的剩余耦合导出与最终真实 E2E 仍未完成。
+
 2026-11-02 PR/composer/GPT/payment/terminal/editor release-owner recovery：一次性恢复
 `pull-request-actions`、`composer-tip`、`my-gpts-page`、`add-payment-method`、
 `duplicate-agent`、`project-import-prompt-host`、`version-history`、

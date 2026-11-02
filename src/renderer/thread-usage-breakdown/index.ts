@@ -1,164 +1,613 @@
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import * as translationsChunk from "@rchunk/model-and-reasoning-effort-translations";
-
-type UsageDimension = "model" | "reasoning_effort" | "speed";
-
-export interface UsageGroup {
-  amount?: number;
-  amountMicros?: number;
-  cachedInputTokens?: number | null;
-  dimension: UsageDimension;
-  netNewInputTokens?: number | null;
-  outputTokens?: number | null;
-  value?: string | null;
-}
-
-export interface ThreadUsage {
-  balanceUnit?: "credits" | "usd";
-  costUsd?: number | null;
-  creditsUsed: number;
-  groups?: readonly UsageGroup[];
-}
-
-interface NormalizedUsageGroup extends UsageGroup { amountMicros: number }
-
-const shared = sharedChunk as unknown as Record<string, any>;
-const initial = initialChunk as unknown as Record<string, any>;
-const translations = translationsChunk as unknown as Record<string, any>;
-const DIMENSIONS: readonly UsageDimension[] = ["model", "reasoning_effort", "speed"];
-const FALLBACK_COLORS = ["#10a37f", "#6d5ce7", "#d97706", "#0284c7", "#db2777", "#65a30d"];
-let React: any;
-let jsx: any;
-let initialized = false;
-
-function call(value: unknown): void { if (typeof value === "function") value(); }
-function formatNumber(value: number, options: Intl.NumberFormatOptions = {}): string {
-  return new Intl.NumberFormat("en-US", options).format(value);
-}
-function formatUsd(value?: number | null, maximumFractionDigits?: number): string {
-  if (value == null) return "—";
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: maximumFractionDigits ?? (Math.abs(value) < 0.01 ? 6 : 2) }).format(value);
-}
-function modelLabel(value: string): string { return typeof initial.X5 === "function" ? initial.X5(value) : value; }
-
-function usageDimensionLabel({ dimension, value }: { dimension: UsageDimension; value?: string | null }): unknown {
-  if (value == null) return "Other";
-  if (dimension === "model") return modelLabel(value);
-  if (dimension === "speed") {
-    if (value === "fast") return "Fast mode";
-    if (value === "ultrafast") return "Ultrafast";
-    if (value === "standard") return "Standard";
-    return value;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  H2 as n,
+  I3 as r,
+  K2 as i,
+  Y2 as a,
+  c_ as o,
+  e6 as s,
+  n4 as c,
+  o_ as l,
+} from "@rchunk/app-shared";
+import {
+  Ent as u,
+  M0t as d,
+  N0t as f,
+  X5 as p,
+  _S as m,
+  gS as h,
+  wnt as g,
+} from "@rchunk/app-initial";
+import { n as _, t as v } from "@rchunk/model-and-reasoning-effort-translations";
+function y(e) {
+  let t = (0, T.c)(30),
+    { usage: r, title: i, showCostUsd: o } = e,
+    s = o === void 0 || o,
+    c;
+  if (r.balanceUnit === `usd`) {
+    let e;
+    (t[0] === r.costUsd
+      ? (e = t[1])
+      : ((e =
+          r.costUsd == null
+            ? null
+            : (0, D.jsx)(n, {
+                value: r.costUsd,
+                style: `currency`,
+                currency: `USD`,
+                maximumFractionDigits: Math.abs(r.costUsd) < 0.01 ? 6 : 2,
+              })),
+        (t[0] = r.costUsd),
+        (t[1] = e)),
+      (c = e));
+  } else if (s && r.costUsd != null) {
+    let e;
+    t[2] === r.creditsUsed
+      ? (e = t[3])
+      : ((e = (0, D.jsx)(n, {
+          value: r.creditsUsed,
+          notation: `compact`,
+          maximumFractionDigits: 1,
+        })),
+        (t[2] = r.creditsUsed),
+        (t[3] = e));
+    let i = r.costUsd < 0.01 ? 4 : 2,
+      o;
+    t[4] !== i || t[5] !== r.costUsd
+      ? ((o = (0, D.jsx)(n, {
+          value: r.costUsd,
+          style: `currency`,
+          currency: `USD`,
+          maximumFractionDigits: i,
+        })),
+        (t[4] = i),
+        (t[5] = r.costUsd),
+        (t[6] = o))
+      : (o = t[6]);
+    let s;
+    (t[7] !== e || t[8] !== o
+      ? ((s = (0, D.jsx)(a, {
+          id: `usageCenter.thread.breakdown.total`,
+          defaultMessage: `{creditCount} credits · {cost}`,
+          description: `Total estimated credits and dollar cost for the current chat`,
+          values: { creditCount: e, cost: o },
+        })),
+        (t[7] = e),
+        (t[8] = o),
+        (t[9] = s))
+      : (s = t[9]),
+      (c = s));
+  } else {
+    let e;
+    (t[10] === r.creditsUsed
+      ? (e = t[11])
+      : ((e = (0, D.jsx)(a, {
+          id: `usageCenter.thread.breakdown.totalCreditsOnly`,
+          defaultMessage: `{creditCount} credits`,
+          description: `Total credits used by a task when dollar amounts are unavailable`,
+          values: {
+            creditCount: (0, D.jsx)(n, {
+              value: r.creditsUsed,
+              notation: `compact`,
+              maximumFractionDigits: 1,
+            }),
+          },
+        })),
+        (t[10] = r.creditsUsed),
+        (t[11] = e)),
+      (c = e));
   }
-  if (typeof initial.N0t === "function" && initial.N0t(value) && typeof translations.t === "function") return jsx.jsx(translations.t, { effort: value });
-  return value;
+  let l;
+  t[12] === i
+    ? (l = t[13])
+    : ((l =
+        i ??
+        (0, D.jsx)(a, {
+          id: `usageCenter.thread.breakdown.title`,
+          defaultMessage: `Usage in this chat`,
+          description: `Title for the current chat's detailed usage breakdown`,
+        })),
+      (t[12] = i),
+      (t[13] = l));
+  let u;
+  t[14] === l
+    ? (u = t[15])
+    : ((u = (0, D.jsx)(`span`, {
+        className: `min-w-0 truncate font-semibold text-default`,
+        children: l,
+      })),
+      (t[14] = l),
+      (t[15] = u));
+  let d;
+  t[16] === c
+    ? (d = t[17])
+    : ((d = (0, D.jsx)(`span`, { className: `shrink-0 text-secondary tabular-nums`, children: c })),
+      (t[16] = c),
+      (t[17] = d));
+  let f;
+  t[18] !== u || t[19] !== d
+    ? ((f = (0, D.jsxs)(`div`, {
+        className: `flex items-center justify-between gap-3`,
+        children: [u, d],
+      })),
+      (t[18] = u),
+      (t[19] = d),
+      (t[20] = f))
+    : (f = t[20]);
+  let p, m, h;
+  t[21] === r
+    ? ((p = t[22]), (m = t[23]), (h = t[24]))
+    : ((p = (0, D.jsx)(b, { dimension: `model`, usage: r })),
+      (m = (0, D.jsx)(b, { dimension: `reasoning_effort`, usage: r })),
+      (h = (0, D.jsx)(b, { dimension: `speed`, usage: r })),
+      (t[21] = r),
+      (t[22] = p),
+      (t[23] = m),
+      (t[24] = h));
+  let g;
+  return (
+    t[25] !== f || t[26] !== p || t[27] !== m || t[28] !== h
+      ? ((g = (0, D.jsxs)(`div`, {
+          className: `flex min-w-0 flex-1 flex-col gap-3 px-3 py-2 text-xs leading-4 select-none`,
+          children: [f, p, m, h],
+        })),
+        (t[25] = f),
+        (t[26] = p),
+        (t[27] = m),
+        (t[28] = h),
+        (t[29] = g))
+      : (g = t[29]),
+    g
+  );
 }
-
-function normalizeGroups(usage: ThreadUsage, dimension: UsageDimension): NormalizedUsageGroup[] {
-  if (typeof initial.gS === "function") {
-    const aggregated = initial.gS(usage.groups ?? [], dimension, usage.balanceUnit);
-    if (Array.isArray(aggregated)) return aggregated.filter((entry) => Number(entry?.amountMicros) > 0);
+function b(e) {
+  let t = (0, T.c)(39),
+    { dimension: n, usage: r } = e,
+    i = c(),
+    o = (0, E.useId)(),
+    s,
+    u,
+    d,
+    f,
+    m,
+    _,
+    v;
+  if (t[0] !== n || t[1] !== i || t[2] !== o || t[3] !== r.balanceUnit || t[4] !== r.groups) {
+    let e = h(r.groups, n, r.balanceUnit),
+      c = e.reduce(x, 0),
+      y = c > 0 ? e : [],
+      b;
+    t[12] === c ? (b = t[13]) : ((b = (e) => Math.round((e / c) * 100)), (t[12] = c), (t[13] = b));
+    let C = b;
+    ((d = `flex flex-col gap-1.5`), (f = o), (m = `group`));
+    let T;
+    t[14] === n
+      ? (T = t[15])
+      : ((T =
+          n === `model`
+            ? (0, D.jsx)(a, {
+                id: `usageCenter.thread.breakdown.model`,
+                defaultMessage: `Models`,
+                description: `Label for model usage in the current chat breakdown`,
+              })
+            : n === `reasoning_effort`
+              ? (0, D.jsx)(a, {
+                  id: `usageCenter.thread.breakdown.reasoning`,
+                  defaultMessage: `Reasoning`,
+                  description: `Label for reasoning effort usage in the current chat breakdown`,
+                })
+              : (0, D.jsx)(a, {
+                  id: `usageCenter.thread.breakdown.speed`,
+                  defaultMessage: `Speed`,
+                  description: `Label for response speed usage in the current chat breakdown`,
+                })),
+        (t[14] = n),
+        (t[15] = T));
+    let E;
+    t[16] !== o || t[17] !== T
+      ? ((E = (0, D.jsx)(`span`, { id: o, className: `text-secondary`, children: T })),
+        (t[16] = o),
+        (t[17] = T),
+        (t[18] = E))
+      : (E = t[18]);
+    let O =
+      y.length === 0
+        ? (0, D.jsx)(`span`, {
+            className: `text-tertiary`,
+            children: (0, D.jsx)(a, {
+              id: `usageCenter.thread.breakdown.noData`,
+              defaultMessage: `Not available`,
+              description: `Shown when one current-chat usage breakdown category has no recorded data`,
+            }),
+          })
+        : null;
+    t[19] !== E || t[20] !== O
+      ? ((_ = (0, D.jsxs)(`div`, {
+          className: `flex items-center justify-between gap-2`,
+          children: [E, O],
+        })),
+        (t[19] = E),
+        (t[20] = O),
+        (t[21] = _))
+      : (_ = t[21]);
+    let k;
+    (t[22] !== n || t[23] !== C
+      ? ((k = (e, t) => {
+          let r = C(e.amountMicros);
+          return (0, D.jsx)(
+            l,
+            {
+              color: `inverse`,
+              delayDuration: 0,
+              tooltipContent: (0, D.jsx)(S, { dimension: n, entry: e, percentage: r }),
+              children: (0, D.jsx)(`button`, {
+                className: `h-full min-w-1 basis-0 cursor-interaction`,
+                "aria-hidden": !0,
+                style: { backgroundColor: g[t % g.length], flexGrow: e.amountMicros },
+                tabIndex: -1,
+                type: `button`,
+              }),
+            },
+            e.value ?? `unknown`,
+          );
+        }),
+        (t[22] = n),
+        (t[23] = C),
+        (t[24] = k))
+      : (k = t[24]),
+      (v = (0, D.jsx)(`div`, {
+        className: `flex h-2 overflow-hidden rounded-full bg-text/10`,
+        children: y.map(k),
+      })),
+      (s = `flex flex-wrap gap-x-4 gap-y-1.5 text-secondary`));
+    let A;
+    (t[25] !== n || t[26] !== C || t[27] !== i
+      ? ((A = (e, t) =>
+          (0, D.jsx)(
+            l,
+            {
+              color: `inverse`,
+              delayDuration: 0,
+              tooltipContent: (0, D.jsx)(S, {
+                dimension: n,
+                entry: e,
+                percentage: C(e.amountMicros),
+              }),
+              children: (0, D.jsxs)(`button`, {
+                className: `inline-flex cursor-interaction items-center gap-1.5 rounded-sm py-px focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring`,
+                "aria-label":
+                  e.value == null
+                    ? i.formatMessage(
+                        {
+                          id: `usageCenter.thread.breakdown.segment.unknownAriaLabel`,
+                          defaultMessage: `Other: {percentage}% of usage`,
+                          description: `Accessible label for an unknown segment of the thread usage breakdown chart`,
+                        },
+                        { percentage: C(e.amountMicros) },
+                      )
+                    : i.formatMessage(
+                        {
+                          id: `usageCenter.thread.breakdown.segment.localizedAriaLabel`,
+                          defaultMessage: `{dimension, select, speed {{value, select, fast {Fast mode} ultrafast {Ultrafast} standard {Standard} other {{value}}}} reasoning_effort {{value, select, none {None} minimal {Minimal} low {Light} medium {Medium} high {High} xhigh {Extra High} max {Max} ultra {Ultra} other {{value}}}} other {{value}}}: {percentage}% of usage`,
+                          description: `Accessible label for one segment of the thread usage breakdown chart`,
+                        },
+                        {
+                          dimension: n,
+                          value: n === `model` ? p(e.value) : e.value,
+                          percentage: C(e.amountMicros),
+                        },
+                      ),
+                type: `button`,
+                children: [
+                  (0, D.jsx)(`span`, {
+                    className: `size-2.5 shrink-0 rounded-full`,
+                    style: { backgroundColor: g[t % g.length] },
+                  }),
+                  (0, D.jsx)(w, { dimension: n, value: e.value }),
+                ],
+              }),
+            },
+            e.value ?? `unknown`,
+          )),
+        (t[25] = n),
+        (t[26] = C),
+        (t[27] = i),
+        (t[28] = A))
+      : (A = t[28]),
+      (u = y.map(A)),
+      (t[0] = n),
+      (t[1] = i),
+      (t[2] = o),
+      (t[3] = r.balanceUnit),
+      (t[4] = r.groups),
+      (t[5] = s),
+      (t[6] = u),
+      (t[7] = d),
+      (t[8] = f),
+      (t[9] = m),
+      (t[10] = _),
+      (t[11] = v));
+  } else ((s = t[5]), (u = t[6]), (d = t[7]), (f = t[8]), (m = t[9]), (_ = t[10]), (v = t[11]));
+  let y;
+  t[29] !== s || t[30] !== u
+    ? ((y = (0, D.jsx)(`div`, { className: s, children: u })),
+      (t[29] = s),
+      (t[30] = u),
+      (t[31] = y))
+    : (y = t[31]);
+  let b;
+  return (
+    t[32] !== d || t[33] !== f || t[34] !== m || t[35] !== _ || t[36] !== v || t[37] !== y
+      ? ((b = (0, D.jsxs)(`div`, {
+          className: d,
+          "aria-labelledby": f,
+          role: m,
+          children: [_, v, y],
+        })),
+        (t[32] = d),
+        (t[33] = f),
+        (t[34] = m),
+        (t[35] = _),
+        (t[36] = v),
+        (t[37] = y),
+        (t[38] = b))
+      : (b = t[38]),
+    b
+  );
+}
+function x(e, t) {
+  return e + t.amountMicros;
+}
+function S(e) {
+  let t = (0, T.c)(18),
+    { dimension: r, entry: i, percentage: o } = e,
+    s;
+  t[0] !== r || t[1] !== i.value || t[2] !== o
+    ? ((s = (0, D.jsx)(`span`, {
+        className: `font-medium`,
+        children: (0, D.jsx)(C, { dimension: r, percentage: o, value: i.value }),
+      })),
+      (t[0] = r),
+      (t[1] = i.value),
+      (t[2] = o),
+      (t[3] = s))
+    : (s = t[3]);
+  let c;
+  t[4] !== r || t[5] !== i.netNewInputTokens
+    ? ((c =
+        r === `model` && i.netNewInputTokens != null
+          ? (0, D.jsx)(`span`, {
+              children: (0, D.jsx)(a, {
+                id: `usageCenter.thread.breakdown.tooltip.inputTokens`,
+                defaultMessage: `Uncached input tokens: {count}`,
+                description: `Uncached input token count for a model usage segment`,
+                values: { count: (0, D.jsx)(n, { value: i.netNewInputTokens }) },
+              }),
+            })
+          : null),
+      (t[4] = r),
+      (t[5] = i.netNewInputTokens),
+      (t[6] = c))
+    : (c = t[6]);
+  let l;
+  t[7] !== r || t[8] !== i.cachedInputTokens
+    ? ((l =
+        r === `model` && i.cachedInputTokens != null
+          ? (0, D.jsx)(`span`, {
+              children: (0, D.jsx)(a, {
+                id: `usageCenter.thread.breakdown.tooltip.cachedInputTokens`,
+                defaultMessage: `Cached input tokens: {count}`,
+                description: `Cached input token count for a model usage segment`,
+                values: { count: (0, D.jsx)(n, { value: i.cachedInputTokens }) },
+              }),
+            })
+          : null),
+      (t[7] = r),
+      (t[8] = i.cachedInputTokens),
+      (t[9] = l))
+    : (l = t[9]);
+  let u;
+  t[10] !== r || t[11] !== i.outputTokens
+    ? ((u =
+        r === `model` && i.outputTokens != null
+          ? (0, D.jsx)(`span`, {
+              children: (0, D.jsx)(a, {
+                id: `usageCenter.thread.breakdown.tooltip.outputTokens`,
+                defaultMessage: `Output tokens: {count}`,
+                description: `Output token count for a model usage segment`,
+                values: { count: (0, D.jsx)(n, { value: i.outputTokens }) },
+              }),
+            })
+          : null),
+      (t[10] = r),
+      (t[11] = i.outputTokens),
+      (t[12] = u))
+    : (u = t[12]);
+  let d;
+  return (
+    t[13] !== s || t[14] !== c || t[15] !== l || t[16] !== u
+      ? ((d = (0, D.jsxs)(`div`, {
+          className: `flex flex-col gap-0.5 text-xs`,
+          children: [s, c, l, u],
+        })),
+        (t[13] = s),
+        (t[14] = c),
+        (t[15] = l),
+        (t[16] = u),
+        (t[17] = d))
+      : (d = t[17]),
+    d
+  );
+}
+function C(e) {
+  let t = (0, T.c)(13),
+    { dimension: n, percentage: r, value: i } = e;
+  if (i == null) {
+    let e;
+    return (
+      t[0] === r
+        ? (e = t[1])
+        : ((e = (0, D.jsx)(a, {
+            id: `usageCenter.thread.breakdown.tooltip.otherPercentage`,
+            defaultMessage: `Other: {percentage}%`,
+            description: `Percentage attributed to an unknown current-chat usage dimension`,
+            values: { percentage: r },
+          })),
+          (t[0] = r),
+          (t[1] = e)),
+      e
+    );
   }
-  const combined = new Map<string | null, NormalizedUsageGroup>();
-  for (const group of usage.groups ?? []) {
-    if (group.dimension !== dimension) continue;
-    const amountMicros = Number(group.amountMicros ?? group.amount ?? 0);
-    if (!(amountMicros > 0)) continue;
-    const key = group.value ?? null;
-    const current = combined.get(key);
-    if (current == null) combined.set(key, { ...group, value: key, amountMicros });
-    else {
-      current.amountMicros += amountMicros;
-      for (const field of ["netNewInputTokens", "cachedInputTokens", "outputTokens"] as const) {
-        if (group[field] != null) current[field] = (current[field] ?? 0) + group[field]!;
+  if (n === `speed`) {
+    let e;
+    return (
+      t[2] !== r || t[3] !== i
+        ? ((e = (0, D.jsx)(a, {
+            id: `usageCenter.thread.breakdown.tooltip.speedPercentage`,
+            defaultMessage: `{speed, select, fast {Fast mode} ultrafast {Ultrafast} standard {Standard} other {{speed}}}: {percentage}%`,
+            description: `Response speed and its percentage of the current chat's usage`,
+            values: { percentage: r, speed: i },
+          })),
+          (t[2] = r),
+          (t[3] = i),
+          (t[4] = e))
+        : (e = t[4]),
+      e
+    );
+  }
+  if (n === `reasoning_effort`) {
+    let e;
+    return (
+      t[5] !== r || t[6] !== i
+        ? ((e = (0, D.jsx)(a, {
+            id: `usageCenter.thread.breakdown.tooltip.reasoningPercentage`,
+            defaultMessage: `{effort, select, none {None} minimal {Minimal} low {Light} medium {Medium} high {High} xhigh {Extra High} max {Max} ultra {Ultra} other {{effort}}}: {percentage}%`,
+            description: `Reasoning effort and its percentage of the current chat's usage`,
+            values: { effort: i, percentage: r },
+          })),
+          (t[5] = r),
+          (t[6] = i),
+          (t[7] = e))
+        : (e = t[7]),
+      e
+    );
+  }
+  let o;
+  t[8] === i ? (o = t[9]) : ((o = p(i)), (t[8] = i), (t[9] = o));
+  let s;
+  return (
+    t[10] !== r || t[11] !== o
+      ? ((s = (0, D.jsx)(a, {
+          id: `usageCenter.thread.breakdown.tooltip.modelPercentage`,
+          defaultMessage: `{model}: {percentage}%`,
+          description: `Model and its percentage of the current chat's usage`,
+          values: { model: o, percentage: r },
+        })),
+        (t[10] = r),
+        (t[11] = o),
+        (t[12] = s))
+      : (s = t[12]),
+    s
+  );
+}
+function w(e) {
+  let t = (0, T.c)(12),
+    { dimension: n, value: r } = e;
+  if (r == null) {
+    let e;
+    return (
+      t[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, D.jsx)(a, {
+            id: `usageCenter.thread.breakdown.other`,
+            defaultMessage: `Other`,
+            description: `Fallback label for unknown current-chat usage dimensions`,
+          })),
+          (t[0] = e))
+        : (e = t[0]),
+      e
+    );
+  }
+  if (n === `model`) {
+    let e;
+    t[1] === r ? (e = t[2]) : ((e = p(r)), (t[1] = r), (t[2] = e));
+    let n;
+    return (
+      t[3] === e
+        ? (n = t[4])
+        : ((n = (0, D.jsx)(D.Fragment, { children: e })), (t[3] = e), (t[4] = n)),
+      n
+    );
+  }
+  if (n === `speed`)
+    switch (r) {
+      case `fast`: {
+        let e;
+        return (
+          t[5] === Symbol.for(`react.memo_cache_sentinel`)
+            ? ((e = (0, D.jsx)(a, {
+                id: `usageCenter.thread.breakdown.fast`,
+                defaultMessage: `Fast mode`,
+                description: `Label for fast-mode speed in the current-chat usage breakdown`,
+              })),
+              (t[5] = e))
+            : (e = t[5]),
+          e
+        );
+      }
+      case `ultrafast`: {
+        let e;
+        return (
+          t[6] === Symbol.for(`react.memo_cache_sentinel`)
+            ? ((e = (0, D.jsx)(a, {
+                id: `usageCenter.thread.breakdown.ultrafast`,
+                defaultMessage: `Ultrafast`,
+                description: `Label for ultrafast speed in the current-chat usage breakdown`,
+              })),
+              (t[6] = e))
+            : (e = t[6]),
+          e
+        );
+      }
+      case `standard`: {
+        let e;
+        return (
+          t[7] === Symbol.for(`react.memo_cache_sentinel`)
+            ? ((e = (0, D.jsx)(a, {
+                id: `usageCenter.thread.breakdown.standard`,
+                defaultMessage: `Standard`,
+                description: `Label for standard speed in the current-chat usage breakdown`,
+              })),
+              (t[7] = e))
+            : (e = t[7]),
+          e
+        );
+      }
+      default: {
+        let e;
+        return (
+          t[8] === r
+            ? (e = t[9])
+            : ((e = (0, D.jsx)(D.Fragment, { children: r })), (t[8] = r), (t[9] = e)),
+          e
+        );
       }
     }
-  }
-  return [...combined.values()];
+  let i;
+  return (
+    t[10] === r
+      ? (i = t[11])
+      : ((i = f(r) ? (0, D.jsx)(v, { effort: r }) : (0, D.jsx)(D.Fragment, { children: r })),
+        (t[10] = r),
+        (t[11] = i)),
+    i
+  );
 }
-
-function dimensionTitle(dimension: UsageDimension): string { return dimension === "model" ? "Models" : dimension === "reasoning_effort" ? "Reasoning" : "Speed"; }
-function percentageLabel(dimension: UsageDimension, value: string | null | undefined, percentage: number): string {
-  const label = usageDimensionLabel({ dimension, value });
-  return `${typeof label === "string" ? label : value ?? "Other"}: ${percentage}%`;
+var T, E, D;
+function O() {
+  return (O = e(() => {
+    ((T = t()), d(), (E = s()), i(), _(), o(), u(), m(), (D = r()));
+  }))();
 }
-
-function TooltipContent({ dimension, entry, percentage }: { dimension: UsageDimension; entry: NormalizedUsageGroup; percentage: number }): unknown {
-  const tokenRows = dimension === "model" ? [
-    ["Uncached input tokens", entry.netNewInputTokens],
-    ["Cached input tokens", entry.cachedInputTokens],
-    ["Output tokens", entry.outputTokens],
-  ] as const : [];
-  return jsx.jsxs("div", { className: "flex flex-col gap-0.5 text-xs", children: [
-    jsx.jsx("span", { className: "font-medium", children: percentageLabel(dimension, entry.value, percentage) }),
-    ...tokenRows.filter(([, value]) => value != null).map(([label, value]) => jsx.jsx("span", { children: `${label}: ${formatNumber(value!)}` }, label)),
-  ] });
-}
-
-function withTooltip(content: unknown, child: unknown, key?: string): unknown {
-  const Tooltip = shared.o_;
-  return typeof Tooltip === "function" ? jsx.jsx(Tooltip, { color: "inverse", delayDuration: 0, tooltipContent: content, children: child }, key) : jsx.jsx(jsx.Fragment, { children: child }, key);
-}
-
-function DimensionBreakdown({ dimension, usage }: { dimension: UsageDimension; usage: ThreadUsage }): unknown {
-  const id = typeof React?.useId === "function" ? React.useId() : `usage-${dimension}`;
-  const entries = normalizeGroups(usage, dimension);
-  const total = entries.reduce((sum, entry) => sum + entry.amountMicros, 0);
-  const visible = total > 0 ? entries : [];
-  const colors: readonly string[] = Array.isArray(initial.wnt) && initial.wnt.length > 0 ? initial.wnt : FALLBACK_COLORS;
-  const percentage = (amount: number): number => total > 0 ? Math.round(amount / total * 100) : 0;
-  const legend = visible.map((entry, index) => {
-    const share = percentage(entry.amountMicros);
-    return withTooltip(jsx.jsx(TooltipContent, { dimension, entry, percentage: share }), jsx.jsxs("button", {
-      className: "inline-flex cursor-interaction items-center gap-1.5 rounded-sm py-px focus-visible:outline-2 focus-visible:outline-offset-0 focus-visible:outline-ring",
-      "aria-label": `${percentageLabel(dimension, entry.value, share)} of usage`, type: "button", children: [
-        jsx.jsx("span", { className: "size-2.5 shrink-0 rounded-full", style: { backgroundColor: colors[index % colors.length] } }),
-        jsx.jsx("span", { children: usageDimensionLabel({ dimension, value: entry.value }) }),
-      ],
-    }), entry.value ?? "unknown");
-  });
-  const segments = visible.map((entry, index) => {
-    const share = percentage(entry.amountMicros);
-    return withTooltip(jsx.jsx(TooltipContent, { dimension, entry, percentage: share }), jsx.jsx("button", {
-      className: "h-full min-w-1 basis-0 cursor-interaction", "aria-hidden": true,
-      style: { backgroundColor: colors[index % colors.length], flexGrow: entry.amountMicros }, tabIndex: -1, type: "button",
-    }), entry.value ?? "unknown");
-  });
-  return jsx.jsxs("div", { className: "flex flex-col gap-1.5", "aria-labelledby": id, role: "group", "data-dimension": dimension, children: [
-    jsx.jsxs("div", { className: "flex items-center justify-between gap-2", children: [
-      jsx.jsx("span", { id, className: "text-secondary", children: dimensionTitle(dimension) }),
-      visible.length === 0 ? jsx.jsx("span", { className: "text-tertiary", children: "Not available" }) : null,
-    ] }),
-    jsx.jsx("div", { className: "flex h-2 overflow-hidden rounded-full bg-text/10", children: segments }),
-    jsx.jsx("div", { className: "flex flex-wrap gap-x-4 gap-y-1.5 text-secondary", children: legend }),
-  ] });
-}
-
-function totalLabel(usage: ThreadUsage, showCostUsd: boolean): string {
-  if (usage.balanceUnit === "usd") return formatUsd(usage.costUsd);
-  const credits = `${formatNumber(usage.creditsUsed, { notation: "compact", maximumFractionDigits: 1 })} credits`;
-  return !showCostUsd || usage.costUsd == null ? credits : `${credits} · ${formatUsd(usage.costUsd, usage.costUsd < 0.01 ? 4 : 2)}`;
-}
-
-function ThreadUsageBreakdown({ usage, title, showCostUsd = true }: { usage: ThreadUsage; title?: unknown; showCostUsd?: boolean }): unknown {
-  initializeThreadUsageBreakdown();
-  return jsx.jsxs("div", { className: "flex min-w-0 flex-1 flex-col gap-3 px-3 py-2 text-xs leading-4 select-none", children: [
-    jsx.jsxs("div", { className: "flex items-center justify-between gap-3", children: [
-      jsx.jsx("span", { className: "min-w-0 truncate font-semibold text-default", children: title ?? "Usage in this chat" }),
-      jsx.jsx("span", { className: "shrink-0 text-secondary tabular-nums", children: totalLabel(usage, showCostUsd) }),
-    ] }),
-    ...DIMENSIONS.map((dimension) => jsx.jsx(DimensionBreakdown, { dimension, usage }, dimension)),
-  ] });
-}
-
-function initializeThreadUsageBreakdown(): void {
-  if (initialized) return;
-  initialized = true;
-  for (const candidate of [shared.$3, initial.M0t, shared.K2, translations.n, shared.c_, initial.Ent, initial._S]) call(candidate);
-  React = typeof shared.e6 === "function" ? shared.e6() : shared.e6;
-  jsx = shared.I3();
-}
-initializeThreadUsageBreakdown();
-
-export { ThreadUsageBreakdown as n, initializeThreadUsageBreakdown as r, usageDimensionLabel as t };
+export { y as n, O as r, w as t };

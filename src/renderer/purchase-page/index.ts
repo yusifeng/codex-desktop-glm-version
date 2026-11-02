@@ -1,613 +1,1049 @@
-// purchase-page — Pricing route validation and subscription checkout preparation.
-
-import * as accountIntegrityChunk from "@rchunk/account-action-integrity";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as checkoutLatencyChunk from "@rchunk/checkout-confirm-latency";
-import * as checkoutPageChunk from "@rchunk/checkout-page-core";
-import * as checkoutPolicyChunk from "@rchunk/checkout-policy";
-import * as checkoutSessionChunk from "@rchunk/checkout-session";
-// @ts-ignore -- semantic dependency exists in the published renderer asset graph.
-import * as checkoutTelemetryChunk from "@rchunk/checkout-telemetry";
-import * as creditPurchaseChunk from "@rchunk/credit-purchase-page-core";
-import * as offerQueriesChunk from "@rchunk/offer-queries";
-import * as promoFunnelChunk from "@rchunk/promo-funnel-context";
-import * as queriesChunk from "@rchunk/queries";
-import "@rchunk/rolldown-runtime";
-// @ts-ignore -- semantic dependency exists in the published renderer asset graph.
-import * as workspaceNameChunk from "@rchunk/workspace-auto-generated-name";
-
-type PurchasePlan = "go" | "plus" | "pro" | "pro5x" | "team";
-
-interface JsxRuntime {
-  Fragment: unknown;
-  jsx(type: unknown, props: unknown, key?: string): unknown;
-  jsxs(type: unknown, props: unknown, key?: string): unknown;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  CL as r,
+  FX as i,
+  H4 as a,
+  I3 as o,
+  K2 as s,
+  LX as c,
+  QI as l,
+  SL as u,
+  V4 as d,
+  Y2 as f,
+  Yh as p,
+  ZI as ee,
+  Zh as m,
+  _L as h,
+  dg as g,
+  e6 as _,
+  fg as te,
+  g4 as ne,
+  gL as v,
+  n4 as re,
+  q4 as y,
+  vW as ie,
+  wL as b,
+} from "@rchunk/app-shared";
+import {
+  JP as ae,
+  KP as oe,
+  M6t as x,
+  N6t as S,
+  Pdn as C,
+  Qgn as w,
+  Rln as se,
+  Sdn as ce,
+  XP as le,
+  YP as ue,
+  Ygn as T,
+  Zgn as de,
+  _0 as E,
+  _T as fe,
+  aI as D,
+  cJt as pe,
+  gC as O,
+  h0 as me,
+  hC as he,
+  i_n as ge,
+  ifn as _e,
+  l_n as ve,
+  lfn as ye,
+  m0 as be,
+  mC as xe,
+  nI as Se,
+  oI as Ce,
+  o_n as we,
+  qP as k,
+  rJt as Te,
+  r_n as Ee,
+  rfn as De,
+  rht as Oe,
+  tI as ke,
+  uht as Ae,
+  v0 as je,
+  vT as Me,
+  wdn as Ne,
+} from "@rchunk/app-initial";
+import {
+  ah as Pe,
+  fh as Fe,
+  mh as Ie,
+  nh as Le,
+  oh as Re,
+  ph as ze,
+  sh as Be,
+  uh as Ve,
+} from "@rchunk/app-primary";
+import { i as He, n as Ue } from "@rchunk/queries";
+import { E as We, S as A } from "@rchunk/checkout-policy";
+import { r as j, t as Ge } from "@rchunk/checkout-telemetry";
+import { n as Ke, r as qe } from "@rchunk/account-action-integrity";
+import {
+  D as Je,
+  E as Ye,
+  F as M,
+  I as Xe,
+  M as Ze,
+  N as Qe,
+  O as $e,
+  T as et,
+  a as tt,
+  d as N,
+  k as nt,
+  o as rt,
+  s as P,
+  t as it,
+  u as at,
+} from "@rchunk/checkout-session";
+import { m as F, p as I } from "@rchunk/checkout-confirm-latency";
+import { n as ot, r as st } from "@rchunk/checkout-page-core";
+import { n as ct, r as L } from "@rchunk/offer-queries";
+import { n as R, r as lt } from "@rchunk/promo-funnel-context";
+import { n as z, t as B } from "@rchunk/credit-purchase-page-core";
+import { n as ut, t as dt } from "@rchunk/workspace-auto-generated-name";
+async function ft({
+  accountId: e,
+  requestBody: t,
+  appearance: n,
+  cancelUrl: r,
+  purchaseAttemptId: i,
+  signal: a,
+}) {
+  let [o, s] = await Promise.all([t, Ke(`chatgpt_checkout`)]);
+  return (
+    a.throwIfAborted(),
+    Te.safePost(`/payments/checkout`, {
+      additionalHeaders: { ...s, "ChatGPT-Account-ID": e, [ie]: e },
+      signal: a,
+      requestBody: { ...o, checkout_appearance: n, cancel_url: r, purchase_attempt_id: i },
+    })
+  );
 }
-
-interface ReactRuntime {
-  useEffect(effect: () => void, dependencies: readonly unknown[]): void;
-  useRef<Value>(value: Value): { current: Value };
-  useState<Value>(value: Value): [Value, (next: Value) => void];
+function V() {
+  return (V = e(() => {
+    (b(), qe(), pe());
+  }))();
 }
-
-interface AbortSignalLike {
-  aborted?: boolean;
-  throwIfAborted(): void;
+function H(e) {
+  let t = (0, xt.c)(22),
+    {
+      route: n,
+      cancelHref: r,
+      onPrepared: i,
+      loadingContent: a,
+      upsellContextId: o,
+      checkoutEntryPoint: s,
+      pricingCheckoutId: c,
+    } = e,
+    l = ge(),
+    { accountId: u, userId: d } = S(),
+    f,
+    p;
+  t[0] === n
+    ? ((f = t[1]), (p = t[2]))
+    : ((p = new URL(n, `https://chatgpt.com`)),
+      (f = P.safeParse(p.pathname.split(`/`).at(-1))),
+      (t[0] = n),
+      (t[1] = f),
+      (t[2] = p));
+  let ee = f;
+  if (!ee.success) {
+    let e;
+    return (
+      t[3] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, W.jsx)(T, { to: E(), replace: !0 })), (t[3] = e))
+        : (e = t[3]),
+      e
+    );
+  }
+  if (u == null || d == null) return a;
+  let m = `${d}:${u}:${n}`,
+    h;
+  t[4] !== l || t[5] !== p.pathname || t[6] !== p.search
+    ? ((h = { ...l, pathname: p.pathname, search: p.search }),
+      (t[4] = l),
+      (t[5] = p.pathname),
+      (t[6] = p.search),
+      (t[7] = h))
+    : (h = t[7]);
+  let g;
+  t[8] !== r || t[9] !== s || t[10] !== a || t[11] !== i || t[12] !== c || t[13] !== o
+    ? ((g = {
+        onPrepared: i,
+        loadingContent: a,
+        cancelHref: r,
+        upsellContextId: o,
+        checkoutEntryPoint: s,
+        pricingCheckoutId: c,
+      }),
+      (t[8] = r),
+      (t[9] = s),
+      (t[10] = a),
+      (t[11] = i),
+      (t[12] = c),
+      (t[13] = o),
+      (t[14] = g))
+    : (g = t[14]);
+  let _;
+  return (
+    t[15] !== u || t[16] !== ee.data || t[17] !== m || t[18] !== h || t[19] !== g || t[20] !== d
+      ? ((_ = (0, W.jsx)(
+          mt,
+          { accountId: u, plan: ee.data, userId: d, location: h, preparation: g },
+          m,
+        )),
+        (t[15] = u),
+        (t[16] = ee.data),
+        (t[17] = m),
+        (t[18] = h),
+        (t[19] = g),
+        (t[20] = d),
+        (t[21] = _))
+      : (_ = t[21]),
+    _
+  );
 }
-
-interface LocationLike {
-  pathname: string;
-  search: string;
-  state?: Record<string, unknown> | null;
+function U() {
+  let e = (0, xt.c)(11),
+    { plan: t } = ve(),
+    n = ge(),
+    { accountId: r, userId: i } = S();
+  if (t === `credits`) {
+    let t;
+    return (
+      e[0] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, W.jsx)(B, {})), (e[0] = t))
+        : (t = e[0]),
+      t
+    );
+  }
+  let a;
+  e[1] === t ? (a = e[2]) : ((a = P.safeParse(t)), (e[1] = t), (e[2] = a));
+  let o = a;
+  if (!o.success) {
+    let t;
+    return (
+      e[3] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, W.jsx)(T, { to: E(), replace: !0 })), (e[3] = t))
+        : (t = e[3]),
+      t
+    );
+  }
+  if (r == null || i == null) {
+    let t;
+    return (
+      e[4] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((t = (0, W.jsx)(I, { loading: !0, onRetry: pt })), (e[4] = t))
+        : (t = e[4]),
+      t
+    );
+  }
+  let s = `${i}:${r}:${o.data}`,
+    c;
+  return (
+    e[5] !== r || e[6] !== n || e[7] !== o.data || e[8] !== s || e[9] !== i
+      ? ((c = (0, W.jsx)(mt, { accountId: r, plan: o.data, userId: i, location: n }, s)),
+        (e[5] = r),
+        (e[6] = n),
+        (e[7] = o.data),
+        (e[8] = s),
+        (e[9] = i),
+        (e[10] = c))
+      : (c = e[10]),
+    c
+  );
 }
-
-interface Account {
-  account_user_role?: string | null;
-  id: string;
-  plan_type: string;
-}
-
-interface QueryResult<Value> {
-  data?: Value | null;
-  error?: unknown;
-  isPending?: boolean;
-  refetch(): Promise<unknown> | unknown;
-}
-
-interface CheckoutResponse extends Record<string, unknown> {
-  checkout_session_id?: string;
-  tag?: string;
-  url?: string | null;
-}
-
-interface SubscriptionState {
-  eligible_offers?: unknown[];
-  entitlement: { has_active_subscription: boolean };
-  last_active_subscription?: { purchase_origin_platform?: string | null } | null;
-}
-
-interface PromotionState {
-  is_eligible?: boolean;
-  metadata?: { plan_name?: string; metadata?: { plan_name?: string } } | null;
-}
-
-interface ConfigurationClient {
-  checkGate(key: string): boolean;
-  getDynamicConfig(key: string): { get<Value>(name: string, fallback: Value): Value };
-  getLayer(key: string): { get<Value>(name: string, fallback: Value): Value };
-}
-
-interface CheckoutPreparation {
-  cancelHref?: string;
-  checkoutEntryPoint?: string;
-  loadingContent?: unknown;
-  onPrepared(response: CheckoutResponse, request: Record<string, unknown>): Promise<unknown> | unknown;
-  pricingCheckoutId?: string;
-  upsellContextId?: string;
-}
-
-interface PricingCheckoutPreparationProps extends CheckoutPreparation {
-  route: string;
-}
-
-interface CheckoutFlowProps {
-  accountId: string;
-  location: LocationLike;
-  plan: PurchasePlan;
-  preparation?: CheckoutPreparation;
-  userId: string;
-}
-
-interface AppSharedApi {
-  $3(): void;
-  BX<Value>(family: unknown, parameter: unknown): { data?: Value; error?: unknown; isLoading?: boolean };
-  FX(): void;
-  I3(): JsxRuntime;
-  K2(): void;
-  LX(scope: unknown): { queryClient: { invalidateQueries(input: { queryKey: unknown[] }): unknown } };
-  QI(): void;
-  Y2: unknown;
-  Yh: unknown;
-  ZI: unknown;
-  Zh(): void;
-  _L<Value>(options: Record<string, unknown>): QueryResult<Value>;
-  e6(): ReactRuntime;
-  fg(): boolean;
-  gL(): void;
-  vW: string;
-  wL(): void;
-}
-
-interface ApiClient {
-  safePost(path: string, input: Record<string, unknown>): Promise<CheckoutResponse>;
-}
-
-interface AppInitialApi {
-  M6t(): void;
-  N6t(): { accountId: string | null; userId: string | null };
-  Qgn(): void;
-  XP(scope: unknown, attempt: unknown): void;
-  Ygn: unknown;
-  _0(input?: { search?: string }): string;
-  cJt(): void;
-  i_n(): LocationLike;
-  ifn(): void;
-  l_n(): { plan?: string };
-  lfn(): ConfigurationClient;
-  mC: unknown;
-  o_n(): (destination: unknown, options?: Record<string, unknown>) => void;
-  rJt: ApiClient;
-  rht(): void;
-  uht(accountId?: string, options?: { preview: boolean }): { data?: Account | null; isError?: boolean; isLoading?: boolean };
-}
-
-interface CheckoutSessionApi {
-  I(): void;
-  d(): void;
-  o(): void;
-  u: unknown;
-}
-
-interface IntegrityApi {
-  i(surface: string): Promise<Record<string, string>>;
-  n(): void;
-}
-
-const {
-  $3: initializeCompilerRuntime,
-  BX: useSignalFamilyValue,
-  FX: initializeSignalRuntime,
-  I3: getJsxRuntime,
-  K2: initializeIntlRuntime,
-  LX: useScope,
-  QI: initializeScopeRuntime,
-  Y2: FormattedMessage,
-  Yh: Button,
-  ZI: applicationScope,
-  Zh: initializeButton,
-  _L: useQuery,
-  e6: getReactRuntime,
-  fg: useDarkMode,
-  gL: initializeUseQuery,
-  vW: accountHeaderName,
-  wL: initializeQueryRuntime,
-} = appSharedChunk as unknown as AppSharedApi;
-
-const {
-  M6t: initializeAccountModels,
-  N6t: useSessionIdentity,
-  Qgn: initializeAuthentication,
-  XP: resetCheckoutAttempt,
-  Ygn: Redirect,
-  _0: buildPricingRoute,
-  cJt: initializeApiClient,
-  i_n: useLocation,
-  ifn: initializeFeatureGates,
-  l_n: useRouteParams,
-  lfn: useConfiguration,
-  mC: workspaceNameFamily,
-  o_n: useNavigate,
-  rJt: apiClient,
-  rht: initializeAccountQueries,
-  uht: useAccount,
-} = appInitialChunk as unknown as AppInitialApi;
-
-interface AppPrimaryApi { ph(): void; sh(): void }
-const { ph: initializeCheckoutSelection, sh: initializeWorkspaceCheckout } =
-  appPrimaryChunk as unknown as AppPrimaryApi;
-
-const { i: initializeSubscriptionQueries, n: subscriptionQueryOptions } = queriesChunk;
-const { E: resolveCheckoutUiMode, S: initializeCheckoutPolicy } = checkoutPolicyChunk;
-interface CheckoutTelemetryApi { r(): void; t: { ALL_PLANS_PRICING_MODAL: string } }
-const { r: initializeCheckoutTelemetry, t: checkoutEntryPoints } =
-  checkoutTelemetryChunk as unknown as CheckoutTelemetryApi;
-const { i: getIntegrityHeaders, n: initializeAccountIntegrity } =
-  accountIntegrityChunk as unknown as IntegrityApi;
-const { I: initializeCheckoutSession, d: initializeCheckoutPlanData, o: initializeCheckoutRoute, u: CheckoutReturn } =
-  checkoutSessionChunk as unknown as CheckoutSessionApi;
-const { m: initializeCheckoutLoading, p: CheckoutLoadingState } = checkoutLatencyChunk;
-const { n: HostedCheckout, r: initializeCheckoutPage } = checkoutPageChunk;
-interface OfferQueriesApi {
-  n(input: {
-    accountId: string;
-    code: string;
-    kind: string;
-    signal: AbortSignalLike;
-  }): Promise<PromotionState>;
-  r(): void;
-}
-const { n: checkOffer, r: initializeOfferQueries } =
-  offerQueriesChunk as unknown as OfferQueriesApi;
-const { n: initializePromoFunnel, r: recordPromoApplied } = promoFunnelChunk;
-const { n: initializeCreditPurchase, t: CreditPurchasePage } = creditPurchaseChunk;
-interface WorkspaceNameApi { n(): void; t(input: unknown, workspace: unknown, generated: unknown): string }
-const { n: initializeWorkspaceName, t: resolveWorkspaceName } =
-  workspaceNameChunk as unknown as WorkspaceNameApi;
-
-const ACCOUNT_QUERY_OPTIONS = { preview: false };
-const VALID_PLANS = new Set<PurchasePlan>(["go", "plus", "pro", "pro5x", "team"]);
-const PLAN_NAMES: Record<PurchasePlan, string> = {
-  go: "chatgptgoplan",
-  plus: "chatgptplusplan",
-  pro: "chatgptpro",
-  pro5x: "chatgptpro",
-  team: "chatgptteamplan",
-};
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let initialized = false;
-
-function initializePurchasePage(): void {
-  if (initialized) return;
-  initializeCompilerRuntime();
-  initializeSignalRuntime();
-  initializeIntlRuntime();
-  initializeScopeRuntime();
-  initializeButton();
-  initializeUseQuery();
-  initializeQueryRuntime();
-  initializeAccountModels();
-  initializeAuthentication();
-  initializeApiClient();
-  initializeFeatureGates();
-  initializeAccountQueries();
-  initializeCheckoutSelection();
-  initializeWorkspaceCheckout();
-  initializeSubscriptionQueries();
-  initializeCheckoutPolicy();
-  initializeCheckoutTelemetry();
-  initializeAccountIntegrity();
-  initializeCheckoutSession();
-  initializeCheckoutPlanData();
-  initializeCheckoutRoute();
-  initializeCheckoutLoading();
-  initializeCheckoutPage();
-  initializeOfferQueries();
-  initializePromoFunnel();
-  initializeCreditPurchase();
-  initializeWorkspaceName();
-  React = getReactRuntime();
-  jsx = getJsxRuntime();
-  initialized = true;
-}
-
-function parsePlan(value: string | undefined): PurchasePlan | null {
-  return value != null && VALID_PLANS.has(value as PurchasePlan)
-    ? (value as PurchasePlan)
-    : null;
-}
-
-function returnPath(search: URLSearchParams, preparation?: CheckoutPreparation): string {
-  const offerReturnPath = search.get("offer_return_path");
-  if (offerReturnPath?.startsWith("/pricing/offers")) return offerReturnPath;
-  return preparation?.cancelHref ?? buildPricingRoute();
-}
-
-function seatCount(search: URLSearchParams): { premium: number; standard: number } | null {
-  const standard = Number(search.get("standardSeats") ?? "0");
-  const premium = Number(search.get("premiumSeats") ?? "0");
-  if (!Number.isInteger(standard) || !Number.isInteger(premium)) return null;
-  if (standard < 0 || premium < 0 || standard + premium < 1 || standard + premium > 200) return null;
-  return { standard, premium };
-}
-
-function validCheckoutResponse(response: CheckoutResponse): void {
-  if (!(response.tag === "custom_checkout_session") && response.url == null)
-    throw Error("Checkout URL unavailable");
-}
-
-async function createCheckout(input: {
-  accountId: string;
-  appearance: "dark" | "light";
-  cancelUrl: string;
-  purchaseAttemptId: string;
-  requestBody: Promise<Record<string, unknown>> | Record<string, unknown>;
-  signal: AbortSignalLike;
-}): Promise<CheckoutResponse> {
-  const [requestBody, integrityHeaders] = await Promise.all([
-    input.requestBody,
-    getIntegrityHeaders("chatgpt_checkout"),
-  ]);
-  input.signal.throwIfAborted();
-  return apiClient.safePost("/payments/checkout", {
-    additionalHeaders: {
-      ...integrityHeaders,
-      "ChatGPT-Account-ID": input.accountId,
-      [accountHeaderName]: input.accountId,
+function pt() {}
+function mt(e) {
+  let t = (0, xt.c)(130),
+    { accountId: i, plan: a, userId: o, location: s, preparation: l } = e,
+    u = c(ee),
+    d = we(),
+    m = te(),
+    g = ye(),
+    _ = r(),
+    ne;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((ne = { preview: !1 }), (t[0] = ne))
+    : (ne = t[0]);
+  let { data: v, isLoading: y, isError: b } = Ae(void 0, ne),
+    x = !y && !b && v?.id === i,
+    S = a !== `team` && x && v.plan_type !== `free`,
+    w;
+  t[1] === i ? (w = t[2]) : ((w = Ue(i)), (t[1] = i), (t[2] = w));
+  let se;
+  t[3] !== S || t[4] !== w
+    ? ((se = { ...w, enabled: S, staleTime: 0 }), (t[3] = S), (t[4] = w), (t[5] = se))
+    : (se = t[5]);
+  let { data: D, isPending: pe, error: O, refetch: me } = h(se),
+    ge = x && (!S || (!pe && O == null && D != null)),
+    _e =
+      ge &&
+      (!S ||
+        (D != null &&
+          (!D.entitlement.has_active_subscription ||
+            (D.last_active_subscription.purchase_origin_platform === `chatgpt_no_payment_trial` &&
+              Ce({ eligibleOffers: D.eligible_offers, planName: it[a] }))))),
+    ve =
+      a === `team` && v?.plan_type === `free_workspace` && v.account_user_role !== `account-owner`,
+    k = a === `team` && v?.plan_type === `free_workspace` && !ve ? v : null,
+    Oe = a === `team` && !y && !b && (k == null || g.checkGate(`4176229075`)),
+    je = re(),
+    Me = a === `team` ? i : null,
+    Ne = a === `team` ? o : null,
+    ze;
+  t[6] !== Me || t[7] !== Ne
+    ? ((ze = { accountId: Me, userId: Ne }), (t[6] = Me), (t[7] = Ne), (t[8] = ze))
+    : (ze = t[8]);
+  let { data: Be, isLoading: He, error: A } = n(xe, ze),
+    [j] = (0, St.useState)(yt),
+    Ke;
+  t[9] !== je || t[10] !== Be || t[11] !== k
+    ? ((Ke = dt(je, k == null ? null : { data: k, isPersonalAccount: vt }, Be)),
+      (t[9] = je),
+      (t[10] = Be),
+      (t[11] = k),
+      (t[12] = Ke))
+    : (Ke = t[12]);
+  let qe = Ke,
+    M = new URLSearchParams(s.search),
+    Xe = Ve({ accountId: i, search: M, state: l == null ? s.state : null }),
+    N = Xe?.targetPlan === wt[a] ? Xe : null,
+    rt =
+      N == null &&
+      (Re(s.search) ||
+        (l == null && s.state != null && typeof s.state == `object` && `beaconUpgrade` in s.state));
+  (0, St.useEffect)(() => {
+    l == null &&
+      N != null &&
+      N.accountId == null &&
+      d(
+        { pathname: s.pathname, search: s.search },
+        { replace: !0, state: { ...s.state, beaconUpgrade: { ...N, accountId: i } } },
+      );
+  }, [i, N, s.pathname, s.search, s.state, d, l]);
+  let P = Ct.safeParse({
+      standard: M.get(`standardSeats`) ?? `0`,
+      premium: M.get(`premiumSeats`) ?? `0`,
+    }),
+    F =
+      P.success &&
+      (P.data.premium === 0 ||
+        (Oe && M.get(`promo_campaign`)?.trim().toLowerCase() !== `team-1-month-free`))
+        ? P.data
+        : null,
+    st =
+      l == null &&
+      N == null &&
+      !rt &&
+      a === `team` &&
+      !y &&
+      !b &&
+      F == null &&
+      De(g, `1069053961`).get(`redirect_team_purchase_to_create_workspace`, !1),
+    L = $e(M.toString()),
+    { promoCode: R, promoCampaign: z } = L,
+    B = R != null || z != null,
+    {
+      data: ut,
+      isPending: V,
+      error: H,
+    } = h({
+      queryKey: [`business-promotion-checkout`, i, R, z],
+      enabled: a === `team` && B,
+      queryFn: async (e) => {
+        let { signal: t } = e,
+          n = { "ChatGPT-Account-ID": i, [ie]: i };
+        if (R != null) {
+          let e = await ct({ accountId: i, code: R, kind: `promo`, signal: t });
+          return (
+            t.throwIfAborted(),
+            { metadata: e.is_eligible ? e.metadata : null, eligibleCampaign: null }
+          );
+        }
+        if (z == null) throw Error(`Promotion input missing`);
+        let r = await Te.safeGet(`/promo_campaign/check_coupon`, {
+          additionalHeaders: n,
+          parameters: { query: { coupon: z, is_coupon_from_query_param: !0 } },
+          signal: t,
+        });
+        return (
+          t.throwIfAborted(),
+          { metadata: null, eligibleCampaign: r.state === `eligible` ? (r.coupon ?? null) : null }
+        );
+      },
+      staleTime: 0,
+      retry: !1,
+      refetchOnWindowFocus: !1,
+    }),
+    U = s.state,
+    [pt, mt] = (0, St.useState)(!1),
+    G = (0, St.useRef)(null),
+    K = () => {
+      let e = oe(u, l?.pricingCheckoutId ?? U?.pricingCheckoutId, s.pathname + s.search, j, i, o);
+      return ((G.current = e), e);
     },
-    signal: input.signal,
-    requestBody: {
-      ...requestBody,
-      checkout_appearance: input.appearance,
-      cancel_url: input.cancelUrl,
-      purchase_attempt_id: input.purchaseAttemptId,
-    },
-  });
-}
-
-function checkoutRoute(response: CheckoutResponse): string {
-  const sessionId = typeof response.checkout_session_id === "string"
-    ? response.checkout_session_id
-    : "session";
-  return `/checkout/${sessionId}`;
-}
-
-function planFromPromotion(promotion: PromotionState | null | undefined): string | null {
-  return promotion?.metadata?.metadata?.plan_name ?? promotion?.metadata?.plan_name ?? null;
-}
-
-function CheckoutFlow({ accountId, plan, userId, location, preparation }: CheckoutFlowProps): unknown {
-  const scope = useScope(applicationScope);
-  const navigate = useNavigate();
-  const darkMode = useDarkMode();
-  const configuration = useConfiguration();
-  const accountQuery = useAccount(undefined, ACCOUNT_QUERY_OPTIONS);
-  const accountReady = !accountQuery.isLoading && !accountQuery.isError && accountQuery.data?.id === accountId;
-  const account = accountReady ? accountQuery.data ?? null : null;
-  const requiresSubscriptionCheck = plan !== "team" && account != null && account.plan_type !== "free";
-  const subscriptionOptions = subscriptionQueryOptions<SubscriptionState>(accountId);
-  const subscriptionQuery = useQuery<SubscriptionState>({
-    ...subscriptionOptions,
-    enabled: requiresSubscriptionCheck,
-    staleTime: 0,
-  });
-  const subscriptionReady =
-    accountReady &&
-    (!requiresSubscriptionCheck ||
-      (!subscriptionQuery.isPending && subscriptionQuery.error == null && subscriptionQuery.data != null));
-  const purchaseEligible =
-    subscriptionReady &&
-    (!requiresSubscriptionCheck ||
-      subscriptionQuery.data?.entitlement.has_active_subscription !== true ||
-      subscriptionQuery.data?.last_active_subscription?.purchase_origin_platform === "chatgpt_no_payment_trial");
-  const isTeam = plan === "team";
-  const teamOwnerBlocked =
-    isTeam &&
-    account?.plan_type === "free_workspace" &&
-    account.account_user_role !== "account-owner";
-  const workspaceQuery = useSignalFamilyValue<string>(workspaceNameFamily, { accountId, userId });
-  const workspaceName = resolveWorkspaceName(null, account?.plan_type === "free_workspace" ? account : null, workspaceQuery.data);
-  const search = new URLSearchParams(location.search);
-  const promoCode = search.get("promoCode");
-  const referralCode = search.get("referralCode");
-  const promotionCode = isTeam ? null : promoCode ?? referralCode;
-  const promotionKind = promoCode == null ? "referral" : "promo";
-  const promotionQuery = useQuery<PromotionState>({
-    queryKey: ["purchase-promotion", accountId, userId, promotionKind, promotionCode],
-    enabled: !isTeam && promotionCode != null,
-    queryFn: ({ signal }: { signal: AbortSignalLike }) =>
-      checkOffer({ accountId, code: promotionCode ?? "", kind: promotionKind, signal }),
-    retry: false,
-    staleTime: 0,
-  });
-  const eligiblePromotion =
-    promotionCode == null ||
-    (promotionQuery.data?.is_eligible === true &&
-      planFromPromotion(promotionQuery.data) === PLAN_NAMES[plan]);
-  const seats = seatCount(search);
-  const shouldCreateWorkspace =
-    isTeam &&
-    accountReady &&
-    account?.plan_type !== "free_workspace" &&
-    seats == null &&
-    configuration
-      .getDynamicConfig("1069053961")
-      .get("redirect_team_purchase_to_create_workspace", false);
-  const request: Record<string, unknown> | null = isTeam
-    ? accountReady && !teamOwnerBlocked && !shouldCreateWorkspace
+    Tt = ut?.metadata?.duration?.period,
+    Et = L.priceInterval;
+  !M.has(`price_interval`) &&
+    !M.has(`selectedPlan`) &&
+    (Tt === `year` ? (Et = et.ANNUAL) : Tt === `month` && (Et = et.FLEXIBLE));
+  let Dt = nt({
+      input: { ...L, priceInterval: Et },
+      metadata: ut?.metadata,
+      eligibleCampaign: ut?.eligibleCampaign,
+    }),
+    Ot = M.get(`source`),
+    kt = M.get(`promoCode`),
+    At = M.get(`referralCode`),
+    q = a === `team` ? null : (kt ?? At),
+    jt = kt == null ? `referral` : `promo`,
+    {
+      data: Mt,
+      error: Nt,
+      isPending: Pt,
+      refetch: Ft,
+    } = h({
+      queryKey: [`purchase-promotion`, i, o, jt, q],
+      enabled: a !== `team` && q != null,
+      queryFn: (e) => {
+        let { signal: t } = e;
+        return (K(), ct({ accountId: i, code: q ?? ``, kind: jt, signal: t }));
+      },
+      retry: !1,
+      staleTime: 0,
+    }),
+    It = Mt?.is_eligible === !0 && Mt.metadata != null ? ke(Mt.metadata) : null,
+    Lt = q == null || It === it[a],
+    Rt = M.get(`promo_campaign`)?.trim() || void 0,
+    zt = U?.[`account-payment-modal-promo-campaign-handoff`],
+    Bt =
+      a === `team`
+        ? {}
+        : Se({
+            promoCode: kt,
+            referralCode: At,
+            promoCampaign: Rt ?? zt,
+            isPromoCampaignFromQueryParam: N == null && l == null && Rt != null,
+            checkoutSource: Ot === `codex` || Ot === `codex-embedded-checkout` ? Ot : void 0,
+          }),
+    Vt = M.get(`offer_return_path`),
+    J = N?.returnPath ?? (Vt?.startsWith(`/pricing/offers`) === !0 ? Vt : de(E())),
+    Ht = Ee(J),
+    Ut = new URL(N == null ? (l?.cancelHref ?? Ht) : Ht, window.location.origin).href,
+    Wt;
+  t[13] !== N || t[14] !== s.state
+    ? ((Wt =
+        N?.checkoutMode === `direct` && N.targetPlan === C.SELF_SERVE_BUSINESS
+          ? Ie(s.state)
+          : null),
+      (t[13] = N),
+      (t[14] = s.state),
+      (t[15] = Wt))
+    : (Wt = t[15]);
+  let Gt = Wt,
+    Kt = k?.id,
+    qt;
+  t[16] === Kt ? (qt = t[17]) : ((qt = tt(Kt)), (t[16] = Kt), (t[17] = qt));
+  let { data: Jt, isPending: Yt, error: Xt, refetch: Zt } = h(qt),
+    Qt = k != null,
+    $t = Jt?.total,
+    en;
+  t[18] !== Qt || t[19] !== $t
+    ? ((en = Ze({ isFreeWorkspace: Qt, workspaceMemberCount: $t })),
+      (t[18] = Qt),
+      (t[19] = $t),
+      (t[20] = en))
+    : (en = t[20]);
+  let { minimumSeats: tn } = en,
+    nn =
+      !y &&
+      !b &&
+      !ve &&
+      !He &&
+      Be != null &&
+      A == null &&
+      (k == null || (!Yt && Xt == null)) &&
+      (!B || (!V && H == null && (Dt.promo_code != null || Dt.promo_campaign != null))),
+    rn = F?.premium ?? 0,
+    an;
+  if (F != null) an = Math.max(F.standard, tn - rn);
+  else if (L.requestedSeatQuantity == null) {
+    let e;
+    (t[21] !== nn || t[22] !== tn || t[23] !== a || t[24] !== g
+      ? ((e = Ye({
+          configuredDefaultSeats:
+            a === `team` && nn
+              ? g.getLayer(`1945869247`).get(`default_seat_count`, void 0)
+              : void 0,
+          fallbackDefaultSeats: Qe(),
+          maxSeats: 200,
+          minimumSeats: tn,
+        })),
+        (t[21] = nn),
+        (t[22] = tn),
+        (t[23] = a),
+        (t[24] = g),
+        (t[25] = e))
+      : (e = t[25]),
+      (an = e));
+  } else an = Math.max(tn, Math.min(200, L.requestedSeatQuantity));
+  let Y =
+    a === `team` && nn
       ? {
-          entry_point: "team_workspace_purchase_modal",
-          plan_name: PLAN_NAMES.team,
+          entry_point: `team_workspace_purchase_modal`,
+          plan_name: `chatgptteamplan`,
+          ...Dt,
           team_plan_data: {
-            workspace_name: workspaceName,
-            price_interval: search.get("price_interval") ?? "month",
-            existing_workspace_id: account?.plan_type === "free_workspace" ? account.id : undefined,
-            seat_quantity: seats == null ? 1 : seats.standard + seats.premium,
-            seat_quantities: seats?.premium
-              ? [
-                  { seat_type: "default", quantity: seats.standard },
-                  { seat_type: "prolite", quantity: seats.premium },
-                ]
-              : undefined,
+            workspace_name: qe,
+            price_interval: Et,
+            existing_workspace_id: k?.id,
+            seat_quantity: an + rn,
+            seat_quantities:
+              F != null && Oe
+                ? [
+                    { seat_type: `default`, quantity: an },
+                    { seat_type: `prolite`, quantity: rn },
+                  ]
+                : void 0,
           },
         }
-      : null
-    : purchaseEligible && eligiblePromotion
-      ? {
-          plan_name: PLAN_NAMES[plan],
-          promo_code: promoCode ?? undefined,
-          referral_code: referralCode ?? undefined,
-          promo_campaign: search.get("promo_campaign")?.trim() || undefined,
-        }
       : null;
-  if (request != null && preparation != null) {
-    request.entry_point =
-      request.entry_point ?? preparation.checkoutEntryPoint ?? checkoutEntryPoints.ALL_PLANS_PRICING_MODAL;
-    if (plan === "plus" && preparation.upsellContextId != null)
-      request.upsell_context_id = preparation.upsellContextId;
+  if (
+    (a !== `team` && (Y = _e && Lt ? { plan_name: it[a], ...Bt } : null), Y != null && l != null)
+  ) {
+    let e;
+    (t[26] !== a || t[27] !== l
+      ? ((e =
+          a === `plus` && l.upsellContextId != null
+            ? { upsell_context_id: l.upsellContextId }
+            : {}),
+        (t[26] = a),
+        (t[27] = l),
+        (t[28] = e))
+      : (e = t[28]),
+      (Y = {
+        ...Y,
+        entry_point:
+          Y.entry_point ??
+          (a === `plus` ? l.checkoutEntryPoint : void 0) ??
+          Ge.ALL_PLANS_PRICING_MODAL,
+        ...e,
+      }));
   }
-  const purchaseAttemptId = React.useRef(crypto.randomUUID());
-  const cancelUrl = new URL(
-    returnPath(search, preparation),
-    typeof window === "undefined" ? "https://chatgpt.com" : window.location.origin,
-  ).href;
-  const checkoutQuery = useQuery<CheckoutResponse>({
-    queryKey: ["subscription-checkout-create", purchaseAttemptId.current, location.pathname, request],
-    enabled: request != null && !shouldCreateWorkspace,
-    queryFn: async ({ signal }: { signal: AbortSignalLike }) => {
-      if (request == null) throw Error("Checkout selection missing");
-      const checkoutUiMode = resolveCheckoutUiMode(request, {
-        isServerOwnedModeEnabled: () => configuration.checkGate("2065253865"),
-        isCustomModeEnabled: (gate: string) =>
-          configuration.getDynamicConfig("3950229590").get(gate, true),
+  rt
+    ? (Y = null)
+    : Y != null &&
+      N != null &&
+      (Y = {
+        ...Y,
+        entry_point: Le,
+        lightweight_return_to: Pe(N, Ut) ?? void 0,
+        promo_campaign_source: Y.promo_campaign == null ? void 0 : Le,
+        upsell_context_id: N.upsellContextId ?? void 0,
       });
-      const response = await createCheckout({
-        accountId,
-        requestBody: { ...request, checkout_ui_mode: checkoutUiMode },
-        appearance: darkMode ? "dark" : "light",
-        cancelUrl,
-        purchaseAttemptId: purchaseAttemptId.current,
-        signal,
-      });
-      signal.throwIfAborted();
-      validCheckoutResponse(response);
-      if (promotionCode != null)
-        recordPromoApplied({
-          accountId,
-          location: "PricingColumnPrimaryCtaButton",
-          promoCode: promoCode ?? undefined,
-          referralCode: referralCode ?? undefined,
-        });
-      if (!signal.aborted && preparation != null)
-        await preparation.onPrepared(response, request);
-      return response;
-    },
-    staleTime: Infinity,
-    gcTime: 0,
-    retry: false,
-    refetchOnWindowFocus: false,
-    refetchOnReconnect: false,
-  });
-
-  const checkoutUnavailable =
-    location.search.includes("beacon_upgrade=1") ||
-    (typeof checkoutQuery.error === "object" &&
-      checkoutQuery.error != null &&
-      "status" in checkoutQuery.error &&
-      checkoutQuery.error.status === 403);
-  const resolvedReturnPath = returnPath(search, preparation);
-  if (checkoutUnavailable)
-    return jsx.jsx(CheckoutReturn, {
-      returnPath: resolvedReturnPath,
-      children: jsx.jsx("p", {
-        role: "alert",
-        children: jsx.jsx(FormattedMessage, {
-          id: "checkout.unavailable",
-          defaultMessage: "Checkout isn’t available for this account right now. Close checkout to choose another plan or switch accounts.",
-          description: "Checkout account denied",
-        }),
-      }),
-    });
-  if (shouldCreateWorkspace)
-    return jsx.jsx(Redirect, { to: `/create-workspace${location.search}`, replace: true });
-  if (!isTeam && !subscriptionReady)
-    return jsx.jsx(CheckoutLoadingState, {
-      returnPath: resolvedReturnPath,
-      loadingContent: preparation?.loadingContent,
-      loading: accountQuery.isLoading || (requiresSubscriptionCheck && subscriptionQuery.isPending),
-      error: subscriptionQuery.error,
-      onRetry: () => {
-        if (accountReady) void subscriptionQuery.refetch();
-        else scope.queryClient.invalidateQueries({ queryKey: ["accounts", "check"] });
-      },
-    });
-  if (!isTeam && !purchaseEligible) {
-    const pricingSearch = new URLSearchParams(location.search);
-    pricingSearch.set("plan", plan);
-    return jsx.jsx(Redirect, {
-      to: buildPricingRoute({ search: `?${pricingSearch}` }),
-      state: location.state,
-      replace: true,
-    });
-  }
-  if (teamOwnerBlocked) return jsx.jsx(Redirect, { to: buildPricingRoute(), replace: true });
-  if (promotionCode != null && promotionQuery.isPending)
-    return jsx.jsx(CheckoutLoadingState, {
-      returnPath: resolvedReturnPath,
-      loadingContent: preparation?.loadingContent,
-      loading: true,
-      onRetry: () => void promotionQuery.refetch(),
-    });
-  if (promotionCode != null && (promotionQuery.error != null || !eligiblePromotion))
-    return jsx.jsxs(CheckoutReturn, {
-      returnPath: resolvedReturnPath,
-      children: [
-        jsx.jsx("p", {
-          role: "alert",
-          children: jsx.jsx(FormattedMessage, {
-            id: "checkout.offerUnavailable",
-            defaultMessage: "This promotion isn’t available for this checkout",
-            description: "Invalid promotion before checkout",
-          }),
-        }),
-        promotionQuery.error == null
-          ? null
-          : jsx.jsx(Button, {
-              onClick: () => void promotionQuery.refetch(),
-              children: jsx.jsx(FormattedMessage, {
-                id: "checkout.offers.retry",
-                defaultMessage: "Try again",
-                description: "Retry promotion eligibility",
-              }),
+  let on = Gt?.actionId,
+    X;
+  t[29] !== j || t[30] !== s.pathname || t[31] !== Y || t[32] !== on
+    ? ((X = [`subscription-checkout-create`, j, s.pathname, Y, on]),
+      (t[29] = j),
+      (t[30] = s.pathname),
+      (t[31] = Y),
+      (t[32] = on),
+      (t[33] = X))
+    : (X = t[33]);
+  let sn = Y != null && !st,
+    Z;
+  t[34] !== i ||
+  t[35] !== j ||
+  t[36] !== N ||
+  t[37] !== Ut ||
+  t[38] !== K ||
+  t[39] !== Gt ||
+  t[40] !== m ||
+  t[41] !== U?.pricingCheckoutId ||
+  t[42] !== l ||
+  t[43] !== Y ||
+  t[44] !== u ||
+  t[45] !== g
+    ? ((Z = async (e) => {
+        let { signal: t } = e;
+        if (Y == null) throw Error(`Checkout selection missing`);
+        let n = K();
+        if (N != null && (l?.pricingCheckoutId ?? U?.pricingCheckoutId) != null && n == null)
+          throw Error(`Checkout selection no longer belongs to this account`);
+        try {
+          let e = We(Y, {
+              isServerOwnedModeEnabled: () => g.checkGate(`2065253865`),
+              isCustomModeEnabled: (e) => De(g, `3950229590`).get(e, !0),
             }),
-      ],
-    });
-  if (checkoutQuery.data != null) {
-    if (preparation != null && request != null) return preparation.loadingContent;
-    if (checkoutQuery.data.tag === "custom_checkout_session")
-      return jsx.jsx(Redirect, {
-        to: `${checkoutRoute(checkoutQuery.data)}${location.search}`,
-        state: {
-          checkoutRequest: request ?? undefined,
-          checkoutLoadingValuePropMessages: location.state?.checkoutLoadingValuePropMessages,
-        },
-        replace: true,
-      });
-    if (checkoutQuery.data.url != null)
-      return jsx.jsx(HostedCheckout, { url: checkoutQuery.data.url, returnPath: resolvedReturnPath });
+            r = await ft({
+              accountId: i,
+              requestBody: {
+                ...Y,
+                checkout_ui_mode: e,
+                team_plan_data: Je(Y, {
+                  checkoutUiMode: e,
+                  isPremiumSeatsEnabled: () => g.checkGate(`1445075732`),
+                  getConfiguredDefaultSeats: () =>
+                    g.getLayer(`1945869247`).get(`default_seat_count`, void 0),
+                  getConfiguredSeatQuantities: () =>
+                    g.getLayer(`1945869247`).get(`default_seat_quantities`, void 0),
+                }),
+              },
+              appearance: m ? `dark` : `light`,
+              cancelUrl: Ut,
+              purchaseAttemptId: j,
+              signal: t,
+            });
+          (t.throwIfAborted(), bt(r));
+          let a = Y.discount_code;
+          return (
+            a != null &&
+              lt({
+                accountId: i,
+                location: `PricingColumnPrimaryCtaButton`,
+                promoCode: `promo_code` in a ? a.promo_code : void 0,
+                referralCode: `referral_code` in a ? a.referral_code : void 0,
+              }),
+            t.aborted ||
+              ue(
+                u,
+                n,
+                `checkout_session_id` in r
+                  ? r.checkout_session_id
+                  : r.url?.match(/cs_[A-Za-z0-9_]+/)?.[0],
+              ),
+            Gt != null && !t.aborted && Fe(u, i, Gt).catch(_t),
+            !t.aborted && l != null && (await l.onPrepared(r, Y)),
+            r
+          );
+        } catch (e) {
+          let r = e;
+          throw (t.aborted || ae(u, n), r);
+        }
+      }),
+      (t[34] = i),
+      (t[35] = j),
+      (t[36] = N),
+      (t[37] = Ut),
+      (t[38] = K),
+      (t[39] = Gt),
+      (t[40] = m),
+      (t[41] = U?.pricingCheckoutId),
+      (t[42] = l),
+      (t[43] = Y),
+      (t[44] = u),
+      (t[45] = g),
+      (t[46] = Z))
+    : (Z = t[46]);
+  let cn;
+  t[47] !== X || t[48] !== sn || t[49] !== Z
+    ? ((cn = {
+        queryKey: X,
+        enabled: sn,
+        queryFn: Z,
+        staleTime: 1 / 0,
+        gcTime: 0,
+        retry: !1,
+        refetchOnWindowFocus: !1,
+        refetchOnReconnect: !1,
+      }),
+      (t[47] = X),
+      (t[48] = sn),
+      (t[49] = Z),
+      (t[50] = cn))
+    : (cn = t[50]);
+  let { data: Q, isPending: ln, error: un, refetch: dn } = h(cn);
+  if (rt || (un instanceof ce && un.status === 403)) {
+    let e;
+    t[51] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, W.jsx)(`p`, {
+          role: `alert`,
+          children: (0, W.jsx)(f, {
+            id: `checkout.unavailable`,
+            defaultMessage: `Checkout isn’t available for this account right now. Close checkout to choose another plan or switch accounts.`,
+            description: `The checkout service denied this account's purchase request. The user can return to pricing or switch accounts.`,
+          }),
+        })),
+        (t[51] = e))
+      : (e = t[51]);
+    let n;
+    return (
+      t[52] === J
+        ? (n = t[53])
+        : ((n = (0, W.jsx)(at, { returnPath: J, children: e })), (t[52] = J), (t[53] = n)),
+      n
+    );
   }
-  return jsx.jsx(CheckoutLoadingState, {
-    returnPath: resolvedReturnPath,
-    loadingContent: preparation?.loadingContent,
-    loading: checkoutQuery.isPending,
-    error: checkoutQuery.error,
-    onRetry: () => {
-      resetCheckoutAttempt(scope, purchaseAttemptId.current);
-      void checkoutQuery.refetch();
-    },
-  });
+  if (st) {
+    let e = `/create-workspace${s.search}`,
+      n;
+    return (
+      t[54] === e
+        ? (n = t[55])
+        : ((n = (0, W.jsx)(T, { to: e, replace: !0 })), (t[54] = e), (t[55] = n)),
+      n
+    );
+  }
+  if (a !== `team` && !ge) {
+    let e = l?.loadingContent,
+      n = y || (S && pe),
+      r;
+    t[56] !== x || t[57] !== _ || t[58] !== me
+      ? ((r = () => {
+          x ? me() : _.invalidateQueries({ queryKey: [`accounts`, `check`] });
+        }),
+        (t[56] = x),
+        (t[57] = _),
+        (t[58] = me),
+        (t[59] = r))
+      : (r = t[59]);
+    let i;
+    return (
+      t[60] !== O || t[61] !== J || t[62] !== e || t[63] !== n || t[64] !== r
+        ? ((i = (0, W.jsx)(I, {
+            returnPath: J,
+            loadingContent: e,
+            loading: n,
+            error: O,
+            onRetry: r,
+          })),
+          (t[60] = O),
+          (t[61] = J),
+          (t[62] = e),
+          (t[63] = n),
+          (t[64] = r),
+          (t[65] = i))
+        : (i = t[65]),
+      i
+    );
+  }
+  if (a !== `team` && !_e) {
+    let e;
+    t[66] !== s.search || t[67] !== a
+      ? ((e = new URLSearchParams(s.search)),
+        e.set(`plan`, a),
+        (t[66] = s.search),
+        (t[67] = a),
+        (t[68] = e))
+      : (e = t[68]);
+    let n = `?${e}`,
+      r;
+    t[69] === n ? (r = t[70]) : ((r = E({ search: n })), (t[69] = n), (t[70] = r));
+    let i;
+    return (
+      t[71] !== s.state || t[72] !== r
+        ? ((i = (0, W.jsx)(T, { to: r, state: s.state, replace: !0 })),
+          (t[71] = s.state),
+          (t[72] = r),
+          (t[73] = i))
+        : (i = t[73]),
+      i
+    );
+  }
+  if (Q != null) {
+    if (l != null && Y != null) return l.loadingContent;
+    let e = U?.checkoutLoadingContext === `pricing-to-checkout` ? De(g, `2942273643`) : null,
+      n = e?.get(`pricing_to_checkout_loading_animation_exit_timing`, `immediate`);
+    if (
+      !pt &&
+      e?.get(`pricing_to_checkout_loading_animation_enabled`, !1) &&
+      (n === `fade_before_navigation` || n === `after_current_slide_dwell`)
+    ) {
+      let e = l?.loadingContent,
+        n;
+      t[74] === mt ? (n = t[75]) : ((n = () => mt(!0)), (t[74] = mt), (t[75] = n));
+      let r;
+      return (
+        t[76] !== J || t[77] !== e || t[78] !== n
+          ? ((r = (0, W.jsx)(I, {
+              returnPath: J,
+              loadingContent: e,
+              loading: !0,
+              exitRequested: !0,
+              onExitReady: n,
+              onRetry: gt,
+            })),
+            (t[76] = J),
+            (t[77] = e),
+            (t[78] = n),
+            (t[79] = r))
+          : (r = t[79]),
+        r
+      );
+    }
+    if (`tag` in Q && Q.tag === `custom_checkout_session`) {
+      let e;
+      t[80] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, W.jsx)(fe, {})), (t[80] = e))
+        : (e = t[80]);
+      let n;
+      t[81] === Q ? (n = t[82]) : ((n = be(Q)), (t[81] = Q), (t[82] = n));
+      let r = `${n}${s.search}`,
+        i = Y ?? void 0,
+        a = U?.checkoutLoadingValuePropMessages,
+        o;
+      t[83] !== i || t[84] !== a
+        ? ((o = { checkoutRequest: i, checkoutLoadingValuePropMessages: a }),
+          (t[83] = i),
+          (t[84] = a),
+          (t[85] = o))
+        : (o = t[85]);
+      let c = o,
+        l;
+      return (
+        t[86] !== r || t[87] !== c
+          ? ((l = (0, W.jsxs)(W.Fragment, {
+              children: [e, (0, W.jsx)(T, { to: r, state: c, replace: !0 })],
+            })),
+            (t[86] = r),
+            (t[87] = c),
+            (t[88] = l))
+          : (l = t[88]),
+        l
+      );
+    }
+    if (Q.url != null) {
+      let e;
+      return (
+        t[89] !== J || t[90] !== Q.url
+          ? ((e = (0, W.jsx)(ot, { url: Q.url, returnPath: J })),
+            (t[89] = J),
+            (t[90] = Q.url),
+            (t[91] = e))
+          : (e = t[91]),
+        e
+      );
+    }
+  }
+  if (ve) {
+    let e;
+    return (
+      t[92] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, W.jsx)(T, { to: E(), replace: !0 })), (t[92] = e))
+        : (e = t[92]),
+      e
+    );
+  }
+  if (
+    a === `team` &&
+    (y || b || He || A != null || (B && (V || H != null)) || (k != null && (Yt || Xt != null)))
+  ) {
+    let e = l?.loadingContent,
+      n = y || He || (B && V) || (k != null && Yt),
+      r = A ?? H ?? Xt,
+      a;
+    t[93] !== b ||
+    t[94] !== i ||
+    t[95] !== R ||
+    t[96] !== H ||
+    t[97] !== z ||
+    t[98] !== _ ||
+    t[99] !== Zt ||
+    t[100] !== A ||
+    t[101] !== o
+      ? ((a = () => {
+          b
+            ? _.invalidateQueries({ queryKey: [`accounts`, `check`] })
+            : A == null
+              ? H == null
+                ? Zt()
+                : _.invalidateQueries({ queryKey: [`business-promotion-checkout`, i, R, z] })
+              : _.invalidateQueries({ queryKey: he({ accountId: i, userId: o }) });
+        }),
+        (t[93] = b),
+        (t[94] = i),
+        (t[95] = R),
+        (t[96] = H),
+        (t[97] = z),
+        (t[98] = _),
+        (t[99] = Zt),
+        (t[100] = A),
+        (t[101] = o),
+        (t[102] = a))
+      : (a = t[102]);
+    let s;
+    return (
+      t[103] !== J || t[104] !== e || t[105] !== n || t[106] !== r || t[107] !== a
+        ? ((s = (0, W.jsx)(I, {
+            returnPath: J,
+            loadingContent: e,
+            loading: n,
+            error: r,
+            onRetry: a,
+          })),
+          (t[103] = J),
+          (t[104] = e),
+          (t[105] = n),
+          (t[106] = r),
+          (t[107] = a),
+          (t[108] = s))
+        : (s = t[108]),
+      s
+    );
+  }
+  if (a === `team` && B && Dt.promo_code == null && Dt.promo_campaign == null) {
+    let e;
+    return (
+      t[109] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = (0, W.jsx)(T, { to: E(), replace: !0 })), (t[109] = e))
+        : (e = t[109]),
+      e
+    );
+  }
+  if (q != null && Pt) {
+    let e = l?.loadingContent,
+      n;
+    return (
+      t[110] !== J || t[111] !== e
+        ? ((n = (0, W.jsx)(I, { returnPath: J, loading: !0, loadingContent: e, onRetry: ht })),
+          (t[110] = J),
+          (t[111] = e),
+          (t[112] = n))
+        : (n = t[112]),
+      n
+    );
+  }
+  if (q != null && (Nt != null || !Lt)) {
+    let e;
+    t[113] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, W.jsx)(`p`, {
+          role: `alert`,
+          children: (0, W.jsx)(f, {
+            id: `checkout.offerUnavailable`,
+            defaultMessage: `This promotion isn’t available for this checkout`,
+            description: `Shown before checkout when a promo or referral cannot be applied to the selected personal plan`,
+          }),
+        })),
+        (t[113] = e))
+      : (e = t[113]);
+    let n;
+    t[114] !== Nt || t[115] !== Ft
+      ? ((n =
+          Nt == null
+            ? null
+            : (0, W.jsx)(p, {
+                onClick: () => void Ft(),
+                children: (0, W.jsx)(f, {
+                  id: `checkout.offers.retry`,
+                  defaultMessage: `Try again`,
+                  description: `Retries promotion eligibility before checkout`,
+                }),
+              })),
+        (t[114] = Nt),
+        (t[115] = Ft),
+        (t[116] = n))
+      : (n = t[116]);
+    let r;
+    return (
+      t[117] !== J || t[118] !== n
+        ? ((r = (0, W.jsxs)(at, { returnPath: J, children: [e, n] })),
+          (t[117] = J),
+          (t[118] = n),
+          (t[119] = r))
+        : (r = t[119]),
+      r
+    );
+  }
+  let fn = l?.loadingContent,
+    $;
+  t[120] !== G || t[121] !== dn || t[122] !== u
+    ? (($ = () => {
+        (le(u, G.current), dn());
+      }),
+      (t[120] = G),
+      (t[121] = dn),
+      (t[122] = u),
+      (t[123] = $))
+    : ($ = t[123]);
+  let pn;
+  return (
+    t[124] !== J || t[125] !== un || t[126] !== ln || t[127] !== fn || t[128] !== $
+      ? ((pn = (0, W.jsx)(I, {
+          returnPath: J,
+          loadingContent: fn,
+          loading: ln,
+          error: un,
+          onRetry: $,
+        })),
+        (t[124] = J),
+        (t[125] = un),
+        (t[126] = ln),
+        (t[127] = fn),
+        (t[128] = $),
+        (t[129] = pn))
+      : (pn = t[129]),
+    pn
+  );
 }
-
-function PricingCheckoutPreparation(props: PricingCheckoutPreparationProps): unknown {
-  const currentLocation = useLocation();
-  const { accountId, userId } = useSessionIdentity();
-  const routeUrl = new URL(props.route, "https://chatgpt.com");
-  const plan = parsePlan(routeUrl.pathname.split("/").at(-1));
-  if (plan == null)
-    return jsx.jsx(Redirect, { to: buildPricingRoute(), replace: true });
-  if (accountId == null || userId == null) return props.loadingContent;
-  const location = {
-    ...currentLocation,
-    pathname: routeUrl.pathname,
-    search: routeUrl.search,
-  };
-  const preparation: CheckoutPreparation = {
-    cancelHref: props.cancelHref,
-    onPrepared: props.onPrepared,
-    loadingContent: props.loadingContent,
-    upsellContextId: props.upsellContextId,
-    checkoutEntryPoint: props.checkoutEntryPoint,
-    pricingCheckoutId: props.pricingCheckoutId,
-  };
-  const key = `${userId}:${accountId}:${props.route}`;
-  return jsx.jsx(CheckoutFlow, { accountId, plan, userId, location, preparation }, key);
+function ht() {}
+function gt() {}
+function _t() {
+  return !1;
 }
-
-function PurchasePage(): unknown {
-  const { plan: routePlan } = useRouteParams();
-  const location = useLocation();
-  const { accountId, userId } = useSessionIdentity();
-  if (routePlan === "credits") return jsx.jsx(CreditPurchasePage, {});
-  const plan = parsePlan(routePlan);
-  if (plan == null) return jsx.jsx(Redirect, { to: buildPricingRoute(), replace: true });
-  if (accountId == null || userId == null)
-    return jsx.jsx(CheckoutLoadingState, { loading: true, onRetry: () => undefined });
-  const key = `${userId}:${accountId}:${plan}`;
-  return jsx.jsx(CheckoutFlow, { accountId, plan, userId, location }, key);
+function vt() {
+  return !1;
 }
-
-initializePurchasePage();
-export { PricingCheckoutPreparation, PurchasePage };
+function yt() {
+  return crypto.randomUUID();
+}
+function bt(e) {
+  if (!(`tag` in e && e.tag === `custom_checkout_session`) && e.url == null)
+    throw Error(`Checkout URL unavailable`);
+}
+var xt, St, W, G, Ct, wt;
+function K() {
+  return (K = e(() => {
+    ((xt = t()),
+      Xe(),
+      A(),
+      j(),
+      D(),
+      ut(),
+      v(),
+      u(),
+      i(),
+      b(),
+      (St = _()),
+      s(),
+      w(),
+      ne(),
+      x(),
+      ze(),
+      O(),
+      pe(),
+      Oe(),
+      m(),
+      He(),
+      Be(),
+      je(),
+      Me(),
+      k(),
+      me(),
+      V(),
+      l(),
+      _e(),
+      se(),
+      g(),
+      Ne(),
+      st(),
+      z(),
+      F(),
+      L(),
+      R(),
+      rt(),
+      N(),
+      (W = o()),
+      (G = y().regex(/^\d+$/).transform(Number).pipe(d().int().min(0).max(200))),
+      (Ct = a({ standard: G, premium: G }).refine(
+        ({ standard: e, premium: t }) => e + t >= M() && e + t <= 200,
+      )),
+      (wt = { go: C.GO, plus: C.PLUS, pro: C.PRO, pro5x: C.PRO, team: C.SELF_SERVE_BUSINESS }));
+  }))();
+}
+K();
+export { H as PricingCheckoutPreparation, U as PurchasePage };

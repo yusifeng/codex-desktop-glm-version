@@ -11,21 +11,8 @@ function walk(node, visit) { if (node == null || typeof node !== "object") retur
 function find(node, predicate) { let result; walk(node, value => { if (result == null && predicate(value)) result = value; }); return result; }
 function text(node) { const values = []; const collect = value => { if (typeof value === "string") values.push(value); else if (value != null && typeof value === "object") { const children = value.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(collect); else collect(children); } }; collect(node); return values.join(" "); }
 
-// catalog: 10
-const catalog = await bundle("catalog");
-assert.deepEqual(Object.keys(catalog), ["n", "t"]);
-assert.equal(catalog.t("unknown"), null);
-assert.equal(catalog.t("codex_composer_tip_missing"), null);
-const documents = catalog.t("codex_composer_tip_documents");
-assert.equal(documents.id, "documents");
-assert.equal(documents.badgeLabel, "TIP");
-assert.equal(documents.isEligible({}), true);
-const notifications = catalog.t("codex_composer_tip_notifications");
-assert.equal(notifications.isEligible({ notificationOnboardingResolved: true, notificationPermissionStatus: "disabled" }), true);
-assert.equal(notifications.isEligible({ notificationOnboardingResolved: false, notificationPermissionStatus: "disabled" }), false);
-assert.equal(catalog.t("codex_composer_tip_browser_use").isEligible({ browserExtensionInstalled: false }), true);
-assert.equal(catalog.n(), undefined);
+const catalogReleaseAssertions = assertReleaseOwner("catalog");
 
 const mobileReleaseAssertions = assertReleaseOwner("codex-mobile-setup-flow");
 
-console.log(`composer catalog assertions and ${mobileReleaseAssertions} mobile setup release assertions passed`);
+console.log(`${catalogReleaseAssertions + mobileReleaseAssertions} catalog and mobile setup release assertions passed`);

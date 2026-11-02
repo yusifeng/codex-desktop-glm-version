@@ -1,689 +1,1126 @@
-// codex-home-announcements-current —— 当前 Home composer 与 Codex Home 公告候选编排。
-// 原版：app/webview/assets/codex-home-announcements-cc03f986780c.js。
-
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appPrimaryChunk from "@rchunk/app-primary";
-import * as modalSourceChunk from "@rchunk/announcement-modal-source-bridge";
-import * as beaconChunk from "@rchunk/codex-app-home-beacon-announcement-core";
-import * as announcementStateChunk from "@rchunk/home-announcement-state";
-import * as bannerChunk from "@rchunk/banner";
-import * as worktreeStateChunk from "@rchunk/worktree-onboarding-state";
-import * as entryPointsChunk from "@rchunk/announcement-entry-points";
-import * as announcementSlotChunk from "@rchunk/home-announcement-slot";
-import * as realtimeVoiceChunk from "@rchunk/realtime-voice-home-announcement";
-import * as worktreeControllerChunk from "@rchunk/worktree-onboarding-banner-controller";
-import type { ServiceTierModel } from "@rchunk/app-shared";
-
-void runtimeChunk;
-void worktreeStateChunk;
-
-const {
-  $3: initializeJsxRuntimeLazy,
-  I3: jsxRuntime,
-  K2: initializeIntl,
-  HX: useSignalValue,
-  LX: useSignalScope,
-  Y2: FormattedMessage,
-  ZI: applicationScope,
-  _j: fastModeBannerActionEvent,
-  e6: reactRuntime,
-  h4: initializeClassNames,
-  ig: DismissIcon,
-  kz: parseServiceTier,
-  m4: classNames,
-  n4: useIntl,
-  vj: fastModeBannerDismissedEvent,
-} = appSharedChunk;
-const {
-  CNt: useRateLimitResetCandidate,
-  D0t: useHomeAnnouncementOverrides,
-  Fk: useRealtimeVoiceStart,
-  F$: useNavigateToLocalConversation,
-  HZ: useComposerEditor,
-  i_n: useRouterLocation,
-  kNt: getBeaconTreatment,
-  qk: useRealtimeVoiceAvailability,
-  sbt: shouldHideHomePromos,
-  vN: FastModeIcon,
-  xpn: logAnalyticsEvent,
-  U2: usePluginInstallDetails,
-} = appInitialChunk;
-interface AnnouncementInitialBindings {
-  QZ?: unknown;
-  Xyt?: unknown;
-  J2?: () => {
-    serviceTierSettings?: { isLoading?: boolean; selectedServiceTier?: unknown };
-    setServiceTier?(tier: string, source: "home_banner"): Promise<unknown> | unknown;
-  };
-  dun?: (key: string, fallback: boolean) => unknown;
-  f8?: () => { modelSettings?: { model?: unknown } };
-  qNt?: unknown;
-  s8?: () => { isServiceTierAllowed?: boolean };
-  w0t?: (models: unknown, selectedModel: unknown, predicate?: unknown) => ServiceTierModel | null;
-  w8?: () => { data?: { models?: unknown } };
-}
-const {
-  J2: useServiceTierSettings,
-  QZ: homeAnnouncementSourceContext,
-  Xyt: hideFirstNewThreadOnboardingPromosSignal,
-  dun: createPersistedBooleanSignal,
-  f8: useModelSettings,
-  qNt: announcementsDisabledSignal,
-  s8: useServiceTierPolicy,
-  w0t: selectFastModeModel,
-  w8: useModelsQuery,
-} = appInitialChunk as unknown as AnnouncementInitialBindings;
-interface AnnouncementSharedBindings { Dz?: unknown }
-const { Dz: fastModeModelPredicate } = appSharedChunk as unknown as AnnouncementSharedBindings;
-interface AnnouncementPrimaryBindings {
-  Zp?: (enabled: boolean) => {
-    estimate?: { savedHours?: number; savedMinutes?: number; threadCount?: number } | null;
-    estimateStatus?: "failed" | "loading" | "ready" | string;
-  };
-}
-const { Zp: useFastModeEstimate } = appPrimaryChunk as unknown as AnnouncementPrimaryBindings;
-let fastModeSeenSignal: unknown;
-const {
-  $p: getAnnouncementStatus,
-  Ch: useHomeBeaconCandidate,
-  dr: AnnouncementEntriesHost,
-} = appPrimaryChunk;
-const {
-  r: initializeBeaconAnnouncement,
-  t: BeaconAnnouncement,
-} = beaconChunk;
-const {
-  n: initializeAnnouncementModalSource,
-} = modalSourceChunk;
-const {
-  f: useReplayCandidate,
-  g: computerHistoryStatusSignal,
-  h: computerHistoryDismissedSignal,
-  i: useGiftCreditsCandidate,
-  o: useBrowserProfileImportCandidate,
-  p: ReplayAnnouncement,
-  s: ExternalImportAnnouncement,
-  t: GiftCreditsAnnouncement,
-  u: launchReplay,
-  v: ComputerHistoryAnnouncement,
-  y: initializeAnnouncementEntryPoints,
-} = entryPointsChunk;
-const { n: initializeHomeAnnouncementSlot } = announcementSlotChunk;
-const { t: CustomGptBanner } = bannerChunk;
-const { RealtimeVoiceHomeAnnouncementContent } = realtimeVoiceChunk;
-const { WorktreeOnboardingBannerController } = worktreeControllerChunk;
-const { n: useWorktreeOnboardingCandidate } = worktreeStateChunk;
-const {
-  t: initializeRateLimitResetAnnouncementState,
-  u: useMultiAgentAnnouncementEligibility,
-} = announcementStateChunk;
-const { Banner: AnnouncementShell } = (
-  initializeRateLimitResetAnnouncementState as typeof initializeRateLimitResetAnnouncementState & {
-    presentation: { Banner: (props: Record<string, unknown>) => unknown };
-  }
-).presentation;
-
-interface ReactRuntime {
-  useContext<Value>(context: unknown): Value;
-  useState<Value>(initialValue: Value): [
-    Value,
-    (value: Value | ((current: Value) => Value)) => void,
-  ];
-}
-
-interface JsxRuntime {
-  jsx(component: unknown, props: unknown, key?: string): unknown;
-  jsxs(component: unknown, props: unknown, key?: string): unknown;
-}
-
-interface IntlShape {
-  formatMessage(descriptor: {
-    defaultMessage: string;
-    description?: string;
-    id: string;
-  }): string;
-}
-
-type SetState<Value> = (
-  value: Value | ((current: Value) => Value),
-) => void;
-
-interface AnnouncementEntry {
-  content?: unknown;
-  isEligible: boolean;
-  isLoading: boolean;
-  pageContextClaim?: unknown;
-}
-
-interface EntryPointCandidate {
-  dismiss(): void;
-  isEligible: boolean;
-  isLoading: boolean;
-  markShown?(): void;
-  openGiftCredits?(): void;
-  openImport?(): void;
-  replay?(): void;
-}
-
-interface FastModeCandidate extends AnnouncementEntry {
-  content: unknown;
-  fastModeModel: ServiceTierModel | null;
-  intl: IntlShape;
-  isSubmitting: boolean;
-  setHasSeenFastModeHomeBanner(seen: boolean): void;
-  setIsSubmitting: SetState<boolean>;
-  setServiceTier(tier: string, source: "home_banner"): Promise<unknown> | unknown;
-}
-
-interface BeaconCandidate {
-  accountId?: string | null;
-  beacon?: { custom_fields?: { show_after_onboarding?: boolean } } | null;
-  isEligible: boolean;
-  isLoading: boolean;
-  shouldSuppressVanillaPromos?: boolean;
-}
-
-interface HomeAnnouncementCandidatesProps {
-  beaconProduct?: "chatgpt" | "work_tab";
-  entryPoint: string;
-  isLocalModeRemote: boolean;
-  shouldHideOnboardingPromos: boolean;
-}
-
-interface HomeComposerAnnouncementsProps {
-  entryPoint: string;
-  hasSeparateCodexAnnouncements?: boolean;
-  homeComposerMode: "chat" | "work" | string;
-  isLocalModeRemote?: boolean;
-  selectedCustomGptId?: string | null;
-}
-
-interface CodexHomeAnnouncementEntriesProps {
-  homeRunLocationRemoteProject?: unknown;
-  includeGitCheckoutWarning?: boolean;
-  shouldHideOnboardingPromos: boolean;
-}
-
-interface CodexHomeAnnouncementsProps {
-  homeRunLocationRemoteProject?: unknown;
-  includeGitCheckoutWarning?: boolean;
-}
-
-let React: ReactRuntime;
-let jsx: JsxRuntime;
-let initialized = false;
-function initializeCodexHomeAnnouncements(): void {
-  if (initialized) return;
-  initializeJsxRuntimeLazy?.();
-  initializeIntl?.();
-  initializeClassNames?.();
-  initializeHomeAnnouncementSlot?.();
-  initializeAnnouncementModalSource?.();
-  initializeRateLimitResetAnnouncementState();
-  initializeAnnouncementEntryPoints?.();
-  initializeBeaconAnnouncement?.();
-  useHomeAnnouncementOverrides?.();
-  fastModeSeenSignal = createPersistedBooleanSignal?.("has-seen-fast-mode-home-banner", false);
-  React = (typeof reactRuntime === "function"
-    ? reactRuntime()
-    : reactRuntime) as ReactRuntime;
-  jsx = (typeof jsxRuntime === "function" ? jsxRuntime() : jsxRuntime) as JsxRuntime;
-  initialized = true;
-}
-
-function statusFor(entry: AnnouncementEntry): unknown {
-  return (
-    getAnnouncementStatus?.({
-      isEligible: entry.isEligible,
-      isLoading: entry.isLoading,
-    }) ??
-    (entry.isLoading ? "loading" : entry.isEligible ? "eligible" : "ineligible")
-  );
-}
-function firstActive(
-  entries: AnnouncementEntry[],
-): AnnouncementEntry | undefined {
-  return entries.find((entry) => entry.isEligible || entry.isLoading);
-}
-function AnnouncementEntries({
-  entries,
-  trackVisibility = false,
-}: {
-  entries: AnnouncementEntry[];
-  trackVisibility?: boolean;
-}): unknown {
-  const Host = AnnouncementEntriesHost ?? "div";
-  return jsx.jsx(Host, { entries, trackVisibility });
-}
-
-function FastModeBanner({
-  content,
-  fastModeModel,
-  intl,
-  isSubmitting,
-  setHasSeenFastModeHomeBanner,
-  setIsSubmitting,
-  setServiceTier,
-}: FastModeCandidate): unknown {
-  const Shell = AnnouncementShell ?? "div";
-  const scope = useSignalScope?.(applicationScope);
-  const enable = () => {
-    if (fastModeModel == null) return;
-    setIsSubmitting(true);
-    logAnalyticsEvent?.(scope, fastModeBannerActionEvent, {});
-    Promise.resolve(
-      setServiceTier(
-        parseServiceTier?.(fastModeModel)?.id ?? "priority",
-        "home_banner",
-      ),
-    ).finally(() => {
-      setHasSeenFastModeHomeBanner(true);
-      setIsSubmitting(false);
-    });
-  };
-  const dismiss = () => {
-    logAnalyticsEvent?.(scope, fastModeBannerDismissedEvent, {});
-    setHasSeenFastModeHomeBanner(true);
-  };
-  return jsx.jsx(Shell, {
-    title: jsx.jsx(FormattedMessage, {
-      id: "codex.fastModeHomeBanner.title",
-      defaultMessage: "Enable Fast mode",
-      description: "Title shown in the Fast mode home banner",
-    }),
-    description: content,
-    leadingVisual: jsx.jsx(FastModeIcon ?? "span", {
-      className: "icon-sm text-chart-yellow",
-    }),
-    primaryAction: {
-      label: jsx.jsx(FormattedMessage, {
-        id: "codex.fastModeHomeBanner.cta.primary",
-        defaultMessage: "Enable now",
-        description: "Primary CTA shown in the Fast mode home banner",
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/realtime-voice-home-announcement",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/app-primary",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "./app-primary-484df789f2f5.css",
+      "@rchunk/worktree-onboarding-banner-controller",
+      "@rchunk/worktree-onboarding-state",
+      "@rchunk/use-codex-worktrees",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Dz as n,
+  FX as r,
+  H3 as i,
+  HX as a,
+  I3 as o,
+  Jm as s,
+  K2 as c,
+  LX as l,
+  P3 as u,
+  QI as d,
+  V3 as f,
+  Y2 as p,
+  ZI as m,
+  _j as h,
+  ag as g,
+  e6 as _,
+  fI as v,
+  h4 as y,
+  ig as b,
+  kz as x,
+  m4 as S,
+  n4 as C,
+  qm as w,
+  vj as T,
+  yj as E,
+} from "@rchunk/app-shared";
+import {
+  $yt as D,
+  ANt as O,
+  CNt as k,
+  D0t as A,
+  F$ as j,
+  Fk as M,
+  Gk as ee,
+  HNt as te,
+  HZ as ne,
+  Het as re,
+  J2 as ie,
+  JNt as N,
+  L2 as P,
+  M6t as F,
+  Nk as ae,
+  P$ as I,
+  QZ as oe,
+  Qgn as se,
+  S8 as L,
+  TNt as R,
+  U2 as ce,
+  VZ as z,
+  Wk as le,
+  Xyt as B,
+  dun as V,
+  eQ as H,
+  f8 as U,
+  gpn as W,
+  iPt as G,
+  i_n as K,
+  kNt as q,
+  ngn as J,
+  o8 as ue,
+  q2 as Y,
+  qNt as de,
+  qk as fe,
+  rgn as X,
+  s8 as pe,
+  sbt as me,
+  u8 as he,
+  uun as ge,
+  vN as _e,
+  w0t as ve,
+  w8 as ye,
+  wNt as be,
+  xpn as xe,
+  yN as Se,
+  yNt as Ce,
+  ypn as we,
+} from "@rchunk/app-initial";
+import {
+  $p as Te,
+  Ch as Ee,
+  Cm as De,
+  Kp as Oe,
+  Sm as ke,
+  Xp as Ae,
+  Zp as je,
+  bh as Me,
+  dr as Ne,
+  em as Pe,
+  fr as Fe,
+  qp as Ie,
+} from "@rchunk/app-primary";
+import { n as Le, t as Re } from "@rchunk/announcement-modal-source-bridge";
+import { r as ze, t as Be } from "@rchunk/codex-app-home-beacon-announcement-core";
+import {
+  a as Ve,
+  c as He,
+  d as Ue,
+  f as We,
+  i as Ge,
+  l as Ke,
+  n as qe,
+  o as Je,
+  r as Ye,
+  s as Xe,
+  t as Ze,
+  u as Qe,
+} from "@rchunk/home-announcement-state";
+import { n as $e, t as et } from "@rchunk/banner";
+import { n as tt, t as nt } from "@rchunk/worktree-onboarding-state";
+import {
+  _ as rt,
+  a as it,
+  c as at,
+  d as ot,
+  f as st,
+  g as ct,
+  h as lt,
+  i as ut,
+  l as dt,
+  m as ft,
+  n as pt,
+  o as mt,
+  p as ht,
+  r as gt,
+  s as _t,
+  t as vt,
+  u as yt,
+  v as bt,
+  y as xt,
+} from "@rchunk/announcement-entry-points";
+import { n as St } from "@rchunk/home-announcement-slot";
+function Ct(e) {
+  let t = (0, wt.c)(25),
+    {
+      content: n,
+      fastModeModel: r,
+      intl: i,
+      isSubmitting: a,
+      setHasSeenFastModeHomeBanner: o,
+      setIsSubmitting: s,
+      setServiceTier: c,
+    } = e,
+    u = l(m),
+    d;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((d = (0, Tt.jsx)(p, {
+        id: `codex.fastModeHomeBanner.title`,
+        defaultMessage: `Enable Fast mode`,
+        description: `Title shown in the Fast mode home banner`,
+      })),
+      (t[0] = d))
+    : (d = t[0]);
+  let f, g;
+  t[1] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((f = (0, Tt.jsx)(_e, { className: `icon-sm text-chart-yellow` })),
+      (g = (0, Tt.jsx)(p, {
+        id: `codex.fastModeHomeBanner.cta.primary`,
+        defaultMessage: `Enable now`,
+        description: `Primary CTA shown in the Fast mode home banner`,
+      })),
+      (t[1] = f),
+      (t[2] = g))
+    : ((f = t[1]), (g = t[2]));
+  let _;
+  t[3] !== r || t[4] !== u || t[5] !== o || t[6] !== s || t[7] !== c
+    ? ((_ = () => {
+        r != null &&
+          (s(!0),
+          xe(u, h, {}),
+          c(x(r)?.id ?? `priority`, `home_banner`).finally(() => {
+            (o(!0), s(!1));
+          }));
       }),
-      onClick: enable,
-      disabled: isSubmitting,
-    },
-    dismissAction: {
-      ariaLabel: intl.formatMessage({
-        id: "codex.fastModeHomeBanner.dismissLabel",
-        defaultMessage: "Dismiss Fast mode banner",
-        description:
-          "Accessible label for dismissing the Fast mode home banner",
+      (t[3] = r),
+      (t[4] = u),
+      (t[5] = o),
+      (t[6] = s),
+      (t[7] = c),
+      (t[8] = _))
+    : (_ = t[8]);
+  let v;
+  t[9] !== a || t[10] !== _
+    ? ((v = { label: g, onClick: _, disabled: a }), (t[9] = a), (t[10] = _), (t[11] = v))
+    : (v = t[11]);
+  let y;
+  t[12] === i
+    ? (y = t[13])
+    : ((y = i.formatMessage({
+        id: `codex.fastModeHomeBanner.dismissLabel`,
+        defaultMessage: `Dismiss Fast mode banner`,
+        description: `Accessible label for dismissing the Fast mode home banner`,
+      })),
+      (t[12] = i),
+      (t[13] = y));
+  let S;
+  t[14] !== u || t[15] !== o
+    ? ((S = () => {
+        (xe(u, T, {}), o(!0));
       }),
-      icon: DismissIcon,
-      onClick: dismiss,
-      disabled: isSubmitting,
-    },
-  });
-}
-
-function useFastModeCandidate(): FastModeCandidate {
-  const intl = useIntl?.() as IntlShape;
-  const [isSubmitting, setIsSubmitting] = React.useState(false);
-  const override = useHomeAnnouncementOverrides?.() ?? {};
-  if (override.fastModeCandidate != null)
-    return {
-      ...override.fastModeCandidate,
-      intl,
-      isSubmitting,
-      setIsSubmitting,
-    };
-  const scope = useSignalScope?.(applicationScope);
-  const policy = useServiceTierPolicy?.() ?? {};
-  const models = useModelsQuery?.().data?.models;
-  const modelSettings = useModelSettings?.().modelSettings ?? {};
-  const tier = useServiceTierSettings?.() ?? {};
-  const seen = fastModeSeenSignal == null ? false : useSignalValue?.(fastModeSeenSignal) === true;
-  const fastModeModel = selectFastModeModel?.(models, modelSettings.model, fastModeModelPredicate) ?? null;
-  const canEstimate = policy.isServiceTierAllowed === true && fastModeModel != null && !seen &&
-    tier.serviceTierSettings?.selectedServiceTier == null && tier.serviceTierSettings?.isLoading !== true;
-  const estimateState = useFastModeEstimate?.(canEstimate) ?? {};
-  const estimate = estimateState.estimate;
-  const isEligible = canEstimate && estimateState.estimateStatus === "ready" && estimate != null;
-  const isLoading = canEstimate && estimateState.estimateStatus !== "ready" && estimateState.estimateStatus !== "failed";
-  const content = !isEligible || estimate == null ? null : jsx.jsx(FormattedMessage, {
-    id: "codex.fastModeHomeBanner.body.personalizedEstimate",
-    defaultMessage: "Based on your work last week across {threadCount, plural, one {# chat} other {# chats}}, Fast could have saved about {savedHours} hours and {savedMinutes} minutes. Increases plan usage.",
-    description: "Personalized estimate shown in the Fast mode home banner",
-    values: {
-      savedHours: estimate.savedHours ?? 0,
-      savedMinutes: estimate.savedMinutes ?? 0,
-      threadCount: estimate.threadCount ?? 0,
-    },
-  });
-  return {
-    content,
-    intl,
-    isEligible,
-    isLoading,
-    isSubmitting,
-    fastModeModel,
-    setHasSeenFastModeHomeBanner(value) {
-      if (fastModeSeenSignal != null) scope?.set?.(fastModeSeenSignal, value);
-    },
-    setIsSubmitting,
-    setServiceTier: tier.setServiceTier ?? (async () => {}),
-  };
-}
-
-function useBeaconCandidate(product?: string): BeaconCandidate {
-  const candidate = useHomeBeaconCandidate?.(product, {
-    shouldSuppressFocusedModal: () => false,
-  });
+      (t[14] = u),
+      (t[15] = o),
+      (t[16] = S))
+    : (S = t[16]);
+  let C;
+  t[17] !== a || t[18] !== y || t[19] !== S
+    ? ((C = { ariaLabel: y, icon: b, onClick: S, disabled: a }),
+      (t[17] = a),
+      (t[18] = y),
+      (t[19] = S),
+      (t[20] = C))
+    : (C = t[20]);
+  let w;
   return (
-    candidate ?? {
-      accountId: null,
-      beacon: null,
-      isEligible: false,
-      isLoading: false,
-      shouldSuppressVanillaPromos: false,
-    }
+    t[21] !== n || t[22] !== v || t[23] !== C
+      ? ((w = (0, Tt.jsx)(ke, {
+          title: d,
+          description: n,
+          leadingVisual: f,
+          primaryAction: v,
+          dismissAction: C,
+        })),
+        (t[21] = n),
+        (t[22] = v),
+        (t[23] = C),
+        (t[24] = w))
+      : (w = t[24]),
+    w
   );
 }
-function BeaconContent({
-  candidate,
-  editor,
-  product,
-  startRealtimeVoice,
-}: {
-  candidate: BeaconCandidate;
-  editor?: { focus?(): void; setText?(value: string): void; setPromptText?(value: string): void };
-  product?: string;
-  startRealtimeVoice?: (() => unknown) | null;
-}): unknown {
-  const Component = BeaconAnnouncement;
-  if (
-    candidate.accountId == null ||
-    candidate.beacon == null ||
-    Component == null
-  )
-    return null;
-  return jsx.jsx(Component, {
-    accountId: candidate.accountId,
-    actionAccountId: candidate.accountId,
-    analyticsContext: {
-      placement:
-        product === "work_tab"
-          ? "work_tab_home"
-          : product === "codex"
-            ? "codex_home"
-            : "homepage",
-      productExperience: product === "work_tab" ? "work" : "chat",
-      treatment: getBeaconTreatment?.(candidate.beacon),
-    },
-    beacon: candidate.beacon,
-    onComposerText: (value: string) => {
-      editor?.focus?.();
-      if (editor?.setText != null) editor.setText(value);
-      else editor?.setPromptText?.(value);
-    },
-    onStartVoice: startRealtimeVoice == null ? undefined : () => void startRealtimeVoice(),
-  });
+var wt, Tt;
+function Et() {
+  return (Et = e(() => {
+    ((wt = t()), v(), r(), c(), De(), Se(), g(), we(), d(), A(), (Tt = o()));
+  }))();
 }
-
-function HomeAnnouncementCandidates({
-  beaconProduct,
-  entryPoint,
-  isLocalModeRemote,
-  shouldHideOnboardingPromos,
-}: HomeAnnouncementCandidatesProps): unknown {
-  const scope = useSignalScope?.(applicationScope);
-  const candidateOverride = useHomeAnnouncementOverrides?.()
-    ?.homeAnnouncementCandidates;
-  if (candidateOverride != null)
-    return jsx.jsx(AnnouncementEntries, {
-      entries: candidateOverride,
-      trackVisibility: false,
-    });
-  const announcementsDisabled = useSignalValue?.(announcementsDisabledSignal) === true;
-  const voiceStart = useRealtimeVoiceStart?.(
-    beaconProduct === "work_tab" ? "work" : entryPoint,
-  );
-  const voiceAvailable = useRealtimeVoiceAvailability?.();
-  const gift = (useGiftCreditsCandidate?.({ enabled: !announcementsDisabled && !shouldHideOnboardingPromos }) ?? {
-    dismiss() {}, isEligible: false, isLoading: false, openGiftCredits() {},
-  }) as EntryPointCandidate;
-  const externalImportEnabled = !announcementsDisabled && (voiceStart == null || voiceAvailable === false);
-  const externalImport = (useBrowserProfileImportCandidate?.({ enabled: externalImportEnabled }) ?? {
-    dismiss() {}, isEligible: false, isLoading: false, markShown() {}, openImport() {},
-  }) as EntryPointCandidate & { providerId?: string };
-  const replay = (useReplayCandidate?.({ enabled: !announcementsDisabled }) ?? {
-    dismiss() {}, isEligible: false, isLoading: false, markShown() {}, replay() {},
-  }) as EntryPointCandidate;
-  const worktreeEnabled = !announcementsDisabled && !shouldHideOnboardingPromos &&
-    !gift.isEligible && !gift.isLoading &&
-    (voiceStart == null || voiceAvailable === false) &&
-    !externalImport.isEligible && !externalImport.isLoading;
-  const worktree = useWorktreeOnboardingCandidate?.({
-    enabled: worktreeEnabled,
-    entryPoint,
-    isLocalModeRemote,
-  }) ?? { isEligible: false, isLoading: false };
-  const historyStatus = computerHistoryStatusSignal == null ? "ineligible" : useSignalValue?.(computerHistoryStatusSignal);
-  const editor = useComposerEditor?.();
-  const beaconCandidate = useBeaconCandidate(beaconProduct);
-  const navigateToLocalConversation = useNavigateToLocalConversation?.();
-  const pluginInstall = usePluginInstallDetails?.();
-  const voiceEntry: AnnouncementEntry = {
-    isEligible: voiceStart != null && voiceAvailable === true,
-    isLoading: voiceStart != null && voiceAvailable === undefined,
-    content:
-      voiceStart == null
-        ? null
-        : jsx.jsx(RealtimeVoiceHomeAnnouncementContent, {
-            entryPoint,
-            onDismiss: () => {},
-            onStart: () => void voiceStart(),
-          }),
-  };
-  const worktreeEntry: AnnouncementEntry = {
-    isEligible: worktree.isEligible,
-    isLoading: false,
-    content: worktree.isEligible
-      ? jsx.jsx(WorktreeOnboardingBannerController, {})
-      : null,
-  };
-  const giftEntry: AnnouncementEntry = {
-    isEligible: !shouldHideOnboardingPromos && gift.isEligible,
-    isLoading: !shouldHideOnboardingPromos && gift.isLoading,
-    content: GiftCreditsAnnouncement == null ? null : jsx.jsx(GiftCreditsAnnouncement, {
-      onDismiss: gift.dismiss,
-      onOpenGiftCredits: gift.openGiftCredits ?? (() => {}),
-    }),
-  };
-  const importEntry: AnnouncementEntry = {
-    isEligible: externalImport.isEligible,
-    isLoading: externalImport.isLoading,
-    content: ExternalImportAnnouncement == null ? null : jsx.jsx(ExternalImportAnnouncement, {
-      onDismiss: externalImport.dismiss,
-      onImport: externalImport.openImport ?? (() => {}),
-      onShown: externalImport.markShown,
-      providerId: externalImport.providerId,
-    }),
-  };
-  const historyAllowed = !shouldHideOnboardingPromos && !isLocalModeRemote && beaconProduct !== "chatgpt";
-  const dismissHistory = () => scope?.set?.(computerHistoryDismissedSignal, true);
-  const historyEntry: AnnouncementEntry = {
-    isEligible: historyAllowed && historyStatus === "eligible",
-    isLoading: historyAllowed && historyStatus === "loading",
-    content: ComputerHistoryAnnouncement == null ? null : jsx.jsx(ComputerHistoryAnnouncement, {
-      onDismiss: dismissHistory,
-      onViewRecap: (prompt: string) => {
-        dismissHistory();
-        editor?.setPromptText?.(prompt);
-        editor?.eventEmitter?.emit?.("submit");
-      },
-    }),
-  };
-  const replayEntry: AnnouncementEntry = {
-    isEligible: replay.isEligible,
-    isLoading: replay.isLoading,
-    content: ReplayAnnouncement == null ? null : jsx.jsx(ReplayAnnouncement, {
-      onDismiss: replay.dismiss,
-      onShown: replay.markShown,
-      onReplay: () => {
-        if (scope == null || launchReplay == null) return;
-        void launchReplay({
-          scope,
-          navigateToLocalConversation,
-          onReplay: replay.replay,
-          showPluginInstallDetails: pluginInstall?.showPluginInstallDetails,
-        });
-      },
-    }),
-  };
-  const entries = [
-    giftEntry,
-    voiceEntry,
-    importEntry,
-    worktreeEntry,
-    historyEntry,
-    replayEntry,
-  ];
-  if (announcementsDisabled) return null;
-  if (beaconProduct == null) return jsx.jsx(AnnouncementEntries, { entries, trackVisibility: false });
-  const allowBeaconAfterOnboarding = !shouldHideOnboardingPromos ||
-    beaconCandidate.beacon?.custom_fields?.show_after_onboarding === true;
-  const beaconEntry: AnnouncementEntry = {
-    isEligible: allowBeaconAfterOnboarding && beaconCandidate.isEligible,
-    isLoading: allowBeaconAfterOnboarding && beaconCandidate.isLoading,
-    content: jsx.jsx(BeaconContent, {
-      candidate: beaconCandidate,
-      editor,
-      product: beaconProduct,
-      startRealtimeVoice: voiceStart,
-    }),
-  };
-  const vanillaEntries = beaconCandidate.shouldSuppressVanillaPromos === true
-    ? entries.map((entry) => ({ ...entry, isEligible: false, isLoading: false }))
-    : entries;
-  return jsx.jsx(AnnouncementEntries, {
-    entries: [beaconEntry, ...vanillaEntries],
-    trackVisibility: false,
-  });
-}
-
-function HomeComposerAnnouncements({
-  entryPoint,
-  hasSeparateCodexAnnouncements,
-  homeComposerMode,
-  isLocalModeRemote = false,
-  selectedCustomGptId,
-}: HomeComposerAnnouncementsProps): unknown {
-  void hasSeparateCodexAnnouncements;
-  const source = useRouterLocation?.()?.pathname ?? "/";
-  const sourceContext = homeAnnouncementSourceContext == null
-    ? "default"
-    : React.useContext<string>(homeAnnouncementSourceContext);
-  const hideFirstNewThreadOnboardingPromos = hideFirstNewThreadOnboardingPromosSignal == null
-    ? false
-    : useSignalValue?.(hideFirstNewThreadOnboardingPromosSignal) === true;
-  const hidePromos = shouldHideHomePromos?.({
-    hideFirstNewThreadOnboardingPromos,
-    pathname: source,
-  });
-  const beaconProduct =
-    homeComposerMode === "chat"
-      ? "chatgpt"
-      : homeComposerMode === "work"
-        ? "work_tab"
-        : undefined;
-  const customGpt =
-    selectedCustomGptId == null
-      ? null
-      : jsx.jsx(CustomGptBanner, { gizmoId: selectedCustomGptId });
-  return jsx.jsxs("div", {
-    className: classNames?.(
-      "empty:hidden",
-      entryPoint === "codex" &&
-        "electron:mx-[var(--home-composer-inline-inset)]",
-    ),
-    children: [
-      customGpt,
-      sourceContext === "default"
-        ? jsx.jsx(HomeAnnouncementCandidates, {
-            beaconProduct,
-            entryPoint,
-            isLocalModeRemote,
-            shouldHideOnboardingPromos: hidePromos,
-          })
-        : null,
-    ],
-  });
-}
-
-function CodexHomeAnnouncementEntries({
-  homeRunLocationRemoteProject,
-  includeGitCheckoutWarning,
-  shouldHideOnboardingPromos,
-}: CodexHomeAnnouncementEntriesProps): unknown {
-  void homeRunLocationRemoteProject;
-  void includeGitCheckoutWarning;
-  const fastMode = useFastModeCandidate();
-  const multiAgent = useMultiAgentAnnouncementEligibility();
-  const beaconCandidate = useBeaconCandidate("codex");
-  const allowVanillaPromos = beaconCandidate.shouldSuppressVanillaPromos !== true;
-  const allowBeaconAfterOnboarding = !shouldHideOnboardingPromos ||
-    beaconCandidate.beacon?.custom_fields?.show_after_onboarding === true;
-  const beaconContent = jsx.jsx(BeaconContent, {
-    candidate: beaconCandidate,
-    product: "codex",
-  });
-  const entries: AnnouncementEntry[] = [
-    useRateLimitResetCandidate?.() ?? {
-      isEligible: false,
-      isLoading: false,
-      content: null,
-    },
-    {
-      isEligible: allowBeaconAfterOnboarding && beaconCandidate.isEligible,
-      isLoading: allowBeaconAfterOnboarding && beaconCandidate.isLoading,
-      content: beaconContent,
-    },
-    {
-      ...multiAgent,
-      isEligible: !shouldHideOnboardingPromos && allowVanillaPromos && multiAgent.isEligible,
-      isLoading: !shouldHideOnboardingPromos && allowVanillaPromos && multiAgent.isLoading,
-    },
-    {
-      isEligible: !shouldHideOnboardingPromos && allowVanillaPromos && fastMode.isEligible,
-      isLoading: !shouldHideOnboardingPromos && allowVanillaPromos && fastMode.isLoading,
-      content:
-        fastMode.content == null
+function Dt() {
+  let e = (0, Ot.c)(21),
+    t = l(m),
+    r = C(),
+    { isServiceTierAllowed: i } = pe(),
+    { data: o } = ye(),
+    s = a(Mt) ?? J(jt, !1),
+    { modelSettings: c } = U(),
+    { serviceTierSettings: u, setServiceTier: d } = ie(),
+    [f, h] = (0, kt.useState)(!1),
+    g = (0, kt.useRef)(!1),
+    _ = o?.models,
+    v;
+  e[0] !== c.model || e[1] !== _
+    ? ((v = ve(_, c.model, n)), (e[0] = c.model), (e[1] = _), (e[2] = v))
+    : (v = e[2]);
+  let y = v,
+    b = i && y != null && !s && u.selectedServiceTier == null && !u.isLoading,
+    { estimate: x, estimateStatus: S } = je(b),
+    w = !s && b && S !== `ready` && S !== `failed`,
+    T = b && S === `ready` && x != null,
+    D,
+    O;
+  (e[3] !== T || e[4] !== t
+    ? ((D = () => {
+        T && !g.current && ((g.current = !0), xe(t, E, {}));
+      }),
+      (O = [t, T]),
+      (e[3] = T),
+      (e[4] = t),
+      (e[5] = D),
+      (e[6] = O))
+    : ((D = e[5]), (O = e[6])),
+    (0, kt.useEffect)(D, O));
+  let k;
+  e[7] !== x || e[8] !== T
+    ? ((k =
+        !T || x == null
           ? null
-          : jsx.jsx(FastModeBanner, { ...fastMode }),
-    },
-  ];
-  return jsx.jsx(AnnouncementEntries, { entries, trackVisibility: false });
+          : (0, At.jsx)(p, {
+              id: `codex.fastModeHomeBanner.body.personalizedEstimate`,
+              defaultMessage: `Based on your work last week across {threadCount, plural, one {# chat} other {# chats}}, Fast could have saved about {savedHours, plural, =0 {{savedMinutes, plural, one {# minute} other {# minutes}}} one {# hour{savedMinutes, plural, =0 {} one { # minute} other { # minutes}}} other {# hours{savedMinutes, plural, =0 {} one { # minute} other { # minutes}}}}. Increases plan usage.`,
+              description: `Personalized estimate shown in the Fast mode home banner`,
+              values: {
+                savedHours: x.savedHours,
+                savedMinutes: x.savedMinutes,
+                threadCount: x.threadCount,
+              },
+            })),
+      (e[7] = x),
+      (e[8] = T),
+      (e[9] = k))
+    : (k = e[9]);
+  let A = k,
+    j;
+  e[10] === t ? (j = e[11]) : ((j = (e) => t.set(Mt, e)), (e[10] = t), (e[11] = j));
+  let M;
+  return (
+    e[12] !== A ||
+    e[13] !== y ||
+    e[14] !== r ||
+    e[15] !== T ||
+    e[16] !== w ||
+    e[17] !== f ||
+    e[18] !== d ||
+    e[19] !== j
+      ? ((M = {
+          content: A,
+          intl: r,
+          isEligible: T,
+          isLoading: w,
+          isSubmitting: f,
+          fastModeModel: y,
+          setHasSeenFastModeHomeBanner: j,
+          setIsSubmitting: h,
+          setServiceTier: d,
+        }),
+        (e[12] = A),
+        (e[13] = y),
+        (e[14] = r),
+        (e[15] = T),
+        (e[16] = w),
+        (e[17] = f),
+        (e[18] = d),
+        (e[19] = j),
+        (e[20] = M))
+      : (M = e[20]),
+    M
+  );
 }
-
-function CodexHomeAnnouncements({
-  homeRunLocationRemoteProject = null,
-  includeGitCheckoutWarning = true,
-}: CodexHomeAnnouncementsProps): unknown {
-  const pathname = useRouterLocation?.()?.pathname ?? "/";
-  const hidePromos = shouldHideHomePromos?.({
-    hideFirstNewThreadOnboardingPromos: false,
-    pathname,
-  });
-  return jsx.jsx(CodexHomeAnnouncementEntries, {
-    homeRunLocationRemoteProject,
-    includeGitCheckoutWarning,
-    shouldHideOnboardingPromos: hidePromos,
-  });
+var Ot, kt, At, jt, Mt;
+function Nt() {
+  return (Nt = e(() => {
+    ((Ot = t()),
+      v(),
+      r(),
+      (kt = _()),
+      c(),
+      he(),
+      ue(),
+      Y(),
+      we(),
+      L(),
+      d(),
+      X(),
+      ge(),
+      A(),
+      Ae(),
+      (At = o()),
+      (jt = `has-seen-fast-mode-home-banner`),
+      (Mt = V(jt, !1)));
+  }))();
 }
-
-function initializeBeaconAnnouncements(): void {
-  initializeCodexHomeAnnouncements();
+function Pt(e) {
+  let t = (0, It.c)(52),
+    {
+      announcementKey: n,
+      entries: r,
+      product: i,
+      shouldHideOnboardingPromos: a,
+      startRealtimeVoice: o,
+    } = e,
+    s = ne(),
+    c = (0, Lt.useContext)(Oe),
+    l;
+  t[0] === s
+    ? (l = t[1])
+    : ((l = {
+        shouldSuppressFocusedModal: () => s.getText().trim().length > 0 && s.view.hasFocus(),
+      }),
+      (t[0] = s),
+      (t[1] = l));
+  let u = Ee(i, l),
+    d;
+  t[2] !== u.shouldSuppressVanillaPromos || t[3] !== r
+    ? ((d = u.shouldSuppressVanillaPromos ? r.map(Ft) : r),
+      (t[2] = u.shouldSuppressVanillaPromos),
+      (t[3] = r),
+      (t[4] = d))
+    : (d = t[4]);
+  let f = d,
+    p;
+  t[5] !== u.accountId ||
+  t[6] !== u.beacon ||
+  t[7] !== c?.actionOverrides ||
+  t[8] !== c?.allowExternalActions ||
+  t[9] !== c?.allowRemoteImages ||
+  t[10] !== c?.getActionOverride ||
+  t[11] !== s ||
+  t[12] !== i ||
+  t[13] !== o
+    ? ((p =
+        u.accountId == null || u.beacon == null
+          ? null
+          : (0, Z.jsx)(Be, {
+              accountId: u.accountId,
+              actionAccountId: u.accountId,
+              actionOverrides: c?.actionOverrides,
+              allowExternalActions: c?.allowExternalActions,
+              allowRemoteImages: c?.allowRemoteImages,
+              analyticsContext: {
+                placement: i === `work_tab` ? `work_tab_home` : `homepage`,
+                productExperience: i === `work_tab` ? `work` : `chat`,
+                treatment: q(u.beacon),
+              },
+              beacon: u.beacon,
+              getActionOverride: c?.getActionOverride,
+              onComposerText: (e) => {
+                (s.focus(), s.setText(e));
+              },
+              onStartVoice: o == null ? void 0 : () => void o(),
+            })),
+      (t[5] = u.accountId),
+      (t[6] = u.beacon),
+      (t[7] = c?.actionOverrides),
+      (t[8] = c?.allowExternalActions),
+      (t[9] = c?.allowRemoteImages),
+      (t[10] = c?.getActionOverride),
+      (t[11] = s),
+      (t[12] = i),
+      (t[13] = o),
+      (t[14] = p))
+    : (p = t[14]);
+  let m = (!a || u.beacon?.custom_fields?.show_after_onboarding === !0) && u.isEligible,
+    h = (!a || u.beacon?.custom_fields?.show_after_onboarding === !0) && u.isLoading,
+    g,
+    _,
+    v,
+    y,
+    b,
+    x;
+  if (t[15] !== u.beacon || t[16] !== i || t[17] !== p || t[18] !== m || t[19] !== h) {
+    _ = { content: p, isEligible: m, isLoading: h };
+    let e;
+    (t[26] === u.beacon
+      ? (e = t[27])
+      : ((e = u.beacon != null && (Ce(u.beacon) || k(u.beacon))), (t[26] = u.beacon), (t[27] = e)),
+      (v = e),
+      (g = Re),
+      (x = i === `work_tab` ? `home-work` : `home-chat`),
+      (y = `home-beacon:${i}:${u.beacon?.beacon_id ?? `loading`}`),
+      (b = Te({ isEligible: _.isEligible && !v, isLoading: _.isLoading })),
+      (t[15] = u.beacon),
+      (t[16] = i),
+      (t[17] = p),
+      (t[18] = m),
+      (t[19] = h),
+      (t[20] = g),
+      (t[21] = _),
+      (t[22] = v),
+      (t[23] = y),
+      (t[24] = b),
+      (t[25] = x));
+  } else ((g = t[20]), (_ = t[21]), (v = t[22]), (y = t[23]), (b = t[24]), (x = t[25]));
+  let S;
+  t[28] === _.content ? (S = t[29]) : ((S = () => _.content), (t[28] = _.content), (t[29] = S));
+  let C;
+  t[30] !== y || t[31] !== b || t[32] !== S
+    ? ((C = { id: y, status: b, render: S }), (t[30] = y), (t[31] = b), (t[32] = S), (t[33] = C))
+    : (C = t[33]);
+  let w;
+  t[34] !== g || t[35] !== C || t[36] !== x
+    ? ((w = (0, Z.jsx)(g, { source: x, candidate: C })),
+      (t[34] = g),
+      (t[35] = C),
+      (t[36] = x),
+      (t[37] = w))
+    : (w = t[37]);
+  let T = v ? _.content : null,
+    E = _.isEligible && v,
+    D = _.isLoading || (_.isEligible && !v),
+    O;
+  t[38] !== _ || t[39] !== T || t[40] !== E || t[41] !== D
+    ? ((O = { ..._, content: T, isEligible: E, isLoading: D }),
+      (t[38] = _),
+      (t[39] = T),
+      (t[40] = E),
+      (t[41] = D),
+      (t[42] = O))
+    : (O = t[42]);
+  let A;
+  t[43] !== f || t[44] !== O
+    ? ((A = [O, ...f]), (t[43] = f), (t[44] = O), (t[45] = A))
+    : (A = t[45]);
+  let j;
+  t[46] !== n || t[47] !== A
+    ? ((j = (0, Z.jsx)(Ne, { entries: A, trackVisibility: !1 }, n)),
+      (t[46] = n),
+      (t[47] = A),
+      (t[48] = j))
+    : (j = t[48]);
+  let M;
+  return (
+    t[49] !== w || t[50] !== j
+      ? ((M = (0, Z.jsxs)(Z.Fragment, { children: [w, j] })), (t[49] = w), (t[50] = j), (t[51] = M))
+      : (M = t[51]),
+    M
+  );
 }
-
-initializeCodexHomeAnnouncements();
-export {
-  initializeBeaconAnnouncements as i,
-  HomeComposerAnnouncements as n,
-  initializeCodexHomeAnnouncements as r,
-  CodexHomeAnnouncements as t,
-};
+function Ft(e) {
+  return { ...e, isEligible: !1, isLoading: !1 };
+}
+var It, Lt, Z;
+function Rt() {
+  return (Rt = e(() => {
+    ((It = t()), (Lt = _()), Le(), Pe(), Fe(), O(), Ie(), ze(), Me(), z(), (Z = o()));
+  }))();
+}
+function zt(e) {
+  let t = (0, Vt.c)(81),
+    { beaconProduct: n, entryPoint: r, isLocalModeRemote: i, shouldHideOnboardingPromos: o } = e,
+    s = l(m),
+    c = ne(),
+    u = a(de),
+    d = !u && !o,
+    f;
+  t[0] === d ? (f = t[1]) : ((f = { enabled: d }), (t[0] = d), (t[1] = f));
+  let p = ut(f),
+    h = a(ct),
+    g = M(n === `work_tab` ? `work` : r),
+    _ = fe(),
+    v = !u,
+    y;
+  t[2] === v ? (y = t[3]) : ((y = { enabled: v }), (t[2] = v), (t[3] = y));
+  let b = st(y),
+    { showPluginInstallDetails: x } = ce(),
+    S = j(),
+    C = !u && (g == null || _ === !1),
+    w;
+  t[4] === C ? (w = t[5]) : ((w = { enabled: C }), (t[4] = C), (t[5] = w));
+  let T = mt(w),
+    E =
+      !u &&
+      !o &&
+      !p.isEligible &&
+      !p.isLoading &&
+      (g == null || _ === !1) &&
+      !T.isEligible &&
+      !T.isLoading,
+    D;
+  t[6] !== r || t[7] !== i || t[8] !== E
+    ? ((D = { enabled: E, entryPoint: r, isLocalModeRemote: i }),
+      (t[6] = r),
+      (t[7] = i),
+      (t[8] = E),
+      (t[9] = D))
+    : (D = t[9]);
+  let O = tt(D);
+  if (u) return null;
+  let k;
+  t[10] === O.isEligible
+    ? (k = t[11])
+    : ((k = O.isEligible ? (0, Q.jsx)(Wt, {}) : null), (t[10] = O.isEligible), (t[11] = k));
+  let A;
+  t[12] !== k || t[13] !== O.isEligible
+    ? ((A = { isEligible: O.isEligible, isLoading: !1, content: k }),
+      (t[12] = k),
+      (t[13] = O.isEligible),
+      (t[14] = A))
+    : (A = t[14]);
+  let te = A,
+    re = !o && !i && n !== `chatgpt` && h === `eligible`,
+    ie = !o && !i && n !== `chatgpt` && h === `loading`,
+    N;
+  t[15] === s
+    ? (N = t[16])
+    : ((N = () => {
+        s.set(lt, !0);
+      }),
+      (t[15] = s),
+      (t[16] = N));
+  let P;
+  t[17] !== c || t[18] !== s
+    ? ((P = (e) => {
+        (s.set(lt, !0),
+          (0, Ht.flushSync)(() => {
+            c.setPromptText(e);
+          }),
+          c.eventEmitter.emit(`submit`));
+      }),
+      (t[17] = c),
+      (t[18] = s),
+      (t[19] = P))
+    : (P = t[19]);
+  let F;
+  t[20] !== N || t[21] !== P
+    ? ((F = (0, Q.jsx)(bt, { onDismiss: N, onViewRecap: P })),
+      (t[20] = N),
+      (t[21] = P),
+      (t[22] = F))
+    : (F = t[22]);
+  let ae;
+  t[23] !== re || t[24] !== ie || t[25] !== F
+    ? ((ae = { isEligible: re, isLoading: ie, content: F }),
+      (t[23] = re),
+      (t[24] = ie),
+      (t[25] = F),
+      (t[26] = ae))
+    : (ae = t[26]);
+  let I = ae,
+    oe = !o && p.isEligible,
+    se = !o && p.isLoading,
+    L;
+  t[27] !== p.dismiss || t[28] !== p.isEligible || t[29] !== p.openGiftCredits
+    ? ((L = p.isEligible
+        ? (0, Q.jsx)(vt, { onDismiss: p.dismiss, onOpenGiftCredits: p.openGiftCredits })
+        : null),
+      (t[27] = p.dismiss),
+      (t[28] = p.isEligible),
+      (t[29] = p.openGiftCredits),
+      (t[30] = L))
+    : (L = t[30]);
+  let R;
+  t[31] !== oe || t[32] !== se || t[33] !== L
+    ? ((R = { isEligible: oe, isLoading: se, content: L }),
+      (t[31] = oe),
+      (t[32] = se),
+      (t[33] = L),
+      (t[34] = R))
+    : (R = t[34]);
+  let z = g != null && _ === !0,
+    le = g != null && _ === void 0,
+    B;
+  t[35] !== r || t[36] !== s || t[37] !== g
+    ? ((B =
+        g == null
+          ? null
+          : (0, Q.jsx)(Ut, { entryPoint: r, onDismiss: () => ee(s), onStart: () => void g() })),
+      (t[35] = r),
+      (t[36] = s),
+      (t[37] = g),
+      (t[38] = B))
+    : (B = t[38]);
+  let V;
+  t[39] !== z || t[40] !== le || t[41] !== B
+    ? ((V = { isEligible: z, isLoading: le, content: B }),
+      (t[39] = z),
+      (t[40] = le),
+      (t[41] = B),
+      (t[42] = V))
+    : (V = t[42]);
+  let H;
+  t[43] !== T.dismiss || t[44] !== T.markShown || t[45] !== T.openImport || t[46] !== T.providerId
+    ? ((H = (0, Q.jsx)(_t, {
+        onDismiss: T.dismiss,
+        onImport: T.openImport,
+        onShown: T.markShown,
+        providerId: T.providerId,
+      })),
+      (t[43] = T.dismiss),
+      (t[44] = T.markShown),
+      (t[45] = T.openImport),
+      (t[46] = T.providerId),
+      (t[47] = H))
+    : (H = t[47]);
+  let U;
+  t[48] !== T.isEligible || t[49] !== T.isLoading || t[50] !== H
+    ? ((U = { isEligible: T.isEligible, isLoading: T.isLoading, content: H }),
+      (t[48] = T.isEligible),
+      (t[49] = T.isLoading),
+      (t[50] = H),
+      (t[51] = U))
+    : (U = t[51]);
+  let W;
+  t[52] !== b.replay || t[53] !== S || t[54] !== s || t[55] !== x
+    ? ((W = () =>
+        void yt({
+          scope: s,
+          navigateToLocalConversation: S,
+          onReplay: b.replay,
+          showPluginInstallDetails: x,
+        })),
+      (t[52] = b.replay),
+      (t[53] = S),
+      (t[54] = s),
+      (t[55] = x),
+      (t[56] = W))
+    : (W = t[56]);
+  let G;
+  t[57] !== b.dismiss || t[58] !== b.markShown || t[59] !== W
+    ? ((G = (0, Q.jsx)(ht, { onDismiss: b.dismiss, onReplay: W, onShown: b.markShown })),
+      (t[57] = b.dismiss),
+      (t[58] = b.markShown),
+      (t[59] = W),
+      (t[60] = G))
+    : (G = t[60]);
+  let K;
+  t[61] !== b.isEligible || t[62] !== b.isLoading || t[63] !== G
+    ? ((K = { isEligible: b.isEligible, isLoading: b.isLoading, content: G }),
+      (t[61] = b.isEligible),
+      (t[62] = b.isLoading),
+      (t[63] = G),
+      (t[64] = K))
+    : (K = t[64]);
+  let q;
+  t[65] !== I || t[66] !== R || t[67] !== V || t[68] !== U || t[69] !== K || t[70] !== te
+    ? ((q = [R, V, U, te, I, K]),
+      (t[65] = I),
+      (t[66] = R),
+      (t[67] = V),
+      (t[68] = U),
+      (t[69] = K),
+      (t[70] = te),
+      (t[71] = q))
+    : (q = t[71]);
+  let J = q,
+    ue = J.find(Bt),
+    Y = `default`;
+  if (
+    (ue === te ? (Y = `worktree`) : ue === I && (Y = `computer-history-weekly-insights`), n == null)
+  ) {
+    let e;
+    return (
+      t[72] !== J || t[73] !== Y
+        ? ((e = (0, Q.jsx)(Ne, { entries: J, trackVisibility: !1 }, Y)),
+          (t[72] = J),
+          (t[73] = Y),
+          (t[74] = e))
+        : (e = t[74]),
+      e
+    );
+  }
+  let X;
+  return (
+    t[75] !== n || t[76] !== J || t[77] !== Y || t[78] !== o || t[79] !== g
+      ? ((X = (0, Q.jsx)(
+          Pt,
+          {
+            announcementKey: Y,
+            entries: J,
+            product: n,
+            shouldHideOnboardingPromos: o,
+            startRealtimeVoice: g,
+          },
+          n,
+        )),
+        (t[75] = n),
+        (t[76] = J),
+        (t[77] = Y),
+        (t[78] = o),
+        (t[79] = g),
+        (t[80] = X))
+      : (X = t[80]),
+    X
+  );
+}
+function Bt(e) {
+  return e.isEligible || e.isLoading;
+}
+var Vt, Ht, Q, Ut, Wt;
+function Gt() {
+  return (Gt = e(() => {
+    ((Vt = t()),
+      r(),
+      (Ht = u()),
+      Fe(),
+      Rt(),
+      z(),
+      nt(),
+      xt(),
+      rt(),
+      w(),
+      ft(),
+      dt(),
+      ot(),
+      at(),
+      it(),
+      pt(),
+      gt(),
+      N(),
+      P(),
+      ae(),
+      le(),
+      d(),
+      I(),
+      (Q = o()),
+      i(),
+      (Ut = s(
+        async () =>
+          (
+            await f(
+              async () => {
+                let { RealtimeVoiceHomeAnnouncementContent: e } = await import(
+                  `@rchunk/realtime-voice-home-announcement`
+                );
+                return { RealtimeVoiceHomeAnnouncementContent: e };
+              },
+              __vite__mapDeps([0, 1, 2, 3, 4, 5, 6, 7]),
+              import.meta.url,
+            )
+          ).RealtimeVoiceHomeAnnouncementContent,
+        { propagateLoadError: !0 },
+      )),
+      (Wt = s(
+        async () =>
+          (
+            await f(
+              async () => {
+                let { WorktreeOnboardingBannerController: e } = await import(
+                  `@rchunk/worktree-onboarding-banner-controller`
+                );
+                return { WorktreeOnboardingBannerController: e };
+              },
+              __vite__mapDeps([8, 1, 2, 3, 5, 6, 4, 7, 9, 10]),
+              import.meta.url,
+            )
+          ).WorktreeOnboardingBannerController,
+        { propagateLoadError: !0 },
+      )));
+  }))();
+}
+function Kt(e) {
+  let t = (0, Xt.c)(17),
+    {
+      entryPoint: n,
+      hasSeparateCodexAnnouncements: r,
+      homeComposerMode: i,
+      isLocalModeRemote: o,
+      selectedCustomGptId: s,
+    } = e,
+    c = o !== void 0 && o,
+    l = (0, Zt.useContext)(oe),
+    u = K(),
+    d = a(B) ?? !1,
+    f;
+  t[0] !== d || t[1] !== u.pathname
+    ? ((f = me({ hideFirstNewThreadOnboardingPromos: d, pathname: u.pathname })),
+      (t[0] = d),
+      (t[1] = u.pathname),
+      (t[2] = f))
+    : (f = t[2]);
+  let p = f,
+    m;
+  i === `chat` ? (m = `chatgpt`) : i === `work` && (m = `work_tab`);
+  let h = n === `codex` && `electron:mx-[var(--home-composer-inline-inset)]`,
+    g;
+  t[3] === h ? (g = t[4]) : ((g = S(`empty:hidden`, h)), (t[3] = h), (t[4] = g));
+  let _;
+  t[5] === s
+    ? (_ = t[6])
+    : ((_ = s == null ? null : (0, $.jsx)(et, { gizmoId: s })), (t[5] = s), (t[6] = _));
+  let v;
+  t[7] !== m || t[8] !== n || t[9] !== c || t[10] !== l || t[11] !== p
+    ? ((v =
+        l === "default"
+          ? (0, $.jsxs)($.Fragment, {
+              children: [
+                null,
+                (0, $.jsx)($.Fragment, {
+                  children: (0, $.jsx)(zt, {
+                    beaconProduct: m,
+                    entryPoint: n,
+                    isLocalModeRemote: c,
+                    shouldHideOnboardingPromos: p,
+                  }),
+                }),
+              ],
+            })
+          : null),
+      (t[7] = m),
+      (t[8] = n),
+      (t[9] = c),
+      (t[10] = l),
+      (t[11] = p),
+      (t[12] = v))
+    : (v = t[12]);
+  let y;
+  return (
+    t[13] !== g || t[14] !== _ || t[15] !== v
+      ? ((y = (0, $.jsxs)(`div`, { className: g, children: [_, v] })),
+        (t[13] = g),
+        (t[14] = _),
+        (t[15] = v),
+        (t[16] = y))
+      : (y = t[16]),
+    y
+  );
+}
+function qt(e) {
+  let t = (0, Xt.c)(7),
+    { homeRunLocationRemoteProject: n, includeGitCheckoutWarning: r } = e,
+    i = n === void 0 ? null : n,
+    o = r === void 0 || r,
+    s = K(),
+    c = a(B) ?? !1,
+    l;
+  t[0] !== c || t[1] !== s.pathname
+    ? ((l = me({ hideFirstNewThreadOnboardingPromos: c, pathname: s.pathname })),
+      (t[0] = c),
+      (t[1] = s.pathname),
+      (t[2] = l))
+    : (l = t[2]);
+  let u = l,
+    d;
+  return (
+    t[3] !== i || t[4] !== o || t[5] !== u
+      ? ((d = (0, $.jsxs)($.Fragment, {
+          children: [
+            null,
+            (0, $.jsx)($.Fragment, {
+              children: (0, $.jsx)(Jt, {
+                homeRunLocationRemoteProject: i,
+                includeGitCheckoutWarning: o,
+                shouldHideOnboardingPromos: u,
+              }),
+            }),
+            null,
+          ],
+        })),
+        (t[3] = i),
+        (t[4] = o),
+        (t[5] = u),
+        (t[6] = d))
+      : (d = t[6]),
+    d
+  );
+}
+function Jt(e) {
+  let t = (0, Xt.c)(44),
+    {
+      homeRunLocationRemoteProject: n,
+      includeGitCheckoutWarning: r,
+      shouldHideOnboardingPromos: i,
+    } = e,
+    a = qe(),
+    o = Ee(),
+    s = Qe(),
+    c = Dt(),
+    l = !o.shouldSuppressVanillaPromos,
+    u = (!i || o.beacon?.custom_fields?.show_after_onboarding === !0) && o.isEligible,
+    d = (!i || o.beacon?.custom_fields?.show_after_onboarding === !0) && o.isLoading,
+    f;
+  t[0] !== o.accountId || t[1] !== o.beacon
+    ? ((f =
+        o.beacon != null && o.accountId != null
+          ? (0, $.jsx)(Be, {
+              accountId: o.accountId,
+              actionAccountId: o.accountId,
+              analyticsContext: {
+                placement: `codex_home`,
+                productExperience: `chat`,
+                treatment: q(o.beacon),
+              },
+              beacon: o.beacon,
+            })
+          : null),
+      (t[0] = o.accountId),
+      (t[1] = o.beacon),
+      (t[2] = f))
+    : (f = t[2]);
+  let p, m, h, g, _, v;
+  if (
+    t[3] !== o.beacon ||
+    t[4] !== c ||
+    t[5] !== s ||
+    t[6] !== a.availableCount ||
+    t[7] !== a.dismiss ||
+    t[8] !== a.isEligible ||
+    t[9] !== a.isLoading ||
+    t[10] !== i ||
+    t[11] !== l ||
+    t[12] !== u ||
+    t[13] !== d ||
+    t[14] !== f
+  ) {
+    let e = { isEligible: u, isLoading: d, pageContextClaim: te.HomeBeacon, content: f },
+      n;
+    t[21] === o.beacon
+      ? (n = t[22])
+      : ((n = o.beacon != null && (be(o.beacon) || R(o.beacon))), (t[21] = o.beacon), (t[22] = n));
+    let r = n,
+      y;
+    t[23] !== a.availableCount || t[24] !== a.dismiss
+      ? ((y = (0, $.jsx)(Ye, { availableCount: a.availableCount, onDismiss: a.dismiss })),
+        (t[23] = a.availableCount),
+        (t[24] = a.dismiss),
+        (t[25] = y))
+      : (y = t[25]);
+    let b;
+    t[26] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((b = (0, $.jsx)(Xe, {})), (t[26] = b))
+      : (b = t[26]);
+    let x;
+    (t[27] === c
+      ? (x = t[28])
+      : ((x = c.content == null ? null : (0, $.jsx)(Ct, { ...c })), (t[27] = c), (t[28] = x)),
+      (m = [
+        { isEligible: a.isEligible, isLoading: a.isLoading, content: y },
+        {
+          ...e,
+          content: r ? null : e.content,
+          isEligible: e.isEligible && !r,
+          isLoading: e.isLoading || (e.isEligible && r),
+        },
+        { isEligible: !i && l && s.isEligible, isLoading: !i && l && s.isLoading, content: b },
+        { isEligible: !i && l && c.isEligible, isLoading: !i && l && c.isLoading, content: x },
+      ]),
+      (p = Re),
+      (_ = `home-codex`),
+      (h = `home-beacon:codex:${o.beacon?.beacon_id ?? `loading`}`),
+      (g = Te({ isEligible: e.isEligible && r, isLoading: e.isLoading })),
+      (v = () => e.content),
+      (t[3] = o.beacon),
+      (t[4] = c),
+      (t[5] = s),
+      (t[6] = a.availableCount),
+      (t[7] = a.dismiss),
+      (t[8] = a.isEligible),
+      (t[9] = a.isLoading),
+      (t[10] = i),
+      (t[11] = l),
+      (t[12] = u),
+      (t[13] = d),
+      (t[14] = f),
+      (t[15] = p),
+      (t[16] = m),
+      (t[17] = h),
+      (t[18] = g),
+      (t[19] = _),
+      (t[20] = v));
+  } else ((p = t[15]), (m = t[16]), (h = t[17]), (g = t[18]), (_ = t[19]), (v = t[20]));
+  let y;
+  t[29] !== h || t[30] !== g || t[31] !== v
+    ? ((y = { id: h, status: g, render: v }), (t[29] = h), (t[30] = g), (t[31] = v), (t[32] = y))
+    : (y = t[32]);
+  let b;
+  t[33] !== p || t[34] !== _ || t[35] !== y
+    ? ((b = (0, $.jsx)(p, { source: _, candidate: y })),
+      (t[33] = p),
+      (t[34] = _),
+      (t[35] = y),
+      (t[36] = b))
+    : (b = t[36]);
+  let x;
+  t[37] !== m || t[38] !== n || t[39] !== r
+    ? ((x = (0, $.jsx)(Yt, {
+        entries: m,
+        homeRunLocationRemoteProject: n,
+        includeGitCheckoutWarning: r,
+      })),
+      (t[37] = m),
+      (t[38] = n),
+      (t[39] = r),
+      (t[40] = x))
+    : (x = t[40]);
+  let S;
+  return (
+    t[41] !== x || t[42] !== b
+      ? ((S = (0, $.jsxs)($.Fragment, { children: [b, x] })), (t[41] = x), (t[42] = b), (t[43] = S))
+      : (S = t[43]),
+    S
+  );
+}
+function Yt(e) {
+  let t = (0, Xt.c)(6),
+    { entries: n, homeRunLocationRemoteProject: r, includeGitCheckoutWarning: i } = e,
+    a;
+  t[0] !== r || t[1] !== i ? ((a = void 0), (t[0] = r), (t[1] = i), (t[2] = a)) : (a = t[2]);
+  let o;
+  return (
+    t[3] !== n || t[4] !== a
+      ? ((o = (0, $.jsx)(Ne, { entries: n, renderSlot: a })), (t[3] = n), (t[4] = a), (t[5] = o))
+      : (o = t[5]),
+    o
+  );
+}
+var Xt, Zt, $;
+function Qt() {
+  return (Qt = e(() => {
+    ((Xt = t()),
+      y(),
+      r(),
+      (Zt = _()),
+      se(),
+      Le(),
+      Pe(),
+      Et(),
+      Nt(),
+      Fe(),
+      W(),
+      F(),
+      O(),
+      We(),
+      Ue(),
+      Ie(),
+      $e(),
+      Rt(),
+      ze(),
+      Me(),
+      G(),
+      re(),
+      He(),
+      Ke(),
+      w(),
+      Je(),
+      Ve(),
+      Ge(),
+      Ze(),
+      St(),
+      Gt(),
+      D(),
+      N(),
+      d(),
+      H(),
+      ($ = o()),
+      s(async () => () => null, { propagateLoadError: !0 }));
+  }))();
+}
+export { Rt as i, Kt as n, Qt as r, qt as t };

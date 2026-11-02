@@ -1,25 +1,465 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/app-primary";
-
-const jsxRuntime = getJsxRuntime();
-export interface TaxType { country: string; description: string; placeholder?: string; region: string; stripe_type: string; supported: boolean; type: string }
-export interface TaxIdentifier { country?: string; country_specific_type?: string; type: string; value: string }
-export interface ControlledTextValue { onChange(value: string): void; value: string }
-export interface TaxTypeEditorProps { available: TaxType[]; businessName?: ControlledTextValue | null; disabled?: boolean; enabled: boolean; onChange(value: TaxIdentifier): void; onEnabledChange(enabled: boolean): void; selected?: TaxType | null; showErrors?: boolean; taxId?: TaxIdentifier | null }
-
-const taxTypeLabel = (type: string): string => { switch (type) { case "ca_gst_hst": return "CA GST/HST"; case "ca_pst_bc": return "CA PST-BC"; case "ca_pst_mb": return "CA PST-MB"; case "ca_pst_sk": return "CA PST-SK"; default: return type.replace("_", " ").toUpperCase(); } };
-const compareTaxTypes = (left: TaxType, right: TaxType): number => taxTypeLabel(left.type).localeCompare(taxTypeLabel(right.type));
-function TaxTypeEditor({ available, businessName, disabled, enabled, onChange, onEnabledChange, selected, showErrors, taxId }: TaxTypeEditorProps): unknown {
-  const fallback = available[0]; if (!fallback) return null;
-  const active = selected ?? fallback, missingBusinessName = Boolean(showErrors && businessName && !businessName.value.trim()), missingTaxId = Boolean(showErrors && !taxId?.value.trim());
-  return jsxRuntime.jsxs("div", { className: "flex flex-col gap-3", children: [jsxRuntime.jsxs("label", { children: [jsxRuntime.jsx("input", { type: "checkbox", checked: enabled, disabled, onChange: (event: { target: { checked: boolean } }) => onEnabledChange(event.target.checked) }), "Add tax ID"] }), enabled ? jsxRuntime.jsxs(jsxRuntime.Fragment, { children: [businessName == null ? null : jsxRuntime.jsxs("label", { children: ["Business name", jsxRuntime.jsx("input", { disabled, value: businessName.value, "aria-invalid": missingBusinessName, onChange: (event: { target: { value: string } }) => businessName.onChange(event.target.value) })] }), jsxRuntime.jsx("select", { disabled, value: active.type, onChange: (event: { target: { value: string } }) => { const next = available.find(item => item.type === event.target.value) ?? fallback; onChange({ type: next.stripe_type, country: next.country, country_specific_type: next.type, value: taxId?.value ?? "" }); }, children: [...available].sort(compareTaxTypes).map(item => jsxRuntime.jsx("option", { value: item.type, children: taxTypeLabel(item.type) }, item.type)) }), jsxRuntime.jsx("input", { disabled, value: taxId?.value ?? "", placeholder: active.placeholder ?? "Tax ID", "aria-invalid": missingTaxId, onChange: (event: { target: { value: string } }) => onChange({ type: active.stripe_type, country: active.country, country_specific_type: active.type, value: event.target.value }) })] }) : null] });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  Ad as n,
+  G4 as r,
+  H4 as i,
+  I3 as a,
+  K2 as o,
+  Mh as s,
+  Nh as c,
+  Ph as l,
+  Y2 as u,
+  Yh as d,
+  Zh as f,
+  cy as p,
+  e6 as m,
+  g4 as h,
+  iy as g,
+  jd as _,
+  k4 as v,
+  lw as y,
+  n4 as b,
+  q4 as x,
+} from "@rchunk/app-shared";
+import { Jat as S, Xat as C } from "@rchunk/app-initial";
+import { ac as w, ic as T, rc as E } from "@rchunk/app-primary";
+function D(e) {
+  let t = (0, A.c)(47),
+    {
+      available: r,
+      selected: i,
+      taxId: a,
+      enabled: o,
+      disabled: l,
+      showErrors: f,
+      businessName: m,
+      onEnabledChange: h,
+      onChange: _,
+    } = e,
+    v = b(),
+    y = (0, j.useId)(),
+    x = (0, j.useId)(),
+    C = (0, j.useId)(),
+    w = (0, j.useId)(),
+    D = (0, j.useId)(),
+    N = (0, j.useId)(),
+    P = (0, j.useId)(),
+    F = (0, j.useId)(),
+    [I, L] = (0, j.useState)(!1),
+    [R, z] = (0, j.useState)(``),
+    B = r[0];
+  if (B == null) return null;
+  let V;
+  t[0] === v
+    ? (V = t[1])
+    : ((V = v.formatMessage({
+        id: `settings.consumerBilling.taxTypeLabel`,
+        defaultMessage: `Tax type`,
+        description: `Label for the tax identification scheme selector in the consumer billing-information editor`,
+      })),
+      (t[0] = v),
+      (t[1] = V));
+  let H = V,
+    U;
+  t[2] === v
+    ? (U = t[3])
+    : ((U = v.formatMessage({
+        id: `settings.consumerBilling.searchTaxTypes`,
+        defaultMessage: `Search tax types`,
+        description: `Accessible label and placeholder for filtering supported tax identification schemes in the billing-information editor`,
+      })),
+      (t[2] = v),
+      (t[3] = U));
+  let W = U,
+    G;
+  if (
+    t[4] !== r ||
+    t[5] !== m ||
+    t[6] !== N ||
+    t[7] !== D ||
+    t[8] !== y ||
+    t[9] !== l ||
+    t[10] !== o ||
+    t[11] !== B ||
+    t[12] !== w ||
+    t[13] !== v ||
+    t[14] !== C ||
+    t[15] !== _ ||
+    t[16] !== h ||
+    t[17] !== I ||
+    t[18] !== R ||
+    t[19] !== W ||
+    t[20] !== i ||
+    t[21] !== f ||
+    t[22] !== a?.value ||
+    t[23] !== P ||
+    t[24] !== x ||
+    t[25] !== H ||
+    t[26] !== F
+  ) {
+    let e = R.trim().toLocaleLowerCase(),
+      b = r.filter((t) => `${k(t.type)} ${t.description}`.toLocaleLowerCase().includes(e)).sort(O),
+      A = f && i == null,
+      j;
+    t[28] !== f || t[29] !== a?.value
+      ? ((j = f && !a?.value.trim()), (t[28] = f), (t[29] = a?.value), (t[30] = j))
+      : (j = t[30]);
+    let V = j,
+      U;
+    t[31] !== m?.value || t[32] !== f
+      ? ((U = f && !m?.value.trim()), (t[31] = m?.value), (t[32] = f), (t[33] = U))
+      : (U = t[33]);
+    let K = U,
+      q;
+    t[34] === h ? (q = t[35]) : ((q = (e) => h(e === !0)), (t[34] = h), (t[35] = q));
+    let J;
+    t[36] !== y || t[37] !== l || t[38] !== o || t[39] !== q
+      ? ((J = (0, M.jsx)(n, { id: y, checked: o, disabled: l, onCheckedChange: q })),
+        (t[36] = y),
+        (t[37] = l),
+        (t[38] = o),
+        (t[39] = q),
+        (t[40] = J))
+      : (J = t[40]);
+    let Y;
+    t[41] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((Y = (0, M.jsx)(u, {
+          id: `settings.consumerBilling.taxIdEnabled`,
+          defaultMessage: `Add tax ID`,
+          description: `Checkbox enabling business tax identification on personal billing invoices`,
+        })),
+        (t[41] = Y))
+      : (Y = t[41]);
+    let X;
+    t[42] === y
+      ? (X = t[43])
+      : ((X = (0, M.jsx)(`label`, {
+          className: `text-sm font-medium text-default select-none`,
+          htmlFor: y,
+          children: Y,
+        })),
+        (t[42] = y),
+        (t[43] = X));
+    let Z;
+    (t[44] !== J || t[45] !== X
+      ? ((Z = (0, M.jsxs)(c, { children: [J, X] })), (t[44] = J), (t[45] = X), (t[46] = Z))
+      : (Z = t[46]),
+      (G = (0, M.jsxs)(`div`, {
+        className: `flex flex-col gap-3`,
+        children: [
+          Z,
+          o
+            ? (0, M.jsxs)(M.Fragment, {
+                children: [
+                  m == null
+                    ? null
+                    : (0, M.jsxs)(s, {
+                        children: [
+                          (0, M.jsx)(`label`, {
+                            className: `text-sm font-medium text-default select-none`,
+                            htmlFor: D,
+                            children: (0, M.jsx)(u, {
+                              id: `settings.consumerBilling.businessName`,
+                              defaultMessage: `Business name`,
+                              description: `Label for the legal business name associated with a tax identification number on billing invoices`,
+                            }),
+                          }),
+                          (0, M.jsx)(S, {
+                            id: D,
+                            name: `business-name`,
+                            autoComplete: `organization`,
+                            "aria-required": !0,
+                            "aria-invalid": K,
+                            "aria-describedby": K ? N : void 0,
+                            disabled: l,
+                            value: m.value,
+                            onChange: (e) => m.onChange(e.target.value),
+                          }),
+                          K
+                            ? (0, M.jsx)(`p`, {
+                                id: N,
+                                role: `alert`,
+                                className: `text-sm text-danger`,
+                                children: (0, M.jsx)(u, {
+                                  id: `settings.consumerBilling.businessNameRequired`,
+                                  defaultMessage: `Business name is required`,
+                                  description: `Validation when tax identification is enabled but the legal business name for billing invoices is empty`,
+                                }),
+                              })
+                            : null,
+                        ],
+                      }),
+                  (0, M.jsxs)(s, {
+                    children: [
+                      (0, M.jsx)(`label`, {
+                        className: `text-sm font-medium text-default select-none`,
+                        htmlFor: x,
+                        children: (0, M.jsx)(u, {
+                          id: `settings.consumerBilling.taxTypeLabel`,
+                          defaultMessage: `Tax type`,
+                          description: `Label for the tax identification scheme selector in the consumer billing-information editor`,
+                        }),
+                      }),
+                      (0, M.jsx)(E, {
+                        disabled: l,
+                        open: I,
+                        onOpenChange: (e) => {
+                          (L(e), e && z(``));
+                        },
+                        contentClassName: `w-[var(--radix-popover-trigger-width)]`,
+                        contentMaxHeight: `tall`,
+                        triggerButton: (0, M.jsxs)(d, {
+                          id: x,
+                          type: `button`,
+                          color: `outline`,
+                          size: `dialog`,
+                          radius: `small`,
+                          className: `w-full justify-between`,
+                          role: `combobox`,
+                          "aria-label": H,
+                          "aria-expanded": I,
+                          "aria-haspopup": `listbox`,
+                          "aria-controls": I ? C : void 0,
+                          "aria-invalid": A,
+                          "aria-describedby": A ? P : void 0,
+                          disabled: l,
+                          children: [
+                            (0, M.jsx)(`span`, {
+                              className: `truncate`,
+                              children: i == null ? H : k(i.type),
+                            }),
+                            (0, M.jsx)(p, {}),
+                          ],
+                        }),
+                        children: (0, M.jsxs)(T.Root, {
+                          label: H,
+                          children: [
+                            (0, M.jsx)(T.Input, {
+                              "aria-label": W,
+                              placeholder: W,
+                              value: R,
+                              onValueChange: z,
+                            }),
+                            (0, M.jsxs)(T.List, {
+                              id: C,
+                              children: [
+                                b.map((e) =>
+                                  (0, M.jsx)(
+                                    T.Item,
+                                    {
+                                      value: e.type,
+                                      rightIcon: e.type === i?.type ? (0, M.jsx)(g, {}) : void 0,
+                                      onSelect: () => {
+                                        (_({
+                                          type: e.stripe_type,
+                                          country: e.country,
+                                          country_specific_type: e.type,
+                                          value: a?.value ?? ``,
+                                        }),
+                                          L(!1));
+                                      },
+                                      children: (0, M.jsxs)(`div`, {
+                                        className: `flex flex-col gap-0.5`,
+                                        children: [
+                                          (0, M.jsx)(`span`, {
+                                            className: `font-medium`,
+                                            children: k(e.type),
+                                          }),
+                                          (0, M.jsx)(`span`, {
+                                            className: `text-secondary`,
+                                            children: e.description,
+                                          }),
+                                        ],
+                                      }),
+                                    },
+                                    e.type,
+                                  ),
+                                ),
+                                b.length === 0
+                                  ? (0, M.jsx)(`p`, {
+                                      role: `status`,
+                                      className: `p-3 text-sm text-secondary`,
+                                      children: (0, M.jsx)(u, {
+                                        id: `settings.consumerBilling.noMatchingTaxTypes`,
+                                        defaultMessage: `No matching tax types`,
+                                        description: `Empty search result in the consumer billing editor's tax identification scheme selector`,
+                                      }),
+                                    })
+                                  : null,
+                              ],
+                            }),
+                          ],
+                        }),
+                      }),
+                      A
+                        ? (0, M.jsx)(`p`, {
+                            id: P,
+                            role: `alert`,
+                            className: `text-sm text-danger`,
+                            children: (0, M.jsx)(u, {
+                              id: `settings.consumerBilling.taxIdTypeRequired`,
+                              defaultMessage: `Please select a tax ID type`,
+                              description: `Validation in the consumer billing editor when tax identification is enabled but its scheme is missing`,
+                            }),
+                          })
+                        : null,
+                    ],
+                  }),
+                  (0, M.jsxs)(s, {
+                    children: [
+                      (0, M.jsx)(`label`, {
+                        className: `text-sm font-medium text-default select-none`,
+                        htmlFor: w,
+                        children: (0, M.jsx)(u, {
+                          id: `settings.consumerBilling.taxId`,
+                          defaultMessage: `Tax ID`,
+                          description: `Label for the business tax identification number on consumer billing invoices`,
+                        }),
+                      }),
+                      (0, M.jsx)(S, {
+                        id: w,
+                        name: `tax-id`,
+                        autoComplete: `off`,
+                        "aria-required": !0,
+                        "aria-invalid": V,
+                        "aria-describedby": V ? F : void 0,
+                        disabled: l,
+                        value: a?.value ?? ``,
+                        placeholder:
+                          i?.placeholder ??
+                          v.formatMessage({
+                            id: `settings.consumerBilling.taxId`,
+                            defaultMessage: `Tax ID`,
+                            description: `Label for the business tax identification number on consumer billing invoices`,
+                          }),
+                        onChange: (e) => {
+                          let t = i ?? B;
+                          _({
+                            type: t.stripe_type,
+                            country: t.country,
+                            country_specific_type: t.type,
+                            value: e.target.value,
+                          });
+                        },
+                      }),
+                      V
+                        ? (0, M.jsx)(`p`, {
+                            id: F,
+                            role: `alert`,
+                            className: `text-sm text-danger`,
+                            children: (0, M.jsx)(u, {
+                              id: `settings.consumerBilling.taxIdRequired`,
+                              defaultMessage: `Tax ID is required`,
+                              description: `Validation in the consumer billing editor when tax identification is enabled but its number is empty`,
+                            }),
+                          })
+                        : null,
+                    ],
+                  }),
+                ],
+              })
+            : null,
+        ],
+      })),
+      (t[4] = r),
+      (t[5] = m),
+      (t[6] = N),
+      (t[7] = D),
+      (t[8] = y),
+      (t[9] = l),
+      (t[10] = o),
+      (t[11] = B),
+      (t[12] = w),
+      (t[13] = v),
+      (t[14] = C),
+      (t[15] = _),
+      (t[16] = h),
+      (t[17] = I),
+      (t[18] = R),
+      (t[19] = W),
+      (t[20] = i),
+      (t[21] = f),
+      (t[22] = a?.value),
+      (t[23] = P),
+      (t[24] = x),
+      (t[25] = H),
+      (t[26] = F),
+      (t[27] = G));
+  } else G = t[27];
+  return G;
 }
-const supportedTaxCountries = new Set("AE.AM.AT.AU.AZ.BD.BE.BG.BH.CA.CH.CL.CY.CZ.DE.DK.EE.EG.ES.FI.FR.GB.GE.GR.HR.HU.ID.IE.IN.IS.IT.KE.KG.KH.KR.KZ.LI.LT.LU.LV.MA.MD.MT.NG.NL.NO.NZ.PE.PH.PL.PT.RO.SA.SE.SG.SI.SK.TH.TR.TW.TZ.UA.UG.UZ.ZA".split("."));
-const isSupportedTaxCountry = (country: string): boolean => supportedTaxCountries.has(country);
-function supportedTaxTypesForCountry(country: string, value: unknown): TaxType[] { if (!isSupportedTaxCountry(country) || value == null || typeof value !== "object") return []; const entries = Object.values(value as Record<string, unknown>).filter((entry): entry is TaxType => entry != null && typeof entry === "object" && typeof (entry as TaxType).country === "string" && typeof (entry as TaxType).region === "string" && typeof (entry as TaxType).supported === "boolean"); const regions = new Set(entries.filter(entry => entry.country === country && entry.supported).map(entry => entry.region)); return entries.filter(entry => regions.has(entry.region) && entry.supported); }
-function selectTaxType(available: TaxType[], current: Partial<TaxIdentifier> | null | undefined, country: string): TaxType | undefined { return (current == null ? undefined : available.find(item => item.type === current.country_specific_type) ?? available.find(item => item.stripe_type === current.type && item.country === (current.country ?? country))) ?? available.find(item => item.country === country) ?? available[0]; }
-function initializeTaxTypeEditor(): void {}
-function initializeTaxTypeSchema(): void {}
-export { initializeTaxTypeEditor as a, TaxTypeEditor as i, supportedTaxTypesForCountry as n, initializeTaxTypeSchema as r, selectTaxType as t };
+function O(e, t) {
+  return k(e.type).localeCompare(k(t.type));
+}
+function k(e) {
+  switch (e) {
+    case `ca_gst_hst`:
+      return `CA GST/HST`;
+    case `ca_pst_bc`:
+      return `CA PST-BC`;
+    case `ca_pst_mb`:
+      return `CA PST-MB`;
+    case `ca_pst_sk`:
+      return `CA PST-SK`;
+    default:
+      return e.replace(`_`, ` `).toUpperCase();
+  }
+}
+var A, j, M;
+function N() {
+  return (N = e(() => {
+    ((A = t()), (j = m()), o(), f(), _(), w(), l(), y(), C(), (M = a()));
+  }))();
+}
+function P(e) {
+  return I.has(e);
+}
+function F(e, t) {
+  let n = new Set(t.filter((t) => t.country === e && t.supported).map((e) => e.region));
+  return t.filter((e) => n.has(e.region) && e.supported);
+}
+var I;
+function L() {
+  return (L = e(() => {
+    I = new Set(
+      `AE.AM.AT.AU.AZ.BD.BE.BG.BH.CA.CH.CL.CY.CZ.DE.DK.EE.EG.ES.FI.FR.GB.GE.GR.HR.HU.ID.IE.IN.IS.IT.KE.KG.KH.KR.KZ.LI.LT.LU.LV.MA.MD.MT.NG.NL.NO.NZ.PE.PH.PL.PT.RO.SA.SE.SG.SI.SK.TH.TR.TW.TZ.UA.UG.UZ.ZA`.split(
+        `.`,
+      ),
+    );
+  }))();
+}
+function R(e, t) {
+  let n = r(x(), B).safeParse(t);
+  return !P(e) || !n.success ? [] : F(e, Object.values(n.data));
+}
+function z(e, t, n) {
+  return (
+    (t == null
+      ? void 0
+      : (e.find((e) => e.type === t.country_specific_type) ??
+        e.find((e) => e.stripe_type === t.type && e.country === (t.country ?? n)))) ??
+    e.find((e) => e.country === n) ??
+    e[0]
+  );
+}
+var B;
+function V() {
+  return (V = e(() => {
+    (L(),
+      h(),
+      (B = i({
+        type: x(),
+        stripe_type: x(),
+        country: x(),
+        region: x(),
+        supported: v(),
+        description: x(),
+        placeholder: x()
+          .nullish()
+          .transform((e) => e ?? void 0),
+      })));
+  }))();
+}
+export { N as a, D as i, R as n, V as r, z as t };

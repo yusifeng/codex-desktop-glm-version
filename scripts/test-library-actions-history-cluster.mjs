@@ -35,27 +35,7 @@ assert.equal(analytics[2].error.httpStatus, 429);
 trash.n(analyticsScope, "session", "failed", { errorKind: "network" });
 assert.equal(analytics[3].error.type, "network_error");
 
-// library-item-actions: 15
-const actions = await bundle("library-item-actions");
-assert.deepEqual(Object.keys(actions), ["i", "n", "r", "t"]);
-const calls = [], invalidations = [], errors = [];
-const scope = { api: { async delete(pathname, input) { calls.push(["delete", pathname, input]); return { success: true }; }, async patch(pathname, input) { calls.push(["patch", pathname, input]); }, async post(pathname, input) { calls.push(["post", pathname, input]); } }, async download(node) { calls.push(["download", node.id]); }, invalidate(action) { invalidations.push(action.type); }, notifyError(message) { errors.push(message); } };
-const file = { node: { id: "file", kind: "file", name: "Report.pdf" }, canRestore: true };
-assert.equal(await actions.i(scope, file, { type: "rename", name: "New.pdf" }), true);
-assert.deepEqual(calls[0], ["patch", "/files/library/files/file", { file_name: "New.pdf" }]);
-assert.equal(await actions.i(scope, file, { type: "restore" }), true);
-assert.equal(calls[1][1], "/files/library/files/file/restore");
-assert.equal(await actions.i(scope, file, { type: "move", directoryId: "folder" }), true);
-assert.deepEqual(calls[2][2], { directory_id: "folder" });
-assert.equal(await actions.i(scope, file, { type: "download" }), true);
-assert.deepEqual(calls[3], ["download", "file"]);
-assert.equal(await actions.i(scope, { ...file, canDownload: false }, { type: "download" }), false);
-assert.equal(actions.n.get("file"), false);
-const completed = await actions.r(scope, [file, { node: { id: "folder", kind: "directory", name: "Folder" } }], { type: "delete" });
-assert.deepEqual(completed, ["file", "folder"]);
-assert.equal(invalidations.at(-1), "delete");
-assert.equal(errors.length, 0);
-assert.equal(calls.filter(call => call[0] === "delete").length, 2);
+assertReleaseOwner("library-item-actions");
 
 assertReleaseOwner("version-history");
 

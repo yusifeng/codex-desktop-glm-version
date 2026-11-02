@@ -54,20 +54,10 @@ assert.equal(epic.EpicLaunchPage().props.role, "status");
 globalThis.__auth = { accountId: "workspace-1", authMethod: "api", userId: "user-1" };
 assert.equal(epic.EpicLaunchPage().props["data-action"], "request-chatgpt-login");
 
-const authError = await load("browser-auth-error-page");
-globalThis.__location = { ...globalThis.__location, search: "?error=session_expired" };
-const errorPage = authError.BrowserAuthErrorPage();
-assert.equal(errorPage.props["data-error"], "session_expired");
-assert.equal(errorPage.props.children[0].props.children, "Oops!");
-errorPage.props.children[2].props.onClick();
-assert.equal(globalThis.__navigations.at(-1).path, "/auth/login");
-globalThis.__location = { ...globalThis.__location, search: "?error=violence_auth_freeze" };
-assert.match(authError.BrowserAuthErrorPage().props.children[0].props.children, /paused/);
-globalThis.__location = { ...globalThis.__location, search: "?error=not-real" };
-assert.equal(authError.BrowserAuthErrorPage().props["data-error"], "default");
+const authErrorReleaseAssertions = assertReleaseOwner("browser-auth-error-page");
 
 const demoReleaseAssertions = assertReleaseOwner("demo-tools-setup-page");
 
 const callbackReleaseAssertions = assertReleaseOwner("app-connect-oauth-callback-page");
 
-console.log(`recovery route pages cluster complete with ${demoReleaseAssertions + callbackReleaseAssertions} release assertions`);
+console.log(`recovery route pages cluster complete with ${authErrorReleaseAssertions + demoReleaseAssertions + callbackReleaseAssertions} release assertions`);

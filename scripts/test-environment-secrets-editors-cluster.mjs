@@ -278,51 +278,7 @@ const optional = mount(secrets.EnvironmentBatchSecretsDialog, {
 optional.props.children.props.onSubmit({ preventDefault() {} });
 assert.equal(secretsClosed, 2);
 
-const personal = await load("personal-secrets-dialog");
-let requestedInput = null,
-  personalClosed = 0;
-const personalMount = mount(personal.PersonalSecretsDialog, {
-  selection: {
-    accountId: "a",
-    userId: "u",
-    config: { id: "c", name: "Cloud env" },
-  },
-  initialPreflight: {
-    issues: [
-      { namespace: "sensitive", env_var: "API_KEY", code: "missing" },
-      { namespace: "not_sensitive", env_var: "REGION", code: "conflict" },
-    ],
-  },
-  isCurrent: () => true,
-  onClose: () => {
-    personalClosed++;
-  },
-  requestPersonalSecrets: async (input) => {
-    requestedInput = input;
-    return true;
-  },
-});
-let personalView = personalMount.render();
-assert.equal(
-  personalView.props.children.props.children[0].props.children,
-  "Add personal secrets",
-);
-assert.match(
-  personalView.props.children.props.children[1].props.children,
-  /Cloud env/,
-);
-assert.equal(
-  personalView.props.children.props.children[3].props.children.length,
-  1,
-);
-personalView.props.children.props.children[3].props.children[0].props.children[1].props.onChange(
-  { currentTarget: { value: "secret" } },
-);
-personalView = personalMount.render();
-await personalView.props.children.props.onSubmit({ preventDefault() {} });
-assert.equal(requestedInput.namespace, "sensitive");
-assert.equal(requestedInput.secrets[0].value, "secret");
-assert.equal(personalClosed, 1);
+const personalSecretsReleaseAssertions = assertReleaseOwner("personal-secrets-dialog");
 
 const personalSecretReleaseAssertions = assertReleaseOwner("personal-secret-dialog");
-console.log(`environment secrets editors cluster complete with ${secretRowReleaseAssertions} secret row and ${personalSecretReleaseAssertions} personal secret release assertions`);
+console.log(`environment secrets editors cluster complete with ${secretRowReleaseAssertions + personalSecretsReleaseAssertions + personalSecretReleaseAssertions} release assertions`);

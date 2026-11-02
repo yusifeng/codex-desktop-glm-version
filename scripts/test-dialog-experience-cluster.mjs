@@ -114,32 +114,7 @@ assert.equal(all(installedPet, node => node.type === "button").length, 1);
 find(installedPet, node => node.type === "button").props.onClick();
 assert.equal(petClosed, 1);
 
-const renewal = await bundle("subscription-renewal-dialog");
-assert.deepEqual(Object.keys(renewal), ["SubscriptionRenewalDialog"]);
-let renewalClosed = 0;
-let renewed = 0;
-const renewalUi = renewal.SubscriptionRenewalDialog({
-  accountId: "acct",
-  account: { account: { plan_type: "plus" }, entitlement: { billing_period: "month", renews_at: "2026-09-01T00:00:00Z", cancels_at: "2026-10-02T00:00:00Z" } },
-  currency: "EUR",
-  price: 19.5,
-  onClose() { renewalClosed++; },
-  onRenew() { renewed++; },
-});
-assert.match(text(renewalUi), /Renew subscription/);
-assert.match(text(renewalUi), /10\/2\/2026/);
-assert.match(text(renewalUi), /EUR 19\.50 per month/);
-const renewalButtons = all(renewalUi, node => node.type === "button");
-renewalButtons[0].props.onClick();
-renewalButtons[1].props.onClick();
-assert.equal(renewalClosed, 1);
-assert.equal(renewed, 1);
-const pendingRenewal = renewal.SubscriptionRenewalDialog({ accountId: "acct", account: { account: {}, entitlement: {} }, isPending: true, onClose() {} });
-assert.equal(find(pendingRenewal, node => node.props?.children === "Renewing…").props.disabled, true);
-assert.equal(all(pendingRenewal, node => node.type === "button").every(button => button.props.disabled), true);
-const failedRenewal = renewal.SubscriptionRenewalDialog({ accountId: "acct", account: { account: {}, entitlement: {} }, isError: true, onClose() {} });
-assert.match(text(find(failedRenewal, node => node.props?.role === "alert")), /Couldn’t load/);
-assert.equal(find(failedRenewal, node => node.type === "button" && node.props?.children === "Renew subscription").props.disabled, true);
+assertReleaseOwner("subscription-renewal-dialog");
 
 assertReleaseOwner("upgrade-plan-dialog");
 

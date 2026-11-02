@@ -44,10 +44,6 @@ const EXPECTED_IMPORT_CHANGES = new Map([
     },
   ],
   [
-    CHUNKS["codex-home-announcements"],
-    { missing: new Set([`./${CHUNKS["app-primary"]}`]), extra: new Set() },
-  ],
-  [
     CHUNKS.banner,
     { missing: new Set([`./${CHUNKS["app-primary"]}`]), extra: new Set() },
   ],

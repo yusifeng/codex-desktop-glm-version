@@ -102,64 +102,7 @@ assertReleaseOwner("thread-app-shell-chrome");
 
 assertReleaseOwner("thread-user-message-navigation-rail-app");
 
-const usage = await load("thread-usage-breakdown");
-usage.r();
-assert.equal(usage.t({ dimension: "speed", value: "fast" }), "Fast mode");
-assert.equal(usage.t({ dimension: "speed", value: "ultrafast" }), "Ultrafast");
-assert.equal(usage.t({ dimension: "speed", value: "standard" }), "Standard");
-assert.equal(usage.t({ dimension: "model", value: "gpt-6" }), "GPT-6");
-assert.equal(usage.t({ dimension: "model", value: null }), "Other");
-const usageView = usage.n({
-  usage: {
-    creditsUsed: 12.5,
-    costUsd: 0.25,
-    groups: [
-      {
-        dimension: "model",
-        value: "gpt-6",
-        amountMicros: 10,
-        netNewInputTokens: 120,
-        cachedInputTokens: 30,
-        outputTokens: 45,
-      },
-      { dimension: "speed", value: "fast", amountMicros: 2.5 },
-    ],
-  },
-});
-assert.equal(usageView.type, "div");
-assert.equal(
-  usageView.props.children[0].props.children[0].props.children,
-  "Usage in this chat",
-);
-assert.match(
-  usageView.props.children[0].props.children[1].props.children,
-  /12.5 credits/,
-);
-const modelGroup = usageView.props.children[1].type(
-  usageView.props.children[1].props,
-);
-assert.equal(modelGroup.props["data-dimension"], "model");
-assert.equal(
-  modelGroup.props.children[0].props.children[0].props.children,
-  "Models",
-);
-assert.equal(modelGroup.props.children[1].props.children.length, 1);
-assert.equal(modelGroup.props.children[2].props.children.length, 1);
-const modelTooltipNode =
-  modelGroup.props.children[2].props.children[0].props.tooltipContent;
-const modelTooltip = modelTooltipNode.type(modelTooltipNode.props);
-assert.match(modelTooltip.props.children[1].props.children, /120/);
-const reasoningGroup = usageView.props.children[2].type(
-  usageView.props.children[2].props,
-);
-assert.equal(
-  reasoningGroup.props.children[0].props.children[1].props.children,
-  "Not available",
-);
-const usd = usage.n({
-  usage: { balanceUnit: "usd", creditsUsed: 0, costUsd: 0.005 },
-});
-assert.equal(usd.props.children[0].props.children[1].props.children, "$0.005");
+assertReleaseOwner("thread-usage-breakdown");
 
 const transcript = await load("chatgpt-conversation-transcript");
 transcript.n();

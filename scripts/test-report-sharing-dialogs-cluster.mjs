@@ -252,6 +252,7 @@ const sharedTaskReleaseAssertions = assertReleaseOwner("scheduled-shared-task-di
 const skillShareReleaseAssertions = assertReleaseOwner("skill-share-dialog-runtime");
 
 const pluginShareAssertions = assertReleaseOwner("plugin-share-dialog-core");
+const pullRequestModalAssertions = assertReleaseOwner("create-pull-request-modal-content");
 
 // gitlab-merge-request-form-dialog: 7
 const gitlab = await bundle("gitlab-merge-request-form-dialog");
@@ -284,4 +285,4 @@ assert.equal(mergeRequests[0].title, "Ship feature");
 assert.equal(gitlabClosed, true);
 assert.equal(byText(gitlabTree, "Open in browser").type, "button");
 
-console.log(`report/sharing dialogs passed with ${remoteConnectionReleaseAssertions} remote connection, ${sharedTaskReleaseAssertions} shared task, ${skillShareReleaseAssertions} skill share, and ${pluginShareAssertions} plugin share release assertions`);
+console.log(`report/sharing dialogs passed with ${remoteConnectionReleaseAssertions + sharedTaskReleaseAssertions + skillShareReleaseAssertions + pluginShareAssertions + pullRequestModalAssertions} release assertions`);
