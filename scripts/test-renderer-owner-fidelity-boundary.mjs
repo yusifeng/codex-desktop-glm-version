@@ -8,6 +8,7 @@ import { EXACT_ROUTE_SOURCE_OWNERS } from "./renderer-route-recovery.mjs";
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const releaseAssets = path.join(root, ".reference/app-original/webview/assets");
 const failures = [];
+let checkedOwners = 0;
 let largeOwners = 0;
 
 function existingOwnerFiles(name) {
@@ -29,8 +30,8 @@ for (const name of REWRITTEN) {
     continue;
   }
   const releaseBytes = fs.statSync(releaseFile).size;
-  if (releaseBytes < 10_000) continue;
-  largeOwners += 1;
+  checkedOwners += 1;
+  if (releaseBytes >= 10_000) largeOwners += 1;
   const ownerBytes = owners.reduce((total, file) => total + fs.statSync(file).size, 0);
   if (ownerBytes < releaseBytes * 0.8) {
     failures.push(`${name}: suspiciously reduced owner (${ownerBytes}/${releaseBytes} bytes)`);
@@ -54,5 +55,6 @@ if (failures.length > 0) {
 
 console.log(
   `renderer owner fidelity boundary: ${REWRITTEN.size}/${REWRITTEN.size} rewritten owners present, ` +
-  `${largeOwners} large owners above the reduction floor, ${EXACT_ROUTE_SOURCE_OWNERS.size} exact owners verified`,
+  `${checkedOwners} owners above the reduction floor (${largeOwners} at least 10 KB), ` +
+  `${EXACT_ROUTE_SOURCE_OWNERS.size} exact owners verified`,
 );

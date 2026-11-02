@@ -135,10 +135,23 @@ if (mode === "smoke-readonly") {
   };
   const waitForBodyText = async (expected, timeoutMs = 15_000) => {
     const texts = Array.isArray(expected) ? expected : [expected];
+    const recoveryText = ['ChatGPT hit a snag', 'ChatGPT 遇到了问题', 'Something went wrong. Try again to continue', '出了点问题。请重试以继续'];
     const deadline = Date.now() + timeoutMs;
     do {
       const bodyText = await evaluate(`(document.body?.innerText ?? '') + ' ' + (document.body?.textContent ?? '')`);
       if (texts.some((text) => bodyText.includes(text))) return bodyText;
+      if (recoveryText.some((text) => bodyText.includes(text))) {
+        const diagnostics = protocolEvents
+          .filter((event) =>
+            event.method === 'Runtime.exceptionThrown' ||
+            event.params?.type === 'error' ||
+            event.params?.entry?.level === 'error'
+          )
+          .slice(-5)
+          .map(protocolEventDetails)
+          .map(({ stackTrace: _stackTrace, ...detail }) => detail);
+        throw new Error(`App entered the recovery error boundary while waiting for: ${texts.join(' | ')}\n${JSON.stringify(diagnostics, null, 2)}`);
+      }
       await new Promise((resolve) => setTimeout(resolve, 250));
     } while (Date.now() < deadline);
     throw new Error(`Timed out waiting for body text: ${texts.join(' | ')}`);
@@ -409,10 +422,18 @@ if (mode === "smoke-readonly") {
     { label: '计算机历史记录', name: 'computer-history', text: ['让 ChatGPT 关注你的工作', '开启'], minimumInteractive: 2 },
     { label: '应用快照', name: 'appshots', text: ['Appshot 发送目标', '播放音效'], minimumInteractive: 4 },
     { label: '已归档的聊天', name: 'archived-chats', text: ['搜索已归档聊天', '全部删除'], minimumInteractive: 10 },
+    {
+      label: '使用情况和计费',
+      name: 'usage-and-billing',
+      readyText: ['当前套餐', 'Your plan', 'Plan limits'],
+      text: ['额度余额', '当前余额', '使用限额重置'],
+      minimumInteractive: 10,
+      readyTimeoutMs: 60_000,
+    },
   ]) {
     await clickText(page.label);
     await waitForSelectorGone('[role="menu"]');
-    if (page.readyText != null) await waitForBodyText(page.readyText, 30_000);
+    if (page.readyText != null) await waitForBodyText(page.readyText, page.readyTimeoutMs ?? 30_000);
     else await new Promise((resolve) => setTimeout(resolve, 250));
     await waitForSettingsPageToSettle();
     await assertVisualPage(`settings/${page.name}`, {
