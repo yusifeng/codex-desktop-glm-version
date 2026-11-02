@@ -1,7 +1,34 @@
 import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
 import fs from "node:fs";
-import { AppEventPublisher } from "../src/main/main-app/worker/app-event-publisher.ts";
-import { createWorkerRuntime } from "../src/main/main-app/worker/worker-runtime.ts";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import * as esbuild from "esbuild";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const bundle = await esbuild.build({
+  entryPoints: [path.join(ROOT, "src/main/main-app/worker/worker-runtime.ts")],
+  bundle: true,
+  format: "esm",
+  platform: "node",
+  target: "node22",
+  write: false,
+  logLevel: "silent",
+});
+const { createWorkerRuntime } = await import(
+  `data:text/javascript;base64,${Buffer.from(bundle.outputFiles[0].text).toString("base64")}`
+);
+
+class AppEventPublisher {
+  handlers = new Set();
+  subscribe(handler) {
+    this.handlers.add(handler);
+    return { dispose: () => this.handlers.delete(handler) };
+  }
+  emit(type, at = Date.now()) {
+    for (const handler of this.handlers) handler({ type, at });
+  }
+}
 
 let assertions = 0;
 const equal = (actual, expected) => {

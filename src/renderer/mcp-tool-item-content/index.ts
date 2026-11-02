@@ -1,566 +1,2465 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, n4 as useIntl, type JsxRuntime } from "@rchunk/app-shared";
-import * as sharedChunk from "@rchunk/app-shared";
-import * as initialChunk from "@rchunk/app-initial";
-import * as chatgptTasksRuntime from "@rchunk/chatgpt-tasks-runtime";
-import "@rchunk/computer-use-native-app-metadata";
-import { i as initializeMcpToolActivityLabels, t as formatToolActivityLabel } from "@rchunk/mcp-tool-activity-label";
-import { n as openAutomationSidePanelTab, t as initializeOpenAutomationSidePanelTab } from "@rchunk/open-automation-side-panel-tab";
-import "@rchunk/presentation";
-import { n as initializeToolActivityDisclosure, t as ToolActivityDisclosure } from "@rchunk/tool-activity-disclosure";
-import { n as initializeWebMcpToolCalls, t as webMcpCallsFromMetadata } from "@rchunk/webmcp-tool-calls";
-
-interface ContentAnnotations { audience?: string[]; lastModified?: string; priority?: number }
-type McpContentBlock =
-  | { annotations?: ContentAnnotations; data: string; mimeType: string; type: "audio" | "image" }
-  | { annotations?: ContentAnnotations; name?: string; title?: string; type: "resource_link"; uri: string }
-  | { resource: { annotations?: ContentAnnotations; blob?: string; mimeType?: string; text?: string; uri: string }; type: "embedded_resource" }
-  | { annotations?: ContentAnnotations; text: string; type: "text" }
-  | { raw: unknown; type: "unknown" };
-interface ToolResult { content?: McpContentBlock[]; error?: string; raw?: unknown; structuredContent?: unknown; type: "error" | "success" }
-interface WebMcpCall { description?: string; inputJson?: string; inputTruncated?: true; kind: "invokeTool" | "listTools"; name: string; outputJson?: string; outputTruncated?: true; readOnlyHint?: boolean; sourceHostname?: string; title?: string }
-interface ToolItem {
-  appContext?: { actionName?: string; appName?: string; connectorId: string } | null;
-  automaticApprovalReviews?: unknown[];
-  callId: string;
-  completed?: boolean;
-  durationMs?: number;
-  invocation: { arguments?: unknown; server?: string | null; tool: string };
-  invocationResourceUri?: string | null;
-  isMcpAppWidgetSuperseded?: boolean;
-  mcpAppUi?: { preferredModelDisplayMode?: string | null } | null;
-  pluginId?: string | null;
-  result?: ToolResult | null;
-  source?: { backend?: string; kind?: string } | null;
-  threadId?: string;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $d as n,
+  $p as r,
+  Ah as i,
+  BX as a,
+  Bg as o,
+  C_ as s,
+  Df as c,
+  FX as l,
+  HX as u,
+  I3 as d,
+  Ih as f,
+  K2 as p,
+  LX as m,
+  Of as h,
+  Oh as g,
+  Ph as _,
+  Q3 as v,
+  QI as y,
+  Qp as b,
+  Rh as ee,
+  SB as te,
+  S_ as ne,
+  Tw as re,
+  Ui as ie,
+  Wi as ae,
+  Xf as oe,
+  Y2 as x,
+  Yh as se,
+  Z3 as ce,
+  ZI as le,
+  Zh as S,
+  _L as ue,
+  a$ as de,
+  ai as fe,
+  cT as pe,
+  c_ as C,
+  e6 as w,
+  eU as me,
+  ef as he,
+  gL as ge,
+  h4 as T,
+  hq as _e,
+  jh as ve,
+  lT as ye,
+  m4 as E,
+  n4 as be,
+  o$ as xe,
+  oZ as Se,
+  o_ as Ce,
+  oi as we,
+  om as Te,
+  rZ as Ee,
+  sm as De,
+  tp as Oe,
+  wL as ke,
+  ww as Ae,
+  zg as je,
+  zh as Me,
+} from "@rchunk/app-shared";
+import {
+  $2t as Ne,
+  $en as Pe,
+  $sn as Fe,
+  $v as Ie,
+  Ait as Le,
+  Brn as Re,
+  Cct as ze,
+  Ctt as Be,
+  DU as Ve,
+  Dct as He,
+  Dit as Ue,
+  Dlt as We,
+  Dtt as Ge,
+  E4t as Ke,
+  E6t as qe,
+  EU as Je,
+  Ect as Ye,
+  Eit as Xe,
+  FS as Ze,
+  FU as Qe,
+  Fit as D,
+  Flt as $e,
+  GH as et,
+  GYt as tt,
+  Gat as O,
+  Gdt as nt,
+  HYt as k,
+  IH as rt,
+  IU as it,
+  Ilt as at,
+  KH as ot,
+  LU as st,
+  MU as ct,
+  Mit as lt,
+  NU as ut,
+  Nit as dt,
+  Nlt as ft,
+  OU as pt,
+  Oct as mt,
+  Oit as ht,
+  Olt as gt,
+  PS as _t,
+  PU as vt,
+  Pit as yt,
+  Plt as bt,
+  QB as xt,
+  Qdt as St,
+  Qgn as A,
+  Rht as Ct,
+  Srn as wt,
+  Stt as Tt,
+  T6t as Et,
+  TDt as Dt,
+  TU as Ot,
+  Vat as kt,
+  Vrn as At,
+  WH as jt,
+  Wat as Mt,
+  Wdt as Nt,
+  ZB as Pt,
+  Zdt as Ft,
+  aXt as It,
+  aat as Lt,
+  act as Rt,
+  aqt as zt,
+  b6t as Bt,
+  bct as Vt,
+  brn as Ht,
+  btt as Ut,
+  c4t as Wt,
+  dct as Gt,
+  e4t as Kt,
+  eat as qt,
+  ecn as Jt,
+  en as Yt,
+  ey as Xt,
+  fct as Zt,
+  g1 as Qt,
+  gct as $t,
+  h1 as j,
+  h4t as en,
+  i4t as tn,
+  i_n as nn,
+  ict as M,
+  ifn as rn,
+  itn as an,
+  itt as on,
+  jit as sn,
+  jlt as cn,
+  kU as ln,
+  kht as un,
+  kit as N,
+  lXt as dn,
+  lct as fn,
+  mXt as pn,
+  n0 as P,
+  nnt as F,
+  ntt as mn,
+  o_n as hn,
+  ofn as gn,
+  oqt as _n,
+  pXt as vn,
+  qH as yn,
+  rat as bn,
+  rnt as xn,
+  sct as Sn,
+  stt as Cn,
+  t0 as wn,
+  tcn as Tn,
+  tn as En,
+  uHt as Dn,
+  uXt as On,
+  wDt as kn,
+  wVt as An,
+  wrn as jn,
+  wtt as I,
+  xpn as Mn,
+  y6t as Nn,
+  yct as Pn,
+  ypn as Fn,
+  ytt as In,
+  zH as Ln,
+  zat as Rn,
+} from "@rchunk/app-initial";
+import { n as L, t as R } from "@rchunk/open-automation-side-panel-tab";
+import { a as zn, n as z, r as B, s as V } from "@rchunk/chatgpt-tasks-runtime";
+import { a as Bn, i as Vn } from "@rchunk/presentation";
+import { i as Hn, t as Un } from "@rchunk/mcp-tool-activity-label";
+import { n as H, t as Wn } from "@rchunk/webmcp-tool-calls";
+import { i as Gn, n as Kn, r as qn, t as U } from "@rchunk/tool-activity-disclosure";
+import { n as Jn, t as Yn } from "@rchunk/computer-use-native-app-metadata";
+function Xn({ pluginId: e, plugins: t, serverName: n }) {
+  if (e == null || pn(n)) return null;
+  let r = t.find((t) => t.plugin.id === e) ?? null;
+  return r == null ? null : { alt: kn(r), logoUrl: r.composerIconPath ?? r.logoPath };
 }
-interface ToolItemContentProps {
-  conversationId?: string;
-  expandedContentOnly?: boolean;
-  hostId?: string;
-  hideTextBlocksWithStructuredContent?: boolean;
-  item: ToolItem;
-  loadRemoteLogos?: boolean;
-  matchingApp?: { id: string; name: string; pluginDisplayNames?: string[] } | null;
-  onExpand?(): void;
-  renderMcpApps?: boolean;
-  shouldAutoExpandMcpApp?: boolean;
-  summary?: string | null;
-  summaryIcon?: unknown;
-  toolActivityTurnKey?: string;
-  widgetStatePersistence?: unknown;
-  widgetOnly?: boolean;
+function W() {
+  return (W = e(() => {
+    (Dt(), vn());
+  }))();
 }
-interface IntlShape { formatMessage(descriptor: { defaultMessage: string; description?: string; id?: string }, values?: Record<string, unknown>): string }
-interface McpAppResource {
-  blob?: string;
-  heightHint?: number | null;
-  html?: string;
-  mimeType?: string;
-  minFrameHeight?: number | null;
-  prefersBorder?: boolean;
-  text?: string;
-  uri: string;
+function Zn(e) {
+  let t = (0, G.c)(12),
+    { fallback: n, hostId: r, item: i, loadRemoteLogos: o } = e,
+    s;
+  t[0] !== r || t[1] !== i.invocation.server || t[2] !== i.threadId
+    ? ((s = { hostId: r, serverName: i.invocation.server, threadId: i.threadId }),
+      (t[0] = r),
+      (t[1] = i.invocation.server),
+      (t[2] = i.threadId),
+      (t[3] = s))
+    : (s = t[3]);
+  let c = a(
+      !o || wt({ item: i }) != null || _e(i.invocation.server) || pn(i.invocation.server)
+        ? null
+        : $n,
+      s,
+    ),
+    l;
+  t[4] === c ? (l = t[5]) : ((l = Nt(c)), (t[4] = c), (t[5] = l));
+  let u = l,
+    d;
+  return (
+    t[6] !== n ||
+    t[7] !== u ||
+    t[8] !== i.invocation.server ||
+    t[9] !== c?.name ||
+    t[10] !== c?.title
+      ? ((d =
+          u == null
+            ? n
+            : (0, Qn.jsx)(We, {
+                alt: c?.title ?? c?.name ?? i.invocation.server,
+                className: `icon-xs shrink-0 object-contain`,
+                logoUrl: u.logoUrl,
+                logoDarkUrl: u.logoDarkUrl,
+                fallback: n,
+              })),
+        (t[6] = n),
+        (t[7] = u),
+        (t[8] = i.invocation.server),
+        (t[9] = c?.name),
+        (t[10] = c?.title),
+        (t[11] = d))
+      : (d = t[11]),
+    d
+  );
 }
-interface McpAppCatalogEntry { connectorId?: string | null; kind?: string; resourceUri?: string | null; uri?: string | null }
-interface McpAppRuntimeState {
-  appId: string;
-  catalogError: unknown;
-  catalogPending: boolean;
-  presentation: "fallback" | "inline" | "launcher" | "pending";
-  refetch(): void;
-  renderData: unknown;
-  resource: McpAppResource | null;
-  resourceError: unknown;
-  resourcePending: boolean;
-  resourceUri: string | null;
+var G, Qn, $n;
+function er() {
+  return (er = e(() => {
+    ((G = t()),
+      l(),
+      ke(),
+      vn(),
+      gt(),
+      Fe(),
+      y(),
+      nt(),
+      ct(),
+      jn(),
+      (Qn = d()),
+      ($n = Ee(le, (e, { get: t }) => {
+        let n = e.threadId == null ? null : t(ut, { hostId: e.hostId, conversationId: e.threadId }),
+          { data: r } = n == null ? t(Jt, e.hostId) : t(Tn, { hostId: e.hostId, threadId: n });
+        return r?.data.find((t) => t.name === e.serverName)?.serverInfo ?? null;
+      })));
+  }))();
 }
-
-let runtime: JsxRuntime | undefined;
-function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-
-function safeStringify(value: unknown, spacing = 2): string {
-  try { return JSON.stringify(value, (_key, nested) => typeof nested === "bigint" ? `${nested.toString()}n` : nested, spacing) ?? "null"; }
-  catch { return ""; }
-}
-function annotationText(annotations?: ContentAnnotations): string | null {
-  if (annotations == null) return null;
-  const values: string[] = [];
-  if (annotations.audience?.length) values.push(`audience=${annotations.audience.join(", ")}`);
-  if (annotations.priority != null) values.push(`priority=${String(annotations.priority)}`);
-  if (annotations.lastModified != null) values.push(`lastModified=${annotations.lastModified}`);
-  return values.length === 0 ? null : values.join("; ");
-}
-function annotationLine(annotations?: ContentAnnotations): string | null {
-  const value = annotationText(annotations);
-  return value == null ? null : `Annotations: ${value}`;
-}
-function structuredTextContent(content?: McpContentBlock[]): string | null {
-  if (content?.length !== 1) return null;
-  const [block] = content;
-  if (block.type !== "text" || block.annotations != null) return null;
-  const value = block.text.trim();
-  if (value[0] !== "{" && value[0] !== "[") return null;
-  try { return safeStringify(JSON.parse(value)); } catch { return null; }
-}
-function record(value: unknown): Record<string, unknown> | null { return value != null && typeof value === "object" && !Array.isArray(value) ? value as Record<string, unknown> : null; }
-function resultMetadata(result?: ToolResult | null): Record<string, unknown> | null {
-  const raw = record(result?.raw);
-  return record(raw?._meta) ?? record(record(result?.structuredContent)?._meta);
-}
-function mcpAppResourceUri(item: ToolItem): string | null {
-  if (item.invocationResourceUri?.trim()) return item.invocationResourceUri.trim();
-  const metadata = resultMetadata(item.result);
-  for (const key of ["openai/outputTemplate", "ui/resourceUri", "mcp/resourceUri", "resourceUri"]) {
-    const value = metadata?.[key];
-    if (typeof value === "string" && value.trim()) return value.trim();
-  }
-  return null;
-}
-function browserPageUrl(item: ToolItem): string | null {
-  const metadata = resultMetadata(item.result);
-  for (const key of ["openai/pageUrl", "pageUrl", "sourceUrl"]) {
-    const value = metadata?.[key];
-    if (typeof value === "string" && /^https?:\/\//i.test(value)) return value;
-  }
-  return null;
-}
-
-function optionalCall<T>(candidate: unknown, ...args: unknown[]): T | undefined {
-  return typeof candidate === "function" ? (candidate as (...values: unknown[]) => T)(...args) : undefined;
-}
-function queryValue<T>(descriptor: unknown, input: unknown, options?: unknown): { data?: T; error?: unknown; isFetching?: boolean; isPending?: boolean } {
-  const useQuery = (sharedChunk as any).BX;
-  if (typeof useQuery !== "function" || descriptor == null) return {};
-  try { return useQuery(descriptor, input, options) ?? {}; } catch { return {}; }
-}
-function signalValue<T>(descriptor: unknown, input: unknown, options?: unknown): T | undefined {
-  const useSignal = (sharedChunk as any).BX;
-  if (typeof useSignal !== "function" || descriptor == null) return undefined;
-  try { return useSignal(descriptor, input, options) as T; } catch { return undefined; }
-}
-function resourceFromResult(result: ToolResult | null | undefined, uri: string): McpAppResource | null {
-  for (const block of result?.content ?? []) {
-    if (block.type !== "embedded_resource" || block.resource.uri !== uri) continue;
-    return { uri, mimeType: block.resource.mimeType, text: block.resource.text, blob: block.resource.blob };
-  }
-  return null;
-}
-function normalizeResource(value: unknown, fallbackUri: string): McpAppResource | null {
-  const source = record(value);
-  if (source == null) return null;
-  const resource = record(source.resource) ?? source;
-  const uri = typeof resource.uri === "string" ? resource.uri : fallbackUri;
-  const text = typeof resource.text === "string" ? resource.text : undefined;
-  const blob = typeof resource.blob === "string" ? resource.blob : undefined;
-  const mimeType = typeof resource.mimeType === "string" ? resource.mimeType : undefined;
-  const html = typeof source.html === "string" ? source.html : mimeType?.includes("html") ? text : undefined;
-  return {
-    uri, text, blob, mimeType, html,
-    heightHint: typeof source.heightHint === "number" ? source.heightHint : null,
-    minFrameHeight: typeof source.minFrameHeight === "number" ? source.minFrameHeight : null,
-    prefersBorder: typeof source.prefersBorder === "boolean" ? source.prefersBorder : undefined,
-  };
-}
-function catalogResource(data: unknown, item: ToolItem, descriptorOnly: boolean, catalogPending: boolean, registeredResourceUri: string | null, toolResult: unknown): { isPending: boolean; resourceUri: string | null } {
-  const exactResolver = (initialChunk as any).aXt;
-  if (typeof exactResolver === "function") {
-    try {
-      const resolved = exactResolver({
-        item,
-        mcpServerStatuses: data,
-        descriptorOnly,
-        toolResult,
-        isCatalogPending: catalogPending,
-        registeredResourceUri,
-      });
-      if (resolved != null) return {
-        isPending: resolved.isPending === true,
-        resourceUri: typeof resolved.resourceUri === "string" ? resolved.resourceUri : null,
-      };
-    } catch { /* fall through to the recovered semantic resolver */ }
-  }
-  const direct = mcpAppResourceUri(item);
-  if (direct != null) return { isPending: false, resourceUri: direct };
-  const entries = Array.isArray(data) ? data : Array.isArray(record(data)?.resources) ? record(data)!.resources as unknown[] : [];
-  const server = item.invocation.server;
-  const tool = item.invocation.tool;
-  for (const value of entries) {
-    const entry = record(value) as McpAppCatalogEntry | null;
-    if (entry == null) continue;
-    const entryRecord = value as Record<string, unknown>;
-    if (entryRecord.server != null && entryRecord.server !== server) continue;
-    if (entryRecord.tool != null && entryRecord.tool !== tool) continue;
-    const uri = entry.resourceUri ?? entry.uri;
-    if (typeof uri === "string" && uri.trim()) return { isPending: false, resourceUri: uri.trim() };
-  }
-  return { isPending: catalogPending, resourceUri: null };
-}
-function errorMessage(value: unknown): string {
-  if (value instanceof Error) return value.message;
-  const object = record(value);
-  return typeof object?.message === "string" ? object.message : typeof value === "string" ? value : "Unable to load app";
-}
-function resourceValidation(resource: McpAppResource | null, renderData: unknown): "error" | "ok" | "too-large" {
-  if (resource == null) return "ok";
-  const exactValidation = optionalCall<{ kind?: string }>((initialChunk as any).Ect, { data: renderData, error: null, isLoading: false }, (initialChunk as any).Cct ?? ["inline", "fullscreen", "pip"]);
-  if (exactValidation?.kind === "too-large" || exactValidation?.kind === "error") return exactValidation.kind;
-  const payload = resource.html ?? resource.text ?? resource.blob ?? "";
-  return payload.length > 1_000_000 ? "too-large" : "ok";
-}
-
-function useMcpAppRuntime(item: ToolItem, props: ToolItemContentProps, enabled: boolean): McpAppRuntimeState {
-  const appId = optionalCall<string>((sharedChunk as any).eU, item.callId) ?? item.callId;
-  const registered = signalValue<Record<string, any>>((initialChunk as any).act, appId);
-  const registeredResourceUri = typeof registered?.content?.mcpAppScope?.originResourceUri === "string"
-    ? registered.content.mcpAppScope.originResourceUri
-    : null;
-  const liveToolResult = item.result?.raw ?? registered?.content?.toolResult ?? null;
-  const threadId = signalValue<string>((initialChunk as any).NU, { hostId: props.hostId, conversationId: props.conversationId });
-  const queryInput = {
-    appContext: item.appContext,
-    hostId: props.hostId,
-    invocationResourceUri: item.invocationResourceUri,
-    server: item.invocation.server,
-    threadId: threadId ?? item.threadId ?? props.conversationId,
-    tool: item.invocation.tool,
-  };
-  const catalog = queryValue<unknown>((initialChunk as any).PU, queryInput, { enabled });
-  const target = signalValue<McpAppCatalogEntry>((initialChunk as any).FU, queryInput, { enabled });
-  const resolvedResource = enabled
-    ? catalogResource(catalog.data, item, props.conversationId?.startsWith("chatgpt:") === true, catalog.isPending === true || catalog.isFetching === true, registeredResourceUri, liveToolResult)
-    : { isPending: false, resourceUri: null };
-  const resourceUri = resolvedResource.resourceUri;
-  const exactResourceHook = (initialChunk as any).LU;
-  let resourceQuery: { data?: unknown; error?: unknown; isFetching?: boolean; isPending?: boolean; refetch?: (options?: unknown) => unknown } = {};
-  if (typeof exactResourceHook === "function") {
-    try {
-      resourceQuery = exactResourceHook({
-        connectorId: target?.connectorId ?? null,
-        connectorTarget: target?.kind === "target" ? target : null,
-        hostId: props.hostId,
-        originCallId: item.invocation.server === "codex_apps" && item.appContext != null ? item.callId : null,
-        server: item.invocation.server, threadId: props.conversationId,
-        uri: resourceUri,
-        enabled: enabled && resourceUri != null && !resolvedResource.isPending
-          && !(item.completed === true && item.result == null && liveToolResult == null)
-          && (item.invocation.server !== "codex_apps" || item.appContext == null || item.completed === true),
-      }) ?? {};
-    } catch { resourceQuery = {}; }
-  }
-  const embedded = resourceUri == null ? null : resourceFromResult(item.result, resourceUri);
-  const queriedResource = record(resourceQuery.data)?.resource ?? resourceQuery.data;
-  const parsedResource = optionalCall<unknown>((initialChunk as any).EU, queriedResource);
-  const resource = resourceUri == null ? null : normalizeResource(resourceQuery.data, resourceUri) ?? embedded;
-  const renderData = parsedResource ?? resource;
-  let presentation: McpAppRuntimeState["presentation"] = "fallback";
-  if (resourceUri != null && (resolvedResource.isPending || resourceQuery.isPending || resourceQuery.isFetching) && resource == null) presentation = "pending";
-  else if (resourceUri != null && resource != null) {
-    const exactMode = optionalCall<{ kind?: string }>((initialChunk as any).TU, {
-      hasResourceError: resourceQuery.error != null,
-      isResourceLoading: false,
-      isDilEnabled: false,
-      renderData,
-      resourceUri,
-      shouldRenderMcpApp: enabled,
-    });
-    const kind = exactMode?.kind;
-    presentation = kind === "launcher" || kind === "inline" || kind === "pending" ? kind : "inline";
-  } else if (resourceUri != null && resourceQuery.error == null && catalog.error == null) presentation = "launcher";
-  return {
-    appId,
-    catalogError: catalog.error,
-    catalogPending: catalog.isPending === true || catalog.isFetching === true,
-    presentation,
-    refetch: () => { resourceQuery.refetch?.({ cancelRefetch: false }); },
-    renderData,
-    resource,
-    resourceError: resourceQuery.error,
-    resourcePending: resourceQuery.isPending === true || resourceQuery.isFetching === true,
-    resourceUri,
-  };
-}
-
-function ContentBlock({ block }: { block: McpContentBlock }): unknown {
-  switch (block.type) {
-    case "image": {
-      const annotation = annotationLine(block.annotations);
-      return jsx().jsxs("div", { children: [jsx().jsx("img", { alt: "Image returned by tool", src: `data:${block.mimeType};base64,${block.data}` }), annotation == null ? null : jsx().jsx("p", { children: annotation })] });
+function tr(e, t, n) {
+  let r = t != null && I(t.automation) === `completed`,
+    i = !r && (t?.automation.is_enabled ?? e.isEnabled),
+    a = t == null ? e.title : In(t);
+  if (!i)
+    return {
+      isEnabled: i,
+      nextRunAt: null,
+      scheduleLabel: r ? n.formatMessage(F.completed) : n.formatMessage(F.paused),
+      title: a,
+    };
+  let o = t?.automation.schedule ?? e.schedule,
+    s = (/^DTSTART[;:]/m.test(o) && !/^RRULE:/m.test(o)) || /(?:^|[;:])COUNT=1(?:;|$)/m.test(Tt(o)),
+    c;
+  return (
+    (c = s
+      ? (t == null ? e.displaySchedule : t.automation.display_schedule)?.trim() ||
+        n.formatMessage({
+          id: `chatgpt.automation.oneTimeSchedule`,
+          defaultMessage: `Once`,
+          description: `Schedule summary for a task that runs only once`,
+        })
+      : t == null
+        ? e.displaySchedule?.trim() ||
+          k({
+            rrule: Tt(e.schedule),
+            intl: n,
+            fallbackMessage: n.formatMessage({
+              id: `settings.automations.rruleSummaryFallback`,
+              defaultMessage: `Custom schedule`,
+              description: `Fallback label when RRULE summary cannot be generated`,
+            }),
+          })
+        : Be(t, n)),
+    {
+      isEnabled: i,
+      nextRunAt: t == null ? (e.nextRunAt ?? null) : Ut(t),
+      scheduleLabel: c,
+      title: a,
     }
-    case "audio": {
-      const annotation = annotationLine(block.annotations);
-      return jsx().jsxs("div", { children: [jsx().jsx("audio", { controls: true, preload: "metadata", src: `data:${block.mimeType};base64,${block.data}` }), annotation == null ? null : jsx().jsx("p", { children: annotation })] });
+  );
+}
+function K() {
+  return (K = e(() => {
+    (tt(), xn(), Ge());
+  }))();
+}
+function nr(e) {
+  let t = (0, q.c)(30),
+    { automation: n } = e,
+    r = m(Pe),
+    i = be(),
+    o = (0, J.useId)(),
+    s = a(mn, n.id),
+    c,
+    l,
+    u,
+    d,
+    f,
+    p,
+    h,
+    g,
+    _,
+    v,
+    y;
+  if (t[0] !== n || t[1] !== s || t[2] !== o || t[3] !== i || t[4] !== r) {
+    let { isEnabled: e, nextRunAt: a, scheduleLabel: m, title: b } = tr(n, s, i);
+    y = b;
+    let ee = !!m || a != null;
+    ((c = se),
+      (l = `max-w-full self-start`),
+      (u = !0),
+      (d = ee ? o : void 0),
+      (f = y),
+      (p = `outline`),
+      (h = `large`),
+      (g = y),
+      (_ = () => {
+        (s ?? r.queryClient.invalidateQueries({ queryKey: [`cloud-automations`] }),
+          L({ scope: r, automationId: n.id, title: y }));
+      }),
+      (v = ee
+        ? (0, Y.jsxs)(Y.Fragment, {
+            children: [
+              (0, Y.jsxs)(`span`, {
+                id: o,
+                className: E(`flex min-w-0 items-center gap-1`, e ? `text-info` : `text-tertiary`),
+                children: [
+                  m ? (0, Y.jsx)(`span`, { className: `truncate`, children: m }) : null,
+                  m && a != null ? (0, Y.jsx)(_t, { className: `shrink-0 text-tertiary` }) : null,
+                  a == null
+                    ? null
+                    : (0, Y.jsx)(`span`, {
+                        className: `truncate`,
+                        children: (0, Y.jsx)(x, {
+                          id: `chatgpt.automation.nextRun`,
+                          defaultMessage: `Next {nextRunAt, date, ::MMMd}, {nextRunAt, time, short}`,
+                          description: `Next scheduled run of a task, with a compact date and time in the user's locale`,
+                          values: { nextRunAt: new Date(a) },
+                        }),
+                      }),
+                ],
+              }),
+              (0, Y.jsx)(_t, { className: `shrink-0 text-tertiary` }),
+            ],
+          })
+        : null),
+      (t[0] = n),
+      (t[1] = s),
+      (t[2] = o),
+      (t[3] = i),
+      (t[4] = r),
+      (t[5] = c),
+      (t[6] = l),
+      (t[7] = u),
+      (t[8] = d),
+      (t[9] = f),
+      (t[10] = p),
+      (t[11] = h),
+      (t[12] = g),
+      (t[13] = _),
+      (t[14] = v),
+      (t[15] = y));
+  } else
+    ((c = t[5]),
+      (l = t[6]),
+      (u = t[7]),
+      (d = t[8]),
+      (f = t[9]),
+      (p = t[10]),
+      (h = t[11]),
+      (g = t[12]),
+      (_ = t[13]),
+      (v = t[14]),
+      (y = t[15]));
+  let b;
+  t[16] === y
+    ? (b = t[17])
+    : ((b = (0, Y.jsx)(`span`, { className: `min-w-0 flex-1 truncate text-default`, children: y })),
+      (t[16] = y),
+      (t[17] = b));
+  let ee;
+  return (
+    t[18] !== c ||
+    t[19] !== l ||
+    t[20] !== b ||
+    t[21] !== u ||
+    t[22] !== d ||
+    t[23] !== f ||
+    t[24] !== p ||
+    t[25] !== h ||
+    t[26] !== g ||
+    t[27] !== _ ||
+    t[28] !== v
+      ? ((ee = (0, Y.jsxs)(c, {
+          className: l,
+          allowShrink: u,
+          "aria-describedby": d,
+          "aria-label": f,
+          color: p,
+          size: h,
+          title: g,
+          onClick: _,
+          children: [v, b],
+        })),
+        (t[18] = c),
+        (t[19] = l),
+        (t[20] = b),
+        (t[21] = u),
+        (t[22] = d),
+        (t[23] = f),
+        (t[24] = p),
+        (t[25] = h),
+        (t[26] = g),
+        (t[27] = _),
+        (t[28] = v),
+        (t[29] = ee))
+      : (ee = t[29]),
+    ee
+  );
+}
+var q, J, Y;
+function rr() {
+  return (rr = e(() => {
+    ((q = t()), T(), l(), (J = w()), p(), Cn(), R(), Ze(), S(), an(), K(), (Y = d()));
+  }))();
+}
+function ir(e) {
+  let t = (0, ar.c)(5),
+    { conversationId: n } = e,
+    r = m(Pe),
+    { key: i } = nn(),
+    a,
+    o;
+  return (
+    t[0] !== n || t[1] !== i || t[2] !== r
+      ? ((a = () => {
+          if (r.value.routeKind !== `chatgpt-thread`) return;
+          let e = r.value.conversationId;
+          return r.watch((t) => {
+            let a = t.get(An, n);
+            if (a == null || a !== t.get(An, e)) return;
+            let o = { locationKey: i, conversationId: a };
+            r.get(sr, o) ||
+              (r.set(sr, o, !0),
+              Mn(r, z, {
+                type: B.CHATGPT_TASKS_EVENT_TYPE_CONVERSATION_WITH_TASK_VIEWED,
+                conversationId: a,
+                openDestination: zn.CHATGPT_TASKS_OPEN_DESTINATION_CONVERSATION,
+              }));
+          });
+        }),
+        (o = [n, i, r]),
+        (t[0] = n),
+        (t[1] = i),
+        (t[2] = r),
+        (t[3] = a),
+        (t[4] = o))
+      : ((a = t[3]), (o = t[4])),
+    (0, or.useEffect)(a, o),
+    null
+  );
+}
+var ar, or, sr;
+function cr() {
+  return (cr = e(() => {
+    ((ar = t()), V(), l(), (or = w()), A(), Fn(), an(), Dn(), (sr = Se(Pe, (e) => !1)));
+  }))();
+}
+function lr(e) {
+  let t = (0, dr.c)(25),
+    { automations: n, conversationId: r } = e,
+    i = hn(),
+    { data: a, isSuccess: o } = u(on),
+    s,
+    c,
+    l,
+    d,
+    f;
+  if (t[0] !== n || t[1] !== a || t[2] !== r || t[3] !== o) {
+    let e =
+      o && a.isAvailable
+        ? n.filter((e) => {
+            let { id: t } = e;
+            return a.items.some((e) => {
+              let { automation: n } = e;
+              return n.id === t;
+            });
+          })
+        : n;
+    ((l = `w-full max-w-sm overflow-hidden rounded-2xl border border-default bg-surface`),
+      (d = r != null && e.length > 0 ? (0, X.jsx)(ir, { conversationId: r }) : null));
+    let i;
+    (t[9] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((i = (0, X.jsx)(Ie, { "aria-hidden": `true`, className: `icon-sm shrink-0` })), (t[9] = i))
+      : (i = t[9]),
+      t[10] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((f = (0, X.jsxs)(`header`, {
+            className: `flex items-center gap-2 border-b border-subtle px-4 py-3 text-sm text-secondary select-none`,
+            children: [
+              i,
+              (0, X.jsx)(`h2`, {
+                className: `text-sm font-medium uppercase`,
+                children: (0, X.jsx)(x, {
+                  id: `automations.scheduled.destination.label`,
+                  defaultMessage: `Scheduled`,
+                  description: `Title of the Scheduled destination and the compact scheduled-task list in a conversation`,
+                }),
+              }),
+            ],
+          })),
+          (t[10] = f))
+        : (f = t[10]),
+      (s = `px-4`),
+      (c = e.slice(0, pr).map(ur)),
+      (t[0] = n),
+      (t[1] = a),
+      (t[2] = r),
+      (t[3] = o),
+      (t[4] = s),
+      (t[5] = c),
+      (t[6] = l),
+      (t[7] = d),
+      (t[8] = f));
+  } else ((s = t[4]), (c = t[5]), (l = t[6]), (d = t[7]), (f = t[8]));
+  let p;
+  t[11] === i
+    ? (p = t[12])
+    : ((p = () => {
+        i(`/automations`);
+      }),
+      (t[11] = i),
+      (t[12] = p));
+  let m;
+  t[13] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((m = (0, X.jsx)(x, {
+        id: `automations.list.seeAllTasks`,
+        defaultMessage: `See all tasks`,
+        description: `Button in a compact scheduled-task conversation list that opens the Scheduled destination`,
+      })),
+      (t[13] = m))
+    : (m = t[13]);
+  let h;
+  t[14] === p
+    ? (h = t[15])
+    : ((h = (0, X.jsx)(`li`, {
+        children: (0, X.jsx)(`button`, {
+          type: `button`,
+          className: `w-full cursor-interaction py-3 text-start text-sm text-tertiary select-none hover:text-default`,
+          onClick: p,
+          children: m,
+        }),
+      })),
+      (t[14] = p),
+      (t[15] = h));
+  let g;
+  t[16] !== s || t[17] !== c || t[18] !== h
+    ? ((g = (0, X.jsxs)(`ul`, { className: s, children: [c, h] })),
+      (t[16] = s),
+      (t[17] = c),
+      (t[18] = h),
+      (t[19] = g))
+    : (g = t[19]);
+  let _;
+  return (
+    t[20] !== l || t[21] !== d || t[22] !== f || t[23] !== g
+      ? ((_ = (0, X.jsxs)(`section`, { className: l, children: [d, f, g] })),
+        (t[20] = l),
+        (t[21] = d),
+        (t[22] = f),
+        (t[23] = g),
+        (t[24] = _))
+      : (_ = t[24]),
+    _
+  );
+}
+function ur(e) {
+  return (0, X.jsx)(mr, { automation: e }, e.id);
+}
+var dr, fr, X, pr, mr;
+function Z() {
+  return (Z = e(() => {
+    ((dr = t()),
+      l(),
+      (fr = w()),
+      p(),
+      A(),
+      Cn(),
+      R(),
+      r(),
+      Xt(),
+      an(),
+      cr(),
+      K(),
+      (X = d()),
+      (pr = 5),
+      (mr = (0, fr.memo)(function (e) {
+        let t = (0, dr.c)(19),
+          { automation: n } = e,
+          r = m(Pe),
+          i = be(),
+          o = a(mn, n.id),
+          s;
+        t[0] !== n || t[1] !== o || t[2] !== i
+          ? ((s = tr(n, o, i)), (t[0] = n), (t[1] = o), (t[2] = i), (t[3] = s))
+          : (s = t[3]);
+        let { scheduleLabel: c, title: l } = s,
+          u;
+        t[4] !== n.id || t[5] !== r || t[6] !== l
+          ? ((u = () => {
+              L({ scope: r, automationId: n.id, title: l });
+            }),
+            (t[4] = n.id),
+            (t[5] = r),
+            (t[6] = l),
+            (t[7] = u))
+          : (u = t[7]);
+        let d;
+        t[8] === l
+          ? (d = t[9])
+          : ((d = (0, X.jsx)(`span`, { className: `truncate text-sm text-default`, children: l })),
+            (t[8] = l),
+            (t[9] = d));
+        let f;
+        t[10] === c
+          ? (f = t[11])
+          : ((f =
+              c == null || c.length === 0
+                ? null
+                : (0, X.jsx)(`span`, { className: `truncate text-sm text-tertiary`, children: c })),
+            (t[10] = c),
+            (t[11] = f));
+        let p;
+        t[12] !== d || t[13] !== f
+          ? ((p = (0, X.jsxs)(`span`, {
+              className: `flex min-w-0 flex-col gap-0.5`,
+              children: [d, f],
+            })),
+            (t[12] = d),
+            (t[13] = f),
+            (t[14] = p))
+          : (p = t[14]);
+        let h;
+        t[15] === Symbol.for(`react.memo_cache_sentinel`)
+          ? ((h = (0, X.jsx)(b, {
+              "aria-hidden": `true`,
+              className: `icon-sm shrink-0 text-tertiary`,
+            })),
+            (t[15] = h))
+          : (h = t[15]);
+        let g;
+        return (
+          t[16] !== u || t[17] !== p
+            ? ((g = (0, X.jsx)(`li`, {
+                className: `border-b border-subtle`,
+                children: (0, X.jsxs)(`button`, {
+                  type: `button`,
+                  className: `flex w-full min-w-0 cursor-interaction items-center justify-between gap-4 py-3 text-start hover:text-default`,
+                  onClick: u,
+                  children: [p, h],
+                }),
+              })),
+              (t[16] = u),
+              (t[17] = p),
+              (t[18] = g))
+            : (g = t[18]),
+          g
+        );
+      })));
+  }))();
+}
+function hr(e) {
+  let t = (0, Er.c)(269),
+    {
+      item: r,
+      conversationId: o,
+      expandedContentOnly: s,
+      hideTextBlocksWithStructuredContent: c,
+      hostId: l,
+      loadRemoteLogos: d,
+      matchingApp: p,
+      onExpand: h,
+      renderMcpApps: _,
+      shouldAutoExpandMcpApp: v,
+      summary: y,
+      summaryIcon: b,
+      toolActivityTurnKey: ae,
+    } = e,
+    ce = s !== void 0 && s,
+    le = c !== void 0 && c,
+    S = d === void 0 || d,
+    de = _ === void 0 || _,
+    fe = v !== void 0 && v,
+    pe = y === void 0 ? null : y,
+    C = m(Pe),
+    w = be(),
+    { platform: he } = qe(),
+    ge;
+  t[0] === r.callId ? (ge = t[1]) : ((ge = me(r.callId)), (t[0] = r.callId), (t[1] = ge));
+  let T = ge,
+    Se = a($t, T),
+    Ee = Se === T,
+    De = de && St() && r.isMcpAppWidgetSuperseded !== !0 && (Se == null || Ee),
+    Oe;
+  t[2] !== o || t[3] !== r.callId
+    ? ((Oe = cn({ callId: r.callId, conversationId: o })),
+      (t[2] = o),
+      (t[3] = r.callId),
+      (t[4] = Oe))
+    : (Oe = t[4]);
+  let ke = Oe,
+    Ae = a(bt, ke),
+    Me = gn(`3350594700`);
+  gn(`2957382457`);
+  let Ne = u(En),
+    Fe = pn(r.invocation.server),
+    Ie = Fe && r.appContext != null ? r.callId : null,
+    Be = a(Rt, T),
+    Ve = On({ isCodexAppsServer: Fe, result: r.result }),
+    Ue = r.result?.type === `success` && !Ve ? r.result.raw : null,
+    Ge = Ue ?? (Be?.content.toolCallStatus == null ? Be?.content.toolResult : null) ?? null,
+    { elementHeightPx: Ke, elementRef: Ze } = Gn(),
+    D = r.result?.type === `success` ? r.result.content : null,
+    et = r.result?.type === `error` ? r.result.error : null,
+    tt;
+  t[5] !== r || t[6] !== he
+    ? ((tt = wt({ item: r, platform: he })), (t[5] = r), (t[6] = he), (t[7] = tt))
+    : (tt = t[7]);
+  let O = tt,
+    nt = O?.nativeAppReference ?? null,
+    k = Jn(nt),
+    it = k?.appPath ?? null,
+    ct;
+  t[8] === it ? (ct = t[9]) : ((ct = { appPath: it }), (t[8] = it), (t[9] = ct));
+  let { iconSmall: dt } = Qt(ct),
+    ft;
+  t[10] !== r || t[11] !== p || t[12] !== b
+    ? ((ft = b === void 0 ? Vn(r, p == null ? [] : [p])?.icon : b),
+      (t[10] = r),
+      (t[11] = p),
+      (t[12] = b),
+      (t[13] = ft))
+    : (ft = t[13]);
+  let pt = ft,
+    mt = p ?? null,
+    gt;
+  t[14] !== w ||
+  t[15] !== r.appContext ||
+  t[16] !== r.completed ||
+  t[17] !== r.invocation.arguments ||
+  t[18] !== r.invocation.server ||
+  t[19] !== r.invocation.tool ||
+  t[20] !== r.result ||
+  t[21] !== r.source ||
+  t[22] !== k ||
+  t[23] !== he ||
+  t[24] !== mt
+    ? ((gt = Un({
+        appContext: r.appContext,
+        completed: r.completed,
+        intl: w,
+        toolName: r.invocation.tool,
+        serverName: r.invocation.server,
+        matchingApp: mt,
+        nativeDesktopAppMetadata: k,
+        platform: he,
+        source: r.source,
+        toolArguments: r.invocation.arguments,
+        toolResult: r.result,
+      })),
+      (t[14] = w),
+      (t[15] = r.appContext),
+      (t[16] = r.completed),
+      (t[17] = r.invocation.arguments),
+      (t[18] = r.invocation.server),
+      (t[19] = r.invocation.tool),
+      (t[20] = r.result),
+      (t[21] = r.source),
+      (t[22] = k),
+      (t[23] = he),
+      (t[24] = mt),
+      (t[25] = gt))
+    : (gt = t[25]);
+  let _t = gt,
+    xt;
+  t[26] !== r.source?.kind || t[27] !== Ue
+    ? ((xt = r.source?.kind === `browserUse` && Ue != null ? Ht(Ue._meta) : null),
+      (t[26] = r.source?.kind),
+      (t[27] = Ue),
+      (t[28] = xt))
+    : (xt = t[28]);
+  let A = xt,
+    Ct =
+      Ne &&
+      !ce &&
+      r.completed &&
+      _e(r.invocation.server) &&
+      r.invocation.tool === `js` &&
+      Ue != null
+        ? Wn(Ue._meta)
+        : [],
+    Tt;
+  t[29] !== o || t[30] !== l
+    ? ((Tt = { hostId: l, conversationId: o }), (t[29] = o), (t[30] = l), (t[31] = Tt))
+    : (Tt = t[31]);
+  let Et = a(ut, Tt),
+    Dt;
+  t[32] !== l ||
+  t[33] !== r.appContext ||
+  t[34] !== r.invocation.server ||
+  t[35] !== r.invocation.tool ||
+  t[36] !== r.invocationResourceUri ||
+  t[37] !== Et
+    ? ((Dt = {
+        appContext: r.appContext,
+        hostId: l,
+        invocationResourceUri: r.invocationResourceUri,
+        server: r.invocation.server,
+        threadId: Et,
+        tool: r.invocation.tool,
+      }),
+      (t[32] = l),
+      (t[33] = r.appContext),
+      (t[34] = r.invocation.server),
+      (t[35] = r.invocation.tool),
+      (t[36] = r.invocationResourceUri),
+      (t[37] = Et),
+      (t[38] = Dt))
+    : (Dt = t[38]);
+  let { data: kt, isPending: At, isFetching: Mt, error: Nt } = a(vt, Dt, { enabled: De }),
+    Pt;
+  t[39] !== l ||
+  t[40] !== r.appContext ||
+  t[41] !== r.invocation.server ||
+  t[42] !== r.invocation.tool ||
+  t[43] !== r.invocationResourceUri ||
+  t[44] !== Et
+    ? ((Pt = {
+        appContext: r.appContext,
+        hostId: l,
+        invocationResourceUri: r.invocationResourceUri,
+        server: r.invocation.server,
+        threadId: Et,
+        tool: r.invocation.tool,
+      }),
+      (t[39] = l),
+      (t[40] = r.appContext),
+      (t[41] = r.invocation.server),
+      (t[42] = r.invocation.tool),
+      (t[43] = r.invocationResourceUri),
+      (t[44] = Et),
+      (t[45] = Pt))
+    : (Pt = t[45]);
+  let Ft = a(Qe, Pt, { enabled: De }),
+    { resourceUri: Lt, isPending: zt } = It({
+      item: r,
+      mcpServerStatuses: kt,
+      descriptorOnly: o.startsWith(`chatgpt:`),
+      toolResult: Ge,
+      isCatalogPending: At,
+      registeredResourceUri: Be?.content.mcpAppScope.originResourceUri,
+    }),
+    Ut = r.pluginId != null && !Fe,
+    Jt;
+  t[46] !== l || t[47] !== Ut
+    ? ((Jt = { enabled: Ut, hostId: l }), (t[46] = l), (t[47] = Ut), (t[48] = Jt))
+    : (Jt = t[48]);
+  let Yt = Bt(Jt),
+    Xt;
+  t[49] !== l || t[50] !== Yt
+    ? ((Xt = { enabled: Yt, hostId: l, roots: void 0, resolveActiveRoots: !0 }),
+      (t[49] = l),
+      (t[50] = Yt),
+      (t[51] = Xt))
+    : (Xt = t[51]);
+  let { data: j } = Wt(Xt),
+    tn;
+  t[52] !== j || t[53] !== r.pluginId || t[54] !== Me
+    ? ((tn = j?.find((e) => {
+        let { plugin: t } = e;
+        return (
+          t.id === r.pluginId || (Me && t.remotePluginId != null && t.remotePluginId === r.pluginId)
+        );
+      })),
+      (t[52] = j),
+      (t[53] = r.pluginId),
+      (t[54] = Me),
+      (t[55] = tn))
+    : (tn = t[55]);
+  let nn = tn,
+    M = Yt && j != null && r.pluginId != null && nn == null,
+    rn;
+  t[56] !== l || t[57] !== r.pluginId || t[58] !== C.query || t[59] !== M
+    ? ((rn = C.query.getOptions(Kt, {
+        hostId: l,
+        marketplacePath: null,
+        pluginName: M ? (r.pluginId ?? null) : null,
+        remoteMarketplaceName: te,
+      })),
+      (t[56] = l),
+      (t[57] = r.pluginId),
+      (t[58] = C.query),
+      (t[59] = M),
+      (t[60] = rn))
+    : (rn = t[60]);
+  let an = rn,
+    on = M && an.enabled,
+    sn;
+  t[61] !== an || t[62] !== on
+    ? ((sn = { ...an, enabled: on, retry: !1 }), (t[61] = an), (t[62] = on), (t[63] = sn))
+    : (sn = t[63]);
+  let { data: ln } = ue(sn),
+    un;
+  if (
+    t[64] !== nn?.plugin ||
+    t[65] !== j ||
+    t[66] !== r.invocation.server ||
+    t[67] !== r.pluginId ||
+    t[68] !== ln ||
+    t[69] !== M
+  ) {
+    let e = ln == null ? null : en(ln);
+    ((un = Xn({
+      pluginId: e?.plugin.id ?? nn?.plugin.id ?? r.pluginId,
+      plugins: M && e != null ? [e] : (j ?? []),
+      serverName: r.invocation.server,
+    })),
+      (t[64] = nn?.plugin),
+      (t[65] = j),
+      (t[66] = r.invocation.server),
+      (t[67] = r.pluginId),
+      (t[68] = ln),
+      (t[69] = M),
+      (t[70] = un));
+  } else un = t[70];
+  let N = un,
+    dn = r.completed && r.result == null && Ge == null,
+    P = De && Lt != null && !(De && Lt != null && (Ve || dn)),
+    [F, mn] = (0, Dr.useState)(!1),
+    {
+      data: hn,
+      error: _n,
+      isPending: vn,
+      isFetching: yn,
+      refetch: xn,
+    } = st({
+      connectorId: Ft?.connectorId ?? null,
+      connectorTarget: Ft?.kind === `target` ? Ft : null,
+      hostId: l,
+      originCallId: Ie,
+      server: r.invocation.server,
+      threadId: o,
+      uri: Lt ?? null,
+      enabled: P && !zt && (Ie == null || r.completed),
+    }),
+    Cn = zt ? void 0 : hn,
+    Tn = Cn?.resource,
+    Dn;
+  t[71] === Tn ? (Dn = t[72]) : ((Dn = Je(Tn)), (t[71] = Tn), (t[72] = Dn));
+  let kn = Dn,
+    An = He({
+      resource: Cn?.resource,
+      resourceError: _n,
+      isResourcePending: vn,
+      isResourceFetching: yn,
+      catalogError: Nt,
+      isCatalogPending: At,
+      isCatalogFetching: Mt,
+      canReadResource: !zt && (!Fe || Ft != null),
+    }),
+    jn = An.error,
+    I = P && An.isLoading,
+    Mn = a(Zt, T),
+    Nn = a(Gt, T),
+    Fn = a(fn, T),
+    In = a(Pn, T),
+    Ln = a(Sn, T),
+    L = Ot({
+      hasResourceError: jn != null,
+      isResourceLoading: I,
+      isDilEnabled: !1,
+      renderData: kn,
+      resourceUri: Lt ?? null,
+      shouldRenderMcpApp: P,
+    }),
+    R = L.kind === `html` ? L.renderData : null,
+    zn = Ye({ data: R, error: jn, isLoading: I }, ze),
+    z = L.kind !== `fallback`,
+    B =
+      De &&
+      Lt != null &&
+      (!z || jn != null || Mn != null || zn.kind === `too-large` || zn.kind === `error`),
+    V = B || (R?.isCollapsible ?? !0),
+    Bn = Nn;
+  B ? (Bn = `fallback`) : L.kind !== `html` && (Bn = L.kind);
+  let Hn = Bn === `pending`,
+    H = Bn === `launcher`,
+    Kn = Hn || H,
+    qn = Kn || (!ce && (V || L.kind === `html`)),
+    U = Bn === `inline`,
+    Yn = fe && P,
+    W = z && !H && (!V || (Ae ?? ((!B && F) || Yn))),
+    G = W && !Hn,
+    Qn = F || (Ae ?? Yn),
+    [$n, er] = (0, Dr.useState)(!1),
+    tr = U && G && $n,
+    K = null;
+  !B && (Hn || L.kind === `html`) && ((K = Fn), W && (K = In && !I && !tr ? `open` : `opening`));
+  let nr;
+  t[73] !== Fe ||
+  t[74] !== r.appContext?.appName ||
+  t[75] !== r.invocation.server ||
+  t[76] !== p?.name ||
+  t[77] !== N?.alt
+    ? ((nr = p?.name ?? r.appContext?.appName ?? N?.alt ?? (Fe ? null : Re(r.invocation.server))),
+      (t[73] = Fe),
+      (t[74] = r.appContext?.appName),
+      (t[75] = r.invocation.server),
+      (t[76] = p?.name),
+      (t[77] = N?.alt),
+      (t[78] = nr))
+    : (nr = t[78]);
+  let q = nr,
+    J = B ? ce || F : !Kn && (ce || (z ? G : Qn)),
+    Y;
+  bb0: {
+    if (!J) {
+      let e;
+      (t[79] === D
+        ? (e = t[80])
+        : ((e = { displayContent: D, displayStructuredContentJson: null }),
+          (t[79] = D),
+          (t[80] = e)),
+        (Y = e));
+      break bb0;
     }
-    case "resource_link": {
-      const annotation = annotationLine(block.annotations);
-      return jsx().jsxs("div", { children: [jsx().jsx("div", { children: `Read ${block.title ?? block.name ?? block.uri}` }), annotation == null ? null : jsx().jsx("div", { children: annotation })] });
+    let e;
+    t[81] === r.result
+      ? (e = t[82])
+      : ((e =
+          r.result?.type === `success` && r.result.structuredContent != null
+            ? yr(r.result.structuredContent, 2)
+            : null),
+        (t[81] = r.result),
+        (t[82] = e));
+    let n = e,
+      i;
+    t[83] !== D || t[84] !== le || t[85] !== n
+      ? ((i = le && n != null && D != null ? D.filter(gr) : D),
+        (t[83] = D),
+        (t[84] = le),
+        (t[85] = n),
+        (t[86] = i))
+      : (i = t[86]);
+    let a = i,
+      o;
+    t[87] === a ? (o = t[88]) : ((o = Sr(a)), (t[87] = a), (t[88] = o));
+    let s = o;
+    if (s == null) {
+      let e;
+      (t[89] !== n || t[90] !== a
+        ? ((e = { displayContent: a, displayStructuredContentJson: n }),
+          (t[89] = n),
+          (t[90] = a),
+          (t[91] = e))
+        : (e = t[91]),
+        (Y = e));
+      break bb0;
     }
-    case "embedded_resource": {
-      const content = block.resource.text ?? block.resource.blob ?? "";
-      const annotation = annotationText(block.resource.annotations);
-      return jsx().jsxs("div", { children: [
-        jsx().jsxs("div", { children: [jsx().jsx("strong", { children: "URI" }), " ", block.resource.uri] }),
-        block.resource.mimeType == null ? null : jsx().jsxs("div", { children: [jsx().jsx("strong", { children: "MIME type" }), " ", block.resource.mimeType] }),
-        annotation == null ? null : jsx().jsxs("div", { children: [jsx().jsx("strong", { children: "Annotations" }), " ", annotation] }),
-        content === "" ? null : jsx().jsxs("div", { children: [jsx().jsx("strong", { children: "Content" }), jsx().jsx("pre", { children: content })] }),
-      ] });
+    if (n == null || s === n) {
+      let e;
+      t[92] === Symbol.for(`react.memo_cache_sentinel`) ? ((e = []), (t[92] = e)) : (e = t[92]);
+      let r = n ?? s,
+        i;
+      (t[93] === r
+        ? (i = t[94])
+        : ((i = { displayContent: e, displayStructuredContentJson: r }), (t[93] = r), (t[94] = i)),
+        (Y = i));
+      break bb0;
     }
-    case "unknown": return jsx().jsx("pre", { children: safeStringify(block.raw) });
-    case "text": {
-      const content = [block.text, annotationLine(block.annotations)].filter(value => value != null).join("\n");
-      return jsx().jsxs("div", { children: [jsx().jsx("div", { children: "plaintext" }), jsx().jsx("pre", { children: content })] });
+    let c;
+    (t[95] !== n || t[96] !== a
+      ? ((c = { displayContent: a, displayStructuredContentJson: n }),
+        (t[95] = n),
+        (t[96] = a),
+        (t[97] = c))
+      : (c = t[97]),
+      (Y = c));
+  }
+  let { displayContent: rr, displayStructuredContentJson: ir } = Y,
+    [ar, or] = (0, Dr.useState)(!1),
+    sr;
+  bb1: {
+    if (!ar) {
+      sr = null;
+      break bb1;
+    }
+    let e;
+    (t[98] !== r.callId || t[99] !== r.durationMs || t[100] !== r.invocation || t[101] !== r.result
+      ? ((e = yr(
+          {
+            callId: r.callId,
+            invocation: r.invocation,
+            durationMs: r.durationMs,
+            result: r.result,
+          },
+          2,
+        )),
+        (t[98] = r.callId),
+        (t[99] = r.durationMs),
+        (t[100] = r.invocation),
+        (t[101] = r.result),
+        (t[102] = e))
+      : (e = t[102]),
+      (sr = e));
+  }
+  let cr = sr,
+    lr;
+  t[103] === w
+    ? (lr = t[104])
+    : ((lr = w.formatMessage({
+        id: `codex.mcpTool.rawOutputTriggerTooltip`,
+        defaultMessage: `Show raw tool call output`,
+        description: `Tooltip for the button that opens the raw MCP tool output dialog`,
+      })),
+      (t[103] = w),
+      (t[104] = lr));
+  let ur = lr,
+    dr = r.completed || r.result != null || z,
+    fr = J ? Ke : 0,
+    X = K == null ? !r.completed : K === `opening`,
+    pr = K == null ? void 0 : `status`,
+    mr;
+  t[105] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((mr = E(
+        `text-text-tertiary/90 group-hover/activity-header:text-default`,
+        `text-size-chat min-w-0 shrink truncate`,
+      )),
+      (t[105] = mr))
+    : (mr = t[105]);
+  let Z;
+  t[106] !== q || t[107] !== K
+    ? ((Z =
+        K != null &&
+        q != null &&
+        (0, $.jsx)(x, {
+          id: `codex.mcpTool.namedWidgetStatus`,
+          defaultMessage: `{status, select, opening {Opening {appName}} open {{appName}} other {Open {appName}}}`,
+          description: `Widget row label: opening while preparing, open while expanded inline or in an existing tab (including background or hidden tabs), otherwise an action to open it. appName is the app's display name`,
+          values: { status: K, appName: q },
+        })),
+      (t[106] = q),
+      (t[107] = K),
+      (t[108] = Z))
+    : (Z = t[108]);
+  let hr;
+  t[109] !== q || t[110] !== K
+    ? ((hr =
+        K != null &&
+        q == null &&
+        (0, $.jsx)(x, {
+          id: `codex.mcpTool.unnamedWidgetStatus`,
+          defaultMessage: `{status, select, opening {Opening app} open {App} other {Open app}}`,
+          description: `Widget row label when no app name is available: opening while preparing, open while expanded inline or in an existing tab (including background or hidden tabs), otherwise an action to open it`,
+          values: { status: K },
+        })),
+      (t[109] = q),
+      (t[110] = K),
+      (t[111] = hr))
+    : (hr = t[111]);
+  let br;
+  t[112] !== _t || t[113] !== K
+    ? ((br =
+        K == null &&
+        (0, $.jsx)(x, {
+          id: `codex.mcpTool.collapsedLabel.toolOnly`,
+          defaultMessage: `{tool}`,
+          description: `Short MCP tool label shown in the collapsed summary row`,
+          values: { tool: (0, $.jsx)(`span`, { children: _t }, `tool`) },
+        })),
+      (t[112] = _t),
+      (t[113] = K),
+      (t[114] = br))
+    : (br = t[114]);
+  let xr;
+  t[115] !== X || t[116] !== pr || t[117] !== Z || t[118] !== hr || t[119] !== br
+    ? ((xr = (0, $.jsxs)(Rn, { active: X, role: pr, className: mr, children: [Z, hr, br] })),
+      (t[115] = X),
+      (t[116] = pr),
+      (t[117] = Z),
+      (t[118] = hr),
+      (t[119] = br),
+      (t[120] = xr))
+    : (xr = t[120]);
+  let Q = xr,
+    wr;
+  t[121] !== pt ||
+  t[122] !== A ||
+  t[123] !== l ||
+  t[124] !== r ||
+  t[125] !== S ||
+  t[126] !== p ||
+  t[127] !== dt ||
+  t[128] !== k?.displayName ||
+  t[129] !== nt ||
+  t[130] !== O ||
+  t[131] !== N ||
+  t[132] !== pe ||
+  t[133] !== Q ||
+  t[134] !== K
+    ? ((wr =
+        (K == null ? pe : null) ??
+        (0, $.jsxs)($.Fragment, {
+          children: [
+            pt === void 0
+              ? (0, $.jsx)(Zn, {
+                  hostId: l,
+                  item: r,
+                  loadRemoteLogos: S,
+                  fallback:
+                    N == null && nt != null
+                      ? (0, $.jsx)(We, {
+                          alt: k?.displayName ?? O?.name ?? r.invocation.server,
+                          className: `icon-xs shrink-0 scale-[1.15] object-contain`,
+                          loadRemote: S,
+                          logoUrl: dt,
+                          logoDarkUrl: null,
+                          fallback: (0, $.jsx)(ne, {
+                            className: `shrink-0 text-secondary`,
+                            "aria-hidden": !1,
+                            asset: ie,
+                          }),
+                        })
+                      : N == null && O?.groupKey === `computer-use`
+                        ? (0, $.jsx)(ne, { className: `shrink-0 text-secondary`, asset: ie })
+                        : N == null && O?.logoUrl != null
+                          ? (0, $.jsx)(We, {
+                              alt: O.name,
+                              className: `icon-xs shrink-0 object-contain`,
+                              loadRemote: S,
+                              logoUrl: O.logoUrl,
+                              logoDarkUrl: null,
+                              fallback: (0, $.jsx)(ne, {
+                                className: `shrink-0 text-secondary`,
+                                "aria-hidden": !1,
+                                asset: ye,
+                              }),
+                            })
+                          : N == null && O?.usesBrowserIcon === !0
+                            ? A == null
+                              ? (0, $.jsx)(ne, {
+                                  className: `shrink-0 object-contain text-secondary`,
+                                  asset: we,
+                                })
+                              : (0, $.jsx)(wn, {
+                                  className: `icon-xs shrink-0 object-contain text-secondary`,
+                                  href: A,
+                                  loadRemote: S,
+                                })
+                            : N == null && _e(r.invocation.server)
+                              ? (0, $.jsx)(ne, {
+                                  className: `shrink-0 object-contain text-secondary`,
+                                  asset: re,
+                                })
+                              : (0, $.jsx)(We, {
+                                  alt:
+                                    N?.alt ??
+                                    p?.name ??
+                                    r.appContext?.appName ??
+                                    r.invocation.server,
+                                  appInfo: N == null ? p : null,
+                                  className: `icon-xs shrink-0 object-contain text-secondary`,
+                                  loadRemote: S,
+                                  knownAppId:
+                                    N?.alt ?? r.appContext?.appName ?? r.appContext?.connectorId,
+                                  logoUrl: N?.logoUrl,
+                                  fallback: (0, $.jsx)(ne, {
+                                    className: `shrink-0 text-secondary`,
+                                    "aria-hidden": !1,
+                                    asset: ye,
+                                  }),
+                                }),
+                })
+              : pt,
+            Q,
+          ],
+        })),
+      (t[121] = pt),
+      (t[122] = A),
+      (t[123] = l),
+      (t[124] = r),
+      (t[125] = S),
+      (t[126] = p),
+      (t[127] = dt),
+      (t[128] = k?.displayName),
+      (t[129] = nt),
+      (t[130] = O),
+      (t[131] = N),
+      (t[132] = pe),
+      (t[133] = Q),
+      (t[134] = K),
+      (t[135] = wr))
+    : (wr = t[135]);
+  let Tr = wr,
+    Or;
+  t[136] !== Qn ||
+  t[137] !== W ||
+  t[138] !== B ||
+  t[139] !== F ||
+  t[140] !== ke ||
+  t[141] !== h ||
+  t[142] !== C ||
+  t[143] !== Yn ||
+  t[144] !== z ||
+  t[145] !== U ||
+  t[146] !== ae ||
+  t[147] !== Ae
+    ? ((Or = () => {
+        if (B) {
+          (F || h?.(), mn(!F));
+          return;
+        }
+        let e = z ? !W : !Qn;
+        if ((e && h?.(), z)) {
+          (er(e && U), at(C, ke, e));
+          return;
+        }
+        (e && ae != null && $e(C, ae), !e && (Ae === !0 || Yn) && at(C, ke, !1), mn(e));
+      }),
+      (t[136] = Qn),
+      (t[137] = W),
+      (t[138] = B),
+      (t[139] = F),
+      (t[140] = ke),
+      (t[141] = h),
+      (t[142] = C),
+      (t[143] = Yn),
+      (t[144] = z),
+      (t[145] = U),
+      (t[146] = ae),
+      (t[147] = Ae),
+      (t[148] = Or))
+    : (Or = t[148]);
+  let kr = Or,
+    Ar;
+  t[149] === r.automaticApprovalReviews
+    ? (Ar = t[150])
+    : ((Ar = r.automaticApprovalReviews == null ? null : (0, $.jsx)(qt, {})),
+      (t[149] = r.automaticApprovalReviews),
+      (t[150] = Ar));
+  let jr;
+  t[151] !== Ln || t[152] !== vn || t[153] !== T || t[154] !== Fn || t[155] !== H
+    ? ((jr = H && Fn === `closed` && Ln ? (0, $.jsx)(ot, { disabled: vn, mcpAppId: T }) : null),
+      (t[151] = Ln),
+      (t[152] = vn),
+      (t[153] = T),
+      (t[154] = Fn),
+      (t[155] = H),
+      (t[156] = jr))
+    : (jr = t[156]);
+  let Mr;
+  t[157] !== Ar || t[158] !== jr
+    ? ((Mr = (0, $.jsxs)($.Fragment, { children: [Ar, jr] })),
+      (t[157] = Ar),
+      (t[158] = jr),
+      (t[159] = Mr))
+    : (Mr = t[159]);
+  let Nr = Mr,
+    Pr;
+  t[160] !== dr ||
+  t[161] !== kr ||
+  t[162] !== V ||
+  t[163] !== J ||
+  t[164] !== Ln ||
+  t[165] !== T ||
+  t[166] !== Fn ||
+  t[167] !== C ||
+  t[168] !== H ||
+  t[169] !== K
+    ? ((Pr =
+        dr && K !== `opening` && (H ? Fn === `closed` && !Ln : V)
+          ? { expanded: !H && J, onToggle: H ? () => Vt(C, T) : kr }
+          : void 0),
+      (t[160] = dr),
+      (t[161] = kr),
+      (t[162] = V),
+      (t[163] = J),
+      (t[164] = Ln),
+      (t[165] = T),
+      (t[166] = Fn),
+      (t[167] = C),
+      (t[168] = H),
+      (t[169] = K),
+      (t[170] = Pr))
+    : (Pr = t[170]);
+  let Fr = Pr,
+    Ir =
+      U &&
+      G &&
+      (R?.prefersBorder ?? Be?.content.resource?.prefersBorder ?? !0) &&
+      `overflow-hidden rounded-lg border border-strong bg-surface`,
+    Lr;
+  t[171] === Ir ? (Lr = t[172]) : ((Lr = E(`group`, Ir)), (t[171] = Ir), (t[172] = Lr));
+  let Rr = Lr,
+    zr = H && `w-full`,
+    Br = U && G && `w-full px-4 pt-3 pb-2`,
+    Vr;
+  t[173] !== zr || t[174] !== Br
+    ? ((Vr = E(zr, Br)), (t[173] = zr), (t[174] = Br), (t[175] = Vr))
+    : (Vr = t[175]);
+  let Hr = Vr,
+    Ur;
+  t[176] !== Fr || t[177] !== Hr || t[178] !== Nr || t[179] !== Tr
+    ? ((Ur = (0, $.jsx)(yt, { accessory: Nr, className: Hr, disclosure: Fr, children: Tr })),
+      (t[176] = Fr),
+      (t[177] = Hr),
+      (t[178] = Nr),
+      (t[179] = Tr),
+      (t[180] = Ur))
+    : (Ur = t[180]);
+  let Wr = Ur,
+    Gr = Lt == null ? null : R,
+    Kr;
+  t[181] !== I || t[182] !== jn || t[183] !== Gr
+    ? ((Kr = { data: Gr, error: jn, isLoading: I }),
+      (t[181] = I),
+      (t[182] = jn),
+      (t[183] = Gr),
+      (t[184] = Kr))
+    : (Kr = t[184]);
+  let qr = U ? `card` : `standalone`,
+    Jr = q ?? void 0,
+    Yr = U ? `inline` : Nn,
+    Xr;
+  t[185] === xn
+    ? (Xr = t[186])
+    : ((Xr = () => {
+        xn({ cancelRefetch: !1 });
+      }),
+      (t[185] = xn),
+      (t[186] = Xr));
+  let Zr = !qn,
+    Qr;
+  t[187] !== T ||
+  t[188] !== Kr ||
+  t[189] !== qr ||
+  t[190] !== Jr ||
+  t[191] !== Yr ||
+  t[192] !== Xr ||
+  t[193] !== Zr
+    ? ((Qr = (0, $.jsx)(jt, {
+        hostDisplayModes: ze,
+        resource: Kr,
+        inlineSurface: qr,
+        mcpAppId: T,
+        pluginName: Jr,
+        presentation: Yr,
+        onRetryResourceRead: Xr,
+        showLoadingStatus: Zr,
+      })),
+      (t[187] = T),
+      (t[188] = Kr),
+      (t[189] = qr),
+      (t[190] = Jr),
+      (t[191] = Yr),
+      (t[192] = Xr),
+      (t[193] = Zr),
+      (t[194] = Qr))
+    : (Qr = t[194]);
+  let $r = Qr,
+    ei = +!!J,
+    ti;
+  t[195] !== ei || t[196] !== fr
+    ? ((ti = { height: fr, opacity: ei }), (t[195] = ei), (t[196] = fr), (t[197] = ti))
+    : (ti = t[197]);
+  let ni = J ? `overflow-visible` : `overflow-hidden`,
+    ri;
+  t[198] === ni ? (ri = t[199]) : ((ri = E(ni)), (t[198] = ni), (t[199] = ri));
+  let ii = J ? `auto` : `none`,
+    ai;
+  t[200] === ii ? (ai = t[201]) : ((ai = { pointerEvents: ii }), (t[200] = ii), (t[201] = ai));
+  let oi;
+  t[202] === G
+    ? (oi = t[203])
+    : ((oi = () => {
+        G && er(!1);
+      }),
+      (t[202] = G),
+      (t[203] = oi));
+  let si = J ? Ze : null,
+    ci = P && `relative`,
+    li = !V && `p-1`,
+    ui;
+  t[204] !== ci || t[205] !== li
+    ? ((ui = E(ci, li)), (t[204] = ci), (t[205] = li), (t[206] = ui))
+    : (ui = t[206]);
+  let di = !U && V ? `grouped` : `flush`,
+    fi;
+  t[207] !== o ||
+  t[208] !== rr ||
+  t[209] !== ir ||
+  t[210] !== R?.heightHint ||
+  t[211] !== R?.minFrameHeight ||
+  t[212] !== L ||
+  t[213] !== et ||
+  t[214] !== l ||
+  t[215] !== J ||
+  t[216] !== I ||
+  t[217] !== ar ||
+  t[218] !== r.automaticApprovalReviews ||
+  t[219] !== r.invocation.server ||
+  t[220] !== r.invocation.tool ||
+  t[221] !== $r ||
+  t[222] !== ur ||
+  t[223] !== cr ||
+  t[224] !== z ||
+  t[225] !== P ||
+  t[226] !== tr ||
+  t[227] !== U
+    ? ((fi = J
+        ? (0, $.jsxs)($.Fragment, {
+            children: [
+              r.automaticApprovalReviews == null
+                ? null
+                : (0, $.jsx)(bn, {
+                    className: U ? `px-4` : void 0,
+                    isExpandable: !U,
+                    reviews: r.automaticApprovalReviews,
+                  }),
+              z
+                ? tr
+                  ? (0, $.jsx)(vr, {
+                      heightHint: R?.heightHint ?? null,
+                      minFrameHeight: R?.minFrameHeight ?? null,
+                    })
+                  : $r
+                : rr && rr.length > 0
+                  ? (0, $.jsx)(`div`, {
+                      className: E(`[&_*]:text-text/50`, `flex flex-col gap-0.5`),
+                      children: rr.map((e, t) =>
+                        (0, $.jsx)(Cr, { block: e, conversationId: o, hostId: l }, t),
+                      ),
+                    })
+                  : et
+                    ? (0, $.jsx)(Te, {
+                        className: `w-full`,
+                        fullWidth: !0,
+                        level: `danger`,
+                        children: (0, $.jsx)(`div`, {
+                          className: `max-h-48 overflow-auto text-size-chat whitespace-pre-wrap`,
+                          children: et,
+                        }),
+                      })
+                    : ir
+                      ? null
+                      : (0, $.jsx)(`p`, {
+                          className: `text-codex-description/80`,
+                          children: (0, $.jsx)(x, {
+                            id: `codex.mcpTool.noResult`,
+                            defaultMessage: `Tool returned no content`,
+                            description: `Message shown when an MCP tool call produced no content`,
+                          }),
+                        }),
+              !I &&
+                J &&
+                !tr &&
+                !z &&
+                ir &&
+                (0, $.jsx)(n, {
+                  codeContainerClassName: `max-h-48 overflow-auto`,
+                  language: `json`,
+                  content: ir,
+                  showStickyRightContent: !1,
+                }),
+              !I &&
+                J &&
+                !tr &&
+                (0, $.jsx)(f, {
+                  open: ar,
+                  onOpenChange: or,
+                  triggerContent: (0, $.jsx)(`div`, {
+                    className: E(`inline-flex w-fit`, P && `absolute right-1 bottom-2 z-50`),
+                    children: (0, $.jsx)(Ce, {
+                      side: `top`,
+                      align: `center`,
+                      cloneCustomTrigger: !0,
+                      tooltipContent: ur,
+                      children: (0, $.jsx)(se, {
+                        className: `cursor-interaction opacity-0 group-focus-within:opacity-100 group-hover:opacity-100 focus-visible:opacity-100`,
+                        "aria-label": ur,
+                        color: `ghost`,
+                        onClick: () => {
+                          or(!0);
+                        },
+                        size: `icon`,
+                        children: (0, $.jsx)(je, { className: `icon-xxs` }),
+                      }),
+                    }),
+                  }),
+                  children: (0, $.jsxs)(g, {
+                    children: [
+                      (0, $.jsx)(ve, {
+                        children: (0, $.jsx)(i, {
+                          title: (0, $.jsx)(ee, {
+                            children: (0, $.jsx)(x, {
+                              id: `codex.mcpTool.rawOutputHeading`,
+                              defaultMessage: `Raw {server}.{tool} tool call output`,
+                              description: `Heading shown within the raw output dialog`,
+                              values: { server: r.invocation.server, tool: r.invocation.tool },
+                            }),
+                          }),
+                        }),
+                      }),
+                      (0, $.jsx)(ve, {
+                        children:
+                          cr == null
+                            ? null
+                            : (0, $.jsx)(n, {
+                                codeContainerClassName: `max-h-128 overflow-auto`,
+                                language: `json`,
+                                content: cr,
+                                showStickyRightContent: !0,
+                              }),
+                      }),
+                    ],
+                  }),
+                }),
+            ],
+          })
+        : null),
+      (t[207] = o),
+      (t[208] = rr),
+      (t[209] = ir),
+      (t[210] = R?.heightHint),
+      (t[211] = R?.minFrameHeight),
+      (t[212] = L),
+      (t[213] = et),
+      (t[214] = l),
+      (t[215] = J),
+      (t[216] = I),
+      (t[217] = ar),
+      (t[218] = r.automaticApprovalReviews),
+      (t[219] = r.invocation.server),
+      (t[220] = r.invocation.tool),
+      (t[221] = $r),
+      (t[222] = ur),
+      (t[223] = cr),
+      (t[224] = z),
+      (t[225] = P),
+      (t[226] = tr),
+      (t[227] = U),
+      (t[228] = fi))
+    : (fi = t[228]);
+  let pi;
+  t[229] !== si || t[230] !== ui || t[231] !== di || t[232] !== fi
+    ? ((pi = (0, $.jsx)(Xe, { ref: si, className: ui, variant: di, children: fi })),
+      (t[229] = si),
+      (t[230] = ui),
+      (t[231] = di),
+      (t[232] = fi),
+      (t[233] = pi))
+    : (pi = t[233]);
+  let mi;
+  t[234] !== ti || t[235] !== ri || t[236] !== ai || t[237] !== oi || t[238] !== pi
+    ? ((mi = (0, $.jsx)(xe.div, {
+        initial: !1,
+        animate: ti,
+        transition: oe,
+        className: ri,
+        style: ai,
+        onAnimationComplete: oi,
+        children: pi,
+      })),
+      (t[234] = ti),
+      (t[235] = ri),
+      (t[236] = ai),
+      (t[237] = oi),
+      (t[238] = pi),
+      (t[239] = mi))
+    : (mi = t[239]);
+  let hi = Kn ? $r : mi,
+    gi;
+  t[242] !== W || t[243] !== T || t[244] !== de || t[245] !== C.value || t[246] !== P
+    ? ((gi =
+        de || C.value.routeKind !== `chatgpt-thread`
+          ? (0, $.jsx)(rt, { mcpAppId: T, isInlineRequested: P && W })
+          : null),
+      (t[242] = W),
+      (t[243] = T),
+      (t[244] = de),
+      (t[245] = C.value),
+      (t[246] = P),
+      (t[247] = gi))
+    : (gi = t[247]);
+  let _i;
+  t[248] !== Rr ||
+  t[249] !== Fr ||
+  t[250] !== qn ||
+  t[251] !== Hr ||
+  t[252] !== hi ||
+  t[253] !== U ||
+  t[254] !== pe ||
+  t[255] !== Nr ||
+  t[256] !== b ||
+  t[257] !== Q ||
+  t[258] !== Wr ||
+  t[259] !== K
+    ? ((_i =
+        b !== void 0 && qn
+          ? (0, $.jsx)(Le, {
+              accessory: Nr,
+              body: hi,
+              className: Rr,
+              "data-mcp-app-card": U ? !0 : void 0,
+              disclosure: Fr,
+              headerClassName: Hr,
+              icon: b,
+              summary: K == null ? (pe ?? Q) : Q,
+            })
+          : (0, $.jsx)(lt, {
+              className: Rr,
+              "data-mcp-app-card": U ? !0 : void 0,
+              header: qn ? Wr : null,
+              body: hi,
+            })),
+      (t[248] = Rr),
+      (t[249] = Fr),
+      (t[250] = qn),
+      (t[251] = Hr),
+      (t[252] = hi),
+      (t[253] = U),
+      (t[254] = pe),
+      (t[255] = Nr),
+      (t[256] = b),
+      (t[257] = Q),
+      (t[258] = Wr),
+      (t[259] = K),
+      (t[260] = _i))
+    : (_i = t[260]);
+  let vi;
+  t[261] !== A || t[262] !== r.callId || t[263] !== S
+    ? ((vi = (e, t) =>
+        (0, $.jsxs)(
+          Dr.Fragment,
+          {
+            children: [
+              (0, $.jsx)(ht, { variant: `grouped` }),
+              (0, $.jsx)(_r, { call: e, fallbackPageUrl: A, loadRemoteLogos: S }),
+            ],
+          },
+          `${r.callId}:webmcp:${t}:${e.name}`,
+        )),
+      (t[261] = A),
+      (t[262] = r.callId),
+      (t[263] = S),
+      (t[264] = vi))
+    : (vi = t[264]);
+  let yi = Ct.map(vi),
+    bi;
+  return (
+    t[265] !== gi || t[266] !== _i || t[267] !== yi
+      ? ((bi = (0, $.jsxs)($.Fragment, { children: [gi, _i, yi] })),
+        (t[265] = gi),
+        (t[266] = _i),
+        (t[267] = yi),
+        (t[268] = bi))
+      : (bi = t[268]),
+    bi
+  );
+}
+function gr(e) {
+  return e.type !== `text`;
+}
+function _r(e) {
+  let t = (0, Er.c)(32),
+    { call: r, fallbackPageUrl: i, loadRemoteLogos: a } = e,
+    o = r.sourceHostname == null ? i : `https://${r.sourceHostname}`,
+    s = r.kind === `invokeTool` ? r.inputJson : void 0,
+    c = r.kind === `invokeTool` && r.inputTruncated === !0,
+    l;
+  t[0] !== a || t[1] !== o
+    ? ((l =
+        o == null
+          ? (0, $.jsx)(ne, { className: `shrink-0 text-text/60`, asset: we })
+          : (0, $.jsx)(wn, { className: `icon-xs shrink-0 text-text/60`, href: o, loadRemote: a })),
+      (t[0] = a),
+      (t[1] = o),
+      (t[2] = l))
+    : (l = t[2]);
+  let u;
+  t[3] !== r.name || t[4] !== r.title
+    ? ((u = r.title ?? Re(r.name, { style: `sentence` })),
+      (t[3] = r.name),
+      (t[4] = r.title),
+      (t[5] = u))
+    : (u = t[5]);
+  let d;
+  t[6] !== r.kind || t[7] !== u
+    ? ((d = (0, $.jsx)(x, {
+        id: `codex.mcpTool.webMcpActivity.completed`,
+        defaultMessage: `{kind, select, listTools {Listed website tools} other {{toolName}}}`,
+        description: `Human-readable activity label for a website-provided WebMCP tool invocation`,
+        values: { kind: r.kind, toolName: u },
+      })),
+      (t[6] = r.kind),
+      (t[7] = u),
+      (t[8] = d))
+    : (d = t[8]);
+  let f;
+  t[9] !== r.description ||
+  t[10] !== r.name ||
+  t[11] !== r.readOnlyHint ||
+  t[12] !== r.sourceHostname ||
+  t[13] !== r.title ||
+  t[14] !== s ||
+  t[15] !== c
+    ? ((f = yr(
+        {
+          name: r.name,
+          title: r.title,
+          description: r.description,
+          website: r.sourceHostname,
+          readOnlyHint: r.readOnlyHint,
+          input: s == null || c ? s : br(s),
+          inputTruncated: c ? !0 : void 0,
+        },
+        2,
+      )),
+      (t[9] = r.description),
+      (t[10] = r.name),
+      (t[11] = r.readOnlyHint),
+      (t[12] = r.sourceHostname),
+      (t[13] = r.title),
+      (t[14] = s),
+      (t[15] = c),
+      (t[16] = f))
+    : (f = t[16]);
+  let p = c ? `true` : `false`,
+    m;
+  t[17] === p
+    ? (m = t[18])
+    : ((m = (0, $.jsx)(x, {
+        id: `codex.localConversation.webMcpTools.toolLabel`,
+        defaultMessage: `{truncated, select, true {Tool (input truncated)} other {Tool}}`,
+        description: `Title for a website-provided WebMCP tool definition and its input`,
+        values: { truncated: p },
+      })),
+      (t[17] = p),
+      (t[18] = m));
+  let h;
+  t[19] !== f || t[20] !== m
+    ? ((h = (0, $.jsx)(n, {
+        codeContainerClassName: `max-h-48 overflow-auto`,
+        content: f,
+        language: `json`,
+        showStickyRightContent: !1,
+        title: m,
+      })),
+      (t[19] = f),
+      (t[20] = m),
+      (t[21] = h))
+    : (h = t[21]);
+  let g;
+  t[22] !== r.outputJson || t[23] !== r.outputTruncated
+    ? ((g =
+        r.outputJson == null
+          ? null
+          : (0, $.jsx)(n, {
+              codeContainerClassName: `max-h-48 overflow-auto`,
+              content: r.outputTruncated ? r.outputJson : xr(r.outputJson),
+              language: `json`,
+              showStickyRightContent: !1,
+              title: (0, $.jsx)(x, {
+                id: `codex.localConversation.webMcpTools.resultLabel`,
+                defaultMessage: `{truncated, select, true {Result (truncated)} other {Result}}`,
+                description: `Title for a website-provided WebMCP tool result`,
+                values: { truncated: r.outputTruncated ? `true` : `false` },
+              }),
+            })),
+      (t[22] = r.outputJson),
+      (t[23] = r.outputTruncated),
+      (t[24] = g))
+    : (g = t[24]);
+  let _;
+  t[25] !== h || t[26] !== g
+    ? ((_ = (0, $.jsxs)(`div`, { className: `flex min-w-0 flex-col gap-2`, children: [h, g] })),
+      (t[25] = h),
+      (t[26] = g),
+      (t[27] = _))
+    : (_ = t[27]);
+  let v;
+  return (
+    t[28] !== l || t[29] !== d || t[30] !== _
+      ? ((v = (0, $.jsx)(U, { icon: l, status: `completed`, summary: d, children: _ })),
+        (t[28] = l),
+        (t[29] = d),
+        (t[30] = _),
+        (t[31] = v))
+      : (v = t[31]),
+    v
+  );
+}
+function vr(e) {
+  let t = (0, Er.c)(5),
+    { heightHint: n, minFrameHeight: r } = e,
+    i;
+  t[0] !== n || t[1] !== r ? ((i = pt(n, r)), (t[0] = n), (t[1] = r), (t[2] = i)) : (i = t[2]);
+  let a;
+  return (
+    t[3] === i
+      ? (a = t[4])
+      : ((a = (0, $.jsx)(Mt, {
+          "aria-hidden": !0,
+          "data-mcp-app-expanding-placeholder": `true`,
+          className: `w-full`,
+          style: { height: i },
+        })),
+        (t[3] = i),
+        (t[4] = a)),
+    a
+  );
+}
+function yr(e, t) {
+  try {
+    return JSON.stringify(e, null, t) ?? `null`;
+  } catch {
+    return (
+      v.debug(`Failed to stringify MCP tool call payload`, { safe: { value: e }, sensitive: {} }),
+      ``
+    );
+  }
+}
+function br(e) {
+  try {
+    return JSON.parse(e);
+  } catch {
+    return e;
+  }
+}
+function xr(e) {
+  try {
+    return yr(JSON.parse(e), 2);
+  } catch {
+    return e;
+  }
+}
+function Sr(e) {
+  if (e?.length !== 1) return null;
+  let [t] = e;
+  if (t.type !== `text` || t.annotations != null) return null;
+  let n = t.text.trim();
+  if (n[0] !== `{` && n[0] !== `[`) return null;
+  try {
+    return yr(JSON.parse(n), 2);
+  } catch {
+    return null;
+  }
+}
+function Cr(e) {
+  let t = (0, Er.c)(73),
+    { block: n, conversationId: r, hostId: i } = e,
+    a = m(un),
+    o = be();
+  switch (n.type) {
+    case `image`: {
+      let e;
+      t[0] !== n.annotations || t[1] !== o
+        ? ((e = Q(n.annotations, o)), (t[0] = n.annotations), (t[1] = o), (t[2] = e))
+        : (e = t[2]);
+      let s = e,
+        l = `data:${n.mimeType};base64,${n.data}`,
+        u;
+      t[3] === o
+        ? (u = t[4])
+        : ((u = o.formatMessage({
+            id: `codex.mcpTool.contentBlock.imageAlt`,
+            defaultMessage: `Image returned by tool`,
+            description: `Accessible description for an image included in an MCP tool result`,
+          })),
+          (t[3] = o),
+          (t[4] = u));
+      let d = u,
+        f;
+      t[5] !== r || t[6] !== i || t[7] !== d || t[8] !== l || t[9] !== o || t[10] !== a
+        ? ((f = () =>
+            Pt(a, {
+              chatGptConversationId: r.startsWith(`chatgpt:`) ? zt(r.slice(8)) : void 0,
+              displaySrc: l,
+              hostId: i,
+              image: { kind: `generic`, src: l, alt: d },
+              intl: o,
+            })),
+          (t[5] = r),
+          (t[6] = i),
+          (t[7] = d),
+          (t[8] = l),
+          (t[9] = o),
+          (t[10] = a),
+          (t[11] = f))
+        : (f = t[11]);
+      let p;
+      t[12] !== d || t[13] !== l
+        ? ((p = (0, $.jsx)(`img`, {
+            className: `max-h-48 w-max max-w-full gap-0.5 rounded-md object-contain`,
+            alt: d,
+            src: l,
+          })),
+          (t[12] = d),
+          (t[13] = l),
+          (t[14] = p))
+        : (p = t[14]);
+      let m;
+      t[15] !== f || t[16] !== p
+        ? ((m = (0, $.jsx)(c, { getItems: f, children: p })), (t[15] = f), (t[16] = p), (t[17] = m))
+        : (m = t[17]);
+      let h = m;
+      if (s == null) return h;
+      let g;
+      t[18] === s
+        ? (g = t[19])
+        : ((g = (0, $.jsx)(`p`, {
+            className: `text-size-chat whitespace-pre-wrap text-codex-description/80`,
+            children: s,
+          })),
+          (t[18] = s),
+          (t[19] = g));
+      let _;
+      return (
+        t[20] !== h || t[21] !== g
+          ? ((_ = (0, $.jsxs)(`div`, { className: `flex flex-col gap-0.5`, children: [h, g] })),
+            (t[20] = h),
+            (t[21] = g),
+            (t[22] = _))
+          : (_ = t[22]),
+        _
+      );
+    }
+    case `audio`: {
+      let e;
+      t[23] !== n.annotations || t[24] !== o
+        ? ((e = Q(n.annotations, o)), (t[23] = n.annotations), (t[24] = o), (t[25] = e))
+        : (e = t[25]);
+      let r = e,
+        i = `data:${n.mimeType};base64,${n.data}`,
+        a;
+      t[26] === i
+        ? (a = t[27])
+        : ((a = (0, $.jsx)(`audio`, {
+            className: `w-full gap-0.5`,
+            controls: !0,
+            src: i,
+            preload: `metadata`,
+          })),
+          (t[26] = i),
+          (t[27] = a));
+      let s;
+      t[28] === r
+        ? (s = t[29])
+        : ((s =
+            r == null
+              ? null
+              : (0, $.jsx)(`p`, {
+                  className: `text-size-chat whitespace-pre-wrap text-codex-description/80`,
+                  children: r,
+                })),
+          (t[28] = r),
+          (t[29] = s));
+      let c;
+      return (
+        t[30] !== a || t[31] !== s
+          ? ((c = (0, $.jsxs)(`div`, { className: `flex flex-col gap-0.5`, children: [a, s] })),
+            (t[30] = a),
+            (t[31] = s),
+            (t[32] = c))
+          : (c = t[32]),
+        c
+      );
+    }
+    case `resource_link`: {
+      let e;
+      t[33] !== n.annotations || t[34] !== o
+        ? ((e = Q(n.annotations, o)), (t[33] = n.annotations), (t[34] = o), (t[35] = e))
+        : (e = t[35]);
+      let r = e,
+        i = n.title ?? n.name ?? n.uri,
+        a;
+      t[36] === i
+        ? (a = t[37])
+        : ((a = (0, $.jsx)(`div`, {
+            className: `break-words text-codex-description/80`,
+            children: (0, $.jsx)(x, {
+              id: `codex.mcpTool.resourceLink.reading`,
+              defaultMessage: `Read {resourceLinkName}`,
+              description: `Summary shown for MCP resource link content blocks`,
+              values: { resourceLinkName: i },
+            }),
+          })),
+          (t[36] = i),
+          (t[37] = a));
+      let s;
+      t[38] === r
+        ? (s = t[39])
+        : ((s =
+            r == null
+              ? null
+              : (0, $.jsx)(`div`, {
+                  className: `break-words whitespace-pre-wrap text-codex-description/80`,
+                  children: r,
+                })),
+          (t[38] = r),
+          (t[39] = s));
+      let c;
+      return (
+        t[40] !== a || t[41] !== s
+          ? ((c = (0, $.jsxs)(`div`, {
+              className: `flex flex-col gap-0.5 text-size-chat`,
+              children: [a, s],
+            })),
+            (t[40] = a),
+            (t[41] = s),
+            (t[42] = c))
+          : (c = t[42]),
+        c
+      );
+    }
+    case `embedded_resource`: {
+      let e = n.resource.text ?? n.resource.blob ?? ``,
+        r = e !== ``,
+        i;
+      t[43] === n.resource.annotations
+        ? (i = t[44])
+        : ((i = wr(n.resource.annotations)), (t[43] = n.resource.annotations), (t[44] = i));
+      let a = i,
+        o;
+      t[45] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((o = (0, $.jsx)(`span`, {
+            className: `font-medium text-default`,
+            children: (0, $.jsx)(x, {
+              id: `codex.mcpTool.embeddedResource.uriLabel`,
+              defaultMessage: `URI`,
+              description: `Label for the URI of an embedded resource`,
+            }),
+          })),
+          (t[45] = o))
+        : (o = t[45]);
+      let s;
+      t[46] === n.resource.uri
+        ? (s = t[47])
+        : ((s = (0, $.jsxs)(`div`, {
+            className: `flex gap-1`,
+            children: [o, (0, $.jsx)(`span`, { className: `break-all`, children: n.resource.uri })],
+          })),
+          (t[46] = n.resource.uri),
+          (t[47] = s));
+      let c;
+      t[48] === n.resource.mimeType
+        ? (c = t[49])
+        : ((c =
+            n.resource.mimeType == null
+              ? null
+              : (0, $.jsxs)(`div`, {
+                  className: `flex gap-1`,
+                  children: [
+                    (0, $.jsx)(`span`, {
+                      className: `font-medium text-default`,
+                      children: (0, $.jsx)(x, {
+                        id: `codex.mcpTool.embeddedResource.mimeTypeLabel`,
+                        defaultMessage: `MIME type`,
+                        description: `Label for the MIME type of an embedded resource`,
+                      }),
+                    }),
+                    (0, $.jsx)(`span`, { className: `break-all`, children: n.resource.mimeType }),
+                  ],
+                })),
+          (t[48] = n.resource.mimeType),
+          (t[49] = c));
+      let l;
+      t[50] === a
+        ? (l = t[51])
+        : ((l =
+            a == null
+              ? null
+              : (0, $.jsxs)(`div`, {
+                  className: `flex gap-1`,
+                  children: [
+                    (0, $.jsx)(`span`, {
+                      className: `font-medium text-default`,
+                      children: (0, $.jsx)(x, {
+                        id: `codex.mcpTool.embeddedResource.annotationsLabel`,
+                        defaultMessage: `Annotations`,
+                        description: `Label for annotations shown with an embedded resource`,
+                      }),
+                    }),
+                    (0, $.jsx)(`span`, { className: `break-all`, children: a }),
+                  ],
+                })),
+          (t[50] = a),
+          (t[51] = l));
+      let u;
+      t[52] !== r || t[53] !== e
+        ? ((u = r
+            ? (0, $.jsxs)(`div`, {
+                className: `flex flex-col gap-0.5`,
+                children: [
+                  (0, $.jsx)(`span`, {
+                    className: `font-medium text-default`,
+                    children: (0, $.jsx)(x, {
+                      id: `codex.mcpTool.embeddedResource.contentLabel`,
+                      defaultMessage: `Content`,
+                      description: `Label for the content of an embedded resource`,
+                    }),
+                  }),
+                  (0, $.jsx)(`pre`, {
+                    className: `max-h-48 overflow-auto rounded-md bg-primary-soft px-3 py-2 whitespace-pre-wrap text-codex-description/80`,
+                    children: e,
+                  }),
+                ],
+              })
+            : null),
+          (t[52] = r),
+          (t[53] = e),
+          (t[54] = u))
+        : (u = t[54]);
+      let d;
+      return (
+        t[55] !== s || t[56] !== c || t[57] !== l || t[58] !== u
+          ? ((d = (0, $.jsxs)(`div`, {
+              className: `flex flex-col gap-0.5 text-size-chat text-codex-description/80`,
+              children: [s, c, l, u],
+            })),
+            (t[55] = s),
+            (t[56] = c),
+            (t[57] = l),
+            (t[58] = u),
+            (t[59] = d))
+          : (d = t[59]),
+        d
+      );
+    }
+    case `unknown`: {
+      let e;
+      t[60] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((e = E(
+            `[&_*]:text-text/50`,
+            `bg-primary-soft text-codex-description/80 max-h-48 overflow-auto whitespace-pre-wrap rounded-md px-3 py-2 text-size-chat`,
+          )),
+          (t[60] = e))
+        : (e = t[60]);
+      let r;
+      t[61] === n.raw ? (r = t[62]) : ((r = yr(n.raw, 2)), (t[61] = n.raw), (t[62] = r));
+      let i;
+      return (
+        t[63] === r
+          ? (i = t[64])
+          : ((i = (0, $.jsx)(`pre`, { className: e, children: r })), (t[63] = r), (t[64] = i)),
+        i
+      );
+    }
+    case `text`: {
+      let e;
+      t[65] !== n.annotations || t[66] !== n.text || t[67] !== o
+        ? ((e = Tr([n.text, Q(n.annotations, o)])),
+          (t[65] = n.annotations),
+          (t[66] = n.text),
+          (t[67] = o),
+          (t[68] = e))
+        : (e = t[68]);
+      let r = e,
+        i;
+      t[69] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((i = (0, $.jsxs)(`div`, {
+            className: `sticky top-0 z-10 flex items-center justify-between py-1 ps-2 pe-2 font-sans text-sm text-codex-description select-none`,
+            children: [
+              (0, $.jsx)(`div`, {
+                className: `min-w-0 truncate`,
+                children: (0, $.jsx)(x, {
+                  id: `codex.mcpTool.textBlock.plaintextTitle`,
+                  defaultMessage: `plaintext`,
+                  description: `Title shown for MCP text content blocks rendered in a code-style container`,
+                }),
+              }),
+              (0, $.jsx)(`div`, { className: `flex items-center` }),
+            ],
+          })),
+          (t[69] = i))
+        : (i = t[69]);
+      let a;
+      t[70] === Symbol.for(`react.memo_cache_sentinel`)
+        ? ((a = E(
+            `[&_*]:text-text/50`,
+            `text-codex-description/80 m-0 whitespace-pre-wrap break-words font-sans text-size-chat leading-relaxed extension:leading-normal`,
+          )),
+          (t[70] = a))
+        : (a = t[70]);
+      let s;
+      return (
+        t[71] === r
+          ? (s = t[72])
+          : ((s = (0, $.jsxs)(`div`, {
+              className: `relative overflow-clip rounded-lg border border-strong bg-secondary-soft-alpha contain-inline-size`,
+              children: [
+                i,
+                (0, $.jsx)(`div`, {
+                  className: `max-h-48 overflow-y-auto p-2`,
+                  children: (0, $.jsx)(`pre`, { className: a, children: r }),
+                }),
+              ],
+            })),
+            (t[71] = r),
+            (t[72] = s)),
+        s
+      );
     }
   }
 }
-
-function resolvePluginLogo({ pluginId, plugins, serverName }: { pluginId?: string | null; plugins: Array<{ composerIconPath?: string; logoPath?: string; plugin: { id: string; name?: string } }>; serverName?: string | null }): { alt: string; logoUrl?: string } | null { if (!pluginId || serverName === "codex_apps") return null; const plugin = plugins.find(candidate => candidate.plugin.id === pluginId); return plugin == null ? null : { alt: plugin.plugin.name ?? plugin.plugin.id, logoUrl: plugin.composerIconPath ?? plugin.logoPath }; }
-function RemoteToolLogo({ fallback, item }: { fallback?: unknown; hostId?: string; item: ToolItem; loadRemoteLogos?: boolean }): unknown { return jsx().jsx("span", { "aria-label": item.invocation.server ?? "tool", children: fallback ?? "◈" }); }
-interface AutomationSummary { id: string; isEnabled?: boolean; nextRunAt?: string | null; scheduleLabel?: string | null; title: string }
-function AutomationItem({ automation, onOpen }: { automation: AutomationSummary; onOpen?(id: string): void }): unknown {
-  const scope = (sharedChunk as any).LX?.((sharedChunk as any).ZI);
-  return jsx().jsxs("button", { type: "button", onClick: () => {
-    if (onOpen != null) onOpen(automation.id);
-    else if (scope != null) openAutomationSidePanelTab({ scope, automationId: automation.id, title: automation.title });
-  }, children: [automation.title, automation.scheduleLabel ? ` · ${automation.scheduleLabel}` : "", automation.isEnabled === false ? " · Disabled" : ""] });
+function Q(e, t) {
+  let n = wr(e);
+  return n == null
+    ? null
+    : t.formatMessage(
+        {
+          id: `codex.mcpTool.contentBlock.annotationsLine`,
+          defaultMessage: `Annotations: {annotations}`,
+          description: `Line showing MCP content block annotations in text output`,
+        },
+        { annotations: n },
+      );
 }
-function AutomationList({ automations, conversationId, onOpen }: { automations: AutomationSummary[]; conversationId?: string; onOpen?(id: string): void }): unknown {
-  return jsx().jsxs("section", { "aria-label": "Scheduled tasks", children: [conversationId == null || automations.length === 0 ? null : jsx().jsx(TrackTaskView, { conversationId }), automations.slice(0, 5).map(item => jsx().jsx(AutomationItem, { automation: item, onOpen }, item.id))] });
+function wr(e) {
+  if (e == null) return null;
+  let t = [];
+  return (
+    e.audience != null && e.audience.length > 0 && t.push(`audience=${e.audience.join(`, `)}`),
+    e.priority != null && t.push(`priority=${String(e.priority)}`),
+    e.lastModified != null && t.push(`lastModified=${e.lastModified}`),
+    t.length === 0 ? null : t.join(`; `)
+  );
 }
-
-function AutomaticApprovalReviews({ reviews }: { reviews: unknown[] }): unknown {
-  return jsx().jsx("aside", { "data-automatic-approval-reviews": true, children: reviews.map((review, index) => jsx().jsx("pre", { children: typeof review === "string" ? review : safeStringify(review) }, index)) });
+function Tr(e) {
+  return e.filter((e) => e != null).join(`
+`);
 }
-function WebMcpOutput({ call, fallbackPageUrl }: { call: WebMcpCall; fallbackPageUrl: string | null }): unknown {
-  const sourceUrl = call.sourceHostname == null ? fallbackPageUrl : `https://${call.sourceHostname}`;
-  const title = call.kind === "listTools" ? "Listed website tools" : call.title ?? sentenceLabel(call.name);
-  const details = safeStringify({ name: call.name, title: call.title, description: call.description, website: call.sourceHostname, readOnlyHint: call.readOnlyHint, input: call.inputJson, inputTruncated: call.inputTruncated });
-  return jsx().jsxs("section", { "data-webmcp-call": call.kind, children: [
-    jsx().jsxs("header", { children: [sourceUrl == null ? null : jsx().jsx("a", { href: sourceUrl, children: sourceUrl }), jsx().jsx("strong", { children: title })] }),
-    jsx().jsx("pre", { children: details }),
-    call.outputJson == null ? null : jsx().jsx("pre", { children: call.outputJson }),
-  ] });
+var Er, Dr, $;
+function Or() {
+  return (Or = e(() => {
+    ((Er = t()),
+      ae(),
+      pe(),
+      Ae(),
+      fe(),
+      ge(),
+      T(),
+      de(),
+      l(),
+      ke(),
+      At(),
+      (Dr = w()),
+      p(),
+      vn(),
+      Yt(),
+      rr(),
+      Z(),
+      _n(),
+      j(),
+      gt(),
+      S(),
+      he(),
+      h(),
+      Me(),
+      _(),
+      P(),
+      s(),
+      O(),
+      De(),
+      C(),
+      Nn(),
+      Et(),
+      o(),
+      xt(),
+      ln(),
+      yn(),
+      Ve(),
+      et(),
+      mt(),
+      M(),
+      Ln(),
+      tn(),
+      Ke(),
+      it(),
+      Ne(),
+      Ct(),
+      an(),
+      rn(),
+      Oe(),
+      ce(),
+      Lt(),
+      ct(),
+      Ft(),
+      er(),
+      jn(),
+      ft(),
+      qn(),
+      H(),
+      sn(),
+      Bn(),
+      Yn(),
+      N(),
+      W(),
+      Hn(),
+      dn(),
+      kt(),
+      Ue(),
+      D(),
+      dt(),
+      Kn(),
+      ($ = d()));
+  }))();
 }
-function sentenceLabel(value: string): string { const text = value.replace(/[_-]+/g, " ").trim(); return text ? text[0].toUpperCase() + text.slice(1) : "Tool"; }
-function McpAppWidget({ appName, state }: { appName: string; state: McpAppRuntimeState }): unknown {
-  const resource = state.resource;
-  const payload = resource?.html ?? resource?.text ?? (resource?.blob == null ? null : `data:${resource.mimeType ?? "text/html"};base64,${resource.blob}`);
-  const exactRenderer = (initialChunk as any).WH;
-  if (typeof exactRenderer === "function") {
-    return jsx().jsx(exactRenderer, {
-      hostDisplayModes: ["inline", "fullscreen", "pip"],
-      inlineSurface: state.presentation === "inline" ? "card" : "standalone",
-      mcpAppId: state.appId,
-      onRetryResourceRead: state.refetch,
-      pluginName: appName,
-      presentation: state.presentation,
-      resource: { data: state.renderData, error: state.resourceError, isLoading: state.resourcePending },
-      showLoadingStatus: false,
-    });
-  }
-  void payload;
-  return null;
-}
-function McpAppSurface({ appName, expanded, loading, onOpen, state }: { appName: string; expanded: boolean; loading: boolean; onOpen(): void; state: McpAppRuntimeState }): unknown {
-  const error = state.resourceError ?? state.catalogError;
-  const validation = resourceValidation(state.resource, state.renderData);
-  const pending = loading || state.catalogPending || state.resourcePending || state.presentation === "pending";
-  const lifecycle = typeof (initialChunk as any).IH === "function"
-    ? jsx().jsx((initialChunk as any).IH, { isInlineRequested: expanded && state.presentation === "inline", mcpAppId: state.appId })
-    : null;
-  let body: unknown = null;
-  if (pending) body = jsx().jsx("div", { role: "status", "data-mcp-app-pending": true, children: `Opening ${appName}` });
-  else if (expanded && error != null) body = jsx().jsxs("div", { role: "alert", "data-mcp-app-error": true, children: [errorMessage(error), jsx().jsx("button", { type: "button", onClick: state.refetch, children: "Retry" })] });
-  else if (expanded && validation === "too-large") body = jsx().jsx("div", { role: "alert", "data-mcp-app-too-large": true, children: "This app is too large to display." });
-  else if (expanded && validation === "error") body = jsx().jsxs("div", { role: "alert", "data-mcp-app-error": true, children: ["Unable to display this app.", jsx().jsx("button", { type: "button", onClick: state.refetch, children: "Retry" })] });
-  else if ((expanded || state.presentation === "launcher") && state.resource != null) body = jsx().jsx("div", { "data-mcp-app-widget": true, children: jsx().jsx(McpAppWidget, { appName, state }) });
-  else if (expanded) body = jsx().jsxs("div", { role: "alert", "data-mcp-app-error": true, children: ["App resource is unavailable.", jsx().jsx("button", { type: "button", onClick: state.refetch, children: "Retry" })] });
-  return jsx().jsxs("section", {
-    "data-mcp-app-card": state.presentation === "inline" || undefined,
-    "data-mcp-app-presentation": state.presentation,
-    "data-mcp-app-resource-uri": state.resourceUri,
-    "data-mcp-app-state": pending ? "pending" : expanded ? "open" : "launcher",
-    children: [lifecycle, jsx().jsx("button", { type: "button", "aria-expanded": expanded, onClick: onOpen, children: pending ? `Opening ${appName}` : expanded ? appName : `Open ${appName}` }), body],
-  });
-}
-
-function ResultContent({ businessFailed, hideTextBlocksWithStructuredContent, result }: { businessFailed: boolean; hideTextBlocksWithStructuredContent?: boolean; result: ToolResult }): unknown {
-  if (result.type === "error" || businessFailed) return jsx().jsx("pre", { children: result.error ?? "Tool failed" });
-  let structured = result.structuredContent == null ? null : safeStringify(result.structuredContent);
-  let content = result.structuredContent != null && hideTextBlocksWithStructuredContent
-    ? result.content?.filter(block => block.type !== "text")
-    : result.content;
-  const singleJsonText = structuredTextContent(content);
-  if (singleJsonText != null && (structured == null || singleJsonText === structured)) {
-    content = [];
-    structured ??= singleJsonText;
-  }
-  const renderedContent = content?.length ? content.map((block, index) => jsx().jsx(ContentBlock, { block }, index)) : [];
-  if (structured != null) return jsx().jsxs("div", { children: [...renderedContent, jsx().jsx("pre", { children: structured }, "structured-content")] });
-  if (renderedContent.length) return jsx().jsx("div", { children: renderedContent });
-  if (result.raw != null) return jsx().jsx("pre", { children: typeof result.raw === "string" ? result.raw : safeStringify(result.raw) });
-  return null;
-}
-function ToolItemContent(props: ToolItemContentProps): unknown {
-  const item = props.item;
-  const completed = item.completed === true;
-  const intl = useIntl() as IntlShape;
-  const businessFailed = item.result != null && typeof (initialChunk as any).uXt === "function"
-    ? Boolean((initialChunk as any).uXt({ result: item.result, isCodexAppsServer: item.invocation.server === "codex_apps" }))
-    : item.result?.type === "error";
-  const label = props.summary ?? formatToolActivityLabel({ appContext: item.appContext, completed, intl, matchingApp: props.matchingApp, serverName: item.invocation.server, source: item.source, toolArguments: item.invocation.arguments, toolName: item.invocation.tool, toolResult: item.result });
-  const status = businessFailed ? "error" : completed ? "success" : "active";
-  const canRenderMcpApp = props.renderMcpApps !== false && item.isMcpAppWidgetSuperseded !== true && !businessFailed;
-  const appRuntime = useMcpAppRuntime(item, props, canRenderMcpApp);
-  const resourceUri = appRuntime.resourceUri;
-  const react = (sharedChunk as any).e6?.();
-  const [expanded, setExpanded] = react?.useState?.(props.shouldAutoExpandMcpApp === true) ?? [props.shouldAutoExpandMcpApp === true, () => undefined];
-  const [opening, setOpening] = react?.useState?.(false) ?? [false, () => undefined];
-  const recipient = typeof (sharedChunk as any).LX === "function" ? (sharedChunk as any).LX((initialChunk as any).kht) : null;
-  const toggle = (): void => { if (!expanded) props.onExpand?.(); setOpening(true); setExpanded(!expanded); setOpening(false); };
-  const raw = record(item.result?.raw);
-  const metadata = resultMetadata(item.result);
-  const webCalls = item.source?.kind === "browserUse" ? webMcpCallsFromMetadata(metadata ?? raw?._meta) as WebMcpCall[] : [];
-  const resultBody = item.result == null ? null : jsx().jsx(ResultContent, { businessFailed, hideTextBlocksWithStructuredContent: props.hideTextBlocksWithStructuredContent, result: item.result });
-  const reviews = item.automaticApprovalReviews?.length ? jsx().jsx(AutomaticApprovalReviews, { reviews: item.automaticApprovalReviews }) : null;
-  const appName = props.matchingApp?.name ?? item.appContext?.appName ?? item.invocation.server ?? "app";
-  if (props.widgetOnly === true) {
-    const PersistentWidget = (sharedChunk as any).Xf;
-    if (resourceUri == null || typeof PersistentWidget !== "function") return null;
-    const toolResult = item.result?.raw ?? (item.result?.type === "error"
-      ? { content: [{ type: "text", text: item.result.error }], structuredContent: { error: item.result.error } }
-      : item.result);
-    return jsx().jsx(PersistentWidget, {
-      conversationId: props.conversationId,
-      hostDisplayModes: (initialChunk as any).Cct ?? ["inline", "fullscreen", "pip"],
-      hostId: props.hostId,
-      hostedInThreadScrollLayout: true,
-      legacyPreferredDisplayMode: item.mcpAppUi?.preferredModelDisplayMode,
-      lifetime: "thread",
-      mcpAppId: appRuntime.appId,
-      mcpAppScope: {
-        appContext: item.appContext,
-        invocationResourceUri: item.invocationResourceUri,
-        originCallId: item.invocation.server === "codex_apps" && item.appContext != null ? item.callId : null,
-        originResourceUri: resourceUri,
-        originTool: item.invocation.tool,
-      },
-      openOnRegistration: props.shouldAutoExpandMcpApp === true,
-      recipient,
-      resource: { data: appRuntime.renderData, error: appRuntime.resourceError, isLoading: appRuntime.resourcePending || appRuntime.catalogPending },
-      resourceIdentity: null,
-      resourceUri,
-      server: item.invocation.server,
-      title: `${item.invocation.server ?? "MCP"} ${item.invocation.tool}`,
-      toolArguments: item.invocation.arguments,
-      toolResult,
-      widgetStatePersistence: props.widgetStatePersistence,
-    });
-  }
-  const appSurface = resourceUri == null ? null : jsx().jsx(McpAppSurface, { appName, expanded, loading: opening, state: appRuntime, onOpen: toggle });
-  const appValidation = resourceValidation(appRuntime.resource, appRuntime.renderData);
-  const canDisplayApp = resourceUri != null
-    && appRuntime.resourceError == null
-    && appRuntime.catalogError == null
-    && appValidation === "ok"
-    && (appRuntime.resource != null || appRuntime.resourcePending || appRuntime.catalogPending)
-    && typeof (initialChunk as any).WH === "function";
-  const details = canDisplayApp ? appSurface : resultBody;
-  const disclosure = props.expandedContentOnly ? details : jsx().jsx(ToolActivityDisclosure as any, { defaultExpanded: completed === false, icon: jsx().jsx(RemoteToolLogo, { fallback: props.summaryIcon, hostId: props.hostId, item, loadRemoteLogos: props.loadRemoteLogos }), status: status === "active" ? "running" : status === "error" ? "error" : "complete", summary: label, onExpand: props.onExpand, children: jsx().jsxs(jsx().Fragment, { children: [reviews, details] }) });
-  return jsx().jsxs(jsx().Fragment, { children: [
-    jsx().jsx("div", { "aria-label": label, "data-tool-status": status, "data-tool-activity-turn-key": props.toolActivityTurnKey, children: disclosure }),
-    ...webCalls.map((call, index) => jsx().jsx(WebMcpOutput, { call, fallbackPageUrl: browserPageUrl(item) }, `${item.callId}:webmcp:${index}:${call.name}`)),
-  ] });
-}
-let trackTaskViewedSignal: unknown;
-function TrackTaskView(props: { conversationId?: string }): null {
-  const taskOpenDestinations = (chatgptTasksRuntime as any).a ?? {};
-  const taskEvent = (chatgptTasksRuntime as any).n;
-  const taskEventTypes = (chatgptTasksRuntime as any).r ?? {};
-  const react = (sharedChunk as any).e6?.();
-  const scope = typeof (sharedChunk as any).LX === "function"
-    ? (sharedChunk as any).LX((initialChunk as any).$en)
-    : null;
-  const route = typeof (initialChunk as any).i_n === "function"
-    ? (initialChunk as any).i_n()
-    : null;
-  react?.useEffect?.(() => {
-    if (
-      props.conversationId == null
-      || scope?.value?.routeKind !== "chatgpt-thread"
-      || typeof scope.watch !== "function"
-    ) return;
-    const currentConversationId = scope.value.conversationId;
-    return scope.watch((state: any) => {
-      const taskConversationId = state.get?.((initialChunk as any).wVt, props.conversationId);
-      if (
-        taskConversationId == null
-        || taskConversationId !== state.get?.((initialChunk as any).wVt, currentConversationId)
-      ) return;
-      const identity = { conversationId: taskConversationId, locationKey: route?.key };
-      if (trackTaskViewedSignal != null && state.get?.(trackTaskViewedSignal, identity)) return;
-      if (trackTaskViewedSignal != null) state.set?.(trackTaskViewedSignal, identity, true);
-      const submitTaskEvent = (initialChunk as any).xpn;
-      if (typeof submitTaskEvent === "function") {
-        submitTaskEvent(scope, taskEvent, {
-          conversationId: taskConversationId,
-          eventKind: taskEventTypes.CHATGPT_TASKS_EVENT_TYPE_CONVERSATION_WITH_TASK_VIEWED,
-          openDestination: taskOpenDestinations.CHATGPT_TASKS_OPEN_DESTINATION_CONVERSATION,
-        });
-      }
-    });
-  }, [props.conversationId, route?.key, scope]);
-  return null;
-}
-function initializeTrackTaskView(): void {
-  (chatgptTasksRuntime as any).s?.();
-  for (const initializer of [
-    (sharedChunk as any).$3,
-    (sharedChunk as any).V4,
-    (sharedChunk as any).K2,
-    (sharedChunk as any).gL,
-    (initialChunk as any).Qgn,
-    (initialChunk as any).ypn,
-    (initialChunk as any).itn,
-    (initialChunk as any).uHt,
-  ]) if (typeof initializer === "function") initializer();
-  if (trackTaskViewedSignal == null && typeof (sharedChunk as any).rZ === "function") {
-    trackTaskViewedSignal = (sharedChunk as any).rZ((initialChunk as any).$en, () => false);
-  }
-  void jsx();
-}
-function initializeResolvePluginLogo(): void {}
-function initializePluginLogoRuntime(): void { void jsx(); }
-function initializeAutomationItem(): void { initializeOpenAutomationSidePanelTab(); void jsx(); }
-function initializeAutomationList(): void { initializeAutomationItem(); initializeTrackTaskView(); void jsx(); }
-function initializeRemoteToolLogo(): void { void jsx(); }
-let toolItemContentInitialized = false;
-function initializeToolItemContent(): void {
-  if (toolItemContentInitialized) return;
-  toolItemContentInitialized = true;
-  for (const dependency of [
-    (sharedChunk as any).$3, (sharedChunk as any).Wi, (sharedChunk as any).cT, (sharedChunk as any).ww,
-    (sharedChunk as any).ai, (sharedChunk as any).gL, (sharedChunk as any).h4, (sharedChunk as any).a$,
-    (sharedChunk as any).FX, (sharedChunk as any).wL, (initialChunk as any).Vrn, (sharedChunk as any).e6,
-    (sharedChunk as any).K2, (initialChunk as any).pXt, (initialChunk as any).en, (initialChunk as any).oqt,
-    (initialChunk as any).h1, (initialChunk as any).Olt, (sharedChunk as any).Zh, (sharedChunk as any).ef,
-    (sharedChunk as any).Of, (sharedChunk as any).zh, (sharedChunk as any).Ph, (initialChunk as any).n0,
-    (sharedChunk as any).C_, (initialChunk as any).Gat, (sharedChunk as any).sm, (sharedChunk as any).c_,
-    (initialChunk as any).T6t, (sharedChunk as any).Bg, (initialChunk as any).QB, (initialChunk as any).kU,
-    (initialChunk as any).qH, (initialChunk as any).DU, (initialChunk as any).GH, (initialChunk as any).Oct,
-    (initialChunk as any).ict, (initialChunk as any).i4t, (initialChunk as any).E4t, (initialChunk as any).IU,
-    (initialChunk as any).$2t, (initialChunk as any).Rht, (initialChunk as any).itn, (initialChunk as any).ifn,
-    (sharedChunk as any).tp, (sharedChunk as any).Z3, (initialChunk as any).aat, (initialChunk as any).MU,
-    (initialChunk as any).Zdt, (initialChunk as any).wrn, (initialChunk as any).jit, (initialChunk as any).kit,
-    (initialChunk as any).lXt, (initialChunk as any).Vat, (initialChunk as any).Dit, (initialChunk as any).Fit,
-    (initialChunk as any).Nit, (sharedChunk as any).QI,
-  ]) {
-    if (typeof dependency === "function") dependency();
-  }
-  initializeMcpToolActivityLabels();
-  initializeToolActivityDisclosure();
-  initializeWebMcpToolCalls();
-  initializeRemoteToolLogo();
-  initializeAutomationList();
-  void jsx();
-}
-export { TrackTaskView as a, initializeAutomationItem as c, resolvePluginLogo as d, initializePluginLogoRuntime as f, initializeAutomationList as i, RemoteToolLogo as l, initializeToolItemContent as n, initializeTrackTaskView as o, AutomationList as r, AutomationItem as s, ToolItemContent as t, initializeRemoteToolLogo as u };
+export {
+  ir as a,
+  rr as c,
+  Xn as d,
+  W as f,
+  Z as i,
+  Zn as l,
+  Or as n,
+  cr as o,
+  lr as r,
+  nr as s,
+  hr as t,
+  er as u,
+};

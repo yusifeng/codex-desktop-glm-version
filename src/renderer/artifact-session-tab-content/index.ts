@@ -1,490 +1,2439 @@
-import "@rchunk/rolldown-runtime";
-import { e6 as getReactRuntime, I3 as getJsxRuntime, n4 as useIntl } from "@rchunk/app-shared";
-import { ofn as isGateEnabled, pnt as appServices } from "@rchunk/app-initial";
-import "@rchunk/artifact-presentation";
-import "@rchunk/spreadsheet-editor";
-import "@rchunk/app-primary";
-import "@rchunk/draw-presence-label";
-import "@rchunk/presentation-review-utils";
-import "@rchunk/workbook-review-utils";
-import { t as ArtifactLayout } from "@rchunk/artifact-layout";
-import { n as CommentsControl, t as EditorHeader } from "@rchunk/editor-header";
-import { t as ArtifactFeedbackButton } from "@rchunk/artifact-feedback-button";
-import { t as OpenInButton } from "@rchunk/open-in-button";
-import "@rchunk/artifact-annotation-comment";
-import "@rchunk/sidebar-panel";
-import { n as renderPaneLayout } from "@rchunk/pane-layout";
-
-const React = getReactRuntime();
-const jsx = getJsxRuntime();
-
-type ArtifactSessionKind = "presentation" | "spreadsheet";
-type ArtifactSessionProblem = "invalid-session" | "persistence";
-
-interface ArtifactSessionUpdate {
-  baseStateVersion?: number;
-  bytes: ArrayLike<number>;
-  originId?: string;
-  stateVersion?: number;
-  updateId: string;
-}
-
-interface CommittedArtifactSessionUpdate {
-  stateVersion: number;
-  update: ArtifactSessionUpdate;
-}
-
-interface ArtifactSessionRecord {
-  artifactRef: string;
-  checkpointCrdtState: ArrayLike<number>;
-  checkpointStateVersion: number;
-  initialArtifactProto: ArrayLike<number>;
-  kind: ArtifactSessionKind;
-  stateVersion: number;
-  title?: string | null;
-  updates: ArtifactSessionUpdate[];
-}
-
-interface ArtifactSessionSubscription {
-  append(update: ArtifactSessionUpdate): Promise<{ stateVersion: number }>;
-  markDirty?(): void | { [Symbol.dispose]?(): void };
-  readAsset?(request: { sha256: string }): Promise<ArrayLike<number> | null>;
-  unsubscribe?(): void | { [Symbol.dispose]?(): void };
-  [Symbol.dispose]?(): void;
-}
-
-interface ArtifactSessionOpenResponse {
-  record: ArtifactSessionRecord;
-  subscription: ArtifactSessionSubscription;
-  [Symbol.dispose]?(): void;
-}
-
-interface ArtifactSessionsService {
-  open(
-    request: { artifactRef: string; threadId: string },
-    onCommittedUpdate: (update: CommittedArtifactSessionUpdate) => void,
-    flushFromHost: () => Promise<void>,
-  ): Promise<ArtifactSessionOpenResponse>;
-}
-
-interface CrdtController {
-  flushCrdtUpdates?(): Promise<void>;
-}
-
-interface ImageHydrationRequest {
-  assetId: string;
-  contentType: string;
-  uri: string;
-}
-
-interface ImageHydrationAsset extends ImageHydrationRequest {
-  data: Uint8Array;
-}
-
-interface StartingSnapshot { status: "starting" }
-interface FailedSnapshot { problem: ArtifactSessionProblem; status: "failed" }
-interface LiveSnapshot {
-  externalCrdtUpdates: Uint8Array[];
-  initialArtifactBytes: Uint8Array;
-  initialCrdtState: Uint8Array;
-  kind: ArtifactSessionKind;
-  problem: ArtifactSessionProblem | null;
-  stateVersion: number;
-  status: "live";
-  title?: string | null;
-}
-type ArtifactSessionSnapshot = StartingSnapshot | FailedSnapshot | LiveSnapshot;
-
-interface ArtifactSessionTabContentProps {
-  artifactRef: string;
-  hostId: string;
-  kind: ArtifactSessionKind;
-  onClose(): void;
-  renderSlots?: unknown;
-  reviewTools?: unknown;
-  tabId?: string;
-  threadId: string;
-  title: string;
-}
-
-interface SessionControllerOptions {
-  artifactRef: string;
-  artifactSessions: ArtifactSessionsService;
-  kind: ArtifactSessionKind;
-  threadId: string;
-}
-
-const services = appServices as unknown as { artifactSessions?: ArtifactSessionsService };
-const ASSET_URI = /^artifact-session-asset:sha256:([0-9a-f]{64})$/;
-const STARTING_SNAPSHOT: StartingSnapshot = { status: "starting" };
-
-function disposeResource(resource: unknown): void {
-  if ((typeof resource !== "object" && typeof resource !== "function") || resource == null) return;
-  const disposable = resource as { [Symbol.dispose]?: () => void };
-  disposable[Symbol.dispose]?.();
-}
-
-function validateRecord(record: ArtifactSessionRecord, artifactRef: string): void {
-  if (record.artifactRef !== artifactRef
-    || record.initialArtifactProto.length === 0
-    || record.checkpointCrdtState.length === 0
-    || record.checkpointStateVersion < 0
-    || record.stateVersion < record.checkpointStateVersion) {
-    throw new Error("Invalid Artifact Session bootstrap record");
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/popcorn-presentation-panel",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "@rchunk/artifact-workbook-runtime",
+      "@rchunk/linear",
+      "@exact-chunk/string-963febbec52f.js",
+      "@rchunk/default-locale",
+      "@rchunk/scale-init",
+      "@rchunk/d3-ordinal-runtime",
+      "@rchunk/expand",
+      "@rchunk/nice",
+      "@rchunk/constant-accessor",
+      "@rchunk/array-like-to-array-runtime",
+      "@exact-chunk/band-7f9eb19564f9.js",
+      "@exact-chunk/treemap-4d58692b5de2.js",
+      "@rchunk/tableau10-palette",
+      "@exact-chunk/arc-a62fdff23ebe.js",
+      "@exact-chunk/path-3b8129ebc7ff.js",
+      "@rchunk/math-lazy-runtime",
+      "@exact-chunk/linear-51abf1a86c3b.js",
+      "@exact-chunk/line-5171f1d885cc.js",
+      "@exact-chunk/pie-f34043ff89c8.js",
+      "@rchunk/catmull-rom",
+      "@rchunk/monotone",
+      "@rchunk/spreadsheet-utils",
+      "@rchunk/spreadsheet-address-utils",
+      "@rchunk/app-initial",
+      "./app-initial-e8ceb32eb626.css",
+      "@rchunk/artifact-presentation",
+      "@rchunk/spreadsheet-editor",
+      "@rchunk/yjs-runtime",
+      "@rchunk/portable-thumbnail-font-metrics",
+      "@rchunk/three-core",
+      "@rchunk/three.module",
+      "@rchunk/core-vendor-runtime",
+      "@rchunk/lodash-union-runtime-initialized",
+      "@rchunk/lodash-zip-object-runtime",
+      "@exact-chunk/map-3ea4bc6d7205.js",
+      "@rchunk/popcorn-icons",
+      "@rchunk/artifact-source-bootstrap",
+      "@rchunk/app-primary",
+      "./app-primary-484df789f2f5.css",
+      "@rchunk/popcorn-manual-edit-header-controls",
+      "@rchunk/drawing-frame-geometry",
+      "./artifact-source-bootstrap-c4c481274826.css",
+      "@rchunk/text-underline-icon",
+      "@rchunk/portable-thumbnail-font-face-source-runtime",
+      "@rchunk/portable-thumbnail-font-runtime",
+      "./ensure-fonts-loaded-cc781733d401.css",
+      "@rchunk/floating-ui-modifiers",
+      "@rchunk/popcorn-electron-surface-style",
+      "@rchunk/draw-presence-label",
+      "@rchunk/popcorn-review-bar-overlay",
+      "@rchunk/presentation-review-utils",
+      "./PopcornElectronPresentationPanel-7665528eaa36.css",
+      "@rchunk/popcorn-workbook-panel",
+      "@rchunk/popcorn-chart-hover-tooltip",
+      "@rchunk/freeze-panes",
+      "@rchunk/workbook-review-utils",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  $3 as n,
+  $Z as r,
+  $f as i,
+  BX as a,
+  Bc as o,
+  C_ as s,
+  FX as c,
+  G3 as l,
+  Gq as u,
+  H3 as d,
+  HX as f,
+  Hw as p,
+  I3 as m,
+  If as h,
+  J$ as g,
+  K2 as _,
+  KZ as v,
+  LX as y,
+  Nj as b,
+  P3 as x,
+  QI as S,
+  S_ as C,
+  U$ as w,
+  UI as T,
+  Uw as E,
+  V3 as D,
+  Vc as O,
+  W$ as k,
+  W3 as A,
+  Xv as j,
+  Y2 as M,
+  YC as N,
+  YZ as P,
+  Yh as F,
+  ZI as I,
+  Zh as L,
+  Zv as R,
+  a$ as z,
+  aw as B,
+  c_ as V,
+  cg as ee,
+  db as H,
+  e6 as U,
+  eD as W,
+  eQ as te,
+  eb as G,
+  fI as ne,
+  fb as re,
+  iQ as ie,
+  iy as ae,
+  jf as oe,
+  l3 as se,
+  lg as ce,
+  lw as le,
+  n4 as ue,
+  nD as de,
+  o$ as fe,
+  o_ as pe,
+  q$ as me,
+  qZ as he,
+  rD as ge,
+  rZ as _e,
+  tD as ve,
+  tp as ye,
+  ug as be,
+  vV as xe,
+  wL as Se,
+  xv as Ce,
+} from "@rchunk/app-shared";
+import {
+  $at as we,
+  A_t as Te,
+  B6t as Ee,
+  D_n as De,
+  EZ as Oe,
+  E_n as ke,
+  Evt as Ae,
+  GA as je,
+  Grt as Me,
+  IS as Ne,
+  I_t as Pe,
+  J6 as Fe,
+  KA as Ie,
+  Mhn as Le,
+  Nhn as Re,
+  O_t as ze,
+  RS as Be,
+  R_t as Ve,
+  Rrt as He,
+  Slt as Ue,
+  Urt as We,
+  V6t as Ge,
+  V_t as Ke,
+  Y6 as qe,
+  Z6 as Je,
+  bnn as Ye,
+  eot as Xe,
+  gC as Ze,
+  i8 as Qe,
+  ifn as $e,
+  iit as et,
+  jX as tt,
+  mC as nt,
+  mZ as rt,
+  mnt as it,
+  n7 as at,
+  ofn as ot,
+  oq as st,
+  pZ as ct,
+  pnt as lt,
+  r7 as ut,
+  sq as dt,
+  xlt as ft,
+  xvt as pt,
+  ynn as mt,
+} from "@rchunk/app-initial";
+import { $ as ht, $t as gt } from "@rchunk/artifact-presentation";
+import { Un as _t, Wn as vt } from "@rchunk/spreadsheet-editor";
+import { Jl as yt, Yl as bt } from "@rchunk/app-primary";
+import {
+  a as xt,
+  c as St,
+  i as Ct,
+  l as wt,
+  o as Tt,
+  r as Et,
+  u as Dt,
+} from "@rchunk/draw-presence-label";
+import { t as Ot } from "@rchunk/presentation-review-utils";
+import { f as kt, n as At } from "@rchunk/workbook-review-utils";
+import { n as jt, t as Mt } from "@rchunk/artifact-layout";
+import { n as Nt, r as Pt, t as Ft } from "@rchunk/editor-header";
+import { n as It, t as Lt } from "@rchunk/artifact-feedback-button";
+import { n as Rt, t as zt } from "@rchunk/open-in-button";
+import { i as Bt, o as Vt, r as Ht } from "@rchunk/artifact-annotation-comment";
+import {
+  a as Ut,
+  i as Wt,
+  n as Gt,
+  o as Kt,
+  r as qt,
+  t as Jt,
+} from "@rchunk/sidebar-panel";
+import { n as Yt, t as Xt } from "@rchunk/pane-layout";
+function Zt(e, t) {
+  if (
+    e.artifactRef !== t ||
+    e.initialArtifactProto.length === 0 ||
+    e.checkpointCrdtState.length === 0 ||
+    e.checkpointStateVersion < 0 ||
+    e.stateVersion < e.checkpointStateVersion
+  )
+    throw Error(`Invalid Artifact Session bootstrap record`);
+  let n = e.checkpointStateVersion,
+    r = new Set();
+  for (let t of e.updates) {
+    if (
+      t.stateVersion !== n + 1 ||
+      t.stateVersion > e.stateVersion ||
+      t.bytes.length === 0 ||
+      r.has(t.updateId)
+    )
+      throw Error(`Invalid Artifact Session update history`);
+    ((n = t.stateVersion), r.add(t.updateId));
   }
-  let version = record.checkpointStateVersion;
-  const updateIds = new Set<string>();
-  for (const update of record.updates) {
-    if (update.stateVersion !== version + 1
-      || update.stateVersion > record.stateVersion
-      || update.bytes.length === 0
-      || updateIds.has(update.updateId)) {
-      throw new Error("Invalid Artifact Session update history");
-    }
-    version = update.stateVersion;
-    updateIds.add(update.updateId);
-  }
-  if (version !== record.stateVersion) throw new Error("Incomplete Artifact Session update history");
+  if (n !== e.stateVersion) throw Error(`Incomplete Artifact Session update history`);
 }
-
-function randomId(): string {
-  return globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`;
+function Qt(e) {
+  return an.exec(e)?.[1] ?? null;
 }
-
-class ArtifactSessionController {
-  readonly #options: SessionControllerOptions;
-  readonly #listeners = new Set<() => void>();
-  readonly #originId = randomId();
-  readonly #seenUpdateIds = new Set<string>();
-  #appendQueue: ArtifactSessionUpdate[] = [];
-  #appendPromise: Promise<void> | null = null;
-  #crdtController: CrdtController | null = null;
-  #initializationPromise: Promise<void> | null = null;
-  #openResponse: ArtifactSessionOpenResponse | null = null;
-  #snapshot: ArtifactSessionSnapshot = STARTING_SNAPSHOT;
-  #stateVersion = 0;
-  #subscription: ArtifactSessionSubscription | null = null;
-
-  constructor(options: SessionControllerOptions) {
-    this.#options = options;
-  }
-
-  getSnapshot = (): ArtifactSessionSnapshot => this.#snapshot;
-
-  subscribe = (listener: () => void): (() => void) => {
-    this.#listeners.add(listener);
-    void this.#initialize();
-    return () => { this.#listeners.delete(listener); };
+function $t(e) {
+  return {
+    stateVersion: e.stateVersion,
+    update: { ...e.update, bytes: new Uint8Array(e.update.bytes) },
   };
-
-  attachCrdtController = (controller: CrdtController): void => {
-    this.#crdtController = controller;
-  };
-
-  onCrdtUpdate = (bytes: ArrayLike<number>): void => {
-    if (bytes.length === 0 || this.#subscription == null) return;
-    disposeResource(this.#subscription.markDirty?.());
-    this.#appendQueue.push({
-      baseStateVersion: this.#stateVersion,
-      bytes: new Uint8Array(bytes),
-      originId: this.#originId,
-      updateId: randomId(),
-    });
-    void this.#appendQueuedUpdates();
-  };
-
-  onCrdtDrain = (drain: Promise<void>): void => {
-    void drain.then(() => this.#appendQueuedUpdates(), () => this.#setProblem("persistence"));
-  };
-
-  onCrdtDrainAttemptFailed = (): void => { this.#setProblem("persistence"); };
-
-  retry = (): void => {
-    this.#setProblem(null);
-    if (this.#subscription == null) void this.#initialize();
-    else void this.#appendQueuedUpdates();
-  };
-
-  resolveImageHydrationAssets = async (requests: ImageHydrationRequest[]): Promise<ImageHydrationAsset[]> => {
-    const subscription = this.#subscription;
-    if (subscription?.readAsset == null) return [];
-    const assets = await Promise.all(requests.map(async (request) => {
-      const digest = ASSET_URI.exec(request.uri)?.[1];
-      if (digest == null) return null;
-      const bytes = await subscription.readAsset?.({ sha256: digest });
-      return bytes == null ? null : { ...request, data: new Uint8Array(bytes) };
-    }));
-    const resolved: ImageHydrationAsset[] = [];
-    for (const asset of assets) {
-      if (asset != null) resolved.push(asset);
-    }
-    return resolved;
-  };
-
-  async #initialize(): Promise<void> {
-    if (this.#initializationPromise != null || this.#subscription != null) {
-      await this.#initializationPromise;
-      return;
-    }
-    this.#initializationPromise = this.#initializeOnce().finally(() => { this.#initializationPromise = null; });
-    await this.#initializationPromise;
-  }
-
-  async #initializeOnce(): Promise<void> {
-    let response: ArtifactSessionOpenResponse;
-    try {
-      response = await this.#options.artifactSessions.open(
-        { artifactRef: this.#options.artifactRef, threadId: this.#options.threadId },
-        this.#handleCommittedUpdate,
-        this.#flushFromHost,
-      );
-    } catch {
-      this.#setSnapshot({ problem: "persistence", status: "failed" });
-      return;
-    }
-    try {
-      validateRecord(response.record, this.#options.artifactRef);
-      if (response.record.kind !== this.#options.kind) throw new Error("Artifact Session kind mismatch");
-    } catch {
-      disposeResource(response.subscription.unsubscribe?.());
-      disposeResource(response);
-      this.#setSnapshot({ problem: "invalid-session", status: "failed" });
-      return;
-    }
-    this.#openResponse = response;
-    this.#subscription = response.subscription;
-    this.#stateVersion = response.record.stateVersion;
-    for (const update of response.record.updates) this.#seenUpdateIds.add(update.updateId);
-    this.#setSnapshot({
-      externalCrdtUpdates: response.record.updates.map((update) => new Uint8Array(update.bytes)),
-      initialArtifactBytes: new Uint8Array(response.record.initialArtifactProto),
-      initialCrdtState: new Uint8Array(response.record.checkpointCrdtState),
-      kind: response.record.kind,
-      problem: null,
-      stateVersion: response.record.stateVersion,
-      status: "live",
-      title: response.record.title,
-    });
-  }
-
-  #handleCommittedUpdate = (event: CommittedArtifactSessionUpdate): void => {
-    const update = event.update;
-    if (this.#snapshot.status !== "live"
-      || event.stateVersion !== update.stateVersion
-      || update.bytes.length === 0
-      || this.#seenUpdateIds.has(update.updateId)) return;
-    this.#seenUpdateIds.add(update.updateId);
-    this.#stateVersion = Math.max(this.#stateVersion, event.stateVersion);
-    if (update.originId === this.#originId) return;
-    this.#setSnapshot({
-      ...this.#snapshot,
-      externalCrdtUpdates: [...this.#snapshot.externalCrdtUpdates, new Uint8Array(update.bytes)],
-      stateVersion: event.stateVersion,
-    });
-  };
-
-  async #appendQueuedUpdates(): Promise<void> {
-    if (this.#appendPromise != null) return this.#appendPromise;
-    const subscription = this.#subscription;
-    if (subscription == null) return;
-    this.#appendPromise = (async () => {
-      while (this.#appendQueue.length > 0) {
-        const update = this.#appendQueue[0];
-        if (update == null) return;
-        try {
-          const result = await subscription.append(update);
-          this.#stateVersion = Math.max(this.#stateVersion, result.stateVersion);
-          this.#appendQueue.shift();
-          this.#setProblem(null);
-        } catch {
-          this.#setProblem("persistence");
-          return;
+}
+function en(e) {
+  (tn(e.subscription.unsubscribe()), tn(e));
+}
+function tn(e) {
+  nn(e) && e[Symbol.dispose]();
+}
+function nn(e) {
+  return (typeof e == `object` || typeof e == `function`) && e != null && Symbol.dispose in e;
+}
+var rn, an, on;
+function sn() {
+  return (sn = e(() => {
+    (gt(),
+      vt(),
+      (rn = { status: `starting` }),
+      (an = /^artifact-session-asset:sha256:([0-9a-f]{64})$/),
+      (on = class {
+        options;
+        assetBytesByDigest = new Map();
+        assetReadAbortController = new AbortController();
+        assetReadsByDigest = new Map();
+        appendPromise = null;
+        appendQueue = [];
+        appendQueueDrainedListeners = new Set();
+        closing = !1;
+        disposalTimer = null;
+        disposed = !1;
+        initializationPromise = null;
+        listeners = new Set();
+        openResponse = null;
+        pendingCrdtDrain = null;
+        pendingEvents = [];
+        originId = globalThis.crypto.randomUUID();
+        seenUpdateIds = new Set();
+        snapshot = rn;
+        stateVersion = 0;
+        subscription = null;
+        crdtController = null;
+        constructor(e) {
+          this.options = e;
         }
-      }
-    })().finally(() => { this.#appendPromise = null; });
-    return this.#appendPromise;
-  }
-
-  #flushFromHost = async (): Promise<void> => {
-    await this.#crdtController?.flushCrdtUpdates?.();
-    await this.#appendQueuedUpdates();
-    if (this.#appendQueue.length > 0) throw new Error("Artifact Session viewer updates are not durable yet");
-  };
-
-  #setProblem(problem: ArtifactSessionProblem | null): void {
-    if (this.#snapshot.status === "live") {
-      if (this.#snapshot.problem !== problem) this.#setSnapshot({ ...this.#snapshot, problem });
-    } else if (problem != null) {
-      this.#setSnapshot({ problem, status: "failed" });
+        getSnapshot = () => this.snapshot;
+        subscribe = (e) => {
+          if (this.disposed) return () => void 0;
+          (this.disposalTimer != null &&
+            (clearTimeout(this.disposalTimer), (this.disposalTimer = null)),
+            this.listeners.add(e),
+            this.initialize());
+          let t = !0;
+          return () => {
+            t &&
+              ((t = !1),
+              this.listeners.delete(e),
+              this.listeners.size === 0 &&
+                !this.closing &&
+                (this.disposalTimer = setTimeout(() => {
+                  ((this.disposalTimer = null), this.listeners.size === 0 && this.dispose());
+                }, 0)));
+          };
+        };
+        onCrdtUpdate = (e) => {
+          let t = this.subscription;
+          if (!(t == null || this.disposed || e.length === 0)) {
+            try {
+              tn(t.markDirty());
+            } catch {
+              this.setProblem(`persistence`);
+            }
+            (this.appendQueue.push({
+              baseStateVersion: this.stateVersion,
+              bytes: new Uint8Array(e),
+              originId: this.originId,
+              updateId: globalThis.crypto.randomUUID(),
+            }),
+              this.appendQueuedUpdates().catch(() => void 0));
+          }
+        };
+        onCrdtDrain = (e) => {
+          let t = e.then(() => this.appendQueuedUpdates());
+          this.pendingCrdtDrain = t;
+          let n = () => {
+            this.pendingCrdtDrain === t && (this.pendingCrdtDrain = null);
+          };
+          t.then(n, n);
+        };
+        onCrdtDrainAttemptFailed = () => {
+          this.setProblem(`persistence`);
+        };
+        attachCrdtController = (e) => {
+          !this.closing && !this.disposed && (this.crdtController = e);
+        };
+        resolveImageHydrationAssets = async (e) => {
+          let t = this.subscription;
+          return t == null || this.closing || this.disposed
+            ? []
+            : (
+                await Promise.all(
+                  e.map(async (e) => {
+                    let n = Qt(e.uri);
+                    if (n == null) return null;
+                    let r = await this.readAsset(t, n);
+                    return r == null || this.closing || this.disposed || t !== this.subscription
+                      ? null
+                      : {
+                          assetId: e.assetId,
+                          contentType: e.contentType,
+                          data: new Uint8Array(r),
+                          uri: e.uri,
+                        };
+                  }),
+                )
+              ).filter((e) => e != null);
+        };
+        retry = () => {
+          if ((this.setProblem(null), this.subscription == null)) {
+            this.initialize();
+            return;
+          }
+          this.appendQueuedUpdates().catch(() => void 0);
+        };
+        dispose() {
+          this.closing ||
+            this.disposed ||
+            ((this.closing = !0),
+            this.disposalTimer != null &&
+              (clearTimeout(this.disposalTimer), (this.disposalTimer = null)),
+            this.assetReadAbortController.abort(),
+            this.assetBytesByDigest.clear(),
+            this.assetReadsByDigest.clear(),
+            this.listeners.clear(),
+            this.finishDispose());
+        }
+        initialize() {
+          return this.initializationPromise != null ||
+            this.subscription != null ||
+            this.closing ||
+            this.disposed
+            ? (this.initializationPromise ?? Promise.resolve())
+            : ((this.initializationPromise = this.initializeOnce().finally(() => {
+                this.initializationPromise = null;
+              })),
+              this.initializationPromise);
+        }
+        async initializeOnce() {
+          let e;
+          try {
+            e = await this.options.artifactSessions.open(
+              { artifactRef: this.options.artifactRef, threadId: this.options.threadId },
+              this.handleCommittedUpdate,
+              this.flushFromHost,
+            );
+          } catch {
+            this.disposed || this.setSnapshot({ problem: `persistence`, status: `failed` });
+            return;
+          }
+          if (this.disposed) {
+            en(e);
+            return;
+          }
+          let t;
+          try {
+            if ((Zt(e.record, this.options.artifactRef), e.record.kind !== this.options.kind))
+              throw Error(`Artifact Session kind does not match the viewer`);
+            switch (e.record.kind) {
+              case `presentation`:
+                t = {
+                  initialPresentationProto: ht.decode(
+                    new Uint8Array(e.record.initialArtifactProto),
+                  ),
+                  kind: `presentation`,
+                };
+                break;
+              case `spreadsheet`:
+                t = {
+                  initialWorkbookProto: _t.decode(new Uint8Array(e.record.initialArtifactProto)),
+                  kind: `spreadsheet`,
+                };
+            }
+          } catch {
+            (en(e), this.setSnapshot({ problem: `invalid-session`, status: `failed` }));
+            return;
+          }
+          ((this.openResponse = e),
+            (this.subscription = e.subscription),
+            this.applyRecord(e.record, t));
+          for (let e of this.pendingEvents.splice(0)) this.applyCommittedUpdate(e);
+        }
+        applyRecord(e, t) {
+          this.stateVersion = e.stateVersion;
+          for (let t of e.updates) this.seenUpdateIds.add(t.updateId);
+          this.setSnapshot({
+            ...t,
+            externalCrdtUpdates: e.updates.map(({ bytes: e }) => new Uint8Array(e)),
+            initialCrdtState: new Uint8Array(e.checkpointCrdtState),
+            problem: null,
+            stateVersion: e.stateVersion,
+            status: `live`,
+            title: e.title,
+          });
+        }
+        handleCommittedUpdate = (e) => {
+          if (!this.disposed) {
+            if (this.snapshot.status !== `live`) {
+              this.pendingEvents.push($t(e));
+              return;
+            }
+            this.applyCommittedUpdate(e);
+          }
+        };
+        applyCommittedUpdate(e) {
+          let t = e.update;
+          e.stateVersion !== t.stateVersion ||
+            t.bytes.length === 0 ||
+            this.seenUpdateIds.has(t.updateId) ||
+            (this.seenUpdateIds.add(t.updateId),
+            (this.stateVersion = Math.max(this.stateVersion, e.stateVersion)),
+            this.snapshot.status === `live` &&
+              t.originId !== this.originId &&
+              this.setSnapshot({
+                ...this.snapshot,
+                externalCrdtUpdates: [
+                  ...this.snapshot.externalCrdtUpdates,
+                  new Uint8Array(t.bytes),
+                ],
+                stateVersion: e.stateVersion,
+              }));
+        }
+        readAsset(e, t) {
+          if (this.assetBytesByDigest.has(t))
+            return Promise.resolve(this.assetBytesByDigest.get(t) ?? null);
+          let n = this.assetReadsByDigest.get(t);
+          if (n != null) return n;
+          let r;
+          return (
+            (r = T(e.readAsset({ sha256: t }), this.assetReadAbortController.signal)
+              .then((n) => {
+                if (this.closing || this.disposed || e !== this.subscription) return null;
+                if (n == null) return (this.assetBytesByDigest.set(t, null), null);
+                let r = new Uint8Array(n);
+                return (this.assetBytesByDigest.set(t, r), r);
+              })
+              .catch(() => null)
+              .finally(() => {
+                this.assetReadsByDigest.get(t) === r && this.assetReadsByDigest.delete(t);
+              })),
+            this.assetReadsByDigest.set(t, r),
+            r
+          );
+        }
+        appendQueuedUpdates() {
+          if (this.appendPromise != null || this.disposed)
+            return this.appendPromise ?? Promise.resolve();
+          let e = !1;
+          return (
+            (this.appendPromise = this.appendQueuedUpdatesOnce()
+              .then(() => {
+                e = !0;
+              })
+              .finally(() => {
+                ((this.appendPromise = null),
+                  e &&
+                    this.appendQueue.length > 0 &&
+                    !this.disposed &&
+                    this.appendQueuedUpdates().catch(() => void 0));
+              })),
+            this.appendPromise
+          );
+        }
+        async appendQueuedUpdatesOnce() {
+          let e = this.subscription;
+          if (e != null)
+            for (; this.appendQueue.length > 0 && !this.disposed;) {
+              let t = this.appendQueue[0];
+              if (t == null) break;
+              try {
+                let n = await T(e.append(t));
+                ((this.stateVersion = Math.max(this.stateVersion, n.stateVersion)),
+                  this.appendQueue.shift(),
+                  this.notifyAppendQueueDrained(),
+                  this.setProblem(null));
+              } catch (e) {
+                throw (this.setProblem(`persistence`), e);
+              }
+            }
+        }
+        flushFromHost = async () => {
+          (await this.crdtController?.flushCrdtUpdates?.(), await this.pendingCrdtDrain);
+          try {
+            await this.appendQueuedUpdates();
+          } catch {
+            await this.appendQueuedUpdates();
+          }
+          if (this.appendQueue.length > 0)
+            throw Error(`Artifact Session viewer updates are not durable yet`);
+        };
+        async finishDispose() {
+          try {
+            await this.crdtController?.flushCrdtUpdates?.();
+          } catch {}
+          for (
+            this.crdtController = null, await this.pendingCrdtDrain?.catch(() => void 0);
+            this.appendQueue.length > 0;
+          )
+            try {
+              await this.appendQueuedUpdates();
+            } catch {
+              await this.waitForAppendQueueDrained();
+            }
+          ((this.disposed = !0),
+            this.openResponse == null
+              ? this.subscription != null && tn(this.subscription.unsubscribe())
+              : (en(this.openResponse), (this.openResponse = null)),
+            (this.subscription = null));
+        }
+        waitForAppendQueueDrained() {
+          return this.appendQueue.length === 0
+            ? Promise.resolve()
+            : new Promise((e) => {
+                this.appendQueueDrainedListeners.add(e);
+              });
+        }
+        notifyAppendQueueDrained() {
+          if (!(this.appendQueue.length > 0)) {
+            for (let e of this.appendQueueDrainedListeners) e();
+            this.appendQueueDrainedListeners.clear();
+          }
+        }
+        setProblem(e) {
+          this.snapshot.status === `live`
+            ? this.snapshot.problem !== e && this.setSnapshot({ ...this.snapshot, problem: e })
+            : e != null && this.setSnapshot({ problem: e, status: `failed` });
+        }
+        setSnapshot(e) {
+          this.snapshot = e;
+          for (let e of this.listeners) e();
+        }
+      }));
+  }))();
+}
+function cn(e) {
+  let t = (0, ln.c)(45),
+    {
+      value: n,
+      onChange: i,
+      placeholder: a,
+      ariaLabel: o,
+      assignedToChatGpt: s,
+      recipient: c,
+      recipientPlaceholder: l,
+      inputRef: u,
+      autoFocus: d,
+      onRemoveRecipient: f,
+      onSubmit: p,
+    } = e,
+    m = o === void 0 ? a : o,
+    h = d === void 0 || d,
+    g;
+  t[0] !== s || t[1] !== n
+    ? ((g = () => {
+        let e = Oe(n, {
+            defaultTextKind: `prompt`,
+            enableFileMentions: !1,
+            enableSkillMentions: !1,
+            enableSlashCommands: !1,
+            enterBehavior: `enter`,
+            plainTextMode: !0,
+          }),
+          t = { controller: e, destroy: () => e.destroy() },
+          i = {
+            mention: document.createElement(`span`),
+            placeholder: document.createElement(`span`),
+          };
+        return (
+          e.view.updateState(
+            e.view.state.reconfigure({
+              plugins: [
+                ...e.view.state.plugins,
+                new r({
+                  key: q,
+                  state: {
+                    init: () => s,
+                    apply(e, t) {
+                      let n = e.getMeta(q);
+                      return typeof n == `boolean` ? n : t;
+                    },
+                  },
+                  props: {
+                    decorations(e) {
+                      if (q.getState(e) !== !0) return null;
+                      let { doc: t } = e,
+                        n = [v.widget(1, i.mention, { side: -1 })];
+                      return (
+                        t.childCount === 1 &&
+                          t.child(0).content.size === 0 &&
+                          n.push(v.widget(1, i.placeholder, { side: 1 })),
+                        he.create(t, n)
+                      );
+                    },
+                  },
+                }),
+              ],
+            }),
+          ),
+          { ...t, prefix: i }
+        );
+      }),
+      (t[0] = s),
+      (t[1] = n),
+      (t[2] = g))
+    : (g = t[2]);
+  let [_] = (0, K.useState)(g),
+    { controller: y, destroy: b, prefix: x } = _;
+  ct(b);
+  let S;
+  t[3] === y.view.dom ? (S = t[4]) : ((S = () => y.view.dom), (t[3] = y.view.dom), (t[4] = S));
+  let C;
+  (t[5] === y ? (C = t[6]) : ((C = [y]), (t[5] = y), (t[6] = C)),
+    (0, K.useImperativeHandle)(u, S, C));
+  let w;
+  t[7] !== y || t[8] !== i || t[9] !== n
+    ? ((w = (e) => {
+        if (e) {
+          let e = y.getText();
+          e !== n && i(e);
+        }
+      }),
+      (t[7] = y),
+      (t[8] = i),
+      (t[9] = n),
+      (t[10] = w))
+    : (w = t[10]);
+  let T = (0, K.useEffectEvent)(w),
+    E;
+  t[11] !== y.view || t[12] !== T
+    ? ((E = () => Qe(y.view, T)), (t[11] = y.view), (t[12] = T), (t[13] = E))
+    : (E = t[13]);
+  let D;
+  (t[14] === y ? (D = t[15]) : ((D = [y]), (t[14] = y), (t[15] = D)), (0, K.useEffect)(E, D));
+  let O, k;
+  (t[16] !== y || t[17] !== n
+    ? ((O = () => {
+        y.getText() !== n && y.restoreText(n);
+      }),
+      (k = [y, n]),
+      (t[16] = y),
+      (t[17] = n),
+      (t[18] = O),
+      (t[19] = k))
+    : ((O = t[18]), (k = t[19])),
+    (0, K.useEffect)(O, k));
+  let A;
+  t[20] !== s || t[21] !== y.view
+    ? ((A = () => {
+        q.getState(y.view.state) !== s && y.view.dispatch(y.view.state.tr.setMeta(q, s));
+      }),
+      (t[20] = s),
+      (t[21] = y.view),
+      (t[22] = A))
+    : (A = t[22]);
+  let j;
+  (t[23] !== s || t[24] !== y ? ((j = [y, s]), (t[23] = s), (t[24] = y), (t[25] = j)) : (j = t[25]),
+    (0, K.useEffect)(A, j));
+  let M;
+  bb0: {
+    if (s) {
+      M = ``;
+      break bb0;
     }
+    M = a;
   }
-
-  #setSnapshot(snapshot: ArtifactSessionSnapshot): void {
-    this.#snapshot = snapshot;
-    for (const listener of this.#listeners) listener();
+  let N = M,
+    P;
+  t[26] !== s || t[27] !== y.view.state || t[28] !== f
+    ? ((P = (e) => {
+        s &&
+          f != null &&
+          e.key === `Backspace` &&
+          !e.nativeEvent.isComposing &&
+          y.view.state.selection.empty &&
+          y.view.state.selection.from === 1 &&
+          (e.preventDefault(), e.stopPropagation(), f());
+      }),
+      (t[26] = s),
+      (t[27] = y.view.state),
+      (t[28] = f),
+      (t[29] = P))
+    : (P = t[29]);
+  let F = !h,
+    I;
+  t[30] !== m || t[31] !== y || t[32] !== N || t[33] !== p || t[34] !== F
+    ? ((I = (0, dn.jsx)(rt, {
+        ariaLabel: m,
+        composerController: y,
+        disableAutoFocus: F,
+        minHeight: `1lh`,
+        placeholder: N,
+        onSubmit: p,
+      })),
+      (t[30] = m),
+      (t[31] = y),
+      (t[32] = N),
+      (t[33] = p),
+      (t[34] = F),
+      (t[35] = I))
+    : (I = t[35]);
+  let L;
+  t[36] !== s || t[37] !== x || t[38] !== c || t[39] !== l
+    ? ((L =
+        s &&
+        (0, dn.jsxs)(dn.Fragment, {
+          children: [(0, un.createPortal)(c, x.mention), (0, un.createPortal)(l, x.placeholder)],
+        })),
+      (t[36] = s),
+      (t[37] = x),
+      (t[38] = c),
+      (t[39] = l),
+      (t[40] = L))
+    : (L = t[40]);
+  let R;
+  return (
+    t[41] !== P || t[42] !== I || t[43] !== L
+      ? ((R = (0, dn.jsxs)(`div`, { className: `min-w-0`, onKeyDownCapture: P, children: [I, L] })),
+        (t[41] = P),
+        (t[42] = I),
+        (t[43] = L),
+        (t[44] = R))
+      : (R = t[44]),
+    R
+  );
+}
+var ln, K, un, dn, q;
+function fn() {
+  return (fn = e(() => {
+    ((ln = n()),
+      ie(),
+      P(),
+      (K = U()),
+      (un = x()),
+      tt(),
+      (dn = m()),
+      (q = new te(`artifact-comment-recipient`)));
+  }))();
+}
+function pn(e) {
+  let t = (0, gn.c)(8),
+    { composer: n } = e,
+    { value: r, initialAssignedToChatGpt: i, onCancel: a, onChange: o, onSubmit: s } = n,
+    c;
+  t[0] === s ? (c = t[1]) : ((c = (e) => (s(e), !0)), (t[0] = s), (t[1] = c));
+  let l;
+  return (
+    t[2] !== i || t[3] !== a || t[4] !== o || t[5] !== c || t[6] !== r
+      ? ((l = (0, J.jsx)(mn, {
+          initialValue: r,
+          mode: `create`,
+          initialAssignedToChatGpt: i,
+          onCancel: a,
+          onChange: o,
+          onSubmit: c,
+        })),
+        (t[2] = i),
+        (t[3] = a),
+        (t[4] = o),
+        (t[5] = c),
+        (t[6] = r),
+        (t[7] = l))
+      : (l = t[7]),
+    l
+  );
+}
+function mn(e) {
+  let t = (0, gn.c)(29),
+    {
+      initialValue: n,
+      mode: r,
+      initialAssignedToChatGpt: i,
+      onCancel: a,
+      onChange: o,
+      onSubmit: s,
+    } = e,
+    c = n === void 0 ? `` : n,
+    l = ue(),
+    u;
+  bb0: {
+    if (r !== `reply`) {
+      let e;
+      (t[0] === l
+        ? (e = t[1])
+        : ((e = l.formatMessage({
+            id: `artifactComments.newCommentPlaceholder`,
+            defaultMessage: `Add a comment`,
+            description: `Placeholder in the floating artifact comment composer`,
+          })),
+          (t[0] = l),
+          (t[1] = e)),
+        (u = e));
+      break bb0;
+    }
+    let e;
+    (t[2] === l
+      ? (e = t[3])
+      : ((e = l.formatMessage({
+          id: `artifactComments.replyPlaceholder`,
+          defaultMessage: `Add a reply`,
+          description: `Placeholder for replying to an artifact comment`,
+        })),
+        (t[2] = l),
+        (t[3] = e)),
+      (u = e));
   }
+  let d = u,
+    f;
+  bb1: {
+    if (r === `reply`) {
+      let e;
+      (t[4] === l
+        ? (e = t[5])
+        : ((e = l.formatMessage({
+            id: `artifactComments.replyInput`,
+            defaultMessage: `Reply to comment`,
+            description: `Accessible label for the artifact comment reply editor`,
+          })),
+          (t[4] = l),
+          (t[5] = e)),
+        (f = e));
+      break bb1;
+    }
+    let e;
+    (t[6] === l
+      ? (e = t[7])
+      : ((e = l.formatMessage({
+          id: `artifactComments.composerInput`,
+          defaultMessage: `Comment`,
+          description: `Accessible name of the artifact comment text editor`,
+        })),
+        (t[6] = l),
+        (t[7] = e)),
+      (f = e));
+  }
+  let p = f,
+    m;
+  t[8] === l
+    ? (m = t[9])
+    : ((m = l.formatMessage({
+        id: `artifactComments.toggleRecipient`,
+        defaultMessage: `Assign to ChatGPT`,
+        description: `Toggle assigning an artifact comment or reply to ChatGPT`,
+      })),
+      (t[8] = l),
+      (t[9] = m));
+  let h = m,
+    g,
+    _;
+  t[10] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((g = (0, J.jsx)(M, {
+        id: `artifactComments.assistantMention`,
+        defaultMessage: `@ChatGPT`,
+        description: `Mention that assigns an artifact comment to ChatGPT; leave the product name unchanged`,
+      })),
+      (_ = (0, J.jsx)(M, {
+        id: `artifactComments.send`,
+        defaultMessage: `Send`,
+        description: `Send an artifact comment or reply immediately`,
+      })),
+      (t[10] = g),
+      (t[11] = _))
+    : ((g = t[10]), (_ = t[11]));
+  let v;
+  t[12] !== p || t[13] !== d || t[14] !== h
+    ? ((v = { placeholder: d, input: p, assignment: h, recipient: g, submit: _ }),
+      (t[12] = p),
+      (t[13] = d),
+      (t[14] = h),
+      (t[15] = v))
+    : (v = t[15]);
+  let y, b;
+  t[16] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((y = (0, J.jsx)(Ce, {})),
+      (b = (0, J.jsx)(C, { "aria-hidden": !0, asset: me })),
+      (t[16] = y),
+      (t[17] = b))
+    : ((y = t[16]), (b = t[17]));
+  let x;
+  t[18] === h
+    ? (x = t[19])
+    : ((x = (e) => (0, J.jsx)(pe, { tooltipContent: h, children: e })), (t[18] = h), (t[19] = x));
+  let S;
+  return (
+    t[20] !== i ||
+    t[21] !== c ||
+    t[22] !== r ||
+    t[23] !== a ||
+    t[24] !== o ||
+    t[25] !== s ||
+    t[26] !== x ||
+    t[27] !== v
+      ? ((S = (0, J.jsx)(xt, {
+          initialValue: c,
+          mode: r,
+          initialAssignedToChatGpt: i,
+          onCancel: a,
+          onChange: o,
+          onSubmit: s,
+          labels: v,
+          assignmentIcon: y,
+          submitIcon: b,
+          wrapAssignmentControl: x,
+          renderInput: hn,
+        })),
+        (t[20] = i),
+        (t[21] = c),
+        (t[22] = r),
+        (t[23] = a),
+        (t[24] = o),
+        (t[25] = s),
+        (t[26] = x),
+        (t[27] = v),
+        (t[28] = S))
+      : (S = t[28]),
+    S
+  );
 }
-
-const PresentationPanel = React.lazy(async () => {
-  const { PopcornElectronPresentationPanel } = await import("@rchunk/popcorn-presentation-panel");
-  return { default: PopcornElectronPresentationPanel };
-});
-const WorkbookPanel = React.lazy(async () => {
-  const { PopcornElectronWorkbookPanel } = await import("@rchunk/popcorn-workbook-panel");
-  return { default: PopcornElectronWorkbookPanel };
-});
-
-function renderWithLayout(content: unknown, renderLayout?: (parts: unknown) => unknown): unknown {
-  return jsx.jsx(ArtifactLayout, { content, header: null, renderLayout });
+function hn(e) {
+  return (0, J.jsx)(cn, { ...e });
 }
-
-function LoadingSession({ kind, renderLayout }: { kind: ArtifactSessionKind; renderLayout?: (parts: unknown) => unknown }): unknown {
-  const intl = useIntl();
-  return renderWithLayout(jsx.jsx("div", {
-    className: "flex h-full items-center justify-center",
-    "aria-busy": true,
-    children: kind === "presentation"
-      ? intl.formatMessage({ id: "artifactSession.loadingPresentation", defaultMessage: "Opening live slide deck…" })
-      : intl.formatMessage({ id: "artifactSession.loading", defaultMessage: "Opening live spreadsheet…" }),
-  }), renderLayout);
+var gn, J;
+function _n() {
+  return (_n = e(() => {
+    ((gn = n()), g(), Tt(), _(), s(), le(), V(), fn(), (J = m()));
+  }))();
 }
-
-function LiveArtifactSession({
-  controller,
-  hostId,
-  onClose,
-  renderLayout,
-  reviewTools,
-  snapshot,
-  tabId,
-  title,
-  artifactRef,
-  threadId,
-}: ArtifactSessionTabContentProps & {
-  controller: ArtifactSessionController;
-  renderLayout?: (parts: unknown) => unknown;
-  snapshot: LiveSnapshot;
-}): unknown {
-  const intl = useIntl();
-  const commentsEnabled = isGateEnabled("1292007209");
-  const [commentsOpen, setCommentsOpen] = React.useState(false);
-  const resolvedTitle = snapshot.title ?? title;
-  const openIn = jsx.jsx(OpenInButton, {
-    artifactRef,
-    hostId,
-    kind: snapshot.kind,
-    threadId,
-    title: resolvedTitle,
-    variant: commentsEnabled ? "title" : "menu",
-  });
-  const commentsControl = commentsEnabled
-    ? jsx.jsx(CommentsControl, { open: commentsOpen, onOpenChange: setCommentsOpen })
-    : null;
-  const feedback = jsx.jsx(ArtifactFeedbackButton, {
-    artifacts: [{ artifactRef, artifactType: snapshot.kind === "presentation" ? "slides" : "spreadsheet", title: resolvedTitle }],
-    hostId,
-    variant: "icon",
-  });
-  const renderHeader = (controls: unknown) => jsx.jsx(EditorHeader, {
-    actions: openIn,
-    commentsControl,
-    controls: typeof controls === "object" && controls != null ? controls : {},
-    onClose,
-    tabId,
-    title: resolvedTitle,
-  });
-  const sharedProps = {
-    annotationsEnabled: commentsEnabled,
-    className: "h-full min-h-0",
-    externalCrdtUpdates: snapshot.externalCrdtUpdates,
-    headerCenterContent: commentsEnabled ? resolvedTitle : null,
-    headerRightContent: commentsEnabled ? null : openIn,
-    initialCrdtState: snapshot.initialCrdtState,
-    initialSourceBytes: snapshot.initialArtifactBytes,
-    isEditing: true,
-    onControllerReady: controller.attachCrdtController,
-    onCrdtDrain: controller.onCrdtDrain,
-    onCrdtDrainAttemptFailed: controller.onCrdtDrainAttemptFailed,
-    onCrdtUpdate: controller.onCrdtUpdate,
-    renderHeader: commentsEnabled ? renderHeader : undefined,
-    renderLayout,
-    resolveImageHydrationAssets: controller.resolveImageHydrationAssets,
-    reviewTools: commentsEnabled ? reviewTools : undefined,
-    title: resolvedTitle,
+function vn(e) {
+  let t = e.comments[0];
+  return t != null && (/^@ChatGPT(?:\s|$)/u.test(t.text) || St(t.author));
+}
+function yn(e, t) {
+  let n = e.artifactKind === `workbook` ? At(e.target) : Ot(e.target, e.markerPoint);
+  return {
+    annotationId: e.threadId,
+    artifactKind: e.artifactKind,
+    assignedToChatGpt: !0,
+    body: t,
+    label: e.label,
+    target: n,
   };
-  const panel = snapshot.kind === "presentation"
-    ? jsx.jsx(PresentationPanel, {
-        ...sharedProps,
-        zoomToFitLabel: intl.formatMessage({ id: "artifactViewer.zoomToFit", defaultMessage: "Zoom to fit" }),
-      })
-    : jsx.jsx(WorkbookPanel, { ...sharedProps, toolbarHidden: false });
-  const commentsSidebar = commentsEnabled && commentsOpen
-    ? jsx.jsxs("aside", { "aria-label": "Artifact comments", children: [feedback, "Comments"] })
-    : null;
-
-  return jsx.jsxs("div", {
-    className: "flex h-full min-h-0 flex-col",
-    children: [
-      jsx.jsx("div", {
-        className: "min-h-0 flex-1",
-        children: jsx.jsx(React.Suspense, {
-          fallback: jsx.jsx(LoadingSession, { kind: snapshot.kind, renderLayout }),
-          children: jsx.jsxs("div", { className: "flex h-full min-h-0", children: [panel, commentsSidebar] }),
+}
+function bn() {
+  return (bn = e(() => {
+    kt();
+  }))();
+}
+function xn(e) {
+  let t = (0, En.c)(66),
+    {
+      thread: n,
+      borderless: r,
+      preview: a,
+      isPending: s,
+      isSelected: c,
+      isUnread: l,
+      onDelete: u,
+      onHover: d,
+      onReply: f,
+      onResolve: p,
+      onSelect: m,
+    } = e,
+    h = r !== void 0 && r,
+    g = a !== void 0 && a,
+    _ = s !== void 0 && s,
+    v = c !== void 0 && c,
+    y = l !== void 0 && l,
+    b = ue(),
+    x = Ue() ? 0 : 150 / 1e3,
+    S;
+  t[0] === x ? (S = t[1]) : ((S = { duration: x, ease: i }), (t[0] = x), (t[1] = S));
+  let C, w, T;
+  t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((w = {
+        assistant: (0, Y.jsx)(je, { className: `size-3` }),
+        viewer: (0, Y.jsx)(ee, {
+          "aria-hidden": !1,
+          legacyIcon: yt,
+          asset16: o,
+          legacyClassName: `icon-2xs`,
         }),
+        resolve: (0, Y.jsx)(ae, {}),
+        delete: (0, Y.jsx)(N, {}),
+        menu: (0, Y.jsx)(G, {}),
       }),
-      snapshot.problem == null ? null : jsx.jsxs("div", {
-        role: "status",
-        className: "shrink-0 px-2 pt-1 pb-2",
-        children: [
-          intl.formatMessage({ id: "artifactSession.syncProblem", defaultMessage: "Changes may not be synced to this Artifact Session yet." }),
-          jsx.jsx("button", { type: "button", onClick: controller.retry, children: intl.formatMessage({ id: "artifactSession.retry", defaultMessage: "Try again" }) }),
-        ],
+      (T = (0, Y.jsx)(M, {
+        id: `artifactComments.assistantName`,
+        defaultMessage: `ChatGPT`,
+        description: `Name of the ChatGPT assistant responding inside an artifact comment thread; leave the product name unchanged`,
+      })),
+      (C = (0, Y.jsx)(M, {
+        id: `artifactComments.thinking`,
+        defaultMessage: `Thinking`,
+        description: `Status shown while ChatGPT is responding to one artifact comment thread`,
+      })),
+      (t[2] = C),
+      (t[3] = w),
+      (t[4] = T))
+    : ((C = t[2]), (w = t[3]), (T = t[4]));
+  let E;
+  t[5] === b
+    ? (E = t[6])
+    : ((E = b.formatMessage({
+        id: `artifactComments.deletedComment`,
+        defaultMessage: `Comment deleted`,
+        description: `Placeholder replacing the text of an individually deleted comment in an artifact comment thread`,
+      })),
+      (t[5] = b),
+      (t[6] = E));
+  let D;
+  t[7] === b
+    ? (D = t[8])
+    : ((D = b.formatMessage({
+        id: `artifactComments.edited`,
+        defaultMessage: `edited`,
+        description: `Label beside an artifact comment's timestamp indicating that its text was edited`,
+      })),
+      (t[7] = b),
+      (t[8] = D));
+  let O;
+  t[9] === b
+    ? (O = t[10])
+    : ((O = b.formatMessage({
+        id: `artifactComments.unreadReply`,
+        defaultMessage: `New ChatGPT reply`,
+        description: `Accessible label for the blue dot identifying an unread assistant reply on an artifact comment`,
+      })),
+      (t[9] = b),
+      (t[10] = O));
+  let k;
+  t[11] !== b || t[12] !== n.label
+    ? ((k = b.formatMessage(
+        {
+          id: `artifactComments.resolveThread`,
+          defaultMessage: `Resolve comment on {target}`,
+          description: `Accessible label for resolving an artifact comment thread and moving it into the resolved section`,
+        },
+        { target: n.label },
+      )),
+      (t[11] = b),
+      (t[12] = n.label),
+      (t[13] = k))
+    : (k = t[13]);
+  let A;
+  t[14] === b
+    ? (A = t[15])
+    : ((A = b.formatMessage({
+        id: `artifactComments.deleteComment`,
+        defaultMessage: `Delete comment`,
+        description: `Menu action that permanently deletes this artifact comment thread and its replies`,
+      })),
+      (t[14] = b),
+      (t[15] = A));
+  let j;
+  t[16] === b
+    ? (j = t[17])
+    : ((j = b.formatMessage({
+        id: `artifactComments.threadActions`,
+        defaultMessage: `Comment actions`,
+        description: `Accessible label for the menu of actions on an artifact comment thread`,
+      })),
+      (t[16] = b),
+      (t[17] = j));
+  let P;
+  t[18] !== E || t[19] !== D || t[20] !== O || t[21] !== k || t[22] !== A || t[23] !== j
+    ? ((P = {
+        assistantName: T,
+        thinking: C,
+        deletedComment: E,
+        edited: D,
+        unread: O,
+        resolve: k,
+        delete: A,
+        menu: j,
       }),
-    ],
+      (t[18] = E),
+      (t[19] = D),
+      (t[20] = O),
+      (t[21] = k),
+      (t[22] = A),
+      (t[23] = j),
+      (t[24] = P))
+    : (P = t[24]);
+  let F;
+  t[25] !== p || t[26] !== n.threadId
+    ? ((F = p == null ? void 0 : () => p(n.threadId)),
+      (t[25] = p),
+      (t[26] = n.threadId),
+      (t[27] = F))
+    : (F = t[27]);
+  let I;
+  t[28] !== u || t[29] !== n.threadId
+    ? ((I = u == null ? void 0 : () => u(n.threadId)),
+      (t[28] = u),
+      (t[29] = n.threadId),
+      (t[30] = I))
+    : (I = t[30]);
+  let L;
+  t[31] === n.artifactKind
+    ? (L = t[32])
+    : ((L =
+        n.artifactKind === `presentation` &&
+        (0, Y.jsx)(M, {
+          id: `artifactComments.powerPointComment`,
+          defaultMessage: `PowerPoint comment`,
+          description: `Label identifying a comment stored in the PowerPoint presentation file; leave the product name PowerPoint unchanged`,
+        })),
+      (t[31] = n.artifactKind),
+      (t[32] = L));
+  let R;
+  t[33] === n.artifactKind
+    ? (R = t[34])
+    : ((R =
+        n.artifactKind === `workbook` &&
+        (0, Y.jsx)(M, {
+          id: `artifactComments.excelComment`,
+          defaultMessage: `Excel comment`,
+          description: `Label identifying a comment stored in the Excel spreadsheet file; leave the product name Excel unchanged`,
+        })),
+      (t[33] = n.artifactKind),
+      (t[34] = R));
+  let z;
+  t[35] !== L || t[36] !== R
+    ? ((z = (0, Y.jsxs)(Y.Fragment, { children: [L, R] })), (t[35] = L), (t[36] = R), (t[37] = z))
+    : (z = t[37]);
+  let B;
+  t[38] !== b || t[39] !== n.label
+    ? ((B = b.formatMessage(
+        {
+          id: `artifactComments.selectThread`,
+          defaultMessage: `Open comment on {target}`,
+          description: `Accessible label for selecting an artifact comment and navigating to its anchored element`,
+        },
+        { target: n.label },
+      )),
+      (t[38] = b),
+      (t[39] = n.label),
+      (t[40] = B))
+    : (B = t[40]);
+  let V;
+  t[41] !== b || t[42] !== n.label
+    ? ((V = b.formatMessage(
+        {
+          id: `artifactComments.selectThreadReplies`,
+          defaultMessage: `Open replies on {target}`,
+          description: `Open an artifact comment's replies and navigate to their anchored target`,
+        },
+        { target: n.label },
+      )),
+      (t[41] = b),
+      (t[42] = n.label),
+      (t[43] = V))
+    : (V = t[43]);
+  let H;
+  t[44] !== f || t[45] !== n
+    ? ((H =
+        f == null
+          ? void 0
+          : (0, Y.jsx)(mn, {
+              mode: `reply`,
+              initialAssignedToChatGpt: vn(n),
+              onSubmit: (e) => {
+                let { body: t, assignedToChatGpt: r } = e;
+                return f(n.threadId, t, r);
+              },
+            })),
+      (t[44] = f),
+      (t[45] = n),
+      (t[46] = H))
+    : (H = t[46]);
+  let U;
+  t[47] !== h ||
+  t[48] !== _ ||
+  t[49] !== v ||
+  t[50] !== y ||
+  t[51] !== d ||
+  t[52] !== m ||
+  t[53] !== g ||
+  t[54] !== P ||
+  t[55] !== F ||
+  t[56] !== I ||
+  t[57] !== z ||
+  t[58] !== B ||
+  t[59] !== V ||
+  t[60] !== H ||
+  t[61] !== n
+    ? ((U = (0, Y.jsx)(Et, {
+        thread: n,
+        borderless: h,
+        preview: g,
+        isSelected: v,
+        isUnread: y,
+        isPending: _,
+        icons: w,
+        labels: P,
+        renderDeleteMenu: Tn,
+        onResolve: F,
+        onDelete: I,
+        formatTimestamp: wn,
+        onHover: d,
+        onSelect: m,
+        sourceLabel: z,
+        selectLabel: B,
+        selectRepliesLabel: V,
+        repliesToggleLabel: Cn,
+        renderMetadata: Sn,
+        replyComposer: H,
+      })),
+      (t[47] = h),
+      (t[48] = _),
+      (t[49] = v),
+      (t[50] = y),
+      (t[51] = d),
+      (t[52] = m),
+      (t[53] = g),
+      (t[54] = P),
+      (t[55] = F),
+      (t[56] = I),
+      (t[57] = z),
+      (t[58] = B),
+      (t[59] = V),
+      (t[60] = H),
+      (t[61] = n),
+      (t[62] = U))
+    : (U = t[62]);
+  let W;
+  return (
+    t[63] !== U || t[64] !== S
+      ? ((W = (0, Y.jsx)(fe.div, { layout: `position`, transition: S, children: U })),
+        (t[63] = U),
+        (t[64] = S),
+        (t[65] = W))
+      : (W = t[65]),
+    W
+  );
+}
+function Sn(e) {
+  let { authorName: t, relativeTime: n, author: r, timestamp: i } = e;
+  return (0, Y.jsx)(M, {
+    id: `artifactComments.commentAuthorMetadata`,
+    defaultMessage: `<author>{authorName}</author> <timestamp>{relativeTime}</timestamp>`,
+    description: `Stored author name and relative timestamp shown together on an artifact comment, including the author's name when the current viewer wrote the comment`,
+    values: { authorName: t, relativeTime: n, author: r, timestamp: i },
   });
 }
-
-function ConnectedArtifactSession(props: ArtifactSessionTabContentProps & {
-  artifactSessions: ArtifactSessionsService;
-  renderLayout?: (parts: unknown) => unknown;
-}): unknown {
-  const intl = useIntl();
-  const [controller] = React.useState(() => new ArtifactSessionController({
-    artifactRef: props.artifactRef,
-    artifactSessions: props.artifactSessions,
-    kind: props.kind,
-    threadId: props.threadId,
-  }));
-  const snapshot = React.useSyncExternalStore(controller.subscribe, controller.getSnapshot, controller.getSnapshot);
-  if (snapshot.status === "starting") return jsx.jsx(LoadingSession, { kind: props.kind, renderLayout: props.renderLayout });
-  if (snapshot.status === "failed") {
-    const message = props.kind === "presentation"
-      ? intl.formatMessage({ id: "artifactSession.loadPresentationFailed", defaultMessage: "Couldn’t open this live slide deck" })
-      : intl.formatMessage({ id: "artifactSession.loadFailed", defaultMessage: "Couldn’t open this live spreadsheet." });
-    return renderWithLayout(jsx.jsxs("div", {
-      className: "flex h-full flex-col items-center justify-center gap-3",
-      children: [
-        message,
-        snapshot.problem === "persistence"
-          ? jsx.jsx("button", { type: "button", onClick: controller.retry, children: intl.formatMessage({ id: "artifactSession.retry", defaultMessage: "Try again" }) })
-          : null,
-      ],
-    }), props.renderLayout);
-  }
-  return jsx.jsx(LiveArtifactSession, { ...props, controller, snapshot });
+function Cn(e, t) {
+  return e
+    ? (0, Y.jsx)(M, {
+        id: `artifactComments.hideReplies`,
+        defaultMessage: `Hide replies`,
+        description: `Collapse older replies, keeping the original artifact comment and latest reply visible`,
+      })
+    : (0, Y.jsx)(M, {
+        id: `artifactComments.showReplies`,
+        defaultMessage: `{count, plural, one {Show # reply} other {Show # replies}}`,
+        description: `Expand the counted older replies between the original artifact comment and the latest reply`,
+        values: { count: t },
+      });
 }
-
-function ArtifactSessionTabContent(props: ArtifactSessionTabContentProps): unknown {
-  const { renderSlots, ...sessionProps } = props;
-  const renderLayout = renderSlots == null ? undefined : (parts: unknown) => renderPaneLayout(renderSlots, parts);
-  const artifactSessions = services.artifactSessions;
-  if (artifactSessions == null) {
-    return renderWithLayout(jsx.jsx("div", {
-      className: "flex h-full items-center justify-center",
-      children: "Live Artifact Sessions aren’t available in this app host.",
-    }), renderLayout);
-  }
-  return jsx.jsx(ConnectedArtifactSession, { ...sessionProps, artifactSessions, renderLayout });
+function wn(e) {
+  return (0, Y.jsx)(Ne, { dateString: e }, `artifact-comment-relative-time`);
 }
-
-export { ArtifactSessionTabContent };
+function Tn(e) {
+  let { trigger: t, onDelete: n, label: r } = e;
+  return (0, Y.jsx)(et, {
+    triggerButton: t,
+    contentWidth: `sidebar`,
+    children: (0, Y.jsx)(oe.Item, { onSelect: n, children: r }),
+  });
+}
+var En, Y;
+function Dn() {
+  return (Dn = e(() => {
+    ((En = n()),
+      O(),
+      Ct(),
+      z(),
+      _(),
+      h(),
+      Be(),
+      le(),
+      be(),
+      ft(),
+      bt(),
+      Ie(),
+      ye(),
+      He(),
+      _n(),
+      bn(),
+      (Y = m()));
+  }))();
+}
+function On(e) {
+  let t = (0, Mn.c)(46),
+    {
+      threads: n,
+      embedded: r,
+      selectedThreadId: i,
+      unreadThreadIds: a,
+      pendingThreadIds: o,
+      onSelect: s,
+      onHover: c,
+      onDelete: l,
+      onDeleteAll: u,
+      onReply: d,
+      onResolve: f,
+      onClose: p,
+    } = e,
+    m = r !== void 0 && r,
+    h = i === void 0 ? null : i,
+    g = ue(),
+    _;
+  t[0] === g
+    ? (_ = t[1])
+    : ((_ = g.formatMessage({
+        id: `artifactComments.close`,
+        defaultMessage: `Close comments`,
+        description: `Accessible label for the button that closes the artifact comments sidebar`,
+      })),
+      (t[0] = g),
+      (t[1] = _));
+  let v = _,
+    y;
+  t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((y = (0, X.jsx)(M, {
+        id: `artifactComments.deleteAllResolved`,
+        defaultMessage: `Delete all`,
+        description: `Action that permanently deletes every resolved artifact comment thread`,
+      })),
+      (t[2] = y))
+    : (y = t[2]);
+  let b = y,
+    x;
+  t[3] === g
+    ? (x = t[4])
+    : ((x = g.formatMessage({
+        id: `artifactComments.filterLabel`,
+        defaultMessage: `Filter comments`,
+        description: `Accessible label for the menu that filters artifact comments by open or resolved status`,
+      })),
+      (t[3] = g),
+      (t[4] = x));
+  let S = x,
+    T;
+  t[5] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((T = (0, X.jsx)(M, {
+        id: `artifactComments.filterOpen`,
+        defaultMessage: `Open`,
+        description: `Filter option showing artifact comment threads that have not been resolved`,
+      })),
+      (t[5] = T))
+    : (T = t[5]);
+  let E = T,
+    D;
+  t[6] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((D = (0, X.jsx)(M, {
+        id: `artifactComments.filterResolved`,
+        defaultMessage: `Resolved`,
+        description: `Filter option showing resolved artifact comment threads`,
+      })),
+      (t[6] = D))
+    : (D = t[6]);
+  let O = D,
+    k;
+  t[7] === g
+    ? (k = t[8])
+    : ((k = g.formatMessage({
+        id: `artifactComments.sidebarLabel`,
+        defaultMessage: `Artifact comments`,
+        description: `Accessible label for the sidebar containing native file comments and persistent ChatGPT comments on the open artifact; leave the product name ChatGPT unchanged`,
+      })),
+      (t[7] = g),
+      (t[8] = k));
+  let A;
+  t[9] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((A = (0, X.jsx)(M, {
+        id: `artifactComments.heading`,
+        defaultMessage: `Comments`,
+        description: `Heading of the sidebar containing native file comments and persistent ChatGPT comments on the open artifact; leave the product name ChatGPT unchanged`,
+      })),
+      (t[9] = A))
+    : (A = t[9]);
+  let j, N, P, I, L;
+  t[10] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((j = (0, X.jsx)(M, {
+        id: `artifactComments.empty`,
+        defaultMessage: `No comments yet`,
+        description: `Empty state shown when the open artifact has no native file comments or persistent ChatGPT comment threads; leave the product name ChatGPT unchanged`,
+      })),
+      (N = (0, X.jsx)(M, {
+        id: `artifactComments.emptyDescription`,
+        defaultMessage: `Select text or objects to add a comment`,
+        description: `Instructions in the empty artifact comments sidebar explaining how to add the first comment`,
+      })),
+      (P = (0, X.jsx)(M, {
+        id: `artifactComments.filteredEmpty`,
+        defaultMessage: `Adjust filters to see comments`,
+        description: `Empty state when existing artifact comment threads do not match the selected open or resolved filter`,
+      })),
+      (I = (0, X.jsx)(M, {
+        id: `artifactComments.showAllOpenThreads`,
+        defaultMessage: `Show all open threads`,
+        description: `Button that changes the artifact comments filter to show unresolved threads`,
+      })),
+      (L = (0, X.jsx)(M, {
+        id: `artifactComments.showResolvedThreads`,
+        defaultMessage: `Show resolved threads`,
+        description: `Button that changes the artifact comments filter to show resolved threads when no open threads remain`,
+      })),
+      (t[10] = j),
+      (t[11] = N),
+      (t[12] = P),
+      (t[13] = I),
+      (t[14] = L))
+    : ((j = t[10]), (N = t[11]), (P = t[12]), (I = t[13]), (L = t[14]));
+  let R;
+  t[15] !== v || t[16] !== S || t[17] !== k
+    ? ((R = {
+        sidebar: k,
+        heading: A,
+        close: v,
+        filter: S,
+        open: E,
+        empty: j,
+        emptyDescription: N,
+        filteredEmpty: P,
+        showOpen: I,
+        showResolved: L,
+        resolved: O,
+        resolvedCount: jn,
+        deleteAll: b,
+      }),
+      (t[15] = v),
+      (t[16] = S),
+      (t[17] = k),
+      (t[18] = R))
+    : (R = t[18]);
+  let z, V;
+  t[19] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((z = (0, X.jsx)(C, { "aria-hidden": !0, asset: w })),
+      (V = (0, X.jsx)(re, {})),
+      (t[19] = z),
+      (t[20] = V))
+    : ((z = t[19]), (V = t[20]));
+  let ee;
+  t[21] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((ee = (0, X.jsx)(B, {})), (t[21] = ee))
+    : (ee = t[21]);
+  let U;
+  t[22] !== v || t[23] !== p
+    ? ((U = (0, X.jsx)(F, {
+        "aria-label": v,
+        color: `ghostSecondary`,
+        size: `formatToolbar`,
+        uniform: !0,
+        onClick: p,
+        children: ee,
+      })),
+      (t[22] = v),
+      (t[23] = p),
+      (t[24] = U))
+    : (U = t[24]);
+  let W;
+  t[25] === S
+    ? (W = t[26])
+    : ((W = (e) => {
+        let { value: t, onChange: n } = e;
+        return (0, X.jsx)(et, {
+          align: `end`,
+          contentWidth: `sidebar`,
+          triggerButton: (0, X.jsx)(F, {
+            "aria-label": S,
+            color: `ghostSecondary`,
+            size: `formatToolbar`,
+            uniform: !0,
+            children: (0, X.jsx)(H, {}),
+          }),
+          children: (0, X.jsxs)(oe.RadioGroup, {
+            value: t,
+            onValueChange: (e) => {
+              (e === `open` || e === `resolved`) && n(e);
+            },
+            children: [
+              (0, X.jsx)(oe.RadioItem, { value: `open`, variant: `chatgpt`, children: E }),
+              (0, X.jsx)(oe.RadioItem, { value: `resolved`, variant: `chatgpt`, children: O }),
+            ],
+          }),
+        });
+      }),
+      (t[25] = S),
+      (t[26] = W));
+  let te;
+  t[27] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((te = (e) =>
+        (0, X.jsx)(F, { color: `ghostActive`, size: `inline`, onClick: e, children: b })),
+      (t[27] = te))
+    : (te = t[27]);
+  let G;
+  t[28] !== l ||
+  t[29] !== c ||
+  t[30] !== d ||
+  t[31] !== f ||
+  t[32] !== s ||
+  t[33] !== o ||
+  t[34] !== h ||
+  t[35] !== a
+    ? ((G = (e) =>
+        (0, X.jsx)(xn, {
+          thread: e,
+          isPending: e.status !== `resolved` && o?.has(e.threadId) === !0,
+          isSelected: h === e.threadId,
+          isUnread: e.status !== `resolved` && a?.has(e.threadId) === !0,
+          onDelete: l,
+          onHover: c,
+          onReply: e.status === `resolved` ? void 0 : d,
+          onResolve: e.status === `resolved` ? void 0 : f,
+          onSelect: s,
+        })),
+      (t[28] = l),
+      (t[29] = c),
+      (t[30] = d),
+      (t[31] = f),
+      (t[32] = s),
+      (t[33] = o),
+      (t[34] = h),
+      (t[35] = a),
+      (t[36] = G))
+    : (G = t[36]);
+  let ne;
+  return (
+    t[37] !== m ||
+    t[38] !== p ||
+    t[39] !== u ||
+    t[40] !== R ||
+    t[41] !== U ||
+    t[42] !== W ||
+    t[43] !== G ||
+    t[44] !== n
+      ? ((ne = (0, X.jsx)(wt, {
+          threads: n,
+          embedded: m,
+          labels: R,
+          onClose: p,
+          onDeleteAll: u,
+          emptyIcon: z,
+          filteredEmptyIcon: V,
+          closeButton: U,
+          renderFilter: W,
+          renderDeleteAllButton: te,
+          renderChangeFilterButton: An,
+          renderScrollContainer: kn,
+          renderThread: G,
+        })),
+        (t[37] = m),
+        (t[38] = p),
+        (t[39] = u),
+        (t[40] = R),
+        (t[41] = U),
+        (t[42] = W),
+        (t[43] = G),
+        (t[44] = n),
+        (t[45] = ne))
+      : (ne = t[45]),
+    ne
+  );
+}
+function kn(e) {
+  return (0, X.jsx)(fe.div, { ...e, layoutScroll: !0 });
+}
+function An(e) {
+  return (0, X.jsx)(F, { color: `outline`, size: `dialog`, ...e });
+}
+function jn(e) {
+  let { count: t, label: n } = e;
+  return (0, X.jsx)(M, {
+    id: `artifactComments.resolvedCount`,
+    defaultMessage: `<label>Resolved</label> · {count, number}`,
+    description: `Toolbar label showing the number of resolved artifact comment threads; label styles the word Resolved with medium weight`,
+    values: { count: t, label: n },
+  });
+}
+var Mn, X;
+function Nn() {
+  return (Nn = e(() => {
+    ((Mn = n()), k(), Dt(), z(), _(), L(), h(), s(), le(), He(), Dn(), (X = m()));
+  }))();
+}
+function Pn(e) {
+  let t = (0, In.c)(15),
+    { artifactRef: n, hostId: r, threadId: i, reviewTools: o, children: s } = e,
+    c = ot(`1246162292`),
+    l = (0, Z.useContext)(Ee),
+    u = l?.accountId ?? null,
+    d = l?.userId ?? null,
+    f;
+  t[0] !== u || t[1] !== d
+    ? ((f = { accountId: u, userId: d }), (t[0] = u), (t[1] = d), (t[2] = f))
+    : (f = t[2]);
+  let p;
+  t[3] === c ? (p = t[4]) : ((p = { enabled: c }), (t[3] = c), (t[4] = p));
+  let { data: m } = a(nt, f, p),
+    h =
+      c && l?.userId != null
+        ? {
+            displayName: m?.name?.trim() || l.email || l.userId,
+            userId: l.userId,
+            providerId: `openai`,
+            email: l.email,
+          }
+        : void 0,
+    g = (0, Z.useRef)(null),
+    _;
+  t[5] !== n || t[6] !== r || t[7] !== i
+    ? ((_ = { artifactRef: n, hostId: r, threadId: i }),
+      (t[5] = n),
+      (t[6] = r),
+      (t[7] = i),
+      (t[8] = _))
+    : (_ = t[8]);
+  let v = a(zn, _),
+    y;
+  t[9] === Symbol.for(`react.memo_cache_sentinel`) ? ((y = []), (t[9] = y)) : (y = t[9]);
+  let [b, x] = (0, Z.useState)(y),
+    [S, C] = (0, Z.useState)(!1),
+    [w, T] = (0, Z.useState)(null),
+    E;
+  t[10] === o
+    ? (E = t[11])
+    : ((E = (e) => {
+        (T(e.annotationId), e.assignedToChatGpt && o.annotation?.onDirectSubmit?.(e));
+      }),
+      (t[10] = o),
+      (t[11] = E));
+  let D = E,
+    O;
+  t[12] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((O = (e) => {
+        (T(e), e != null && C(!0));
+      }),
+      (t[12] = O))
+    : (O = t[12]);
+  let k = O,
+    A = s({
+      reviewTools:
+        h == null
+          ? o
+          : {
+              ...o,
+              annotation: {
+                ...o.annotation,
+                enabled: !0,
+                createCommentThreads: !0,
+                commentAuthor: h,
+                renderCommentComposer: Fn,
+                onCommentDraftOpen: () => T(null),
+                onCommentSubmitted: D,
+              },
+            },
+      commentsControl: h == null ? void 0 : (0, Q.jsx)(Nt, { open: S, onOpenChange: C }),
+      commentsSidebarOpen: S,
+      onCommentsSidebarOpenChange: C,
+      commentsSidebarContent:
+        h == null
+          ? null
+          : (0, Q.jsx)(On, {
+              embedded: !0,
+              threads: b,
+              pendingThreadIds: v,
+              selectedThreadId: w,
+              onSelect: k,
+              onReply: (e, t, n) => {
+                let r = b.find((t) => t.threadId === e);
+                return r == null ||
+                  !g.current?.replyToCommentThread(
+                    e,
+                    n && !/^@ChatGPT(?:\s|$)/u.test(t) ? `@ChatGPT ${t}` : t,
+                    h,
+                  )
+                  ? !1
+                  : (n && D(yn(r, t)), !0);
+              },
+              onResolve: (e) => {
+                g.current?.resolveCommentThread(e, h) && o.annotation?.onDismiss?.(e);
+              },
+              onDelete: (e) => {
+                g.current?.deleteCommentThread(e) && o.annotation?.onDismiss?.(e);
+              },
+              onDeleteAll: () => {
+                for (let e of b)
+                  e.status === `resolved` &&
+                    g.current?.deleteCommentThread(e.threadId) &&
+                    o.annotation?.onDismiss?.(e.threadId);
+              },
+              onClose: () => C(!1),
+            }),
+      panelProps: {
+        commentThreadsEnabled: h != null,
+        commentControllerRef: g,
+        onCommentThreadsChange: x,
+        selectedCommentThreadId: w,
+        onSelectedCommentThreadChange: k,
+      },
+    }),
+    j;
+  return (
+    t[13] === A
+      ? (j = t[14])
+      : ((j = (0, Q.jsx)(Q.Fragment, { children: A })), (t[13] = A), (t[14] = j)),
+    j
+  );
+}
+function Fn(e) {
+  return (0, Q.jsx)(pn, { composer: e });
+}
+var In, Ln, Rn, Z, Q, zn;
+function Bn() {
+  return (Bn = e(() => {
+    ((In = n()),
+      (Ln = t(xe(), 1)),
+      (Rn = t(se(), 1)),
+      c(),
+      Re(),
+      (Z = U()),
+      ze(),
+      Ge(),
+      Ze(),
+      mt(),
+      S(),
+      $e(),
+      _n(),
+      bn(),
+      Nn(),
+      Pt(),
+      (Q = m()),
+      (zn = _e(
+        I,
+        ({ artifactRef: e, ...t }, { get: n }) => {
+          let r = new Set(),
+            i = (0, Ln.default)(n(Pe, t), (e) => !n(Ve, e)?.pendingUserMessageAdmission);
+          if (i == null) return r;
+          let a = n(Ve, i);
+          if (a?.status !== `inProgress` || a.turnId == null) return r;
+          let o = a.params.input;
+          if (o.length === 0 && (a.params.commentAttachments?.length ?? 0) === 0)
+            for (let e of n(Ke, i) ?? []) {
+              let t = n(Te, { ...i, itemId: e });
+              if (t?.type === `userMessage`) {
+                o = t.content;
+                break;
+              }
+            }
+          for (let t of Ye(Le({ input: o }).rawText, {
+            commentAttachments: a.params.commentAttachments,
+          }))
+            t.artifactRef === e && t.annotationId != null && r.add(t.annotationId);
+          return r;
+        },
+        { isEqual: Rn.default },
+      )));
+  }))();
+}
+function Vn(e) {
+  let t = (0, Hn.c)(6),
+    { hostId: n, kind: r, title: i } = e,
+    a = ot(`2587877334`),
+    o = f(dt),
+    s;
+  return (
+    t[0] !== a || t[1] !== o || t[2] !== n || t[3] !== r || t[4] !== i
+      ? ((s =
+          a && o
+            ? (0, Un.jsx)(Lt, {
+                artifacts: [
+                  {
+                    allowArtifactAttachment: !1,
+                    artifactType: r === `presentation` ? `slides` : `spreadsheet`,
+                    fileFormat: r === `presentation` ? `pptx` : `xlsx`,
+                    label: i,
+                    path: null,
+                  },
+                ],
+                fileSizeBytes: null,
+                hostId: n,
+                variant: `manualEditHeader`,
+              })
+            : null),
+        (t[0] = a),
+        (t[1] = o),
+        (t[2] = n),
+        (t[3] = r),
+        (t[4] = i),
+        (t[5] = s))
+      : (s = t[5]),
+    s
+  );
+}
+var Hn, Un;
+function Wn() {
+  return (Wn = e(() => {
+    ((Hn = n()), c(), st(), $e(), It(), (Un = m()));
+  }))();
+}
+function Gn(e, { artifactRef: t, threadId: n, title: r, comments: i }) {
+  let a = (i) => {
+      let a = e.get(Fe, n),
+        o = a.find(
+          (e) =>
+            e.localArtifactAnnotationContext?.artifactRef === t &&
+            e.localArtifactAnnotationContext.annotationId === i.annotationId,
+        );
+      return u({
+        artifactRef: t,
+        title: r,
+        annotationId: i.annotationId,
+        ...(i.assignedToChatGpt
+          ? { commentThreadId: i.annotationId, commentReplyId: De() }
+          : { commentThreadId: void 0, commentReplyId: void 0 }),
+        artifactKind: i.artifactKind,
+        body: i.body,
+        label: i.label,
+        line: o?.position.line ?? Ht(a),
+        metadata: { target: i.target },
+      });
+    },
+    o = (r) => {
+      let i = a(r);
+      Je(e, n, (e) => [
+        ...e.filter(
+          (e) =>
+            e.localArtifactAnnotationContext?.artifactRef !== t ||
+            e.localArtifactAnnotationContext.annotationId !== r.annotationId,
+        ),
+        i,
+      ]);
+    };
+  return {
+    annotation: {
+      enabled: !0,
+      artifactKey: t,
+      dictationControls: Ut,
+      defaultCreateSubmitMode: `saved`,
+      initialPendingAnnotations: Bt(
+        i.filter((e) => e.localArtifactAnnotationContext?.artifactRef === t),
+      ),
+      onSubmit: (e) => {
+        (o(e), pt());
+      },
+      onDirectSubmit: (e) => {
+        l.dispatchHostMessage({
+          type: `artifact-direct-comment`,
+          body: e.body,
+          comment: a(e),
+          conversationId: n,
+          sessionId: e.annotationId,
+        });
+      },
+      onUpdate: o,
+      onDismiss: (r) => {
+        Je(e, n, (e) =>
+          e.filter(
+            (e) =>
+              e.localArtifactAnnotationContext?.artifactRef !== t ||
+              e.localArtifactAnnotationContext.annotationId !== r,
+          ),
+        );
+      },
+    },
+  };
+}
+function Kn() {
+  return (Kn = e(() => {
+    (Se(), ke(), qe(), Ae(), A(), Vt(), Kt());
+  }))();
+}
+function qn(e) {
+  let t = (0, Qn.c)(11),
+    n,
+    r;
+  t[0] === e
+    ? ((n = t[1]), (r = t[2]))
+    : (({ renderSlots: r, ...n } = e), (t[0] = e), (t[1] = n), (t[2] = r));
+  let i;
+  t[3] === r ? (i = t[4]) : ((i = r == null ? void 0 : (e) => Yt(r, e)), (t[3] = r), (t[4] = i));
+  let a = i,
+    o = lt?.artifactSessions;
+  if (o == null) {
+    let e;
+    t[5] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, $.jsx)(Zn, {})), (t[5] = e))
+      : (e = t[5]);
+    let n;
+    return (
+      t[6] === a
+        ? (n = t[7])
+        : ((n = (0, $.jsx)(Mt, { header: null, content: e, renderLayout: a })),
+          (t[6] = a),
+          (t[7] = n)),
+      n
+    );
+  }
+  let s;
+  return (
+    t[8] !== n || t[9] !== a
+      ? ((s = (0, $.jsx)(Jn, { ...n, artifactSessions: o, renderLayout: a })),
+        (t[8] = n),
+        (t[9] = a),
+        (t[10] = s))
+      : (s = t[10]),
+    s
+  );
+}
+function Jn(e) {
+  let t = (0, Qn.c)(72),
+    {
+      artifactRef: n,
+      artifactSessions: r,
+      hostId: i,
+      kind: o,
+      onClose: s,
+      renderLayout: c,
+      tabId: l,
+      threadId: u,
+      title: d,
+    } = e,
+    f = y(I),
+    p = ue(),
+    m = ot(`1292007209`),
+    h = a(Fe, u),
+    g;
+  t[0] !== n || t[1] !== r || t[2] !== o || t[3] !== u
+    ? ((g = () => new on({ artifactRef: n, artifactSessions: r, kind: o, threadId: u })),
+      (t[0] = n),
+      (t[1] = r),
+      (t[2] = o),
+      (t[3] = u),
+      (t[4] = g))
+    : (g = t[4]);
+  let [_] = (0, $n.useState)(g),
+    v = (0, $n.useSyncExternalStore)(_.subscribe, _.getSnapshot, _.getSnapshot);
+  if (v.status === `starting`) {
+    let e;
+    return (
+      t[5] !== o || t[6] !== c
+        ? ((e = (0, $.jsx)(Xn, { kind: o, renderLayout: c })), (t[5] = o), (t[6] = c), (t[7] = e))
+        : (e = t[7]),
+      e
+    );
+  }
+  if (v.status === `failed`) {
+    let e;
+    t[8] === o
+      ? (e = t[9])
+      : ((e =
+          o === `presentation`
+            ? (0, $.jsx)(M, {
+                id: `artifactSession.loadPresentationFailed`,
+                defaultMessage: `Couldn’t open this live slide deck`,
+                description: `Error shown when a live presentation Artifact Session cannot be opened`,
+              })
+            : (0, $.jsx)(M, {
+                id: `artifactSession.loadFailed`,
+                defaultMessage: `Couldn’t open this live spreadsheet.`,
+                description: `Error shown when a live spreadsheet Artifact Session cannot be opened`,
+              })),
+        (t[8] = o),
+        (t[9] = e));
+    let n;
+    t[10] !== _.retry || t[11] !== v.problem
+      ? ((n =
+          v.problem === `persistence`
+            ? (0, $.jsx)(F, {
+                color: `outline`,
+                onClick: _.retry,
+                children: (0, $.jsx)(M, {
+                  id: `artifactSession.retry`,
+                  defaultMessage: `Try again`,
+                  description: `Button that retries Artifact Session synchronization`,
+                }),
+              })
+            : null),
+        (t[10] = _.retry),
+        (t[11] = v.problem),
+        (t[12] = n))
+      : (n = t[12]);
+    let r;
+    t[13] !== e || t[14] !== n
+      ? ((r = (0, $.jsxs)(we, { className: `h-full gap-3`, children: [e, n] })),
+        (t[13] = e),
+        (t[14] = n),
+        (t[15] = r))
+      : (r = t[15]);
+    let i;
+    return (
+      t[16] !== c || t[17] !== r
+        ? ((i = (0, $.jsx)(Mt, { header: null, renderLayout: c, content: r })),
+          (t[16] = c),
+          (t[17] = r),
+          (t[18] = i))
+        : (i = t[18]),
+      i
+    );
+  }
+  let x = v.title ?? d,
+    S;
+  t[19] !== n || t[20] !== h || t[21] !== f || t[22] !== x || t[23] !== u
+    ? ((S = Gn(f, { artifactRef: n, threadId: u, title: x, comments: h })),
+      (t[19] = n),
+      (t[20] = h),
+      (t[21] = f),
+      (t[22] = x),
+      (t[23] = u),
+      (t[24] = S))
+    : (S = t[24]);
+  let w = S,
+    T = v.title ?? d,
+    D = m ? `title` : `menu`,
+    O;
+  t[25] !== n || t[26] !== i || t[27] !== v.kind || t[28] !== T || t[29] !== D || t[30] !== u
+    ? ((O = (0, $.jsx)(zt, {
+        analyticsClickSource:
+          b.CODEX_GOOGLE_WORKSPACE_RESOURCE_CLICK_SOURCE_ARTIFACT_PREVIEW_EXPORT_MENU,
+        artifactRef: n,
+        hostId: i,
+        kind: v.kind,
+        threadId: u,
+        title: T,
+        variant: D,
+      })),
+      (t[25] = n),
+      (t[26] = i),
+      (t[27] = v.kind),
+      (t[28] = T),
+      (t[29] = D),
+      (t[30] = u),
+      (t[31] = O))
+    : (O = t[31]);
+  let k = O,
+    A;
+  t[32] !== _.attachCrdtController ||
+  t[33] !== _.onCrdtDrain ||
+  t[34] !== _.onCrdtDrainAttemptFailed ||
+  t[35] !== _.onCrdtUpdate ||
+  t[36] !== _.resolveImageHydrationAssets ||
+  t[37] !== i ||
+  t[38] !== p ||
+  t[39] !== o ||
+  t[40] !== m ||
+  t[41] !== s ||
+  t[42] !== c ||
+  t[43] !== v.externalCrdtUpdates ||
+  t[44] !== v.initialCrdtState ||
+  t[45] !== v.initialPresentationProto ||
+  t[46] !== v.initialWorkbookProto ||
+  t[47] !== v.kind ||
+  t[48] !== v.stateVersion ||
+  t[49] !== v.title ||
+  t[50] !== l ||
+  t[51] !== d ||
+  t[52] !== k
+    ? ((A = (e) => {
+        switch (v.kind) {
+          case `presentation`:
+            return (0, $.jsx)(er, {
+              className: `h-full min-h-0`,
+              renderLayout: c,
+              ...(m ? e.panelProps : void 0),
+              annotationsEnabled: m,
+              externalCrdtUpdates: v.externalCrdtUpdates,
+              headerAnnotationIcon: m
+                ? (0, $.jsx)(ce, { icon: { assets: { 16: de, 20: W } } })
+                : void 0,
+              headerSidebarIcon: m
+                ? (0, $.jsx)(C, { asset: E, className: `text-secondary` })
+                : void 0,
+              headerCenterContent: m
+                ? (0, $.jsx)(Vn, { hostId: i, kind: v.kind, title: v.title ?? d })
+                : void 0,
+              headerEditingIcons: m ? Wt : void 0,
+              headerCommentsIcon: m ? (0, $.jsx)(ce, { icon: { 16: j, 20: R } }) : void 0,
+              renderCommentsSidebar: m ? Yn : void 0,
+              renderSidebarPanel: m ? Gt : void 0,
+              commentsSidebarContent: m ? e.commentsSidebarContent : void 0,
+              commentsSidebarOpen: m && e.commentsSidebarOpen,
+              onCommentsSidebarOpenChange: e.onCommentsSidebarOpenChange,
+              renderHeader: m
+                ? (t) =>
+                    (0, $.jsx)(Ft, {
+                      commentsControl: e.commentsControl,
+                      controls: t,
+                      onClose: s,
+                      tabId: l,
+                      title: v.title ?? d,
+                      actions: k,
+                    })
+                : void 0,
+              renderHeaderZoomControl: m ? Me : void 0,
+              headerRightContent: m ? void 0 : k,
+              initialCrdtState: v.initialCrdtState,
+              initialPresentationProto: v.initialPresentationProto,
+              isEditing: m,
+              onControllerReady: _.attachCrdtController,
+              onCrdtDrain: _.onCrdtDrain,
+              onCrdtDrainAttemptFailed: _.onCrdtDrainAttemptFailed,
+              onCrdtUpdate: _.onCrdtUpdate,
+              resolveImageHydrationAssets: _.resolveImageHydrationAssets,
+              reviewTools: m ? e.reviewTools : void 0,
+              title: v.title ?? d,
+              zoomToFitLabel: p.formatMessage({
+                id: `artifactViewer.zoomToFit`,
+                defaultMessage: `Zoom to fit`,
+                description: `Zoom menu action that fits the artifact within the viewer`,
+              }),
+            });
+          case `spreadsheet`:
+            return v.stateVersion === 0 && v.initialWorkbookProto.sheets.length === 0
+              ? (0, $.jsx)(Xn, { kind: o, renderLayout: c })
+              : (0, $.jsx)(tr, {
+                  className: `h-full min-h-0`,
+                  renderLayout: c,
+                  sidePanel: m
+                    ? (0, $.jsx)(We, {
+                        open: e.commentsSidebarOpen,
+                        size: `compact`,
+                        elevation: `card`,
+                        children: e.commentsSidebarContent,
+                      })
+                    : void 0,
+                  headerCommentsIcon: m ? (0, $.jsx)(ce, { icon: { 16: j, 20: R } }) : void 0,
+                  manualEditUiEnabled: m,
+                  headerEditingIcons: m ? Wt : void 0,
+                  ...(m ? e.panelProps : void 0),
+                  annotationsEnabled: m,
+                  externalCrdtUpdates: v.externalCrdtUpdates,
+                  headerAnnotationIcon: m
+                    ? (0, $.jsx)(ce, { icon: { assets: { 16: de, 20: W } } })
+                    : void 0,
+                  headerCenterContent: m
+                    ? (0, $.jsx)(Vn, { hostId: i, kind: v.kind, title: v.title ?? d })
+                    : void 0,
+                  renderHeader: m
+                    ? (t) =>
+                        (0, $.jsx)(Ft, {
+                          commentsControl: e.commentsControl,
+                          controls: t,
+                          onClose: s,
+                          tabId: l,
+                          title: v.title ?? d,
+                          actions: k,
+                        })
+                    : void 0,
+                  renderHeaderZoomControl: m ? Me : void 0,
+                  headerRightContent: m ? void 0 : k,
+                  initialCrdtState: v.initialCrdtState,
+                  initialWorkbookProto: v.initialWorkbookProto,
+                  isEditing: !0,
+                  onControllerReady: _.attachCrdtController,
+                  onCrdtDrain: _.onCrdtDrain,
+                  onCrdtDrainAttemptFailed: _.onCrdtDrainAttemptFailed,
+                  onCrdtUpdate: _.onCrdtUpdate,
+                  resolveImageHydrationAssets: _.resolveImageHydrationAssets,
+                  reviewTools: m ? e.reviewTools : void 0,
+                  title: v.title ?? d,
+                });
+        }
+      }),
+      (t[32] = _.attachCrdtController),
+      (t[33] = _.onCrdtDrain),
+      (t[34] = _.onCrdtDrainAttemptFailed),
+      (t[35] = _.onCrdtUpdate),
+      (t[36] = _.resolveImageHydrationAssets),
+      (t[37] = i),
+      (t[38] = p),
+      (t[39] = o),
+      (t[40] = m),
+      (t[41] = s),
+      (t[42] = c),
+      (t[43] = v.externalCrdtUpdates),
+      (t[44] = v.initialCrdtState),
+      (t[45] = v.initialPresentationProto),
+      (t[46] = v.initialWorkbookProto),
+      (t[47] = v.kind),
+      (t[48] = v.stateVersion),
+      (t[49] = v.title),
+      (t[50] = l),
+      (t[51] = d),
+      (t[52] = k),
+      (t[53] = A))
+    : (A = t[53]);
+  let N;
+  t[54] !== n || t[55] !== i || t[56] !== w || t[57] !== A || t[58] !== u
+    ? ((N = (0, $.jsx)(Pn, {
+        artifactRef: n,
+        hostId: i,
+        threadId: u,
+        reviewTools: w,
+        children: A,
+      })),
+      (t[54] = n),
+      (t[55] = i),
+      (t[56] = w),
+      (t[57] = A),
+      (t[58] = u),
+      (t[59] = N))
+    : (N = t[59]);
+  let P = N,
+    L;
+  t[60] !== o || t[61] !== c
+    ? ((L = (0, $.jsx)(Xn, { kind: o, renderLayout: c })), (t[60] = o), (t[61] = c), (t[62] = L))
+    : (L = t[62]);
+  let z;
+  t[63] !== P || t[64] !== L
+    ? ((z = (0, $.jsx)(`div`, {
+        className: `min-h-0 flex-1`,
+        children: (0, $.jsx)($n.Suspense, { fallback: L, children: P }),
+      })),
+      (t[63] = P),
+      (t[64] = L),
+      (t[65] = z))
+    : (z = t[65]);
+  let B;
+  t[66] !== _.retry || t[67] !== v.problem
+    ? ((B =
+        v.problem == null
+          ? null
+          : (0, $.jsx)(`div`, {
+              className: `shrink-0 px-2 pt-1 pb-2`,
+              children: (0, $.jsx)(at, {
+                ariaLive: `polite`,
+                content: (0, $.jsx)(M, {
+                  id: `artifactSession.syncProblem`,
+                  defaultMessage: `Changes may not be synced to this Artifact Session yet.`,
+                  description: `Warning shown when live Artifact Session persistence fails`,
+                }),
+                onPrimaryCtaClick: _.retry,
+                primaryCtaText: (0, $.jsx)(M, {
+                  id: `artifactSession.retry`,
+                  defaultMessage: `Try again`,
+                  description: `Button that retries Artifact Session synchronization`,
+                }),
+                role: `status`,
+                stackOnNarrow: !0,
+                type: `warning`,
+              }),
+            })),
+      (t[66] = _.retry),
+      (t[67] = v.problem),
+      (t[68] = B))
+    : (B = t[68]);
+  let V;
+  return (
+    t[69] !== z || t[70] !== B
+      ? ((V = (0, $.jsxs)(`div`, { className: `flex h-full min-h-0 flex-col`, children: [z, B] })),
+        (t[69] = z),
+        (t[70] = B),
+        (t[71] = V))
+      : (V = t[71]),
+    V
+  );
+}
+function Yn(e, t) {
+  return (0, $.jsx)(We, { open: t, size: `compact`, elevation: `card`, children: e });
+}
+function Xn(e) {
+  let t = (0, Qn.c)(5),
+    { kind: n, renderLayout: r } = e,
+    i;
+  t[0] === n
+    ? (i = t[1])
+    : ((i = (0, $.jsx)(we, {
+        className: `h-full`,
+        children: (0, $.jsx)(`span`, {
+          className: `loading-shimmer-pure-text font-medium`,
+          children:
+            n === `presentation`
+              ? (0, $.jsx)(M, {
+                  id: `artifactSession.loadingPresentation`,
+                  defaultMessage: `Opening live slide deck…`,
+                  description: `Loading state while a live presentation Artifact Session connects`,
+                })
+              : (0, $.jsx)(M, {
+                  id: `artifactSession.loading`,
+                  defaultMessage: `Opening live spreadsheet…`,
+                  description: `Loading state while a live spreadsheet Artifact Session connects`,
+                }),
+        }),
+      })),
+      (t[0] = n),
+      (t[1] = i));
+  let a;
+  return (
+    t[2] !== r || t[3] !== i
+      ? ((a = (0, $.jsx)(Mt, { header: null, renderLayout: r, content: i })),
+        (t[2] = r),
+        (t[3] = i),
+        (t[4] = a))
+      : (a = t[4]),
+    a
+  );
+}
+function Zn() {
+  let e = (0, Qn.c)(1),
+    t;
+  return (
+    e[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((t = (0, $.jsx)(we, {
+          className: `h-full`,
+          children: (0, $.jsx)(M, {
+            id: `artifactSession.unavailable`,
+            defaultMessage: `Live Artifact Sessions aren’t available in this app host.`,
+            description: `Message shown when the app host does not provide Artifact Sessions`,
+          }),
+        })),
+        (e[0] = t))
+      : (t = e[0]),
+    t
+  );
+}
+var Qn, $n, $, er, tr;
+function nr() {
+  return (nr = e(() => {
+    ((Qn = n()),
+      ne(),
+      ge(),
+      ve(),
+      p(),
+      c(),
+      ($n = U()),
+      _(),
+      qe(),
+      ut(),
+      L(),
+      s(),
+      le(),
+      Xe(),
+      be(),
+      it(),
+      S(),
+      $e(),
+      He(),
+      jt(),
+      sn(),
+      Bn(),
+      Wn(),
+      Rt(),
+      Kn(),
+      Pt(),
+      Xt(),
+      qt(),
+      Jt(),
+      ($ = m()),
+      d(),
+      (er = (0, $n.lazy)(async () => {
+        let { PopcornElectronPresentationPanel: e } = await D(
+          async () => {
+            let { PopcornElectronPresentationPanel: e } = await import(
+              `@rchunk/popcorn-presentation-panel`
+            );
+            return { PopcornElectronPresentationPanel: e };
+          },
+          __vite__mapDeps([
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+            24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45,
+            46, 47, 48, 49, 50, 51, 52, 53, 54, 55,
+          ]),
+          import.meta.url,
+        );
+        return { default: e };
+      })),
+      (tr = (0, $n.lazy)(async () => {
+        let { PopcornElectronWorkbookPanel: e } = await D(
+          async () => {
+            let { PopcornElectronWorkbookPanel: e } = await import(
+              `@rchunk/popcorn-workbook-panel`
+            );
+            return { PopcornElectronWorkbookPanel: e };
+          },
+          __vite__mapDeps([
+            56, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23,
+            24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 57, 40, 41, 42, 43, 44,
+            45, 58, 47, 48, 49, 50, 51, 52, 53, 59,
+          ]),
+          import.meta.url,
+        );
+        return { default: e };
+      })));
+  }))();
+}
+nr();
+export { qn as ArtifactSessionTabContent };

@@ -1,5 +1,21 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Conversation tools/worker verification release-owner recovery：一次性恢复
+`pull-request-comment`、`scheduled-tasks-page`、`sketch-composer-host-core`、
+`mcp-server-elicitation-request-panel`、`chatgpt-code-block`、`artifact-session-tab-content`、
+`content-quick-chat-overlay`、`hooks-settings`、`mcp-tool-item-content` 与
+`pets-settings-route` 十个发布 owner，净恢复约 1.9 万行，并将绑定旧 mock ABI 的测试迁移为
+发布一致性验证。Git core/node/stable-metadata/turn-diff dispatch、worker dispatcher/runtime、
+native-event convergence、invocation sampler/sampler manager 专项全部通过；同时修正
+`test-main-worker-runtime` 在 Node 22 下直接加载 TypeScript 导致的假阴性测试边界。BrowserHost、
+IAB、detached/debug/quick-chat window 与 jank sampler 专项也全部通过。整批通过
+12,448/12,448 transform check、1,888/1,888 renderer build/verify、2,247/2,247 app-code
+coverage、0 semantic tail 与 typecheck；严格 hub 消费推进到 app-shared 1,526/3,185、
+app-initial 4,738/8,204、app-primary 615/917，仍为 0 unreviewed、0 invalid consumers。
+`conversation-route` 当前已经是 0/0 compatibility、33/33 preserved vendor/generated；旧目标中
+“209 个原始 conversation chunks”属于已清零的阶段性数字。该批不把其余 425 个明确 preserved
+边界的最终复核和真实登录态 E2E 误报为已经完成。
+
 2026-11-02 Onboarding/quick-chat/settings/preview release-owner recovery：一次性恢复
 `work-onboarding-suggestions`、`personal-finance-page`、`subscription-onboarding-content`、
 `gpt-builder-page`、`ad-control-dialog-runtime`、`quick-chat-window`、
