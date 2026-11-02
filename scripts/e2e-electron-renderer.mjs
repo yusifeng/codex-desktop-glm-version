@@ -231,13 +231,21 @@ if (mode === "smoke-readonly") {
       return {
         bodyText,
         brokenImages: brokenImages.length,
+        controlText: interactive.map((element) => [
+          element.getAttribute('aria-label'),
+          element.getAttribute('placeholder'),
+          element.innerText,
+          'value' in element ? element.value : null,
+        ].filter(Boolean).join(' ')).join('\\n'),
         documentWidth,
         interactiveCount: interactive.length,
         viewportWidth: window.innerWidth,
       };
     })()`);
     for (const text of expectations.text) {
-      if (!result.bodyText.includes(text)) throw new Error(`${name} is missing visual content: ${text}`);
+      if (!result.bodyText.includes(text) && !result.controlText.includes(text)) {
+        throw new Error(`${name} is missing visual content: ${text}`);
+      }
     }
     for (const text of expectations.forbidden ?? []) {
       if (result.bodyText.includes(text)) throw new Error(`${name} still contains the skeletal placeholder: ${text}`);
@@ -389,26 +397,27 @@ if (mode === "smoke-readonly") {
   await new Promise((resolve) => setTimeout(resolve, 250));
 
   for (const page of [
-    { label: '通知', name: 'notifications' },
-    { label: '导入', name: 'import' },
-    { label: '个人资料', name: 'profile' },
-    { label: '家长控制', name: 'parental-controls' },
-    { label: 'Trusted contact', name: 'trusted-contact' },
-    { label: '语音', name: 'voice' },
-    { label: '宠物', name: 'pets' },
-    { label: '键盘快捷键', name: 'keyboard-shortcuts' },
-    { label: '电脑操控', name: 'computer-use' },
-    { label: '计算机历史记录', name: 'computer-history' },
-    { label: '应用快照', name: 'appshots' },
-    { label: '已归档的聊天', name: 'archived-chats' },
+    { label: '通知', name: 'notifications', text: ['ChatGPT', 'Codex', '个性化提示'], minimumInteractive: 10 },
+    { label: '导入', name: 'import', text: ['自动同步', '从其他 AI 应用导入', '导入历史'], minimumInteractive: 3 },
+    { label: '个人资料', name: 'profile', readyText: ['邀请好友', 'Invite friends'], text: ['Token 活动', '活动洞察', '最常用的插件'], minimumInteractive: 5 },
+    { label: '家长控制', name: 'parental-controls', text: ['Add family member'], minimumInteractive: 2 },
+    { label: 'Trusted contact', name: 'trusted-contact', text: ['Add contact'], minimumInteractive: 2 },
+    { label: '语音', name: 'voice', text: ['麦克风', '语音聊天', '听写'], minimumInteractive: 8 },
+    { label: '宠物', name: 'pets', text: ['我的宠物', '创建虚拟宠物'], minimumInteractive: 8 },
+    { label: '键盘快捷键', name: 'keyboard-shortcuts', text: ['搜索快捷键', '全部重置为默认值'], minimumInteractive: 12 },
+    { label: '电脑操控', name: 'computer-use', text: ['任意应用', 'Google Chrome', '始终允许的应用'], minimumInteractive: 8 },
+    { label: '计算机历史记录', name: 'computer-history', text: ['让 ChatGPT 关注你的工作', '开启'], minimumInteractive: 2 },
+    { label: '应用快照', name: 'appshots', text: ['Appshot 发送目标', '播放音效'], minimumInteractive: 4 },
+    { label: '已归档的聊天', name: 'archived-chats', text: ['搜索已归档聊天', '全部删除'], minimumInteractive: 10 },
   ]) {
     await clickText(page.label);
     await waitForSelectorGone('[role="menu"]');
-    await new Promise((resolve) => setTimeout(resolve, 250));
+    if (page.readyText != null) await waitForBodyText(page.readyText, 30_000);
+    else await new Promise((resolve) => setTimeout(resolve, 250));
     await waitForSettingsPageToSettle();
     await assertVisualPage(`settings/${page.name}`, {
-      text: [page.label],
-      minimumInteractive: 1,
+      text: [page.label, ...page.text],
+      minimumInteractive: page.minimumInteractive,
     });
   }
 
@@ -426,17 +435,17 @@ if (mode === "smoke-readonly") {
     minimumInteractive: 5,
   });
   for (const tab of [
-    { label: '应用', name: 'apps' },
-    { label: 'MCP', name: 'mcp' },
-    { label: '技能', name: 'skills' },
-    { label: '插件', name: 'plugins' },
+    { label: '应用', name: 'apps', text: ['搜索应用'], minimumInteractive: 10 },
+    { label: 'MCP', name: 'mcp', text: ['搜索 MCP 服务器', '服务器', 'MCP Apps'], minimumInteractive: 8 },
+    { label: '技能', name: 'skills', text: ['搜索技能'], minimumInteractive: 7 },
+    { label: '插件', name: 'plugins', text: ['搜索插件'], minimumInteractive: 4 },
   ]) {
     await waitForClickableStartingWith(tab.label);
     await clickTextStartingWith(tab.label);
     await waitForSettingsPageToSettle();
     await assertVisualPage(`settings/plugins-${tab.name}`, {
-      text: [tab.label],
-      minimumInteractive: 3,
+      text: [tab.label, ...tab.text],
+      minimumInteractive: tab.minimumInteractive,
       allowHorizontalOverflow: true,
     });
   }
@@ -444,39 +453,39 @@ if (mode === "smoke-readonly") {
   await clickText('钩子');
   await waitForSettingsPageToSettle();
   await assertVisualPage('settings/hooks', {
-    text: ['钩子'],
-    minimumInteractive: 1,
+    text: ['钩子', '了解更多', '未找到钩子'],
+    minimumInteractive: 2,
   });
 
   await clickText('环境');
   await waitForSettingsPageToSettle();
   await assertVisualPage('settings/environment', {
-    text: ['环境'],
-    minimumInteractive: 1,
+    text: ['环境', 'Cloud', 'Local', 'Personal vault', 'Create'],
+    minimumInteractive: 5,
   });
 
   await clickText('Git');
   await waitForBodyText(['分支前缀', 'Branch prefix']);
   await waitForSettingsPageToSettle();
   await assertVisualPage('settings/git', {
-    text: ['Git'],
-    minimumInteractive: 1,
+    text: ['Git', '分支前缀', 'Pull Request 合并方法', '提交说明'],
+    minimumInteractive: 7,
   });
 
   await clickText('Worktrees');
   await waitForBodyText(['工作树根目录', 'Worktree root']);
   await waitForSettingsPageToSettle();
   await assertVisualPage('settings/worktrees', {
-    text: ['Worktrees'],
-    minimumInteractive: 1,
+    text: ['Worktrees', '工作树根目录', '自动删除旧工作树', '自动删除限制'],
+    minimumInteractive: 8,
   });
 
   await clickText('浏览器');
   await waitForBodyText(['In-app browser', '管理你的 Browser Use']);
   await waitForSettingsPageToSettle();
   await assertVisualPage('settings/browser', {
-    text: ['浏览器'],
-    minimumInteractive: 2,
+    text: ['浏览器', '网页 URL 和链接打开位置', '浏览数据', '自动填充和密码'],
+    minimumInteractive: 10,
   });
 
   if (await evaluate(`[...document.querySelectorAll('button, a')].some((element) => element.innerText?.trim() === '返回应用')`)) {
@@ -539,11 +548,11 @@ if (mode === "smoke-readonly") {
   };
   const explorePages = [
     // Meetings is account/feature-flag gated and is absent for some signed-in users.
-    { label: 'Meetings', name: 'meetings', readyText: 'Connect Google Calendar', optional: true },
-    { label: '站点', name: 'sites', readyText: '“站点”使用前须知' },
-    { label: 'Pull Request', name: 'pull-requests', readyText: '搜索 Pull Request' },
-    { label: '定时任务', name: 'automations', readyText: '搜索已安排任务' },
-    { label: '插件', name: 'plugins', readyText: '热门' },
+    { label: 'Meetings', name: 'meetings', readyText: 'Connect Google Calendar', text: ['Connect Google Calendar'], minimumInteractive: 2, optional: true },
+    { label: '站点', name: 'sites', readyText: '“站点”使用前须知', text: ['创建并发布网站时', '继续'], minimumInteractive: 3 },
+    { label: 'Pull Request', name: 'pull-requests', readyText: '搜索 Pull Request', text: ['全部', '正在审查', '由我创建'], minimumInteractive: 6 },
+    { label: '定时任务', name: 'automations', readyText: '搜索已安排任务', text: ['全部', '已开启', '已暂停', '已完成'], minimumInteractive: 7 },
+    { label: '插件', name: 'plugins', readyText: '热门', text: ['已安装', '公开', '个人'], minimumInteractive: 10 },
   ];
   const visibleExploreLabels = await evaluate(`
     [...document.querySelectorAll('[role="menuitem"]')].map((element) => element.innerText?.trim()).filter(Boolean)
@@ -558,9 +567,9 @@ if (mode === "smoke-readonly") {
     }
     await waitForSettingsPageToSettle();
     await assertVisualPage(`app/${page.name}`, {
-      text: [page.label],
+      text: [page.label, ...page.text],
       forbidden: page.name === 'meetings' ? ['Loading meetings', '正在加载会议'] : [],
-      minimumInteractive: 1,
+      minimumInteractive: page.minimumInteractive,
       allowHorizontalOverflow: true,
     });
     await navigateToChat(page.name);
@@ -950,6 +959,83 @@ if (mode === "smoke-readonly") {
       await waitUntil("SSH dialog close", () => evaluate(`document.querySelector('[role="dialog"]') == null`));
     }
     await assertNoInteractionException("SSH discovery dialog interaction");
+
+    await clickText("键盘快捷键");
+    await waitUntil("keyboard shortcut search", () => evaluate(`
+      document.querySelector('input[placeholder="搜索快捷键"]') != null
+    `));
+    const setInputValue = (selector, value) => evaluate(`(() => {
+      const input = document.querySelector(${JSON.stringify(selector)});
+      if (!(input instanceof HTMLInputElement)) throw new Error('Input not found: ' + ${JSON.stringify(selector)});
+      input.focus();
+      Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set.call(input, ${JSON.stringify(value)});
+      input.dispatchEvent(new InputEvent('input', {
+        bubbles: true,
+        inputType: ${JSON.stringify(value.length === 0 ? "deleteContentBackward" : "insertText")},
+        data: ${JSON.stringify(value.length === 0 ? null : value)},
+      }));
+      return input.value;
+    })()`);
+    await setInputValue('input[placeholder="搜索快捷键"]', '归档聊天');
+    await waitUntil("filtered keyboard shortcut", () => evaluate(`(() => {
+      const input = document.querySelector('input[placeholder="搜索快捷键"]');
+      const visible = (element) => {
+        const rect = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+      };
+      return input?.value === '归档聊天' && [...document.querySelectorAll('div, p, span')]
+        .some((element) => element.childElementCount === 0 && element.innerText?.trim() === '归档聊天' && visible(element));
+    })()`));
+    await setInputValue('input[placeholder="搜索快捷键"]', '');
+    await waitUntil("keyboard shortcut search restore", () => evaluate(`
+      document.querySelector('input[placeholder="搜索快捷键"]')?.value === ''
+    `));
+    deepChecks.push("keyboard shortcut filtering");
+    await assertNoInteractionException("keyboard shortcut filtering");
+
+    await clickText("插件");
+    await waitUntil("plugin settings tabs", () => evaluate(`
+      ['插件', '应用', 'MCP', '技能'].every((label) =>
+        [...document.querySelectorAll('button')].some((button) =>
+          new RegExp('^' + label + '\\\\s+\\\\d+$').test(button.innerText?.trim() ?? '')
+        )
+      )
+    `));
+    for (const tab of [
+      { label: '应用', placeholder: '搜索应用' },
+      { label: 'MCP', placeholder: '搜索 MCP 服务器' },
+      { label: '技能', placeholder: '搜索技能' },
+      { label: '插件', placeholder: '搜索插件' },
+    ]) {
+      await evaluate(`(() => {
+        const button = [...document.querySelectorAll('button')]
+          .find((element) => new RegExp('^' + ${JSON.stringify(tab.label)} + '\\\\s+\\\\d+$')
+            .test(element.innerText?.trim() ?? ''));
+        if (button == null) throw new Error('Plugin tab not found: ' + ${JSON.stringify(tab.label)});
+        button.click();
+      })()`);
+      await waitUntil(`${tab.label} plugin tab`, () => evaluate(`
+        document.querySelector('input[placeholder=${JSON.stringify(tab.placeholder)}]') != null
+      `));
+    }
+    await evaluate(`(() => {
+      const button = [...document.querySelectorAll('button')]
+        .find((element) => /^应用\\s+\\d+$/.test(element.innerText?.trim() ?? ''));
+      button?.click();
+    })()`);
+    await waitUntil("apps plugin search", () => evaluate(`document.querySelector('input[placeholder="搜索应用"]') != null`));
+    await setInputValue('input[placeholder="搜索应用"]', 'GitHub');
+    await waitUntil("filtered plugin app", () => evaluate(`
+      document.querySelector('input[placeholder="搜索应用"]')?.value === 'GitHub' &&
+      (document.body?.innerText ?? '').includes('GitHub')
+    `));
+    await setInputValue('input[placeholder="搜索应用"]', '');
+    await waitUntil("plugin app search restore", () => evaluate(`
+      document.querySelector('input[placeholder="搜索应用"]')?.value === ''
+    `));
+    deepChecks.push("plugin tabs and app filtering");
+    await assertNoInteractionException("plugin tabs and app filtering");
 
     await clickText("Worktrees");
     await waitUntil("Worktrees controls", () => evaluate(`
