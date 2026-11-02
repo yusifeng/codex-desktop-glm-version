@@ -368,7 +368,17 @@ export const PROMOTED_ROUTE_DEPENDENCIES = new Set([
 // compiles the selected checked-in owner directly. This lets large UI
 // modules leave the compatibility graph before their local names are manually
 // clarified, without changing their behavior or export surface.
-export const EXACT_ROUTE_SOURCE_OWNERS = new Map([]);
+export const EXACT_ROUTE_SOURCE_OWNERS = new Map([
+  // These settings owners were previously replaced by small structural
+  // approximations. Keep their complete release-faithful React/state graphs
+  // checked in while the readable semantic rewrites are rebuilt and reviewed.
+  ["general-settings", "general-settings-3d550f75d0eb.js"],
+  ["personalization-settings", "personalization-settings-c52a4963cfd3.js"],
+  ["remote-connections-settings", "remote-connections-settings-12e860fd2983.js"],
+  ["security-settings", "security-settings-2da2a3b205ab.js"],
+  ["codex-micro-settings", "codex-micro-settings-cbf47e1d3359.js"],
+  ["settings-plugin-selection", "settings-plugin-selection-e42895d573ba.js"],
+]);
 
 export const SEMANTIC_ROUTE_OVERRIDES = new Set([
   // These keep their published filenames, but are now built from readable

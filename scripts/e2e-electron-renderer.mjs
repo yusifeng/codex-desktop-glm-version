@@ -3,6 +3,9 @@
 // mutation modes explicit prevents an inspection run from accidentally
 // submitting a message through the user's signed-in account.
 
+import fs from "node:fs";
+import path from "node:path";
+
 const endpoint = process.env.CODEX_RENDERER_DEBUG_ENDPOINT ?? "http://127.0.0.1:9223";
 const [mode = "inspect", argument = ""] = process.argv.slice(2);
 const pages = await fetch(`${endpoint}/json/list`).then((response) => response.json());
@@ -51,6 +54,8 @@ await command("Page.bringToFront");
 
 if (mode === "smoke-readonly") {
   const checkpoints = [];
+  const screenshotDirectory = process.env.CODEX_E2E_SCREENSHOT_DIR ?? "/tmp/codex-packaged-e2e/screenshots";
+  fs.mkdirSync(screenshotDirectory, { recursive: true });
   const conversationTitle = process.env.CODEX_E2E_CONVERSATION_TITLE ?? "回应问候";
   const clickText = async (text) => evaluate(`(() => {
     const candidates = [...document.querySelectorAll('button, a, [role="button"], [role="option"], [role="menuitem"]')]
@@ -111,6 +116,79 @@ if (mode === "smoke-readonly") {
     if (recoveryText.some((text) => bodyText.includes(text))) throw new Error(`${name} entered the recovery error boundary`);
     checkpoints.push({ name, bodyTail: bodyText.slice(-1200) });
   };
+  const assertVisualPage = async (name, expectations) => {
+    const result = await evaluate(`(() => {
+      const bodyText = document.body?.innerText ?? '';
+      const visible = (element) => {
+        const style = getComputedStyle(element);
+        const rect = element.getBoundingClientRect();
+        return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+      };
+      const contentRoot = document.body;
+      const interactive = [...contentRoot.querySelectorAll('button, input, textarea, select, [role="switch"], [role="tab"], [role="combobox"]')].filter(visible);
+      const brokenImages = [...contentRoot.querySelectorAll('img')].filter((image) => visible(image) && image.complete && image.naturalWidth === 0);
+      const documentWidth = Math.max(document.documentElement.scrollWidth, document.body?.scrollWidth ?? 0);
+      return {
+        bodyText,
+        brokenImages: brokenImages.length,
+        documentWidth,
+        interactiveCount: interactive.length,
+        viewportWidth: window.innerWidth,
+      };
+    })()`);
+    for (const text of expectations.text) {
+      if (!result.bodyText.includes(text)) throw new Error(`${name} is missing visual content: ${text}`);
+    }
+    for (const text of expectations.forbidden ?? []) {
+      if (result.bodyText.includes(text)) throw new Error(`${name} still contains the skeletal placeholder: ${text}`);
+    }
+    if (result.interactiveCount < expectations.minimumInteractive) {
+      throw new Error(`${name} has only ${result.interactiveCount} visible controls; expected at least ${expectations.minimumInteractive}`);
+    }
+    if (result.brokenImages !== 0) throw new Error(`${name} contains ${result.brokenImages} broken image(s)`);
+    if (result.documentWidth > result.viewportWidth + 2) {
+      throw new Error(`${name} horizontally overflows: ${result.documentWidth}px > ${result.viewportWidth}px`);
+    }
+    const screenshot = await command('Page.captureScreenshot', { format: 'png', fromSurface: true });
+    const screenshotPath = path.join(screenshotDirectory, `${name.replaceAll('/', '-')}.png`);
+    fs.writeFileSync(screenshotPath, Buffer.from(screenshot.data, 'base64'));
+    checkpoints.push({ name, screenshotPath });
+  };
+  const assertReversibleSwitch = async (labelText) => {
+    const before = await evaluate(`(() => {
+      const label = [...document.querySelectorAll('label, p, span, div')]
+        .filter((element) => element.childElementCount <= 4)
+        .find((element) => element.innerText?.trim() === ${JSON.stringify(labelText)});
+      if (label == null) throw new Error('Switch label not found: ' + ${JSON.stringify(labelText)});
+      let container = label;
+      let control = null;
+      for (let depth = 0; depth < 6 && container != null; depth += 1, container = container.parentElement) {
+        control = container.querySelector('[role="switch"], button[aria-checked]');
+        if (control != null) break;
+      }
+      if (control == null) throw new Error('Switch control not found: ' + ${JSON.stringify(labelText)});
+      control.dataset.packagedE2eSwitch = 'true';
+      const before = control.getAttribute('aria-checked') ?? control.dataset.state;
+      control.click();
+      return before;
+    })()`);
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    const after = await evaluate(`(() => {
+      const control = document.querySelector('[data-packaged-e2e-switch="true"]');
+      const state = control?.getAttribute('aria-checked') ?? control?.dataset.state;
+      control?.click();
+      return state;
+    })()`);
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    const restored = await evaluate(`(() => {
+      const control = document.querySelector('[data-packaged-e2e-switch="true"]');
+      const state = control?.getAttribute('aria-checked') ?? control?.dataset.state;
+      control?.removeAttribute('data-packaged-e2e-switch');
+      return state;
+    })()`);
+    if (after === before) throw new Error(`${labelText} switch did not change state`);
+    if (restored !== before) throw new Error(`${labelText} switch did not restore its original state`);
+  };
 
   await waitForAppReady();
   if (!(await evaluate(`document.querySelector('#settings-search') != null`))) {
@@ -148,6 +226,35 @@ if (mode === "smoke-readonly") {
   await clickText('常规');
   await waitForBodyText(['默认权限', 'Send messages']);
   await assertHealthy('settings/general');
+  await assertVisualPage('settings/general', {
+    text: ['默认权限', '默认文件打开位置', '发送快捷键', '跟进处理方式'],
+    forbidden: ['Preferences\nDefault editor\nSend messages'],
+    minimumInteractive: 12,
+  });
+  await assertReversibleSwitch('在菜单栏中显示');
+
+  await clickText('外观');
+  await waitForBodyText(['强调色', 'Accent color']);
+  await assertVisualPage('settings/appearance', {
+    text: ['主题', 'UI 字体', '代码字体', '减少动态效果'],
+    minimumInteractive: 14,
+  });
+
+  await clickText('个性化');
+  await waitForBodyText(['Codex 说明', 'Codex instructions']);
+  await assertVisualPage('settings/personalization', {
+    text: ['Codex 说明', 'Codex 记忆', '保存'],
+    forbidden: ['Personalization\nInstructions\nMemory'],
+    minimumInteractive: 4,
+  });
+
+  await clickText('连接');
+  await waitForBodyText(['控制这台 Mac', 'Control this Mac']);
+  await assertVisualPage('settings/connections', {
+    text: ['控制这台 Mac', '控制其他设备', 'SSH', '允许连接'],
+    forbidden: ['Remote connections\nRefreshAdd connection'],
+    minimumInteractive: 5,
+  });
 
   await clickText('Git');
   await waitForBodyText(['分支前缀', 'Branch prefix']);
@@ -188,7 +295,7 @@ if (mode === "smoke-readonly") {
   await command('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' });
   await command('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape' });
 
-  console.log(JSON.stringify({ mode, checkpoints: checkpoints.map(({ name }) => name) }, null, 2));
+  console.log(JSON.stringify({ mode, screenshotDirectory, checkpoints: checkpoints.map(({ name }) => name) }, null, 2));
 } else if (mode === "fill" || mode === "append") {
   if (argument.length === 0) throw new Error(`${mode} requires non-empty message text`);
   const result = await evaluate(`(() => {
