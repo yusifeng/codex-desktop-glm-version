@@ -1,7 +1,24 @@
 import assert from "node:assert/strict";
+import { Buffer } from "node:buffer";
 import fs from "node:fs";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
+import * as esbuild from "esbuild";
 import { z } from "zod";
-import { createSshConnectionRegistrationClass } from "../src/main/main-app/remote/ssh-connection-registration.ts";
+
+const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+const registrationBuild = await esbuild.build({
+  bundle: true,
+  entryPoints: [path.join(root, "src/main/main-app/remote/ssh-connection-registration.ts")],
+  format: "esm",
+  logLevel: "silent",
+  platform: "node",
+  target: "node22",
+  write: false,
+});
+const { createSshConnectionRegistrationClass } = await import(
+  `data:text/javascript;base64,${Buffer.from(registrationBuild.outputFiles[0].text).toString("base64")}#ssh-registration`
+);
 
 const runtime = {
   Uf: class {}, Of: () => z.string(), gf: () => z.boolean(), wf: (shape) => z.object(shape), ys: (alias) => `ssh:${alias}`,
@@ -47,8 +64,10 @@ assert.equal(fast.autoConnect, false);
 await assert.rejects(() => registration.add({ sshAlias: "bad alias" }));
 
 const main = fs.readFileSync(new URL("../.reference/originals/main/main-C-Mhak1n.ts", import.meta.url), "utf8");
+const windowContext = fs.readFileSync(new URL("../src/main/main-app/window/window-context.ts", import.meta.url), "utf8");
 assert.match(main, /ett = createSshConnectionRegistrationClass\(\{/);
 assert.doesNotMatch(main, /ett = class/);
 assert.doesNotMatch(main, /s5 = n\.wf/);
-assert.match(main, /sshConnectionRegistration: new ett/);
+assert.match(main, /createWindowContextClass\(\{[\s\S]*?\bett,/, "main composition must inject the extracted registration class into the window context");
+assert.match(windowContext, /sshConnectionRegistration: new ett\(this\.appState, this\.remoteConnectionsHandler\)/);
 console.log("ssh connection registration assertions: 20");

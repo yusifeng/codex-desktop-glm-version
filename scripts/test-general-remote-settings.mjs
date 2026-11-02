@@ -30,4 +30,29 @@ const remoteUi = remote.RemoteConnectionsSettings({ routeDraft: { draft: {} }, s
 assert.equal(remoteUi.props["data-editor-mode"], "add"); assert.match(text(remoteUi), /SSH connections/); assert.match(text(remoteUi), /Production/); assert.match(text(remoteUi), /Remote control connections/);
 const buttons = walk(remoteUi).filter(node => node.type === "button"); buttons.find(node => text(node) === "Refresh").props.onClick(); buttons.find(node => text(node) === "Add connection").props.onClick(); buttons.find(node => text(node) === "Pair mobile device").props.onClick(); buttons.find(node => text(node) === "Edit").props.onClick();
 assert.deepEqual({ refreshed, added, paired, edited }, { refreshed: 1, added: 1, paired: 1, edited: "ssh-1" });
+let toggled, installed, deleted, authorized = 0, savedDraft;
+const lifecycleUi = remote.RemoteConnectionsSettings({
+  authRequired: true,
+  clientAuthorized: false,
+  routeDraft: { hostId: "ssh-2", draft: { displayName: "Staging", sshHost: "staging.test", sshPort: "22" } },
+  sshConnections: [{ hostId: "ssh-2", displayName: "Staging", autoConnect: true, codexInstalled: false, error: "Login expired", status: "login-required" }],
+  supportsWsl: false,
+  onAuthorize() { authorized++; },
+  onDelete(connection) { deleted = connection.hostId; },
+  onInstallCodex(connection) { installed = connection.hostId; },
+  onSaveDraft(draft, hostId) { savedDraft = [draft, hostId]; },
+  onToggleAutoConnect(connection, enabled) { toggled = [connection.hostId, enabled]; },
+});
+assert.equal(lifecycleUi.props["data-editor-mode"], "edit");
+assert.equal(walk(lifecycleUi).find(node => node.type === "section" && node.props?.["aria-label"] === "WSL connections"), undefined);
+walk(lifecycleUi).find(node => node.type === "input" && node.props.type === "checkbox").props.onChange({ currentTarget: { checked: false } });
+assert.deepEqual(toggled, ["ssh-2", false]);
+walk(lifecycleUi).find(node => node.type === "button" && text(node) === "Install Codex CLI").props.onClick();
+walk(lifecycleUi).find(node => node.type === "button" && text(node) === "Delete").props.onClick();
+walk(lifecycleUi).find(node => node.type === "button" && text(node) === "Authorize").props.onClick();
+assert.deepEqual({ installed, deleted, authorized }, { installed: "ssh-2", deleted: "ssh-2", authorized: 1 });
+const editorForm = walk(lifecycleUi).find(node => node.type === "form");
+editorForm.props.onSubmit({ preventDefault() {} });
+assert.equal(savedDraft[0].displayName, "Staging");
+assert.equal(savedDraft[1], "ssh-2");
 console.log("31 general and remote settings assertions passed");
