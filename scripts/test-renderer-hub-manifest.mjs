@@ -9,6 +9,6 @@ const jsonOutput = execFileSync(process.execPath, ["scripts/audit-renderer-hub-m
 const manifest = JSON.parse(jsonOutput);
 assert.equal(manifest.filter((entry) => entry.category === "unreviewed").length, 0);
 assert.equal(manifest.find((entry) => entry.hub === "app-initial" && entry.alias === "ggt")?.category, "consumed");
-assert.equal(manifest.find((entry) => entry.hub === "app-primary" && entry.alias === "Bg")?.category, "preserved-coupled");
+assert.equal(manifest.find((entry) => entry.hub === "app-primary" && entry.alias === "Bg")?.category, "consumed");
 assert.equal(manifest.find((entry) => entry.hub === "app-primary" && entry.alias === "Pg")?.category, "consumed");
 console.log("renderer hub manifest: exhaustive category output verified");

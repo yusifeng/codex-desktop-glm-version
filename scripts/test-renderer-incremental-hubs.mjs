@@ -57,7 +57,13 @@ assert.equal(typeof artifactSource.chunk, "string");
 assert.equal(artifactSource.exportCount, 79);
 assert.ok(
   artifactSource.imports.length > 0 &&
-    artifactSource.imports.every((item) => item.clause == null),
+    artifactSource.imports.some((item) => item.clause == null) &&
+    artifactSource.imports.some((item) => item.clause != null),
+);
+assert.ok(
+  artifactSource.imports
+    .filter((item) => item.clause != null)
+    .every((item) => /popcorn-(document|workbook|presentation)-panel/.test(item.file)),
 );
 const textUnderline = inspectHub("text-underline-icon");
 assert.equal(textUnderline.rewritten, true);
@@ -66,7 +72,12 @@ assert.equal(typeof textUnderline.chunk, "string");
 assert.equal(textUnderline.exportCount, 37);
 assert.ok(
   textUnderline.imports.length > 0 &&
-    textUnderline.imports.every((item) => item.clause == null),
+    textUnderline.imports.some((item) => item.clause != null),
+);
+assert.ok(
+  textUnderline.imports
+    .filter((item) => item.clause != null)
+    .every((item) => /popcorn-(document|presentation)-panel/.test(item.file)),
 );
 const surfaceStyle = inspectHub("popcorn-electron-surface-style");
 assert.equal(surfaceStyle.rewritten, true);
@@ -75,7 +86,12 @@ assert.equal(typeof surfaceStyle.chunk, "string");
 assert.equal(surfaceStyle.exportCount, 65);
 assert.ok(
   surfaceStyle.imports.length > 0 &&
-    surfaceStyle.imports.every((item) => item.clause == null),
+    surfaceStyle.imports.some((item) => item.clause != null),
+);
+assert.ok(
+  surfaceStyle.imports
+    .filter((item) => item.clause != null)
+    .every((item) => /popcorn-(workbook|presentation)-panel/.test(item.file)),
 );
 
 const importedSetup = inspectHub("use-imported-setup-opportunity");
@@ -121,11 +137,18 @@ const checkoutSessionConsumers = checkoutSession.imports.filter(
 );
 assert.equal(checkoutSessionConsumers.length, 2);
 assert.ok(
-  checkoutSessionConsumers.every((item) =>
+  checkoutSessionConsumers.some((item) =>
     item.clause?.includes("* as checkoutSessionChunk"),
-  ),
+  ) &&
+    checkoutSessionConsumers.some(
+      (item) =>
+        /checkout-success-page/.test(item.file) &&
+        item.clause?.includes("c as Bt"),
+    ),
 );
-for (const { file } of checkoutSessionConsumers) {
+for (const { file } of checkoutSessionConsumers.filter((item) =>
+  item.clause?.includes("* as checkoutSessionChunk"),
+)) {
   const source = fs.readFileSync(file, "utf8");
   assert.match(source, /checkoutSessionChunk as unknown as CheckoutSessionApi/);
   assert.doesNotMatch(source, /checkoutSessionChunk\./);
