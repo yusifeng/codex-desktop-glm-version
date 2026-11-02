@@ -4,9 +4,12 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-globalThis.__reviewFileTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
+let activeHooks = [], hookCursor = 0;
+const React = { useState(initial) { const hooks = activeHooks, index = hookCursor++; if (!(index in hooks)) hooks[index] = typeof initial === "function" ? initial() : initial; return [hooks[index], value => { hooks[index] = typeof value === "function" ? value(hooks[index]) : value; }]; } };
+globalThis.__reviewFileTest = { React, jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
 const actual = new Map([["review-file-source-breadcrumb", "review-file-source-breadcrumb"], ["review-file-tree-side-pane", "review-file-tree-side-pane"], ["review-file-source-item", "review-file-source-item"]]);
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "review-file-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => { const name = importPath.slice(8); return actual.has(name) ? { path: path.join(ROOT, "src/renderer", actual.get(name), "index.ts") } : { path: name, namespace: "mock" }; }); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__reviewFileTest.jsx;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "review-file-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => { const name = importPath.slice(8); return actual.has(name) ? { path: path.join(ROOT, "src/renderer", actual.get(name), "index.ts") } : { path: name, namespace: "mock" }; }); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__reviewFileTest.jsx;export const e6=globalThis.__reviewFileTest.React;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+function mount(Component, props) { const hooks = []; return { render() { activeHooks = hooks; hookCursor = 0; return Component(props); } }; }
 function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(child => walk(child, visit)); else walk(children, visit); }
 function find(node, predicate) { let result; walk(node, value => { if (result == null && predicate(value)) result = value; }); return result; }
 function all(node, predicate) { const result = []; walk(node, value => { if (predicate(value)) result.push(value); }); return result; }
@@ -36,9 +39,11 @@ find(crumbs, node => node.type === "button" && node.props.children === "src").pr
 assert.deepEqual(selected, ["src", { preview: true }]);
 assert.equal(breadcrumb.t({ path: "/" }), null);
 let previewed, committed, cancelled = 0;
-const goto = breadcrumb.s({ getLineCount: () => 20, onPreviewLine: line => { previewed = line; }, onGoToLine: line => { committed = line; }, onCancelPreview: () => { cancelled++; } });
+const gotoMount = mount(breadcrumb.s, { getLineCount: () => 20, onPreviewLine: line => { previewed = line; }, onGoToLine: line => { committed = line; }, onCancelPreview: () => { cancelled++; } });
+let goto = gotoMount.render();
 find(goto, node => node.type === "input").props.onChange({ currentTarget: { value: "-1" } });
 assert.equal(previewed, 20);
+goto = gotoMount.render();
 goto.props.onSubmit({ preventDefault() {} });
 assert.equal(committed, 20);
 find(goto, node => node.type === "button").props.onClick();

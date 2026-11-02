@@ -1,4 +1,4 @@
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import { I3 as getJsxRuntime, e6 as ReactRuntime, type JsxRuntime } from "@rchunk/app-shared";
 import { pnt as desktopApi } from "@rchunk/app-initial";
 import "@rchunk/entry-type";
 import "@rchunk/rolldown-runtime";
@@ -69,12 +69,12 @@ function selectedTargetLabel(target: SecretTarget): string {
 
 function PersonalSecretDialog(props: PersonalSecretDialogProps): unknown {
   const runtime = ensureJsx();
-  let namespace = props.initialNamespace;
-  let key = props.secret?.env_var ?? "";
-  let target = normalizeTarget(props.secret?.target);
-  let revealed = false;
-  let pending = false;
-  let error: "delete" | "permission" | "save" | null = null;
+  const [namespace, setNamespace] = ReactRuntime.useState(props.initialNamespace);
+  const [key, setKey] = ReactRuntime.useState(props.secret?.env_var ?? "");
+  const [target, setTarget] = ReactRuntime.useState(() => normalizeTarget(props.secret?.target));
+  const [revealed, setRevealed] = ReactRuntime.useState(false);
+  const [pending, setPending] = ReactRuntime.useState(false);
+  const [error, setError] = ReactRuntime.useState<"delete" | "permission" | "save" | null>(null);
 
   const submit = async (event: {
     preventDefault(): void;
@@ -88,7 +88,7 @@ function PersonalSecretDialog(props: PersonalSecretDialogProps): unknown {
     const service = (desktopApi as DesktopApiWithPersonalSecrets)
       .environmentConfigs;
     if (!service) {
-      error = "permission";
+      setError("permission");
       return;
     }
     const value = event.currentTarget.elements?.namedItem("value")?.value ?? "";
@@ -110,8 +110,8 @@ function PersonalSecretDialog(props: PersonalSecretDialogProps): unknown {
                 : { name: key, env_var: key, target, value },
             ],
           };
-    pending = true;
-    error = null;
+    setPending(true);
+    setError(null);
     const result = await service
       .requestPersonalSecrets({
         accountId: props.accountId,
@@ -120,7 +120,7 @@ function PersonalSecretDialog(props: PersonalSecretDialogProps): unknown {
         body,
       })
       .catch(() => null);
-    pending = false;
+    setPending(false);
     if (result?.ok && result.data.secrets.length === 1) {
       const saved = result.data.secrets[0];
       if (saved?.id != null && saved.error == null) {
@@ -128,14 +128,15 @@ function PersonalSecretDialog(props: PersonalSecretDialogProps): unknown {
         return;
       }
     }
-    error =
+    setError(
       result &&
       !result.ok &&
       (result.error === "authentication" || result.status === 403)
         ? "permission"
         : props.deleting
           ? "delete"
-          : "save";
+          : "save",
+    );
   };
 
   return runtime.jsx("dialog", {
@@ -160,12 +161,12 @@ function PersonalSecretDialog(props: PersonalSecretDialogProps): unknown {
                   ? null
                   : runtime.jsx("select", {
                       "aria-label": "Type",
-                      defaultValue: namespace,
+                      value: namespace,
+                      disabled: pending,
                       onChange: (event: {
                         currentTarget: { value: string };
                       }) => {
-                        namespace = event.currentTarget
-                          .value as SecretNamespace;
+                        setNamespace(event.currentTarget.value as SecretNamespace);
                       },
                       children: [
                         runtime.jsx("option", {
@@ -184,9 +185,10 @@ function PersonalSecretDialog(props: PersonalSecretDialogProps): unknown {
                   pattern: "[A-Za-z_][A-Za-z0-9_]*",
                   maxLength: 256,
                   required: true,
-                  defaultValue: key,
+                  value: key,
+                  disabled: pending,
                   onChange: (event: { currentTarget: { value: string } }) => {
-                    key = event.currentTarget.value;
+                    setKey(event.currentTarget.value);
                   },
                 }),
                 runtime.jsx("input", {
@@ -194,6 +196,7 @@ function PersonalSecretDialog(props: PersonalSecretDialogProps): unknown {
                   "aria-label": "Value",
                   name: "value",
                   type: revealed ? "text" : "password",
+                  disabled: pending,
                   placeholder: props.secret ? "••••••••••••" : undefined,
                   required: props.secret == null,
                 }),
@@ -201,18 +204,20 @@ function PersonalSecretDialog(props: PersonalSecretDialogProps): unknown {
                   type: "button",
                   "aria-label": revealed ? "Hide value" : "Show value",
                   onClick: () => {
-                    revealed = !revealed;
+                    setRevealed(value => !value);
                   },
                   children: revealed ? "Hide" : "Show",
                 }),
                 runtime.jsx("select", {
                   "aria-label": "Applies to",
-                  defaultValue: target.type,
+                  value: target.type,
+                  disabled: pending,
                   onChange: (event: { currentTarget: { value: string } }) => {
-                    target =
+                    setTarget(
                       event.currentTarget.value === "all_environment_configs"
                         ? { type: "all_environment_configs" }
-                        : { type: "environment_config_ids", ids: [] };
+                        : { type: "environment_config_ids", ids: [] },
+                    );
                   },
                   children: [
                     runtime.jsx("option", {

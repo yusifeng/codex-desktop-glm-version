@@ -1,4 +1,4 @@
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import { I3 as getJsxRuntime, e6 as ReactRuntime, type JsxRuntime } from "@rchunk/app-shared";
 import {
   t as AllowedDomainsInput,
   r as EnvironmentIssueDetail,
@@ -98,7 +98,7 @@ let jsx: JsxRuntime;
 
 function AllowedDomainField(props: AllowedDomainFieldProps): unknown {
   const runtime = ensureJsx();
-  let value = "";
+  const [value, setValue] = ReactRuntime.useState("");
   const issues = props.issues ?? [];
   return runtime.jsxs("section", {
     "data-environment-invalid": issues.length > 0,
@@ -111,7 +111,7 @@ function AllowedDomainField(props: AllowedDomainFieldProps): unknown {
         showErrors: issues.length > 0,
         onChange: props.onChange,
         onInputChange: (next: string) => {
-          value = next;
+          setValue(next);
         },
       }),
       ...issues.map((issue, index) =>

@@ -14,6 +14,10 @@ globalThis.__jsx = jsx;
 globalThis.__requests = [];
 globalThis.__queryData = null;
 globalThis.__scopedValues = Object.create(null);
+let activeHooks = [], hookCursor = 0;
+const React = { useState(initial) { const hooks = activeHooks, index = hookCursor++; if (!(index in hooks)) hooks[index] = typeof initial === "function" ? initial() : initial; return [hooks[index], value => { hooks[index] = typeof value === "function" ? value(hooks[index]) : value; }]; } };
+globalThis.__environmentConfigurationReact = React;
+function mount(Component, props) { const hooks = []; return { render() { activeHooks = hooks; hookCursor = 0; return Component(props); } }; }
 
 async function load(name) {
   const result = await esbuild.build({
@@ -39,7 +43,7 @@ async function load(name) {
                 return {
                   loader: "js",
                   contents:
-                    "export const I3=()=>globalThis.__jsx;export const $O={FIVE_MINUTES:300000};export const CL=()=>({setQueryData:(key,value)=>globalThis.__queryData={key,value}});export const SL=()=>{};export const _L=(options)=>({kind:'query',options});export const ek=()=>{};export const gL=()=>{};export const iL=(options)=>({kind:'mutation',options});export const rL=()=>{};export const BX=(signal)=>globalThis.__scopedValues[signal.kind];export const HX=(signal)=>globalThis.__scopedValues[signal.kind];export const rJ=(id)=>id.startsWith('client');",
+                    "export const I3=()=>globalThis.__jsx;export const e6=globalThis.__environmentConfigurationReact;export const $O={FIVE_MINUTES:300000};export const CL=()=>({setQueryData:(key,value)=>globalThis.__queryData={key,value}});export const SL=()=>{};export const _L=(options)=>({kind:'query',options});export const ek=()=>{};export const gL=()=>{};export const iL=(options)=>({kind:'mutation',options});export const rL=()=>{};export const BX=(signal)=>globalThis.__scopedValues[signal.kind];export const HX=(signal)=>globalThis.__scopedValues[signal.kind];export const rJ=(id)=>id.startsWith('client');",
                 };
               if (modulePath === "app-initial")
                 return {
@@ -146,13 +150,14 @@ const fields = await load("environment-configuration-fields");
 fields.n();
 fields.i();
 let domainChanges = null;
-const domainField = fields.r({
+const domainMount = mount(fields.r, {
   domains: ["api.example.com"],
   issues: [{ code: "invalid", field: "network-0", message: "Invalid domain" }],
   onChange: (domains) => {
     domainChanges = domains;
   },
 });
+let domainField = domainMount.render();
 assert.equal(domainField.props["data-environment-invalid"], true);
 const domainEditor = domainField.props.children[1].type(
   domainField.props.children[1].props,
@@ -160,6 +165,9 @@ const domainEditor = domainField.props.children[1].type(
 assert.equal(domainEditor.type, "allowed-domains");
 domainField.props.children[1].props.onChange(["openai.com"]);
 assert.deepEqual(domainChanges, ["openai.com"]);
+domainField.props.children[1].props.onInputChange("api.openai.com");
+domainField = domainMount.render();
+assert.equal(domainField.props.children[1].props.value, "api.openai.com");
 const domainIssue = domainField.props.children[2].type(
   domainField.props.children[2].props,
 );

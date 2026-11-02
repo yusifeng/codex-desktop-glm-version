@@ -1,5 +1,5 @@
 import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import { I3 as getJsxRuntime, e6 as ReactRuntime, type JsxRuntime } from "@rchunk/app-shared";
 import "@rchunk/codemirror-state-runtime";
 import "@rchunk/codemirror-view-runtime";
 import "@rchunk/codemirror-commands-runtime";
@@ -75,6 +75,10 @@ function renderMarkdown(content: string): unknown {
 function TextFileEditorTabContent(props: TextFileEditorProps): unknown {
   initializeTextFileEditor();
   const filePath = props.filePath ?? props.path ?? "";
+  const originalContent = props.content ?? "";
+  const [draft, setDraft] = ReactRuntime.useState(originalContent);
+  const [savedContent, setSavedContent] = ReactRuntime.useState(originalContent);
+  const [mode, setMode] = ReactRuntime.useState<"preview" | "source">(props.editor.kind === "markdown" ? "preview" : "source");
   if (props.isLoading) return jsx().jsx("div", { role: "status", children: "Loading file" });
   if (props.error != null) {
     props.onLoadError?.();
@@ -82,21 +86,17 @@ function TextFileEditorTabContent(props: TextFileEditorProps): unknown {
   }
   if (filePath.length === 0) return jsx().jsx("div", { children: "Select a file" });
 
-  const originalContent = props.content ?? "";
-  let draft = originalContent;
-  let mode: "preview" | "source" = props.editor.kind === "markdown" ? "preview" : "source";
-  let dirty = false;
+  const dirty = draft !== savedContent;
   const reportDraft = (value: string) => {
-    draft = value;
-    dirty = value !== originalContent;
+    setDraft(value);
     props.onDraftChange?.(value);
     props.onContentChange?.(value);
-    props.onUnsavedChangesChange?.(dirty);
+    props.onUnsavedChangesChange?.(value !== savedContent);
   };
-  const finishSave = (saved: boolean) => {
+  const finishSave = (saved: boolean, value: string) => {
     props.onSaveChange?.(saved);
     if (saved) {
-      dirty = false;
+      setSavedContent(value);
       props.onUnsavedChangesChange?.(false);
     }
     return saved;
@@ -104,32 +104,33 @@ function TextFileEditorTabContent(props: TextFileEditorProps): unknown {
   const save = (value = draft): boolean | Promise<boolean> => {
     const result = props.onSave?.(value);
     return result != null && typeof (result as Promise<boolean>).then === "function"
-      ? Promise.resolve(result).then((saved) => finishSave(saved !== false))
-      : finishSave(result !== false);
+      ? Promise.resolve(result).then((saved) => finishSave(saved !== false, value))
+      : finishSave(result !== false, value);
   };
   const discard = () => {
-    draft = originalContent;
-    dirty = false;
+    setDraft(originalContent);
+    setSavedContent(originalContent);
     props.onDraftChange?.(originalContent);
     props.onContentChange?.(originalContent);
     props.onUnsavedChangesChange?.(false);
     props.onDiscardChange?.();
   };
   const switchMode = () => {
-    mode = mode === "preview" ? "source" : "preview";
-    props.onModeChange?.(mode);
+    const next = mode === "preview" ? "source" : "preview";
+    setMode(next);
+    props.onModeChange?.(next);
   };
   const editor = jsx().jsx("textarea", {
     "aria-label": "File contents",
-    defaultValue: originalContent,
+    value: draft,
     "data-language": props.language ?? props.editor.language,
     readOnly: props.readOnly ?? false,
     onChange: (event: { currentTarget: { value: string } }) => reportDraft(event.currentTarget.value),
     onKeyDown: (event: { key: string; metaKey?: boolean; ctrlKey?: boolean; currentTarget: { value: string }; preventDefault(): void }) => {
       if ((event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s") {
         event.preventDefault();
-        draft = event.currentTarget.value;
-        save(draft);
+        setDraft(event.currentTarget.value);
+        save(event.currentTarget.value);
       }
     },
   });

@@ -4,8 +4,11 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-globalThis.__editorWorkbenchTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
-async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "editor-workbench-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__editorWorkbenchTest.jsx;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+let activeHooks = [], hookCursor = 0;
+const React = { useState(initial) { const hooks = activeHooks, index = hookCursor++; if (!(index in hooks)) hooks[index] = typeof initial === "function" ? initial() : initial; return [hooks[index], value => { hooks[index] = typeof value === "function" ? value(hooks[index]) : value; }]; } };
+globalThis.__editorWorkbenchTest = { React, jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } } };
+async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "editor-workbench-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__editorWorkbenchTest.jsx;export const e6=globalThis.__editorWorkbenchTest.React;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
+function mount(Component, props) { const hooks = []; return { render() { activeHooks = hooks; hookCursor = 0; return Component(props); } }; }
 function walk(node, visit) { if (node == null || typeof node !== "object") return; visit(node); const children = node.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(child => walk(child, visit)); else walk(children, visit); }
 function find(node, predicate) { let result; walk(node, value => { if (result == null && predicate(value)) result = value; }); return result; }
 function text(node) { const values = []; const collect = value => { if (typeof value === "string") values.push(value); else if (value != null && typeof value === "object") { const children = value.props?.children; if (Array.isArray(children)) children.flat(Infinity).forEach(collect); else collect(children); } }; collect(node); return values.join(" "); }
@@ -67,7 +70,8 @@ const editor = await bundle("text-file-editor-tab-content");
 assert.deepEqual(Object.keys(editor), ["i", "n", "r", "t"]);
 assert.equal(editor.r("env-1", "/repo"), "text-editor:env-1:/repo");
 let draft, saved, unsaved, prevented = 0;
-const editorUi = editor.t({ content: "const a = 1;", editor: { kind: "code" }, filePath: "src/a.ts", language: "typescript", onDraftChange(value) { draft = value; }, onSaveChange(value) { saved = value; }, onUnsavedChangesChange(value) { unsaved = value; }, tabId: "tab-1" });
+const editorMount = mount(editor.t, { content: "const a = 1;", editor: { kind: "code" }, filePath: "src/a.ts", language: "typescript", onDraftChange(value) { draft = value; }, onSaveChange(value) { saved = value; }, onUnsavedChangesChange(value) { unsaved = value; }, tabId: "tab-1" });
+let editorUi = editorMount.render();
 assert.equal(editorUi.props["data-editor-kind"], "code");
 assert.equal(editorUi.props["data-file-path"], "src/a.ts");
 assert.equal(editorUi.props["data-tab-id"], "tab-1");
@@ -77,13 +81,14 @@ assert.equal(textarea.props["data-language"], "typescript");
 textarea.props.onChange({ currentTarget: { value: "const a = 2;" } });
 assert.equal(draft, "const a = 2;");
 assert.equal(unsaved, true);
-textarea.props.onKeyDown({ key: "s", metaKey: true, currentTarget: { value: draft }, preventDefault() { prevented++; } });
+editorUi = editorMount.render();
+find(editorUi, node => node.type === "textarea").props.onKeyDown({ key: "s", metaKey: true, currentTarget: { value: draft }, preventDefault() { prevented++; } });
 assert.equal(prevented, 1);
 assert.equal(saved, true);
 assert.equal(unsaved, false);
-assert.equal(editor.t({ editor: { kind: "pierre" }, filePath: "a", isActive: false, tabId: "t" }).props.hidden, true);
+assert.equal(mount(editor.t, { editor: { kind: "pierre" }, filePath: "a", isActive: false, tabId: "t" }).render().props.hidden, true);
 let selectedEditorPath, markdownMode, slottedEditor;
-const markdownEditor = editor.t({
+const markdownMount = mount(editor.t, {
   content: "# Title\n\nBody",
   editor: { kind: "markdown" },
   path: "notes/readme.md",
@@ -93,6 +98,7 @@ const markdownEditor = editor.t({
   onSelectFile(path) { selectedEditorPath = path; },
   renderSlots(slots) { slottedEditor = slots; return slots.content; },
 });
+let markdownEditor = markdownMount.render();
 assert.equal(markdownEditor.props["data-editor-kind"], "markdown");
 assert.equal(find(markdownEditor, node => node.props?.["data-markdown-preview"] === true).type, "div");
 assert.match(text(markdownEditor), /Title Body/);
@@ -100,17 +106,19 @@ find(markdownEditor, node => node.props?.children === "/repo/notes/readme.md").p
 assert.equal(selectedEditorPath, "notes/readme.md");
 find(markdownEditor, node => node.props?.children === "View source").props.onClick();
 assert.equal(markdownMode, "source");
+markdownEditor = markdownMount.render();
+assert.equal(find(markdownEditor, node => node.type === "textarea").props.value, "# Title\n\nBody");
 assert.equal(slottedEditor.headerRows.length, 1);
 assert.equal(slottedEditor.sidePane, undefined);
 let savePayload, saveResult;
-const savingEditor = editor.t({ content: "old", editor: { kind: "code" }, filePath: "a.ts", tabId: "save", onSave(value) { savePayload = value; return false; }, onSaveChange(value) { saveResult = value; } });
+const savingEditor = mount(editor.t, { content: "old", editor: { kind: "code" }, filePath: "a.ts", tabId: "save", onSave(value) { savePayload = value; return false; }, onSaveChange(value) { saveResult = value; } }).render();
 const savingTextarea = find(savingEditor, node => node.type === "textarea");
 savingTextarea.props.onChange({ currentTarget: { value: "new" } });
 savingTextarea.props.onKeyDown({ key: "s", ctrlKey: true, currentTarget: { value: "new" }, preventDefault() {} });
 assert.equal(savePayload, "new");
 assert.equal(saveResult, false);
-assert.equal(find(editor.t({ editor: { kind: "code" }, error: new Error("Denied"), filePath: "a", tabId: "error" }), node => node.props?.role === "alert").props.children, "Denied");
-assert.match(text(editor.t({ editor: { kind: "code" }, filePath: "a", isLoading: true, tabId: "loading" })), /Loading file/);
+assert.equal(find(mount(editor.t, { editor: { kind: "code" }, error: new Error("Denied"), filePath: "a", tabId: "error" }).render(), node => node.props?.role === "alert").props.children, "Denied");
+assert.match(text(mount(editor.t, { editor: { kind: "code" }, filePath: "a", isLoading: true, tabId: "loading" }).render()), /Loading file/);
 assert.equal(editor.i(), undefined);
 assert.equal(editor.n(), undefined);
 

@@ -1,4 +1,4 @@
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import { I3 as getJsxRuntime, e6 as ReactRuntime, type JsxRuntime } from "@rchunk/app-shared";
 import "@rchunk/app-initial";
 import {
   n as parseEnvironmentEntries,
@@ -26,9 +26,9 @@ function EnvironmentBatchSecretsDialog(
   props: EnvironmentBatchSecretsDialogProps,
 ): unknown {
   const runtime = ensureJsx();
-  let rows = props.initialSecrets.map((item) => ({ ...item })),
-    nextId = Math.max(-1, ...rows.map((row) => row.id)) + 1,
-    pending = false;
+  const [rows, setRows] = ReactRuntime.useState(() => props.initialSecrets.map((item) => ({ ...item })));
+  const nextId = ReactRuntime.useRef(Math.max(-1, ...props.initialSecrets.map((row) => row.id)) + 1);
+  const [pending, setPending] = ReactRuntime.useState(false);
   const requireValues = props.requireValues ?? true;
   const importEntries = (source: string): EnvironmentParseResult => {
     const parsed = parseEnvironmentEntries(
@@ -46,25 +46,25 @@ function EnvironmentBatchSecretsDialog(
     );
     if (!parsed.ok) return parsed;
     const entries = new Map(parsed.entries);
-    rows = rows.map((row) => {
+    const nextRows = rows.map((row) => {
       const value = entries.get(row.name);
       entries.delete(row.name);
       return value === undefined ? row : { ...row, value };
     });
     for (const [name, value] of entries)
-      rows.push({
-        id: nextId++,
+      nextRows.push({
+        id: nextId.current++,
         name,
         value,
         source: "environment",
         injectionTarget: { type: "environment_variable", name },
       });
-    return rows.length > 20
-      ? { ok: false, reason: "limit", line: 0 }
-      : {
-          ok: true,
-          entries: new Map(rows.map((row) => [row.name, row.value])),
-        };
+    if (nextRows.length > 20) return { ok: false, reason: "limit", line: 0 };
+    setRows(nextRows);
+    return {
+      ok: true,
+      entries: new Map(nextRows.map((row) => [row.name, row.value])),
+    };
   };
   const valid = () =>
     rows.every(
@@ -83,7 +83,7 @@ function EnvironmentBatchSecretsDialog(
       onSubmit: (event: { preventDefault(): void }) => {
         event.preventDefault();
         if (!props.hasConflict && !pending && valid()) {
-          props.onLocalSave(rows);
+          props.onLocalSave(rows.map(row => ({ ...row })));
           props.onClose();
         }
       },
@@ -106,10 +106,10 @@ function EnvironmentBatchSecretsDialog(
                 configuration: props.configuration,
                 readOnly: row.requested,
                 onChange: (value: EnvironmentSecret) => {
-                  rows[index] = value;
+                  setRows(current => current.map(item => item.id === row.id ? value : item));
                 },
                 onDelete: () => {
-                  rows.splice(index, 1);
+                  setRows(current => current.filter(item => item.id !== row.id));
                 },
               },
               row.id,
@@ -120,17 +120,17 @@ function EnvironmentBatchSecretsDialog(
           limit: 20,
           entryCount: rows.length,
           onAddKey: (key: string) => {
-            rows.push({
-              id: nextId++,
+            setRows(current => [...current, {
+              id: nextId.current++,
               name: key,
               value: "",
               source: "environment",
               injectionTarget: { type: "environment_variable", name: key },
-            });
+            }]);
           },
           onImport: importEntries,
           onPendingChange: (value: boolean) => {
-            pending = value;
+            setPending(value);
           },
         }),
         runtime.jsxs("footer", {

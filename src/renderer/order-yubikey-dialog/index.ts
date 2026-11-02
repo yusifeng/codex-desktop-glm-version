@@ -1,6 +1,7 @@
 import "@rchunk/rolldown-runtime";
 import {
   I3 as getJsxRuntime,
+  e6 as ReactRuntime,
   K2 as initializeInternationalization,
   Lh as DialogDescription,
   Oh as DialogContent,
@@ -40,10 +41,10 @@ function YubicoTermsLink(chunks: unknown): unknown {
 }
 
 function OrderYubikeyDialog({ accountId, onClose }: OrderYubikeyDialogProps): unknown {
-  let pending = false;
+  const [pending, setPending] = ReactRuntime.useState(false);
   const order = async () => {
     if (pending) return;
-    pending = true;
+    setPending(true);
     try {
       const result = await securityApiClient.safePost(
         "/accounts/security_settings/yubikey/order_link",
@@ -63,7 +64,7 @@ function OrderYubikeyDialog({ accountId, onClose }: OrderYubikeyDialogProps): un
         disposition: "current-tab",
       });
     } finally {
-      pending = false;
+      setPending(false);
     }
   };
   const onSubmit = (event: { preventDefault(): void }) => {

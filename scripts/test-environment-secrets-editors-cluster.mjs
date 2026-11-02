@@ -11,7 +11,10 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
   };
 globalThis.__jsx = jsx;
 let activeHooks = [], hookCursor = 0;
-const React = { useState(initial) { const hooks = activeHooks, index = hookCursor++; if (!(index in hooks)) hooks[index] = typeof initial === "function" ? initial() : initial; return [hooks[index], value => { hooks[index] = typeof value === "function" ? value(hooks[index]) : value; }]; } };
+const React = {
+  useRef(initial) { const hooks = activeHooks, index = hookCursor++; if (!(index in hooks)) hooks[index] = { current: initial }; return hooks[index]; },
+  useState(initial) { const hooks = activeHooks, index = hookCursor++; if (!(index in hooks)) hooks[index] = typeof initial === "function" ? initial() : initial; return [hooks[index], value => { hooks[index] = typeof value === "function" ? value(hooks[index]) : value; }]; },
+};
 globalThis.__environmentEditorReact = React;
 globalThis.__parseEnvironment = () => ({ ok: true, entries: new Map() });
 globalThis.__preflight = async () => null;
@@ -103,7 +106,7 @@ assert.deepEqual(
 assert.equal(entry.a().props.role, "alert");
 let pending = null,
   added = null;
-const entryView = entry.r({
+const entryMount = mount(entry.r, {
   limit: 2,
   entryCount: 0,
   onAddKey: (key) => {
@@ -114,10 +117,12 @@ const entryView = entry.r({
     pending = value;
   },
 });
+let entryView = entryMount.render();
 entryView.props.children[0].props.onChange({
   currentTarget: { value: "NEW_KEY" },
 });
 assert.equal(pending, true);
+entryView = entryMount.render();
 entryView.props.children[0].props.onKeyDown({
   key: "Enter",
   shiftKey: false,
@@ -273,7 +278,7 @@ conflictVariables.props.children.props.onSubmit({ preventDefault() {} });
 const secrets = await load("environment-batch-secrets-dialog");
 let savedSecrets = null,
   secretsClosed = 0;
-const secretsView = secrets.EnvironmentBatchSecretsDialog({
+const secretsMount = mount(secrets.EnvironmentBatchSecretsDialog, {
   initialSecrets: [{ id: 1, name: "TOKEN", value: "x" }],
   onClose: () => {
     secretsClosed++;
@@ -282,21 +287,24 @@ const secretsView = secrets.EnvironmentBatchSecretsDialog({
     savedSecrets = value;
   },
 });
+let secretsView = secretsMount.render();
 assert.equal(
   secretsView.props.children.props.children[0].props.children,
   "Manage secrets",
 );
 secretsView.props.children.props.children[3].props.onImport("SECOND=two");
+secretsView = secretsMount.render();
 secretsView.props.children.props.children[2].props.children[0].props.onChange({
   id: 1,
   name: "TOKEN",
   value: "updated",
 });
+secretsView = secretsMount.render();
 secretsView.props.children.props.onSubmit({ preventDefault() {} });
 assert.equal(savedSecrets[0].value, "updated");
 assert.equal(savedSecrets[1].name, "SECOND");
 assert.equal(secretsClosed, 1);
-const optional = secrets.EnvironmentBatchSecretsDialog({
+const optional = mount(secrets.EnvironmentBatchSecretsDialog, {
   initialSecrets: [{ id: 1, name: "EMPTY", value: "" }],
   requireValues: false,
   onClose: () => {
@@ -305,7 +313,7 @@ const optional = secrets.EnvironmentBatchSecretsDialog({
   onLocalSave: (value) => {
     savedSecrets = value;
   },
-});
+}).render();
 optional.props.children.props.onSubmit({ preventDefault() {} });
 assert.equal(secretsClosed, 2);
 

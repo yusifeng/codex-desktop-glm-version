@@ -20,6 +20,10 @@ globalThis.__requestPersonalSecrets = async () => ({
   data: { secrets: [{ id: "saved" }] },
 });
 globalThis.__definedSignals = [];
+let activeHooks = [], hookCursor = 0;
+const React = { useState(initial) { const hooks = activeHooks, index = hookCursor++; if (!(index in hooks)) hooks[index] = typeof initial === "function" ? initial() : initial; return [hooks[index], value => { hooks[index] = typeof value === "function" ? value(hooks[index]) : value; }]; } };
+globalThis.__localEnvironmentReact = React;
+function mount(Component, props) { const hooks = []; return { render() { activeHooks = hooks; hookCursor = 0; return Component(props); } }; }
 
 async function load(name) {
   const result = await esbuild.build({
@@ -45,7 +49,7 @@ async function load(name) {
                 return {
                   loader: "js",
                   contents:
-                    "export const I3=()=>globalThis.__jsx;export const e6=()=>{};export const G2=(messages)=>messages;export const K2=()=>{};export const FX=()=>{};export const QI=()=>{};export const ZI={};export const pZ=(_scope,value)=>{const signal={kind:'signal',value};globalThis.__definedSignals.push(signal);return signal};export const rZ=(_scope,derive)=>{const family={kind:'family',derive};globalThis.__definedSignals.push(family);return family};",
+                    "export const I3=()=>globalThis.__jsx;export const e6=Object.assign(()=>globalThis.__localEnvironmentReact,globalThis.__localEnvironmentReact);export const G2=(messages)=>messages;export const K2=()=>{};export const FX=()=>{};export const QI=()=>{};export const ZI={};export const pZ=(_scope,value)=>{const signal={kind:'signal',value};globalThis.__definedSignals.push(signal);return signal};export const rZ=(_scope,derive)=>{const family={kind:'family',derive};globalThis.__definedSignals.push(family);return family};",
                 };
               if (modulePath === "app-initial")
                 return {
@@ -242,7 +246,7 @@ globalThis.__requestPersonalSecrets = async (input) => {
   requestInput = input;
   return { ok: true, data: { secrets: [{ id: "created" }] } };
 };
-const addSecret = secretDialog.PersonalSecretDialog({
+const addSecretMount = mount(secretDialog.PersonalSecretDialog, {
   accountId: "account",
   userId: "user",
   initialNamespace: "sensitive",
@@ -250,6 +254,7 @@ const addSecret = secretDialog.PersonalSecretDialog({
     closedNamespace = namespace;
   },
 });
+let addSecret = addSecretMount.render();
 assert.equal(addSecret.type, "dialog");
 const addForm = addSecret.props.children;
 assert.equal(addForm.props.children[0].props.children, "Add to personal vault");
@@ -260,7 +265,8 @@ assert.equal(
 addForm.props.children[1].props.children[1].props.onChange({
   currentTarget: { value: "API_KEY" },
 });
-await addForm.props.onSubmit({
+addSecret = addSecretMount.render();
+await addSecret.props.children.props.onSubmit({
   preventDefault() {},
   currentTarget: {
     elements: { namedItem: () => ({ value: "secret-value" }) },
@@ -272,7 +278,7 @@ assert.equal(requestInput.body.secrets[0].value, "secret-value");
 assert.equal(closedNamespace, "sensitive");
 
 closedNamespace = null;
-const deleteSecret = secretDialog.PersonalSecretDialog({
+const deleteSecret = mount(secretDialog.PersonalSecretDialog, {
   accountId: "account",
   userId: "user",
   initialNamespace: "not_sensitive",
@@ -281,7 +287,7 @@ const deleteSecret = secretDialog.PersonalSecretDialog({
   onClose: (namespace) => {
     closedNamespace = namespace;
   },
-});
+}).render();
 const deleteForm = deleteSecret.props.children;
 assert.equal(deleteForm.props.children[0].props.children, "Delete TOKEN?");
 await deleteForm.props.onSubmit({ preventDefault() {}, currentTarget: {} });

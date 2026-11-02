@@ -64,7 +64,7 @@ const overrides = {
     S_: `"Icon"`,
     Y2: `"FormattedMessage"`,
     Yh: `"Button"`,
-    e6: `() => globalThis.__securityFlowTest.react`,
+    e6: `Object.assign(() => globalThis.__securityFlowTest.react, globalThis.__securityFlowTest.react)`,
     h4: marker("class-names"),
     kh: `"DialogFooterActions"`,
     m4: `(...values) => values.flat(Infinity).filter(Boolean).join(" ")`,
@@ -233,15 +233,22 @@ assert.equal(historyBody.props.children[1].type, "Button");
 const orderModule = await bundle("order-yubikey-dialog");
 let orderClosed = 0;
 let prevented = false;
+state.stateValues = [];
+state.stateCursor = 0;
 let order = orderModule.OrderYubikeyDialog({ accountId: "account-2", onClose: () => orderClosed++ });
 assert.equal(order.type, "DialogContent");
 assert.equal(order.props.open, true);
 order.props.children.props.onSubmit({ preventDefault: () => { prevented = true; } });
+state.stateCursor = 0;
+order = orderModule.OrderYubikeyDialog({ accountId: "account-2", onClose: () => orderClosed++ });
+assert.equal(order.props.children.props.children[1].props.children[1].props.disabled, true);
 await new Promise(resolve => setImmediate(resolve));
 assert.equal(prevented, true);
 assert.equal(state.apiPosts.at(-1).path, "/accounts/security_settings/yubikey/order_link");
 assert.equal(state.apiPosts.at(-1).options.additionalHeaders["ChatGPT-Account-ID"], "account-2");
 assert.equal(state.opened.at(-1).href, "https://order.example/key");
+state.stateCursor = 0;
+order = orderModule.OrderYubikeyDialog({ accountId: "account-2", onClose: () => orderClosed++ });
 order.props.onOpenChange(false);
 assert.equal(orderClosed, 1);
 

@@ -188,16 +188,15 @@ function menuItem(label: string, onSelect: () => void, disabled: boolean): unkno
   return jsx.jsx("button", { type: "button", role: "menuitem", disabled, onClick: onSelect, children: label }, label);
 }
 function renameDialog(value: string, setValue: (next: string | null) => void, props: ThreadOverflowMenuProps, actions: ThreadActions): unknown {
-  let draft = value;
   const save = (): void => {
-    const title = draft.trim();
+    const title = value.trim();
     if (props.pendingWorktreeId != null) props.onRenamePendingWorktree?.(title);
     else if (props.conversationId != null) void actions.renameThread?.({ conversationId: props.conversationId, previousTitle: props.title ?? "", title });
     setValue(null);
   };
   return jsx.jsxs("div", { role: "dialog", "aria-label": "Rename chat", children: [
-    jsx.jsx("input", { defaultValue: value, onChange: (event: { currentTarget: { value: string } }) => { draft = event.currentTarget.value; } }),
-    jsx.jsx("button", { type: "button", onClick: save, children: "Save" }),
+    jsx.jsx("input", { value, onChange: (event: { currentTarget: { value: string } }) => setValue(event.currentTarget.value) }),
+    jsx.jsx("button", { type: "button", disabled: value.trim().length === 0, onClick: save, children: "Save" }),
     jsx.jsx("button", { type: "button", onClick: () => setValue(null), children: "Cancel" }),
   ] });
 }

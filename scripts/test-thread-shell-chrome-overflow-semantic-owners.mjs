@@ -101,7 +101,8 @@ overflowTree = renderOverflow();
 const dialog = walk(overflowTree).find(node => node.props?.role === "dialog");
 assert(dialog, "rename action opens a real dialog");
 walk(dialog).find(node => node.type === "input").props.onChange({currentTarget:{value:"Renamed"}});
-walk(dialog).find(node => node.props?.children === "Save").props.onClick();
+overflowTree = renderOverflow();
+walk(overflowTree).find(node => node.props?.children === "Save").props.onClick();
 assert(state.calls.some(call => Array.isArray(call) && call[0] === "rename" && call[1].title === "Renamed"));
 
 console.log("thread app-shell chrome and overflow semantic owner assertions passed");

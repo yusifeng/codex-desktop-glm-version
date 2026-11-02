@@ -1,4 +1,4 @@
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import { I3 as getJsxRuntime, e6 as ReactRuntime, type JsxRuntime } from "@rchunk/app-shared";
 import "@rchunk/app-initial";
 export type EnvironmentParseFailure = {
   ok: false;
@@ -80,15 +80,15 @@ export interface EnvironmentEntryInputProps {
 }
 function EnvironmentEntryInput(props: EnvironmentEntryInputProps): unknown {
   const runtime = ensureJsx();
-  let value = "",
-    error: EnvironmentParseFailure | null = null;
+  const [value, setValue] = ReactRuntime.useState("");
+  const [error, setError] = ReactRuntime.useState<EnvironmentParseFailure | null>(null);
   const consume = (source: string) => {
     const result = props.onImport(source);
     if ("entries" in result) {
-      error = null;
-      value = "";
+      setError(null);
+      setValue("");
     } else {
-      error = result;
+      setError(result);
     }
     props.onPendingChange(!result.ok && source.trim().length > 0);
     return result;
@@ -100,8 +100,9 @@ function EnvironmentEntryInput(props: EnvironmentEntryInputProps): unknown {
         "aria-label": "Paste .env or type a key",
         placeholder: "Paste your .env or type a key",
         onChange: (event: { currentTarget: { value: string } }) => {
-          value = event.currentTarget.value;
-          props.onPendingChange(value.trim().length > 0);
+          const next = event.currentTarget.value;
+          setValue(next);
+          props.onPendingChange(next.trim().length > 0);
         },
         onKeyDown: (event: {
           key: string;
@@ -118,7 +119,7 @@ function EnvironmentEntryInput(props: EnvironmentEntryInputProps): unknown {
               props.entryCount < props.limit
             ) {
               props.onAddKey(value, () => {});
-              value = "";
+              setValue("");
               props.onPendingChange(false);
             } else consume(value);
           }

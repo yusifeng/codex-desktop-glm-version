@@ -1,5 +1,5 @@
 import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
+import { I3 as getJsxRuntime, e6 as ReactRuntime, type JsxRuntime } from "@rchunk/app-shared";
 import "@rchunk/app-initial";
 import "@rchunk/app-primary";
 import "@rchunk/keyboard-shortcuts-gate";
@@ -56,7 +56,7 @@ function GoToLine(props: {
   onGoToLine?(line: number): void;
   onPreviewLine?(line: number): void;
 }): unknown {
-  let value = "";
+  const [value, setValue] = ReactRuntime.useState("");
   const resolve = () => u(value, props.getLineCount?.() ?? Number.POSITIVE_INFINITY);
   return jsx().jsxs("form", {
     "aria-label": "Go to line",
@@ -70,8 +70,9 @@ function GoToLine(props: {
         "aria-label": "Line",
         inputMode: "numeric",
         onChange: (event: { currentTarget: { value: string } }) => {
-          value = event.currentTarget.value;
-          const line = resolve();
+          const next = event.currentTarget.value;
+          setValue(next);
+          const line = u(next, props.getLineCount?.() ?? Number.POSITIVE_INFINITY);
           if (line != null) props.onPreviewLine?.(line);
         },
         type: "text",
