@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getBrowserSidebarSubmitAvailability as Jt, subscribeBrowserSidebarSubmitAvailability as Kt } from "../app-primary/runtime/browser-sidebar-submit-contract";
 import { appgenInteractionActions as a } from "../app-shared/runtime/appgen-interaction-action";
 import { appgenInteractionSources as p } from "../app-shared/runtime/appgen-interaction-source";
 import { sitesSharingSources as s } from "../app-shared/runtime/sites-sharing-source";
@@ -156,9 +157,7 @@ import {
   Xl as Ut,
   Zl as Wt,
   eu as Gt,
-  lf as Kt,
   nf as qt,
-  of as Jt,
   rf as Yt,
   sf as Xt,
 } from "@rchunk/app-primary";

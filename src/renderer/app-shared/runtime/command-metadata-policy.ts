@@ -28,3 +28,14 @@ export function isNavigationMouseButton(value: string): boolean {
 export function isWebviewCommandMenu(value: { kind: string; commandMenu?: unknown }): boolean {
   return value.kind === "webview" && "commandMenu" in value && value.commandMenu === true;
 }
+
+/** Check whether a command is available in the requested application surface. */
+export function isCommandAvailableIn(value: { availableIn?: readonly string[] }, surface: string): boolean {
+  return value.availableIn?.includes(surface) ?? true;
+}
+
+/** Exclude VS Code-only and explicitly fixed shortcut definitions from configuration. */
+export function isCommandShortcutConfigurable(value: { kind: string; shortcutConfigurable?: boolean }): boolean {
+  return value.kind !== "vscode-only" &&
+    !("shortcutConfigurable" in value && value.shortcutConfigurable === false);
+}

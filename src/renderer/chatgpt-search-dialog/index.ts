@@ -102,6 +102,7 @@ const __vite__mapDeps = (
       "@rchunk/cloud-file-preview",
     ]),
 ) => i.map((i) => d[i]);
+import { isImageFile as w } from "../app-shared/runtime/file-predicates";
 import { classNames as F, initializeClassNames as be } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -127,7 +128,6 @@ import {
   LX as x,
   Lb as S,
   Lh as C,
-  NR as w,
   QI as T,
   QX as E,
   R4 as D,

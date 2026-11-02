@@ -51,6 +51,7 @@ const __vite__mapDeps = (
       "@rchunk/permission-dropdown",
     ]),
 ) => i.map((i) => d[i]);
+import { getBrowserSidebarSubmitAvailability as U, getBrowserSidebarSubmitStarted as We, subscribeBrowserSidebarSubmitAvailability as Ge } from "../app-primary/runtime/browser-sidebar-submit-contract";
 import { hasItems as o } from "../app-shared/runtime/non-empty-collection";
 import { sitesSharingSources as n } from "../app-shared/runtime/sites-sharing-source";
 import { resolveBrowserContext as ze, subscribeBrowserCommentReadiness as Le } from "../app-primary-browser-comment-runtime/index";
@@ -142,9 +143,6 @@ import {
   Vi as Be,
   Ws as Ve,
   Xf as He,
-  cf as We,
-  lf as Ge,
-  of as U,
   sf as Ke,
   uf as qe,
 } from "@rchunk/app-primary";

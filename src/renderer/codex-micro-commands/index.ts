@@ -1,10 +1,10 @@
 // @ts-nocheck
+import { isCommandAvailableIn as r } from "../app-shared/runtime/command-metadata-policy";
 import { isElectronCommandEnabled as a } from "../app-initial/runtime/electron-command-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   Ep as t,
   Xp as n,
-  qp as r,
 } from "@rchunk/app-shared";
 import {
   hEt as i,

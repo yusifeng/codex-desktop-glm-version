@@ -16,6 +16,7 @@ const __vite__mapDeps = (
       "./app-primary-484df789f2f5.css",
     ]),
 ) => i.map((i) => d[i]);
+import { isImageFile as ee } from "../app-shared/runtime/file-predicates";
 import { classNames as j, initializeClassNames as pe } from "../app-shared/ui/class-names";
 import { n as e, o as t } from "@rchunk/rolldown-runtime";
 import {
@@ -39,7 +40,6 @@ import {
   K2 as y,
   LX as b,
   Ln as x,
-  NR as ee,
   Nn as S,
   Pn as te,
   Q3 as ne,

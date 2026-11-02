@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isCommandShortcutConfigurable as h } from "../app-shared/runtime/command-metadata-policy";
 import { isElectronCommandEnabled as I } from "../app-initial/runtime/electron-command-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -16,7 +17,6 @@ import {
   Oh as f,
   Ph as p,
   Rh as m,
-  Up as h,
   Xp as g,
   Y2 as _,
   al as v,

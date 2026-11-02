@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createPluginRoute as g } from "../app-shared/runtime/navigation-route-policy";
 import { createCommandQueryKey as Be } from "../app-initial/runtime/create-command-query-key";
 import { classNames as be, initializeClassNames as le } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -18,7 +19,6 @@ import {
   IF as p,
   If as m,
   Ih as h,
-  JB as g,
   K2 as _,
   Km as v,
   LX as y,

@@ -21,6 +21,16 @@ export function joinPathFragments(left: string, right: string): string {
   return left ? (right ? `${left.replace(/\/+$/u, "")}/${right.replace(/^\/+/, "")}` : left) : right;
 }
 
+/** Join path segments using Win32 separators for drive/UNC roots and POSIX separators otherwise. */
+export function joinPlatformPath(root: string, ...segments: string[]): string {
+  const windows = /^[a-z]:[\\/]/iu.test(root) || /^[\\/]{2}/u.test(root);
+  const separator = windows ? "\\" : "/";
+  return segments.reduce((value, segment) => {
+    const base = windows ? value.replace(/[\\/]+$/u, "") : value.replace(/\/+$/u, "");
+    return `${base}${separator}${segment.replace(/^[\\/]+/u, "")}`;
+  }, root);
+}
+
 /** Return at most the final two normalized path segments. */
 export function getLastTwoPathSegments(value: string): string {
   return normalizePathSeparators(stripExtendedWindowsPathPrefix(value))

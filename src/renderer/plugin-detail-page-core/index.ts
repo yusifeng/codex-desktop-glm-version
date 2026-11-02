@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isPluginId as me } from "../app-shared/runtime/navigation-route-policy";
 import { createMcpAppRoute as m, createPluginSettingsRoute as _e } from "../app-shared/runtime/navigation-route-policy";
 import { firstOrNull as Ce } from "../app-shared/runtime/non-empty-collection";
 import { getPackageSourceSuffix as P } from "../app-shared/runtime/runtime-identifier-policy";
@@ -52,7 +53,6 @@ import {
   lk as ue,
   n4 as fe,
   nN as pe,
-  nV as me,
   o_ as he,
   pO as I,
   pk as ge,

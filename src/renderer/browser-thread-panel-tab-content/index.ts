@@ -27,6 +27,7 @@ const __vite__mapDeps = (
       "@rchunk/browser-site-annotation-permission-dialog",
     ]),
 ) => i.map((i) => d[i]);
+import { getBrowserSidebarSubmitAvailability as Gr, getBrowserSidebarSubmitStarted as Hr, subscribeBrowserSidebarSubmitAvailability as Ur } from "../app-primary/runtime/browser-sidebar-submit-contract";
 import { getPrimaryModifierPressed as ne } from "../app-shared/runtime/command-metadata-policy";
 import { hasItems as f } from "../app-shared/runtime/non-empty-collection";
 import { sitesSharingSources as l } from "../app-shared/runtime/sites-sharing-source";
@@ -282,10 +283,7 @@ import {
   Is as Rr,
   Vi as zr,
   Xf as Br,
-  cf as Hr,
-  lf as Ur,
   ml as Wr,
-  of as Gr,
   pl as Kr,
   sf as qr,
   zi as Jr,

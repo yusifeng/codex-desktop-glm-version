@@ -1,5 +1,24 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Navigation/submission/file-policy convergence：以一个合并批次恢复 22 个公开
+压缩契约，并将其中仍有直接 renderer 调用的 15 个 alias、32 个绑定迁到 checked-in
+TypeScript owner。app-shared 范围包括 Chrome Extension Store URL、hotkey remote、computer
+assistant、remote conversation、plugin/managed-plugin/MCP-plugin route、skills/conversation
+route parser、plugin ID 等价规则、Win32/UNC 感知的 variadic path join、图片 MIME/扩展名、
+256 MiB 上传边界以及 command surface/configurability；app-primary 范围包括 Browser sidebar
+submit-start/availability/invalidations 的同步 CustomEvent 协议、success-state collapse、
+local/worktree composer mode toggle 和 host-worktree destination operation matcher。严格证据复核
+同时修正两个旧误判：`AG/tRe` 不是通用 channel path builder，而是校验 32 位 Chromium
+extension id 的 Chrome Web Store URL；`yp/$M` 也不是 5,166 行附近的 generated `M`，而是
+host-worktree operation matcher。四组专项共 124 条断言通过；app-shared 直接 hub 消费由
+1,829 降至 1,820，app-primary 由 735 降至 729，三 hub 保持 0 unreviewed、0 invalid
+consumers，迁移检查为 0 遗漏绑定。`npm run check` 通过 12,464 transform、11 main roots、
+1,916 renderer chunks 和 33 preserved vendor/generated route sources；最终当前构建通过真实
+登录态 `npm run e2e:critical`，覆盖 settings、Git、worktrees、Browser/IAB、conversation
+history/add-context，并发送 `E2E_REPLY_20261102083433` 后从 assistant message 收到同 marker。
+该批继续减少聚合 hub 的真实运行依赖，不把 vendor/generated/coupled export 数量或一次关键
+矩阵通过误报为整个长期目标完成。
+
 2026-11-02 App-shared navigation/identifier batch：一次迁移 14 个公开压缩别名、84 个
 renderer 调用绑定，覆盖 extended Win32/UNC separator normalization、POSIX/drive/UNC absolute
 path、absolute-aware path resolution、Windows/WSL/`/mnt` 等价比较、hotkey/local/MCP/plugin

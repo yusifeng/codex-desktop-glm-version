@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { getBrowserSidebarSubmitAvailability as Re, subscribeBrowserSidebarSubmitAvailability as Ie } from "../app-primary/runtime/browser-sidebar-submit-contract";
 import { isTerminalConversationStatus as X } from "../app-initial/runtime/is-terminal-conversation-status";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
@@ -90,9 +91,7 @@ import {
 } from "@rchunk/app-initial";
 import { I as Ne, d as Pe, g as Fe } from "@rchunk/popcorn-icons";
 import {
-  lf as Ie,
   nf as Le,
-  of as Re,
   rf as ze,
   sf as Be,
 } from "@rchunk/app-primary";

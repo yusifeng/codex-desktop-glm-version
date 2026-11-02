@@ -5,6 +5,7 @@ import * as esbuild from "esbuild";
 const entryPoints = {
   "clamp-within-range": "src/renderer/app-shared/runtime/clamp-within-range.ts",
   "command-metadata-policy": "src/renderer/app-shared/runtime/command-metadata-policy.ts",
+  "file-predicates": "src/renderer/app-shared/runtime/file-predicates.ts",
   "path-key-policy": "src/renderer/app-shared/runtime/path-key-policy.ts",
   "point-geometry": "src/renderer/app-shared/runtime/point-geometry.ts",
   "project-appearance-policy": "src/renderer/app-shared/runtime/project-appearance-policy.ts",
@@ -47,16 +48,32 @@ equal(commands.isNavigationMouseButton("MouseMiddle"), false);
 equal(commands.isWebviewCommandMenu({ kind: "webview", commandMenu: true }), true);
 equal(commands.isWebviewCommandMenu({ kind: "webview", commandMenu: false }), false);
 equal(commands.isWebviewCommandMenu({ kind: "native", commandMenu: true }), false);
+equal(commands.isCommandAvailableIn({}, "codex"), true);
+equal(commands.isCommandAvailableIn({ availableIn: ["chatgpt", "codex"] }, "codex"), true);
+equal(commands.isCommandAvailableIn({ availableIn: ["chatgpt"] }, "codex"), false);
+equal(commands.isCommandShortcutConfigurable({ kind: "webview" }), true);
+equal(commands.isCommandShortcutConfigurable({ kind: "webview", shortcutConfigurable: false }), false);
+equal(commands.isCommandShortcutConfigurable({ kind: "vscode-only" }), false);
 
 const paths = modules["path-key-policy"];
 equal(paths.joinPathFragments("/root/", "/child"), "/root/child");
 equal(paths.joinPathFragments("/root", ""), "/root");
 equal(paths.joinPathFragments("", "child"), "child");
+equal(paths.joinPlatformPath("/root/", "/child", "file.ts"), "/root/child/file.ts");
+equal(paths.joinPlatformPath("C:\\Root\\", "/child", "file.ts"), "C:\\Root\\child\\file.ts");
+equal(paths.joinPlatformPath("\\\\server\\share\\", "child"), "\\\\server\\share\\child");
 equal(paths.stripExtendedWindowsPathPrefix("\\\\?\\C:\\Work\\Repo"), "C:\\Work\\Repo");
 equal(paths.stripExtendedWindowsPathPrefix("\\\\?\\UNC\\Server\\Share"), "\\\\Server\\Share");
 equal(paths.stripExtendedWindowsPathPrefix("C:\\Work"), "C:\\Work");
 equal(paths.getLastTwoPathSegments("C:\\Work\\Repo\\file.ts"), "Repo/file.ts");
 equal(paths.getLastTwoPathSegments("/file.ts"), "file.ts");
+const files = modules["file-predicates"];
+equal(files.isImageFile({ type: "image/png", name: "asset.bin" }), true);
+equal(files.isImageFile({ type: "application/octet-stream", name: "photo.JPEG" }), true);
+equal(files.isImageFile({ type: "image/svg+xml", name: "photo.svg" }), false);
+equal(files.isImageFile({ type: "application/octet-stream", name: "README" }), false);
+equal(files.isFileLargerThanUploadLimit(268_435_456), false);
+equal(files.isFileLargerThanUploadLimit(268_435_457), true);
 const appearances = modules["project-appearance-policy"];
 const original = { one: "blue", two: "red" };
 equal(appearances.updateProjectAppearance({ projectAppearances: original, projectId: "one", appearance: "green" }), { one: "green", two: "red" });

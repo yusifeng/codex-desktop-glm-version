@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { joinPlatformPath as O } from "../app-shared/runtime/path-key-policy";
 import { normalizePathSeparators as D, resolvePath as p } from "../app-shared/runtime/path-key-policy";
 import { classNames as fe, initializeClassNames as se } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -28,7 +29,6 @@ import {
   S_ as w,
   Sf as T,
   Tf as E,
-  WK as O,
   Xd as k,
   Y2 as A,
   Yd as j,

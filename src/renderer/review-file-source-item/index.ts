@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isFileLargerThanUploadLimit as oe } from "../app-shared/runtime/file-predicates";
 import { resolvePath as u } from "../app-shared/runtime/path-key-policy";
 import { createRuntimeUuid as le } from "../app-shared/runtime/runtime-identifier-policy";
 import { classNames as G, initializeClassNames as L } from "../app-shared/ui/class-names";
@@ -52,7 +53,6 @@ import {
   n4 as re,
   nf as ie,
   o_ as ae,
-  sJ as oe,
   sZ as se,
   sy as ce,
   tf as ue,

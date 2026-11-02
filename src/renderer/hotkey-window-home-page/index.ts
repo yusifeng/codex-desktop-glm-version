@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { toggleComposerWorktreeMode as pt } from "../app-primary/runtime/submission-state-policy";
 import { createHotkeyThreadRoute as b } from "../app-shared/runtime/navigation-route-policy";
 import { firstOrNull as le } from "../app-shared/runtime/non-empty-collection";
 import { deriveCloudUnavailableReason as xt } from "../app-primary/runtime/derive-cloud-unavailable-reason";
@@ -111,7 +112,6 @@ import {
   Cf as ut,
   Dn as dt,
   Ns as ft,
-  Nt as pt,
   Oo as mt,
   Ps as ht,
   Qh as gt,

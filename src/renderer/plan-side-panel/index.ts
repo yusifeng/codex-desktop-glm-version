@@ -1,6 +1,13 @@
 // @ts-nocheck
+import { joinPlatformPath as r } from "../app-shared/runtime/path-key-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
-import { Q3 as t, RI as n, WK as r, Z3 as i, wL as a, zU as o } from "@rchunk/app-shared";
+import {
+  Q3 as t,
+  RI as n,
+  Z3 as i,
+  wL as a,
+  zU as o,
+} from "@rchunk/app-shared";
 import {
   Bst as s,
   Dyt as c,

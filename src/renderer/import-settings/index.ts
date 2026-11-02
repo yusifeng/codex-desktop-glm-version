@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createManagedPluginRoute as p } from "../app-shared/runtime/navigation-route-policy";
 import { createLocalConversationRoute as I } from "../app-shared/runtime/navigation-route-policy";
 import { classNames as le, initializeClassNames as re } from "../app-shared/ui/class-names";
 import { n as e } from "@rchunk/rolldown-runtime";
@@ -15,7 +16,6 @@ import {
   Bv as u,
   FX as d,
   G2 as f,
-  GB as p,
   Gd as m,
   HX as h,
   I3 as g,

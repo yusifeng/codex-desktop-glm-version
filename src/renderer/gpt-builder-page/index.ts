@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { isImageFile as _ } from "../app-shared/runtime/file-predicates";
 import { initializeMountedState as ae, useIsMounted as te } from "../app-shared/runtime/mounted-state";
 import { EXPECTED_ACCOUNT_ID_HEADER as le } from "../app-shared/runtime/request-protocol";
 import { classNames as re, initializeClassNames as L } from "../app-shared/ui/class-names";
@@ -20,7 +21,6 @@ import {
   If as m,
   K2 as h,
   LX as g,
-  NR as _,
   QI as v,
   QX as y,
   Q_ as b,

@@ -4,6 +4,7 @@ import * as esbuild from "esbuild";
 
 const entryPoints = {
   collection: "src/renderer/app-shared/runtime/non-empty-collection.ts",
+  extensionStore: "src/renderer/app-shared/runtime/build-extension-channel-path.ts",
   identifiers: "src/renderer/app-shared/runtime/runtime-identifier-policy.ts",
   paths: "src/renderer/app-shared/runtime/path-key-policy.ts",
   routes: "src/renderer/app-shared/runtime/navigation-route-policy.ts",
@@ -54,6 +55,37 @@ equal(routes.createHotkeyThreadRoute("thread-1"), "/hotkey-window/thread/thread-
 equal(routes.createLocalConversationRoute("thread-1"), "/local/thread-1");
 equal(routes.createMcpAppRoute("server/name", "tool name"), "/mcp-app/server%2Fname/tool%20name");
 equal(routes.createPluginSettingsRoute("server/name", "tool name"), "/settings/plugins/server%2Fname/tool%20name");
+equal(routes.createHotkeyRemoteRoute("task-1"), "/hotkey-window/remote/task-1");
+equal(routes.createComputerAssistantRoute("thread-1"), "/ca/thread-1");
+equal(routes.createRemoteConversationRoute("task-1"), "/remote/task-1");
+const pluginRouteInput = {
+  pluginId: "plugin@example",
+  marketplacePath: "featured/path",
+  remoteMarketplaceName: "remote market",
+  pluginName: "Plugin Name",
+  deepLinkMode: "install",
+  hostId: "host-1",
+};
+equal(routes.createPluginRoute(pluginRouteInput), "/plugins/plugin@example?marketplacePath=featured%2Fpath&remoteMarketplaceName=remote+market&pluginName=Plugin+Name&mode=install&hostId=host-1");
+equal(routes.createManagedPluginRoute(pluginRouteInput), "/skills/manage/plugins/plugin@example?marketplacePath=featured%2Fpath&remoteMarketplaceName=remote+market&pluginName=Plugin+Name&mode=install&hostId=host-1");
+equal(routes.createMcpPluginRoute("server/name", "tool name"), "/mcp-app/plugins/server%2Fname/tool%20name");
+equal(routes.parseSkillsRoute("codex://skills/library/item?tab=one#section"), "/skills/library/item?tab=one#section");
+equal(routes.parseSkillsRoute("https://skills/library"), null);
+const conversationId = "12345678-1234-1234-1234-123456789abc";
+equal(routes.parseConversationRoute(`codex://threads/${conversationId}`), { conversationId });
+equal(routes.parseConversationRoute(`codex://threads/${conversationId}?view=review`), { conversationId, openReview: true });
+equal(routes.parseConversationRoute(`codex://threads/${conversationId}?view=review&diffFilter=branch&path=src%2Ffile.ts`), { conversationId, openReview: true, reviewDiffFilter: "branch", reviewPath: "src/file.ts" });
+equal(routes.parseConversationRoute(`codex://threads/${conversationId}/extra`), null);
+equal(routes.parseConversationRoute(`codex://threads/${conversationId}/extra`, { allowExtraPathSegments: true }), { conversationId });
+equal(routes.parseConversationRoute("codex://threads/not-a-uuid"), null);
+equal(routes.isPluginId(`plugin_${"a".repeat(32)}`), true);
+equal(routes.isPluginId(`Plugin_${"a".repeat(32)}`), true);
+equal(routes.isPluginId("invalid plugin"), false);
+equal(routes.areEquivalentPluginIds(`plugins~Plugin_${"a".repeat(32)}`, `Plugin_${"a".repeat(32)}`), true);
+equal(routes.areEquivalentPluginIds("plugin_one", "plugin_two"), false);
+
+const extensionStore = modules.extensionStore;
+equal(extensionStore.buildChromeExtensionStoreUrl("abcdefghijklmnopabcdefghijklmnop"), "https://chromewebstore.google.com/detail/abcdefghijklmnopabcdefghijklmnop");
 
 const identifiers = modules.identifiers;
 const clientThreadId = identifiers.createClientNewThreadId();

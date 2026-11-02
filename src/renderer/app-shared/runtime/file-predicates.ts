@@ -9,6 +9,8 @@ export interface PreviewablePathValue extends PathValue {
 
 const missingFileErrorCodes = new Set(["ENOENT", "ENOTDIR"]);
 const richFileExtension = /\.(csv|docx|ipynb|pdf|pptx|tex|tsv|xlsm|xlsx)$/i;
+const imageMimeTypes = new Set(["image/gif", "image/jpeg", "image/jpg", "image/png", "image/webp", "image/x-png"]);
+const imageExtensions = new Set(["png", "jpg", "jpeg", "gif", "webp"]);
 
 /** 原 `GBe` / 压缩导出 `bU`。 */
 export function isDirectoryPath(value: PathValue): boolean {
@@ -46,3 +48,17 @@ export function isLibraryFileId(value: string): boolean {
 
 /** 原 `ZBe` / 压缩导出 `mU`。 */
 export function initializeLibraryFileId(): void {}
+
+/** Recognize supported image uploads by a trusted MIME type or filename extension. */
+export function isImageFile(value: { type?: string | null; name?: string | null }): boolean {
+  const mimeType = value.type?.toLowerCase() ?? "";
+  if (mimeType.startsWith("image/")) return imageMimeTypes.has(mimeType);
+  const name = value.name ?? "";
+  const dot = name.lastIndexOf(".");
+  return dot >= 0 && dot < name.length - 1 && imageExtensions.has(name.slice(dot + 1).toLowerCase());
+}
+
+/** Match the release upload boundary for files larger than 256 MiB. */
+export function isFileLargerThanUploadLimit(size: number): boolean {
+  return size > 268_435_456;
+}

@@ -1,4 +1,5 @@
 // @ts-nocheck
+import { createPluginRoute as o } from "../app-shared/runtime/navigation-route-policy";
 import { n as e } from "@rchunk/rolldown-runtime";
 import {
   $3 as t,
@@ -6,7 +7,6 @@ import {
   FX as r,
   HX as i,
   I3 as a,
-  JB as o,
   _L as s,
   ek as c,
   gL as l,
