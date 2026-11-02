@@ -1,28 +1,31 @@
 import "@rchunk/rolldown-runtime";
 import {
+  BX as useRuntimeQuery,
+  HX as useRuntimeSignal,
   I3 as getJsxRuntime,
   Qh as LoadingSpinner,
   Y2 as FormattedMessage,
   Yh as Button,
   wy as AutomationIcon,
 } from "@rchunk/app-shared";
-import { qvt as sidePanelTabs } from "@rchunk/app-initial";
+import { QCt as automationsSignal, qvt as sidePanelTabs, ttt as automationDetailSignal } from "@rchunk/app-initial";
 import "@rchunk/appgen-access";
 import "@rchunk/elicitation-events";
 import "@rchunk/site-automation-setup-state";
-import { r as AutomationEditorPanel } from "@rchunk/cloud-automation-detail-panel";
+import { t as AutomationEditorPanel } from "@rchunk/cloud-automation-detail-panel";
 import "@rchunk/automation-dialog";
 import "@rchunk/automation-editor-dialog";
 import "@rchunk/automation-delete-confirmation-dialog";
 
-interface AutomationSummary extends Record<string, unknown> { id: string; name: string; title?: string; }
+interface AutomationSummary extends Record<string, unknown> { id: string; name: string; prompt?: string; title?: string; }
 interface AutomationRequest {
   automation?: AutomationSummary | null;
   automationId?: string | null;
   error?: unknown;
   isLoading?: boolean;
   proposal?: { prompt: string; projectId: string; rrule?: string | null; title: string };
-  type: "persisted" | "proposal" | "site";
+  seed?: { directiveKey?: string; prompt?: string; title?: string; userMessage?: string };
+  type: "automation" | "persisted" | "proposal" | "site" | "suggestion";
 }
 interface AutomationTabState { draftInstanceId: string; savedAutomationId?: string | null; }
 interface AutomationSidePanelTabContentProps {
@@ -45,6 +48,14 @@ function MissingAutomation(): unknown {
   ] });
 }
 
+function AutomationLoadError({ onRetry }: { onRetry?(): void }): unknown {
+  const runtime = getJsxRuntime();
+  return runtime.jsxs("div", { role: "alert", className: "flex h-full flex-col items-center justify-center gap-3 bg-surface p-panel text-center", children: [
+    runtime.jsx(FormattedMessage, { id: "inbox.automations.cloud.loadError", defaultMessage: "Cloud scheduled tasks could not be loaded" }),
+    onRetry == null ? null : runtime.jsx(Button, { type: "button", onClick: onRetry, children: "Try again" }),
+  ] });
+}
+
 function SiteAutomationSetup(props: AutomationSidePanelTabContentProps): unknown {
   const runtime = getJsxRuntime();
   const proposal = props.request.proposal;
@@ -64,11 +75,27 @@ function SiteAutomationSetup(props: AutomationSidePanelTabContentProps): unknown
 
 function AutomationSidePanelTabContent(props: AutomationSidePanelTabContentProps): unknown {
   if (props.request.type === "site") return SiteAutomationSetup(props);
-  if (props.request.isLoading === true) return LoadingPanel();
-  const automation = props.request.automation;
+  const requestedId = props.request.automationId ?? props.tabState.savedAutomationId ?? null;
+  const readSignal = useRuntimeSignal as unknown as ((signal: unknown) => unknown) | undefined;
+  const readQuery = useRuntimeQuery as unknown as ((signal: unknown, parameter: unknown) => unknown) | undefined;
+  const listQuery = readSignal?.(automationsSignal) as { data?: { items?: AutomationSummary[] }; isFetching?: boolean; isLoading?: boolean } | undefined;
+  const detailQuery = readQuery?.(automationDetailSignal, requestedId) as { data?: AutomationSummary | { automation?: AutomationSummary }; error?: unknown; isFetching?: boolean; isLoading?: boolean; refetch?(): void } | undefined;
+  const listAutomation = requestedId == null ? null : listQuery?.data?.items?.find((item) => item.id === requestedId) ?? null;
+  const detailData = detailQuery?.data;
+  const detailAutomation = detailData != null && "automation" in detailData ? detailData.automation ?? null : detailData ?? null;
+  const suggestion = props.request.type === "suggestion" || props.request.type === "proposal"
+    ? {
+        id: `suggestion:${props.request.seed?.directiveKey ?? props.tabState.draftInstanceId}`,
+        name: props.request.seed?.title ?? props.request.proposal?.title ?? "New scheduled task",
+        prompt: props.request.seed?.prompt ?? props.request.seed?.userMessage ?? props.request.proposal?.prompt ?? "",
+      }
+    : null;
+  if (props.request.isLoading === true || listQuery?.isLoading === true || listQuery?.isFetching === true || detailQuery?.isLoading === true || detailQuery?.isFetching === true) return LoadingPanel();
+  if (props.request.error != null || detailQuery?.error != null) return getJsxRuntime().jsx(AutomationLoadError, { onRetry: detailQuery?.refetch });
+  const automation = props.request.automation ?? listAutomation ?? detailAutomation ?? suggestion;
   if (automation == null) return MissingAutomation();
   return getJsxRuntime().jsx(AutomationEditorPanel, {
-    item: automation,
+    item: { automation, teamId: null },
     onClose: () => sidePanelTabs.closeTab?.(props.tabId),
     onSaved: (saved: AutomationSummary) => {
       props.setTabState((state) => ({ ...state, savedAutomationId: saved.id }));

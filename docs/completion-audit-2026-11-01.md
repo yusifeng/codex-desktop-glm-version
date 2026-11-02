@@ -41,6 +41,18 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
+The Automations scheduling-infrastructure follow-up replaces the former thin frequency compatibility shell with a
+source-owned implementation of the published export ABI, standard/cloud schedule modes, quarter-hour time choices,
+weekday selection invariants, hourly/weekly/monthly/custom controls, and timezone-correct date bounds. It also corrects
+`automation-dialog.n` from a fabricated whole-dialog export to the published live model/reasoning selector, including
+reasoning-effort correction when the selected model changes. The side-panel path now accepts the production
+`automation|suggestion|site` protocol, uses cloud detail export `t`, and projects loading, retryable error, missing, and
+suggestion states. The complete automation test family, focused infrastructure/page/registration suites, typecheck,
+route source-build, 2,417 semantic overrides, and the 1,912-script index pass. The current strict hub counts are
+app-shared 372/3,185, app-initial 1,499/8,204, and app-primary 169/917 consumed, with zero unreviewed exports and zero
+invalid consumers. This closes a concrete scheduling/public-ABI gap; it is not evidence that the three aggregate hubs or
+all remaining presentation owners are fully migrated.
+
 The Automations detail/editor follow-up restores the confirmation boundary between delete requests and the real local/cloud
 mutations, including source-qualified targets, cancel/confirm state, and pending-state projection across rerenders. Run history
 is newest-first and retains last-run timestamps, unread presentation, safe conversation actions, and mutation pending states.

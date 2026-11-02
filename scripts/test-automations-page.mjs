@@ -91,7 +91,7 @@ const mocks = {
   "app-primary": `export const n = () => globalThis.__automationsPageTest.initialized.push("app-primary");`,
   "elicitation-events": `export const n = () => globalThis.__automationsPageTest.initialized.push("elicitation:n"); export const t = () => globalThis.__automationsPageTest.initialized.push("elicitation:t");`,
   "cloud-automation-detail-panel": `export const n = () => globalThis.__automationsPageTest.initialized.push("cloud-detail"); export const t = props => ({ type: "CloudDetail", props });`,
-  "automation-frequency-section": `export const i = () => globalThis.__automationsPageTest.initialized.push("frequency"); export const l = props => ({ type: "Frequency", props });`,
+  "automation-frequency-section": `export const r = () => globalThis.__automationsPageTest.initialized.push("frequency"); export const t = props => ({ type: "Frequency", props });`,
   "editor-dialog": `export const a = () => globalThis.__automationsPageTest.initialized.push("editor:a"); export const h = () => globalThis.__automationsPageTest.initialized.push("editor:h"); export const i = () => globalThis.__automationsPageTest.initialized.push("editor:i"); export const m = () => globalThis.__automationsPageTest.initialized.push("editor:m");`,
   "automation-delete-confirmation-dialog": `export const n = () => globalThis.__automationsPageTest.initialized.push("delete"); export const t = props => ({ type: "DeleteDialog", props });`,
   "schedule-fields": `export const i = () => globalThis.__automationsPageTest.initialized.push("schedule"); export const a = () => {};`,

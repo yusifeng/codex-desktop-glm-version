@@ -50,7 +50,7 @@ const overrides = {
   "appgen-query": { appgenProjectQuery$: `{ id: "project-query" }` },
   "conversation-thumbnail-ui": { n: marker("thumbnail-ui"), t: component("ConversationThumbnail") },
   "local-conversation-webmcp-tools-model": { t: `url => new URL(url).hostname` },
-  "cloud-automation-detail-panel": { r: component("AutomationEditorPanel") },
+  "cloud-automation-detail-panel": { t: component("AutomationEditorPanel") },
 };
 
 function mockModule(name) {
@@ -148,20 +148,26 @@ assert.deepEqual(Object.keys(automation).sort(), ["AutomationSidePanelTabContent
 assert.equal(automation.AutomationSidePanelTabIcon().type, "AutomationIcon");
 let tabState = { draftInstanceId: "draft-1" };
 const setTabState = (update) => { tabState = update(tabState); };
-let automationNode = automation.AutomationSidePanelTabContent({ request: { isLoading: true, type: "persisted" }, setTabState, tabId: "tab-1", tabState });
+let automationNode = automation.AutomationSidePanelTabContent({ request: { isLoading: true, type: "automation" }, setTabState, tabId: "tab-1", tabState });
 assert.equal(find(automationNode, (node) => node.type === "LoadingSpinner").type, "LoadingSpinner");
-automationNode = automation.AutomationSidePanelTabContent({ request: { type: "persisted" }, setTabState, tabId: "tab-1", tabState });
+automationNode = automation.AutomationSidePanelTabContent({ request: { type: "automation" }, setTabState, tabId: "tab-1", tabState });
 assert.equal(find(automationNode, (node) => node.type === "FormattedMessage").props.defaultMessage, "Scheduled task unavailable");
+automationNode = automation.AutomationSidePanelTabContent({ request: { error: new Error("offline"), type: "automation" }, setTabState, tabId: "tab-1", tabState });
+assert.equal(find(automationNode, (node) => node.props?.role === "alert") != null, true);
+assert.equal(find(automationNode, (node) => node.type === "FormattedMessage").props.defaultMessage, "Cloud scheduled tasks could not be loaded");
 automationNode = automation.AutomationSidePanelTabContent({ request: { proposal: { projectId: "p1", prompt: "Build", title: "Nightly" }, type: "site" }, setTabState, tabId: "tab-1", tabState });
 assert.equal(automationNode.type, "section");
 find(automationNode, (node) => node.type === "Button").props.onClick();
 assert.equal(tabState.savedAutomationId, "site:p1");
-automationNode = automation.AutomationSidePanelTabContent({ request: { automation: { id: "a1", name: "Daily" }, type: "persisted" }, setTabState, tabId: "tab-1", tabState });
+automationNode = automation.AutomationSidePanelTabContent({ request: { automation: { id: "a1", name: "Daily" }, type: "automation" }, setTabState, tabId: "tab-1", tabState });
 assert.equal(automationNode.type, "AutomationEditorPanel");
 automationNode.props.onClose();
 assert.equal(state.closedTab, "tab-1");
 automationNode.props.onSaved({ id: "a2", name: "Weekly" });
 assert.equal(tabState.savedAutomationId, "a2");
 assert.deepEqual(state.updatedTab, ["tab-1", { title: "Weekly", tooltip: "Weekly" }]);
+automationNode = automation.AutomationSidePanelTabContent({ request: { seed: { directiveKey: "weekly", prompt: "Summarize", title: "Weekly digest" }, type: "suggestion" }, setTabState, tabId: "tab-1", tabState });
+assert.equal(automationNode.type, "AutomationEditorPanel");
+assert.equal(automationNode.props.item.automation.id, "suggestion:weekly");
 
 console.log("conversation preview registration cluster tests passed");

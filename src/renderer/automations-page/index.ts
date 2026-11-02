@@ -262,8 +262,8 @@ interface CloudDetailBindings {
 }
 
 interface FrequencyBindings {
-  i?(): void;
-  l?: (props: Record<string, unknown>) => unknown;
+  r?(): void;
+  t?: (props: Record<string, unknown>) => unknown;
 }
 
 interface EditorDialogBindings {
@@ -336,7 +336,7 @@ const { n: initializeElicitationEvents, t: initializeElicitationRuntime } =
   elicitationEventsChunk as unknown as InitializerBindings;
 const { n: initializeCloudDetail, t: CloudAutomationDetail } =
   cloudDetailChunk as unknown as CloudDetailBindings;
-const { i: initializeFrequency, l: FrequencySection } =
+const { r: initializeFrequency, t: FrequencySection } =
   frequencySectionChunk as unknown as FrequencyBindings;
 const {
   a: initializeEditorDialog,
@@ -907,9 +907,9 @@ function AutomationEditor({ presentation }: { presentation: AutomationsPresentat
       FrequencySection == null
         ? null
         : jsx().jsx(FrequencySection, {
-            draft: { frequency: draft.scheduleConfig.mode ?? "daily", time: draft.scheduleConfig.time ?? "09:00", timeZone: draft.scheduleConfig.timeZone ?? "UTC" },
+            scheduleConfig: { mode: draft.scheduleConfig.mode ?? "daily", time: draft.scheduleConfig.time ?? "09:00", timeZone: draft.scheduleConfig.timeZone ?? "UTC" },
             disabled: presentation.saveMutationPending === true,
-            onChange: (schedule: ScheduleConfig) => { draft.scheduleConfig = { ...draft.scheduleConfig, ...schedule }; setDraft({ ...draft, scheduleConfig: { ...draft.scheduleConfig } }); },
+            onUpdateScheduleDraft: (schedule: ScheduleConfig) => { draft.scheduleConfig = { ...draft.scheduleConfig, ...schedule }; setDraft({ ...draft, scheduleConfig: { ...draft.scheduleConfig } }); },
           }),
       jsx().jsxs("footer", {
         children: [

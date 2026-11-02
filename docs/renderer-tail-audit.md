@@ -1,5 +1,18 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Automations scheduling infrastructure recovery：`automation-frequency-section` 不再用
+15 行兼容壳伪装 1,823 行发布 owner。当前 TypeScript owner 已恢复真实公开 ABI、标准/云端频率选项、
+96 个十五分钟时间点、星期多选且禁止清空最后一天、hourly/weekly/monthly/custom 分支、时区日期下限与
+结束日期输入；`automations-page` 同步改用发布版 `r/t` initializer/component binding。
+`automation-dialog.n` 也从错误的整窗 dialog 映射纠正为真实 model/reasoning selector，读取 live models
+query，并在切换模型时校正不受支持的 reasoning effort。侧边栏入口改用生产请求类型
+`automation|suggestion|site`、真实 cloud detail export `t`，并补齐 list/detail loading、error/retry、missing
+和 suggestion draft 路由。整个 automation 测试族、focused infrastructure/page/registration suites、
+typecheck、route source-build、2,417 项 semantic overrides 与 1,912-script index 均通过；严格 hub gate
+当前为 app-shared 372/3,185、app-initial 1,499/8,204、app-primary 169/917 consumed，0 unreviewed、
+0 invalid consumers。本批修复调度与侧栏基础设施的真实契约，但不把三个聚合 hub 或其他静态展示差异
+计作完整反编译。
+
 2026-11-02 Automations detail/editor release recovery：`automations-page` 现已恢复删除请求与真实
 mutation 之间的确认状态，本地与云端任务都不再首次点击就直接删除；确认目标按
 source/id 隔离，cancel/confirm 与 pending 状态保持到重渲染。详情页恢复运行历史倒序、最近运行时间、
