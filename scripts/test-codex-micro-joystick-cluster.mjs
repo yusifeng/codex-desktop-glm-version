@@ -25,6 +25,9 @@ async function bundle(directory) {
     plugins: [{ name: "joystick-mocks", setup(build) {
       build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" }));
       build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: moduleName }) => {
+        if (moduleName === "rolldown-runtime") return { loader: "js", contents: `
+          export const n=initializer=>{let initialized=false;return()=>{if(!initialized){initialized=true;initializer();}}};
+        ` };
         if (moduleName === "app-shared") return { loader: "js", contents: `
           const state=globalThis.__joystickTest;
           export const FX=()=>{},QI=()=>{},ZI={name:"app"},pZ=(_scope,value)=>({value});
@@ -36,6 +39,16 @@ async function bundle(directory) {
           export const r=()=>{},t={name:"feedback"};
         ` };
         if (moduleName === "codex-micro-analog-action-title") return { loader: "js", contents: "export const n=()=>{};" };
+        if (moduleName === "app-initial") return { loader: "js", contents: `
+          export const dw=()=>{};
+          export const uw=({angle},threshold)=>{
+            if (!Number.isFinite(angle) || threshold < 0) return null;
+            if (angle < 0.125 || angle >= 0.875) return "right";
+            if (angle < 0.375) return "down";
+            if (angle < 0.625) return "left";
+            return "up";
+          };
+        ` };
         return { loader: "js", contents: "export {};" };
       });
     }}],

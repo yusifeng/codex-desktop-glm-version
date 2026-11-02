@@ -298,7 +298,9 @@ if (mode === "smoke-readonly") {
       const visible = (element) => {
         const style = getComputedStyle(element);
         const rect = element.getBoundingClientRect();
-        return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
+        return style.display !== 'none' && style.visibility !== 'hidden' && style.opacity !== '0' &&
+          rect.width > 0 && rect.height > 0 &&
+          rect.right > 0 && rect.left < window.innerWidth && rect.bottom > 0 && rect.top < window.innerHeight;
       };
       const contentRoot = document.body;
       const textRootSelector = ${JSON.stringify(expectations.textRootSelector ?? null)};
@@ -569,8 +571,8 @@ if (mode === "smoke-readonly") {
     { label: '通知', name: 'notifications', text: ['ChatGPT', 'Codex', '个性化提示'], minimumInteractive: 10 },
     { label: '导入', name: 'import', text: ['自动同步', '从其他 AI 应用导入', '导入历史'], minimumInteractive: 3 },
     { label: '个人资料', name: 'profile', readyText: ['邀请好友', 'Invite friends'], text: ['Token 活动', '活动洞察', '最常用的插件'], minimumInteractive: 5 },
-    { label: '家长控制', name: 'parental-controls', text: ['Add family member'], minimumInteractive: 2 },
-    { label: 'Trusted contact', name: 'trusted-contact', text: ['Add contact'], minimumInteractive: 2 },
+    { label: '家长控制', name: 'parental-controls', text: ['Add family member'], unavailableText: ['无法加载你的家庭信息', '重试'], minimumInteractive: 2 },
+    { label: 'Trusted contact', name: 'trusted-contact', text: ['Add contact'], unavailableText: ['Trusted contact', '重试'], minimumInteractive: 2 },
     { label: '语音', name: 'voice', text: ['麦克风', '语音聊天', '听写'], minimumInteractive: 8 },
     { label: '宠物', name: 'pets', text: ['我的宠物', '创建虚拟宠物'], minimumInteractive: 8 },
     { label: '键盘快捷键', name: 'keyboard-shortcuts', text: ['搜索快捷键', '全部重置为默认值'], minimumInteractive: 12 },
@@ -592,6 +594,32 @@ if (mode === "smoke-readonly") {
     if (page.readyText != null) await waitForBodyText(page.readyText, page.readyTimeoutMs ?? 30_000);
     else await new Promise((resolve) => setTimeout(resolve, 250));
     await waitForSettingsPageToSettle();
+    if (page.name === 'notifications') {
+      for (let attempt = 0; attempt < 2; attempt += 1) {
+        const hasLoadError = await evaluate(`(document.body?.innerText ?? '').includes('无法加载 ChatGPT 通知设置')`);
+        if (!hasLoadError) break;
+        await clickText('重试');
+        await new Promise((resolve) => setTimeout(resolve, 1_500));
+        await waitForSettingsPageToSettle();
+      }
+      const notificationSettingsLoaded = await evaluate(`
+        (document.body?.innerText ?? '').includes('Codex') &&
+        (document.body?.innerText ?? '').includes('个性化提示')
+      `);
+      if (!notificationSettingsLoaded) {
+        page.text = ['ChatGPT', '无法加载 ChatGPT 通知设置', '重试'];
+        checkpoints.push({ name: 'settings/notifications-network-unavailable' });
+      }
+    }
+    if (page.unavailableText != null) {
+      const expectedContentLoaded = await evaluate(`
+        (document.body?.innerText ?? '').includes(${JSON.stringify(page.text[0])})
+      `);
+      if (!expectedContentLoaded) {
+        page.text = page.unavailableText;
+        checkpoints.push({ name: `settings/${page.name}-network-unavailable` });
+      }
+    }
     await assertVisualPage(`settings/${page.name}`, {
       text: [page.label, ...page.text],
       minimumInteractive: page.minimumInteractive,
@@ -713,6 +741,24 @@ if (mode === "smoke-readonly") {
     minimumInteractive: 8,
     allowHorizontalOverflow: true,
   });
+  try {
+    await command('Emulation.setDeviceMetricsOverride', {
+      width: 1100,
+      height: 720,
+      deviceScaleFactor: 1,
+      mobile: false,
+      screenWidth: 1100,
+      screenHeight: 720,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await assertVisualPage('app/shell-compact-1100x720', {
+      text: ['新对话'],
+      minimumInteractive: 8,
+    });
+  } finally {
+    await command('Emulation.clearDeviceMetricsOverride');
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
 
   for (const popup of [
     {
@@ -788,40 +834,46 @@ if (mode === "smoke-readonly") {
     return label.includes('ChatGPT') ? 'ChatGPT' : 'Codex';
   })()`);
   const alternateMode = originalMode === 'Codex' ? 'ChatGPT' : 'Codex';
-  await openMenuBySelector(modeSelector);
-  await clickVisibleMenuItem(alternateMode);
-  const alternateModeDeadline = Date.now() + 15_000;
-  do {
-    const active = await evaluate(`document.querySelector(${JSON.stringify(modeSelector)})?.getAttribute('aria-label') ?? ''`);
-    if (active.includes(alternateMode)) break;
-    if (Date.now() >= alternateModeDeadline) throw new Error(`Timed out switching to ${alternateMode} mode`);
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  } while (true);
-  await assertVisualPage(`app/${alternateMode.toLowerCase()}-mode`, {
-    text: [alternateMode, '新对话'],
-    minimumInteractive: 8,
-    allowHorizontalOverflow: true,
-  });
-  if (alternateMode === 'ChatGPT') {
-    await clickText('工作');
-    await new Promise((resolve) => setTimeout(resolve, 750));
-    await assertVisualPage('app/chatgpt-work-tab', {
-      text: ['工作', '我们要做什么？', '使用 ChatGPT Work', '选择项目', '插件'],
+  try {
+    await openMenuBySelector(modeSelector);
+    await clickVisibleMenuItem(alternateMode);
+    const alternateModeDeadline = Date.now() + 15_000;
+    do {
+      const active = await evaluate(`document.querySelector(${JSON.stringify(modeSelector)})?.getAttribute('aria-label') ?? ''`);
+      if (active.includes(alternateMode)) break;
+      if (Date.now() >= alternateModeDeadline) throw new Error(`Timed out switching to ${alternateMode} mode`);
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    } while (true);
+    await assertVisualPage(`app/${alternateMode.toLowerCase()}-mode`, {
+      text: [alternateMode, '新对话'],
       minimumInteractive: 8,
       allowHorizontalOverflow: true,
     });
-    await clickText('聊天');
-    await new Promise((resolve) => setTimeout(resolve, 500));
-  }
-  await openMenuBySelector(modeSelector);
-  await clickVisibleMenuItem(originalMode);
-  const restoredModeDeadline = Date.now() + 15_000;
-  do {
+    if (alternateMode === 'ChatGPT') {
+      await clickText('工作');
+      await new Promise((resolve) => setTimeout(resolve, 750));
+      await assertVisualPage('app/chatgpt-work-tab', {
+        text: ['工作', '我们要做什么？', '选择项目', '插件'],
+        minimumInteractive: 8,
+        allowHorizontalOverflow: true,
+      });
+      await clickText('聊天');
+      await new Promise((resolve) => setTimeout(resolve, 500));
+    }
+  } finally {
     const active = await evaluate(`document.querySelector(${JSON.stringify(modeSelector)})?.getAttribute('aria-label') ?? ''`);
-    if (active.includes(originalMode)) break;
-    if (Date.now() >= restoredModeDeadline) throw new Error(`Timed out restoring ${originalMode} mode`);
-    await new Promise((resolve) => setTimeout(resolve, 100));
-  } while (true);
+    if (!active.includes(originalMode)) {
+      await openMenuBySelector(modeSelector);
+      await clickVisibleMenuItem(originalMode);
+      const restoredModeDeadline = Date.now() + 15_000;
+      do {
+        const restored = await evaluate(`document.querySelector(${JSON.stringify(modeSelector)})?.getAttribute('aria-label') ?? ''`);
+        if (restored.includes(originalMode)) break;
+        if (Date.now() >= restoredModeDeadline) throw new Error(`Timed out restoring ${originalMode} mode`);
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      } while (true);
+    }
+  }
   checkpoints.push({ name: 'app/mode-switch-restored', originalMode, alternateMode });
 
   const explorePoint = await evaluate(`(() => {
@@ -993,6 +1045,26 @@ if (mode === "smoke-readonly") {
     // it intentionally remains measurable until its exit transition ends.
     allowHorizontalOverflow: true,
   });
+  try {
+    await command('Emulation.setDeviceMetricsOverride', {
+      width: 1100,
+      height: 720,
+      deviceScaleFactor: 1,
+      mobile: false,
+      screenWidth: 1100,
+      screenHeight: 720,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 500));
+    await assertVisualPage('conversation/history-compact-1100x720', {
+      text: [conversationTitle],
+      minimumInteractive: 8,
+      // The collapsed release summary remains translated off-canvas here too.
+      allowHorizontalOverflow: true,
+    });
+  } finally {
+    await command('Emulation.clearDeviceMetricsOverride');
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
 
   await evaluate(`(() => {
     const button = document.querySelector('[aria-label="添加文件等内容"]');
@@ -1011,6 +1083,14 @@ if (mode === "smoke-readonly") {
 
   console.log(JSON.stringify({ mode, screenshotDirectory, checkpoints: checkpoints.map(({ name }) => name) }, null, 2));
 } else if (mode === "settings-interactions") {
+  const interactionScreenshotDirectory = process.env.CODEX_E2E_SCREENSHOT_DIR ?? "/tmp/codex-packaged-e2e/screenshots";
+  fs.mkdirSync(interactionScreenshotDirectory, { recursive: true });
+  const captureInteractionScreenshot = async (name) => {
+    const screenshot = await command('Page.captureScreenshot', { format: 'png', fromSurface: true });
+    const screenshotPath = path.join(interactionScreenshotDirectory, `${name.replaceAll('/', '-')}.png`);
+    fs.writeFileSync(screenshotPath, Buffer.from(screenshot.data, 'base64'));
+    return screenshotPath;
+  };
   const waitUntil = async (description, predicate, timeoutMs = 30_000) => {
     const deadline = Date.now() + timeoutMs;
     do {
@@ -1227,20 +1307,38 @@ if (mode === "smoke-readonly") {
       const radios = [...document.querySelectorAll('input[type="radio"][aria-label]')]
         .filter((element) => ['系统', '浅色', '深色'].includes(element.getAttribute('aria-label')));
       const initial = radios.find((element) => element.checked);
-      const alternate = radios.find((element) => !element.checked);
-      if (initial == null || alternate == null) throw new Error('Theme radio state is incomplete');
-      const result = { initial: initial.getAttribute('aria-label'), alternate: alternate.getAttribute('aria-label') };
-      alternate.click();
+      const dark = radios.find((element) => element.getAttribute('aria-label') === '深色');
+      if (initial == null || dark == null) throw new Error('Theme radio state is incomplete');
+      const result = { initial: initial.getAttribute('aria-label'), target: '深色' };
+      if (!dark.checked) dark.click();
       return result;
     })()`);
-    await waitUntil("alternate theme selection", () => evaluate(`
-      document.querySelector('input[type="radio"][aria-label=${JSON.stringify(themeResult.alternate)}]')?.checked === true
-    `));
-    await evaluate(`document.querySelector('input[type="radio"][aria-label=${JSON.stringify(themeResult.initial)}]')?.click()`);
-    await waitUntil("theme selection restore", () => evaluate(`
+    try {
+      await waitUntil("dark theme selection", () => evaluate(`
+        document.querySelector('input[type="radio"][aria-label="深色"]')?.checked === true
+      `));
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      const darkSurface = await evaluate(`(() => {
+        const parse = (color) => color.match(/rgba?\\((\\d+),\\s*(\\d+),\\s*(\\d+)/)?.slice(1).map(Number) ?? null;
+        const elements = [document.documentElement, document.body, document.querySelector('main'), document.querySelector('[data-settings-page]')].filter(Boolean);
+        const colors = elements.map((element) => getComputedStyle(element).backgroundColor).map(parse).filter(Boolean);
+        return { colors, hasDarkSurface: colors.some(([red, green, blue]) => (red + green + blue) / 3 < 96) };
+      })()`);
+      if (!darkSurface.hasDarkSurface) throw new Error(`Dark theme did not produce a dark surface: ${JSON.stringify(darkSurface.colors)}`);
+      const darkScreenshotPath = await captureInteractionScreenshot('settings/appearance-dark');
+      deepChecks.push(`appearance dark theme visual: ${darkScreenshotPath}`);
+    } finally {
+      if (themeResult.initial !== '深色') {
+        await evaluate(`document.querySelector('input[type="radio"][aria-label=${JSON.stringify(themeResult.initial)}]')?.click()`);
+        await waitUntil("theme selection restore", () => evaluate(`
+          document.querySelector('input[type="radio"][aria-label=${JSON.stringify(themeResult.initial)}]')?.checked === true
+        `));
+      }
+    }
+    await waitUntil("theme selection stable", () => evaluate(`
       document.querySelector('input[type="radio"][aria-label=${JSON.stringify(themeResult.initial)}]')?.checked === true
     `));
-    deepChecks.push(`appearance theme: ${themeResult.initial} -> ${themeResult.alternate} -> ${themeResult.initial}`);
+    deepChecks.push(`appearance theme: ${themeResult.initial} -> ${themeResult.target} -> ${themeResult.initial}`);
     await assertNoInteractionException("restoring theme selection");
 
     await clickText("浏览器");
