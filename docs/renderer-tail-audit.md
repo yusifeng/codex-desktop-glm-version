@@ -1,5 +1,17 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Preview/automation/command/workspace release-owner recovery：一次性恢复
+`site-preview`、`automation-frequency-section`、`command-messages`、
+`appgen-analytics-page`、`local-conversation-git-actions`、`gpt-about-dialog-core`、
+`saved-memories`、`sidebar-onboarding-checklist`、`plugin-share-dialog-core` 与
+`workspace-agent-landing` 十个发布 owner，净恢复 14,378 行发布 TypeScript。旧的局部 mock
+测试已迁移为逐字发布一致性验证，同时修正 incremental-hub consumer 口径和已过期的
+`result-card` 环境结果契约测试。整批通过 12,448/12,448 transform check、1,888/1,888
+renderer build/verify、2,247/2,247 app-code coverage、0 semantic tail 与 typecheck。严格 hub
+消费推进到 app-shared 1,579/3,185、app-initial 4,881/8,204、app-primary 627/917，仍为
+0 unreviewed、0 invalid consumers。该批继续恢复发布控制流和依赖图；425 个 preserved
+边界、三个聚合 hub 的耦合导出以及最终真实登录态 E2E 仍按总目标继续，不据此宣称完成。
+
 2026-11-02 Automation/trust/browser/MCP release-owner recovery：一次性恢复
 `cloud-automation-detail-panel`、`trusted-contact-settings`、`mcp-tool-approval-message`、
 `browser-skill-editor`、`flight-search-form`、`pull-request-fix-workflow`、

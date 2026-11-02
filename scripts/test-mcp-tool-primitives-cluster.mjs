@@ -362,25 +362,25 @@ const result = await bundle("result-card");
 result.r();
 const resultTree = result.n({
   details: {
-    branch: "main",
+    access: "private",
+    name: "Ready",
     networkDomains: ["api.example.test"],
-    repository: "desktop",
-    worktree: "/repo",
+    repositories: ["desktop"],
+    secretNames: [],
   },
-  title: "Ready",
 });
 assert.equal(resultTree.type, "article");
-assert.equal(nodeOfType(resultTree, "h3").props.children, "Ready");
+assert.equal(resultTree.props["data-environment-result"], true);
 assert.equal(
   nodes(resultTree).filter((node) => typeof node.type === "function").length,
-  4,
+  6,
 );
 assert.match(
   nodeOfType(resultTree, "footer").props.children,
   /Prototype draft/,
 );
-const wrappedResult = result.t({ details: { repository: "desktop" } });
+const wrappedResult = result.t({ details: { name: "Ready", repositories: ["desktop"], secretNames: [] } });
 assert.equal(wrappedResult.type, result.n);
-assert.equal(wrappedResult.props.details.repository, "desktop");
+assert.deepEqual(wrappedResult.props.details.repositories, ["desktop"]);
 
 console.log("45 MCP tool primitives cluster assertions passed");

@@ -7,6 +7,7 @@ import {
   INCREMENTAL_HUBS,
   REWRITTEN,
 } from "./renderer-chunk-manifest.mjs";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const RENDERER = path.join(ROOT, "src/renderer");
@@ -63,7 +64,7 @@ assert.ok(
 assert.ok(
   artifactSource.imports
     .filter((item) => item.clause != null)
-    .every((item) => /popcorn-(document|workbook|presentation)-panel/.test(item.file)),
+    .every((item) => /popcorn-(document|workbook|presentation)-panel|popcorn-electron-surface-style/.test(item.file)),
 );
 const textUnderline = inspectHub("text-underline-icon");
 assert.equal(textUnderline.rewritten, true);
@@ -100,18 +101,12 @@ assert.equal(importedSetup.strategy, undefined);
 assert.equal(typeof importedSetup.chunk, "string");
 assert.equal(importedSetup.exportCount, 74);
 assert.ok(
-  importedSetup.imports.some((item) =>
-    item.clause?.includes("* as importedSetupChunk"),
-  ),
+  importedSetup.imports.filter((item) => item.clause != null).length >= 2 &&
+    importedSetup.imports
+      .filter((item) => item.clause != null)
+      .every((item) => !item.clause.includes("* as")),
 );
-const checklistSource = fs.readFileSync(
-  path.join(RENDERER, "sidebar-onboarding-checklist/index.ts"),
-  "utf8",
-);
-assert.match(
-  checklistSource,
-  /ft:\s*resolveImportedSetupLabel[\s\S]*pt:\s*projectImportedSetupItems/,
-);
+assertReleaseOwner("sidebar-onboarding-checklist");
 const declarationSource = fs.readFileSync(
   path.join(RENDERER, "types/rchunk-modules.d.ts"),
   "utf8",

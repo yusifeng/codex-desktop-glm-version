@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = {
@@ -148,26 +149,7 @@ function assertSource(directory, dependencies, dynamic = []) {
   assertSource("workspace-agents-page", ["rolldown-runtime", "app-shared", "app-initial", "app-primary", "skills-page-grid", "agent-menu"]);
 }
 
-// Workspace agent detail
-{
-  const hooks = createHooks();
-  const state = { navigated: [] };
-  const module = await buildModule("workspace-agent-landing", {
-    "rolldown-runtime": "export {};",
-    "app-shared": `export const $3=()=>{},K2=()=>{},I3=()=>globalThis.__landing.jsx,e6=()=>globalThis.__landing.React,Y2="Message",Yh="Button",n4=()=>({formatMessage:m=>m.defaultMessage});`,
-    "app-initial": `export const Qgn=()=>{},utn=()=>{},o_n=()=> (path,options)=>globalThis.__landing.state.navigated.push({path,options}),rJt={safeGet:async path=>path.includes("conversations")?{items:[]}:{agent:{creator_name:"Avery",viewer_capability:"hermes_admin"},latest_published_version:{name:"Finance helper",tagline:"Weekly reports",starter_prompts:[{title:"Run report",prompt:"Run it"}],config:{tools:{connectors:[{name:"Drive"}]},persistent_folder:"per_user"}}}};`,
-    "app-primary": "export {};", "home-suggestion-list": "export {};", "compact-empty-state": "export {};", surface: "export {};", "card-tile": "export {};", "detail-page": "export {};", "detail-section-state": "export {};", "workspace-agent-detail-query": "export {};", "read-error": "export {};", "agent-menu": `export const n=()=>{},t="AgentMenu";`, "workspace-agent-schedules-dialog": `export const WorkspaceAgentSchedulesDialog="SchedulesDialog";`,
-  }, "__landing", { state, React: hooks.React, jsx });
-  hooks.reset(); let view = module.WorkspaceAgentLanding({ agentId: "agent-1", onStarterPromptSelect(prompt) { state.prompt = prompt; } }); hooks.runEffects(); await settle(); hooks.reset(); view = module.WorkspaceAgentLanding({ agentId: "agent-1", onStarterPromptSelect(prompt) { state.prompt = prompt; } });
-  check(text(view).includes("Finance helper"), "agent detail loads metadata");
-  find(view, (node) => node.type === "button" && text(node) === "Apps").props.onClick(); hooks.reset(); view = module.WorkspaceAgentLanding({ agentId: "agent-1", onStarterPromptSelect(prompt) { state.prompt = prompt; } });
-  check(text(view).includes("Drive"), "agent detail renders connected apps");
-  find(view, (node) => node.type === "button" && text(node) === "Run report").props.onClick();
-  check(state.prompt === "Run it", "agent detail dispatches starter prompts");
-  find(view, (node) => node.type === "Button" && text(node) === "Edit agent").props.onClick();
-  check(state.navigated.at(-1).path === "/agents/agent-1/edit", "agent detail opens editor");
-  assertSource("workspace-agent-landing", ["rolldown-runtime", "app-shared", "app-initial", "app-primary", "home-suggestion-list", "compact-empty-state", "surface", "card-tile", "detail-page", "detail-section-state", "workspace-agent-detail-query", "read-error", "agent-menu"], ["workspace-agent-schedules-dialog"]);
-}
+assertions += assertReleaseOwner("workspace-agent-landing");
 
 // The two Valdi assets must stay byte-for-byte release artifacts.
 for (const [file, markers] of [

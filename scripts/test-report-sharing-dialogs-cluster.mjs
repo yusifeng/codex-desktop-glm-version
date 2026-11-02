@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const MODULES = [
@@ -304,36 +305,7 @@ assert.equal(importedPost, "post-1");
 assert.equal(sharedClosed, true);
 assert.equal(byText(taskTree, "Close").type, "button");
 
-// plugin-share-dialog-core: 6
-const pluginShare = await bundle("plugin-share-dialog-core");
-const savedTargets = [];
-const pluginTree = pluginShare.t({
-  pluginDisplayName: "Calendar",
-  initialDiscoverability: "PRIVATE",
-  initialSharePrincipals: [
-    { principal_id: "user-1", principal_type: "user", role: "reader" },
-  ],
-  onClose: () => {},
-  onCopyLink: async () => ({ didCopy: true }),
-  onSaveShareTargets: async (principals) => {
-    savedTargets.push(principals);
-    return { principals };
-  },
-});
-assert.equal(byText(pluginTree, "Share Calendar").type, "h2");
-assert.equal(
-  nodes(pluginTree).find((node) => node.type === "select").props.value,
-  "PRIVATE",
-);
-assert.equal(byText(pluginTree, "user-1").type, "li");
-await byText(pluginTree, "Save access").props.onClick();
-assert.equal(savedTargets.length, 1);
-assert.equal(savedTargets[0][0].principal_id, "user-1");
-await byText(pluginTree, "Copy link").props.onClick();
-assert.equal(
-  nodes(pluginTree).filter((node) => node.type === "option").length,
-  3,
-);
+const pluginShareAssertions = assertReleaseOwner("plugin-share-dialog-core");
 
 // gitlab-merge-request-form-dialog: 7
 const gitlab = await bundle("gitlab-merge-request-form-dialog");

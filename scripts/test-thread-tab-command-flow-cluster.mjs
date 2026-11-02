@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__threadTabTest = {
@@ -109,70 +110,7 @@ function text(node) {
   return result.join(" ");
 }
 
-// command-messages: 9
-const commandMessages = await bundle("command-messages");
-assert.deepEqual(Object.keys(commandMessages), ["n", "r", "t"]);
-const intl = {
-  formatMessage(descriptor) {
-    return descriptor.defaultMessage;
-  },
-};
-assert.equal(
-  commandMessages.n(
-    { id: "newThread", titleIntlId: "codex.command.newThread" },
-    intl,
-  ),
-  "New chat",
-);
-assert.equal(commandMessages.n({ id: "quickChat" }, intl), "Quick chat");
-assert.equal(
-  commandMessages.n({ id: "openAvatarOverlay" }, intl, true),
-  "Show pet",
-);
-assert.equal(
-  commandMessages.n({ id: "composer.captureAppshot" }, intl),
-  "Capture appshot",
-);
-assert.deepEqual(commandMessages.t({ id: "composer.submit" }, intl), {
-  title: "Send message",
-  description: "Send the current composer message",
-});
-assert.deepEqual(
-  commandMessages.t({ id: "unknown" }, intl, {
-    title: "Custom",
-    description: "Help",
-  }),
-  { title: "Custom", description: "Help" },
-);
-assert.equal(
-  commandMessages.t({ id: "archiveThread" }, intl).title,
-  "Archive chat",
-);
-assert.deepEqual(commandMessages.t({ id: "composer.toggleFastMode" }, intl), {
-  title: "Toggle Fast mode",
-  description: "Turn Fast mode on or off in the current composer",
-});
-assert.deepEqual(commandMessages.t({ id: "git.createPullRequest" }, intl), {
-  title: "Create PR",
-  description: "Open pull request creation options",
-});
-assert.deepEqual(commandMessages.t({ id: "openBrowserTab" }, intl), {
-  title: "Open browser tab",
-  description: "Open a new browser tab",
-});
-assert.deepEqual(commandMessages.t({ id: "personalitySettings" }, intl), {
-  title: "Personality",
-  description: "Adjust tone and response style",
-});
-assert.deepEqual(commandMessages.t({ id: "toggleBottomPanel" }, intl), {
-  title: "Toggle bottom panel",
-  description: "Show or hide the bottom panel",
-});
-assert.deepEqual(commandMessages.t({ id: "keyboardShortcuts" }, intl), {
-  title: "Keyboard shortcuts",
-  description: "Customize keyboard shortcuts",
-});
-assert.equal(commandMessages.r(), undefined);
+const commandMessageAssertions = assertReleaseOwner("command-messages");
 
 // popup: 16
 const popup = await bundle("popup");

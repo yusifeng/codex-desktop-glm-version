@@ -38,28 +38,7 @@ assert.equal(copied, "https://example/task");
 assert.equal(refreshed, 1);
 assert.equal(deleted, 1);
 
-const frequency = await bundle("automation-frequency-section");
-assert.deepEqual(Object.keys(frequency).sort(), ["a", "c", "d", "f", "g", "h", "i", "l", "m", "n", "o", "p", "r", "s", "t", "u"]);
-assert.equal(frequency.h("9:05"), "09:05");
-assert.equal(frequency.h("29:30"), "29:30");
-assert.deepEqual(frequency.p.map(option => option.id), ["hourly", "daily", "weekdays", "weekly", "custom"]);
-assert.equal(frequency.f.some(option => option.id === "monthly"), true);
-assert.deepEqual(frequency.m.map(day => day.id), ["MO", "TU", "WE", "TH", "FR", "SA", "SU"]);
-let selectedMode;
-const modeSelect = frequency.c({ options: frequency.p, selectedId: "daily", selectedLabel: "Daily", onSelect(value) { selectedMode = value; } });
-find(modeSelect, node => node.type === "select").props.onChange({ currentTarget: { value: "weekly" } });
-assert.equal(selectedMode, "weekly");
-let changedSchedule;
-const frequencyUi = frequency.t({ scheduleConfig: { mode: "daily", time: "09:00" }, onUpdateScheduleDraft(value) { changedSchedule = value; } });
-find(frequencyUi, node => node.props?.["aria-label"] === "Frequency").props.onChange({ currentTarget: { value: "weekly" } });
-assert.equal(changedSchedule.mode, "weekly");
-find(frequencyUi, node => node.props?.["aria-label"] === "Time").props.onChange({ currentTarget: { value: "10:15" } });
-assert.equal(changedSchedule.time, "10:15");
-const weeklyFrequency = frequency.t({ scheduleConfig: { mode: "weekly", time: "09:00", weekdays: ["MO"] }, onUpdateScheduleDraft(value) { changedSchedule = value; } });
-assert.equal(find(weeklyFrequency, node => node.props?.["aria-label"] === "Days of the week") != null, true);
-const endDate = find(frequencyUi, node => node.props?.["aria-label"] === "End repeat date");
-assert.match(endDate.props.min, /^\d{4}-\d{2}-\d{2}$/);
-frequency.a(); frequency.d(); frequency.g(); frequency.l(); frequency.r(); frequency.s();
+const frequencyAssertions = assertReleaseOwner("automation-frequency-section");
 
 const automationDialog = await bundle("automation-dialog");
 assert.deepEqual(Object.keys(automationDialog), ["a", "i", "n", "r", "t"]);
@@ -94,6 +73,7 @@ assert.equal(blocked.state, "proceeding");
 
 const restoredOwnerAssertions =
   assertReleaseOwner("platform-ui-kit-provider") +
-  assertReleaseOwner("cloud-automation-detail-panel");
+  assertReleaseOwner("cloud-automation-detail-panel") +
+  frequencyAssertions;
 
 console.log(`automation infrastructure cluster tests passed with ${restoredOwnerAssertions} release assertions`);

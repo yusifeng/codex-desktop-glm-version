@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const state = globalThis.__automationScheduleTest = {};
@@ -10,9 +11,8 @@ state.jsx = { Fragment: "Fragment", jsx(type, props, key) { return typeof type =
 async function bundle(directory) {
   const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "schedule-mocks", setup(build) {
     build.onResolve({ filter: /^@rchunk\/schedule-draft$/ }, () => ({ path: path.join(ROOT, "src/renderer/schedule-draft/index.ts") }));
-    build.onResolve({ filter: /^@rchunk\/automation-frequency-section$/ }, () => ({ path: path.join(ROOT, "src/renderer/automation-frequency-section/index.ts") }));
     build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" }));
-    build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? `export const I3=()=>globalThis.__automationScheduleTest.jsx;` : "export {};", loader: "js" }));
+    build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? `export const I3=()=>globalThis.__automationScheduleTest.jsx;` : importPath === "automation-frequency-section" ? `const j=globalThis.__automationScheduleTest.jsx;export const c=p=>j.jsx("select",{"aria-label":p.ariaLabel,value:p.selectedId,onChange:e=>p.onSelect(e.currentTarget.value),children:p.options?.map(o=>j.jsx("option",{value:o.id,children:o.label},o.id))}),i=p=>j.jsxs("section",{children:[p.title,p.children]}),n=p=>j.jsx("input",{"aria-label":p.ariaLabel,value:p.value,onChange:e=>p.onChange(e.currentTarget.value)}),o=p=>j.jsx("div",{"aria-label":"Days of the week",children:["MO","TU","WE","TH","FR","SA","SU"].map(d=>j.jsx("input",{type:"checkbox",checked:p.value?.includes(d),onChange:()=>p.onChange(p.value?.includes(d)?p.value.filter(x=>x!==d):[...(p.value??[]),d])},d))}),u=p=>j.jsx("input",{"aria-label":"Time",value:p.value,onChange:e=>p.onChange(e.currentTarget.value)});` : "export {};", loader: "js" }));
   } }] });
   return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`);
 }
@@ -142,5 +142,6 @@ assert.match(changed.scheduleConfig.untilDate, /^\d{4}-\d{2}-\d{2}$/);
 const preview = fields.t({ automation: base, draft: daily, sharedPreview: true, onChange() {} });
 assert.equal(preview.props.disabled, true);
 fields.i(); fields.m(); fields.n(); fields.p(); fields.u(); assert.equal(typeof fields.t, "function");
+const frequencyAssertions = assertReleaseOwner("automation-frequency-section");
 
-console.log("automation schedule model cluster tests passed");
+console.log(`automation schedule model cluster tests passed with ${frequencyAssertions} frequency release assertions`);
