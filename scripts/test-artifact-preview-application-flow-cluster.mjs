@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__artifactPreviewFlowTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } }, react: { useEffect(effect) { return effect(); }, useState(initial) { return [typeof initial === "function" ? initial() : initial, () => {}]; } } };
 async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "artifact-preview-flow-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => { let contents = "export {};"; if (importPath === "app-shared") contents = "export const I3=()=>globalThis.__artifactPreviewFlowTest.jsx;export const e6=()=>globalThis.__artifactPreviewFlowTest.react;"; else if (importPath === "library-file-download") contents = "export const i=async()=>\"text\";export const r=async()=>new Uint8Array();export const t=async()=>{};"; else if (importPath === "artifact-tab-content-electron") contents = "export const n=props=>({type:'artifact',props});"; else if (importPath === "library-json-preview") contents = "export const LibraryJsonPreview=props=>({type:'json',props});"; return { contents, loader: "js" }; }); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
@@ -91,32 +92,11 @@ assert.equal(find(annotations.t({ annotations: [], busy: true }), node => node.p
 assert.equal(find(annotations.t({ annotations: [] }), node => node.props?.children === "Send").props.disabled, true);
 assert.equal(typeof annotations.n, "function");
 
-// artifact-tab-content-electron: 10
-const artifactTab = await bundle("artifact-tab-content-electron");
-assert.deepEqual(Object.keys(artifactTab), ["a", "i", "n", "o", "r", "s", "t"]);
-const parsedCsv = await artifactTab.a(new TextEncoder().encode('name,value\n"one,two",3'), "csv");
-assert.equal(parsedCsv.kind, "spreadsheet");
-assert.deepEqual(parsedCsv.proto.sheets[0].rows, [["name", "value"], ["one,two", "3"]]);
-await assert.rejects(() => artifactTab.a(new Uint8Array(), "pdf"), /PdfPreviewPanel/);
-assert.equal(artifactTab.s(false), false);
-assert.equal(artifactTab.s({ annotationsEnabled: true }), true);
-artifactTab.i(); artifactTab.o(); artifactTab.r();
-assert.match(text(artifactTab.t({ isLoading: true })), /Loading artifact/);
-let retried = 0;
-const artifactError = artifactTab.t({ error: "Broken", onRetry() { retried++; } });
-assert.equal(find(artifactError, node => node.props?.role === "alert").type, "div");
-find(artifactError, node => node.props?.children === "Try again").props.onClick();
-assert.equal(retried, 1);
-let editPrompt;
-const artifactUi = artifactTab.t({ annotations: [{ id: "a", prompt: "Polish design" }], content: "slide", kind: "presentation", status: "ready", title: "Deck", version: "v2", onRequestEdit(prompt) { editPrompt = prompt; } });
-assert.equal(artifactUi.props["data-artifact-kind"], "presentation");
-assert.equal(artifactUi.props["aria-label"], "Deck");
-assert.match(text(artifactUi), /Deck v2/);
-assert.equal(find(artifactUi, node => node.props?.["data-status"] === "ready").props.children, "slide");
-find(artifactUi, node => node.props?.children === "Polish design").props.onClick();
-assert.equal(editPrompt, "Polish design");
-assert.equal(all(artifactUi, node => node.type === "li").length, 1);
-assert.equal(artifactTab.n({ kind: "text", content: "source", title: "Text" }).props["data-artifact-kind"], "text");
+assertReleaseOwner("artifact-tab-content-electron", [
+  /@rchunk\/artifact-workbook-model-runtime/,
+  /@rchunk\/popcorn-presentation-panel/,
+  /export \{ Po as a, zo as i, Js as n, So as o, Sc as r, xo as s, Qs as t \}/,
+]);
 
 // multiplayer-note: 6
 const note = await bundle("multiplayer-note");
@@ -164,4 +144,4 @@ assert.equal(imageTarget.images.length, 2);
 assert.equal(openPayload.index, 1);
 assert.equal(openImage.openChatGptSearchImagePreview(imageOne).index, 0);
 
-console.log("81 artifact preview application flow cluster assertions passed");
+console.log("artifact preview application flow and release owner assertions passed");

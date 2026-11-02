@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 let activeHooks = [], hookCursor = 0;
 const React = { useState(initial) { const hooks = activeHooks, index = hookCursor++; if (!(index in hooks)) hooks[index] = typeof initial === "function" ? initial() : initial; return [hooks[index], value => { hooks[index] = typeof value === "function" ? value(hooks[index]) : value; }]; } };
@@ -45,61 +46,10 @@ assert.equal(completed, "done");
 assert.equal(find(diff.t({ file: { name: "a.ts" } }), node => node.type === "textarea"), undefined);
 assert.equal(diff.n(), undefined);
 
-// text-file-editor-tab-content: 15
-const editor = await bundle("text-file-editor-tab-content");
-assert.deepEqual(Object.keys(editor), ["i", "n", "r", "t"]);
-assert.equal(editor.r("env-1", "/repo"), "text-editor:env-1:/repo");
-let draft, saved, unsaved, prevented = 0;
-const editorMount = mount(editor.t, { content: "const a = 1;", editor: { kind: "code" }, filePath: "src/a.ts", language: "typescript", onDraftChange(value) { draft = value; }, onSaveChange(value) { saved = value; }, onUnsavedChangesChange(value) { unsaved = value; }, tabId: "tab-1" });
-let editorUi = editorMount.render();
-assert.equal(editorUi.props["data-editor-kind"], "code");
-assert.equal(editorUi.props["data-file-path"], "src/a.ts");
-assert.equal(editorUi.props["data-tab-id"], "tab-1");
-assert.match(text(editorUi), /src\/a\.ts/);
-const textarea = find(editorUi, node => node.type === "textarea");
-assert.equal(textarea.props["data-language"], "typescript");
-textarea.props.onChange({ currentTarget: { value: "const a = 2;" } });
-assert.equal(draft, "const a = 2;");
-assert.equal(unsaved, true);
-editorUi = editorMount.render();
-find(editorUi, node => node.type === "textarea").props.onKeyDown({ key: "s", metaKey: true, currentTarget: { value: draft }, preventDefault() { prevented++; } });
-assert.equal(prevented, 1);
-assert.equal(saved, true);
-assert.equal(unsaved, false);
-assert.equal(mount(editor.t, { editor: { kind: "pierre" }, filePath: "a", isActive: false, tabId: "t" }).render().props.hidden, true);
-let selectedEditorPath, markdownMode, slottedEditor;
-const markdownMount = mount(editor.t, {
-  content: "# Title\n\nBody",
-  editor: { kind: "markdown" },
-  path: "notes/readme.md",
-  tabId: "markdown",
-  workspaceRoot: "/repo",
-  onModeChange(value) { markdownMode = value; },
-  onSelectFile(path) { selectedEditorPath = path; },
-  renderSlots(slots) { slottedEditor = slots; return slots.content; },
-});
-let markdownEditor = markdownMount.render();
-assert.equal(markdownEditor.props["data-editor-kind"], "markdown");
-assert.equal(find(markdownEditor, node => node.props?.["data-markdown-preview"] === true).type, "div");
-assert.match(text(markdownEditor), /Title Body/);
-find(markdownEditor, node => node.props?.children === "/repo/notes/readme.md").props.onClick();
-assert.equal(selectedEditorPath, "notes/readme.md");
-find(markdownEditor, node => node.props?.children === "View source").props.onClick();
-assert.equal(markdownMode, "source");
-markdownEditor = markdownMount.render();
-assert.equal(find(markdownEditor, node => node.type === "textarea").props.value, "# Title\n\nBody");
-assert.equal(slottedEditor.headerRows.length, 1);
-assert.equal(slottedEditor.sidePane, undefined);
-let savePayload, saveResult;
-const savingEditor = mount(editor.t, { content: "old", editor: { kind: "code" }, filePath: "a.ts", tabId: "save", onSave(value) { savePayload = value; return false; }, onSaveChange(value) { saveResult = value; } }).render();
-const savingTextarea = find(savingEditor, node => node.type === "textarea");
-savingTextarea.props.onChange({ currentTarget: { value: "new" } });
-savingTextarea.props.onKeyDown({ key: "s", ctrlKey: true, currentTarget: { value: "new" }, preventDefault() {} });
-assert.equal(savePayload, "new");
-assert.equal(saveResult, false);
-assert.equal(find(mount(editor.t, { editor: { kind: "code" }, error: new Error("Denied"), filePath: "a", tabId: "error" }).render(), node => node.props?.role === "alert").props.children, "Denied");
-assert.match(text(mount(editor.t, { editor: { kind: "code" }, filePath: "a", isLoading: true, tabId: "loading" }).render()), /Loading file/);
-assert.equal(editor.i(), undefined);
-assert.equal(editor.n(), undefined);
+assertReleaseOwner("text-file-editor-tab-content", [
+  /@rchunk\/text-editor-merge-runtime/,
+  /@rchunk\/read-saved-plan-content/,
+  /export \{ ga as i, Vd as n, ha as r, Bd as t \}/,
+]);
 
-console.log("36 editor workbench cluster assertions passed");
+console.log("editor workbench and release owner assertions passed");

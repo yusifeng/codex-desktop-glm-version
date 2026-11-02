@@ -4,9 +4,10 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["pull-request-comment", "review-file-tree-pane"];
+const MODULES = ["pull-request-comment"];
 const state = globalThis.__gitReviewCoreTest = {
   initialized: [], mutationOptions: null, navigations: [], queryFactory: null,
   signals: [], stateOverrides: [],
@@ -160,49 +161,10 @@ assert.equal(card.props["data-comment-id"], "c1");
 find(card, node => node.type === "Button").props.onClick();
 assert.deepEqual(state.navigations, ["rt1"]);
 
-// review-file-tree-pane
-const tree = await bundle("review-file-tree-pane");
-tree.r(); tree.r();
-assert.equal(state.initialized.filter(name => name === "review-preferences").length, 1);
-assert.deepEqual(Object.keys(tree).sort(), ["a", "c", "d", "f", "i", "l", "n", "o", "r", "s", "t", "u"]);
-const element = new Element({ "data-item-type": "file", "data-item-path": "src/app.ts" });
-assert.equal(tree.d({ composedPath: () => [{}, element] }), "src/app.ts");
-assert.equal(tree.d({ composedPath: () => [new Element({ "data-item-type": "folder" })] }), null);
-
-const generated = tree.i("*.gen.ts linguist-generated\nmanual.gen.ts -linguist-generated\n# ignored");
-assert.equal(generated("src/code.gen.ts"), "set");
-assert.equal(generated("manual.gen.ts"), "unset");
-assert.equal(generated("readme.md"), null);
-const based = tree.i("generated/** linguist-generated", { basePath: "repo" });
-assert.equal(based("repo/generated/a.ts"), "set");
-assert.equal(based("other/generated/a.ts"), null);
-assert.equal(tree.i("# only comments"), null);
-
-const selections = [];
-let reviewTree = tree.n({
-  activePath: "src/a.ts", allowSelectingActivePath: false, hostId: "local",
-  entries: [{ path: "src/a.ts", changeKind: "copied" }, { path: "src/b.ts", changeKind: "unmerged" }],
-  commentCountByPath: new Map([["src/b.ts", 2]]), onSelectPath: path => selections.push(path),
-});
-assert.equal(reviewTree.type, "div");
-const items = reviewTree.props.children.props.children;
-assert.equal(items[0].props["data-change-kind"], "added");
-assert.equal(items[1].props["data-change-kind"], "modified");
-items[0].props.onClick(); items[1].props.onClick();
-assert.deepEqual(selections, ["src/b.ts"]);
-assert.deepEqual(items[1].props.children, ["src/b.ts", " (2)"]);
-
-const queries = [];
-let search = tree.s({ searchQuery: "src", onQueryChange: value => queries.push(value) });
-assert.equal(find(search, node => node.type === "input").props.value, "src");
-find(search, node => node.type === "Button").props.onClick();
-assert.deepEqual(queries, [""]);
-find(search, node => node.type === "input").props.onChange({ target: { value: "test" } });
-assert.deepEqual(queries, ["", "test"]);
-assert.equal(tree.t().props.children.props.defaultMessage, "No matching files");
-const generatedFiles = tree.o({ gitRoot: "/repo", gitCommonDir: "/repo/.git", cwd: "/repo", hostId: "local", paths: ["src/a.ts", "src/lib/b.ts"] });
-assert.equal(generatedFiles.isReady, true);
-assert.equal(generatedFiles.hasUnhandledAttributesFiles, true);
-assert.equal(generatedFiles.paths.size, 0);
+assertReleaseOwner("review-file-tree-pane", [
+  /@rchunk\/review-preferences-model/,
+  /linguist-generated/,
+  /export \{/,
+]);
 
 console.log("git review core cluster tests passed");

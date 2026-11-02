@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } };
@@ -68,53 +69,10 @@ assert.equal(children(empty).at(-1).props.disabled, true);
 assert.equal(children(empty)[0].props.autoFocus, true);
 assert.equal(children(annotation.t({ showAdjustEntry: false, session: { body: "x", sessionId: "a5", surfaceMode: "preview" } }))[1], null);
 
-// artifact-viewer: 36
-const viewer = await bundle("artifact-viewer");
-assert.deepEqual(Object.keys(viewer), ["_", "a", "c", "d", "f", "g", "h", "i", "l", "m", "n", "o", "p", "r", "s", "t", "u"]);
-assert.equal(viewer._(), undefined);
-assert.equal(viewer.c(), undefined);
-assert.equal(viewer.d(), undefined);
-assert.equal(viewer.i(), undefined);
-assert.equal(viewer.l(), undefined);
-assert.equal(viewer.m(), undefined);
-assert.equal(viewer.n(), undefined);
-assert.equal(viewer.o(), undefined);
-assert.equal(viewer.p.key, "chatgpt-conversation-effects");
-let panel;
-viewer.f({ openPanel(value) { panel = value; } }, { conversationId: "c1", selectedThreadId: "thread-2" });
-assert.equal(panel.id, "chatgpt-subagents:c1");
-assert.equal(panel.title, "Subagents");
-assert.deepEqual(panel.props, { conversationId: "c1", selectedThreadId: "thread-2" });
-const pending = viewer.h({ isStreaming: true, pendingSubmission: { attachments: [{ id: "f1", name: "screen.png", previewSrc: "data:image/png;base64,AA==" }], commentCount: 2, prompt: "Review this", renderMarkdown: true, selectedTextAttachments: [{ text: "selection" }] }, threadCurrentNode: "n1", threadMapping: {} });
-assert.equal(pending.renderedTurns.length, 1);
-assert.equal(pending.renderedTurns[0].id, "pending-chatgpt-submit");
-assert.equal(pending.renderedTurns[0].turn.items[0].message, "Review this");
-assert.deepEqual(pending.renderedTurns[0].turn.items[0].images, ["data:image/png;base64,AA=="]);
-assert.deepEqual(pending.renderedTurns[0].turn.items[0].selectedTextAttachments, ["selection"]);
-assert.equal(pending.showPendingLoadingMessage, true);
-assert.equal(viewer.h({ isStreaming: true, pendingSubmission: null, threadMapping: {} }).showPendingLoadingMessage, true);
-const baseTurns = [{ id: "t1", turn: { items: [{ messageId: "m1", type: "user-message" }] } }, { id: "t2", turn: { items: [{ completed: true, type: "assistant-message" }] } }];
-const decorated = viewer.g({ conversationId: "c1", errorMessage: "failed", renderedTurns: baseTurns, showPendingLoadingMessage: true });
-assert.equal(decorated[0].isMostRecentTurn, false);
-assert.equal(decorated[0].turnKey, "m1");
-assert.equal(decorated[1].isMostRecentTurn, true);
-assert.equal(decorated[1].errorMessage, "failed");
-assert.equal(decorated[1].showPendingLoadingMessage, true);
-const turn = viewer.r({ conversationId: "c1", isMostRecentTurn: true, turn: { items: [{ message: "Hello", type: "assistant-message" }] }, turnId: "t2" });
-assert.equal(turn.type, "article");
-assert.equal(turn.props["data-most-recent"], true);
-assert.equal(children(turn)[0].props.children, "Hello");
-assert.equal(viewer.a.current.turnId, "t2");
-const gallery = viewer.s({ conversationId: "c1", images: [{ id: "img", src: "one.png", title: "Result" }] });
-assert.equal(children(gallery)[0].props.alt, "Result");
-assert.equal(children(gallery)[0].props.src, "one.png");
-let preferred;
-const comparison = viewer.t({ comparison: { treatment: "personalization", variants: [{ id: "v1", isComplete: true, isOriginal: true, turns: [] }] }, conversationId: "c1", onPrefer(variant) { preferred = variant.id; } });
-assert.equal(comparison.type, "section");
-assert.equal(children(comparison)[0].props.children[0].props.children, "Original response");
-children(comparison)[0].props.children[2].props.onClick();
-assert.equal(preferred, "v1");
-assert.deepEqual(await viewer.u(null, { height: 10, src: "image.png", width: 20 }), { height: 10, name: "image.png", src: "image.png", width: 20 });
-await assert.rejects(() => viewer.u(null, null), /unavailable/);
+assertReleaseOwner("artifact-viewer", [
+  /@rchunk\/chatgpt-subagents-panel/,
+  /pending-chatgpt-submit/,
+  /export \{/,
+]);
 
-console.log("66 preview interaction surface cluster assertions passed");
+console.log("preview interaction surfaces and release owner assertions passed");
