@@ -9,7 +9,10 @@ import "@rchunk/command-menu-client";
 import "@rchunk/command-menu-queries";
 import "@rchunk/dock";
 import "@rchunk/hooks";
-import "@rchunk/import-settings-gate";
+import {
+  n as initializeImportSettingsGate,
+  t as importedSetupExperimentKey,
+} from "@rchunk/import-settings-gate";
 import "@rchunk/queries";
 import "@rchunk/security-keys";
 
@@ -32,7 +35,10 @@ interface SettingsRuntimeState {
   visibility: Readonly<Record<string, SettingsVisibility>>;
 }
 
-const shared = appSharedChunk as unknown as { HX?<Value>(signal: unknown): Value };
+const shared = appSharedChunk as unknown as {
+  BX?<Value>(signal: unknown, input: unknown): Value;
+  HX?<Value>(signal: unknown): Value;
+};
 const initial = appInitialChunk as unknown as {
   /** Published settings section registry and default local route. */
   NT?: readonly SettingsSection[];
@@ -45,6 +51,14 @@ const initial = appInitialChunk as unknown as {
   htt?: unknown;
   /** Host-aware plugins settings availability hook. */
   Wgn?(input: { hostId?: string }): boolean;
+  /** Dynamic section eligibility contracts. */
+  Xet?: unknown;
+  _A?: unknown;
+  bL?: unknown;
+  fw?: unknown;
+  ofn?: (gateId: string) => boolean;
+  vj?: unknown;
+  xun?: unknown;
 };
 const analyticsGateId = "3895602085";
 const externalSettings = {
@@ -71,9 +85,29 @@ const fallbackSections: readonly SettingsSection[] = fallbackSlugs.map((slug) =>
 function readBooleanSignal(signal: unknown, fallback: boolean): boolean {
   return signal == null || shared.HX == null ? fallback : shared.HX<boolean>(signal) === true;
 }
+function readCapability(name: string, fallback = true): { isCapable: boolean; isLoading: boolean } {
+  if (shared.BX == null || initial.Xet == null) return { isCapable: fallback, isLoading: false };
+  const result = shared.BX<{ isCapable?: boolean; isLoading?: boolean }>(initial.Xet, { name }) ?? {};
+  return { isCapable: result.isCapable === true, isLoading: result.isLoading === true };
+}
 function readRuntimeState(hostId?: string): SettingsRuntimeState {
   const chatGpt = readBooleanSignal(initial.htt, false);
   const codex = readBooleanSignal(initial.LS, true);
+  const accountCapability = readCapability("chatgpt.cme");
+  const dictationComposer = readCapability("dictation.composer", false);
+  const dictationGlobal = readCapability("dictation.global", false);
+  const accountState = initial.bL == null || shared.HX == null
+    ? { status: "allowed" }
+    : shared.HX<{ status?: "allowed" | "error" | "loading" }>(initial.bL) ?? { status: "loading" };
+  const notificationsEnabled = readBooleanSignal(initial.xun, true);
+  const appshotsVisible = readBooleanSignal(initial._A, true);
+  const importEnabled = initial.ofn?.(importedSetupExperimentKey ?? "3278809559") === true;
+  const isRemoteMode = readBooleanSignal(initial.vj, false);
+  const codexMicroEnabled = initial.ofn?.("3207467860") === true;
+  const codexMicroAvailability = initial.fw == null || shared.HX == null
+    ? undefined
+    : shared.HX<boolean | undefined>(initial.fw);
+  const debugEnabled = initial.ofn?.("2423536643") === true;
   return {
     enterprisePlan: false,
     pluginsSettingsVisible: initial.Wgn?.({ hostId }) ?? true,
@@ -85,13 +119,65 @@ function readRuntimeState(hostId?: string): SettingsRuntimeState {
       codexLocal: readBooleanSignal(initial.gmn, codex),
       codexOrWorkLocal: readBooleanSignal(initial.Sht, codex),
     },
-    visibility: {},
+    visibility: {
+      account: { pending: accountCapability.isLoading, visible: accountCapability.isCapable },
+      appshots: { pending: false, visible: appshotsVisible },
+      "codex-micro": {
+        pending: codexMicroEnabled && codexMicroAvailability === undefined,
+        visible: codexMicroEnabled && codexMicroAvailability === false,
+      },
+      debug: { pending: false, visible: debugEnabled },
+      import: { pending: false, visible: importEnabled && !isRemoteMode },
+      notifications: {
+        error: accountState.status === "error",
+        pending: accountState.status === "loading",
+        visible: notificationsEnabled && accountState.status === "allowed",
+      },
+      "parental-controls": {
+        error: accountState.status === "error",
+        pending: accountState.status === "loading",
+        visible: accountState.status === "allowed",
+      },
+      voice: {
+        pending: dictationComposer.isLoading || dictationGlobal.isLoading,
+        visible: dictationComposer.isCapable || dictationGlobal.isCapable,
+      },
+    },
   };
 }
 function surfaceVisible(surface: SettingsSurface | undefined, state: SettingsRuntimeState, local: boolean): boolean {
   if (surface == null) return true;
   const localSurface = surface === "codexLocal" || surface === "codexOrWorkLocal";
   return state.surfaces[surface] && (!localSurface || local);
+}
+function publishedSectionVisibility(section: SettingsSection, state: SettingsRuntimeState): SettingsVisibility | undefined {
+  switch (section.slug) {
+    case "billing":
+    case "cloud-environments":
+    case "cloud-settings":
+    case "security":
+    case "skills-settings":
+    case "storage":
+    case "teams":
+    case "time-management":
+      return { pending: false, visible: false };
+    case "plugins-settings":
+      return { pending: false, visible: state.pluginsSettingsVisible };
+    case "agent":
+    case "appearance":
+    case "environments":
+    case "general-settings":
+    case "git-settings":
+    case "hooks-settings":
+    case "keyboard-shortcuts":
+    case "local-environments":
+    case "mcp-settings":
+    case "personalization":
+    case "worktrees":
+      return { pending: false, visible: true };
+    default:
+      return undefined;
+  }
 }
 function getSectionAsset(slug: string, platform?: string): { commandAsset: string; component: string; navigation: { ariaHidden: boolean; assets: { 16: string; 20: string } } } {
   const key = slug === "appshots" && platform === "windows" ? "appshots-windows" : slug;
@@ -102,10 +188,15 @@ function initializeExternalSettings(): void {}
 function useVisibleSettingsSections(requestedSlug?: string | null, isLocalHost = true, hostId = initial.ugn): VisibleSettingsResult {
   const state = readRuntimeState(hostId);
   const evaluated = state.sections.map((section) => {
-    const override = state.visibility[section.slug];
+    const eligibility = state.visibility[section.slug] ?? publishedSectionVisibility(section, state);
     const hostAllowed = isLocalHost || alwaysAvailableRemotely.has(section.slug);
     const defaultVisible = !section.disabled && hostAllowed && surfaceVisible(section.surface ?? sectionSurfaces[section.slug], state, isLocalHost);
-    return { error: override?.error === true, pending: override?.pending === true, section, visible: override?.visible ?? defaultVisible };
+    return {
+      error: eligibility?.error === true,
+      pending: eligibility?.pending === true,
+      section,
+      visible: defaultVisible && eligibility?.visible !== false,
+    };
   });
   const visibleSettingsSections = evaluated.filter((entry) => entry.visible).map((entry) => entry.section);
   const requested = requestedSlug == null ? undefined : evaluated.find((entry) => entry.section.slug === requestedSlug);
@@ -117,5 +208,5 @@ function useVisibleSettingsSections(requestedSlug?: string | null, isLocalHost =
   return { activeSettingsSection, settingsNavigationSections, shouldRedirectToVisibleSettingsSection, shouldRenderRouteContent: requested?.pending !== true, showEnterpriseUsageLabel: state.enterprisePlan && visibleSettingsSections.some((section) => section.slug === "analytics"), visibleSettingsSections };
 }
 let initialized = false;
-function initializeVisibleSettingsSections(): void { if (!initialized) { initializeExternalSettings(); initializeSectionAssets(); initialized = true; } }
+function initializeVisibleSettingsSections(): void { if (!initialized) { initializeImportSettingsGate?.(); initializeExternalSettings(); initializeSectionAssets(); initialized = true; } }
 export { analyticsGateId as a, initializeSectionAssets as i, useVisibleSettingsSections as n, externalSettings as o, getSectionAsset as r, initializeExternalSettings as s, initializeVisibleSettingsSections as t };

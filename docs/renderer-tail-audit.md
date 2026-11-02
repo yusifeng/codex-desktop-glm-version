@@ -1,5 +1,13 @@
 # Renderer 尾部资产审计
 
+2026-11-02 Settings eligibility recovery：`use-visible-settings-sections` 在 surface/host 路由之外恢复了
+发布版 section eligibility 的确定性关闭矩阵，并按发布顺序将 eligibility 与 surface/remote-host 做 AND，
+不再让局部 `visible=true` 越过宿主限制。Account/Voice capability、Appshots、notifications/parental auth、
+Import experiment/remote mode、Codex Micro availability 和 Debug gate 现均读取真实公共 ABI；pending/error
+状态会阻止过早重定向并控制 route content。focused settings application cluster 从 44 增至 61 项断言，
+typecheck 与 strict hub gate 通过。Usage/Analytics/Profile/Trusted Contact 等 plan/query 组合仍需继续恢复，
+因此该批不宣称设置资格矩阵已完全等同发布版。
+
 2026-11-02 Codex Home announcements runtime recovery：`codex-home-announcements-current` 不再把
 `D0t` initializer 误当生产 override hook，也不再插入发布候选序列不存在的 synthetic recap entry。
 Home 候选现在执行全局 disabled signal、focused-source context、gift/voice/import/worktree/history/replay

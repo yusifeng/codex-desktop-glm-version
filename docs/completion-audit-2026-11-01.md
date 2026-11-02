@@ -41,6 +41,12 @@ exports were previously classified. Current completion requires source-backed bu
 
 ## Current runtime-source recovery status
 
+The settings eligibility follow-up restores the published static-disabled matrix and combines per-section eligibility with
+surface and remote-host constraints instead of allowing an override to bypass them. Account/Voice capabilities, Appshots,
+notifications/parental authorization, Import experiment/remote mode, Codex Micro availability, and Debug gating now consume
+live public ABIs with pending/error redirect semantics. The settings application cluster grows from 44 to 61 assertions.
+Plan/query-heavy Usage, Analytics, Profile, and Trusted Contact rules remain incomplete.
+
 The current Codex Home announcement batch removes a synthetic recap candidate and restores the published global-disable,
 focused-source, and ordered gift/voice/import/worktree/history/replay gates. Product Beacon candidates now precede vanilla
 promos, honor suppression and post-onboarding metadata, and retain composer-text/voice actions. Fast Mode no longer depends
