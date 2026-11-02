@@ -16,6 +16,7 @@
     "verify-renderer-cluster": "node scripts/verify-renderer-cluster.mjs",
     "e2e:inspect": "node scripts/inspect-electron-renderer.mjs",
     "e2e:readonly": "node scripts/e2e-electron-renderer.mjs smoke-readonly",
+    "e2e:interactions": "node scripts/e2e-electron-renderer.mjs settings-interactions",
     "e2e:critical": "node scripts/e2e-packaged-critical.mjs",
     "e2e:critical:attached": "node scripts/e2e-critical.mjs",
     "verify": "node scripts/verify-chunks.mjs",

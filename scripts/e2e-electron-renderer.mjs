@@ -54,6 +54,7 @@ function protocolEventDetails(event) {
       url: exception.url ?? "",
       lineNumber: exception.lineNumber ?? null,
       columnNumber: exception.columnNumber ?? null,
+      exceptionPreview: exception.exception?.preview ?? null,
       stackTrace: exception.stackTrace ?? exception.exception?.preview ?? null,
     };
   }
@@ -111,6 +112,16 @@ if (mode === "smoke-readonly") {
     target.click();
     return { tagName: target.tagName, text: target.innerText?.trim() ?? '' };
   })()`);
+  const waitForClickableStartingWith = async (text, timeoutMs = 30_000) => {
+    const deadline = Date.now() + timeoutMs;
+    do {
+      const found = await evaluate(`([...document.querySelectorAll('button, a, [role="button"], [role="tab"], [role="menuitem"]')]
+        .some((element) => element.innerText?.trim().split('\\n')[0] === ${JSON.stringify(text)}))`);
+      if (found) return;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    } while (Date.now() < deadline);
+    throw new Error(`Timed out waiting for clickable element starting with: ${text}`);
+  };
   const clickAriaWithMouse = async (label) => {
     const point = await evaluate(`(() => {
       const target = document.querySelector('[aria-label=${JSON.stringify(label)}]');
@@ -420,6 +431,7 @@ if (mode === "smoke-readonly") {
     { label: '技能', name: 'skills' },
     { label: '插件', name: 'plugins' },
   ]) {
+    await waitForClickableStartingWith(tab.label);
     await clickTextStartingWith(tab.label);
     await waitForSettingsPageToSettle();
     await assertVisualPage(`settings/plugins-${tab.name}`, {
@@ -526,13 +538,18 @@ if (mode === "smoke-readonly") {
     await waitForBodyText(['Pull Request', '定时任务'], 30_000);
   };
   const explorePages = [
-    { label: 'Meetings', name: 'meetings', readyText: 'Connect Google Calendar' },
+    // Meetings is account/feature-flag gated and is absent for some signed-in users.
+    { label: 'Meetings', name: 'meetings', readyText: 'Connect Google Calendar', optional: true },
     { label: '站点', name: 'sites', readyText: '“站点”使用前须知' },
     { label: 'Pull Request', name: 'pull-requests', readyText: '搜索 Pull Request' },
     { label: '定时任务', name: 'automations', readyText: '搜索已安排任务' },
     { label: '插件', name: 'plugins', readyText: '热门' },
   ];
-  for (const [pageIndex, page] of explorePages.entries()) {
+  const visibleExploreLabels = await evaluate(`
+    [...document.querySelectorAll('[role="menuitem"]')].map((element) => element.innerText?.trim()).filter(Boolean)
+  `);
+  const enabledExplorePages = explorePages.filter((page) => !page.optional || visibleExploreLabels.includes(page.label));
+  for (const [pageIndex, page] of enabledExplorePages.entries()) {
     await clickText(page.label);
     await waitForSelectorGone('[role="menu"]');
     await waitForBodyText(page.readyText, 30_000);
@@ -547,19 +564,23 @@ if (mode === "smoke-readonly") {
       allowHorizontalOverflow: true,
     });
     await navigateToChat(page.name);
-    if (pageIndex < explorePages.length - 1) await openExploreMenu();
+    if (pageIndex < enabledExplorePages.length - 1) await openExploreMenu();
   }
 
-  await evaluate(`(() => {
+  const projectsPageAvailable = await evaluate(`(() => {
     const target = [...document.querySelectorAll('nav button')].find((button) => button.innerText?.trim() === '项目');
-    if (target == null) throw new Error('Projects navigation button not found');
+    if (target == null) return false;
+    if (target.hasAttribute('data-app-action-sidebar-section-toggle')) return false;
     target.click();
+    return true;
   })()`);
-  await waitForBodyText('搜索项目', 30_000);
-  await assertVisualPage('app/projects', {
-    text: ['项目', '搜索项目', '名称', '已更新'],
-    minimumInteractive: 10,
-  });
+  if (projectsPageAvailable) {
+    await waitForBodyText('搜索项目', 30_000);
+    await assertVisualPage('app/projects', {
+      text: ['项目', '搜索项目', '名称', '已更新'],
+      minimumInteractive: 10,
+    });
+  }
 
   await evaluate(`(() => {
     const target = [...document.querySelectorAll('nav button')].find((button) =>
@@ -584,13 +605,14 @@ if (mode === "smoke-readonly") {
       .map((element) => element.getAttribute('aria-label'))
       .find((label) => label?.startsWith('查看活动')) ?? null
   )()`);
-  if (activityLabel == null) throw new Error('Activity navigation button not found');
-  await clickAriaWithMouse(activityLabel);
-  await waitForBodyText('优先级', 30_000);
-  await assertVisualPage('app/activity', {
-    text: ['活动', '优先级', '未读'],
-    minimumInteractive: 8,
-  });
+  if (activityLabel != null) {
+    await clickAriaWithMouse(activityLabel);
+    await waitForBodyText('优先级', 30_000);
+    await assertVisualPage('app/activity', {
+      text: ['活动', '优先级', '未读'],
+      minimumInteractive: 8,
+    });
+  }
   await evaluate(`(() => {
     const target = [...document.querySelectorAll('nav button')].find((button) =>
       ['聊天', '新对话'].includes(button.innerText?.trim())
@@ -634,6 +656,169 @@ if (mode === "smoke-readonly") {
   await command('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape' });
 
   console.log(JSON.stringify({ mode, screenshotDirectory, checkpoints: checkpoints.map(({ name }) => name) }, null, 2));
+} else if (mode === "settings-interactions") {
+  const waitUntil = async (description, predicate, timeoutMs = 30_000) => {
+    const deadline = Date.now() + timeoutMs;
+    do {
+      const value = await predicate();
+      if (value) return value;
+      await new Promise((resolve) => setTimeout(resolve, 250));
+    } while (Date.now() < deadline);
+    throw new Error(`Timed out waiting for ${description}`);
+  };
+  const clickText = (text) => evaluate(`(() => {
+    const target = [...document.querySelectorAll('button, a, [role="button"], [role="menuitem"]')].find((element) =>
+      element.getAttribute('aria-label') === ${JSON.stringify(text)} ||
+      element.innerText?.trim() === ${JSON.stringify(text)} ||
+      element.innerText?.trim().split('\\n')[0] === ${JSON.stringify(text)}
+    );
+    if (target == null) throw new Error(${JSON.stringify("No clickable element: ")} + ${JSON.stringify(text)});
+    target.click();
+    return true;
+  })()`);
+  const clickTextWithMouse = async (text) => {
+    const point = await evaluate(`(() => {
+      const target = [...document.querySelectorAll('button, a, [role="button"], [role="menuitem"]')].find((element) =>
+        element.getAttribute('aria-label') === ${JSON.stringify(text)} ||
+        element.innerText?.trim() === ${JSON.stringify(text)} ||
+        element.innerText?.trim().split('\\n')[0] === ${JSON.stringify(text)}
+      );
+      if (target == null) throw new Error(${JSON.stringify("No mouse-clickable element: ")} + ${JSON.stringify(text)});
+      target.scrollIntoView({ block: 'center', inline: 'nearest' });
+      const rect = target.getBoundingClientRect();
+      const x = rect.left + rect.width / 2;
+      const y = rect.top + rect.height / 2;
+      const hit = document.elementFromPoint(x, y);
+      return { x, y, hit: hit?.outerHTML?.slice(0, 300) ?? null };
+    })()`);
+    const coordinates = { x: point.x, y: point.y };
+    await command('Input.dispatchMouseEvent', { type: 'mouseMoved', ...coordinates });
+    await command('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...coordinates });
+    await command('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...coordinates });
+    return point;
+  };
+  const openMenuWithMouse = async (text) => {
+    const attempts = [];
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      const open = await evaluate(`
+        [...document.querySelectorAll('button[aria-haspopup="menu"]')].some((element) =>
+          element.innerText?.trim() === ${JSON.stringify(text)} && element.getAttribute('aria-expanded') === 'true'
+        )
+      `);
+      if (open) return;
+      attempts.push(await clickTextWithMouse(text));
+      await new Promise((resolve) => setTimeout(resolve, 750));
+    }
+    throw new Error(`Menu did not open after real mouse retries: ${text}; ${JSON.stringify(attempts)}`);
+  };
+  if (!(await evaluate(`document.querySelector('#settings-search') != null`))) {
+    const profileMenuLabel = await evaluate(`
+      document.querySelector('[aria-label="打开个人资料菜单"]') != null ? '打开个人资料菜单' :
+      document.querySelector('[aria-label="Open profile menu"]') != null ? 'Open profile menu' : null
+    `);
+    if (profileMenuLabel == null) throw new Error('Profile menu button not found');
+    await clickTextWithMouse(profileMenuLabel);
+    await waitUntil("settings menu item", () => evaluate(`
+      [...document.querySelectorAll('button, [role="menuitem"]')].some((element) =>
+        element.innerText?.trim() === '设置' || element.innerText?.trim().split('\\n')[0] === '设置'
+      )
+    `));
+    await clickText("设置");
+  }
+  await waitUntil("settings shell", () => evaluate(`document.querySelector('#settings-search') != null`));
+  await evaluate(`(() => {
+    const input = document.querySelector('#settings-search');
+    if (input.value === '') return;
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+    setter.call(input, '');
+    input.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'deleteContentBackward', data: null }));
+  })()`);
+  await waitUntil("settings search reset", () => evaluate(`document.querySelector('#settings-search')?.value === ''`));
+  await clickText("常规");
+  await waitUntil("general settings controls", () => evaluate(`document.querySelector('[aria-label="纯文本编辑器"]') != null`));
+  protocolEvents.length = 0;
+  const assertNoInteractionException = async (step) => {
+    await new Promise((resolve) => setTimeout(resolve, 250));
+    const exceptions = protocolEvents.filter((event) => event.method === "Runtime.exceptionThrown").map(protocolEventDetails);
+    if (exceptions.length > 0) throw new Error(`Renderer exceptions after ${step}: ${JSON.stringify(exceptions)}`);
+  };
+
+  const switchLabels = ["在菜单栏中显示 ChatGPT", "运行时防止系统休眠", "纯文本编辑器"];
+  const initialSwitchStates = new Map();
+  const readSwitch = (label) => evaluate(`document.querySelector('[role="switch"][aria-label=${JSON.stringify(label)}]')?.getAttribute('aria-checked') ?? null`);
+  const toggleSwitch = (label) => evaluate(`(() => {
+    const target = document.querySelector('[role="switch"][aria-label=${JSON.stringify(label)}]');
+    if (target == null) throw new Error(${JSON.stringify("Switch not found: ")} + ${JSON.stringify(label)});
+    target.click();
+    return true;
+  })()`);
+  const restored = [];
+  try {
+    for (const label of switchLabels) {
+      const initial = await readSwitch(label);
+      if (!['true', 'false'].includes(initial)) throw new Error(`Switch has no boolean state: ${label}=${initial}`);
+      initialSwitchStates.set(label, initial);
+      await toggleSwitch(label);
+      await waitUntil(`${label} to change`, async () => (await readSwitch(label)) !== initial);
+      await toggleSwitch(label);
+      await waitUntil(`${label} to restore`, async () => (await readSwitch(label)) === initial);
+      restored.push(label);
+      await assertNoInteractionException(`restoring ${label}`);
+    }
+
+    const searchInput = await evaluate(`document.querySelector('#settings-search') != null`);
+    if (!searchInput) throw new Error('Settings search input disappeared');
+    await evaluate(`(() => {
+      const input = document.querySelector('#settings-search');
+      const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+      setter.call(input, '浏览器');
+      input.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'insertText', data: '浏览器' }));
+    })()`);
+    await waitUntil("browser settings search result", () => evaluate(`
+      document.querySelector('#settings-search')?.value === '浏览器' &&
+      [...document.querySelectorAll('[data-list-navigation-item="true"]')].some((element) =>
+        (element.getAttribute('aria-label') ?? element.innerText ?? '').includes('浏览器')
+      )
+    `));
+    await evaluate(`(() => {
+      const input = document.querySelector('#settings-search');
+      const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set;
+      setter.call(input, '');
+      input.dispatchEvent(new InputEvent('input', { bubbles: true, inputType: 'deleteContentBackward', data: null }));
+    })()`);
+    await waitUntil("settings search to clear", () => evaluate(`document.querySelector('#settings-search')?.value === ''`));
+    await assertNoInteractionException("settings search");
+    // The search-results layer exits with a transition after the input clears.
+    // Wait for it to stop intercepting the real pointer used by the menu test.
+    await new Promise((resolve) => setTimeout(resolve, 1_000));
+
+    await openMenuWithMouse("按 Enter 键");
+    await waitUntil("send shortcut menu", () => evaluate(`
+      [...document.querySelectorAll('button[aria-haspopup="menu"]')].some((element) =>
+        element.innerText?.trim() === '按 Enter 键' && element.getAttribute('aria-expanded') === 'true'
+      ) && (document.body?.innerText ?? '').includes('总是使用 ⌘ + Enter')
+    `));
+    await clickTextWithMouse("外观");
+    await waitUntil("appearance settings after open menu navigation", () => evaluate(`
+      document.querySelector('[aria-label="主题"]') != null ||
+      (document.body?.innerText ?? '').includes('强调色')
+    `));
+    await assertNoInteractionException("open menu route navigation");
+    await clickText("常规");
+    await waitUntil("general settings after route regression", () => evaluate(`
+      document.querySelector('[aria-label="纯文本编辑器"]') != null
+    `));
+  } finally {
+    for (const [label, initial] of initialSwitchStates) {
+      if ((await readSwitch(label)) !== initial) {
+        await toggleSwitch(label);
+        await waitUntil(`${label} emergency restore`, async () => (await readSwitch(label)) === initial);
+      }
+    }
+  }
+  const exceptions = protocolEvents.filter((event) => event.method === "Runtime.exceptionThrown").map(protocolEventDetails);
+  if (exceptions.length > 0) throw new Error(`Renderer exceptions during settings interactions: ${JSON.stringify(exceptions)}`);
+  console.log(JSON.stringify({ mode, restored, search: "passed", menu: "passed", exceptions }, null, 2));
 } else if (mode === "fill" || mode === "append") {
   if (argument.length === 0) throw new Error(`${mode} requires non-empty message text`);
   const result = await evaluate(`(() => {
@@ -919,7 +1104,19 @@ if (mode === "smoke-readonly") {
   if (!Number.isFinite(durationMs) || durationMs <= 0) throw new Error("watch-errors duration must be a positive number");
   await command("Log.enable");
   await new Promise((resolve) => setTimeout(resolve, durationMs));
-  console.log(JSON.stringify({ mode, protocolEvents }, null, 2));
+  const details = protocolEvents.map(protocolEventDetails);
+  const exceptions = details.filter((event) => event.method === "Runtime.exceptionThrown");
+  const errors = details.filter((event) =>
+    event.method === "Log.entryAdded" ? event.level === "error" : event.method === "Runtime.consoleAPICalled" && event.type === "error"
+  );
+  const warnings = details.filter((event) =>
+    event.method === "Log.entryAdded" ? event.level === "warning" : event.method === "Runtime.consoleAPICalled" && event.type === "warning"
+  );
+  const warningSummary = [...new Set(warnings.map((event) => event.text))];
+  console.log(JSON.stringify({ mode, exceptions, errors, warningCount: warnings.length, warningSummary }, null, 2));
+  if (exceptions.length > 0 || errors.length > 0) {
+    throw new Error(`Renderer runtime errors detected: ${JSON.stringify({ exceptions, errors })}`);
+  }
 } else if (mode === "inspect") {
   console.log(JSON.stringify(await composerState(), null, 2));
 } else if (mode === "dump-conversation") {

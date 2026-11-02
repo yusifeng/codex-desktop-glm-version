@@ -2047,13 +2047,27 @@ function vr() {
           r != null && s(`${d.pathname}${d.search}${d.hash}`);
           return;
         }
-        F(() => {
-          n.current = o;
-          let r = Pe(e);
-          (s(r),
-            e === `profile` && Lt(t, a, { source: `settings_page` }),
-            l(r, { replace: !0, state: d.state }));
-        });
+        let c = () => {
+            F(() => {
+              n.current = o;
+              let r = Pe(e);
+              (s(r),
+                e === `profile` && Lt(t, a, { source: `settings_page` }),
+                l(r, { replace: !0, state: d.state }));
+            });
+          },
+          u = document.querySelector('[aria-haspopup="menu"][aria-expanded="true"]');
+        if (u instanceof HTMLElement) {
+          u.dispatchEvent(
+            new KeyboardEvent(`keydown`, {
+              key: `Escape`,
+              code: `Escape`,
+              bubbles: !0,
+              cancelable: !0,
+            }),
+          );
+          requestAnimationFrame(c);
+        } else c();
       }),
       (e[48] = b),
       (e[49] = C),
