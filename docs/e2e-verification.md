@@ -50,6 +50,13 @@ Then run the non-mutating matrix:
 npm run e2e:readonly
 ```
 
+Run the complete critical matrix, including a signed-in mutation and assistant
+reply assertion, with:
+
+```sh
+npm run e2e:critical
+```
+
 The driver is state-independent: it can start on the home page, a conversation,
 or an already-open settings page. It currently checks all of the following in one
 run and rejects the renderer recovery boundary at every checkpoint:
@@ -68,7 +75,9 @@ Only `send` submits through the signed-in account; keep it a separate, intention
 mutation step rather than hiding it inside inspection or navigation checks.
 
 The 2026-11-01 signed-in package run passed all six read-only checkpoints. On
-2026-11-02 the mutation matrix also passed:
+2026-11-02 the mutation matrix also passed. After the renderer source-owner
+convergence, the complete `e2e:critical` command was rerun against a freshly
+packed application and passed with zero local `@rchunk` asset failures:
 
 - `fill` + `send` + `wait` submitted a fresh turn through the signed-in account and
   observed the assistant response marker.

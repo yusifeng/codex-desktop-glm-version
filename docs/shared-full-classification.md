@@ -112,7 +112,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Ha` | `LA` | 22426 | hosts-wsl-plugins | semantic | `hosts-runtime` (`appearanceSettings`) |
 | `Hc` | `yS` | 18533 | settings-threads | semantic | `browser-tab-mentions` (`mentionsWithinBudget`) |
 | `Hd` | `Ug` | 16079 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `Hf` | `lt` | 2676 | core-path-utils | semantic | `rpc-core` (`RpcStubLike`) |
+| `Hf` | `lt` | 2676 | core-path-utils | preserved | original core-path-utils implementation retained for compatibility |
 | `Hi` | `lre` | 24111 | hosts-wsl-plugins | semantic | `wsl-paths` (`wslDistroFromUnc`) |
 | `Hl` | `Bb` | 17912 | settings-threads | semantic | `app-constants` (`buildAutoInstallOptOutKey`) |
 | `Hn` | `dY` | 42234 | mcp-rpc | semantic | `mcp-runtime` (`setWindowsCoreRoot`) |
@@ -291,7 +291,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Va` | `RA` | 22512 | hosts-wsl-plugins | preserved | original hosts-wsl-plugins implementation retained for compatibility |
 | `Vc` | `uS` | 18500 | settings-threads | semantic | `browser-tab-mentions` (`BROWSER_PLUGIN_DESCRIPTORS`) |
 | `Vd` | `Xg` | 16158 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `Vf` | `ut` | 2677 | core-path-utils | semantic | `rpc-core` (`RpcConnectionLike`) |
+| `Vf` | `ut` | 2677 | core-path-utils | preserved | original core-path-utils implementation retained for compatibility |
 | `Vi` | `Rj` | 24127 | hosts-wsl-plugins | semantic | `wsl-paths` (`windowsToWslPath`) |
 | `Vl` | `Eb` | 17859 | settings-threads | semantic | `app-constants` (`DEFAULT_MARKETPLACE_NAME`) |
 | `Vn` | `mY` | 42252 | mcp-rpc | semantic | `mcp-runtime` (`recordExecutableResolution`) |
@@ -304,7 +304,7 @@ Classification is exhaustive: semantic exports point to a named shared module; r
 | `Wa` | `PA` | 22408 | hosts-wsl-plugins | semantic | `hosts-runtime` (`resolveModelServiceTier`) |
 | `Wc` | `_S` | 18516 | settings-threads | semantic | `browser-tab-mentions` (`tabDedupeKey`) |
 | `Wd` | `Rg` | 15995 | settings-threads | preserved | original settings-threads implementation retained for compatibility |
-| `Wf` | `ft` | 2679 | core-path-utils | semantic | `rpc-core` (`connectRpc`) |
+| `Wf` | `ft` | 2679 | core-path-utils | preserved | original core-path-utils implementation retained for compatibility |
 | `Wi` | `Pj` | 24102 | hosts-wsl-plugins | semantic | `wsl-paths` (`isWslPath`) |
 | `Wl` | `Rb` | 17905 | settings-threads | semantic | `app-constants` (`isBundledMarketplaceName`) |
 | `Wn` | `XJ` | 42154 | mcp-rpc | semantic | `runtime-state` (`Wn`) |

@@ -146,6 +146,43 @@ export function isRemoteHostConfig(config: HostConfigLike | null | undefined): b
   return isSshHostConfig(config) || isWslHostConfig(config) || isRemoteControlHost(config);
 }
 
+const ELIGIBLE_THREAD_SOURCES = new Set([
+  "user", "agent_created_thread", "agent_forked_thread", "ambient_suggestion_task", "avatar_quick_chat",
+  "chatgpt_handoff", "code_review", "codex_replay", "conversation_digest", "implement_todo",
+  "local_environment_configuration", "mcp_app_follow_up", "onboarding_checklist", "security_remediation",
+  "security_scan", "voice_chat",
+]);
+
+/** Sources accepted by the desktop thread-creation contract (original `fj` / `ha`). */
+export function isEligibleThreadSource(source: unknown): boolean {
+  return source == null || (typeof source === "string" && ELIGIBLE_THREAD_SOURCES.has(source));
+}
+
+/** Canonical remote path used by declaration reconciliation (original `Hne` / `va`). */
+export function normalizeRemotePath(path: string): string {
+  let value = path.trim().replace(/\\/g, "/").toLowerCase();
+  const unc = value.match(/^\/\/(?:wsl\$|wsl\.localhost)\/[^/]+(?:\/(.*))?$/);
+  if (unc) value = unc[1] ? `/${unc[1]}` : "/";
+  const drive = value.match(/^\/?([a-z]):(?:\/(.*))?$/);
+  if (drive) value = drive[2] ? `/mnt/${drive[1]}/${drive[2]}` : `/mnt/${drive[1]}`;
+  value = value.replace(/\/+/g, "/");
+  return value === "/" ? value : value.replace(/\/+$/, "");
+}
+
+/** Preserve display casing while removing redundant separators (original `cj` / `ya`). */
+export function canonicalizeRemotePath(path: string): string {
+  const value = path.trim().replace(/\\/g, "/");
+  if (!value) return "";
+  if (/^\/+$/u.test(value)) return "/";
+  if (/^[A-Za-z]:\/+$/u.test(value)) return `${value.slice(0, 2)}/`;
+  return value.replace(/\/+$/, "");
+}
+
+export function defaultProjectLabel(path: string): string {
+  const value = canonicalizeRemotePath(path);
+  return value.split("/").filter(Boolean).at(-1) ?? value;
+}
+
 // ---------------------------------------------------------------------------
 // 兼容导出（host-config 分区 8 个压缩名）
 // ---------------------------------------------------------------------------
@@ -159,4 +196,13 @@ export {
   hostIdOfEnvId as bs,
   isSshHostConfig as Os,
   isRemoteHostConfig as Es,
+  isEligibleThreadSource as ha,
+  normalizeRemotePath as va,
+  canonicalizeRemotePath as ya,
+  defaultProjectLabel as _a,
+  discoveredSshHostId as ys,
+  sshTargetArgs as Ss,
+  isWslConnection as ks,
+  isRemoteControlConnection as ws,
+  isWslHostConfig as As,
 };

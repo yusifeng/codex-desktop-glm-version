@@ -72,14 +72,15 @@ if (mode === "smoke-readonly") {
     await command('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...point });
     await command('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...point });
   };
-  const waitForBodyText = async (text, timeoutMs = 15_000) => {
+  const waitForBodyText = async (expected, timeoutMs = 15_000) => {
+    const texts = Array.isArray(expected) ? expected : [expected];
     const deadline = Date.now() + timeoutMs;
     do {
       const bodyText = await evaluate(`(document.body?.innerText ?? '') + ' ' + (document.body?.textContent ?? '')`);
-      if (bodyText.includes(text)) return bodyText;
+      if (texts.some((text) => bodyText.includes(text))) return bodyText;
       await new Promise((resolve) => setTimeout(resolve, 250));
     } while (Date.now() < deadline);
-    throw new Error(`Timed out waiting for body text: ${text}`);
+    throw new Error(`Timed out waiting for body text: ${texts.join(' | ')}`);
   };
   const waitForAppReady = async (timeoutMs = 60_000) => {
     const deadline = Date.now() + timeoutMs;
@@ -121,19 +122,19 @@ if (mode === "smoke-readonly") {
   }
   await waitForBodyText('搜索设置');
   await clickText('常规');
-  await waitForBodyText('默认权限');
+  await waitForBodyText(['默认权限', 'Send messages']);
   await assertHealthy('settings/general');
 
   await clickText('Git');
-  await waitForBodyText('分支前缀');
+  await waitForBodyText(['分支前缀', 'Branch prefix']);
   await assertHealthy('settings/git');
 
   await clickText('Worktrees');
-  await waitForBodyText('工作树根目录');
+  await waitForBodyText(['工作树根目录', 'Worktree root']);
   await assertHealthy('settings/worktrees');
 
   await clickText('浏览器');
-  await waitForBodyText('In-app browser');
+  await waitForBodyText(['In-app browser', '管理你的 Browser Use']);
   await assertHealthy('settings/browser');
 
   if (await evaluate(`document.querySelector('nav[aria-label="应用导航"]') != null`)) {
@@ -258,7 +259,13 @@ if (mode === "smoke-readonly") {
     if (event.method !== 'Runtime.consoleAPICalled' || event.params?.type !== 'error') return false;
     return true;
   });
-  if (fatalEvents.length > 0) throw new Error(`Renderer emitted ${fatalEvents.length} fatal protocol event(s)`);
+  if (fatalEvents.length > 0) {
+    const details = fatalEvents.map((event) => event.method === 'Log.entryAdded'
+      ? { text: event.params?.entry?.text ?? '', url: event.params?.entry?.url ?? '' }
+      : { text: (event.params?.args ?? []).map((value) => value.value ?? value.description ?? '').join(' '), url: '' }
+    ).slice(0, 10);
+    throw new Error(`Renderer emitted ${fatalEvents.length} fatal protocol event(s): ${JSON.stringify(details)}`);
+  }
   console.log(JSON.stringify({ mode, marker, prompt, fillResult, sendResult, assistantReply, assistantMessageCount: assistantMessages.length }, null, 2));
 } else if (mode === "open-text") {
   if (argument.length === 0) throw new Error("open-text requires visible text");

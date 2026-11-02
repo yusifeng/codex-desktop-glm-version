@@ -284,3 +284,10 @@ locking, license/error retry, navigation, and command registration. The focused 
 build and verification, 2,247 app-code coverage, zero semantic tail, strict hub/route/index gates, and whole-tree build check
 pass. This removes the known Review publication gap; it does not by itself prove the remaining preserved inventory or the final
 real-app E2E matrix complete.
+
+The 2026-11-02 shared-root and critical-E2E batch replaces 62 of 105 direct exact-main consumers of the preserved shared
+namespace with named TypeScript contracts. It also repairs three runtime-only alias/initializer regressions and makes the
+renderer build resolve lazy `@rchunk` preload strings while rejecting any leaked build alias. A freshly packed signed-in app
+passed all six read-only route checkpoints and a real prompt/assistant-reply marker through `npm run e2e:critical`; the eight
+previous local lazy-asset 404s are gone. This establishes the current critical runnable path, not whole-project completion:
+43 direct shared aliases remain, along with the preserved source inventories and remaining conversation-route convergence.

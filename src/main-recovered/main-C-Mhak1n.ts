@@ -8,6 +8,15 @@ const e = require("./rolldown-runtime-CPUxUITh.js"),
   o = require("./electron-resources-path-BDLw2lp0.js"),
   s = require("./dist-wQAv1pJP.js");
 const { isEligibleAccount } = require("./main-app/util/main-business.js");
+const { orderBy } = require("./main-app/util/order-by.js");
+const browserProfileContracts = require("./main-app/browser-sidebar/browser-profile-import-contracts.js");
+const browserSettingsContracts = require("./main-app/browser-sidebar/browser-settings-contracts.js");
+const browserCommentContracts = require("./main-app/browser-sidebar/browser-comment-contracts.js");
+const runtimeSettingDescriptors = require("./main-app/settings/runtime-descriptors.js");
+const mcpSandboxContracts = require("./main-app/mcp-sandbox/contracts.js");
+const routeContracts = require("./main-app/window/route-contracts.js");
+const sharedHostContracts = require("./shared/host-config.js");
+const { NODE_REPL_MODULE_DIR_ENV_KEY } = require("./shared/app-constants.js");
 const { resolveAutomationModelRouting: Ln } = require("./main-app/misc/model-routing.js");
 const {
   DEFAULT_DEFERRED_STARTUP_FALLBACK_MS: zr,
@@ -699,8 +708,8 @@ const {
   developmentBuildFlavor: a.in.Dev,
   isInternalBuild: a.in.isInternal,
   isNodeReplSandboxPlatform: n.nu,
-  isEligibleThreadSource: n.ha,
-  nodeModulesPathEnvKey: n.Ql,
+  isEligibleThreadSource: sharedHostContracts.isEligibleThreadSource,
+  nodeModulesPathEnvKey: NODE_REPL_MODULE_DIR_ENV_KEY,
   mcpServicesEnvKey: n.$l,
   requestMetaEnvKey: n.Yl,
   nodeReplBannerEnvKey: `NODE_REPL_JS_BANNER`,
@@ -742,7 +751,7 @@ const {
   getDesktopFeatureAvailability: Tr,
   getDesktopAccessState: Er,
   isEligibleAccount,
-  enabledSettingKey: n.Ua.enabled.key,
+  enabledSettingKey: runtimeSettingDescriptors.ambientSuggestionSettings.enabled.key,
   conversationDetailModeSettingKey: n.ja.conversationDetailMode.key,
   shouldNormalizeDesktopPaths: n.zi,
   normalizeDesktopPath: zn,
@@ -14800,10 +14809,10 @@ var {
       autoConnectByHostId: n.iu.REMOTE_CONNECTION_AUTO_CONNECT_BY_HOST_ID,
       appliedRemoteDeclarations: a.z,
     },
-    normalizeRemotePath: n.va,
-    canonicalizeRemotePath: n.ya,
-    defaultProjectLabel: n._a,
-    hostIdForSshAlias: n.ys,
+    normalizeRemotePath: sharedHostContracts.normalizeRemotePath,
+    canonicalizeRemotePath: sharedHostContracts.canonicalizeRemotePath,
+    defaultProjectLabel: sharedHostContracts.defaultProjectLabel,
+    hostIdForSshAlias: sharedHostContracts.discoveredSshHostId,
     randomUUID: _.randomUUID,
     joinPath: h.join,
     existsSync: v.existsSync,
@@ -14838,149 +14847,7 @@ var {
   requestThreadOwner: n.m,
   logger: r.i(`habitat-automations`)(),
 });
-var Tke = e.t((e, t) => {
-    var r = n.Vd();
-    function i(e, t) {
-      return function (n, i) {
-        if (n == null) return n;
-        if (!r(n)) return e(n, i);
-        for (
-          var a = n.length, o = t ? a : -1, s = Object(n);
-          (t ? o-- : ++o < a) && i(s[o], o, s) !== !1;
-        );
-        return n;
-      };
-    }
-    t.exports = i;
-  }),
-  Eke = e.t((e, t) => {
-    var r = n.za();
-    t.exports = Tke()(r);
-  }),
-  Dke = e.t((e, t) => {
-    var r = Eke(),
-      i = n.Vd();
-    function a(e, t) {
-      var n = -1,
-        a = i(e) ? Array(e.length) : [];
-      return (
-        r(e, function (e, r, i) {
-          a[++n] = t(e, r, i);
-        }),
-        a
-      );
-    }
-    t.exports = a;
-  }),
-  Oke = e.t((e, t) => {
-    function n(e, t) {
-      var n = e.length;
-      for (e.sort(t); n--;) e[n] = e[n].value;
-      return e;
-    }
-    t.exports = n;
-  }),
-  kke = e.t((e, t) => {
-    var r = n.cd();
-    function i(e, t) {
-      if (e !== t) {
-        var n = e !== void 0,
-          i = e === null,
-          a = e === e,
-          o = r(e),
-          s = t !== void 0,
-          c = t === null,
-          l = t === t,
-          u = r(t);
-        if (
-          (!c && !u && !o && e > t) ||
-          (o && s && l && !c && !u) ||
-          (i && s && l) ||
-          (!n && l) ||
-          !a
-        )
-          return 1;
-        if (
-          (!i && !o && !u && e < t) ||
-          (u && n && a && !i && !o) ||
-          (c && n && a) ||
-          (!s && a) ||
-          !l
-        )
-          return -1;
-      }
-      return 0;
-    }
-    t.exports = i;
-  }),
-  Ake = e.t((e, t) => {
-    var n = kke();
-    function r(e, t, r) {
-      for (var i = -1, a = e.criteria, o = t.criteria, s = a.length, c = r.length; ++i < s;) {
-        var l = n(a[i], o[i]);
-        if (l) return i >= c ? l : l * (r[i] == `desc` ? -1 : 1);
-      }
-      return e.index - t.index;
-    }
-    t.exports = r;
-  }),
-  jke = e.t((e, t) => {
-    var r = n.sd(),
-      i = n.rd(),
-      a = n.Ao(),
-      o = Dke(),
-      s = Oke(),
-      c = n.Ud(),
-      l = Ake(),
-      u = n.lc(),
-      d = n.Yd();
-    function f(e, t, n) {
-      t = t.length
-        ? r(t, function (e) {
-            return d(e)
-              ? function (t) {
-                  return i(t, e.length === 1 ? e[0] : e);
-                }
-              : e;
-          })
-        : [u];
-      var f = -1;
-      return (
-        (t = r(t, c(a))),
-        s(
-          o(e, function (e, n, i) {
-            return {
-              criteria: r(t, function (t) {
-                return t(e);
-              }),
-              index: ++f,
-              value: e,
-            };
-          }),
-          function (e, t) {
-            return l(e, t, n);
-          },
-        )
-      );
-    }
-    t.exports = f;
-  }),
-  Mke = e.t((e, t) => {
-    var r = n.qr(),
-      i = jke(),
-      a = n.cc(),
-      o = n.sc();
-    t.exports = a(function (e, t) {
-      if (e == null) return [];
-      var n = t.length;
-      return (
-        n > 1 && o(e, t[0], t[1]) ? (t = []) : n > 2 && o(t[0], t[1], t[2]) && (t = [t[0]]),
-        i(e, r(t, 1), [])
-      );
-    });
-  }),
-  Nke = e.a(Mke()),
-  Pke = n.wf({ icons: n.Ef(n.Of(), n.Of()).optional() });
+var Pke = n.wf({ icons: n.Ef(n.Of(), n.Of()).optional() });
 var {
   getExtensionActions,
   loadFaviconData,
@@ -14996,7 +14863,7 @@ var {
   featureAvailability: Tr,
   iconManifestSchema: Pke,
   nativeImage: l.nativeImage,
-  orderBy: Nke.default,
+  orderBy,
   path: h,
 });
 var BrowserHostService = createBrowserHostServiceClass({
@@ -15017,10 +14884,10 @@ var BrowserProfileImportService = createBrowserProfileImportServiceClass({
   RpcHandlerBase: n.Uf,
   platform: process.platform,
   logger: r.r(`browser-profile-import`),
-  parseSignals: (value) => n.hl.parse(value),
-  parseImportRequest: (value) => n.pl.parse(value),
-  parseProfileList: (value) => n.hf(n.fl).parse(value),
-  parseImportResult: (value) => n.ml.parse(value),
+  parseSignals: (value) => browserProfileContracts.browserProfileSignalsSchema.parse(value),
+  parseImportRequest: (value) => browserProfileContracts.browserProfileImportRequestSchema.parse(value),
+  parseProfileList: (value) => browserProfileContracts.browserProfileSchema.array().parse(value),
+  parseImportResult: (value) => browserProfileContracts.browserProfileImportResultSchema.parse(value),
 });
 var BrowserHistoryService = createBrowserHistoryServiceClass({
   RpcHandlerBase: n.Uf,
@@ -25826,9 +25693,9 @@ var {
   webviewPartitionSuffix: HOST_GENERATION_SUFFIX,
 });
 var xWe = [
-    { allowedNavigationUrls: n.el, canOpenPopup: ({ url: e }) => MH(e), partition: n.tl },
+    { allowedNavigationUrls: browserSettingsContracts.BROWSER_CONTACT_SETTINGS_URLS, canOpenPopup: ({ url: e }) => MH(e), partition: browserSettingsContracts.CONTACT_SETTINGS_PARTITION },
     {
-      allowedNavigationUrls: [n.nl],
+      allowedNavigationUrls: [browserSettingsContracts.BROWSER_EXTENSIONS_URL],
       canOpenPopup: ({ url: e, disposition: t }) => {
         if (MH(e)) return !0;
         let n = UG(e);
@@ -25843,8 +25710,8 @@ var xWe = [
       isEnabled: () => Tr().browserExtensions,
       partition: n.rl,
     },
-    { allowedNavigationUrls: [n.il], canOpenPopup: ({ url: e }) => MH(e), partition: n.ol },
-    { allowedNavigationUrls: n.sl, canOpenPopup: ({ url: e }) => MH(e), partition: n.ll },
+    { allowedNavigationUrls: [browserSettingsContracts.BROWSER_PASSWORD_MANAGER_URL], canOpenPopup: ({ url: e }) => MH(e), partition: browserSettingsContracts.PASSWORD_MANAGER_PARTITION },
+    { allowedNavigationUrls: browserSettingsContracts.BROWSER_SITE_SETTINGS_URLS, canOpenPopup: ({ url: e }) => MH(e), partition: browserSettingsContracts.SITE_SETTINGS_PARTITION },
   ];
 var {
   bindBrowserSettingsWebview: DWe,
@@ -25874,7 +25741,7 @@ var installBrowserWebviewListeners = createBrowserWebviewListenerRuntime({
   getWebviewInstanceId: GG,
   hasWebviewAdoptionLease: NWe,
   hostIdentityFromWebviewParams: yWe,
-  isBrowserRoutePartition: (partition) => n.is(partition) != null,
+  isBrowserRoutePartition: (partition) => mcpSandboxContracts.parseMcpSandboxPartition(partition) != null,
   isCheckoutAttachParams: GW,
   isCheckoutWebContents: KW,
   isFirstPartyAuthenticatedPartition: AW,
@@ -25944,10 +25811,10 @@ var {
   unionScreenshotRegion: VK,
   upsertComment: YK,
 } = createBrowserCommentPolicy({
-  anchorsEqual: n.Cu,
+  anchorsEqual: browserCommentContracts.browserAnchorsEqual,
   browserRuntimeMessageChannel: a.At,
   isDesignChange: (value) => browserCommentSchemas.designChangeSchema.safeParse(value).success,
-  markerSize: n._u,
+  markerSize: browserCommentContracts.BROWSER_ANNOTATION_MARKER_SIZE,
   nativeImage: l.nativeImage,
   projectCaptureRect: projectBrowserCaptureRect,
 });
@@ -26062,11 +25929,11 @@ var {
   makePageRecordKey: qU,
   makePageKey: KU,
   makePartitionKey: browserRoutePartition,
-  makeTransferKey: n.ku,
+  makeTransferKey: browserCommentContracts.browserTransferKey,
   normalizeWindowId: oX,
   pageHandleForThread: lW,
   registerThreadAndRecordOpened: fX,
-  runtimeIntlConfig: n.xu,
+  runtimeIntlConfig: browserCommentContracts.DEFAULT_RUNTIME_INTL_CONFIG,
 });
 var {
   getDebugSnapshot: DXe,
@@ -26116,7 +25983,7 @@ var {
   deserializeHistory: nW,
   isRouteNavigationDisabled: nl,
   normalizeUrl: normalizeUrlOrBlank,
-  routePathForUrl: n.dl,
+  routePathForUrl: browserSettingsContracts.browserSettingsRoutePathForUrl,
 });
 var {
   applyWebMcpTools: qX,
@@ -26154,7 +26021,7 @@ var BrowserSessionService = createBrowserSessionServiceClass({
   getPartitionName: () => Jc(`app`),
   isBrowserSettingsNavigationBlocked: OWe,
   isRouteNavigationDisabled: nl,
-  routePathForUrl: n.dl,
+  routePathForUrl: browserSettingsContracts.browserSettingsRoutePathForUrl,
 });
 var { dispatchPageEvent: dispatchSitePageEvent } = createSitePageEventRuntime({
   browserWindowFromWebContents: (owner) => l.BrowserWindow.fromWebContents(owner),
@@ -26167,14 +26034,14 @@ var { dispatchPageEvent: dispatchSitePageEvent } = createSitePageEventRuntime({
 var $Ze = createSiteAnnotationFeatureControllerClass({
     pageEventSchema: siteAnnotationFeaturesChangedSchema,
     normalizeSiteHostname,
-    settings: n.Ba,
+    settings: runtimeSettingDescriptors.browserRuntimeSettings,
     updatePageAnnotationFeatures: JX,
   }),
   eQe = createSiteAnnotationPermissionControllerClass({
     createId: () => (0, _.randomUUID)(),
     normalizeSiteHostname,
     routeKey: qU,
-    settings: n.Ba,
+    settings: runtimeSettingDescriptors.browserRuntimeSettings,
   }),
   EZ = (0, h.join)(__dirname, `browser-page-preload.js`),
   DZ = `In-app browser is unavailable.`,
@@ -26494,7 +26361,7 @@ var $Ze = createSiteAnnotationFeatureControllerClass({
       for (const windowState of this.windows.values()) {
         for (const threadState of windowState.threads.values()) {
           if (!enabled) {
-            const comments = n.Ou(threadState.snapshot.comments, false, true);
+            const comments = browserCommentContracts.sanitizeBrowserComments(threadState.snapshot.comments, false, true);
             const snapshot = {
               ...threadState.snapshot,
               annotationEditorMode: `comment`,
@@ -35089,23 +34956,23 @@ var O$ = r.i(`mcp-app-sandbox`),
 var mcpSandboxNetwork = createMcpSandboxNetworkRuntime({
   RpcHandlerBase: n.Uf,
   app: l.app,
-  buildSharedUrl: (e) => n.es(e),
+  buildSharedUrl: (e) => mcpSandboxContracts.buildMcpSandboxUrl(e),
   consumeUserGesture: (e, t, n) => mcpSandboxLifecycle.consumeUserGesture(e, t, n),
   defaultSession: `session` in l ? l.session?.defaultSession : null,
   developmentBaseUrl:
     process.env.NODE_ENV === `development` ? process.env.CODEX_MCP_APP_SANDBOX_URL : void 0,
   fsPromises: b.default,
-  isSandboxHostname: (e) => n.ss(e),
+  isSandboxHostname: (e) => mcpSandboxContracts.isMcpSandboxHostname(e),
   logger: O$,
   markTrustedSession: (e) => pWe(e),
   netFetch: (e, t) => l.net.fetch(e, t),
-  parseOrigin: (e, t) => n.as(e, t),
+  parseOrigin: (e, t) => mcpSandboxContracts.parseMcpSandboxOrigin(e, t),
   path: h,
-  persistentPartition: n.Qo,
+  persistentPartition: mcpSandboxContracts.MCP_SANDBOX_PARTITION,
   protocolScheme: n.$o,
   sanitizeUrl: (e) => fT(e),
   sessionFromPartition: (e) => l.session.fromPartition(e),
-  toPersistentPartition: (e) => n.rs(e, { persist: !0 }),
+  toPersistentPartition: (e) => mcpSandboxContracts.mcpSandboxPartition(e, { persist: !0 }),
   userGestureSchema: { safeParse: (e) => E2e.safeParse(e) },
 });
 var _2e = (0, h.join)(__dirname, `sandbox-preload.js`),
@@ -35123,16 +34990,16 @@ var _2e = (0, h.join)(__dirname, `sandbox-preload.js`),
     getSkybridgeCacheState: (e) => mcpSandboxNetwork.getCacheState(e),
     initChannel: a.Nt,
     ipcMain: `ipcMain` in l ? l.ipcMain : null,
-    isPortNameList: (e) => n.os(e),
-    isSandboxId: (e) => n.cs(e),
+    isPortNameList: (e) => mcpSandboxContracts.isMcpSandboxPortNameList(e),
+    isSandboxId: (e) => mcpSandboxContracts.isMcpSandboxId(e),
     logEvent: k$,
     logger: O$,
     matchesAccelerator: (e, t) => oU(e, t),
-    parseInitId: (e) => n.ns(e),
-    parseOrigin: (e, t) => n.as(e, t),
-    parsePartitionSandbox: (e) => n.is(e),
-    parsePersistentSandbox: (e) => n.ts(e),
-    persistentPartition: n.Qo,
+    parseInitId: (e) => mcpSandboxContracts.parseMcpSandboxInitId(e),
+    parseOrigin: (e, t) => mcpSandboxContracts.parseMcpSandboxOrigin(e, t),
+    parsePartitionSandbox: (e) => mcpSandboxContracts.parseMcpSandboxPartition(e),
+    parsePersistentSandbox: (e) => mcpSandboxContracts.parsePersistentMcpSandboxId(e),
+    persistentPartition: mcpSandboxContracts.MCP_SANDBOX_PARTITION,
     prewarmSandbox: (e) => mcpSandboxNetwork.prewarmSandbox(e),
     sanitizeUrl: (e) => fT(e),
     sandboxPreloadPath: _2e,
@@ -35154,7 +35021,7 @@ var _2e = (0, h.join)(__dirname, `sandbox-preload.js`),
   });
 var initializeMcpSandboxRuntime = () =>
   initializeMcpSandbox(mcpSandboxNetwork, mcpSandboxLifecycle);
-var e1 = n.Of().refine(n.cs),
+var e1 = n.Of().refine(mcpSandboxContracts.isMcpSandboxId),
   E2e = n.wf({ initId: e1, sandboxId: e1 }),
   D2e = mcpSandboxNetwork.McpSandboxDataHandler,
   O2e = n.wf({
@@ -35233,7 +35100,7 @@ var {
   findExecutable: Yi,
   findLinuxDesktopEntry: lO,
   isHostConfig: n.Es,
-  isLocalHost: n.As,
+  isLocalHost: sharedHostContracts.isWslHostConfig,
   isRemoteHost: n.Os,
   remoteHost,
   targetFilter: openTargetFilter,
@@ -35346,7 +35213,7 @@ var {
   findSiblingFile: ra,
   findWindowsInstall: ta,
   findStartMenuShortcut: sa,
-  isLocalHostConfig: n.As,
+  isLocalHostConfig: sharedHostContracts.isWslHostConfig,
   translateHostPath: (targetPath, distro) => n.ji(targetPath, distro),
   loadElectronShell: async () => (await import(`electron`)).shell,
   spawn: Zi,
@@ -36109,7 +35976,7 @@ var { discoverSshAliases: Q2, resolveSshAlias: $2 } = createSshConnectionDiscove
   parseSshConfig: (source) => Y2.parse(source),
   directiveType: G2.DIRECTIVE,
   executeCommand: n.Kn,
-  hostIdFromAlias: n.ys,
+  hostIdFromAlias: sharedHostContracts.discoveredSshHostId,
 });
 var { requestRemoteControlEnrollmentStepUpToken: y5e } = createRemoteControlStepUpRuntime({
   schema: n,
@@ -36161,7 +36028,7 @@ var { RemoteControlEnvironmentService: R5e, RemoteHostedPipContentService: z5e }
   } = createRemoteHostConfigRuntime({
     runtime: n,
     RpcHandlerBase: n.Uf,
-    buildSshArguments: n.Ss,
+    buildSshArguments: sharedHostContracts.sshTargetArgs,
     buildWslCodexCommand: wslAppServerArgs,
   }),
   Z5e = createArtifactDocumentsClass({
@@ -40356,12 +40223,12 @@ var G5 = r.r(`WindowContext`),
   $nt = 100;
 var { hostKindForConfig: trt, createAppServerTransport: K5 } =
   createAppServerTransportFactory({
-    isRemoteControlHostConfig: n.ws,
-    isWslHostConfig: n.ks,
+    isRemoteControlHostConfig: sharedHostContracts.isRemoteControlConnection,
+    isWslHostConfig: sharedHostContracts.isWslConnection,
     resolveSshWebsocketConfig: createTransport,
     SshWebsocketTransport: AppServerTransportSshWebsocket,
     RemoteControlTransport: RemoteControlWebsocketTransport,
-    isRemoteStdioHostConfig: n.As,
+    isRemoteStdioHostConfig: sharedHostContracts.isWslHostConfig,
     RemoteStdioTransport: AppServerTransportWslStdio,
     resolveWebsocketUrl: W5,
     isCloudHostId: n.Cs,
@@ -40905,10 +40772,10 @@ var y7 = r.r(`codex-deep-link-navigation`),
         localMarketplacesOnly: Tr().noPluginListPhase2,
       }),
     openBrowserForDeepLink,
-    buildPluginDetailRoute: n.po,
-    buildMcpAppRoute: n.mo,
-    buildSharedConversationRoute: n.uo,
-    buildConversationRoute: n.fo,
+    buildPluginDetailRoute: routeContracts.buildPluginDetailRoute,
+    buildMcpAppRoute: routeContracts.buildMcpAppRoute,
+    buildSharedConversationRoute: routeContracts.buildSharedConversationRoute,
+    buildConversationRoute: routeContracts.buildConversationRoute,
     resolveProjectRoot: n.Wo,
     getLegacyProjects: jr,
     resolveWorkspace: (options) =>
@@ -41088,7 +40955,7 @@ var sat = createGlobalDictationWindowControllerClass({
     BrowserWindow: l.BrowserWindow,
     screen: l.screen,
     logger: r,
-    initialRoute: n.so,
+    initialRoute: routeContracts.GLOBAL_DICTATION_ROUTE,
   }),
   dat = createGlobalDictationLifecycleManagerClass({
     WindowController: sat,
@@ -45532,7 +45399,7 @@ var {
   RpcHandlerBase: n.Uf,
   DisposableCallback: n.Hf,
   createUsingScope: a.en,
-  initialRoute: n.oo,
+  initialRoute: routeContracts.DEBUG_ROUTE,
 });
 var kot = createThreadMetadataServiceClass({
   RpcHandlerBase: n.Uf,
@@ -45731,10 +45598,10 @@ function dst({
     ne = new kat({
       clearTimeout: (e) => clearTimeout(e),
       createLazyWindow: (e) => new GN(e),
-      createRoute: (e, t) => n.lo(e, t),
+      createRoute: (e, t) => routeContracts.buildQuickChatRoute(e, t),
       getMatchingWorkArea: (e) => l.screen.getDisplayMatching(e).workArea,
       getOwnerWindow: (e) => l.BrowserWindow.fromWebContents(e),
-      initialRoute: n.ao,
+      initialRoute: routeContracts.QUICK_CHAT_PREWARM_ROUTE,
       logger: () => r.n(),
       prewarmReadyTimeoutMs: Dat,
       quickChatHeight: i9,
@@ -45752,7 +45619,7 @@ function dst({
     }),
     re = _ ? Git(m) : null,
     U = new AppshotHotkeyManager({
-      destinationSettingKey: n.Va.destination.key,
+      destinationSettingKey: runtimeSettingDescriptors.appshotSettings.destination.key,
       enabled: !_ || (re != null && Tr().appshotsEnabled),
       globalState: u,
       handleQuickChatAppshotShortcut: (e) => V.handleQuickChatAppshotShortcut(e),
@@ -46005,7 +45872,7 @@ async function Ust() {
     await runLocalDataMigrations(V.globalState, projectLocalDataMigrations),
     await V.settingsStore.captureInitialFollowUpQueueMode(),
     await clearLegacyBrowserDownloadHistoryOnStartup(V.globalState));
-  let te = shouldEnableDebugChromePages(E, V.settingsStore.getEffective(n.Ba.debugChromePagesEnabled.key));
+  let te = shouldEnableDebugChromePages(E, V.settingsStore.getEffective(runtimeSettingDescriptors.browserRuntimeSettings.debugChromePagesEnabled.key));
   (l.app.setDebugChromePagesEnabled(te),
     tl(te),
     M(`local data migrations completed`, L),
@@ -46020,13 +45887,13 @@ async function Ust() {
   let re = () => Tr().cuaPIP,
     U = createRemoteHostedPipManager({
       getAlwaysHidePictureInPicture: () =>
-        V.settingsStore.getEffective(n.La.alwaysHidePictureInPicture.key) ?? !1,
+        V.settingsStore.getEffective(runtimeSettingDescriptors.computerUseSettings.alwaysHidePictureInPicture.key) ?? !1,
       isEnabled: re,
       isMacOS: N,
       nativeIntl: a.hn(),
       preferenceStore: V.globalState,
       setAlwaysHidePictureInPicture: (e) => {
-        V.settingsStore.set(n.La.alwaysHidePictureInPicture.key, e);
+        V.settingsStore.set(runtimeSettingDescriptors.computerUseSettings.alwaysHidePictureInPicture.key, e);
       },
       stateStore: V.globalState,
       videoFrameChannel: a.qt,
@@ -46068,7 +45935,7 @@ async function Ust() {
     });
   (primaryWindowMessages.setWindowServices(W),
     installRemoteHostedPipBindings({
-      hiddenSettingKey: n.La.alwaysHidePictureInPicture.key,
+      hiddenSettingKey: runtimeSettingDescriptors.computerUseSettings.alwaysHidePictureInPicture.key,
       logger: r.n(),
       manager: U,
       reconcileOverlayContentHost: () =>
@@ -46568,7 +46435,7 @@ async function Ust() {
         isTrustedIpcEvent: _e,
       }),
     getDesktopFeatureAvailability: Tr,
-    isSafeRoute: n.bo,
+    isSafeRoute: routeContracts.isSafeAppRoute,
     parseBrowserSidebarMessage: (payload) => browserCommentSchemas.runtimeMessageSchema.safeParse(payload),
     isBrowserPageEvent: cte,
     guardedBrowserPageEventTypes: new Set([

@@ -12,6 +12,8 @@ declare module "@rchunk/rolldown-runtime" {
 }
 
 declare module "@rchunk/app-shared" {
+  export const fq: (marketplaceName: string | undefined) => boolean;
+  export const lq: (buildFlavor: unknown) => string;
   export const k: unknown;
   export const db: (props: Record<string, unknown>) => unknown;
   /** parseConfigError（恢复会话失败时提取 config.toml 定位）。 */
@@ -2903,6 +2905,7 @@ declare module "@rchunk/thumbnail-worker-pdf-runtime" {
 }
 
 declare module "@rchunk/app-initial" {
+  export const iDt: (left: string | undefined, right: string | undefined) => boolean;
   export const Cdt: () => void;
   export const Cf: (scope: unknown, hostId: string) => Promise<{ hostId: string; [key: string]: unknown }>;
   export const E$: () => void;

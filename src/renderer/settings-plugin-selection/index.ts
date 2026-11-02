@@ -3,6 +3,8 @@ import "@rchunk/rolldown-runtime";
 import "@rchunk/app-primary";
 import * as appInitialChunk from "@rchunk/app-initial";
 import * as appSharedChunk from "@rchunk/app-shared";
+import { fq as isOfficialMarketplace, lq as marketplaceForBuildFlavor } from "@rchunk/app-shared";
+import { Oun as getBuildFlavor, iDt as marketplacePathsEqual } from "@rchunk/app-initial";
 import * as browserUseOriginStateChunk from "@rchunk/browser-use-origin-state-queries";
 import "@rchunk/settings-loading-row";
 import "@rchunk/assert-never";
@@ -10,7 +12,7 @@ import "@rchunk/assert-never";
 interface PluginRecord { displayName?: string; marketplaceName?: string; marketplacePath?: string; plugin: { enabled?: boolean; id: string; installed?: boolean; name: string } }
 interface PluginItem { action?: unknown; description?: unknown; enabled?: boolean; expanded?: boolean; icon?: unknown; id: string; kind?: "app" | "disclosure" | "plugin" | "unavailable"; onToggleEnabled?(enabled: boolean): void; onToggleExpanded?(): void; plugin?: PluginRecord; showEnableToggle?: boolean; title: unknown; toggleAriaLabel?: string }
 interface PluginsQuery { errorMessage?: string | null; isLoading?: boolean; reload?(): void; retry?(): void }
-const shared = appSharedChunk as unknown as { BX?<Value>(signal: unknown, key: string): Value; I3(): import("@rchunk/app-shared").JsxRuntime; an?(): unknown; Hi?(value: unknown): string | null | undefined; A_?(marketplaceName: string | undefined): boolean; mr?(path: string | undefined, candidate: string | undefined): boolean };
+const shared = appSharedChunk as unknown as { BX?<Value>(signal: unknown, key: string): Value; I3(): import("@rchunk/app-shared").JsxRuntime };
 const initial = appInitialChunk as unknown as { Gv?(): { selectedHostId: string } };
 const browserConfigStatusSignal = (browserUseOriginStateChunk as unknown as { n?: unknown }).n;
 let jsx: import("@rchunk/app-shared").JsxRuntime;
@@ -50,8 +52,12 @@ function PluginControls(props: { emptyStateTitle: unknown; installButtonLabel: u
 }
 function resolvePreferredPlugin(records: readonly PluginRecord[], pluginName: string, marketplacePath?: string): PluginRecord | null {
   const candidates = records.filter((record) => record.plugin.name === pluginName || record.plugin.id.split("@")[0] === pluginName);
-  const currentMarketplace = shared.Hi?.(shared.an?.());
-  return candidates.find((record) => record.marketplaceName === currentMarketplace) ?? candidates.find((record) => shared.A_?.(record.marketplaceName) === true) ?? candidates.find((record) => record.marketplaceName === "openai-curated") ?? candidates.find((record) => shared.mr?.(marketplacePath, record.marketplacePath) === true) ?? null;
+  const currentMarketplace = marketplaceForBuildFlavor(getBuildFlavor());
+  return candidates.find((record) => record.marketplaceName === currentMarketplace)
+    ?? candidates.find((record) => isOfficialMarketplace(record.marketplaceName))
+    ?? candidates.find((record) => record.marketplaceName === "openai-curated")
+    ?? candidates.find((record) => marketplacePathsEqual(marketplacePath, record.marketplacePath))
+    ?? null;
 }
 let initialized = false;
 function initializePluginSelection(): void { if (!initialized) { jsx = shared.I3(); initialized = true; } }

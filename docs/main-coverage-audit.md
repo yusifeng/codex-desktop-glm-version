@@ -1,5 +1,19 @@
 # Main chunk 全量覆盖审计
 
+## 2026-11-02 shared-root contract extraction and signed-in critical E2E
+
+基于 Acorn 词法作用域解析重做 `audit-shared-consumption`，避免把主 chunk 内部参数遮蔽误判为 shared namespace 消费；审计确认
+exact main root 实际直接消费 105 个尚未语义化的 shared exports。本批把其中 62 个迁入具名 TypeScript owner，覆盖 Browser profile/
+settings/comment contracts、MCP sandbox URL/partition contracts、窗口 route contracts、settings runtime descriptors、host config 与 `orderBy`，
+并从主 chunk 删除对应别名调用和内嵌 lodash orderBy 副本。42 条 shared-root extraction 断言、typecheck 与 1,914 项测试索引审计通过；
+当前仍有 43 个直接 shared aliases，故本批明确不是完整反编译完成。
+
+真实签入账号 E2E 同时暴露并修复三个静态门禁未覆盖的契约错误：source-annotation registry 丢失 `browserComments` bridge、
+settings plugin selection 使用错误压缩别名、activity presentation initializer 把 mapper 当作零参 initializer。构建器现在会把 lazy preload
+数组中的 `@rchunk/*` 转换为真实 sibling asset URL，并拒绝任何残留别名；发布产物残留数由 8 个本地 404 降为 0。重新打包后
+`npm run e2e:critical` 通过 General/Git/Worktrees/Browser、历史会话、add-context 六个 checkpoint，并通过真实 fill/send/wait 收到
+指定 assistant marker。可运行关键路径已闭环，但剩余 shared/preserved/conversation inventories 仍属于最终完成范围。
+
 ## 2026-11-01 shared project-state and WSL predicate convergence
 
 `audit-shared-consumption` 定位到最后两个仍被主进程直接消费、但没有语义声明的 shared exports：`Wi/Pj` 与 `qo/iD`。新增

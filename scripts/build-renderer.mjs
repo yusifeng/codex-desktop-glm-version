@@ -232,6 +232,16 @@ for (const [name, originalCode] of assetSources) {
   // every surviving build alias back into a sibling runtime URL so lazy route
   // dependencies cannot request app://-/assets/@exact-chunk/... at runtime.
   let code = originalCode.replace(/(["'`])@exact-chunk\//g, "$1./").replace(
+    /(["'`])@rchunk\/([^"'`]+)\1/g,
+    (statement, quote, semanticName) => {
+      const target = CHUNKS[semanticName] ?? IMPORT_ALIASES[semanticName];
+      if (target == null) {
+        errors.push(`${name}: unresolved lazy renderer alias @rchunk/${semanticName}`);
+        return statement;
+      }
+      return `${quote}./${target}${quote}`;
+    },
+  ).replace(
     /import\s+\{\s*default\s+as\s+([A-Za-z_$][\w$]*)\s*\}\s+from\s+(["'])\.\/([^"']+\.js)\2;/g,
     (statement, binding, quote, target) => {
       const targetCode = assetSources.get(target);
@@ -244,12 +254,16 @@ for (const [name, originalCode] of assetSources) {
 }
 
 const leakedExactAliases = [];
+const leakedRendererAliases = [];
 for (const name of assetNames) {
   const code = await fs.readFile(path.join(assetsDir, name), "utf8");
   if (code.includes("@exact-chunk/")) leakedExactAliases.push(name);
+  if (code.includes("@rchunk/")) leakedRendererAliases.push(name);
 }
 if (leakedExactAliases.length > 0)
   errors.push(`build-only @exact-chunk aliases leaked into ${leakedExactAliases.length} runtime assets`);
+if (leakedRendererAliases.length > 0)
+  errors.push(`build-only @rchunk aliases leaked into ${leakedRendererAliases.length} runtime assets`);
 
 // ---- CSS：src/renderer/<语义名>/index.css → assets/<chunk 基名>.css ----
 for (const name of REWRITTEN) {

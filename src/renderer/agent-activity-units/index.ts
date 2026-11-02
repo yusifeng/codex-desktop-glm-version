@@ -495,7 +495,7 @@ function initializeAgentActivityUnits(): void {
     appInitialInit,
     (agentActivityItem as any).n,
     (patchDiffStats as any).n,
-    (presentationChunk as any).i,
+    (presentationChunk as any).a,
     (skillExplorationLabels as any).n,
   ]) if (typeof initializer === "function") initializer();
 }
