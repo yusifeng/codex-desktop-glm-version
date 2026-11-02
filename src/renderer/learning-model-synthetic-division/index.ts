@@ -1,7 +1,144 @@
-// Synthetic division learning model. Release chunk: model-dabd83a67c23.js.
-import "@rchunk/rolldown-runtime";
-interface Values { dividendDegree?: number | null; dividendCoefficient5?: number | null; dividendCoefficient4?: number | null; dividendCoefficient3?: number | null; dividendCoefficient2?: number | null; dividendCoefficient1?: number | null; dividendCoefficient0?: number | null; divisorConstant?: number | null; step?: number | null } interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: Record<string, { kind: "integer"; defaultValue: number; min: number; max: number }> }
-let manifest: Manifest; let defaults: Required<Values>; let normalizeValues: (values: Values) => Required<Values>; let formatNumber: (value: number) => string; let calculate: (values: Values) => { safeValues: Required<Values>; dividendCoefficients: number[]; divisorCoefficients: number[]; syntheticValue: number; products: Array<number | null>; syntheticBottom: number[]; quotientCoefficients: number[]; remainder: number; timeline: Array<Record<string, unknown>>; currentStep: Record<string, unknown> | undefined; currentStepNumber: number; totalSteps: number; dividendLabel: string; divisorLabel: string; quotientLabel: string }; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "SYNTHETIC_DIVISION", version: 1, thumbnailAssetKey: "synthetic-division-v1", parameters: { dividendCoefficient3: { kind: "integer", defaultValue: 4, min: -20, max: 20 }, dividendCoefficient2: { kind: "integer", defaultValue: 7, min: -20, max: 20 }, dividendCoefficient1: { kind: "integer", defaultValue: -13, min: -20, max: 20 }, dividendCoefficient0: { kind: "integer", defaultValue: 6, min: -20, max: 20 }, divisorConstant: { kind: "integer", defaultValue: 3, min: -5, max: 5 } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); const parameters = manifest.parameters; defaults = { dividendDegree: 3, dividendCoefficient5: 0, dividendCoefficient4: 0, dividendCoefficient3: parameters.dividendCoefficient3.defaultValue, dividendCoefficient2: parameters.dividendCoefficient2.defaultValue, dividendCoefficient1: parameters.dividendCoefficient1.defaultValue, dividendCoefficient0: parameters.dividendCoefficient0.defaultValue, divisorConstant: parameters.divisorConstant.defaultValue, step: 1 }; const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value)); const finite = (value: number | null | undefined, fallback: number) => typeof value === "number" && Number.isFinite(value) ? value : fallback; const rounded = (value: number) => Math.abs(value) < 1e-9 ? 0 : Number(value.toPrecision(12)); const integer = (value: number | null | undefined, parameter: { defaultValue: number; min: number; max: number }) => { const bounded = clamp(finite(value, parameter.defaultValue), parameter.min, parameter.max); return rounded(clamp(parameter.min + Math.round(bounded - parameter.min), parameter.min, parameter.max)); }; const names = ["dividendCoefficient0", "dividendCoefficient1", "dividendCoefficient2", "dividendCoefficient3", "dividendCoefficient4", "dividendCoefficient5"] as const; normalizeValues = values => { const dividendDegree = clamp(Math.round(finite(values.dividendDegree, defaults.dividendDegree)), 2, 5); return { dividendDegree, dividendCoefficient5: integer(values.dividendCoefficient5, { ...parameters.dividendCoefficient3, defaultValue: 0 }), dividendCoefficient4: integer(values.dividendCoefficient4, { ...parameters.dividendCoefficient3, defaultValue: 0 }), dividendCoefficient3: integer(values.dividendCoefficient3, parameters.dividendCoefficient3), dividendCoefficient2: integer(values.dividendCoefficient2, parameters.dividendCoefficient2), dividendCoefficient1: integer(values.dividendCoefficient1, parameters.dividendCoefficient1), dividendCoefficient0: integer(values.dividendCoefficient0, parameters.dividendCoefficient0), divisorConstant: integer(values.divisorConstant, parameters.divisorConstant), step: clamp(Math.round(finite(values.step, defaults.step)), 1, 2 * dividendDegree + 3) }; }; formatNumber = value => { const normalized = rounded(value); const magnitude = Math.abs(normalized); return magnitude >= 1e5 || magnitude > 0 && magnitude < 1e-3 ? normalized.toExponential(2).replace("+", "") : new Intl.NumberFormat("en-US", { maximumFractionDigits: 2, useGrouping: false }).format(normalized); }; const polynomial = (coefficients: number[]) => { const degree = coefficients.length - 1; const terms: string[] = []; coefficients.forEach((coefficient, index) => { const normalized = rounded(coefficient); if (normalized === 0) return; const power = degree - index; const magnitude = Math.abs(normalized); const body = `${power > 0 && Math.abs(magnitude - 1) < 1e-9 ? "" : formatNumber(magnitude)}${power === 0 ? "" : power === 1 ? "x" : `x^${power}`}`; terms.push(terms.length === 0 ? normalized < 0 ? `-${body}` : body : `${normalized < 0 ? "-" : "+"} ${body}`); }); return terms.join(" ") || "0"; }; calculate = values => { const normalized = normalizeValues(values); const dividendCoefficients = Array.from({ length: normalized.dividendDegree + 1 }, (_, index) => normalized[names[normalized.dividendDegree - index]]); const divisorCoefficients = [1, normalized.divisorConstant]; const syntheticValue = rounded(-normalized.divisorConstant); const products: Array<number | null> = [null]; const syntheticBottom = [dividendCoefficients[0] ?? 0]; for (let index = 1; index < dividendCoefficients.length; index += 1) { const product = rounded((syntheticBottom[index - 1] ?? 0) * syntheticValue); products.push(product); syntheticBottom.push(rounded((dividendCoefficients[index] ?? 0) + product)); } const quotientCoefficients = syntheticBottom.slice(0, -1); const remainder = rounded(syntheticBottom.at(-1) ?? 0); const timeline: Array<Record<string, unknown>> = [{ kind: "setup", column: null }, { kind: "bringDown", column: 0, value: syntheticBottom[0] }]; for (let column = 1; column < dividendCoefficients.length; column += 1) { timeline.push({ kind: "multiply", column, left: syntheticBottom[column - 1], syntheticValue, product: products[column] ?? 0 }); timeline.push({ kind: "add", column, coefficient: dividendCoefficients[column], product: products[column] ?? 0, sum: syntheticBottom[column] }); } timeline.push({ kind: "result", column: dividendCoefficients.length - 1 }); const currentStepNumber = clamp(normalized.step, 1, timeline.length); return { safeValues: { ...normalized, step: currentStepNumber }, dividendCoefficients, divisorCoefficients, syntheticValue, products, syntheticBottom, quotientCoefficients, remainder, timeline, currentStep: timeline[currentStepNumber - 1], currentStepNumber, totalSteps: timeline.length, dividendLabel: polynomial(dividendCoefficients), divisorLabel: polynomial(divisorCoefficients), quotientLabel: polynomial(quotientCoefficients) }; }; }
-export { normalizeValues as a, initializeModel as i, calculate as n, initializeManifest as o, formatNumber as r, manifest as s, defaults as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `SYNTHETIC_DIVISION`),
+      (n = `synthetic-division-v1`),
+      (r = {
+        dividendCoefficient3: { kind: `integer`, defaultValue: 4, min: -20, max: 20 },
+        dividendCoefficient2: { kind: `integer`, defaultValue: 7, min: -20, max: 20 },
+        dividendCoefficient1: { kind: `integer`, defaultValue: -13, min: -20, max: 20 },
+        dividendCoefficient0: { kind: `integer`, defaultValue: 6, min: -20, max: 20 },
+        divisorConstant: { kind: `integer`, defaultValue: 3, min: -5, max: 5 },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v;
+function y() {
+  return (y = e(() => {
+    (a(),
+      (o = i.parameters),
+      (s = {
+        dividendDegree: 3,
+        dividendCoefficient5: 0,
+        dividendCoefficient4: 0,
+        dividendCoefficient3: o.dividendCoefficient3.defaultValue,
+        dividendCoefficient2: o.dividendCoefficient2.defaultValue,
+        dividendCoefficient1: o.dividendCoefficient1.defaultValue,
+        dividendCoefficient0: o.dividendCoefficient0.defaultValue,
+        divisorConstant: o.divisorConstant.defaultValue,
+        step: 1,
+      }),
+      (c = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (l = (e, t) => (Number.isFinite(e) ? Number(e) : t)),
+      (u = (e) => (Math.abs(e) < 1e-9 ? 0 : Number(e.toPrecision(12)))),
+      (d = (e, t) => {
+        let n = c(l(e, t.defaultValue), t.min, t.max),
+          r = t.min + Math.round(n - t.min);
+        return u(c(r, t.min, t.max));
+      }),
+      (f = [
+        `dividendCoefficient0`,
+        `dividendCoefficient1`,
+        `dividendCoefficient2`,
+        `dividendCoefficient3`,
+        `dividendCoefficient4`,
+        `dividendCoefficient5`,
+      ]),
+      (p = (e) => 2 * e + 3),
+      (m = (e) => {
+        let t = c(Math.round(l(e.dividendDegree, s.dividendDegree)), 2, 5),
+          n = p(t);
+        return {
+          dividendDegree: t,
+          dividendCoefficient5: d(e.dividendCoefficient5, {
+            ...o.dividendCoefficient3,
+            defaultValue: 0,
+          }),
+          dividendCoefficient4: d(e.dividendCoefficient4, {
+            ...o.dividendCoefficient3,
+            defaultValue: 0,
+          }),
+          dividendCoefficient3: d(e.dividendCoefficient3, o.dividendCoefficient3),
+          dividendCoefficient2: d(e.dividendCoefficient2, o.dividendCoefficient2),
+          dividendCoefficient1: d(e.dividendCoefficient1, o.dividendCoefficient1),
+          dividendCoefficient0: d(e.dividendCoefficient0, o.dividendCoefficient0),
+          divisorConstant: d(e.divisorConstant, o.divisorConstant),
+          step: c(Math.round(l(e.step, s.step)), 1, n),
+        };
+      }),
+      (h = (e) => {
+        let t = u(e),
+          n = Math.abs(t);
+        return n >= 1e5 || (n > 0 && n < 0.001)
+          ? t.toExponential(2).replace(`+`, ``)
+          : new Intl.NumberFormat(`en-US`, { maximumFractionDigits: 2, useGrouping: !1 }).format(t);
+      }),
+      (g = (e) => {
+        let t = e.length - 1,
+          n = [];
+        return (
+          e.forEach((e, r) => {
+            let i = u(e);
+            if (i === 0) return;
+            let a = t - r,
+              o = Math.abs(i),
+              s = `${a > 0 && Math.abs(o - 1) < 1e-9 ? `` : h(o)}${a === 0 ? `` : a === 1 ? `x` : `x^${a}`}`;
+            n.length === 0 ? n.push(i < 0 ? `-${s}` : s) : n.push(`${i < 0 ? `-` : `+`} ${s}`);
+          }),
+          n.join(` `) || `0`
+        );
+      }),
+      (_ = (e, t, n, r) => {
+        let i = [
+          { kind: `setup`, column: null },
+          { kind: `bringDown`, column: 0, value: r[0] },
+        ];
+        for (let a = 1; a < e.length; a += 1) {
+          let o = n[a] ?? 0;
+          (i.push({ kind: `multiply`, column: a, left: r[a - 1], syntheticValue: t, product: o }),
+            i.push({ kind: `add`, column: a, coefficient: e[a], product: o, sum: r[a] }));
+        }
+        return (i.push({ kind: `result`, column: e.length - 1 }), i);
+      }),
+      (v = (e) => {
+        let t = m(e),
+          n = Array.from({ length: t.dividendDegree + 1 }, (e, n) => {
+            let r = t.dividendDegree - n;
+            return t[f[r]];
+          }),
+          r = [1, t.divisorConstant],
+          i = u(-t.divisorConstant),
+          a = [null],
+          o = [n[0]];
+        for (let e = 1; e < n.length; e += 1) {
+          let t = u(o[e - 1] * i);
+          (a.push(t), o.push(u(n[e] + t)));
+        }
+        let s = o.slice(0, -1),
+          l = u(o.at(-1) ?? 0),
+          d = _(n, i, a, o),
+          p = c(t.step, 1, d.length);
+        return {
+          safeValues: { ...t, step: p },
+          dividendCoefficients: n,
+          divisorCoefficients: r,
+          syntheticValue: i,
+          products: a,
+          syntheticBottom: o,
+          quotientCoefficients: s,
+          remainder: l,
+          timeline: d,
+          currentStep: d[p - 1],
+          currentStepNumber: p,
+          totalSteps: d.length,
+          dividendLabel: g(n),
+          divisorLabel: g(r),
+          quotientLabel: g(s),
+        };
+      }));
+  }))();
+}
+export { m as a, y as i, v as n, a as o, h as r, i as s, s as t };

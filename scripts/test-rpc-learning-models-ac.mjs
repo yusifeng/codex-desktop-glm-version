@@ -1,13 +1,11 @@
 import assert from "node:assert/strict"; import { Buffer } from "node:buffer"; import fs from "node:fs"; import path from "node:path"; import { fileURLToPath } from "node:url"; import * as esbuild from "esbuild"; import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."); const ASSET_ROOT = path.resolve(ROOT, "../chatgpt-desktop-src/app/webview/assets");
 const models = [
-  ["model-85b44c5c18b6.js", "learning-model-combining-like-terms-tiles", ["a", "i", "n", "o", "r", "s", "t"]],
   ["model-f5fc9c2ff44e.js", "learning-model-geothermal-power", ["a", "c", "i", "l", "n", "o", "r", "s", "t", "u"]],
   ["model-a39f1b9e2e01.js", "learning-model-pedigree", ["a", "c", "i", "n", "o", "r", "s", "t"]],
   ["model-7f8b73e7da12.js", "learning-model-digestive-tract-absorption", ["a", "c", "d", "f", "i", "l", "n", "o", "r", "s", "t", "u"]],
   ["model-eed7806c8445.js", "learning-model-chi-square-independence", ["a", "i", "n", "o", "r", "t"]],
   ["model-8a2addb2a518.js", "learning-model-critical-path-network", ["a", "c", "i", "n", "o", "r", "s", "t"]],
-  ["model-6d69b6507959.js", "learning-model-born-haber-cycle", ["i", "n", "r", "t"]],
   ["model-d1116d214359.js", "learning-model-distillation", ["a", "c", "d", "i", "l", "n", "o", "r", "s", "t", "u"]],
 ];
 const dependencies = (source, expression) => [...source.matchAll(expression)].map(match => match[1]); const approximatelyEqual = (actual, expected, tolerance = 1e-9) => assert.ok(Math.abs(actual - expected) <= tolerance * Math.max(1, Math.abs(expected)), `${actual} ≈ ${expected}`); let sourceAssertions = 0;
@@ -16,7 +14,6 @@ async function bundle(directory) { const result = await esbuild.build({ entryPoi
 const loaded = new Map(); let runtimeAssertions = 0; for (const [_asset, directory, expected] of models) { const module = await bundle(directory); loaded.set(directory, module); assert.deepEqual(Object.keys(module).sort(), [...expected].sort()); runtimeAssertions += 1; }
 const formatter = { formatMessage: (message, values) => values?.form ? message.defaultMessage.replace("{form}", values.form) : message.defaultMessage };
 
-const likeTerms = loaded.get("learning-model-combining-like-terms-tiles"); likeTerms.o(); assert.deepEqual(likeTerms.s({ exampleIndex: 99, stepIndex: -1 }), { exampleIndex: 3, stepIndex: 0 }); const first = likeTerms.a({ exampleIndex: 0, stepIndex: 2 }); assert.deepEqual(first.totals, { x2: 0, x: 3, unit: 2 }); assert.equal(first.simplifiedPlain, "3x + 2"); const third = likeTerms.a({ exampleIndex: 2 }); assert.deepEqual(third.totals, { x2: 1, x: 4, unit: -2 }); assert.equal(third.simplifiedLatex, "x^2 + 4x - 2"); assert.equal(third.coefficientSums.x2, "2 − 1 = 1"); runtimeAssertions += 6;
 
 const geothermal = loaded.get("learning-model-geothermal-power"); geothermal.s(); assert.deepEqual(geothermal.c({ plant_type: "bad" }), { plant_type: "dry steam" }); assert.deepEqual([geothermal.o("dry steam"), geothermal.a(2)], [0, "binary cycle"]); assert.equal(geothermal.i(formatter, "flash steam"), "Flash steam"); assert.ok(geothermal.r(formatter, "binary cycle").startsWith("Hot water heats")); assert.ok(geothermal.n(formatter, "dry steam").includes("Natural steam rises")); assert.equal(geothermal.u.type, "GEOTHERMAL_POWER"); runtimeAssertions += 6;
 
@@ -28,10 +25,11 @@ const chi = loaded.get("learning-model-chi-square-independence"); chi.r(); asser
 
 const network = loaded.get("learning-model-critical-path-network"); network.a(); assert.deepEqual(network.o({ durationADays: -1, durationFDays: 99 }), { ...network.t, durationADays: 1, durationFDays: 10 }); const schedule = network.i({}); assert.equal(schedule.projectDuration, 12); assert.deepEqual(schedule.criticalPaths, [["B", "D", "F"]]); assert.deepEqual([...schedule.criticalEdges], ["B-D", "D-F"]); assert.equal(schedule.tasks.C.slack, 1); assert.equal(schedule.tasks.E.critical, false); assert.equal(schedule.tasks.F.earlyFinish, 12); runtimeAssertions += 7;
 
-const bornHaber = loaded.get("learning-model-born-haber-cycle"); bornHaber.n(); assert.equal(bornHaber.r("NaCl"), true); assert.equal(bornHaber.i("formation"), true); const sodium = bornHaber.t({ compound: "NaCl", lattice_convention: "formation", stage: 4 }); assert.equal(sodium.indirectBeforeLattice, 376); assert.equal(sodium.latticeMagnitude, 787); assert.equal(sodium.cumulative, -411); assert.equal(sodium.steps.length, 5); assert.ok(sodium.equality.includes("-787=-411")); const magnesium = bornHaber.t({ compound: "MgCl2", lattice_convention: "dissociation", stage: 2 }); assert.equal(magnesium.steps.length, 6); assert.equal(magnesium.cumulative, 2580); assert.equal(magnesium.steps.at(-1).value, 2524); runtimeAssertions += 9;
 
 const distillation = loaded.get("learning-model-distillation"); distillation.c(); assert.deepEqual(distillation.l({ mixture_example: "bad", stage: 9 }), { mixture_example: "salt water", stage: 3 }); assert.deepEqual([distillation.a("colored solution"), distillation.i(2)], [1, "widely separated liquids"]); assert.equal(distillation.s(formatter, 2), "Condensing"); assert.equal(distillation.o(formatter, "salt water"), "Salt water"); assert.equal(distillation.r(formatter, "widely separated liquids"), "Two liquids"); assert.ok(distillation.n(formatter, "salt water", 3).includes("distillate")); runtimeAssertions += 6;
 
 sourceAssertions += assertReleaseOwner("learning-model-hydrocarbon-structures");
 sourceAssertions += assertReleaseOwner("learning-model-acid-base-titration");
+sourceAssertions += assertReleaseOwner("learning-model-combining-like-terms-tiles");
+sourceAssertions += assertReleaseOwner("learning-model-born-haber-cycle");
 console.log(sourceAssertions + " source assertions and " + runtimeAssertions + " runtime assertions passed");

@@ -28,6 +28,7 @@ async function bundle(directory) {
 }
 
 assertReleaseOwner("drawing-frame-geometry");
+assertReleaseOwner("freeze-panes");
 
 // floating-ui-modifiers
 const modifiers = await bundle("floating-ui-modifiers");

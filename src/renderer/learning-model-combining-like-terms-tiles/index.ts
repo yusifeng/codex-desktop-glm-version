@@ -1,6 +1,134 @@
-// Combining-like-terms algebra tiles model. Release chunk: model-85b44c5c18b6.js.
-import "@rchunk/rolldown-runtime";
-type Family = "x2" | "x" | "unit"; interface Term { family: Family; coefficient: number }
-let exampleControl: { min: number; max: number; step: number; defaultValue: number }; let stepControl: { min: number; max: number; step: number; defaultValue: number }; let families: Family[]; let examples: Array<{ shortLabel: string; terms: Term[] }>; let normalizeValues: (values: { exampleIndex?: number | null; stepIndex?: number | null }) => { exampleIndex: number; stepIndex: number }; let calculate: (values: { exampleIndex?: number | null; stepIndex?: number | null }) => { exampleIndex: number; stepIndex: number; example: { shortLabel: string; terms: Term[] }; families: Record<Family, { coefficients: number[]; positiveCount: number; negativeCount: number; zeroPairs: number; total: number; remainingPositive: number; remainingNegative: number }>; totals: Record<Family, number>; originalPlain: string; originalLatex: string; simplifiedPlain: string; simplifiedLatex: string; coefficientSums: Record<Family, string> }; let initialized = false;
-function initializeModel(): void { if (initialized) return; initialized = true; exampleControl = { min: 0, max: 3, step: 1, defaultValue: 0 }; stepControl = { min: 0, max: 2, step: 1, defaultValue: 0 }; families = ["x2", "x", "unit"]; examples = [{ shortLabel: "4x + 2 - x", terms: [{ family: "x", coefficient: 4 }, { family: "unit", coefficient: 2 }, { family: "x", coefficient: -1 }] }, { shortLabel: "3x + 2 - 5x + 4", terms: [{ family: "x", coefficient: 3 }, { family: "unit", coefficient: 2 }, { family: "x", coefficient: -5 }, { family: "unit", coefficient: 4 }] }, { shortLabel: "2x² + 3x + 1 - x² + x - 3", terms: [{ family: "x2", coefficient: 2 }, { family: "x", coefficient: 3 }, { family: "unit", coefficient: 1 }, { family: "x2", coefficient: -1 }, { family: "x", coefficient: 1 }, { family: "unit", coefficient: -3 }] }, { shortLabel: "-2x² + x + 3 + 4x² - 3x - 1", terms: [{ family: "x2", coefficient: -2 }, { family: "x", coefficient: 1 }, { family: "unit", coefficient: 3 }, { family: "x2", coefficient: 4 }, { family: "x", coefficient: -3 }, { family: "unit", coefficient: -1 }] }]; const normalizeIndex = (value: number | null | undefined, control: typeof exampleControl) => Math.min(Math.max(typeof value === "number" && Number.isFinite(value) ? Math.round(value) : control.defaultValue, control.min), control.max); normalizeValues = values => ({ exampleIndex: normalizeIndex(values.exampleIndex, exampleControl), stepIndex: normalizeIndex(values.stepIndex, stepControl) }); const symbol = (family: Family, latex: boolean) => family === "x2" ? latex ? "x^2" : "x²" : family === "x" ? "x" : ""; const expression = (terms: Term[], latex: boolean) => { const nonzero = terms.filter(term => term.coefficient !== 0); if (nonzero.length === 0) return "0"; return nonzero.map((term, index) => { const magnitude = Math.abs(term.coefficient); const suffix = symbol(term.family, latex); const body = term.family === "unit" ? String(magnitude) : `${magnitude === 1 ? "" : magnitude}${suffix}`; return index === 0 ? term.coefficient < 0 ? `-${body}` : body : term.coefficient < 0 ? ` - ${body}` : ` + ${body}`; }).join(""); }; const simplify = (totals: Record<Family, number>, latex = false) => expression(families.map(family => ({ family, coefficient: totals[family] })), latex); const summarize = (terms: Term[], family: Family) => { const coefficients = terms.filter(term => term.family === family).map(term => term.coefficient); const positiveCount = coefficients.filter(value => value > 0).reduce((sum, value) => sum + value, 0); const negativeCount = coefficients.filter(value => value < 0).reduce((sum, value) => sum + Math.abs(value), 0); const total = positiveCount - negativeCount; return { coefficients, positiveCount, negativeCount, zeroPairs: Math.min(positiveCount, negativeCount), total, remainingPositive: Math.max(total, 0), remainingNegative: Math.max(-total, 0) }; }; const sumText = (values: number[]) => { if (values.length === 0) return "0 = 0"; const signed = (value: number) => value < 0 ? `−${Math.abs(value)}` : String(value); const total = values.reduce((sum, value) => sum + value, 0); return `${values.map((value, index) => index === 0 ? signed(value) : value < 0 ? ` − ${Math.abs(value)}` : ` + ${value}`).join("")} = ${signed(total)}`; }; calculate = values => { const normalized = normalizeValues(values); const example = examples[normalized.exampleIndex]; if (!example) throw Error("Missing combining-like-terms example."); const summaries = { x2: summarize(example.terms, "x2"), x: summarize(example.terms, "x"), unit: summarize(example.terms, "unit") }; const totals = { x2: summaries.x2.total, x: summaries.x.total, unit: summaries.unit.total }; return { ...normalized, example, families: summaries, totals, originalPlain: expression(example.terms, false), originalLatex: expression(example.terms, true), simplifiedPlain: simplify(totals), simplifiedLatex: simplify(totals, true), coefficientSums: { x2: sumText(summaries.x2.coefficients), x: sumText(summaries.x.coefficients), unit: sumText(summaries.unit.coefficients) } }; }; }
-export { calculate as a, families as i, stepControl as n, initializeModel as o, examples as r, normalizeValues as s, exampleControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a, o, s, c, l, u, d, f;
+function p() {
+  return (p = e(() => {
+    ((t = { min: 0, max: 3, step: 1, defaultValue: 0 }),
+      (n = { min: 0, max: 2, step: 1, defaultValue: 0 }),
+      (r = [`x2`, `x`, `unit`]),
+      (i = [
+        {
+          shortLabel: `4x + 2 - x`,
+          terms: [
+            { family: `x`, coefficient: 4 },
+            { family: `unit`, coefficient: 2 },
+            { family: `x`, coefficient: -1 },
+          ],
+        },
+        {
+          shortLabel: `3x + 2 - 5x + 4`,
+          terms: [
+            { family: `x`, coefficient: 3 },
+            { family: `unit`, coefficient: 2 },
+            { family: `x`, coefficient: -5 },
+            { family: `unit`, coefficient: 4 },
+          ],
+        },
+        {
+          shortLabel: `2x² + 3x + 1 - x² + x - 3`,
+          terms: [
+            { family: `x2`, coefficient: 2 },
+            { family: `x`, coefficient: 3 },
+            { family: `unit`, coefficient: 1 },
+            { family: `x2`, coefficient: -1 },
+            { family: `x`, coefficient: 1 },
+            { family: `unit`, coefficient: -3 },
+          ],
+        },
+        {
+          shortLabel: `-2x² + x + 3 + 4x² - 3x - 1`,
+          terms: [
+            { family: `x2`, coefficient: -2 },
+            { family: `x`, coefficient: 1 },
+            { family: `unit`, coefficient: 3 },
+            { family: `x2`, coefficient: 4 },
+            { family: `x`, coefficient: -3 },
+            { family: `unit`, coefficient: -1 },
+          ],
+        },
+      ]),
+      (a = (e, t) => {
+        let n = typeof e == `number` && Number.isFinite(e) ? Math.round(e) : t.defaultValue;
+        return Math.min(Math.max(n, t.min), t.max);
+      }),
+      (o = (e) => ({ exampleIndex: a(e.exampleIndex, t), stepIndex: a(e.stepIndex, n) })),
+      (s = (e, t) => {
+        switch (e) {
+          case `x2`:
+            return t ? `x^2` : `x²`;
+          case `x`:
+            return `x`;
+          case `unit`:
+            return ``;
+        }
+      }),
+      (c = (e, t) => {
+        let n = e.filter((e) => e.coefficient !== 0);
+        return n.length === 0
+          ? `0`
+          : n
+              .map((e, n) => {
+                let r = Math.abs(e.coefficient),
+                  i = s(e.family, t),
+                  a = e.family === `unit` ? String(r) : `${r === 1 ? `` : r}${i}`;
+                return n === 0
+                  ? e.coefficient < 0
+                    ? `-${a}`
+                    : a
+                  : e.coefficient < 0
+                    ? ` - ${a}`
+                    : ` + ${a}`;
+              })
+              .join(``);
+      }),
+      (l = (e, t = !1) =>
+        c(
+          r.map((t) => ({ family: t, coefficient: e[t] })),
+          t,
+        )),
+      (u = (e, t) => {
+        let n = e.filter((e) => e.family === t).map((e) => e.coefficient),
+          r = n.filter((e) => e > 0).reduce((e, t) => e + t, 0),
+          i = n.filter((e) => e < 0).reduce((e, t) => e + Math.abs(t), 0),
+          a = Math.min(r, i),
+          o = r - i;
+        return {
+          coefficients: n,
+          positiveCount: r,
+          negativeCount: i,
+          zeroPairs: a,
+          total: o,
+          remainingPositive: Math.max(o, 0),
+          remainingNegative: Math.max(-o, 0),
+        };
+      }),
+      (d = (e) => {
+        if (e.length === 0) return `0 = 0`;
+        let t = (e) => (e < 0 ? `−${Math.abs(e)}` : String(e)),
+          n = e.reduce((e, t) => e + t, 0);
+        return `${e.map((e, n) => (n === 0 ? t(e) : e < 0 ? ` − ${Math.abs(e)}` : ` + ${e}`)).join(``)} = ${t(n)}`;
+      }),
+      (f = (e) => {
+        let t = o(e),
+          n = i[t.exampleIndex],
+          r = { x2: u(n.terms, `x2`), x: u(n.terms, `x`), unit: u(n.terms, `unit`) },
+          a = { x2: r.x2.total, x: r.x.total, unit: r.unit.total };
+        return {
+          ...t,
+          example: n,
+          families: r,
+          totals: a,
+          originalPlain: c(n.terms, !1),
+          originalLatex: c(n.terms, !0),
+          simplifiedPlain: l(a),
+          simplifiedLatex: l(a, !0),
+          coefficientSums: {
+            x2: d(r.x2.coefficients),
+            x: d(r.x.coefficients),
+            unit: d(r.unit.coefficients),
+          },
+        };
+      }));
+  }))();
+}
+export { f as a, r as i, n, p as o, i as r, o as s, t };

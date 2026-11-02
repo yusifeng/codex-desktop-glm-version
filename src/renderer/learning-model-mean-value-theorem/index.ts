@@ -1,7 +1,142 @@
-// Mean value theorem learning model. Release chunk: model-48fb6d2122d9.js.
-import "@rchunk/rolldown-runtime";
-interface Values { cubicCoefficient?: number | null; quadraticCoefficient?: number | null; linearCoefficient?: number | null; constantTerm?: number | null; intervalCenter?: number | null; intervalWidth?: number | null } interface SafeValues { cubicCoefficient: number; quadraticCoefficient: number; linearCoefficient: number; constantTerm: number; intervalCenter: number; intervalWidth: number } interface Manifest { type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string; parameters: Record<keyof SafeValues, { kind: "number"; defaultValue: number; min: number; max: number }> }
-let manifest: Manifest; let intervalControl: { min: number; max: number; step: number; minGap: number }; let intervalWidthParameter: Manifest["parameters"]["intervalWidth"]; let intervalCenterParameter: Manifest["parameters"]["intervalCenter"]; let defaults: SafeValues; let normalizeValues: (values: Values) => SafeValues; let calculate: (values: Values) => { a: number; b: number; fa: number; fb: number; secantSlope: number; c: number; fc: number; tangentSlope: number }; let chartBounds: (values: SafeValues, result: ReturnType<typeof calculate>) => { xMin: number; xMax: number; yMin: number; yMax: number }; let formatNumber: (value: number) => string; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "MEAN_VALUE_THEOREM", version: 1, thumbnailAssetKey: "mean-value-theorem-v1", canonicalFormula: "f'(c) = \\frac{f(b) - f(a)}{b - a}", parameters: { cubicCoefficient: { kind: "number", defaultValue: 0, min: -5, max: 5 }, quadraticCoefficient: { kind: "number", defaultValue: -0.25, min: -10, max: 10 }, linearCoefficient: { kind: "number", defaultValue: 0.8, min: -20, max: 20 }, constantTerm: { kind: "number", defaultValue: 4, min: -100, max: 100 }, intervalCenter: { kind: "number", defaultValue: 5, min: -8, max: 8 }, intervalWidth: { kind: "number", defaultValue: 2, min: 0.5, max: 16 } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); const parameters = manifest.parameters; intervalControl = { min: parameters.intervalCenter.min - parameters.intervalWidth.max / 2, max: parameters.intervalCenter.max + parameters.intervalWidth.max / 2, step: 0.1, minGap: parameters.intervalWidth.min }; intervalCenterParameter = parameters.intervalCenter; intervalWidthParameter = parameters.intervalWidth; defaults = { cubicCoefficient: parameters.cubicCoefficient.defaultValue, quadraticCoefficient: parameters.quadraticCoefficient.defaultValue, linearCoefficient: parameters.linearCoefficient.defaultValue, constantTerm: parameters.constantTerm.defaultValue, intervalCenter: parameters.intervalCenter.defaultValue, intervalWidth: parameters.intervalWidth.defaultValue }; const clamp = (value: number | null | undefined, fallback: number, parameter: { min: number; max: number }) => Math.min(parameter.max, Math.max(parameter.min, typeof value === "number" && Number.isFinite(value) ? value : fallback)); normalizeValues = values => ({ cubicCoefficient: clamp(values.cubicCoefficient, defaults.cubicCoefficient, parameters.cubicCoefficient), quadraticCoefficient: clamp(values.quadraticCoefficient, defaults.quadraticCoefficient, parameters.quadraticCoefficient), linearCoefficient: clamp(values.linearCoefficient, defaults.linearCoefficient, parameters.linearCoefficient), constantTerm: clamp(values.constantTerm, defaults.constantTerm, parameters.constantTerm), intervalCenter: clamp(values.intervalCenter, defaults.intervalCenter, parameters.intervalCenter), intervalWidth: clamp(values.intervalWidth, defaults.intervalWidth, parameters.intervalWidth) }); const valueAt = (values: SafeValues, x: number) => values.cubicCoefficient * x ** 3 + values.quadraticCoefficient * x ** 2 + values.linearCoefficient * x + values.constantTerm; const derivative = (values: SafeValues, x: number) => 3 * values.cubicCoefficient * x ** 2 + 2 * values.quadraticCoefficient * x + values.linearCoefficient; const selectRoot = (roots: number[], a: number, b: number) => { const midpoint = (a + b) / 2; const epsilon = Math.max(1e-10, (b - a) * 1e-8); return roots.filter(root => Number.isFinite(root) && root > a + epsilon && root < b - epsilon).sort((left, right) => Math.abs(left - midpoint) - Math.abs(right - midpoint))[0]; }; const approximate = (values: SafeValues, a: number, b: number, slope: number) => { const epsilon = (b - a) * 1e-6; const start = a + epsilon; const end = b - epsilon; let best = (a + b) / 2; let error = Infinity; for (let index = 0; index <= 256; index += 1) { const x = start + (end - start) * index / 256; const candidate = Math.abs(derivative(values, x) - slope); if (candidate < error) { error = candidate; best = x; } } return best; }; calculate = values => { const safe = normalizeValues(values); const a = safe.intervalCenter - safe.intervalWidth / 2; const b = safe.intervalCenter + safe.intervalWidth / 2; const fa = valueAt(safe, a); const fb = valueAt(safe, b); const secantSlope = (fb - fa) / (b - a); const quadratic = 3 * safe.cubicCoefficient; const linear = 2 * safe.quadraticCoefficient; const constant = safe.linearCoefficient - secantSlope; let roots: number[] = []; if (Math.abs(quadratic) <= 1e-10) roots = Math.abs(linear) <= 1e-10 ? [a + (b - a) / 2] : [-constant / linear]; else { const discriminant = linear ** 2 - 4 * quadratic * constant; if (discriminant >= -1e-10) { const root = Math.sqrt(Math.max(0, discriminant)); roots = [(-linear - root) / (2 * quadratic), (-linear + root) / (2 * quadratic)]; } } const c = selectRoot(roots, a, b) ?? approximate(safe, a, b, secantSlope); return { a, b, fa, fb, secantSlope, c, fc: valueAt(safe, c), tangentSlope: derivative(safe, c) }; }; chartBounds = (values, result) => { const span = result.b - result.a; const paddingX = Math.max(1.6, span * 0.22); const xMin = result.a - paddingX; const xMax = result.b + paddingX; const samples: number[] = []; for (let index = 0; index <= 80; index += 1) { const x = xMin + (xMax - xMin) * index / 80; samples.push(valueAt(values, x), result.fa + result.secantSlope * (x - result.a), result.fc + result.tangentSlope * (x - result.c)); } const finite = samples.filter(Number.isFinite); const minimum = Math.min(...finite); const maximum = Math.max(...finite); const paddingY = Math.max(6, maximum - minimum) * 0.24; return { xMin, xMax, yMin: minimum - paddingY, yMax: maximum + paddingY }; }; formatNumber = value => { const rounded = Number(value.toFixed(2)); return Object.is(rounded, -0) ? "0" : rounded.toString(); }; }
-export { calculate as a, initializeModel as c, manifest as d, intervalWidthParameter as i, normalizeValues as l, intervalControl as n, formatNumber as o, intervalCenterParameter as r, chartBounds as s, defaults as t, initializeManifest as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `MEAN_VALUE_THEOREM`),
+      (n = `mean-value-theorem-v1`),
+      (r = `f'(c) = \\frac{f(b) - f(a)}{b - a}`),
+      (i = {
+        cubicCoefficient: { kind: `number`, defaultValue: 0, min: -5, max: 5 },
+        quadraticCoefficient: { kind: `number`, defaultValue: -0.25, min: -10, max: 10 },
+        linearCoefficient: { kind: `number`, defaultValue: 0.8, min: -20, max: 20 },
+        constantTerm: { kind: `number`, defaultValue: 4, min: -100, max: 100 },
+        intervalCenter: { kind: `number`, defaultValue: 5, min: -8, max: 8 },
+        intervalWidth: { kind: `number`, defaultValue: 2, min: 0.5, max: 16 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+var s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C;
+function w() {
+  return (w = e(() => {
+    (o(),
+      (s = a.parameters),
+      (c = {
+        min: s.intervalCenter.min - s.intervalWidth.max / 2,
+        max: s.intervalCenter.max + s.intervalWidth.max / 2,
+        step: 0.1,
+        minGap: s.intervalWidth.min,
+      }),
+      (l = s.intervalCenter),
+      (u = s.intervalWidth),
+      (d = {
+        cubicCoefficient: s.cubicCoefficient.defaultValue,
+        quadraticCoefficient: s.quadraticCoefficient.defaultValue,
+        linearCoefficient: s.linearCoefficient.defaultValue,
+        constantTerm: s.constantTerm.defaultValue,
+        intervalCenter: s.intervalCenter.defaultValue,
+        intervalWidth: s.intervalWidth.defaultValue,
+      }),
+      (f = {
+        cubicCoefficient: [s.cubicCoefficient.min, s.cubicCoefficient.max],
+        quadraticCoefficient: [s.quadraticCoefficient.min, s.quadraticCoefficient.max],
+        linearCoefficient: [s.linearCoefficient.min, s.linearCoefficient.max],
+        constantTerm: [s.constantTerm.min, s.constantTerm.max],
+      }),
+      (p = 1e-10),
+      (m = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (h = (e, t, n, r) => m(Number.isFinite(e) ? e : t, n, r)),
+      (g = (e) => ({
+        cubicCoefficient: h(e.cubicCoefficient, d.cubicCoefficient, ...f.cubicCoefficient),
+        quadraticCoefficient: h(
+          e.quadraticCoefficient,
+          d.quadraticCoefficient,
+          ...f.quadraticCoefficient,
+        ),
+        linearCoefficient: h(e.linearCoefficient, d.linearCoefficient, ...f.linearCoefficient),
+        constantTerm: h(e.constantTerm, d.constantTerm, ...f.constantTerm),
+        intervalCenter: h(e.intervalCenter, d.intervalCenter, l.min, l.max),
+        intervalWidth: h(e.intervalWidth, d.intervalWidth, u.min, u.max),
+      })),
+      (_ = (e, t) =>
+        e.cubicCoefficient * t ** 3 +
+        e.quadraticCoefficient * t ** 2 +
+        e.linearCoefficient * t +
+        e.constantTerm),
+      (v = (e, t) =>
+        3 * e.cubicCoefficient * t ** 2 + 2 * e.quadraticCoefficient * t + e.linearCoefficient),
+      (y = (e, t, n) => {
+        let r = (t + n) / 2,
+          i = Math.max(p, (n - t) * 1e-8);
+        return e
+          .filter((e) => Number.isFinite(e) && e > t + i && e < n - i)
+          .sort((e, t) => Math.abs(e - r) - Math.abs(t - r))[0];
+      }),
+      (b = (e, t, n, r) => {
+        let i = (n - t) * 1e-6,
+          a = t + i,
+          o = n - i,
+          s = (t + n) / 2,
+          c = 1 / 0;
+        for (let t = 0; t <= 256; t += 1) {
+          let n = a + ((o - a) * t) / 256,
+            i = Math.abs(v(e, n) - r);
+          i < c && ((c = i), (s = n));
+        }
+        return s;
+      }),
+      (x = (e) => {
+        let t = g(e),
+          n = t.intervalCenter - t.intervalWidth / 2,
+          r = t.intervalCenter + t.intervalWidth / 2,
+          i = _(t, n),
+          a = _(t, r),
+          o = (a - i) / (r - n),
+          s = 3 * t.cubicCoefficient,
+          c = 2 * t.quadraticCoefficient,
+          l = t.linearCoefficient - o,
+          u = [];
+        if (Math.abs(s) <= p) u = Math.abs(c) <= p ? [n + (r - n) / 2] : [-l / c];
+        else {
+          let e = c ** 2 - 4 * s * l;
+          if (e >= -1e-10) {
+            let t = Math.sqrt(Math.max(0, e));
+            u = [(-c - t) / (2 * s), (-c + t) / (2 * s)];
+          }
+        }
+        let d = y(u, n, r) ?? b(t, n, r, o);
+        return {
+          a: n,
+          b: r,
+          fa: i,
+          fb: a,
+          secantSlope: o,
+          c: d,
+          fc: _(t, d),
+          tangentSlope: v(t, d),
+        };
+      }),
+      (S = (e, t) => {
+        let n = t.b - t.a,
+          r = Math.max(1.6, n * 0.22),
+          i = t.a - r,
+          a = t.b + r,
+          o = [];
+        for (let n = 0; n <= 80; n += 1) {
+          let r = i + ((a - i) * n) / 80;
+          o.push(_(e, r), t.fa + t.secantSlope * (r - t.a), t.fc + t.tangentSlope * (r - t.c));
+        }
+        let s = o.filter(Number.isFinite),
+          c = Math.min(...s),
+          l = Math.max(...s),
+          u = Math.max(6, l - c) * 0.24;
+        return { xMin: i, xMax: a, yMin: c - u, yMax: l + u };
+      }),
+      (C = (e) => {
+        let t = Number(e.toFixed(2));
+        return Object.is(t, -0) ? `0` : t.toString();
+      }));
+  }))();
+}
+export { x as a, w as c, a as d, u as i, g as l, c as n, C as o, l as r, S as s, d as t, o as u };

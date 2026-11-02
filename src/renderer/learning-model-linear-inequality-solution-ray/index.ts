@@ -1,31 +1,155 @@
-// Algebraic solution steps and number-line ray bounds for a linear inequality.
-import "@rchunk/rolldown-runtime";
-
-type InequalityRelation = "less_than" | "greater_than";
-interface InequalityValues { a?: number | null; b?: number | null; c?: number | null; relation?: unknown }
-
-const inequalitySpecification = { type: "LINEAR_INEQUALITY_SOLUTION_RAY", version: 1, thumbnailAssetKey: "linear-inequality-solution-ray-v1", canonicalFormula: "ax + b \\lessgtr c", parameters: { a: { kind: "integer" as const, defaultValue: -3, min: -5, max: 5 }, b: { kind: "number" as const, defaultValue: 2, min: -12, max: 12 }, c: { kind: "number" as const, defaultValue: 11, min: -12, max: 12 }, relation: { kind: "enum" as const, defaultValue: "greater_than" as InequalityRelation, allowedValues: ["less_than", "greater_than"] as InequalityRelation[] } } };
-const coefficientControl = { ...inequalitySpecification.parameters.a, step: 1 };
-const constantControl = { min: inequalitySpecification.parameters.b.min, max: inequalitySpecification.parameters.b.max, step: 1, defaultValue: inequalitySpecification.parameters.b.defaultValue };
-const rightSideControl = { min: inequalitySpecification.parameters.c.min, max: inequalitySpecification.parameters.c.max, step: 1, defaultValue: inequalitySpecification.parameters.c.defaultValue };
-const isRelation = (value: unknown): value is InequalityRelation => value === "less_than" || value === "greater_than";
-const defaultInequalityValues = { a: coefficientControl.defaultValue, b: constantControl.defaultValue, c: rightSideControl.defaultValue, relation: isRelation(inequalitySpecification.parameters.relation.defaultValue) ? inequalitySpecification.parameters.relation.defaultValue : "greater_than" as InequalityRelation };
-const finiteClamp = (value: number, minimum: number, maximum: number, defaultValue: number): number => Number.isFinite(value) ? Math.min(maximum, Math.max(minimum, value)) : defaultValue;
-const normalizeInequalityValues = (values: InequalityValues) => ({ a: Math.round(finiteClamp(values.a ?? Number.NaN, coefficientControl.min, coefficientControl.max, coefficientControl.defaultValue)), b: finiteClamp(values.b ?? Number.NaN, constantControl.min, constantControl.max, constantControl.defaultValue), c: finiteClamp(values.c ?? Number.NaN, rightSideControl.min, rightSideControl.max, rightSideControl.defaultValue), relation: isRelation(values.relation) ? values.relation : defaultInequalityValues.relation });
-const relationSymbol = (relation: InequalityRelation): string => relation === "less_than" ? "<" : ">";
-const solveInequality = (values: InequalityValues) => { const normalized = normalizeInequalityValues(values); const shiftedBoundary = normalized.c - normalized.b; const signFlips = normalized.a < 0; const solutionSet = normalized.a === 0 ? normalized.relation === "less_than" ? normalized.b < normalized.c ? "all_real" : "empty" : normalized.b > normalized.c ? "all_real" : "empty" : "ray"; const solutionRelation = signFlips ? normalized.relation === "less_than" ? "greater_than" : "less_than" : normalized.relation; return { ...normalized, a: normalized.a, shiftedBoundary, signFlips, solutionBoundary: normalized.a === 0 ? 0 : shiftedBoundary / normalized.a, solutionRelation, solutionSet }; };
-const formatInequalityNumber = (value: number): string => { const rounded = Math.round(value * 100) / 100; return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(2).replace(/0+$/, "").replace(/\.$/, ""); };
-const greatestCommonDivisor = (left: number, right: number): number => right === 0 ? Math.abs(left) : greatestCommonDivisor(right, Math.abs(left) % Math.abs(right));
-const inequalityBoundaryText = (values: InequalityValues): string => { const solution = solveInequality(values); if (solution.a === 0) return solution.solutionSet === "all_real" ? "all real numbers" : "no values"; if (!Number.isInteger(solution.shiftedBoundary) || solution.shiftedBoundary % solution.a === 0) return formatInequalityNumber(solution.shiftedBoundary / solution.a); const divisor = greatestCommonDivisor(solution.shiftedBoundary, solution.a); const numerator = solution.shiftedBoundary / divisor; const denominator = solution.a / divisor; return `${numerator * denominator < 0 ? "-" : ""}${Math.abs(numerator)}/${Math.abs(denominator)}`; };
-const coefficientTerm = (value: number): string => value === 1 ? "x" : value === -1 ? "-x" : `${formatInequalityNumber(value)}x`;
-const linearExpression = (coefficient: number, constant: number): string => `${coefficientTerm(coefficient)}${constant === 0 ? "" : constant > 0 ? ` + ${formatInequalityNumber(constant)}` : ` - ${formatInequalityNumber(Math.abs(constant))}`}`;
-const originalInequalityText = (values: InequalityValues): string => { const solution = solveInequality(values); return `${linearExpression(solution.a, solution.b)} ${relationSymbol(solution.relation)} ${formatInequalityNumber(solution.c)}`; };
-const shiftedInequalityText = (values: InequalityValues): string => { const solution = solveInequality(values); return `${coefficientTerm(solution.a)} ${relationSymbol(solution.relation)} ${formatInequalityNumber(solution.shiftedBoundary)}`; };
-const solutionInequalityText = (values: InequalityValues): string => { const solution = solveInequality(values); return solution.solutionSet === "all_real" ? "x ∈ ℝ" : solution.solutionSet === "empty" ? "∅" : `x ${relationSymbol(solution.solutionRelation)} ${inequalityBoundaryText(values)}`; };
-const niceStep = (value: number): number => { const scale = 10 ** Math.floor(Math.log10(Math.max(value, 0.01))); const normalized = value / scale; return (normalized <= 1 ? 1 : normalized <= 2 ? 2 : normalized <= 5 ? 5 : 10) * scale; };
-const inequalityAxis = (values: number[]) => { const minimum = Math.min(...values); const maximum = Math.max(...values); const range = Math.max(maximum - minimum + 4, 8); const step = niceStep(range / 6); const min = Math.floor((minimum - 2) / step) * step; const max = Math.ceil((maximum + 2) / step) * step; const ticks: number[] = []; for (let tick = min; tick <= max + step / 2; tick += step) ticks.push(Math.round(tick * 100) / 100); return { min, max, ticks }; };
-
-function initializeInequalitySpecification(): void {}
-function initializeInequalityModel(): void {}
-
-export { inequalityAxis as a, shiftedInequalityText as c, relationSymbol as d, initializeInequalityModel as f, inequalitySpecification as g, initializeInequalitySpecification as h, defaultInequalityValues as i, inequalityBoundaryText as l, solveInequality as m, coefficientControl as n, formatInequalityNumber as o, normalizeInequalityValues as p, rightSideControl as r, originalInequalityText as s, constantControl as t, solutionInequalityText as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `LINEAR_INEQUALITY_SOLUTION_RAY`),
+      (n = `linear-inequality-solution-ray-v1`),
+      (r = `ax + b \\lessgtr c`),
+      (i = {
+        a: { kind: `integer`, defaultValue: -3, min: -5, max: 5 },
+        b: { kind: `number`, defaultValue: 2, min: -12, max: 12 },
+        c: { kind: `number`, defaultValue: 11, min: -12, max: 12 },
+        relation: {
+          kind: `enum`,
+          defaultValue: `greater_than`,
+          allowedValues: [`less_than`, `greater_than`],
+        },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+var s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w, T, E;
+function D() {
+  return (D = e(() => {
+    (o(),
+      (s = { ...a.parameters.a, step: 1 }),
+      (c = {
+        min: a.parameters.b.min,
+        max: a.parameters.b.max,
+        step: 1,
+        defaultValue: a.parameters.b.defaultValue,
+      }),
+      (l = {
+        min: a.parameters.c.min,
+        max: a.parameters.c.max,
+        step: 1,
+        defaultValue: a.parameters.c.defaultValue,
+      }),
+      (u = new Set(a.parameters.relation.allowedValues)),
+      (d = (e) => typeof e == `string` && u.has(e)),
+      (f = {
+        a: s.defaultValue,
+        b: c.defaultValue,
+        c: l.defaultValue,
+        relation: d(a.parameters.relation.defaultValue)
+          ? a.parameters.relation.defaultValue
+          : `greater_than`,
+      }),
+      (p = (e, t, n, r) => (Number.isFinite(e) ? Math.min(n, Math.max(t, e)) : r)),
+      (m = (e) => ({
+        a: Math.round(p(e.a ?? NaN, s.min, s.max, s.defaultValue)),
+        b: p(e.b ?? NaN, c.min, c.max, c.defaultValue),
+        c: p(e.c ?? NaN, l.min, l.max, l.defaultValue),
+        relation: d(e.relation) ? e.relation : f.relation,
+      })),
+      (h = (e) => (e === `less_than` ? `<` : `>`)),
+      (g = (e) => {
+        let t = m(e),
+          n = t.a,
+          r = t.c - t.b,
+          i = n < 0,
+          a =
+            n === 0
+              ? t.relation === `less_than`
+                ? t.b < t.c
+                  ? `all_real`
+                  : `empty`
+                : t.b > t.c
+                  ? `all_real`
+                  : `empty`
+              : `ray`,
+          o = i ? (t.relation === `less_than` ? `greater_than` : `less_than`) : t.relation;
+        return {
+          ...t,
+          a: n,
+          shiftedBoundary: r,
+          signFlips: i,
+          solutionBoundary: n === 0 ? 0 : r / n,
+          solutionRelation: o,
+          solutionSet: a,
+        };
+      }),
+      (_ = (e) => {
+        let t = Math.round(e * 100) / 100;
+        return Number.isInteger(t) ? String(t) : t.toFixed(2).replace(/0+$/, ``).replace(/\.$/, ``);
+      }),
+      (v = (e, t) => (t === 0 ? Math.abs(e) : v(t, Math.abs(e) % Math.abs(t)))),
+      (y = (e) => {
+        let t = g(e),
+          n = t.shiftedBoundary,
+          r = t.a;
+        if (r === 0) return t.solutionSet === `all_real` ? `all real numbers` : `no values`;
+        if (!Number.isInteger(n) || n % r === 0) return _(n / r);
+        let i = v(n, r),
+          a = n / i,
+          o = r / i;
+        return `${a * o < 0 ? `-` : ``}${Math.abs(a)}/${Math.abs(o)}`;
+      }),
+      (b = (e) => (e === 1 ? `x` : e === -1 ? `-x` : `${_(e)}x`)),
+      (x = (e, t) => {
+        let n = t === 0 ? `` : t > 0 ? ` + ${_(t)}` : ` - ${_(Math.abs(t))}`;
+        return `${b(e)}${n}`;
+      }),
+      (S = (e) => {
+        let t = g(e);
+        return `${x(t.a, t.b)} ${h(t.relation)} ${_(t.c)}`;
+      }),
+      (C = (e) => {
+        let t = g(e);
+        return `${b(t.a)} ${h(t.relation)} ${_(t.shiftedBoundary)}`;
+      }),
+      (w = (e) => {
+        let t = g(e);
+        return t.solutionSet === `all_real`
+          ? `x ∈ ℝ`
+          : t.solutionSet === `empty`
+            ? `∅`
+            : `x ${h(t.solutionRelation)} ${y(e)}`;
+      }),
+      (T = (e) => {
+        let t = 10 ** Math.floor(Math.log10(Math.max(e, 0.01))),
+          n = e / t;
+        return (n <= 1 ? 1 : n <= 2 ? 2 : n <= 5 ? 5 : 10) * t;
+      }),
+      (E = (e) => {
+        let t = Math.min(...e),
+          n = Math.max(...e),
+          r = Math.max(n - t + 4, 8),
+          i = T(r / 6),
+          a = Math.floor((t - 2) / i) * i,
+          o = Math.ceil((n + 2) / i) * i,
+          s = [];
+        for (let e = a; e <= o + i / 2; e += i) s.push(Math.round(e * 100) / 100);
+        return { min: a, max: o, ticks: s };
+      }));
+  }))();
+}
+export {
+  E as a,
+  C as c,
+  h as d,
+  D as f,
+  a as g,
+  o as h,
+  f as i,
+  y as l,
+  g as m,
+  s as n,
+  _ as o,
+  m as p,
+  l as r,
+  S as s,
+  c as t,
+  w as u,
+};

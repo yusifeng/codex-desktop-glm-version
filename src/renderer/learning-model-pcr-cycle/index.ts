@@ -1,7 +1,134 @@
-// PCR cycle learning model. Release chunk: model-bc73e06612d8.js.
-import "@rchunk/rolldown-runtime";
-import { G2 as defineMessages, K2 as initializeAppShared } from "@rchunk/app-shared";
-interface Message { id: string; defaultMessage: string } interface Formatter { formatMessage(message: Message, values?: Record<string, string | number>): string } interface Stage { id: "start" | "denaturing" | "annealing" | "extension"; temperatureCelsius: number; label: Message; shortLabel: Message; summary: Message; captionDetail: Message }
-let stageControl: { min: number; max: number; step: number; defaultValue: number }; let stages: Stage[]; let normalizeValues: (values: { stage?: number | null }) => { stage: number }; let calculate: (values: { stage?: number | null }) => { activeStage: Stage; safeValues: { stage: number } }; let temperatureLabel: (temperature: number, formatter?: Formatter) => string; let stageLabel: (stage: Stage, formatter?: Formatter) => string; let stageSummary: (stage: Stage, formatter?: Formatter) => string; let caption: (values: { stage?: number | null }, formatter?: Formatter) => { descriptor: string; detail: string }; let initialized = false;
-function initializeModel(): void { if (initialized) return; initialized = true; initializeAppShared(); stageControl = { min: 1, max: 4, step: 1, defaultValue: 1 }; const messages = defineMessages({ temperature: { id: "learningBlock.pcrCycle.temperature", defaultMessage: "{temperature, number} °C" }, startLabel: { id: "learningBlock.pcrCycle.stage.start", defaultMessage: "Reaction setup" }, startShortLabel: { id: "learningBlock.pcrCycle.stageShort.start", defaultMessage: "Setup" }, startSummary: { id: "learningBlock.pcrCycle.summary.start", defaultMessage: "PCR ingredients are combined." }, startCaptionDetail: { id: "learningBlock.pcrCycle.captionDetail.start", defaultMessage: "PCR ingredients are combined ({temperature})." }, denaturingLabel: { id: "learningBlock.pcrCycle.stage.denaturing", defaultMessage: "Denaturation" }, denaturingShortLabel: { id: "learningBlock.pcrCycle.stageShort.denaturing", defaultMessage: "Denature" }, denaturingSummary: { id: "learningBlock.pcrCycle.summary.denaturing", defaultMessage: "Heat separates DNA strands." }, denaturingCaptionDetail: { id: "learningBlock.pcrCycle.captionDetail.denaturing", defaultMessage: "Heat separates DNA strands ({temperature})." }, annealingLabel: { id: "learningBlock.pcrCycle.stage.annealing", defaultMessage: "Annealing" }, annealingShortLabel: { id: "learningBlock.pcrCycle.stageShort.annealing", defaultMessage: "Anneal" }, annealingSummary: { id: "learningBlock.pcrCycle.summary.annealing", defaultMessage: "Primers bind DNA templates." }, annealingCaptionDetail: { id: "learningBlock.pcrCycle.captionDetail.annealing", defaultMessage: "Primers bind DNA templates ({temperature})." }, extensionLabel: { id: "learningBlock.pcrCycle.stage.extension", defaultMessage: "Extension" }, extensionShortLabel: { id: "learningBlock.pcrCycle.stageShort.extension", defaultMessage: "Extend" }, extensionSummary: { id: "learningBlock.pcrCycle.summary.extension", defaultMessage: "Polymerase builds DNA strands." }, extensionCaptionDetail: { id: "learningBlock.pcrCycle.captionDetail.extension", defaultMessage: "Polymerase builds DNA strands ({temperature})." } }); stages = [{ captionDetail: messages.startCaptionDetail, id: "start", temperatureCelsius: 25, label: messages.startLabel, shortLabel: messages.startShortLabel, summary: messages.startSummary }, { captionDetail: messages.denaturingCaptionDetail, id: "denaturing", temperatureCelsius: 95, label: messages.denaturingLabel, shortLabel: messages.denaturingShortLabel, summary: messages.denaturingSummary }, { captionDetail: messages.annealingCaptionDetail, id: "annealing", temperatureCelsius: 55, label: messages.annealingLabel, shortLabel: messages.annealingShortLabel, summary: messages.annealingSummary }, { captionDetail: messages.extensionCaptionDetail, id: "extension", temperatureCelsius: 72, label: messages.extensionLabel, shortLabel: messages.extensionShortLabel, summary: messages.extensionSummary }]; const format = (message: Message, formatter?: Formatter) => formatter ? formatter.formatMessage(message) : message.defaultMessage; normalizeValues = values => ({ stage: Math.min(Math.max(Math.round(typeof values.stage === "number" && Number.isFinite(values.stage) ? values.stage : stageControl.defaultValue), stageControl.min), stageControl.max) }); calculate = values => { const safeValues = normalizeValues(values); const activeStage = stages[safeValues.stage - 1]; if (!activeStage) throw Error("PCR cycle is missing an active stage."); return { activeStage, safeValues }; }; stageLabel = (stage, formatter) => format(stage.label, formatter); stageSummary = (stage, formatter) => format(stage.summary, formatter); temperatureLabel = (temperature, formatter) => formatter ? formatter.formatMessage(messages.temperature, { temperature }) : `${temperature} °C`; caption = (values, formatter) => { const { activeStage } = calculate(values); const descriptor = activeStage.id === "start" ? format(activeStage.shortLabel, formatter) : stageLabel(activeStage, formatter); const temperature = temperatureLabel(activeStage.temperatureCelsius, formatter); return { descriptor, detail: formatter ? formatter.formatMessage(activeStage.captionDetail, { temperature }) : activeStage.captionDetail.defaultMessage.replace("{temperature}", temperature) }; }; }
-export { temperatureLabel as a, initializeModel as c, calculate as i, normalizeValues as l, stageControl as n, stageLabel as o, caption as r, stageSummary as s, stages as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { G2 as t, K2 as n } from "@rchunk/app-shared";
+var r, i, a, o, s, c, l, u, d, f, p, m;
+function h() {
+  return (h = e(() => {
+    (n(),
+      (r = { min: 1, max: 4, step: 1, defaultValue: 1 }),
+      (i = t({
+        temperature: {
+          id: `learningBlock.pcrCycle.temperature`,
+          defaultMessage: `{temperature, number} °C`,
+        },
+        startLabel: { id: `learningBlock.pcrCycle.stage.start`, defaultMessage: `Reaction setup` },
+        startShortLabel: { id: `learningBlock.pcrCycle.stageShort.start`, defaultMessage: `Setup` },
+        startSummary: {
+          id: `learningBlock.pcrCycle.summary.start`,
+          defaultMessage: `PCR ingredients are combined.`,
+        },
+        startCaptionDetail: {
+          id: `learningBlock.pcrCycle.captionDetail.start`,
+          defaultMessage: `PCR ingredients are combined ({temperature}).`,
+        },
+        denaturingLabel: {
+          id: `learningBlock.pcrCycle.stage.denaturing`,
+          defaultMessage: `Denaturation`,
+        },
+        denaturingShortLabel: {
+          id: `learningBlock.pcrCycle.stageShort.denaturing`,
+          defaultMessage: `Denature`,
+        },
+        denaturingSummary: {
+          id: `learningBlock.pcrCycle.summary.denaturing`,
+          defaultMessage: `Heat separates DNA strands.`,
+        },
+        denaturingCaptionDetail: {
+          id: `learningBlock.pcrCycle.captionDetail.denaturing`,
+          defaultMessage: `Heat separates DNA strands ({temperature}).`,
+        },
+        annealingLabel: {
+          id: `learningBlock.pcrCycle.stage.annealing`,
+          defaultMessage: `Annealing`,
+        },
+        annealingShortLabel: {
+          id: `learningBlock.pcrCycle.stageShort.annealing`,
+          defaultMessage: `Anneal`,
+        },
+        annealingSummary: {
+          id: `learningBlock.pcrCycle.summary.annealing`,
+          defaultMessage: `Primers bind DNA templates.`,
+        },
+        annealingCaptionDetail: {
+          id: `learningBlock.pcrCycle.captionDetail.annealing`,
+          defaultMessage: `Primers bind DNA templates ({temperature}).`,
+        },
+        extensionLabel: {
+          id: `learningBlock.pcrCycle.stage.extension`,
+          defaultMessage: `Extension`,
+        },
+        extensionShortLabel: {
+          id: `learningBlock.pcrCycle.stageShort.extension`,
+          defaultMessage: `Extend`,
+        },
+        extensionSummary: {
+          id: `learningBlock.pcrCycle.summary.extension`,
+          defaultMessage: `Polymerase builds DNA strands.`,
+        },
+        extensionCaptionDetail: {
+          id: `learningBlock.pcrCycle.captionDetail.extension`,
+          defaultMessage: `Polymerase builds DNA strands ({temperature}).`,
+        },
+      })),
+      (a = [
+        {
+          captionDetail: i.startCaptionDetail,
+          id: `start`,
+          temperatureCelsius: 25,
+          label: i.startLabel,
+          shortLabel: i.startShortLabel,
+          summary: i.startSummary,
+        },
+        {
+          captionDetail: i.denaturingCaptionDetail,
+          id: `denaturing`,
+          temperatureCelsius: 95,
+          label: i.denaturingLabel,
+          shortLabel: i.denaturingShortLabel,
+          summary: i.denaturingSummary,
+        },
+        {
+          captionDetail: i.annealingCaptionDetail,
+          id: `annealing`,
+          temperatureCelsius: 55,
+          label: i.annealingLabel,
+          shortLabel: i.annealingShortLabel,
+          summary: i.annealingSummary,
+        },
+        {
+          captionDetail: i.extensionCaptionDetail,
+          id: `extension`,
+          temperatureCelsius: 72,
+          label: i.extensionLabel,
+          shortLabel: i.extensionShortLabel,
+          summary: i.extensionSummary,
+        },
+      ]),
+      (o = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (s = (e, t) => (t ? t.formatMessage(e) : e.defaultMessage)),
+      (c = (e) => {
+        let t = Number.isFinite(e.stage) ? Number(e.stage) : r.defaultValue;
+        return { stage: o(Math.round(t), r.min, r.max) };
+      }),
+      (l = (e) => {
+        let t = c(e);
+        return { activeStage: a[t.stage - 1], safeValues: t };
+      }),
+      (u = (e, t) => s(e.label, t)),
+      (d = (e, t) => s(e.shortLabel, t)),
+      (f = (e, t) => s(e.summary, t)),
+      (p = (e, t) => (t ? t.formatMessage(i.temperature, { temperature: e }) : `${e} °C`)),
+      (m = (e, t) => {
+        let { activeStage: n } = l(e),
+          r = n.id === `start` ? d(n, t) : u(n, t),
+          i = p(n.temperatureCelsius, t);
+        return {
+          descriptor: r,
+          detail: t
+            ? t.formatMessage(n.captionDetail, { temperature: i })
+            : n.captionDetail.defaultMessage.replace(`{temperature}`, i),
+        };
+      }));
+  }))();
+}
+export { p as a, h as c, l as i, c as l, r as n, u as o, m as r, f as s, a as t };

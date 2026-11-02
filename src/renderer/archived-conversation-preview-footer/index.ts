@@ -1,38 +1,168 @@
-import "@rchunk/rolldown-runtime";
-import { I3 as getJsxRuntime, Yh as Button, e6 as getReactRuntime, type JsxRuntime, type ReactRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/chat-tab-metadata-bridge";
-
-export interface ArchivedConversationPreviewFooterProps {
-  conversationId: string;
-  kind: "chatgpt" | "cloud" | "local";
-  onDone?(): void;
-  onError?(error: unknown): void;
-  onRecover?(input: { conversationId: string; kind: "chatgpt" | "cloud" | "local" }): Promise<void> | void;
-  restored?: boolean;
-  restoring?: boolean;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  C_ as n,
+  FO as r,
+  FX as i,
+  HX as a,
+  I3 as o,
+  K2 as s,
+  LX as c,
+  PO as l,
+  QI as u,
+  S_ as d,
+  Y2 as f,
+  ZI as p,
+  iL as m,
+  lk as h,
+  n4 as g,
+  pk as _,
+  rL as v,
+} from "@rchunk/app-shared";
+import {
+  AY as y,
+  DY as b,
+  EY as x,
+  Hb as S,
+  KAt as C,
+  LAt as w,
+  Lb as T,
+  NY as E,
+  Qgn as D,
+  Rb as O,
+  TY as k,
+  Vb as A,
+  i_n as j,
+  kY as M,
+  o_n as N,
+  pdn as P,
+  udn as F,
+} from "@rchunk/app-initial";
+import { i as I, r as L } from "@rchunk/chat-tab-metadata-bridge";
+function R(e) {
+  let t = (0, z.c)(36),
+    { conversationId: n, kind: r } = e,
+    i = c(p),
+    o = g(),
+    s = j(),
+    u = N(),
+    h;
+  t[0] !== s.hash || t[1] !== s.pathname || t[2] !== s.search || t[3] !== u || t[4] !== i
+    ? ((h = () => {
+        (x(i),
+          u(
+            { pathname: s.pathname, search: s.search, hash: s.hash },
+            { replace: !0, state: null },
+          ));
+      }),
+      (t[0] = s.hash),
+      (t[1] = s.pathname),
+      (t[2] = s.search),
+      (t[3] = u),
+      (t[4] = i),
+      (t[5] = h))
+    : (h = t[5]);
+  let v = h,
+    b = a(M),
+    w;
+  t[6] !== n || t[7] !== b
+    ? ((w = b?.find((e) => E(e.task) === `hosted:${n}`)), (t[6] = n), (t[7] = b), (t[8] = w))
+    : (w = t[8]);
+  let D = w,
+    O;
+  t[9] !== n || t[10] !== i
+    ? ((O = () => {
+        let e = i.get(y);
+        return e != null && E(e) === `hosted:${n}` ? k(i, e) : void 0;
+      }),
+      (t[9] = n),
+      (t[10] = i),
+      (t[11] = O))
+    : (O = t[11]);
+  let A;
+  t[12] !== n || t[13] !== r || t[14] !== i
+    ? ((A = async () => {
+        if (r === `cloud`) {
+          (await F.safePost(`/wham/tasks/{task_id}/recover`, {
+            parameters: { path: { task_id: n } },
+          }),
+            S(i, n, !1));
+          return;
+        }
+        await C({ scope: i, conversationId: n });
+      }),
+      (t[12] = n),
+      (t[13] = r),
+      (t[14] = i),
+      (t[15] = A))
+    : (A = t[15]);
+  let P;
+  t[16] !== n || t[17] !== v || t[18] !== r || t[19] !== i
+    ? ((P = (e, t, a) => {
+        a?.(`restored`);
+        let o = i.get(_).info((0, B.jsx)(f, { ...T.unarchiveSuccessPlain }), {
+          leading: (0, B.jsx)(d, { "aria-hidden": !1, asset: l }),
+          primaryAction: {
+            label: (0, B.jsx)(f, { ...T.viewNow }),
+            onClick: () => {
+              (o.close(), v());
+            },
+          },
+          id: `unarchive-thread-${r}:${n}`,
+        });
+      }),
+      (t[16] = n),
+      (t[17] = v),
+      (t[18] = r),
+      (t[19] = i),
+      (t[20] = P))
+    : (P = t[20]);
+  let I;
+  t[21] !== o || t[22] !== i
+    ? ((I = (e, t, n) => {
+        (n?.(null),
+          i
+            .get(_)
+            .danger(o.formatMessage(T.unarchiveError), {
+              errorAnalytics: { toastId: `previewFooter.onError.unarchiveError` },
+            }));
+      }),
+      (t[21] = o),
+      (t[22] = i),
+      (t[23] = I))
+    : (I = t[23]);
+  let R;
+  t[24] !== O || t[25] !== A || t[26] !== P || t[27] !== I
+    ? ((R = { onMutate: O, mutationFn: A, onSuccess: P, onError: I }),
+      (t[24] = O),
+      (t[25] = A),
+      (t[26] = P),
+      (t[27] = I),
+      (t[28] = R))
+    : (R = t[28]);
+  let { mutate: V, isPending: H, isSuccess: U } = m(R),
+    W = U || D?.status === `restored`,
+    G = H || D?.status === `restoring`,
+    K;
+  t[29] === V ? (K = t[30]) : ((K = () => V()), (t[29] = V), (t[30] = K));
+  let q;
+  return (
+    t[31] !== v || t[32] !== K || t[33] !== W || t[34] !== G
+      ? ((q = (0, B.jsx)(L, { restored: W, restoring: G, onUnarchive: K, onDone: v })),
+        (t[31] = v),
+        (t[32] = K),
+        (t[33] = W),
+        (t[34] = G),
+        (t[35] = q))
+      : (q = t[35]),
+    q
+  );
 }
-let runtime: JsxRuntime | undefined;
-let React: ReactRuntime | undefined;
-function jsx(): JsxRuntime { runtime ??= getJsxRuntime(); return runtime; }
-function react(): ReactRuntime { React ??= getReactRuntime(); return React; }
-
-function ArchivedConversationPreviewFooter(props: ArchivedConversationPreviewFooterProps): unknown {
-  const view = jsx();
-  const [pending, setPending] = react().useState(props.restoring === true);
-  const recover = async () => {
-    if (pending || props.restored) return;
-    setPending(true);
-    try { await props.onRecover?.({ conversationId: props.conversationId, kind: props.kind }); }
-    catch (error) { props.onError?.(error); }
-    finally { setPending(false); }
-  };
-  return view.jsxs("footer", { className: "archived-conversation-preview-footer", children: [
-    view.jsx("p", { children: props.restored ? "Chat restored" : "This is an archived chat preview" }),
-    props.restored
-      ? view.jsx(Button, { type: "button", onClick: props.onDone, children: "Done" })
-      : view.jsx(Button, { type: "button", disabled: pending, loading: pending, onClick: recover, children: pending ? "Restoring…" : "Restore chat" }),
-  ] });
+var z, B;
+function V() {
+  return (V = e(() => {
+    ((z = t()), r(), v(), i(), s(), D(), w(), n(), h(), A(), u(), O(), P(), I(), b(), (B = o()));
+  }))();
 }
-function initializeArchivedConversationPreviewFooter(): void { jsx(); }
-export { initializeArchivedConversationPreviewFooter as n, ArchivedConversationPreviewFooter as t };
+export { V as n, R as t };

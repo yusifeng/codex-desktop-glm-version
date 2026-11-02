@@ -35,16 +35,6 @@ assert.equal(noteClosed, 1);
 
 assertReleaseOwner("library-cloud-file-preview");
 
-// open-image-preview: 6
-const openImage = await bundle("open-image-preview");
-assert.deepEqual(Object.keys(openImage), ["openChatGptSearchImagePreview"]);
-const imageOne = { id: "one", src: "1" }, imageTwo = { id: "two", src: "2" };
-let openPayload;
-const imageTarget = openImage.openChatGptSearchImagePreview(imageTwo, [imageOne, imageTwo], { open(input) { openPayload = input; } });
-assert.equal(imageTarget.index, 1);
-assert.equal(imageTarget.image, imageTwo);
-assert.equal(imageTarget.images.length, 2);
-assert.equal(openPayload.index, 1);
-assert.equal(openImage.openChatGptSearchImagePreview(imageOne).index, 0);
+assertReleaseOwner("open-image-preview");
 
 console.log("artifact preview application flow and release owner assertions passed");

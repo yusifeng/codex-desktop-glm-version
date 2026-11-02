@@ -3,6 +3,7 @@ import { Buffer } from "node:buffer";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 globalThis.__libraryPreviewPrimitivesTest = { jsx: { Fragment: "Fragment", jsx(type, props, key) { return { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return { type, props: props ?? {}, key }; } } };
 async function bundle(directory) { const result = await esbuild.build({ entryPoints: [path.join(ROOT, "src/renderer", directory, "index.ts")], bundle: true, format: "esm", platform: "node", target: "node22", write: false, logLevel: "silent", plugins: [{ name: "library-preview-primitives-mocks", setup(build) { build.onResolve({ filter: /^@rchunk\// }, ({ path: importPath }) => ({ path: importPath.slice(8), namespace: "mock" })); build.onLoad({ filter: /.*/, namespace: "mock" }, ({ path: importPath }) => ({ contents: importPath === "app-shared" ? "export const I3=()=>globalThis.__libraryPreviewPrimitivesTest.jsx;" : "export {};", loader: "js" })); } }] }); return import(`data:text/javascript;base64,${Buffer.from(result.outputFiles[0].text).toString("base64")}#${directory}`); }
@@ -28,21 +29,7 @@ assert.equal(title.t("Quiz.learningquiz", "learning_quiz", intl), "Quiz");
 assert.equal(title.t("Note.md", "writing_block", intl), "Note");
 assert.equal(title.t("Site.html", "site_preview", intl), "Site");
 
-// library-file-preview-kind: 12
-const kind = await bundle("library-file-preview-kind");
-assert.deepEqual(Object.keys(kind), ["i", "n", "r", "t"]);
-assert.equal(kind.r({ file_name: "photo.bin", mime_type: "image/png" }), "image");
-assert.equal(kind.r({ file_name: "paper.PDF" }), "pdf");
-assert.equal(kind.r({ file_name: "table.csv" }), "artifact");
-assert.equal(kind.r({ file_name: "readme.md" }), "markdown");
-assert.equal(kind.r({ file_name: "index.htm" }), "html");
-assert.equal(kind.r({ file_name: "source.ts" }), "text");
-assert.equal(kind.r({ file_name: "archive.zip" }), "unsupported");
-assert.equal(kind.n({ file_name: "slides.bin", mime_type: "application/vnd.openxmlformats-officedocument.presentationml.presentation" }), "pptx");
-const drive = kind.t({ fileId: "external-gdrive:file:abc_123", mimeType: "application/vnd.google-apps.document" });
-assert.equal(drive, "https://docs.google.com/document/d/abc_123/preview");
-assert.equal(kind.t({ fileId: "file", mimeType: "application/vnd.google-apps.document" }), null);
-assert.equal(kind.t({ fileId: "external-gdrive:file:abc", mimeType: "application/vnd.google-apps.document", sourceUrl: "https://evil.example/?resourcekey=secret" }), null);
+assertReleaseOwner("library-file-preview-kind");
 
 // render-file-children: 6
 const render = await bundle("render-file-children");
@@ -54,17 +41,8 @@ assert.equal(find(rendered, node => node.props?.slot === "line-4").props.childre
 assert.equal(find(rendered, node => node.props?.slot === "gutter-utility-slot").props.children, "gutter");
 assert.equal(find(render.n({ file: {}, renderCustomHeader: () => "custom" }), node => node.props?.slot === "header").props.children, "custom");
 
-// preview-layout: 6
-const layout = await bundle("preview-layout");
-assert.deepEqual(Object.keys(layout), ["n", "t"]);
-let closed = 0;
-const layoutUi = layout.t({ assetName: "Report", children: "body", bottomContent: "footer", headerVariant: "document", onClose() { closed++; } });
-assert.match(text(layoutUi), /Close.*Report/);
-assert.equal(find(layoutUi, node => node.type === "header").props["data-variant"], "document");
-find(layoutUi, node => node.props?.["aria-label"] === "Close preview").props.onClick();
-assert.equal(closed, 1);
-assert.equal(find(layoutUi, node => node.type === "main").props.children, "body");
-assert.equal(find(layout.t({ assetName: "Owned", contentOwnsHeader: true, onClose() {} }), node => node.type === "header"), undefined);
+assertReleaseOwner("preview-layout");
+assertReleaseOwner("option-carousel");
 
 // open-in-library-item: 4
 const open = await bundle("open-in-library-item");

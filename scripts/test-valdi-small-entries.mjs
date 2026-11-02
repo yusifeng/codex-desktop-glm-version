@@ -7,7 +7,7 @@ import * as esbuild from "esbuild";
 import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const directories = ["shopping-bag-fill-icon", "checkout-telemetry", "epic-chart-indicator-entry", "voice-dsp-entry", "code-block-execution-entry", "experimental-feature-visibility", "product-favorite-action-entry", "product-favorite-action-core", "note-icon", "open-automation-side-panel-tab-entry"];
+const directories = ["shopping-bag-fill-icon", "checkout-telemetry", "epic-chart-indicator-entry", "voice-dsp-entry", "code-block-execution-entry", "experimental-feature-visibility", "product-favorite-action-entry", "note-icon", "open-automation-side-panel-tab-entry"];
 const expectedImports = {
   "shopping-bag-fill-icon": ["app-shared", "rolldown-runtime"],
   "checkout-telemetry": ["checkout-policy", "stripe-payment-element-options", "rolldown-runtime"],
@@ -16,7 +16,6 @@ const expectedImports = {
   "code-block-execution-entry": ["app-shared", "rolldown-runtime"],
   "experimental-feature-visibility": ["app-initial", "app-shared", "chronicle-settings", "rolldown-runtime"],
   "product-favorite-action-entry": ["app-shared", "product-favorite-action-core"],
-  "product-favorite-action-core": ["app-initial", "app-shared", "request-context", "rolldown-runtime"],
   "note-icon": ["app-shared", "rolldown-runtime"],
   "open-automation-side-panel-tab-entry": ["app-shared", "open-automation-side-panel-tab"],
 };
@@ -65,7 +64,7 @@ const voice = await bundle("voice-dsp-entry"); assert.equal(await voice.loadVoic
 const execution = await bundle("code-block-execution-entry"); assert.equal(await execution.loadCodeBlockExecution(), "CodeBlockExecution"); runtimeAssertions++;
 const visibility = await bundle("experimental-feature-visibility"); visibility.t(); assert.equal(visibility.n({ stage: "beta", name: "new_feature" }), true); assert.equal(visibility.n({ stage: "beta", name: "realtime_voice" }), false); assert.equal(visibility.n({ stage: "alpha", name: "new_feature" }), false); runtimeAssertions += 3;
 const favoriteEntry = await bundle("product-favorite-action-entry"); assert.equal(favoriteEntry.ProductFavoriteAction, "ProductFavoriteAction"); runtimeAssertions++;
-state.signals.set("account", "account-1"); state.signals.set("user", "user-1"); state.signals.set("saved-state", null); state.signals.set("request-query", { isSourceCatalog: false, rewrittenQueries: ["laptop"] }); const favorite = await bundle("product-favorite-action-core"); favorite.n(); const favoriteNode = favorite.t({ product: { id: "p1", title: "Laptop", url: "https://example.com", query: "laptop", provider: "shop" }, surface: "product_card" }); assert.equal(favoriteNode.type, "ScopedProvider"); const favoriteAction = favoriteNode.props.children.type(favoriteNode.props.children.props); assert.equal(favoriteAction.type, "SavedEntityAction"); runtimeAssertions += 2;
+sourceAssertions += assertReleaseOwner("product-favorite-action-core");
 const automation = await bundle("open-automation-side-panel-tab-entry"); assert.deepEqual(Object.keys(automation), ["openAutomationSidePanelTab", "openAutomationSuggestionSidePanelTab", "openSiteAutomationSidePanelTab", "restoreAutomationSidePanelTab"]); runtimeAssertions++;
 sourceAssertions += assertReleaseOwner("library-file-route");
 sourceAssertions += assertReleaseOwner("restore-image-preview-tab");

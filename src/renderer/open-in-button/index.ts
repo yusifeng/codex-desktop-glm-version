@@ -1,590 +1,712 @@
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as googleDriveChunk from "@rchunk/open-in-google-drive-menu-item";
-import "@rchunk/rolldown-runtime";
-import * as appConnectFlowChunk from "@rchunk/use-app-connect-flow";
-import type { IntlShape, JsxRuntime, ReactRuntime } from "@rchunk/app-shared";
-
-type Component = (props: Record<string, unknown>) => unknown;
-type Variant = "menu" | "title";
-interface OpenInButtonProps {
-  analyticsClickSource?: string;
-  artifactRef?: string;
-  hostId?: string;
-  kind?: string;
-  threadId?: string;
-  title?: string;
-  variant?: Variant;
-}
-interface NativeTarget {
-  default?: boolean;
-  icon: string;
-  id: string;
-  label: string;
-}
-interface NativeTargetsResult {
-  fileManagerIcon?: string | null;
-  reason?: string;
-  status: "failed" | "ready";
-  targets: NativeTarget[];
-}
-type NativeAction =
-  | { type: "download-copy" | "show-in-folder" }
-  | { type: "open"; targetId: string };
-interface NativeActionResult {
-  reason?: string;
-  status: "completed" | "failed";
-}
-interface SnapshotResult {
-  bytes?: Uint8Array;
-  contentType?: string;
-  fileName?: string;
-  status: "completed" | "failed";
-}
-interface ArtifactSessionsBridge {
-  supportsNativeOpen(): Promise<boolean>;
-  getNativeOpenTargets(input: {
-    artifactRef?: string;
-    threadId?: string;
-  }): Promise<NativeTargetsResult>;
-  performNativeFileAction(input: {
-    action: NativeAction;
-    artifactRef?: string;
-    threadId?: string;
-  }): Promise<NativeActionResult>;
-  readNativeSnapshot(input: {
-    artifactRef?: string;
-    threadId?: string;
-  }): Promise<SnapshotResult>;
-}
-interface WorkspaceFilesBridge {
-  getDownloadsFolderIcon?(): Promise<string | null>;
-}
-interface QueryResult<Data> {
-  data?: Data;
-  isError: boolean;
-  isFetching: boolean;
-  refetch(): Promise<unknown>;
-}
-interface ScopeApi {
-  get<Value>(key: unknown): Value;
-}
-interface ToastService {
-  danger(message: unknown, options?: Record<string, unknown>): void;
-  success(message: unknown): void;
-}
-interface MenuComponents {
-  Item: Component;
-  Message: Component;
-  Separator: Component;
-}
-interface SharedDependencies {
-  $O: { INFINITE: number; ONE_MINUTE: number };
-  DO: unknown;
-  EO: unknown;
-  Hl: unknown;
-  I3(): JsxRuntime;
-  Is: unknown;
-  LX(scope: unknown): ScopeApi;
-  UI<Value>(promise: Promise<Value>, signal?: AbortSignal): Promise<Value>;
-  Y2: Component;
-  Yh: Component;
-  ZI: unknown;
-  _L<Data>(options: Record<string, unknown>): QueryResult<Data>;
-  cO: unknown;
-  cy: Component;
-  e6(): ReactRuntime;
-  jf: MenuComponents;
-  kf: Component;
-  lg: Component;
-  n4(): IntlShape;
-  pk: unknown;
-  q_: Component;
-  ug: Component;
-  vb: Component;
-  yb: Component;
-  [key: string]: unknown;
-}
-interface InitialDependencies {
-  E6t(): { platform: "linux" | "macOS" | "windows" };
-  Ml(hostId?: string): boolean;
-  Xrt: Component;
-  ait: Component;
-  oit: Component;
-  pnt?: {
-    artifactSessions?: ArtifactSessionsBridge;
-    workspaceFiles?: WorkspaceFilesBridge;
-  };
-  [key: string]: unknown;
-}
-
-const shared = appSharedChunk as unknown as SharedDependencies;
-const initial = appInitialChunk as unknown as InitialDependencies;
-const useAppConnectFlow = (
-  appConnectFlowChunk as unknown as {
-    n(options: {
-      hostId?: string;
-    }): import("@rchunk/use-app-connect-flow").AppConnectFlow;
-  }
-).n;
-const initializeAppConnectFlow = (
-  appConnectFlowChunk as unknown as { t(): void }
-).t;
-const initializeGoogleDriveItem = (googleDriveChunk as unknown as { i(): void })
-  .i;
-const OpenInGoogleDriveMenuItem = (
-  googleDriveChunk as unknown as { r: Component }
-).r;
-const GoogleDriveConnectModal = (
-  googleDriveChunk as unknown as { t: Component }
-).t;
-let jsx: JsxRuntime;
-let react: ReactRuntime;
-
-function OpenInButton(props: OpenInButtonProps): unknown {
-  initializeOpenInButton();
-  const variant = props.variant ?? "menu";
-  if (!initial.Ml(props.hostId)) return null;
-  return jsx.jsx(jsx.Fragment, {
-    children: jsx.jsx(OpenInMenu, { ...props, variant }),
-  });
-}
-
-function OpenInMenu({
-  analyticsClickSource,
-  artifactRef,
-  hostId,
-  kind,
-  threadId,
-  title,
-  variant,
-}: OpenInButtonProps & { variant: Variant }): unknown {
-  const scope = shared.LX(shared.ZI);
-  const intl = shared.n4();
-  const { platform } = initial.E6t();
-  const bridges = initial.pnt;
-  const artifactSessions = bridges?.artifactSessions;
-  const supportQuery = shared._L<boolean>({
-    queryKey: ["artifact-session-supports-native-open"],
-    queryFn:
-      artifactSessions == null
-        ? shared.FZ
-        : ({ signal }: { signal?: AbortSignal }) =>
-            shared.UI(artifactSessions.supportsNativeOpen(), signal),
-    retry: false,
-    staleTime: shared.$O.INFINITE,
-  });
-  const [open, setOpen] = react.useState(false);
-  const [refreshVersion, setRefreshVersion] = react.useState(0);
-  const [isPerformingAction, setPerformingAction] = react.useState(false);
-  const [isOpeningDrive, setOpeningDrive] = react.useState(false);
-  const nativeTargetsQuery = shared._L<NativeTargetsResult>({
-    enabled: supportQuery.data === true && artifactSessions != null,
-    gcTime: 0,
-    queryKey: [
-      "artifact-session-native-open-targets",
-      threadId,
-      artifactRef,
-      refreshVersion,
-    ],
-    queryFn:
-      artifactSessions == null
-        ? shared.FZ
-        : ({ signal }: { signal?: AbortSignal }) =>
-            shared.UI(
-              artifactSessions.getNativeOpenTargets({ artifactRef, threadId }),
-              signal,
-            ),
-    refetchOnReconnect: false,
-    refetchOnWindowFocus: false,
-    retry: false,
-    staleTime: shared.$O.ONE_MINUTE,
-  });
-  const downloadIconQuery = shared._L<string | null>({
-    queryFn:
-      variant === "title" ||
-      bridges?.workspaceFiles?.getDownloadsFolderIcon == null ||
-      !open
-        ? shared.FZ
-        : () => bridges.workspaceFiles?.getDownloadsFolderIcon?.(),
-    queryKey: ["workspace-file-downloads", "folder-icon"],
-    staleTime: shared.$O.INFINITE,
-  });
-  const connectFlow = useAppConnectFlow({ hostId });
-
-  if (artifactSessions == null || supportQuery.data !== true) {
-    return variant === "title"
-      ? jsx.jsx(initial.Xrt, {
-          fileType: kind,
-          title,
-          open,
-          onOpenChange: setOpen,
-        })
-      : null;
-  }
-
-  const result = nativeTargetsQuery.data;
-  const targets = result?.status === "ready" ? result.targets : null;
-  const fileManagerIcon =
-    result?.status === "ready" ? result.fileManagerIcon : null;
-  const loadFailed = nativeTargetsQuery.isError || result?.status === "failed";
-  const canRetry =
-    !nativeTargetsQuery.isFetching && (loadFailed || targets?.length === 0);
-  const performAction = async (action: NativeAction) => {
-    if (isPerformingAction || isOpeningDrive) return;
-    setPerformingAction(true);
-    const actionResult = await shared
-      .UI(
-        artifactSessions.performNativeFileAction({
-          artifactRef,
-          threadId,
-          action,
-        }),
-      )
-      .catch(() => null);
-    setPerformingAction(false);
-    if (actionResult?.status === "completed") {
-      if (action.type === "download-copy") {
-        scope.get<ToastService>(shared.pk).success(
-          intl.formatMessage({
-            id: "localConversation.endResource.downloadCopy.success",
-            defaultMessage: "Saved a copy to Downloads",
-            description:
-              "Success message after copying an artifact to the Downloads folder",
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  $O as n,
+  DO as r,
+  EO as i,
+  FX as a,
+  FZ as o,
+  Hl as s,
+  I3 as c,
+  If as l,
+  Is as u,
+  K2 as d,
+  LX as ee,
+  Ls as f,
+  QI as p,
+  UI as te,
+  Ul as m,
+  Y2 as h,
+  Yh as ne,
+  ZI as re,
+  Zh as g,
+  _L as ie,
+  cO as ae,
+  cy as oe,
+  e6 as se,
+  ek as _,
+  gL as v,
+  jZ as ce,
+  jf as y,
+  kf as le,
+  lO as b,
+  lg as ue,
+  lk as x,
+  lw as de,
+  n4 as fe,
+  pk as pe,
+  q_ as me,
+  ug as he,
+  vb as ge,
+  yb as _e,
+} from "@rchunk/app-shared";
+import {
+  E6t as ve,
+  Ml as S,
+  Rrt as ye,
+  T6t as C,
+  Xrt as be,
+  ait as xe,
+  jl as Se,
+  mnt as w,
+  oit as Ce,
+  pnt as we,
+} from "@rchunk/app-initial";
+import { n as Te, t as T } from "@rchunk/use-app-connect-flow";
+import { i as E, r as Ee, t as De } from "@rchunk/open-in-google-drive-menu-item";
+function D(e) {
+  let t = (0, je.c)(8),
+    {
+      analyticsClickSource: n,
+      artifactRef: r,
+      hostId: i,
+      kind: a,
+      threadId: o,
+      title: s,
+      variant: c,
+    } = e,
+    l = c === void 0 ? `menu` : c;
+  if (!S(i)) return null;
+  let u;
+  return (
+    t[0] !== n || t[1] !== r || t[2] !== i || t[3] !== a || t[4] !== o || t[5] !== s || t[6] !== l
+      ? ((u = (0, A.jsx)(A.Fragment, {
+          children: (0, A.jsx)(O, {
+            analyticsClickSource: n,
+            artifactRef: r,
+            hostId: i,
+            kind: a,
+            threadId: o,
+            title: s,
+            variant: l,
           }),
-        );
-      }
-      return;
-    }
-    if (actionResult?.reason === "target-unavailable")
-      setRefreshVersion((version) => version + 1);
-    const failures = {
-      "download-copy": [
-        "localConversation.endResource.downloadCopy.failure",
-        "Could not download a copy",
-        "Error message after an artifact could not be copied to the Downloads folder",
-      ],
-      "show-in-folder": [
-        "artifactSession.openIn.showInFolder.failure",
-        "Could not show this artifact in the file manager",
-        "Error message after a live Artifact Session could not be revealed in the system file manager",
-      ],
-      open: [
-        "artifactSession.openIn.failed",
-        "Couldn’t open in the selected app",
-        "Error toast shown when a live Artifact Session cannot be opened in a native desktop app",
-      ],
-    } as const;
-    const [id, defaultMessage, description] = failures[action.type];
-    scope
-      .get<ToastService>(shared.pk)
-      .danger(intl.formatMessage({ id, defaultMessage, description }), {
-        errorAnalytics: { toastId: id },
-      });
-  };
-  const readUploadFile = async () => {
-    const snapshot = await shared.UI(
-      artifactSessions.readNativeSnapshot({ artifactRef, threadId }),
-    );
-    if (snapshot.status === "failed")
-      throw Error("Artifact Session snapshot materialization failed");
-    return {
-      bytes: snapshot.bytes,
-      contentType: snapshot.contentType,
-      fileName: snapshot.fileName,
-    };
-  };
-  const iconSize = variant === "title" ? "base" : "sm";
-  const analyticsContext = {
-    threadId,
-    turnId: null,
-    inputMessageId: null,
-    messageId: null,
-  };
-  const targetItems = targets?.map((target) =>
-    jsx.jsx(
-      shared.jf.Item,
-      {
-        disabled: isPerformingAction,
-        leftIcon: jsx.jsx(initial.ait, {
-          size: iconSize,
-          children: jsx.jsx("img", {
-            alt: "",
-            className: "size-full",
-            src: target.icon,
-          }),
-        }),
-        onSelect: () => {
-          void performAction({ type: "open", targetId: target.id });
-        },
-        children: jsx.jsx(shared.Y2, {
-          id: "localConversation.endResource.nativeAppWithDefault.label",
-          defaultMessage:
-            "{target}{isDefault, select, true { (Default)} other {}}",
-          description:
-            "Native app name in a resource card's Open menu, with a suffix when it is the system default",
-          values: { isDefault: target.default === true, target: target.label },
-        }),
-      },
-      target.id,
-    ),
+        })),
+        (t[0] = n),
+        (t[1] = r),
+        (t[2] = i),
+        (t[3] = a),
+        (t[4] = o),
+        (t[5] = s),
+        (t[6] = l),
+        (t[7] = u))
+      : (u = t[7]),
+    u
   );
-  const statusItems = [
-    open && nativeTargetsQuery.isFetching
-      ? menuMessage(
-          "localConversation.endResource.loadingAvailableApps",
-          "Loading available apps…",
-          "Dropdown item shown while loading apps that can open a conversation resource",
-        )
-      : null,
-    targets?.length === 0 && !nativeTargetsQuery.isFetching
-      ? menuMessage(
-          "artifactSession.openIn.noAvailableApps",
-          "No available apps",
-          "Empty state shown when no native apps can open a live Artifact Session",
-        )
-      : null,
-    loadFailed && !nativeTargetsQuery.isFetching
-      ? menuMessage(
-          "artifactSession.openIn.loadTargetsFailed",
-          "Couldn’t load available apps",
-          "Error shown when native apps for opening a live Artifact Session cannot be discovered",
-          { role: "alert", tone: "error" },
-        )
-      : null,
-    canRetry
-      ? jsx.jsx(shared.jf.Item, {
-          onSelect: (event: { preventDefault(): void }) => {
-            event.preventDefault();
-            void nativeTargetsQuery.refetch();
-          },
-          children: jsx.jsx(shared.Y2, {
-            id: "artifactSession.openIn.retry",
-            defaultMessage: "Try again",
-            description:
-              "Button that retries native app discovery for a live Artifact Session",
-          }),
-        })
-      : null,
-  ];
-  const driveItem = jsx.jsx(OpenInGoogleDriveMenuItem, {
-    analyticsClickSource,
-    analyticsContext,
-    handleConnectApp: connectFlow.handleConnectApp,
-    hostId,
-    iconSize,
-    isOpening: isOpeningDrive,
-    keepOpenWhileOpening: true,
-    onCloseDropdown: () => setOpen(false),
-    onOpeningChange: setOpeningDrive,
-    readUploadFile,
-    sourceId: `artifact-session:${artifactRef}`,
-    targetType: kind,
-    title,
-  });
-  const revealIcon =
-    fileManagerIcon == null
-      ? variant === "title"
-        ? jsx.jsx(shared.ug, { icon: { 16: shared.vb, 20: shared.yb } })
-        : jsx.jsx(shared.vb, {})
-      : jsx.jsx("img", {
-          alt: "",
-          className: "size-full",
-          src: fileManagerIcon,
-        });
-  const revealItem = jsx.jsx(shared.jf.Item, {
-    disabled: isPerformingAction,
-    leftIcon: jsx.jsx(initial.ait, { size: iconSize, children: revealIcon }),
-    onSelect: () => {
-      void performAction({ type: "show-in-folder" });
-    },
-    children: showInFileManagerLabel(intl, platform),
-  });
-  const menuContent = jsx.jsxs(jsx.Fragment, {
-    children: [
-      targetItems,
-      ...statusItems,
-      driveItem,
-      jsx.jsx(shared.jf.Separator, {}),
-      revealItem,
-    ],
-  });
-  const downloadIcon = jsx.jsxs(initial.ait, {
-    size: iconSize,
-    children: [
-      variant === "title"
-        ? jsx.jsx(shared.ug, {
-            icon: { assets: { 16: shared.Hl, 20: shared.EO } },
-          })
-        : null,
-      variant !== "title"
-        ? downloadIconQuery.data == null
-          ? jsx.jsx(shared.q_, {})
-          : jsx.jsx("img", {
-              alt: "",
-              className: "icon-sm",
-              src: downloadIconQuery.data,
-            })
-        : null,
-    ],
-  });
-  const downloadItem = jsx.jsx(shared.jf.Item, {
-    disabled: isPerformingAction,
-    leftIcon: downloadIcon,
-    onSelect: () => {
-      void performAction({ type: "download-copy" });
-    },
-    children: jsx.jsx(
-      shared.Y2,
-      variant === "title"
-        ? {
-            id: "artifactSession.downloadTitleMenu",
-            defaultMessage: "Download",
-            description:
-              "Title menu action for downloading the current live artifact",
-          }
-        : {
-            id: "localConversation.endResource.downloadCopy",
-            defaultMessage: "Download a copy",
-            description:
-              "Dropdown item for saving a separate copy of an artifact to Downloads",
-          },
-    ),
-  });
-  const surface =
-    variant === "title"
-      ? jsx.jsxs(initial.Xrt, {
-          fileType: kind,
-          title,
-          open,
-          onOpenChange: setOpen,
-          children: [
-            jsx.jsx(initial.oit, {
-              leftIcon: jsx.jsx(shared.ug, {
-                icon: { assets: { 16: shared.cO, 20: shared.Is } },
-              }),
-              label: jsx.jsx(shared.Y2, {
-                id: "artifactSession.openIn.menu",
-                defaultMessage: "Open in",
-                description:
-                  "Button that opens the menu of apps and export actions for a live artifact",
-              }),
-              children: menuContent,
+}
+function O(e) {
+  let t = (0, je.c)(127),
+    {
+      analyticsClickSource: r,
+      artifactRef: a,
+      hostId: c,
+      kind: l,
+      threadId: d,
+      title: f,
+      variant: p,
+    } = e,
+    m = ee(re),
+    g = fe(),
+    { platform: se } = ve(),
+    _ = we?.artifactSessions,
+    v;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((v = {
+        queryKey: [`artifact-session-supports-native-open`],
+        queryFn:
+          _ == null
+            ? o
+            : (e) => {
+                let { signal: t } = e;
+                return te(_.supportsNativeOpen(), t);
+              },
+        retry: !1,
+        staleTime: n.INFINITE,
+      }),
+      (t[0] = v))
+    : (v = t[0]);
+  let { data: ce } = ie(v),
+    [b, x] = (0, k.useState)(!1),
+    [de, he] = (0, k.useState)(0),
+    [S, ye] = (0, k.useState)(!1),
+    [C, Se] = (0, k.useState)(!1),
+    w;
+  t[1] !== a || t[2] !== de || t[3] !== d
+    ? ((w = [`artifact-session-native-open-targets`, d, a, de]),
+      (t[1] = a),
+      (t[2] = de),
+      (t[3] = d),
+      (t[4] = w))
+    : (w = t[4]);
+  let T = w,
+    E = ce === !0 && _ != null,
+    D;
+  t[5] !== a || t[6] !== d
+    ? ((D =
+        _ == null
+          ? o
+          : (e) => {
+              let { signal: t } = e;
+              return te(_.getNativeOpenTargets({ artifactRef: a, threadId: d }), t);
             }),
-            downloadItem,
-          ],
-        })
-      : jsx.jsxs(shared.kf, {
-          align: "end",
-          surface: "opaque",
-          open,
-          onOpenChange: setOpen,
-          triggerButton: jsx.jsxs(shared.Yh, {
-            className: "pointer-events-auto shrink-0",
-            color: "outline",
-            size: "toolbar",
-            loading: isPerformingAction,
-            children: [
-              jsx.jsx(shared.Y2, {
-                id: "artifactSession.openIn.menu",
-                defaultMessage: "Open in",
-                description:
-                  "Button that opens the menu of apps and export actions for a live artifact",
+      (t[5] = a),
+      (t[6] = d),
+      (t[7] = D))
+    : (D = t[7]);
+  let O;
+  t[8] !== E || t[9] !== D || t[10] !== T
+    ? ((O = {
+        enabled: E,
+        gcTime: 0,
+        queryKey: T,
+        queryFn: D,
+        refetchOnReconnect: !1,
+        refetchOnWindowFocus: !1,
+        retry: !1,
+        staleTime: n.ONE_MINUTE,
+      }),
+      (t[8] = E),
+      (t[9] = D),
+      (t[10] = T),
+      (t[11] = O))
+    : (O = t[11]);
+  let { data: j, isError: Me, isFetching: M, refetch: Ne } = ie(O),
+    Pe = we?.workspaceFiles?.getDownloadsFolderIcon,
+    N;
+  t[12] !== b || t[13] !== p
+    ? ((N = p === `title` || Pe == null || !b ? o : () => Pe()),
+      (t[12] = b),
+      (t[13] = p),
+      (t[14] = N))
+    : (N = t[14]);
+  let Fe;
+  t[15] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((Fe = [`workspace-file-downloads`, `folder-icon`]), (t[15] = Fe))
+    : (Fe = t[15]);
+  let Ie;
+  t[16] === N
+    ? (Ie = t[17])
+    : ((Ie = { queryFn: N, queryKey: Fe, staleTime: n.INFINITE }), (t[16] = N), (t[17] = Ie));
+  let { data: Le } = ie(Ie),
+    Re;
+  t[18] === c ? (Re = t[19]) : ((Re = { hostId: c }), (t[18] = c), (t[19] = Re));
+  let {
+    clearConnectingApp: ze,
+    connectingApp: Be,
+    handleAppConnectOAuthStarted: Ve,
+    handleConnectApp: He,
+  } = Te(Re);
+  if (_ == null || ce !== !0) {
+    let e;
+    return (
+      t[20] !== b || t[21] !== l || t[22] !== f || t[23] !== p
+        ? ((e =
+            p === `title`
+              ? (0, A.jsx)(be, { fileType: l, title: f, open: b, onOpenChange: x })
+              : null),
+          (t[20] = b),
+          (t[21] = l),
+          (t[22] = f),
+          (t[23] = p),
+          (t[24] = e))
+        : (e = t[24]),
+      e
+    );
+  }
+  let P = j?.status === `ready` ? j.targets : null,
+    Ue = j?.status === `ready` ? j.fileManagerIcon : null,
+    We = Me || j?.status === `failed`,
+    Ge = !M && (We || P?.length === 0),
+    Ke;
+  t[25] !== g || t[26] !== se
+    ? ((Ke = Ae(g, se)), (t[25] = g), (t[26] = se), (t[27] = Ke))
+    : (Ke = t[27]);
+  let qe = Ke,
+    Je;
+  t[28] !== a || t[29] !== g || t[30] !== C || t[31] !== S || t[32] !== m || t[33] !== d
+    ? ((Je = async (e) => {
+        if (S || C) return;
+        ye(!0);
+        let t = await te(
+          _.performNativeFileAction({ artifactRef: a, threadId: d, action: e }),
+        ).catch(ke);
+        if ((ye(!1), t?.status === `completed`)) {
+          e.type === `download-copy` &&
+            m
+              .get(pe)
+              .success(
+                g.formatMessage({
+                  id: `localConversation.endResource.downloadCopy.success`,
+                  defaultMessage: `Saved a copy to Downloads`,
+                  description: `Success message after copying an artifact to the Downloads folder`,
+                }),
+              );
+          return;
+        }
+        switch ((t?.reason === `target-unavailable` && he(Oe), e.type)) {
+          case `download-copy`:
+            m.get(pe).danger(
+              g.formatMessage({
+                id: `localConversation.endResource.downloadCopy.failure`,
+                defaultMessage: `Could not download a copy`,
+                description: `Error message after an artifact could not be copied to the Downloads folder`,
               }),
-              jsx.jsx(shared.cy, {}),
-            ],
-          }),
-          children: [menuContent, downloadItem],
-        });
-  const connectModal =
-    connectFlow.connectingApp == null
-      ? null
-      : jsx.jsx(GoogleDriveConnectModal, {
-          app: connectFlow.connectingApp,
-          hostId,
-          onClose: connectFlow.clearConnectingApp,
-          onOAuthStarted: connectFlow.handleAppConnectOAuthStarted,
-        });
-  return jsx.jsxs(jsx.Fragment, { children: [surface, connectModal] });
-}
-
-function menuMessage(
-  id: string,
-  defaultMessage: string,
-  description: string,
-  extra: Record<string, unknown> = {},
-): unknown {
-  return jsx.jsx(shared.jf.Message, {
-    compact: true,
-    ...extra,
-    children: jsx.jsx(shared.Y2, { id, defaultMessage, description }),
-  });
-}
-function showInFileManagerLabel(
-  intl: IntlShape,
-  platform: "linux" | "macOS" | "windows",
-): string {
-  const copy =
-    platform === "macOS"
-      ? [
-          "localConversation.endResource.showInFinder",
-          "Show in Finder",
-          "Dropdown item for revealing a conversation resource in Finder",
-        ]
-      : platform === "windows"
-        ? [
-            "localConversation.endResource.showInFileExplorer",
-            "Show in File Explorer",
-            "Dropdown item for revealing a conversation resource in File Explorer",
-          ]
-        : [
-            "localConversation.endResource.showInFileManager",
-            "Show in File Manager",
-            "Dropdown item for revealing a conversation resource in the system file manager",
-          ];
-  return String(
-    intl.formatMessage({
-      id: copy[0],
-      defaultMessage: copy[1],
-      description: copy[2],
-    }),
+              { errorAnalytics: { toastId: `localConversation.endResource.downloadCopy.failure` } },
+            );
+            return;
+          case `show-in-folder`:
+            m.get(pe).danger(
+              g.formatMessage({
+                id: `artifactSession.openIn.showInFolder.failure`,
+                defaultMessage: `Could not show this artifact in the file manager`,
+                description: `Error message after a live Artifact Session could not be revealed in the system file manager`,
+              }),
+              { errorAnalytics: { toastId: `artifactSession.openIn.showInFolder.failure` } },
+            );
+            return;
+          case `open`:
+            m.get(pe).danger(
+              g.formatMessage({
+                id: `artifactSession.openIn.failed`,
+                defaultMessage: `Couldn’t open in the selected app`,
+                description: `Error toast shown when a live Artifact Session cannot be opened in a native desktop app`,
+              }),
+              { errorAnalytics: { toastId: `artifactSession.openIn.failed` } },
+            );
+        }
+      }),
+      (t[28] = a),
+      (t[29] = g),
+      (t[30] = C),
+      (t[31] = S),
+      (t[32] = m),
+      (t[33] = d),
+      (t[34] = Je))
+    : (Je = t[34]);
+  let F = Je,
+    Ye;
+  t[35] !== a || t[36] !== d
+    ? ((Ye = async () => {
+        let e = await te(_.readNativeSnapshot({ artifactRef: a, threadId: d }));
+        if (e.status === `failed`) throw Error(`Artifact Session snapshot materialization failed`);
+        return { bytes: e.bytes, contentType: e.contentType, fileName: e.fileName };
+      }),
+      (t[35] = a),
+      (t[36] = d),
+      (t[37] = Ye))
+    : (Ye = t[37]);
+  let Xe = Ye,
+    Ze;
+  t[38] === p
+    ? (Ze = t[39])
+    : ((Ze = p === `title` ? (0, A.jsx)(ue, { icon: { 16: ge, 20: _e } }) : (0, A.jsx)(ge, {})),
+      (t[38] = p),
+      (t[39] = Ze));
+  let Qe = Ze,
+    I;
+  t[40] !== S || t[41] !== F || t[42] !== P || t[43] !== p
+    ? ((I = P?.map((e) =>
+        (0, A.jsx)(
+          y.Item,
+          {
+            disabled: S,
+            leftIcon: (0, A.jsx)(xe, {
+              size: p === `title` ? `base` : `sm`,
+              children: (0, A.jsx)(`img`, { alt: ``, className: `size-full`, src: e.icon }),
+            }),
+            onSelect: () => {
+              F({ type: `open`, targetId: e.id });
+            },
+            children: (0, A.jsx)(h, {
+              id: `localConversation.endResource.nativeAppWithDefault.label`,
+              defaultMessage: `{target}{isDefault, select, true { (Default)} other {}}`,
+              description: `Native app name in a resource card's Open menu, with a suffix when it is the system default`,
+              values: { isDefault: e.default === !0, target: e.label },
+            }),
+          },
+          e.id,
+        ),
+      )),
+      (t[40] = S),
+      (t[41] = F),
+      (t[42] = P),
+      (t[43] = p),
+      (t[44] = I))
+    : (I = t[44]);
+  let L;
+  t[45] !== b || t[46] !== M
+    ? ((L =
+        b && M
+          ? (0, A.jsx)(y.Message, {
+              compact: !0,
+              children: (0, A.jsx)(h, {
+                id: `localConversation.endResource.loadingAvailableApps`,
+                defaultMessage: `Loading available apps…`,
+                description: `Dropdown item shown while loading apps that can open a conversation resource`,
+              }),
+            })
+          : null),
+      (t[45] = b),
+      (t[46] = M),
+      (t[47] = L))
+    : (L = t[47]);
+  let R;
+  t[48] !== M || t[49] !== P?.length
+    ? ((R =
+        P?.length === 0 && !M
+          ? (0, A.jsx)(y.Message, {
+              compact: !0,
+              children: (0, A.jsx)(h, {
+                id: `artifactSession.openIn.noAvailableApps`,
+                defaultMessage: `No available apps`,
+                description: `Empty state shown when no native apps can open a live Artifact Session`,
+              }),
+            })
+          : null),
+      (t[48] = M),
+      (t[49] = P?.length),
+      (t[50] = R))
+    : (R = t[50]);
+  let z;
+  t[51] !== We || t[52] !== M
+    ? ((z =
+        We && !M
+          ? (0, A.jsx)(y.Message, {
+              compact: !0,
+              role: `alert`,
+              tone: `error`,
+              children: (0, A.jsx)(h, {
+                id: `artifactSession.openIn.loadTargetsFailed`,
+                defaultMessage: `Couldn’t load available apps`,
+                description: `Error shown when native apps for opening a live Artifact Session cannot be discovered`,
+              }),
+            })
+          : null),
+      (t[51] = We),
+      (t[52] = M),
+      (t[53] = z))
+    : (z = t[53]);
+  let B;
+  t[54] !== Ge || t[55] !== Ne
+    ? ((B = Ge
+        ? (0, A.jsx)(y.Item, {
+            onSelect: (e) => {
+              (e.preventDefault(), Ne());
+            },
+            children: (0, A.jsx)(h, {
+              id: `artifactSession.openIn.retry`,
+              defaultMessage: `Try again`,
+              description: `Button that retries native app discovery for a live Artifact Session`,
+            }),
+          })
+        : null),
+      (t[54] = Ge),
+      (t[55] = Ne),
+      (t[56] = B))
+    : (B = t[56]);
+  let V;
+  t[57] === d
+    ? (V = t[58])
+    : ((V = { threadId: d, turnId: null, inputMessageId: null, messageId: null }),
+      (t[57] = d),
+      (t[58] = V));
+  let $e = p === `title` ? `base` : `sm`,
+    et;
+  t[59] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((et = () => {
+        x(!1);
+      }),
+      (t[59] = et))
+    : (et = t[59]);
+  let tt = `artifact-session:${a}`,
+    H;
+  t[60] !== r ||
+  t[61] !== He ||
+  t[62] !== c ||
+  t[63] !== C ||
+  t[64] !== l ||
+  t[65] !== Xe ||
+  t[66] !== V ||
+  t[67] !== $e ||
+  t[68] !== tt ||
+  t[69] !== f
+    ? ((H = (0, A.jsx)(Ee, {
+        analyticsClickSource: r,
+        analyticsContext: V,
+        handleConnectApp: He,
+        hostId: c,
+        iconSize: $e,
+        isOpening: C,
+        keepOpenWhileOpening: !0,
+        onCloseDropdown: et,
+        onOpeningChange: Se,
+        readUploadFile: Xe,
+        sourceId: tt,
+        targetType: l,
+        title: f,
+      })),
+      (t[60] = r),
+      (t[61] = He),
+      (t[62] = c),
+      (t[63] = C),
+      (t[64] = l),
+      (t[65] = Xe),
+      (t[66] = V),
+      (t[67] = $e),
+      (t[68] = tt),
+      (t[69] = f),
+      (t[70] = H))
+    : (H = t[70]);
+  let nt;
+  t[71] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((nt = (0, A.jsx)(y.Separator, {})), (t[71] = nt))
+    : (nt = t[71]);
+  let rt = p === `title` ? `base` : `sm`,
+    U;
+  t[72] !== Ue || t[73] !== Qe
+    ? ((U = Ue == null ? Qe : (0, A.jsx)(`img`, { alt: ``, className: `size-full`, src: Ue })),
+      (t[72] = Ue),
+      (t[73] = Qe),
+      (t[74] = U))
+    : (U = t[74]);
+  let W;
+  t[75] !== rt || t[76] !== U
+    ? ((W = (0, A.jsx)(xe, { size: rt, children: U })), (t[75] = rt), (t[76] = U), (t[77] = W))
+    : (W = t[77]);
+  let G;
+  t[78] === F
+    ? (G = t[79])
+    : ((G = () => {
+        F({ type: `show-in-folder` });
+      }),
+      (t[78] = F),
+      (t[79] = G));
+  let K;
+  t[80] !== S || t[81] !== qe || t[82] !== W || t[83] !== G
+    ? ((K = (0, A.jsx)(y.Item, { disabled: S, leftIcon: W, onSelect: G, children: qe })),
+      (t[80] = S),
+      (t[81] = qe),
+      (t[82] = W),
+      (t[83] = G),
+      (t[84] = K))
+    : (K = t[84]);
+  let it;
+  t[85] !== I ||
+  t[86] !== L ||
+  t[87] !== R ||
+  t[88] !== z ||
+  t[89] !== B ||
+  t[90] !== H ||
+  t[91] !== K
+    ? ((it = (0, A.jsxs)(A.Fragment, { children: [I, L, R, z, B, H, nt, K] })),
+      (t[85] = I),
+      (t[86] = L),
+      (t[87] = R),
+      (t[88] = z),
+      (t[89] = B),
+      (t[90] = H),
+      (t[91] = K),
+      (t[92] = it))
+    : (it = t[92]);
+  let at = it,
+    ot = p === `title` ? `base` : `sm`,
+    q;
+  t[93] === p
+    ? (q = t[94])
+    : ((q = p === `title` && (0, A.jsx)(ue, { icon: { assets: { 16: s, 20: i } } })),
+      (t[93] = p),
+      (t[94] = q));
+  let J;
+  t[95] !== Le || t[96] !== p
+    ? ((J =
+        p !== `title` &&
+        (Le == null
+          ? (0, A.jsx)(me, {})
+          : (0, A.jsx)(`img`, { alt: ``, className: `icon-sm`, src: Le }))),
+      (t[95] = Le),
+      (t[96] = p),
+      (t[97] = J))
+    : (J = t[97]);
+  let Y;
+  t[98] !== ot || t[99] !== q || t[100] !== J
+    ? ((Y = (0, A.jsxs)(xe, { size: ot, children: [q, J] })),
+      (t[98] = ot),
+      (t[99] = q),
+      (t[100] = J),
+      (t[101] = Y))
+    : (Y = t[101]);
+  let X;
+  t[102] === F
+    ? (X = t[103])
+    : ((X = () => {
+        F({ type: `download-copy` });
+      }),
+      (t[102] = F),
+      (t[103] = X));
+  let Z;
+  t[104] === p
+    ? (Z = t[105])
+    : ((Z =
+        p === `title`
+          ? (0, A.jsx)(h, {
+              id: `artifactSession.downloadTitleMenu`,
+              defaultMessage: `Download`,
+              description: `Title menu action for downloading the current live artifact`,
+            })
+          : (0, A.jsx)(h, {
+              id: `localConversation.endResource.downloadCopy`,
+              defaultMessage: `Download a copy`,
+              description: `Dropdown item for saving a separate copy of an artifact to Downloads`,
+            })),
+      (t[104] = p),
+      (t[105] = Z));
+  let st;
+  t[106] !== S || t[107] !== Y || t[108] !== X || t[109] !== Z
+    ? ((st = (0, A.jsx)(y.Item, { disabled: S, leftIcon: Y, onSelect: X, children: Z })),
+      (t[106] = S),
+      (t[107] = Y),
+      (t[108] = X),
+      (t[109] = Z),
+      (t[110] = st))
+    : (st = t[110]);
+  let ct = st,
+    lt;
+  t[111] !== ct ||
+  t[112] !== b ||
+  t[113] !== S ||
+  t[114] !== l ||
+  t[115] !== at ||
+  t[116] !== f ||
+  t[117] !== p
+    ? ((lt =
+        p === `title`
+          ? (0, A.jsxs)(be, {
+              fileType: l,
+              title: f,
+              open: b,
+              onOpenChange: x,
+              children: [
+                (0, A.jsx)(Ce, {
+                  leftIcon: (0, A.jsx)(ue, { icon: { assets: { 16: ae, 20: u } } }),
+                  label: (0, A.jsx)(h, {
+                    id: `artifactSession.openIn.menu`,
+                    defaultMessage: `Open in`,
+                    description: `Button that opens the menu of apps and export actions for a live artifact`,
+                  }),
+                  children: at,
+                }),
+                ct,
+              ],
+            })
+          : (0, A.jsxs)(le, {
+              align: `end`,
+              surface: `opaque`,
+              open: b,
+              onOpenChange: x,
+              triggerButton: (0, A.jsxs)(ne, {
+                className: `pointer-events-auto shrink-0`,
+                color: `outline`,
+                size: `toolbar`,
+                loading: S,
+                children: [
+                  (0, A.jsx)(h, {
+                    id: `artifactSession.openIn.menu`,
+                    defaultMessage: `Open in`,
+                    description: `Button that opens the menu of apps and export actions for a live artifact`,
+                  }),
+                  (0, A.jsx)(oe, {}),
+                ],
+              }),
+              children: [at, ct],
+            })),
+      (t[111] = ct),
+      (t[112] = b),
+      (t[113] = S),
+      (t[114] = l),
+      (t[115] = at),
+      (t[116] = f),
+      (t[117] = p),
+      (t[118] = lt))
+    : (lt = t[118]);
+  let ut = lt,
+    Q;
+  t[119] !== ze || t[120] !== Be || t[121] !== Ve || t[122] !== c
+    ? ((Q =
+        Be == null
+          ? null
+          : (0, A.jsx)(De, { app: Be, hostId: c, onClose: ze, onOAuthStarted: Ve })),
+      (t[119] = ze),
+      (t[120] = Be),
+      (t[121] = Ve),
+      (t[122] = c),
+      (t[123] = Q))
+    : (Q = t[123]);
+  let $;
+  return (
+    t[124] !== ut || t[125] !== Q
+      ? (($ = (0, A.jsxs)(A.Fragment, { children: [ut, Q] })),
+        (t[124] = ut),
+        (t[125] = Q),
+        (t[126] = $))
+      : ($ = t[126]),
+    $
   );
 }
-
-let initialized = false;
-function initializeOpenInButton(): void {
-  if (initialized) return;
-  initialized = true;
-  const call = (name: string) => {
-    const candidate = name in shared ? shared[name] : initial[name];
-    if (typeof candidate === "function") (candidate as () => unknown)();
-  };
-  for (const name of [
-    "Ul",
-    "DO",
-    "lO",
-    "Ls",
-    "jZ",
-    "gL",
-    "FX",
-    "K2",
-    "Zh",
-    "If",
-    "lw",
-    "ug",
-    "lk",
-    "T6t",
-    "mnt",
-    "QI",
-    "ek",
-    "Rrt",
-    "jl",
-  ])
-    call(name);
-  initializeAppConnectFlow();
-  initializeGoogleDriveItem();
-  react = shared.e6();
-  jsx = shared.I3();
+function Oe(e) {
+  return e + 1;
 }
-
-export { initializeOpenInButton as n, OpenInButton as t };
+function ke() {
+  return null;
+}
+function Ae(e, t) {
+  switch (t) {
+    case `macOS`:
+      return e.formatMessage({
+        id: `localConversation.endResource.showInFinder`,
+        defaultMessage: `Show in Finder`,
+        description: `Dropdown item for revealing a conversation resource in Finder`,
+      });
+    case `windows`:
+      return e.formatMessage({
+        id: `localConversation.endResource.showInFileExplorer`,
+        defaultMessage: `Show in File Explorer`,
+        description: `Dropdown item for revealing a conversation resource in File Explorer`,
+      });
+    case `linux`:
+      return e.formatMessage({
+        id: `localConversation.endResource.showInFileManager`,
+        defaultMessage: `Show in File Manager`,
+        description: `Dropdown item for revealing a conversation resource in the system file manager`,
+      });
+  }
+}
+var je, k, A;
+function j() {
+  return (j = e(() => {
+    ((je = t()),
+      m(),
+      r(),
+      b(),
+      f(),
+      ce(),
+      v(),
+      a(),
+      (k = se()),
+      d(),
+      T(),
+      E(),
+      g(),
+      l(),
+      de(),
+      he(),
+      x(),
+      C(),
+      w(),
+      p(),
+      _(),
+      ye(),
+      Se(),
+      (A = c()));
+  }))();
+}
+export { j as n, D as t };

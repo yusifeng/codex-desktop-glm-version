@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const ASSET_ROOT = path.resolve(ROOT, "../chatgpt-desktop-src/app/webview/assets");
@@ -16,7 +17,6 @@ const models = [
   ["model-55ff7ae3fc50.js", "learning-model-polynomial-multiplicity-intercepts", ["a","c","d","f","i","l","n","o","p","r","s","t","u"]],
   ["model-bc60e7a4d945.js", "learning-model-bubble-sort", ["a","i","n","o","r","t"]],
   ["model-1cc997c09d9b.js", "learning-model-net-ionic-equations", ["a","i","n","o","r","t"]],
-  ["model-2519c21474d3.js", "learning-model-t-statistic-p-value", ["a","c","d","f","i","l","n","o","p","r","s","t","u"]],
   ["model-78dd2f7b3a04.js", "learning-model-vector-dot-product", ["a","c","d","f","i","l","n","o","r","s","t","u"]],
 ];
 const dependencies = (source, expression) => [...source.matchAll(expression)].map((match) => match[1]);
@@ -74,12 +74,10 @@ const ionic = loaded.get("learning-model-net-ionic-equations");
 assert.equal(ionic.i("silver-chloride-precipitation"), true); assert.equal(ionic.i("bad"), false); const neutralization = ionic.n({ reaction_example: "strong-acid-base-neutralization", step: 99 }); assert.equal(neutralization.step, 3); assert.equal(neutralization.reaction.outcome, "water"); assert.equal(neutralization.reaction.netPlain, "H⁺(aq) + OH⁻(aq) → H₂O(l)"); assert.deepEqual(neutralization.reaction.spectators, ["Na⁺(aq)", "Cl⁻(aq)"]);
 runtimeAssertions += 6;
 
-const ttest = loaded.get("learning-model-t-statistic-p-value");
-assert.deepEqual(ttest.u({ tStatistic: 99, degreesOfFreedom: 0, testType: "bad" }), { tStatistic: 5, degreesOfFreedom: 1, testType: "two_sided" }); const twoSidedState = ttest.s({ tStatistic: 2, degreesOfFreedom: 10, testType: "two_sided" }); const oneSidedState = ttest.s({ tStatistic: 2, degreesOfFreedom: 10, testType: "one_sided" }); assert.ok(Math.abs(twoSidedState.pValue - 0.07338803477074037) < 1e-12); assert.ok(Math.abs(oneSidedState.pValue * 2 - twoSidedState.pValue) < 1e-14); assert.ok(Math.abs(ttest.d(0, 10) - 0.389108383966031) < 1e-12); assert.equal(ttest.c(-2, 2, 10).length, 51);
-runtimeAssertions += 5;
 
 const vectors = loaded.get("learning-model-vector-dot-product");
 const defaultVectors = vectors.s({}); assert.equal(defaultVectors.dotProduct, -1); assert.equal(defaultVectors.alignment, "negative"); assert.ok(Math.abs(defaultVectors.includedAngleDeg - 94.39870535499554) < 1e-12); const perpendicular = vectors.s({ ax: 1, ay: 0, bx: 0, by: 1 }); assert.equal(perpendicular.alignment, "perpendicular"); assert.equal(perpendicular.includedAngleDeg, 90); const clamped = vectors.u({ ax: 9, ay: 0, bx: 0, by: 0 }); assert.deepEqual({ ax: clamped.ax, ay: clamped.ay }, { ax: 6, ay: 0 }); assert.deepEqual(vectors.l({}, "a", { x: 1.12, y: 2.13 }), { ...vectors.u({}), ax: 1, ay: 2.25, aThetaDeg: Math.atan2(2.25, 1) * 180 / Math.PI });
 runtimeAssertions += 7;
 
+sourceAssertions += assertReleaseOwner("learning-model-t-statistic-p-value");
 console.log(sourceAssertions + " source assertions and " + runtimeAssertions + " runtime assertions passed");

@@ -1,21 +1,143 @@
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/codex-mobile-setup-dialog";
-import "@rchunk/codex-mobile-setup-flow";
-
-export interface CodexMobilePageProps {
-  isMfaSetupRequiredError?: boolean; isMfaSetupRequiredFetching?: boolean; mfaSetupRequired?: boolean;
-  remoteControlStatus?: "connected" | "disconnected" | "pending"; setupStepDebugOverride?: string;
-  onManageConnections?(): void; onClose?(): void;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  BX as n,
+  FX as r,
+  HX as i,
+  I3 as a,
+  LX as o,
+  QI as s,
+  ZI as c,
+  _L as l,
+  e6 as u,
+  gL as d,
+} from "@rchunk/app-shared";
+import {
+  Bfn as f,
+  Qgn as p,
+  f5t as m,
+  f7 as h,
+  m5t as g,
+  mCt as _,
+  o_n as v,
+  p7 as y,
+  pCt as b,
+  ugn as x,
+} from "@rchunk/app-initial";
+import { a as S, c as C, l as w, r as T } from "@rchunk/codex-mobile-setup-dialog";
+import { a as E, i as D, n as O, r as k, t as A } from "@rchunk/codex-mobile-setup-flow";
+function j() {
+  let e = (0, N.c)(8),
+    t = o(c),
+    r = n(g, x),
+    a = i(C) ?? `auto`,
+    s;
+  e[0] === t ? (s = e[1]) : ((s = b(t)), (e[0] = t), (e[1] = s));
+  let { data: u, isError: d, isFetching: f, isPending: p } = l(s);
+  if (p || r == null) return null;
+  let m;
+  return (
+    e[2] !== d || e[3] !== f || e[4] !== u || e[5] !== r.status || e[6] !== a
+      ? ((m = (0, F.jsx)(M, {
+          isMfaSetupRequiredError: d,
+          isMfaSetupRequiredFetching: f,
+          mfaSetupRequired: u,
+          remoteControlStatus: r.status,
+          setupStepDebugOverride: a,
+        })),
+        (e[2] = d),
+        (e[3] = f),
+        (e[4] = u),
+        (e[5] = r.status),
+        (e[6] = a),
+        (e[7] = m))
+      : (m = e[7]),
+    m
+  );
 }
-let jsx: JsxRuntime;
-function ensureJsx(): JsxRuntime { if (jsx == null) jsx = getJsxRuntime(); return jsx; }
-
-function CodexMobilePage(props: CodexMobilePageProps): unknown {
-  const runtime = ensureJsx();
-  if (props.isMfaSetupRequiredFetching) return null;
-  if (props.mfaSetupRequired && !props.isMfaSetupRequiredError) return runtime.jsxs("main", { className: "codex-mobile-setup-flow", "data-step": props.setupStepDebugOverride, children: [runtime.jsx("h1", { children: "Set up mobile access" }), runtime.jsx("button", { type: "button", onClick: props.onClose, children: "Close" })] });
-  return runtime.jsxs("main", { className: "codex-mobile-connections", "data-status": props.remoteControlStatus ?? "disconnected", children: [runtime.jsx("h1", { children: "Codex mobile" }), runtime.jsx("button", { type: "button", onClick: props.onManageConnections, children: "Manage connections" })] });
+function M(e) {
+  let t = (0, N.c)(13),
+    {
+      isMfaSetupRequiredError: n,
+      isMfaSetupRequiredFetching: r,
+      mfaSetupRequired: i,
+      remoteControlStatus: a,
+      setupStepDebugOverride: o,
+    } = e,
+    s = v(),
+    [c] = (0, P.useState)(a);
+  if (r) return null;
+  if (
+    E({
+      isMfaSetupRequiredError: n,
+      mfaSetupRequired: i,
+      initialRemoteControlStatus: c,
+      remoteControlStatus: a,
+      setupStepDebugOverride: o,
+    })
+  ) {
+    let e;
+    t[0] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, F.jsx)(h.MainContentLayout, { layout: `full-bleed` })), (t[0] = e))
+      : (e = t[0]);
+    let r;
+    t[1] !== n || t[2] !== i || t[3] !== a
+      ? ((r = k({ isMfaSetupRequiredError: n, mfaSetupRequired: i, remoteControlStatus: a })),
+        (t[1] = n),
+        (t[2] = i),
+        (t[3] = a),
+        (t[4] = r))
+      : (r = t[4]);
+    let o;
+    t[5] === s
+      ? (o = t[6])
+      : ((o = () => {
+          s(`/`);
+        }),
+        (t[5] = s),
+        (t[6] = o));
+    let c;
+    return (
+      t[7] !== r || t[8] !== o
+        ? ((c = (0, F.jsxs)(F.Fragment, {
+            children: [e, (0, F.jsx)(A, { initialStep: r, onClose: o, variant: `page` })],
+          })),
+          (t[7] = r),
+          (t[8] = o),
+          (t[9] = c))
+        : (c = t[9]),
+      c
+    );
+  }
+  let l;
+  t[10] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((l = (0, F.jsx)(h.MainContentLayout, { layout: `full-bleed` })), (t[10] = l))
+    : (l = t[10]);
+  let u;
+  return (
+    t[11] === s
+      ? (u = t[12])
+      : ((u = (0, F.jsxs)(F.Fragment, {
+          children: [
+            l,
+            (0, F.jsx)(T, {
+              onManageConnections: () => {
+                s(`/settings/connections`);
+              },
+            }),
+          ],
+        })),
+        (t[11] = s),
+        (t[12] = u)),
+    u
+  );
 }
-
-export { CodexMobilePage };
+var N, P, F;
+function I() {
+  return (I = e(() => {
+    ((N = t()), d(), r(), (P = u()), p(), m(), y(), s(), f(), w(), O(), _(), D(), S(), (F = a()));
+  }))();
+}
+I();
+export { j as CodexMobilePage };

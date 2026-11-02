@@ -10,11 +10,6 @@ const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."),
   ASSET = path.join(ROOT, "src/webview/assets");
 assert.equal(IMPORT_ALIASES.proxy, CHUNKS["motion-proxy-runtime"]);
 const modules = [
-  [
-    "subagents-f011dd080466.js",
-    "registered-subagents-thumbnail",
-    ["RegisteredSubagentsThumbnail"],
-  ],
   ["system-of-equations-a765decfc54f.js", "system-of-equations", ["n", "t"]],
   [
     "template-224b997c2ad7.js",
@@ -31,7 +26,6 @@ const modules = [
     "learning-model-distance-between-points-template",
     ["n", "r", "t"],
   ],
-  ["thumbnail-7c714f359bb7.js", "file-image-thumbnail", ["i", "n", "r", "t"]],
 ];
 const deps = (s, r) => [...s.matchAll(r)].map((m) => m[1]);
 let sourceAssertions = 0;
@@ -55,6 +49,8 @@ for (const [a, d] of modules) {
 sourceAssertions += assertReleaseOwner("sort-bar-visualization");
 sourceAssertions += assertReleaseOwner("svg-arrow");
 sourceAssertions += assertReleaseOwner("text-file-thumbnail");
+sourceAssertions += assertReleaseOwner("registered-subagents-thumbnail");
+sourceAssertions += assertReleaseOwner("file-image-thumbnail");
 globalThis.__na = {
   cache: Array(100).fill(Symbol.for("react.memo_cache_sentinel")),
   agents: [],
@@ -166,31 +162,7 @@ sys.n();
 assert.deepEqual(sys.t("y=x+1\\\\y=2"), ["y=x+1", "y=2"]);
 assert.equal(sys.t("y=1\\\\y=2"), null);
 runtimeAssertions += 2;
-const sub = L.get("registered-subagents-thumbnail");
-assert.equal(
-  sub.RegisteredSubagentsThumbnail({
-    requestedConversationId: "c",
-    hostId: "h",
-    title: "A",
-  }).kind,
-  "RegisteredConversation",
-);
-runtimeAssertions++;
 sourceAssertions += assertReleaseOwner("conversation-beacon-surfaces");
-const file = L.get("file-image-thumbnail");
-file.n();
-assert.deepEqual(
-  file.t({ title: "I", path: "a.png", sources: ["data:image/png;base64,x"] })
-    .props.sections,
-  [{ kind: "image", src: "data:image/png;base64,x" }],
-);
-file.i();
-assert.equal(
-  file.r({ title: "D", path: "a.pdf", format: "pdf", sizeBytes: 10 }).props
-    .sections[0].content.size,
-  "10 bytes en",
-);
-runtimeAssertions += 2;
 delete globalThis.__na;
 console.log(
   sourceAssertions +

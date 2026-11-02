@@ -1,7 +1,144 @@
-// One-sample t-test learning model. Release chunk: model-a41dd4bab755.js.
-import "@rchunk/rolldown-runtime";
-type Alternative = "two-sided" | "greater" | "less"; interface Parameter { kind: "number" | "integer"; defaultValue: number; min: number; max: number } interface Manifest { type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string; parameters: { hypothesized_mean: Parameter; sample_mean: Parameter; sample_standard_deviation: Parameter; sample_size: Parameter; alternative: { kind: "enum"; defaultValue: Alternative; allowedValues: Alternative[] }; significance_level: Parameter } }
-let manifest: Manifest; let sampleMeanControl: { defaultValue: number; min: number; max: number; step: number }; let sampleSizeControl: { defaultValue: number; min: number; max: number; step: number }; let normalizeValues: (values: Record<string, unknown>) => { hypothesized_mean: number; sample_mean: number; sample_standard_deviation: number; sample_size: number; alternative: Alternative; significance_level: number }; let kernel: (value: number, degreesOfFreedom: number) => number; let calculate: (values: Record<string, unknown>) => { values: ReturnType<typeof normalizeValues>; degreesOfFreedom: number; standardError: number; tStatistic: number; pValue: number; criticalMagnitude: number; reject: boolean }; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "ONE_SAMPLE_T_TEST", version: 2, thumbnailAssetKey: "one-sample-t-test-v1", canonicalFormula: "t = \\frac{\\bar{x}-\\mu_0}{s/\\sqrt{n}}", parameters: { hypothesized_mean: { kind: "number", defaultValue: 50, min: 0, max: 100 }, sample_mean: { kind: "number", defaultValue: 54, min: 0, max: 100 }, sample_standard_deviation: { kind: "number", defaultValue: 10, min: 0.1, max: 100 }, sample_size: { kind: "integer", defaultValue: 16, min: 3, max: 100 }, alternative: { kind: "enum", defaultValue: "two-sided", allowedValues: ["two-sided", "greater", "less"] }, significance_level: { kind: "number", defaultValue: 0.05, min: 0.001, max: 0.2 } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); const parameters = manifest.parameters; sampleMeanControl = { defaultValue: parameters.sample_mean.defaultValue, min: parameters.sample_mean.min, max: parameters.sample_mean.max, step: 1 }; sampleSizeControl = { defaultValue: parameters.sample_size.defaultValue, min: parameters.sample_size.min, max: parameters.sample_size.max, step: 1 }; const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value)); const numeric = (value: unknown, parameter: Parameter) => clamp(typeof value === "number" && Number.isFinite(value) ? value : parameter.defaultValue, parameter.min, parameter.max); const alternative = (value: unknown): Alternative => value === "greater" || value === "less" || value === "two-sided" ? value : "two-sided"; normalizeValues = values => ({ hypothesized_mean: numeric(values.hypothesized_mean, parameters.hypothesized_mean), sample_mean: numeric(values.sample_mean, parameters.sample_mean), sample_standard_deviation: numeric(values.sample_standard_deviation, parameters.sample_standard_deviation), sample_size: Math.round(numeric(values.sample_size, parameters.sample_size)), alternative: alternative(values.alternative ?? parameters.alternative.defaultValue), significance_level: numeric(values.significance_level, parameters.significance_level) }); const logGamma = (value: number) => { const coefficients = [676.5203681218851, -1259.1392167224028, 771.3234287776531, -176.6150291621406, 12.507343278686905, -0.13857109526572012, 9.984369578019572e-6, 1.5056327351493116e-7]; let sum = 0.9999999999998099; const shifted = value - 1; coefficients.forEach((coefficient, index) => { sum += coefficient / (shifted + index + 1); }); const t = shifted + coefficients.length - 0.5; return 0.5 * Math.log(2 * Math.PI) + (shifted + 0.5) * Math.log(t) - t + Math.log(sum); }; const betaFraction = (x: number, a: number, b: number) => { const tiny = 1e-30; let c = 1; let d = 1 - (a + b) * x / (a + 1); d = Math.abs(d) < tiny ? tiny : d; d = 1 / d; let result = d; for (let iteration = 1; iteration <= 150; iteration += 1) { const doubled = 2 * iteration; let coefficient = iteration * (b - iteration) * x / ((a + doubled - 1) * (a + doubled)); d = 1 + coefficient * d; d = Math.abs(d) < tiny ? tiny : d; c = 1 + coefficient / c; c = Math.abs(c) < tiny ? tiny : c; d = 1 / d; result *= d * c; coefficient = -((a + iteration) * (a + b + iteration) * x) / ((a + doubled) * (a + doubled + 1)); d = 1 + coefficient * d; d = Math.abs(d) < tiny ? tiny : d; c = 1 + coefficient / c; c = Math.abs(c) < tiny ? tiny : c; d = 1 / d; const delta = d * c; result *= delta; if (Math.abs(delta - 1) < 1e-12) break; } return result; }; const regularizedBeta = (x: number, a: number, b: number) => { if (x <= 0) return 0; if (x >= 1) return 1; const front = Math.exp(logGamma(a + b) - logGamma(a) - logGamma(b) + a * Math.log(x) + b * Math.log1p(-x)); return x < (a + 1) / (a + b + 2) ? front * betaFraction(x, a, b) / a : 1 - front * betaFraction(1 - x, b, a) / b; }; const upperTailMagnitude = (value: number, degrees: number) => 0.5 * regularizedBeta(degrees / (degrees + value * value), degrees / 2, 0.5); const cdf = (value: number, degrees: number) => value === 0 ? 0.5 : value < 0 ? upperTailMagnitude(Math.abs(value), degrees) : 1 - upperTailMagnitude(Math.abs(value), degrees); const quantile = (probability: number, degrees: number) => { let low = -80; let high = 80; for (let iteration = 0; iteration < 100; iteration += 1) { const middle = (low + high) / 2; cdf(middle, degrees) < probability ? low = middle : high = middle; } return (low + high) / 2; }; kernel = (value, degrees) => (1 + value * value / degrees) ** (-(degrees + 1) / 2); calculate = values => { const normalized = normalizeValues(values); const degreesOfFreedom = normalized.sample_size - 1; const standardError = normalized.sample_standard_deviation / Math.sqrt(normalized.sample_size); const tStatistic = (normalized.sample_mean - normalized.hypothesized_mean) / standardError; const tail = upperTailMagnitude(Math.abs(tStatistic), degreesOfFreedom); const pValue = normalized.alternative === "greater" ? tStatistic >= 0 ? tail : 1 - tail : normalized.alternative === "less" ? tStatistic <= 0 ? tail : 1 - tail : 2 * tail; const criticalMagnitude = quantile(normalized.alternative === "two-sided" ? 1 - normalized.significance_level / 2 : 1 - normalized.significance_level, degreesOfFreedom); return { values: normalized, degreesOfFreedom, standardError, tStatistic, pValue: clamp(pValue, 0, 1), criticalMagnitude, reject: pValue <= normalized.significance_level }; }; }
-export { normalizeValues as a, manifest as c, initializeModel as i, sampleSizeControl as n, kernel as o, calculate as r, initializeManifest as s, sampleMeanControl as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `ONE_SAMPLE_T_TEST`),
+      (n = `one-sample-t-test-v1`),
+      (r = `t = \\frac{\\bar{x}-\\mu_0}{s/\\sqrt{n}}`),
+      (i = {
+        hypothesized_mean: { kind: `number`, defaultValue: 50, min: 0, max: 100 },
+        sample_mean: { kind: `number`, defaultValue: 54, min: 0, max: 100 },
+        sample_standard_deviation: { kind: `number`, defaultValue: 10, min: 0.1, max: 100 },
+        sample_size: { kind: `integer`, defaultValue: 16, min: 3, max: 100 },
+        alternative: {
+          kind: `enum`,
+          defaultValue: `two-sided`,
+          allowedValues: [`two-sided`, `greater`, `less`],
+        },
+        significance_level: { kind: `number`, defaultValue: 0.05, min: 0.001, max: 0.2 },
+      }),
+      (a = { type: t, version: 2, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+var s, c, l, u, d, f, p, m, h, g, _, v, y, b, x;
+function S() {
+  return (S = e(() => {
+    (o(),
+      (s = a.parameters),
+      (c = {
+        defaultValue: s.sample_mean.defaultValue,
+        min: s.sample_mean.min,
+        max: s.sample_mean.max,
+        step: 1,
+      }),
+      (l = {
+        defaultValue: s.sample_size.defaultValue,
+        min: s.sample_size.min,
+        max: s.sample_size.max,
+        step: 1,
+      }),
+      (u = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (d = (e, t) => u(Number.isFinite(e) ? (e ?? t.defaultValue) : t.defaultValue, t.min, t.max)),
+      (f = (e) => (e === `two-sided` || e === `greater` || e === `less` ? e : `two-sided`)),
+      (p = (e) => ({
+        hypothesized_mean: d(e.hypothesized_mean, s.hypothesized_mean),
+        sample_mean: d(e.sample_mean, s.sample_mean),
+        sample_standard_deviation: d(e.sample_standard_deviation, s.sample_standard_deviation),
+        sample_size: Math.round(d(e.sample_size, s.sample_size)),
+        alternative: f(e.alternative ?? s.alternative.defaultValue),
+        significance_level: d(e.significance_level, s.significance_level),
+      })),
+      (m = (e) => {
+        let t = [
+            676.5203681218851, -1259.1392167224028, 771.3234287776531, -176.6150291621406,
+            12.507343278686905, -0.13857109526572012, 9984369578019572e-21, 1.5056327351493116e-7,
+          ],
+          n = 0.9999999999998099,
+          r = e - 1;
+        t.forEach((e, t) => {
+          n += e / (r + t + 1);
+        });
+        let i = r + t.length - 0.5;
+        return 0.5 * Math.log(2 * Math.PI) + (r + 0.5) * Math.log(i) - i + Math.log(n);
+      }),
+      (h = (e, t, n) => {
+        let r = 1e-30,
+          i = 1,
+          a = 1 - ((t + n) * e) / (t + 1);
+        ((a = Math.abs(a) < r ? r : a), (a = 1 / a));
+        let o = a;
+        for (let s = 1; s <= 150; s += 1) {
+          let c = 2 * s,
+            l = (s * (n - s) * e) / ((t + c - 1) * (t + c));
+          ((a = 1 + l * a),
+            (a = Math.abs(a) < r ? r : a),
+            (i = 1 + l / i),
+            (i = Math.abs(i) < r ? r : i),
+            (a = 1 / a),
+            (o *= a * i),
+            (l = -((t + s) * (t + n + s) * e) / ((t + c) * (t + c + 1))),
+            (a = 1 + l * a),
+            (a = Math.abs(a) < r ? r : a),
+            (i = 1 + l / i),
+            (i = Math.abs(i) < r ? r : i),
+            (a = 1 / a));
+          let u = a * i;
+          if (((o *= u), Math.abs(u - 1) < 1e-12)) break;
+        }
+        return o;
+      }),
+      (g = (e, t, n) => {
+        if (e <= 0) return 0;
+        if (e >= 1) return 1;
+        let r = Math.exp(m(t + n) - m(t) - m(n) + t * Math.log(e) + n * Math.log1p(-e));
+        return e < (t + 1) / (t + n + 2) ? (r * h(e, t, n)) / t : 1 - (r * h(1 - e, n, t)) / n;
+      }),
+      (_ = (e, t) => {
+        if (e === 0) return 0.5;
+        let n = v(Math.abs(e), t);
+        return e < 0 ? n : 1 - n;
+      }),
+      (v = (e, t) => 0.5 * g(t / (t + e * e), t / 2, 0.5)),
+      (y = (e, t) => {
+        let n = -80,
+          r = 80;
+        for (let i = 0; i < 100; i += 1) {
+          let i = (n + r) / 2;
+          _(i, t) < e ? (n = i) : (r = i);
+        }
+        return (n + r) / 2;
+      }),
+      (b = (e, t) => (1 + (e * e) / t) ** (-(t + 1) / 2)),
+      (x = (e) => {
+        let t = p(e),
+          n = t.sample_size - 1,
+          r = t.sample_standard_deviation / Math.sqrt(t.sample_size),
+          i = (t.sample_mean - t.hypothesized_mean) / r,
+          a = v(Math.abs(i), n),
+          o =
+            t.alternative === `greater`
+              ? i >= 0
+                ? a
+                : 1 - a
+              : t.alternative === `less`
+                ? i <= 0
+                  ? a
+                  : 1 - a
+                : 2 * a,
+          s =
+            t.alternative === `two-sided` ? 1 - t.significance_level / 2 : 1 - t.significance_level,
+          c = y(s, n);
+        return {
+          values: t,
+          degreesOfFreedom: n,
+          standardError: r,
+          tStatistic: i,
+          pValue: u(o, 0, 1),
+          criticalMagnitude: c,
+          reject: o <= t.significance_level,
+        };
+      }));
+  }))();
+}
+export { p as a, a as c, S as i, l as n, b as o, x as r, o as s, c as t };

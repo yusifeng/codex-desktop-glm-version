@@ -9,7 +9,6 @@ import { assertReleaseOwner } from './release-owner-test-helpers.mjs';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SOURCE = '/Users/david/Workspace/ppio_github/chatgpt-desktop-src/app/webview/assets';
 const modules = [
-  ['open-in-codex-c690ffed81f6.js', 'windows-tabs-open', ['runWindowsTabsOpen']],
 ];
 const aliases = new Map([
   ['settings-parental-presentation', 'presentation'],
@@ -66,13 +65,7 @@ let runtimeAssertions = 0;
 for (const [, semantic, expectedExports] of modules) { const value = await bundle(semantic); loaded.set(semantic, value); assert.deepEqual(Object.keys(value).sort(), expectedExports); runtimeAssertions++; }
 
 const scope = { value: { routeKind: 'local-thread', conversationId: 'thread-1' }, get(key) { if (key === Symbol.for('archived')) return false; if (key === Symbol.for('host')) return 'host-1'; if (key === Symbol.for('terminal-tab-ids')) return []; return undefined; } };
-const open = loaded.get('windows-tabs-open').runWindowsTabsOpen;
-assert.deepEqual(await open({ target: { type: 'file', path: '/tmp/a.ts' } }, { scope }), { threadId: 'thread-1', type: 'file', placement: 'right', status: 'opened', tabId: 'file:/tmp/a.ts' });
-globalThis.__nj.browserTabs = [{ browserTabId: 'existing' }]; assert.equal((await open({ target: { type: 'browser', tabId: 'existing' } }, { scope })).status, 'existing');
-assert.deepEqual(await open({ placement: 'bottom', target: { type: 'terminal', sessionId: 'term' } }, { scope }), { threadId: 'thread-1', type: 'terminal', placement: 'bottom', status: 'opened', tabId: 'terminal:term' });
-globalThis.__nj.reviewLinks = { 'https://pr': { kind: 'pullRequestReview', target: { id: 42 } } }; assert.equal((await open({ target: { type: 'browser', url: 'https://pr' } }, { scope })).status, 'opened');
-await assert.rejects(() => open({ threadId: 'other', target: { type: 'file', path: 'x' } }, { scope }), /not visible/);
-runtimeAssertions += 5;
+sourceAssertions += assertReleaseOwner('windows-tabs-open');
 
 const projectImportAssertions = assertReleaseOwner('project-import-prompt-host');
 

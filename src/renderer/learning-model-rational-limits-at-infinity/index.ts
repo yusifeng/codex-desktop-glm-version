@@ -1,7 +1,130 @@
-// Rational limits at infinity learning model. Release chunk: model-65944a036c44.js.
-import "@rchunk/rolldown-runtime";
-interface Values { numeratorDegree?: number | null; denominatorDegree?: number | null; numeratorLeadingCoefficient?: number | null; denominatorLeadingCoefficient?: number | null } interface Manifest { type: string; version: number; thumbnailAssetKey: string; canonicalFormula: string; parameters: { numeratorDegree: { kind: "integer"; defaultValue: number; min: number; max: number }; denominatorDegree: { kind: "integer"; defaultValue: number; min: number; max: number }; numeratorLeadingCoefficient: { kind: "number"; defaultValue: number; min: number; max: number }; denominatorLeadingCoefficient: { kind: "number"; defaultValue: number; min: number; max: number } } }
-let manifest: Manifest; let numeratorDegrees: number[]; let denominatorDegrees: number[]; let coefficientStep = 0.5; let defaults: Required<Values>; let normalizeValues: (values: Values) => Required<Values>; let polynomialLatex: (coefficients: number[]) => string; let calculate: (values: Values) => { safeValues: Required<Values>; numerator: number[]; denominator: number[]; quotient: number[]; remainder: number[]; limitCase: "zero" | "ratio" | "slant" | "unbounded"; ratio: number; functionLatex: string; functionExpression: string; quotientExpression: string }; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "RATIONAL_LIMITS_AT_INFINITY", version: 1, thumbnailAssetKey: "rational-limits-at-infinity-v1", canonicalFormula: "\\lim_{x\\to\\pm\\infty}\\left(f(x)-q(x)\\right)=0", parameters: { numeratorDegree: { kind: "integer", defaultValue: 1, min: 0, max: 3 }, denominatorDegree: { kind: "integer", defaultValue: 2, min: 1, max: 3 }, numeratorLeadingCoefficient: { kind: "number", defaultValue: 2, min: 0.5, max: 5 }, denominatorLeadingCoefficient: { kind: "number", defaultValue: 1, min: 0.5, max: 5 } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); const parameters = manifest.parameters; const range = (minimum: number, maximum: number) => Array.from({ length: Math.floor(maximum) - Math.ceil(minimum) + 1 }, (_, index) => Math.ceil(minimum + index)); numeratorDegrees = range(parameters.numeratorDegree.min, parameters.numeratorDegree.max); denominatorDegrees = range(parameters.denominatorDegree.min, parameters.denominatorDegree.max); defaults = { numeratorDegree: parameters.numeratorDegree.defaultValue, denominatorDegree: parameters.denominatorDegree.defaultValue, numeratorLeadingCoefficient: parameters.numeratorLeadingCoefficient.defaultValue, denominatorLeadingCoefficient: parameters.denominatorLeadingCoefficient.defaultValue }; const clamp = (value: number | null | undefined, fallback: number, minimum: number, maximum: number) => Math.min(maximum, Math.max(minimum, typeof value === "number" && Number.isFinite(value) ? value : fallback)); normalizeValues = values => ({ numeratorDegree: Math.round(clamp(values.numeratorDegree, defaults.numeratorDegree, parameters.numeratorDegree.min, parameters.numeratorDegree.max)), denominatorDegree: Math.round(clamp(values.denominatorDegree, defaults.denominatorDegree, parameters.denominatorDegree.min, parameters.denominatorDegree.max)), numeratorLeadingCoefficient: clamp(values.numeratorLeadingCoefficient, defaults.numeratorLeadingCoefficient, parameters.numeratorLeadingCoefficient.min, parameters.numeratorLeadingCoefficient.max), denominatorLeadingCoefficient: clamp(values.denominatorLeadingCoefficient, defaults.denominatorLeadingCoefficient, parameters.denominatorLeadingCoefficient.min, parameters.denominatorLeadingCoefficient.max) }); const numerator = (degree: number, leading: number) => degree === 0 ? [leading] : degree === 1 ? [1, leading] : degree === 2 ? [1, 1, leading] : [1, 1, 0, leading]; const denominator = (degree: number, leading: number) => degree === 1 ? [3, leading] : degree === 2 ? [3, 0, leading] : [3, 0, 0, leading]; const trim = (coefficients: number[]) => { const result = [...coefficients]; while (result.length > 1 && Math.abs(result[result.length - 1] ?? 0) < 1e-10) result.pop(); return result; }; const divide = (dividend: number[], divisor: number[]) => { const remainder = [...dividend]; const degreeDifference = dividend.length - divisor.length; if (degreeDifference < 0) return { quotient: [0], remainder: trim(remainder) }; const quotient = Array.from({ length: degreeDifference + 1 }, () => 0); const leading = divisor[divisor.length - 1] ?? 1; for (let degree = degreeDifference; degree >= 0; degree -= 1) { const coefficient = (remainder[divisor.length - 1 + degree] ?? 0) / leading; quotient[degree] = coefficient; for (let index = 0; index < divisor.length; index += 1) remainder[index + degree] = (remainder[index + degree] ?? 0) - coefficient * (divisor[index] ?? 0); } return { quotient: trim(quotient), remainder: trim(remainder.slice(0, Math.max(1, divisor.length - 1))) }; }; const format = (coefficients: number[], latex: boolean, numberFormat: (value: number) => string) => { const terms: string[] = []; for (let degree = coefficients.length - 1; degree >= 0; degree -= 1) { const coefficient = coefficients[degree] ?? 0; if (Math.abs(coefficient) < 1e-10) continue; const sign = coefficient < 0 ? "-" : terms.length === 0 ? "" : "+"; const magnitude = Math.abs(coefficient); terms.push(`${sign}${degree > 0 && Math.abs(magnitude - 1) < 1e-10 ? "" : numberFormat(magnitude)}${degree === 0 ? "" : degree === 1 ? "x" : latex ? `x^{${degree}}` : `x^${degree}`}`); } return terms.join("") || "0"; }; polynomialLatex = coefficients => format(coefficients, true, value => Number((Math.abs(value) < 1e-10 ? 0 : value).toFixed(2)).toString()); const expression = (coefficients: number[]) => format(coefficients, false, value => Number(value.toPrecision(15)).toString()); calculate = values => { const safeValues = normalizeValues(values); const numeratorCoefficients = numerator(safeValues.numeratorDegree, safeValues.numeratorLeadingCoefficient); const denominatorCoefficients = denominator(safeValues.denominatorDegree, safeValues.denominatorLeadingCoefficient); const division = divide(numeratorCoefficients, denominatorCoefficients); const difference = safeValues.numeratorDegree - safeValues.denominatorDegree; const limitCase = difference < 0 ? "zero" : difference === 0 ? "ratio" : difference === 1 ? "slant" : "unbounded"; return { safeValues, numerator: numeratorCoefficients, denominator: denominatorCoefficients, quotient: division.quotient, remainder: division.remainder, limitCase, ratio: safeValues.numeratorLeadingCoefficient / safeValues.denominatorLeadingCoefficient, functionLatex: `f(x)=\\frac{${polynomialLatex(numeratorCoefficients)}}{${polynomialLatex(denominatorCoefficients)}}`, functionExpression: `y=(${expression(numeratorCoefficients)})/(${expression(denominatorCoefficients)})`, quotientExpression: `y=${expression(division.quotient)}` }; }; }
-export { initializeModel as a, normalizeValues as c, numeratorDegrees as i, initializeManifest as l, denominatorDegrees as n, polynomialLatex as o, coefficientStep as r, calculate as s, defaults as t, manifest as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `RATIONAL_LIMITS_AT_INFINITY`),
+      (n = `rational-limits-at-infinity-v1`),
+      (r = `\\lim_{x\\to\\pm\\infty}\\left(f(x)-q(x)\\right)=0`),
+      (i = {
+        numeratorDegree: { kind: `integer`, defaultValue: 1, min: 0, max: 3 },
+        denominatorDegree: { kind: `integer`, defaultValue: 2, min: 1, max: 3 },
+        numeratorLeadingCoefficient: { kind: `number`, defaultValue: 2, min: 0.5, max: 5 },
+        denominatorLeadingCoefficient: { kind: `number`, defaultValue: 1, min: 0.5, max: 5 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+var s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w, T, E, D;
+function O() {
+  return (O = e(() => {
+    (o(),
+      ({ parameters: s } = a),
+      (c = 0.5),
+      (l = (e, t) =>
+        Array.from({ length: Math.floor(t) - Math.ceil(e) + 1 }, (t, n) => Math.ceil(e + n))),
+      (u = l(s.numeratorDegree.min, s.numeratorDegree.max)),
+      (d = l(s.denominatorDegree.min, s.denominatorDegree.max)),
+      (f = {
+        numeratorDegree: s.numeratorDegree.defaultValue,
+        denominatorDegree: s.denominatorDegree.defaultValue,
+        numeratorLeadingCoefficient: s.numeratorLeadingCoefficient.defaultValue,
+        denominatorLeadingCoefficient: s.denominatorLeadingCoefficient.defaultValue,
+      }),
+      (p = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (m = (e, t, n, r) => p(Number.isFinite(e) ? e : t, n, r)),
+      (h = (e) => ({
+        numeratorDegree: Math.round(
+          m(
+            e.numeratorDegree,
+            s.numeratorDegree.defaultValue,
+            s.numeratorDegree.min,
+            s.numeratorDegree.max,
+          ),
+        ),
+        denominatorDegree: Math.round(
+          m(
+            e.denominatorDegree,
+            s.denominatorDegree.defaultValue,
+            s.denominatorDegree.min,
+            s.denominatorDegree.max,
+          ),
+        ),
+        numeratorLeadingCoefficient: m(
+          e.numeratorLeadingCoefficient,
+          s.numeratorLeadingCoefficient.defaultValue,
+          s.numeratorLeadingCoefficient.min,
+          s.numeratorLeadingCoefficient.max,
+        ),
+        denominatorLeadingCoefficient: m(
+          e.denominatorLeadingCoefficient,
+          s.denominatorLeadingCoefficient.defaultValue,
+          s.denominatorLeadingCoefficient.min,
+          s.denominatorLeadingCoefficient.max,
+        ),
+      })),
+      (g = (e, t) => (e === 0 ? [t] : e === 1 ? [1, t] : e === 2 ? [1, 1, t] : [1, 1, 0, t])),
+      (_ = (e, t) => (e === 1 ? [3, t] : e === 2 ? [3, 0, t] : [3, 0, 0, t])),
+      (v = (e) => {
+        let t = [...e];
+        for (; t.length > 1 && Math.abs(t[t.length - 1] ?? 0) < 1e-10;) t.pop();
+        return t;
+      }),
+      (y = (e, t) => {
+        let n = [...e],
+          r = e.length - t.length;
+        if (r < 0) return { quotient: [0], remainder: v(n) };
+        let i = Array.from({ length: r + 1 }, () => 0),
+          a = t[t.length - 1] ?? 1;
+        for (let e = r; e >= 0; --e) {
+          let r = (n[t.length - 1 + e] ?? 0) / a;
+          i[e] = r;
+          for (let i = 0; i < t.length; i += 1) n[i + e] = (n[i + e] ?? 0) - r * (t[i] ?? 0);
+        }
+        return { quotient: v(i), remainder: v(n.slice(0, Math.max(1, t.length - 1))) };
+      }),
+      (b = (e) => {
+        let t = e.numeratorDegree - e.denominatorDegree;
+        return t < 0 ? `zero` : t === 0 ? `ratio` : t === 1 ? `slant` : `unbounded`;
+      }),
+      (x = (e) => Number((Math.abs(e) < 1e-10 ? 0 : e).toFixed(2)).toString()),
+      (S = (e) => Number(e.toPrecision(15)).toString()),
+      (C = (e, t, n, r, i) => {
+        if (Math.abs(e) < 1e-10) return ``;
+        let a = e < 0 ? `-` : n ? `` : `+`,
+          o = Math.abs(e);
+        return `${a}${t > 0 && Math.abs(o - 1) < 1e-10 ? `` : i(o)}${t === 0 ? `` : t === 1 ? `x` : r ? `x^{${t}}` : `x^${t}`}`;
+      }),
+      (w = (e, t, n) => {
+        let r = [];
+        for (let i = e.length - 1; i >= 0; --i) {
+          let a = C(e[i] ?? 0, i, r.length === 0, t, n);
+          a && r.push(a);
+        }
+        return r.join(``) || `0`;
+      }),
+      (T = (e) => w(e, !0, x)),
+      (E = (e) => w(e, !1, S)),
+      (D = (e) => {
+        let t = h(e),
+          n = g(t.numeratorDegree, t.numeratorLeadingCoefficient),
+          r = _(t.denominatorDegree, t.denominatorLeadingCoefficient),
+          i = y(n, r),
+          a = b(t),
+          o = t.numeratorLeadingCoefficient / t.denominatorLeadingCoefficient;
+        return {
+          safeValues: t,
+          numerator: n,
+          denominator: r,
+          quotient: i.quotient,
+          remainder: i.remainder,
+          limitCase: a,
+          ratio: o,
+          functionLatex: `f(x)=\\frac{${T(n)}}{${T(r)}}`,
+          functionExpression: `y=(${E(n)})/(${E(r)})`,
+          quotientExpression: `y=${E(i.quotient)}`,
+        };
+      }));
+  }))();
+}
+export { O as a, h as c, u as i, o as l, d as n, T as o, c as r, D as s, f as t, a as u };

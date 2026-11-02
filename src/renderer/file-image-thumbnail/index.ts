@@ -1,14 +1,149 @@
-import "@rchunk/rolldown-runtime";
-import * as Shared from "@rchunk/app-shared";
-import * as Initial from "@rchunk/app-initial";
-import * as FormatBytes from "@rchunk/format-bytes";
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>): unknown }
-const shared = Shared as unknown as { $3(): { c(n: number): unknown[] }; FX(): void; I3(): JsxRuntime; K2(): void; LX(s: unknown): { queryClient: unknown }; QI(): void; Y2: unknown; ZI: unknown; e6(): unknown; gg(): void; iS: unknown; lw(): void; mg(path: string): unknown; n4(): string };
-const initial = Initial as unknown as { H3t(source: string, hostId: string, client: unknown): string | null; HGt(): void; U3t(): void; Xd: unknown; Zd(): void; zGt(client: unknown, source: string, resolver: unknown): string | null };
-const format = FormatBytes as unknown as { t(bytes: number, locale: string): string };
-let compiler: { c(n: number): unknown[] }, jsx: JsxRuntime;
-function FileThumbnail({ icon, title, path, format: fileFormat = "unknown", sizeBytes }: Record<string, unknown>): unknown { compiler.c(15); const locale = shared.n4(); const shownIcon = icon ?? jsx.jsx(shared.mg(String(path)), { className: "icon-sm" }); const size = typeof sizeBytes === "number" ? format.t(sizeBytes, locale) : null; return jsx.jsx(initial.Xd, { title, subtitle: path, icon: shownIcon, sections: [{ kind: "text", lines: 1, variant: "caption", content: { format: fileFormat, size } }] }); }
-function initializeFileThumbnail(): void { compiler = shared.$3(); shared.K2(); initial.Zd(); shared.gg(); jsx = shared.I3(); }
-function ImageThumbnail({ hostId, icon, imageAssetResolver, title, sources, path, sizeBytes }: Record<string, unknown>): unknown { compiler.c(19); const scope = shared.LX(shared.ZI); let source: string | null = null; if (Array.isArray(sources)) for (const candidate of sources) { if (typeof candidate !== "string") continue; if (candidate.startsWith("data:image/")) { source = candidate; break; } source = initial.zGt(scope.queryClient, candidate, imageAssetResolver) ?? (typeof hostId === "string" ? initial.H3t(candidate, hostId, scope.queryClient) : null); if (source) break; } if (!source && Array.isArray(sources)) source = sources.find((candidate) => typeof candidate === "string" && candidate.startsWith("blob:")) ?? null; if (!source) return path == null ? null : FileThumbnail({ icon, title, path, format: "image", sizeBytes }); return jsx.jsx(initial.Xd, { icon: icon ?? jsx.jsx(shared.iS, {}), subtitle: path, title, sections: [{ kind: "image", src: source }] }); }
-function initializeImageThumbnail(): void { compiler = shared.$3(); shared.FX(); shared.e6(); initial.Zd(); shared.lw(); initializeFileThumbnail(); initial.U3t(); shared.QI(); initial.HGt(); jsx = shared.I3(); }
-export { initializeFileThumbnail as i, initializeImageThumbnail as n, FileThumbnail as r, ImageThumbnail as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  FX as n,
+  I3 as r,
+  K2 as i,
+  LX as a,
+  QI as o,
+  Y2 as s,
+  ZI as c,
+  e6 as l,
+  gg as u,
+  iS as d,
+  lw as f,
+  mg as p,
+  n4 as m,
+} from "@rchunk/app-shared";
+import {
+  H3t as h,
+  HGt as g,
+  U3t as _,
+  Xd as v,
+  Zd as y,
+  zGt as b,
+} from "@rchunk/app-initial";
+import { t as x } from "@rchunk/format-bytes";
+function S(e) {
+  let t = (0, C.c)(15),
+    { icon: n, title: r, path: i, format: a, sizeBytes: o } = e,
+    c = m(),
+    l;
+  t[0] !== n || t[1] !== i
+    ? ((l = n ?? (0, w.createElement)(p(i), { className: `icon-sm` })),
+      (t[0] = n),
+      (t[1] = i),
+      (t[2] = l))
+    : (l = t[2]);
+  let u = a ?? `unknown`,
+    d = o != null,
+    f;
+  t[3] !== c || t[4] !== o
+    ? ((f = o == null ? null : x(o, c)), (t[3] = c), (t[4] = o), (t[5] = f))
+    : (f = t[5]);
+  let h;
+  t[6] !== u || t[7] !== d || t[8] !== f
+    ? ((h = [
+        {
+          kind: `text`,
+          lines: 1,
+          variant: `caption`,
+          content: (0, T.jsx)(s, {
+            id: `tabThumbnail.file.formatDescription`,
+            defaultMessage: `{format, select, image {Image} pdf {PDF} audio {Audio} video {Video} archive {Archive} binary {Binary file} docx {Document} ipynb {Notebook} pptx {Slides} csv {Spreadsheet} tsv {Spreadsheet} xlsx {Spreadsheet} tex {LaTeX} other {File}}{hasSize, select, true { · {size}} other {}}`,
+            description: `Known source file format and optional saved file size in a tab thumbnail`,
+            values: { format: u, hasSize: d, size: f },
+          }),
+        },
+      ]),
+      (t[6] = u),
+      (t[7] = d),
+      (t[8] = f),
+      (t[9] = h))
+    : (h = t[9]);
+  let g;
+  return (
+    t[10] !== i || t[11] !== l || t[12] !== h || t[13] !== r
+      ? ((g = (0, T.jsx)(v, { title: r, subtitle: i, icon: l, sections: h })),
+        (t[10] = i),
+        (t[11] = l),
+        (t[12] = h),
+        (t[13] = r),
+        (t[14] = g))
+      : (g = t[14]),
+    g
+  );
+}
+var C, w, T;
+function E() {
+  return (E = e(() => {
+    ((C = t()), (w = l()), i(), y(), u(), (T = r()));
+  }))();
+}
+function D(e) {
+  let t = (0, k.c)(19),
+    { hostId: n, icon: r, imageAssetResolver: i, title: o, sources: s, path: l, sizeBytes: u } = e,
+    f = a(c),
+    p;
+  t[0] !== n || t[1] !== i || t[2] !== f || t[3] !== s
+    ? ((p = () => {
+        if (s == null) return null;
+        for (let e of s) {
+          if (e.startsWith(`data:image/`)) return e;
+          let t = b(f.queryClient, e, i) ?? (n == null ? null : h(e, n, f.queryClient));
+          if (t != null) return t;
+        }
+        return s.find(O) ?? null;
+      }),
+      (t[0] = n),
+      (t[1] = i),
+      (t[2] = f),
+      (t[3] = s),
+      (t[4] = p))
+    : (p = t[4]);
+  let [m] = (0, A.useState)(p);
+  if (m == null) {
+    let e;
+    return (
+      t[5] !== r || t[6] !== l || t[7] !== u || t[8] !== o
+        ? ((e =
+            l == null
+              ? null
+              : (0, j.jsx)(S, { icon: r, title: o, path: l, format: `image`, sizeBytes: u })),
+          (t[5] = r),
+          (t[6] = l),
+          (t[7] = u),
+          (t[8] = o),
+          (t[9] = e))
+        : (e = t[9]),
+      e
+    );
+  }
+  let g;
+  t[10] === r ? (g = t[11]) : ((g = r ?? (0, j.jsx)(d, {})), (t[10] = r), (t[11] = g));
+  let _;
+  t[12] === m ? (_ = t[13]) : ((_ = [{ kind: `image`, src: m }]), (t[12] = m), (t[13] = _));
+  let y;
+  return (
+    t[14] !== l || t[15] !== g || t[16] !== _ || t[17] !== o
+      ? ((y = (0, j.jsx)(v, { icon: g, subtitle: l, title: o, sections: _ })),
+        (t[14] = l),
+        (t[15] = g),
+        (t[16] = _),
+        (t[17] = o),
+        (t[18] = y))
+      : (y = t[18]),
+    y
+  );
+}
+function O(e) {
+  return e.startsWith(`blob:`);
+}
+var k, A, j;
+function M() {
+  return (M = e(() => {
+    ((k = t()), n(), (A = l()), y(), f(), E(), _(), o(), g(), (j = r()));
+  }))();
+}
+export { E as i, M as n, S as r, D as t };

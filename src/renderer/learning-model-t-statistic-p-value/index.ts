@@ -1,20 +1,144 @@
-// Student t-statistic to p-value learning model.
-import "@rchunk/rolldown-runtime";
-
-type TestType = "one_sided" | "two_sided"; interface TTestValues { tStatistic?: number | null; degreesOfFreedom?: number | null; testType?: unknown }
-const tTestType = "T_STAT_P_SCORE"; const tTestThumbnail = "t-stat-p-score-v1"; const oneSided = "one_sided"; const twoSided = "two_sided";
-const tTestParameters = { tStatistic: { kind: "number", defaultValue: 2, min: -5, max: 5 }, degreesOfFreedom: { kind: "integer", defaultValue: 10, min: 1, max: 50 }, testType: { kind: "enum", defaultValue: twoSided as TestType, allowedValues: [oneSided, twoSided] as TestType[] } };
-const tTestDefinition = { type: tTestType, version: 1, thumbnailAssetKey: tTestThumbnail, parameters: tTestParameters }; const tStatisticParameter = tTestDefinition.parameters.tStatistic; const degreesOfFreedomParameter = tTestDefinition.parameters.degreesOfFreedom; const densityFloor = 0.1; const defaultTestType = tTestDefinition.parameters.testType.defaultValue;
-const lanczos = [0.9999999999998099,676.5203681218851,-1259.1392167224028,771.3234287776531,-176.6150291621406,12.507343278686905,-0.13857109526572012,9.984369578019572e-6,1.5056327351493116e-7]; const epsilon = 3e-14; const tiny = 1e-300; const maxIterations = 200;
-const clamp = (value: number, minimum: number, maximum: number): number => Math.min(Math.max(value, minimum), maximum); const nonzero = (value: number): number => Math.abs(value) < tiny ? value < 0 ? -tiny : tiny : value;
-const logGamma = (value: number): number => { if (value < 0.5) return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * value)) - logGamma(1 - value); const shifted = value - 1; let sum = lanczos[0]; for (let index = 1; index < lanczos.length; index += 1) sum += lanczos[index] / (shifted + index); const t = shifted + lanczos.length - 1.5; return 0.5 * Math.log(2 * Math.PI) + (shifted + 0.5) * Math.log(t) - t + Math.log(sum); };
-const betaFraction = (a: number, b: number, x: number): number => { const sum = a + b; const aPlus = a + 1; const aMinus = a - 1; let c = 1; let d = 1 - sum * x / aPlus; d = 1 / nonzero(d); let result = d; for (let iteration = 1; iteration <= maxIterations; iteration += 1) { const doubled = 2 * iteration; let coefficient = iteration * (b - iteration) * x / ((aMinus + doubled) * (a + doubled)); d = nonzero(1 + coefficient * d); c = nonzero(1 + coefficient / c); d = 1 / d; result *= d * c; coefficient = -(a + iteration) * (sum + iteration) * x / ((a + doubled) * (aPlus + doubled)); d = nonzero(1 + coefficient * d); c = nonzero(1 + coefficient / c); d = 1 / d; const delta = d * c; result *= delta; if (Math.abs(delta - 1) < epsilon) break; } return result; };
-const regularizedBeta = (x: number, a: number, b: number): number => { if (x <= 0) return 0; if (x >= 1) return 1; const factor = Math.exp(logGamma(a + b) - logGamma(a) - logGamma(b) + a * Math.log(x) + b * Math.log1p(-x)); return clamp(x < (a + 1) / (a + b + 2) ? factor * betaFraction(a, b, x) / a : 1 - factor * betaFraction(b, a, 1 - x) / b, 0, 1); };
-const normalizeTTestValues = (values: TTestValues) => ({ tStatistic: clamp(typeof values.tStatistic === "number" && Number.isFinite(values.tStatistic) ? values.tStatistic : tTestParameters.tStatistic.defaultValue, tTestParameters.tStatistic.min, tTestParameters.tStatistic.max), degreesOfFreedom: Math.round(clamp(typeof values.degreesOfFreedom === "number" && Number.isFinite(values.degreesOfFreedom) ? values.degreesOfFreedom : tTestParameters.degreesOfFreedom.defaultValue, tTestParameters.degreesOfFreedom.min, tTestParameters.degreesOfFreedom.max)), testType: values.testType === oneSided || values.testType === twoSided ? values.testType : defaultTestType });
-const tDensity = (t: number, degreesOfFreedom: number): number => Math.exp(logGamma((degreesOfFreedom + 1) / 2) - logGamma(degreesOfFreedom / 2) - 0.5 * Math.log(degreesOfFreedom * Math.PI)) * Math.exp(-(degreesOfFreedom + 1) / 2 * Math.log1p(t * t / degreesOfFreedom));
-const tPValue = (t: number, degreesOfFreedom: number, testType: TestType): number => { const ratio = degreesOfFreedom / (degreesOfFreedom + t * t); const probability = regularizedBeta(ratio, degreesOfFreedom / 2, 0.5); return testType === twoSided ? probability : probability / 2; };
-const deriveTTestState = (values: TTestValues) => { const safe = normalizeTTestValues(values); return { ...safe, magnitude: Math.abs(safe.tStatistic), pValue: clamp(tPValue(safe.tStatistic, safe.degreesOfFreedom, safe.testType), 0, 1) }; };
-const buildTDensityArea = (start: number, end: number, degreesOfFreedom: number) => [{ x: start, y: 0 }, ...Array.from({ length: 49 }, (_unused, index) => { const x = start + index / 48 * (end - start); return { x, y: tDensity(x, degreesOfFreedom) }; }), { x: end, y: 0 }];
-function initializeTTestSchema(): void {}
-function initializeTTestModel(): void {}
-export { tStatisticParameter as a, buildTDensityArea as c, tDensity as d, initializeTTestSchema as f, twoSided as i, initializeTTestModel as l, degreesOfFreedomParameter as n, densityFloor as o, tTestDefinition as p, oneSided as r, deriveTTestState as s, defaultTestType as t, normalizeTTestValues as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `T_STAT_P_SCORE`),
+      (n = `t-stat-p-score-v1`),
+      (r = {
+        tStatistic: { kind: `number`, defaultValue: 2, min: -5, max: 5 },
+        degreesOfFreedom: { kind: `integer`, defaultValue: 10, min: 1, max: 50 },
+        testType: {
+          kind: `enum`,
+          defaultValue: `two_sided`,
+          allowedValues: [`one_sided`, `two_sided`],
+        },
+      }),
+      (i = { type: t, version: 1, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w, T, E;
+function D() {
+  return (D = e(() => {
+    (a(),
+      (o = `one_sided`),
+      (s = `two_sided`),
+      (c = i.parameters.tStatistic),
+      (l = i.parameters.degreesOfFreedom),
+      (u = i.parameters.testType),
+      (d = 0.1),
+      (f = u.defaultValue),
+      (p = [
+        0.9999999999998099, 676.5203681218851, -1259.1392167224028, 771.3234287776531,
+        -176.6150291621406, 12.507343278686905, -0.13857109526572012, 9984369578019572e-21,
+        1.5056327351493116e-7,
+      ]),
+      (m = 3e-14),
+      (h = 1e-300),
+      (g = 200),
+      (_ = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (v = (e) => (Math.abs(e) < h ? (e < 0 ? -1e-300 : h) : e)),
+      (y = (e) => {
+        if (e < 0.5) return Math.log(Math.PI) - Math.log(Math.sin(Math.PI * e)) - y(1 - e);
+        let t = e - 1,
+          n = p[0];
+        for (let e = 1; e < p.length; e += 1) n += p[e] / (t + e);
+        let r = t + p.length - 1.5;
+        return 0.5 * Math.log(2 * Math.PI) + (t + 0.5) * Math.log(r) - r + Math.log(n);
+      }),
+      (b = (e, t, n) => {
+        let r = e + t,
+          i = e + 1,
+          a = e - 1,
+          o = 1,
+          s = 1 - (r * n) / i;
+        s = 1 / v(s);
+        let c = s;
+        for (let l = 1; l <= g; l += 1) {
+          let u = 2 * l,
+            d = (l * (t - l) * n) / ((a + u) * (e + u));
+          ((s = v(1 + d * s)),
+            (o = v(1 + d / o)),
+            (s = 1 / s),
+            (c *= s * o),
+            (d = (-(e + l) * (r + l) * n) / ((e + u) * (i + u))),
+            (s = v(1 + d * s)),
+            (o = v(1 + d / o)),
+            (s = 1 / s));
+          let f = s * o;
+          if (((c *= f), Math.abs(f - 1) < m)) break;
+        }
+        return c;
+      }),
+      (x = (e, t, n) => {
+        if (e <= 0) return 0;
+        if (e >= 1) return 1;
+        let r = Math.exp(y(t + n) - y(t) - y(n) + t * Math.log(e) + n * Math.log1p(-e)),
+          i = e < (t + 1) / (t + n + 2) ? (r * b(t, n, e)) / t : 1 - (r * b(n, t, 1 - e)) / n;
+        return _(i, 0, 1);
+      }),
+      (S = (e) => ({
+        tStatistic: _(
+          typeof e.tStatistic == `number` && Number.isFinite(e.tStatistic)
+            ? e.tStatistic
+            : c.defaultValue,
+          c.min,
+          c.max,
+        ),
+        degreesOfFreedom: Math.round(
+          _(
+            typeof e.degreesOfFreedom == `number` && Number.isFinite(e.degreesOfFreedom)
+              ? e.degreesOfFreedom
+              : l.defaultValue,
+            l.min,
+            l.max,
+          ),
+        ),
+        testType: e.testType === `one_sided` || e.testType === `two_sided` ? e.testType : f,
+      })),
+      (C = (e, t) => {
+        let n = t / 2;
+        return (
+          Math.exp(y((t + 1) / 2) - y(n) - 0.5 * Math.log(t * Math.PI)) *
+          Math.exp((-(t + 1) / 2) * Math.log1p((e * e) / t))
+        );
+      }),
+      (w = (e, t, n) => {
+        let r = t / (t + e * e),
+          i = x(r, t / 2, 0.5);
+        return n === `two_sided` ? i : i / 2;
+      }),
+      (T = (e) => {
+        let t = S(e),
+          n = Math.abs(t.tStatistic);
+        return {
+          ...t,
+          magnitude: n,
+          pValue: _(w(t.tStatistic, t.degreesOfFreedom, t.testType), 0, 1),
+        };
+      }),
+      (E = (e, t, n) => [
+        { x: e, y: 0 },
+        ...Array.from({ length: 49 }, (r, i) => {
+          let a = e + (i / 48) * (t - e);
+          return { x: a, y: C(a, n) };
+        }),
+        { x: t, y: 0 },
+      ]));
+  }))();
+}
+export {
+  c as a,
+  E as c,
+  C as d,
+  a as f,
+  s as i,
+  D as l,
+  l as n,
+  d as o,
+  i as p,
+  o as r,
+  T as s,
+  f as t,
+  S as u,
+};

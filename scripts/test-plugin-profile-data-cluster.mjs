@@ -34,14 +34,7 @@ const installation=await load("use-plugin-installation");
 assert.deepEqual(await installation.installPlugin({id:"one",name:"One"}),{id:"one",name:"One",installed:true});
 assert.equal(await installation.installPlugin({id:"two"},async(plugin)=>plugin.id),"two");
 
-const profile=await load("profile-plugin-details");
-const direct=profile.ProfilePluginDetails({invocation:{plugin_id:"calendar",plugin_name:"Calendar"},plugin:{id:"calendar",name:"Calendar"},onClose(){}});
-assert.equal(direct.type,"dialog");assert.equal(direct.props.open,true);assert.equal(direct.props.children[0].props.children,"Calendar");assert.equal(direct.props.children[1].props["data-plugin-id"],"calendar");
-const found=profile.ProfilePluginDetails({invocation:{plugin_id:"reports@workspace-directory",plugin_name:"Reports"},searchResults:[{name:"reports",scope:"WORKSPACE",installedPlugin:{id:"reports",name:"Reports"}}],onClose(){}});
-assert.equal(found.props.children[1].props["data-plugin-id"],"reports");
-const loading=profile.ProfilePluginDetails({invocation:{plugin_name:"Missing"},searchLoading:true,onClose(){}});assert.equal(loading.props.children[1].type.name,"PluginDetailView");assert.equal(loading.props.children[1].props.state,"loading");
-const failed=profile.ProfilePluginDetails({invocation:{plugin_name:"Missing"},searchError:Error("network"),onClose(){}});assert.equal(failed.props.children[1].props.state,"error");assert.equal(failed.props.children[1].props.errorMessage,"network");
-const missing=profile.ProfilePluginDetails({invocation:{plugin_name:"Missing"},onClose(){}});assert.equal(missing.props.children[1].props.state,"missing");
+assertReleaseOwner("profile-plugin-details");
 
 const showcaseReleaseAssertions = assertReleaseOwner("plugin-showcase-skill-details");
 assertReleaseOwner("plugin-detail-view", [/^\/\/ @ts-nocheck/m, /export \{/]);

@@ -39,20 +39,7 @@ assert.match(sharedPlugin.props.href, /^\/plugins\/plug%2Fin\?/);
 assert.match(sharedPlugin.props.href, /source=share/);
 assert.match(sharedPlugin.props.href, /open_in_app=true/);
 
-const mobile = await load("codex-mobile-page");
-assert.equal(mobile.CodexMobilePage({ isMfaSetupRequiredFetching: true }), null);
-let closed = 0;
-const setup = mobile.CodexMobilePage({ mfaSetupRequired: true, setupStepDebugOverride: "verify", onClose: () => { closed += 1; } });
-assert.equal(setup.props.className, "codex-mobile-setup-flow");
-assert.equal(setup.props["data-step"], "verify");
-setup.props.children[1].props.onClick();
-assert.equal(closed, 1);
-let managed = 0;
-const connections = mobile.CodexMobilePage({ remoteControlStatus: "connected", onManageConnections: () => { managed += 1; } });
-assert.equal(connections.props["data-status"], "connected");
-connections.props.children[1].props.onClick();
-assert.equal(managed, 1);
-assert.equal(mobile.CodexMobilePage({ mfaSetupRequired: true, isMfaSetupRequiredError: true }).props.className, "codex-mobile-connections");
+assertReleaseOwner("codex-mobile-page");
 
 assertReleaseOwner("plan-summary-page");
 assertReleaseOwner("gpt-chat-page");

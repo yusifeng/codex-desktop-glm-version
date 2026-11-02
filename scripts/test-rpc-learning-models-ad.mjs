@@ -4,13 +4,13 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const ASSET_ROOT = path.resolve(ROOT, "../chatgpt-desktop-src/app/webview/assets");
 const models = [
   ["model-9c56b533bfd3.js", "learning-model-iupac-hydrocarbon-naming", ["a", "c", "i", "l", "n", "o", "r", "s", "t"]],
   ["model-47702d2695d6.js", "learning-model-law-of-reflection", ["a", "c", "d", "f", "i", "l", "m", "n", "o", "p", "r", "s", "t", "u"]],
-  ["model-f27f59868f2e.js", "learning-model-linear-inequality-solution-ray", ["a", "c", "d", "f", "g", "h", "i", "l", "m", "n", "o", "p", "r", "s", "t", "u"]],
   ["model-8dcf9b79ed1a.js", "learning-model-correlation", ["a", "c", "i", "l", "n", "o", "r", "s", "t", "u"]],
   ["model-3d95a574c11d.js", "learning-model-electron-orbital-filling", ["a", "c", "i", "l", "n", "o", "r", "s", "t"]],
   ["model-dbdb00b115a8.js", "learning-model-histogram", ["a", "c", "i", "n", "o", "r", "s", "t"]],
@@ -68,16 +68,6 @@ assert.deepEqual(reflection.a(), { incident: { x: 176, y: 200 }, reflected: { x:
 assert.match(geometry.incidentArcPath, /^M 224\.00 192\.00 A 40 40/);
 runtimeAssertions += 7;
 
-const inequality = loaded.get("learning-model-linear-inequality-solution-ray");
-const solved = inequality.m({ a: -3, b: 2, c: 11, relation: "greater_than" });
-assert.deepEqual({ boundary: solved.solutionBoundary, relation: solved.solutionRelation, flips: solved.signFlips, set: solved.solutionSet }, { boundary: -3, relation: "less_than", flips: true, set: "ray" });
-assert.equal(inequality.s(solved), "-3x + 2 > 11");
-assert.equal(inequality.c(solved), "-3x > 9");
-assert.equal(inequality.u(solved), "x < -3");
-assert.equal(inequality.l({ a: 4, b: 0, c: 2, relation: "less_than" }), "1/2");
-assert.deepEqual([inequality.u({ a: 0, b: 2, c: 3, relation: "less_than" }), inequality.u({ a: 0, b: 4, c: 3, relation: "less_than" })], ["x ∈ ℝ", "∅"]);
-assert.deepEqual(inequality.a([-3, 0, 5]), { min: -6, max: 8, ticks: [-6, -4, -2, 0, 2, 4, 6, 8] });
-runtimeAssertions += 7;
 
 const correlation = loaded.get("learning-model-correlation");
 assert.ok(correlation.i(correlation.a("positive")) > 0.9);
@@ -159,4 +149,5 @@ assert.deepEqual(velocity.a(() => 0.5), velocity.t);
 assert.deepEqual([velocity.p(-4), velocity.p(3.9), velocity.u(0.01), velocity.u(-0.2)], [0, 3, 0, -0.2]);
 runtimeAssertions += 7;
 
+sourceAssertions += assertReleaseOwner("learning-model-linear-inequality-solution-ray");
 console.log(sourceAssertions + " source assertions and " + runtimeAssertions + " runtime assertions passed");

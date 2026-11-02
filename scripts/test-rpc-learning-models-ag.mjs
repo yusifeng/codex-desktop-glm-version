@@ -1,8 +1,17 @@
-import assert from "node:assert/strict"; import {Buffer} from "node:buffer"; import fs from "node:fs"; import path from "node:path"; import {fileURLToPath} from "node:url"; import * as esbuild from "esbuild"; import {assertReleaseOwner} from "./release-owner-test-helpers.mjs";
-const ROOT=path.resolve(path.dirname(fileURLToPath(import.meta.url)),".."),ASSET_ROOT=path.resolve(ROOT,"../chatgpt-desktop-src/app/webview/assets");
-const models=[["model-3df6827423e2.js","learning-model-t-distribution",["a","c","i","n","o","r","s","t"]],];
-const aliases={"rolldown-runtime":"rolldown-runtime","build-graph-data":"build-graph-data","tokenize-math-block":"tokenize-math-block","null-throws":"null-throws","numerical-integration":"numerical-integration"}; const deps=(source,regex)=>[...source.matchAll(regex)].map(match=>match[1]); let sourceAssertions=0; for(const[asset,directory]of models){const original=fs.readFileSync(path.join(ASSET_ROOT,asset),"utf8"),recovered=fs.readFileSync(path.join(ROOT,"src/renderer",directory,"index.ts"),"utf8"),originalDeps=deps(original,/from "\.\/([^"]+)\.js"/g).map(value=>value.replace(/-[a-f0-9]{12}$/,"")),recoveredDeps=deps(recovered,/(?:from\s+|import\s*)["']@rchunk\/([^"']+)/g).map(value=>aliases[value]??value);assert.deepEqual(recoveredDeps,originalDeps);assert.equal((original.match(/import\(/g)??[]).length,(recovered.match(/import\(/g)??[]).length);assert.equal(/\bany\b|@ts-expect-error/.test(recovered),false);sourceAssertions+=3;}
-const mock=(name)=>name==="build-graph-data"?`export const a=()=>{};export const n=(expression,x)=>{const source=(expression.source??expression[0].source).split("^").join("**").replace(/pi/g,"Math.PI");return Function("x","return ("+source+")")(x)};`:name==="tokenize-math-block"?`export const n=()=>{};export const r=(source)=>[{type:"number",source:source.replace(/^y=/,"")}];export const t=()=>[];`:name==="null-throws"?`export const n=()=>{};export const t=(value)=>{if(value==null)throw Error();return value};`:name==="numerical-integration"?`export const t=()=>{};export const n=(source)=>({integrand:source,hasUnsupportedLetter:false});`:`export {};`; async function bundle(directory){const result=await esbuild.build({entryPoints:[path.join(ROOT,"src/renderer",directory,"index.ts")],bundle:true,format:"esm",platform:"node",target:"node22",write:false,logLevel:"silent",plugins:[{name:"mocks",setup(build){build.onResolve({filter:/^@rchunk\//},({path:modulePath})=>({path:modulePath.slice(8),namespace:"mock"}));build.onLoad({filter:/.*/,namespace:"mock"},({path:name})=>({contents:mock(name),loader:"js"}));}}]});return import("data:text/javascript;base64,"+Buffer.from(result.outputFiles[0].text).toString("base64")+"#"+directory);}
-const loaded=new Map();let runtimeAssertions=0;for(const[_asset,directory,exports]of models){const module=await bundle(directory);loaded.set(directory,module);assert.deepEqual(Object.keys(module).sort(),[...exports].sort());runtimeAssertions++;}
-const t=loaded.get("learning-model-t-distribution");t.i();const tc=t.r({degrees_of_freedom:5,central_probability:.95});assert.equal(tc.sampleSize,6);assert.ok(tc.tCritical>2.57&&tc.tCritical<2.58);assert.ok(tc.zCritical>1.95&&tc.zCritical<1.97);assert.ok(t.o(0,5)>.37);runtimeAssertions+=4;
-sourceAssertions+=assertReleaseOwner("learning-model-paired-t-test");sourceAssertions+=assertReleaseOwner("learning-model-co2-and-temperature-time-series");sourceAssertions+=assertReleaseOwner("learning-model-phase-change-cycle");sourceAssertions+=assertReleaseOwner("learning-model-simpsons-rule");sourceAssertions+=assertReleaseOwner("learning-model-trapezoidal-rule");sourceAssertions+=assertReleaseOwner("learning-model-food-chain");sourceAssertions+=assertReleaseOwner("learning-model-reflection-transformation-coordinate-plane");sourceAssertions+=assertReleaseOwner("learning-model-joint-marginal-conditional-table");sourceAssertions+=assertReleaseOwner("learning-model-lewis-structure-builder"); console.log(`${sourceAssertions} source assertions and ${runtimeAssertions} runtime assertions passed`);
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
+
+const owners = [
+  "learning-model-t-distribution",
+  "learning-model-paired-t-test",
+  "learning-model-co2-and-temperature-time-series",
+  "learning-model-phase-change-cycle",
+  "learning-model-simpsons-rule",
+  "learning-model-trapezoidal-rule",
+  "learning-model-food-chain",
+  "learning-model-reflection-transformation-coordinate-plane",
+  "learning-model-joint-marginal-conditional-table",
+  "learning-model-lewis-structure-builder",
+];
+let assertions = 0;
+for (const owner of owners) assertions += assertReleaseOwner(owner);
+console.log(`${assertions} learning model release-owner assertions passed`);

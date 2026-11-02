@@ -1,51 +1,179 @@
-import * as RuntimeChunk from "@rchunk/rolldown-runtime";
-import * as SharedChunk from "@rchunk/app-shared";
-import * as InitialChunk from "@rchunk/app-initial";
-import * as ThreadRuntimeChunk from "@rchunk/thread-shell-runtime";
-
-type Placement = "bottom" | "right";
-type Target = { type: "file"; path: string; line?: number } | { type: "browser"; tabId?: string; url?: string } | { type: "terminal"; sessionId?: string } | { type: "review"; baseBranch?: string; path?: string; view?: "branch" | "last-turn" | "staged" | "unstaged" } | { type: "page" };
-interface OpenRequest { placement?: Placement; target: Target; threadId?: string }
-interface RouteValue { clientThreadId?: string; conversationId?: string; routeKind: "chatgpt-thread" | "client-local-thread" | "home" | "local-thread" | "new-thread-panel" | "other" | "remote-thread"; taskId?: string }
-interface Scope { value: RouteValue; get<T>(key: unknown): T; set?(key: unknown, value: unknown): void }
-interface Context { scope?: Scope | null; sourceHostId?: string; sourceThreadId?: string }
-interface OpenResult { placement?: Placement; status: "existing" | "opened" | "superseded"; tabId?: string; threadId: string; type: Target["type"] | "review" }
-interface InitialApi { DDt?(url: string, threadId: string): { kind: "error"; message: string } | { kind: "pullRequestReview"; target: unknown } | { kind: "threadReview"; target: { reviewDiffFilter?: "branch" | "last-turn" | "staged" | "unstaged"; reviewPath?: string } } | null; Dyt: unknown; atn: unknown; jR?(scope: Scope, path: string, input: { hostId?: string; line?: number; target: Placement }): { placement?: Placement; status?: "existing" | "opened"; tabId?: string } | null; fgt?(scope: Scope): Array<{ browserTabId: string }>; ilt?(scope: Scope, input: { browserTabId?: string; hostId?: string; initialUrl?: string; target: Placement }): string | null; dgt?(scope: Scope, tabId: string): { target?: Placement } | null; gvt?(scope: Scope, tabId: string): Placement | null; Pi?(scope: Scope, open: boolean, placement: Placement): boolean; fvt?(scope: Scope, placement: Placement, tabId: string): boolean; pk: unknown; fk?(scope: Scope, value: unknown): void; rtn?(value: RouteValue): string; IO?(scope: Scope, threadId: string, baseBranch: string): void; PE?(scope: Scope, path: string): void }
-
-const initial = InitialChunk as unknown as InitialApi;
-const terminal = ThreadRuntimeChunk as unknown as { l: unknown; r(scope: Scope, sessionId?: string, panel?: Placement): string | null; t(scope: Scope): boolean };
-void RuntimeChunk; void SharedChunk;
-
-function visibleThreadId(value: RouteValue): string | null {
-  if (value.routeKind === "client-local-thread") return value.clientThreadId ?? null;
-  if (value.routeKind === "local-thread" || value.routeKind === "chatgpt-thread") return value.conversationId ?? null;
-  if (value.routeKind === "remote-thread") return value.taskId ?? null;
-  return null;
-}
-
-async function runWindowsTabsOpen(request: OpenRequest, context: Context): Promise<OpenResult> {
-  const scope = context.scope;
-  if (scope == null) throw new Error("windows.tabs.open requires an app view");
-  if (scope.get<boolean>(initial.atn)) throw new Error("Panels are unavailable in archived previews");
-  const visible = visibleThreadId(scope.value);
-  const threadId = request.threadId ?? context.sourceThreadId ?? visible;
-  if (threadId == null || visible == null) throw new Error("windows.tabs.open requires a visible thread");
-  if (threadId !== visible) throw new Error(`Thread ${threadId} is not visible in the targeted main window (showing ${visible})`);
-  const hostId = context.sourceThreadId === threadId && context.sourceHostId != null ? context.sourceHostId : scope.get<string | undefined>(initial.Dyt);
-  const target = request.target;
-  const reviewLink = target.type === "browser" && target.url != null ? initial.DDt?.(target.url, threadId) : null;
-  if (reviewLink?.kind === "error") throw new Error(reviewLink.message);
-  if (reviewLink?.kind === "pullRequestReview") {
-    const module = await import("@rchunk/open-review-link") as { openReviewLink(scope: Scope, input: { hostId?: string; target: unknown }, placement?: Placement): Promise<Partial<OpenResult>> };
-    const opened = await module.openReviewLink(scope, { hostId, target: reviewLink.target }, request.placement);
-    return { threadId, type: "review", status: "superseded", ...opened };
+// @ts-nocheck
+const __vite__mapDeps = (
+  i,
+  m = __vite__mapDeps,
+  d = m.f ||
+    (m.f = [
+      "@rchunk/review-link-open-entry",
+      "@rchunk/app-initial",
+      "@rchunk/rolldown-runtime",
+      "@rchunk/app-shared",
+      "./app-shared-fa570b9eb9dd.css",
+      "./app-initial-e8ceb32eb626.css",
+    ]),
+) => i.map((i) => d[i]);
+import { n as e } from "@rchunk/rolldown-runtime";
+import { H3 as t, V3 as n, hJ as r, wL as i } from "@rchunk/app-shared";
+import {
+  AR as a,
+  DDt as o,
+  Dyt as s,
+  EDt as c,
+  FDt as l,
+  IO as u,
+  PE as d,
+  Pi as f,
+  _k as p,
+  _vt as m,
+  atn as h,
+  byt as g,
+  ck as _,
+  dO as v,
+  dZt as y,
+  dgt as b,
+  dvt as x,
+  fZt as S,
+  fgt as C,
+  fk as w,
+  fvt as T,
+  gk as E,
+  gvt as D,
+  hvt as O,
+  ilt as k,
+  itn as A,
+  jDt as j,
+  jE as M,
+  jR as N,
+  ji as P,
+  mgt as F,
+  nlt as I,
+  pZt as L,
+  pk as R,
+  rtn as z,
+} from "@rchunk/app-initial";
+import { l as B, n as V, r as H, t as U } from "@rchunk/thread-shell-runtime";
+function W(e, t) {
+  let { placement: i, target: a, threadId: c } = e,
+    l = t.scope;
+  if (l == null) throw Error(`windows.tabs.open requires an app view`);
+  if (l.get(h)) throw Error(`Panels are unavailable in archived previews`);
+  let m;
+  switch (l.value.routeKind) {
+    case `client-local-thread`:
+      m = l.value.clientThreadId;
+      break;
+    case `local-thread`:
+    case `chatgpt-thread`:
+      m = l.value.conversationId;
+      break;
+    case `remote-thread`:
+      m = l.value.taskId;
+      break;
+    case `home`:
+    case `new-thread-panel`:
+    case `other`:
+      m = null;
   }
-  if (reviewLink?.kind === "threadReview") return runWindowsTabsOpen({ ...request, target: { type: "review", view: reviewLink.target.reviewDiffFilter, path: reviewLink.target.reviewPath } }, context);
-  if (target.type === "page") throw new Error("Page tabs are unavailable");
-  if (target.type === "file") { const placement = request.placement ?? "right"; const opened = initial.jR?.(scope, target.path, { hostId, line: target.line, target: placement }); if (opened == null) throw new Error("File tab could not be opened"); return { threadId, type: "file", placement: opened.placement ?? placement, status: opened.status ?? "opened", tabId: opened.tabId }; }
-  if (target.type === "browser") { const placement = request.placement ?? "right"; const before = initial.fgt?.(scope) ?? []; const tabId = initial.ilt?.(scope, { browserTabId: target.tabId, hostId, initialUrl: target.url, target: placement }); if (tabId == null) throw new Error("Browser tab could not be opened"); return { threadId, type: "browser", placement: initial.dgt?.(scope, tabId)?.target ?? placement, status: before.some(tab => tab.browserTabId === tabId) ? "existing" : "opened", tabId }; }
-  if (target.type === "terminal") { if (!terminal.t(scope)) throw new Error("Terminal tab is unavailable for this thread"); const placement = request.placement ?? scope.get<Placement>(terminal.l); const existing = scope.get<readonly string[]>(Symbol.for("terminal-tab-ids")) ?? []; const sessionId = terminal.r(scope, target.sessionId, placement); if (sessionId == null) throw new Error("Terminal tab could not be opened"); const tabId = `terminal:${sessionId}`; return { threadId, type: "terminal", placement: initial.gvt?.(scope, tabId) ?? placement, status: existing.includes(tabId) ? "existing" : "opened", tabId }; }
-  const placement = request.placement ?? "right"; const existingPlacement = initial.gvt?.(scope, "diff"); if (target.baseBranch != null) initial.IO?.(scope, initial.rtn?.(scope.value) ?? threadId, target.baseBranch); else if (target.view === "last-turn") initial.fk?.(scope, null); if (target.path != null) initial.PE?.(scope, target.path); if (!(existingPlacement == null ? initial.Pi?.(scope, true, placement) : initial.fvt?.(scope, existingPlacement, "diff"))) throw new Error("Review tab could not be opened"); return { threadId, type: "review", placement: initial.gvt?.(scope, "diff") ?? placement, status: existingPlacement == null ? "opened" : "existing", tabId: "diff" };
+  let g = c ?? t.sourceThreadId ?? m;
+  if (g == null || m == null) throw Error(`windows.tabs.open requires a visible thread`);
+  if (g !== m) throw Error(`Thread ${g} is not visible in the targeted main window (showing ${m})`);
+  let _ = t.sourceThreadId === g && t.sourceHostId != null ? t.sourceHostId : l.get(s),
+    v = a.type === `browser` && a.url != null ? o(a.url, g) : null;
+  if (v?.kind === `error`) throw Error(v.message);
+  if (v?.kind === `pullRequestReview`)
+    return n(
+      async () => {
+        let { openReviewLink: e } = await import(`@rchunk/review-link-open-entry`);
+        return { openReviewLink: e };
+      },
+      __vite__mapDeps([0, 1, 2, 3, 4, 5]),
+      import.meta.url,
+    ).then(async ({ openReviewLink: e }) => {
+      let t = await e(l, { hostId: _, target: v.target }, i);
+      return { threadId: g, type: `review`, status: `superseded`, ...t };
+    });
+  if (v?.kind === `threadReview`)
+    return W(
+      {
+        ...e,
+        target: { type: `review`, view: v.target.reviewDiffFilter, path: v.target.reviewPath },
+      },
+      t,
+    );
+  if (a.type !== `file` && j(y(a.type))?.isAvailable(l) !== !0) throw Error(S(a.type));
+  switch (a.type) {
+    case `file`: {
+      let e = i ?? `right`,
+        t = N(l, a.path, { hostId: _, line: a.line, target: e });
+      if (t == null) throw Error(`File tab could not be opened`);
+      return { threadId: g, type: a.type, ...t };
+    }
+    case `page`:
+      throw Error(`Page tabs are unavailable`);
+    case `browser`: {
+      let e = i ?? `right`,
+        t = C(l),
+        n = k(l, {
+          browserTabId: a.tabId == null ? void 0 : r(a.tabId),
+          hostId: _,
+          initialUrl: a.url,
+          target: e,
+        });
+      if (n == null) throw Error(`Browser tab could not be opened`);
+      let o = b(l, n);
+      return {
+        threadId: g,
+        type: a.type,
+        placement: o?.target ?? e,
+        status: t.some((e) => e.browserTabId === n) ? `existing` : `opened`,
+        tabId: n,
+      };
+    }
+    case `terminal`: {
+      if (!U(l)) throw Error(`Terminal tab is unavailable for this thread`);
+      let e = i ?? l.get(B),
+        t = x.flatMap((e) => l.get(O(e).tabIds$)),
+        n = H(l, a.sessionId, e);
+      if (n == null) throw Error(`Terminal tab could not be opened`);
+      let r = `terminal:${n}`;
+      return {
+        threadId: g,
+        type: a.type,
+        placement: D(l, r) ?? e,
+        status: t.includes(r) ? `existing` : `opened`,
+        tabId: r,
+      };
+    }
+    case `review`: {
+      let e = i ?? `right`,
+        t = D(l, `diff`);
+      if (
+        ((`baseBranch` in a || a.view != null || a.path != null) && l.set(p, null),
+        `baseBranch` in a
+          ? (u(l, z(l.value), a.baseBranch), R(l, `branch`))
+          : a.view === `last-turn`
+            ? w(l, null)
+            : a.view != null && R(l, a.view),
+        !(t == null ? f(l, !0, e) : T(l, t, `diff`)))
+      )
+        throw Error(`Review tab could not be opened`);
+      return (
+        a.path != null && d(l, a.path),
+        {
+          threadId: g,
+          type: a.type,
+          placement: D(l, `diff`) ?? e,
+          status: t == null ? `opened` : `existing`,
+          tabId: `diff`,
+        }
+      );
+    }
+  }
 }
-
-export { runWindowsTabsOpen };
+function G() {
+  return (G = e(() => {
+    (i(), L(), l(), I(), F(), _(), a(), E(), M(), v(), A(), g(), P(), V(), c(), m(), t());
+  }))();
+}
+G();
+export { W as runWindowsTabsOpen };

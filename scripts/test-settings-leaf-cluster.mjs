@@ -4,6 +4,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import * as esbuild from "esbuild";
+import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const jsx = { Fragment: "Fragment", jsx(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; }, jsxs(type, props, key) { return typeof type === "function" ? type(props ?? {}) : { type, props: props ?? {}, key }; } };
@@ -127,21 +128,7 @@ const errorLayout = profileView.props.Layout({ children: "error", header: "back"
 assert.equal(errorLayout.type, "section");
 assert.equal(errorLayout.props["data-profile-error"], "true");
 
-const pluginCore = await load("plugins-settings-core");
-assert.deepEqual(Object.keys(pluginCore), ["n", "t"]);
-assert.equal(globalThis.__settingsLeafTest.pluginsPageInitialized, true);
-const managed = pluginCore.t({ hostId: "local", manageOnly: true });
-assert.equal(managed.type, "plugins-page");
-assert.equal(managed.props.initialManageTab, "mcps");
-let browsed = null;
-const pluginsView = pluginCore.t({ hostId: "local", initialTab: "skills", onBrowseDirectory: (tab) => { browsed = tab; } });
-assert.equal(pluginsView.type, "section");
-assert.equal(pluginsView.props["data-settings-section"], "plugins");
-assert.equal(pluginsView.props.children[3].type, "plugins-page");
-assert.equal(pluginsView.props.children[3].props.initialManageTab, "skills");
-pluginsView.props.children[2].props.children[0].props.onClick();
-assert.equal(browsed, "skills");
-assert.equal(pluginCore.n(), undefined);
+assertReleaseOwner("plugins-settings-core");
 
 const assertionCount = [...fs.readFileSync(fileURLToPath(import.meta.url), "utf8").matchAll(/\bassert\./g)].length;
 console.log(`${assertionCount} settings leaf cluster assertions passed`);

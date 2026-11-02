@@ -1,21 +1,143 @@
-import "@rchunk/rolldown-runtime";
-import { s as initializeSpreadsheetUtils } from "@rchunk/spreadsheet-utils";
-import { b as initializePointerGesture, h as cameraWorldOffset } from "@rchunk/drawing-frame-geometry";
-
-export interface CameraTransform { k: number; x: number; y: number }
-export interface FreezePanes { columnCount: number; rowCount: number }
-export interface GridDimensions { columnWidths: number[]; freezePanes: FreezePanes; rowHeights: number[] }
-const prefixSum = (values: readonly number[], count: number): number => { let total = 0; for (let index = 0; index < count; index += 1) total += values[index] ?? 0; return total; };
-function splitVisibleSegment(input: { frozenBodySize: number; headerSize: number; scroll: number; size: number; start: number }): Array<{ size: number; start: number }> { if (!(input.size > 0)) return []; const end = input.start + input.size, frozenEnd = input.headerSize + input.frozenBodySize, segments: Array<{ size: number; start: number }> = [], frozenVisibleEnd = Math.min(end, frozenEnd); if (frozenVisibleEnd > input.start) segments.push({ start: input.start, size: frozenVisibleEnd - input.start }); const scrollableStart = Math.max(input.start, frozenEnd); if (end > scrollableStart) { const shiftedStart = scrollableStart - input.scroll, shiftedEnd = end - input.scroll, visibleStart = Math.max(shiftedStart, frozenEnd); if (shiftedEnd > visibleStart) segments.push({ start: visibleStart, size: shiftedEnd - visibleStart }); } return segments; }
-function prefixOffsets(values: readonly number[]): number[] { const offsets = [0]; for (let index = 0; index < values.length; index += 1) offsets[index + 1] = (offsets[index] ?? 0) + (values[index] ?? 0); return offsets; }
-function nearestOffsetIndex(offsets: readonly number[], value: number): number { const target = Math.max(0, value); let closest = 0, distance = Infinity; for (let index = 0; index < offsets.length; index += 1) { const nextDistance = Math.abs((offsets[index] ?? 0) - target); if (nextDistance < distance) { closest = index; distance = nextDistance; } } return closest; }
-function freezeMetrics(grid: GridDimensions): { freezeLineX: number; freezeLineY: number; frozenBodyHeight: number; frozenBodyWidth: number } { const frozenBodyWidth = prefixSum(grid.columnWidths, grid.freezePanes.columnCount), frozenBodyHeight = prefixSum(grid.rowHeights, grid.freezePanes.rowCount); return { frozenBodyWidth, frozenBodyHeight, freezeLineX: 40 + frozenBodyWidth, freezeLineY: 20 + frozenBodyHeight }; }
-function constrainFrozenCamera(input: GridDimensions & { bottomScrollReservePx?: number; camera: CameraTransform; maxZoom: number; minZoom: number; viewportHeight: number; viewportWidth: number }): CameraTransform { const k = Math.min(input.maxZoom, Math.max(input.minZoom, input.camera.k)), metrics = freezeMetrics(input), visibleWidth = Math.max(0, input.viewportWidth / k - 40), visibleHeight = Math.max(0, input.viewportHeight / k - 20), reserve = Math.max(0, input.bottomScrollReservePx ?? 0) / k, totalWidth = prefixSum(input.columnWidths, input.columnWidths.length), totalHeight = prefixSum(input.rowHeights, input.rowHeights.length), scrollWidth = Math.max(0, totalWidth - metrics.frozenBodyWidth), scrollHeight = Math.max(0, totalHeight - metrics.frozenBodyHeight), availableWidth = Math.max(0, visibleWidth - metrics.frozenBodyWidth), availableHeight = Math.max(0, visibleHeight - metrics.frozenBodyHeight), maxScrollX = Math.max(0, scrollWidth - availableWidth), maxScrollY = Math.max(0, scrollHeight + reserve - availableHeight), offset = cameraWorldOffset({ ...input.camera, k }), left = Math.min(maxScrollX, Math.max(0, offset.left)), top = Math.min(maxScrollY, Math.max(0, offset.top)); return { x: -left * k, y: -top * k, k }; }
-function logicalToWorld(input: GridDimensions & { camera: CameraTransform; logicalX: number; logicalY: number }): { x: number; y: number } { const offset = cameraWorldOffset(input.camera), metrics = freezeMetrics(input), bodyX = input.logicalX - 40, bodyY = input.logicalY - 20, inColumnHeader = input.logicalX >= 0 && input.logicalX < 40, inRowHeader = input.logicalY >= 0 && input.logicalY < 20, inFrozenColumns = input.freezePanes.columnCount > 0 && bodyX >= 0 && bodyX < metrics.frozenBodyWidth, inFrozenRows = input.freezePanes.rowCount > 0 && bodyY >= 0 && bodyY < metrics.frozenBodyHeight, worldX = inColumnHeader || inFrozenColumns ? bodyX : metrics.frozenBodyWidth + (bodyX - metrics.frozenBodyWidth) + offset.left, worldY = inRowHeader || inFrozenRows ? bodyY : metrics.frozenBodyHeight + (bodyY - metrics.frozenBodyHeight) + offset.top; return { x: inColumnHeader ? input.logicalX : 40 + worldX, y: inRowHeader ? input.logicalY : 20 + worldY }; }
-function screenToFrozenWorld(input: GridDimensions & { camera: CameraTransform; screenX: number; screenY: number }): { x: number; y: number } { const k = Math.max(input.camera.k, 2 ** -52); return logicalToWorld({ ...input, logicalX: input.screenX / k, logicalY: input.screenY / k }); }
-function worldToLogical(input: GridDimensions & { camera: CameraTransform; worldX: number; worldY: number }): { x: number; y: number } { const offset = cameraWorldOffset(input.camera), metrics = freezeMetrics(input), bodyX = input.worldX - 40, bodyY = input.worldY - 20, inColumnHeader = input.worldX >= 0 && input.worldX < 40, inRowHeader = input.worldY >= 0 && input.worldY < 20, inFrozenColumns = input.freezePanes.columnCount > 0 && bodyX >= 0 && bodyX < metrics.frozenBodyWidth, inFrozenRows = input.freezePanes.rowCount > 0 && bodyY >= 0 && bodyY < metrics.frozenBodyHeight, logicalX = inColumnHeader || inFrozenColumns ? bodyX : metrics.frozenBodyWidth + (bodyX - metrics.frozenBodyWidth) - offset.left, logicalY = inRowHeader || inFrozenRows ? bodyY : metrics.frozenBodyHeight + (bodyY - metrics.frozenBodyHeight) - offset.top; return { x: inColumnHeader ? input.worldX : 40 + logicalX, y: inRowHeader ? input.worldY : 20 + logicalY }; }
-function worldToFrozenScreen(input: GridDimensions & { camera: CameraTransform; worldX: number; worldY: number }): { x: number; y: number } { const point = worldToLogical(input); return { x: point.x * input.camera.k, y: point.y * input.camera.k }; }
-function splitFrozenWorldRect(input: GridDimensions & { camera: CameraTransform; height: number; width: number; worldX: number; worldY: number }): Array<{ height: number; width: number; x: number; y: number }> { const k = Math.max(input.camera.k, 2 ** -52), scrollX = -input.camera.x / k, scrollY = -input.camera.y / k, horizontal = splitVisibleSegment({ start: input.worldX, size: input.width, headerSize: 40, frozenBodySize: prefixSum(input.columnWidths, input.freezePanes.columnCount), scroll: scrollX }), vertical = splitVisibleSegment({ start: input.worldY, size: input.height, headerSize: 20, frozenBodySize: prefixSum(input.rowHeights, input.freezePanes.rowCount), scroll: scrollY }), rectangles: Array<{ height: number; width: number; x: number; y: number }> = []; for (const x of horizontal) for (const y of vertical) rectangles.push({ x: x.start, y: y.start, width: x.size, height: y.size }); return rectangles; }
-function splitFrozenScreenRect(input: Parameters<typeof splitFrozenWorldRect>[0]): Array<{ height: number; width: number; x: number; y: number }> { return splitFrozenWorldRect(input).map(rectangle => ({ x: rectangle.x * input.camera.k, y: rectangle.y * input.camera.k, width: rectangle.width * input.camera.k, height: rectangle.height * input.camera.k })); }
-function initializeFreezePanes(): void { initializeSpreadsheetUtils(); initializePointerGesture(); }
-export { splitFrozenWorldRect as a, screenToFrozenWorld as c, initializeFreezePanes as i, worldToLogical as l, constrainFrozenCamera as n, splitFrozenScreenRect as o, freezeMetrics as r, nearestOffsetIndex as s, prefixOffsets as t, worldToFrozenScreen as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { s as t } from "@rchunk/spreadsheet-utils";
+import { b as n, h as r } from "@rchunk/drawing-frame-geometry";
+function i(e, t) {
+  let n = 0;
+  for (let r = 0; r < t; r += 1) n += e[r] ?? 0;
+  return n;
+}
+function a(e) {
+  if (!(e.size > 0)) return [];
+  let t = e.start + e.size,
+    n = e.headerSize + e.frozenBodySize,
+    r = [],
+    i = Math.min(t, n);
+  i > e.start && r.push({ start: e.start, size: i - e.start });
+  let a = Math.max(e.start, n);
+  if (t > a) {
+    let i = a - e.scroll,
+      o = t - e.scroll,
+      s = Math.max(i, n);
+    o > s && r.push({ start: s, size: o - s });
+  }
+  return r;
+}
+function o(e) {
+  let t = [0];
+  for (let n = 0; n < e.length; n += 1) t[n + 1] = (t[n] ?? 0) + (e[n] ?? 0);
+  return t;
+}
+function s(e, t) {
+  let n = Math.max(0, t),
+    r = 0,
+    i = 1 / 0;
+  for (let t = 0; t < e.length; t += 1) {
+    let a = e[t] ?? 0,
+      o = Math.abs(a - n);
+    o < i && ((r = t), (i = o));
+  }
+  return r;
+}
+function c(e) {
+  let t = i(e.columnWidths, e.freezePanes.columnCount),
+    n = i(e.rowHeights, e.freezePanes.rowCount);
+  return { frozenBodyWidth: t, frozenBodyHeight: n, freezeLineX: 40 + t, freezeLineY: 20 + n };
+}
+function l(e) {
+  let t = Math.min(e.maxZoom, Math.max(e.minZoom, e.camera.k)),
+    n = c(e),
+    a = Math.max(0, e.viewportWidth / t - 40),
+    o = Math.max(0, e.viewportHeight / t - 20),
+    s = Math.max(0, e.bottomScrollReservePx ?? 0) / t,
+    l = i(e.columnWidths, e.columnWidths.length),
+    u = i(e.rowHeights, e.rowHeights.length),
+    d = Math.max(0, l - n.frozenBodyWidth),
+    f = Math.max(0, u - n.frozenBodyHeight),
+    p = Math.max(0, a - n.frozenBodyWidth),
+    m = Math.max(0, o - n.frozenBodyHeight),
+    h = Math.max(0, d - p),
+    g = Math.max(0, f + s - m),
+    _ = r({ ...e.camera, k: t }),
+    v = Math.min(h, Math.max(0, _.left)),
+    y = Math.min(g, Math.max(0, _.top));
+  return { x: -v * t, y: -y * t, k: t };
+}
+function u(e) {
+  let t = r(e.camera),
+    n = c(e),
+    i = e.logicalX - 40,
+    a = e.logicalY - 20,
+    o = e.logicalX >= 0 && e.logicalX < 40,
+    s = e.logicalY >= 0 && e.logicalY < 20,
+    l = e.freezePanes.columnCount > 0 && i >= 0 && i < n.frozenBodyWidth,
+    u = e.freezePanes.rowCount > 0 && a >= 0 && a < n.frozenBodyHeight,
+    d = o || l ? i : n.frozenBodyWidth + (i - n.frozenBodyWidth) + t.left,
+    f = s || u ? a : n.frozenBodyHeight + (a - n.frozenBodyHeight) + t.top;
+  return { x: o ? e.logicalX : 40 + d, y: s ? e.logicalY : 20 + f };
+}
+function d(e) {
+  let t = Math.max(e.camera.k, 2 ** -52);
+  return u({
+    camera: e.camera,
+    logicalX: e.screenX / t,
+    logicalY: e.screenY / t,
+    freezePanes: e.freezePanes,
+    columnWidths: e.columnWidths,
+    rowHeights: e.rowHeights,
+  });
+}
+function f(e) {
+  let t = r(e.camera),
+    n = c(e),
+    i = e.worldX - 40,
+    a = e.worldY - 20,
+    o = e.worldX >= 0 && e.worldX < 40,
+    s = e.worldY >= 0 && e.worldY < 20,
+    l = e.freezePanes.columnCount > 0 && i >= 0 && i < n.frozenBodyWidth,
+    u = e.freezePanes.rowCount > 0 && a >= 0 && a < n.frozenBodyHeight,
+    d = o || l ? i : n.frozenBodyWidth + (i - n.frozenBodyWidth) - t.left,
+    f = s || u ? a : n.frozenBodyHeight + (a - n.frozenBodyHeight) - t.top;
+  return { x: o ? e.worldX : 40 + d, y: s ? e.worldY : 20 + f };
+}
+function p(e) {
+  let t = f(e);
+  return { x: t.x * e.camera.k, y: t.y * e.camera.k };
+}
+function m(e) {
+  let t = Math.max(e.camera.k, 2 ** -52),
+    n = -e.camera.x / t,
+    r = -e.camera.y / t,
+    o = a({
+      start: e.worldX,
+      size: e.width,
+      headerSize: 40,
+      frozenBodySize: i(e.columnWidths, e.freezePanes.columnCount),
+      scroll: n,
+    }),
+    s = a({
+      start: e.worldY,
+      size: e.height,
+      headerSize: 20,
+      frozenBodySize: i(e.rowHeights, e.freezePanes.rowCount),
+      scroll: r,
+    }),
+    c = [];
+  for (let e of o)
+    for (let t of s) c.push({ x: e.start, y: t.start, width: e.size, height: t.size });
+  return c;
+}
+function h(e) {
+  return m(e).map((t) => ({
+    x: t.x * e.camera.k,
+    y: t.y * e.camera.k,
+    width: t.width * e.camera.k,
+    height: t.height * e.camera.k,
+  }));
+}
+function g() {
+  return (g = e(() => {
+    (t(), n());
+  }))();
+}
+export { m as a, d as c, g as i, f as l, l as n, h as o, c as r, s, o as t, p as u };

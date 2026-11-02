@@ -1,118 +1,246 @@
-// option-carousel —— 首页公告与表单选项的横向轮播控件。
-
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as runtimeChunk from "@rchunk/rolldown-runtime";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-void appInitialChunk;
-void runtimeChunk;
-
-interface AppSharedBindings {
-  I3: JsxRuntime | (() => JsxRuntime);
-}
-
-export interface OptionCarouselProps {
-  ariaInvalid?: boolean;
-  ariaLabel?: string;
-  backLabel: string;
-  children?: unknown;
-  forwardLabel: string;
-  header?: unknown;
-  layout?: "form" | "gallery";
-  role?: string;
-  shouldUseReducedMotion?: boolean;
-}
-
-const { I3: jsxRuntimeExport } = appSharedChunk as unknown as AppSharedBindings;
-let jsx: JsxRuntime;
-
-function getScrollBounds(element: HTMLElement): {
-  maximum: number;
-  minimum: number;
-} {
-  return {
-    maximum: Math.max(0, element.scrollWidth - element.clientWidth),
-    minimum: 0,
-  };
-}
-
-function getNextScrollLeft(element: HTMLElement, direction: -1 | 1): number {
-  const distance = Math.max(element.clientWidth * 0.8, 160);
-  const { maximum, minimum } = getScrollBounds(element);
-  return Math.min(maximum, Math.max(minimum, element.scrollLeft + direction * distance));
-}
-
-function OptionCarousel({
-  ariaInvalid,
-  ariaLabel,
-  backLabel,
-  children,
-  forwardLabel,
-  header,
-  layout = "form",
-  role = "group",
-  shouldUseReducedMotion = false,
-}: OptionCarouselProps): unknown {
-  initializeOptionCarousel();
-  let viewport: HTMLElement | null = null;
-  const scroll = (direction: -1 | 1) => {
-    if (viewport == null) return;
-    viewport.scrollTo({
-      behavior: shouldUseReducedMotion ? "auto" : "smooth",
-      left: getNextScrollLeft(viewport, direction),
-    });
-  };
-  const gallery = layout === "gallery";
-  return jsx.jsxs("section", {
-    "aria-invalid": ariaInvalid,
-    "aria-label": ariaLabel,
-    className: `option-carousel option-carousel--${layout}`,
-    role,
-    children: [
-      jsx.jsxs("header", {
-        className: "option-carousel__header",
-        children: [
-          jsx.jsx("div", { className: "option-carousel__title", children: header }),
-          jsx.jsxs("div", {
-            className: "option-carousel__controls",
-            children: [
-              jsx.jsx("button", {
-                "aria-label": backLabel,
-                className: gallery ? "option-carousel__button--outlined" : undefined,
-                onClick: () => scroll(-1),
-                title: backLabel,
-                type: "button",
-                children: "‹",
-              }),
-              jsx.jsx("button", {
-                "aria-label": forwardLabel,
-                className: gallery ? "option-carousel__button--outlined" : undefined,
-                onClick: () => scroll(1),
-                title: forwardLabel,
-                type: "button",
-                children: "›",
-              }),
-            ],
-          }),
-        ],
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  C_ as n,
+  I3 as r,
+  JQ as i,
+  S_ as ee,
+  Xd as a,
+  Yd as te,
+  Yh as ne,
+  Zh as o,
+  __ as re,
+  e6 as s,
+  g_ as c,
+  h4 as l,
+  m4 as u,
+  qQ as ie,
+} from "@rchunk/app-shared";
+import { Lz as ae, Rz as oe, zz as d } from "@rchunk/app-initial";
+function f(e) {
+  let t = (0, se.c)(61),
+    {
+      ariaInvalid: n,
+      ariaLabel: r,
+      backLabel: i,
+      children: a,
+      forwardLabel: o,
+      header: s,
+      layout: c,
+      role: l,
+      shouldUseReducedMotion: d,
+    } = e,
+    f = c === void 0 ? `form` : c,
+    h = l === void 0 ? `group` : l,
+    g;
+  t[0] === a ? (g = t[1]) : ((g = p.Children.count(a)), (t[0] = a), (t[1] = g));
+  let _ = g,
+    v = (0, p.useRef)(null),
+    ce = (0, p.useRef)(null),
+    y = (0, p.useRef)(null),
+    [le, ue] = (0, p.useState)(!1),
+    [de, fe] = (0, p.useState)(!1),
+    b;
+  t[2] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((b = (e) => {
+        let { maximum: t, minimum: n } = ae(e);
+        (ue(e.scrollLeft > n + 1), fe(e.scrollLeft < t - 1));
       }),
-      jsx.jsx("div", {
-        className: "option-carousel__viewport",
-        ref: (element: HTMLElement | null) => {
-          viewport = element;
-        },
-        children,
+      (t[2] = b))
+    : (b = t[2]);
+  let x = re(b),
+    S;
+  t[3] !== _ || t[4] !== x
+    ? ((S = (e) => {
+        if ((ce.current?.disconnect(), (v.current = e), e == null || _ === 0)) {
+          y.current?.stop();
+          return;
+        }
+        if ((x(e), typeof ResizeObserver > `u`)) return;
+        let t = new ResizeObserver(() => x(e));
+        (t.observe(e),
+          e.firstElementChild != null && t.observe(e.firstElementChild),
+          e.lastElementChild != null && t.observe(e.lastElementChild),
+          (ce.current = t));
       }),
-    ],
-  });
+      (t[3] = _),
+      (t[4] = x),
+      (t[5] = S))
+    : (S = t[5]);
+  let pe = S,
+    C;
+  t[6] !== d || t[7] !== x
+    ? ((C = (e) => {
+        let t = v.current;
+        if (t == null) return;
+        y.current?.stop();
+        let n = oe(t, e);
+        if (d) {
+          (t.scrollTo({ left: n }), t.style.removeProperty(`scroll-snap-type`), x(t));
+          return;
+        }
+        ((t.style.scrollSnapType = `none`),
+          (y.current = ie(t.scrollLeft, n, {
+            duration: 0.2,
+            ease: [0.165, 0.84, 0.44, 1],
+            onUpdate: (e) => t.scrollTo({ left: e }),
+            onComplete: () => {
+              (t.style.removeProperty(`scroll-snap-type`), v.current === t && x(t));
+            },
+          })));
+      }),
+      (t[6] = d),
+      (t[7] = x),
+      (t[8] = C))
+    : (C = t[8]);
+  let w = C,
+    T = f === `gallery` ? `gap-4` : `gap-1.5`,
+    E;
+  t[9] === T ? (E = t[10]) : ((E = u(`flex min-w-0 flex-col`, T)), (t[9] = T), (t[10] = E));
+  let D = f === `gallery` ? `min-h-9 gap-3` : `gap-1 px-3 py-1.5`,
+    O;
+  t[11] === D ? (O = t[12]) : ((O = u(`flex min-w-0 items-center`, D)), (t[11] = D), (t[12] = O));
+  let k;
+  t[13] === s
+    ? (k = t[14])
+    : ((k = (0, m.jsx)(`div`, { className: `min-w-0 flex-1`, children: s })),
+      (t[13] = s),
+      (t[14] = k));
+  let A = f === `gallery` ? `gap-2` : `gap-1`,
+    j;
+  t[15] === A ? (j = t[16]) : ((j = u(`flex items-center`, A)), (t[15] = A), (t[16] = j));
+  let M = f === `gallery` ? `outlineSurface` : `ghost`,
+    N = !le,
+    P;
+  t[17] === w ? (P = t[18]) : ((P = () => w(-1)), (t[17] = w), (t[18] = P));
+  let F = f === `gallery` ? `full` : `default`,
+    I = f === `gallery` ? `dialog` : `toolbar`,
+    L;
+  t[19] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((L = (0, m.jsx)(ee, { className: `rotate-180`, asset: te })), (t[19] = L))
+    : (L = t[19]);
+  let R;
+  t[20] !== i || t[21] !== M || t[22] !== N || t[23] !== P || t[24] !== F || t[25] !== I
+    ? ((R = (0, m.jsx)(ne, {
+        "aria-label": i,
+        color: M,
+        disabled: N,
+        onClick: P,
+        radius: F,
+        size: I,
+        title: i,
+        uniform: !0,
+        children: L,
+      })),
+      (t[20] = i),
+      (t[21] = M),
+      (t[22] = N),
+      (t[23] = P),
+      (t[24] = F),
+      (t[25] = I),
+      (t[26] = R))
+    : (R = t[26]);
+  let z = f === `gallery` ? `outlineSurface` : `ghost`,
+    B = !de,
+    V;
+  t[27] === w ? (V = t[28]) : ((V = () => w(1)), (t[27] = w), (t[28] = V));
+  let H = f === `gallery` ? `full` : `default`,
+    U = f === `gallery` ? `dialog` : `toolbar`,
+    W;
+  t[29] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((W = (0, m.jsx)(ee, { asset: te })), (t[29] = W))
+    : (W = t[29]);
+  let G;
+  t[30] !== o || t[31] !== z || t[32] !== B || t[33] !== V || t[34] !== H || t[35] !== U
+    ? ((G = (0, m.jsx)(ne, {
+        "aria-label": o,
+        color: z,
+        disabled: B,
+        onClick: V,
+        radius: H,
+        size: U,
+        title: o,
+        uniform: !0,
+        children: W,
+      })),
+      (t[30] = o),
+      (t[31] = z),
+      (t[32] = B),
+      (t[33] = V),
+      (t[34] = H),
+      (t[35] = U),
+      (t[36] = G))
+    : (G = t[36]);
+  let K;
+  t[37] !== j || t[38] !== R || t[39] !== G
+    ? ((K = (0, m.jsxs)(`div`, { className: j, children: [R, G] })),
+      (t[37] = j),
+      (t[38] = R),
+      (t[39] = G),
+      (t[40] = K))
+    : (K = t[40]);
+  let q;
+  t[41] !== O || t[42] !== k || t[43] !== K
+    ? ((q = (0, m.jsxs)(`div`, { className: O, children: [k, K] })),
+      (t[41] = O),
+      (t[42] = k),
+      (t[43] = K),
+      (t[44] = q))
+    : (q = t[44]);
+  let J =
+      f === `gallery`
+        ? `-my-1.5 gap-3 overscroll-x-contain py-1.5`
+        : `snap-x snap-mandatory scroll-px-3 gap-4 px-3 py-1`,
+    Y;
+  t[45] === J
+    ? (Y = t[46])
+    : ((Y = u(`hide-scrollbar flex overflow-x-auto`, J)), (t[45] = J), (t[46] = Y));
+  let X = n || void 0,
+    Z;
+  t[47] === x ? (Z = t[48]) : ((Z = (e) => x(e.currentTarget)), (t[47] = x), (t[48] = Z));
+  let Q;
+  t[49] !== r ||
+  t[50] !== a ||
+  t[51] !== h ||
+  t[52] !== pe ||
+  t[53] !== Y ||
+  t[54] !== X ||
+  t[55] !== Z
+    ? ((Q = (0, m.jsx)(`div`, {
+        ref: pe,
+        className: Y,
+        role: h,
+        "aria-invalid": X,
+        "aria-label": r,
+        onScroll: Z,
+        children: a,
+      })),
+      (t[49] = r),
+      (t[50] = a),
+      (t[51] = h),
+      (t[52] = pe),
+      (t[53] = Y),
+      (t[54] = X),
+      (t[55] = Z),
+      (t[56] = Q))
+    : (Q = t[56]);
+  let $;
+  return (
+    t[57] !== q || t[58] !== Q || t[59] !== E
+      ? (($ = (0, m.jsxs)(`div`, { className: E, children: [q, Q] })),
+        (t[57] = q),
+        (t[58] = Q),
+        (t[59] = E),
+        (t[60] = $))
+      : ($ = t[60]),
+    $
+  );
 }
-
-function initializeOptionCarousel(): void {
-  if (jsx != null) return;
-  jsx = typeof jsxRuntimeExport === "function" ? jsxRuntimeExport() : jsxRuntimeExport;
+var se, p, m;
+function h() {
+  return (h = e(() => {
+    ((se = t()), a(), l(), i(), (p = s()), o(), d(), n(), c(), (m = r()));
+  }))();
 }
-
-initializeOptionCarousel();
-
-export { initializeOptionCarousel as n, OptionCarousel as t };
+export { h as n, f as t };

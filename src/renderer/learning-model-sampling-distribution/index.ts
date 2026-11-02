@@ -1,7 +1,142 @@
-// Sampling-distribution simulation model. Release chunk: model-689c31877cb2.js.
-import "@rchunk/rolldown-runtime";
-type Shape = "normal" | "right-skewed"; interface Manifest { type: string; version: number; thumbnailAssetKey: string; parameters: { population_shape: { kind: "enum"; defaultValue: Shape; allowedValues: Shape[] }; population_mean: { kind: "number"; defaultValue: number; min: number; max: number }; population_standard_deviation: { kind: "number"; defaultValue: number; min: number; max: number }; sample_size: { kind: "integer"; defaultValue: number; min: number; max: number } } } interface Values { population_shape?: string | null; population_mean?: number | null; population_standard_deviation?: number | null; sample_size?: number | null; histogramCounts?: number[] | null; latestSample?: number[] | null }
-let manifest: Manifest; let normalizeShape: (value: unknown) => Shape; let chartMinimum = -3.5; let chartMaximum = 5.5; let normalizeState: (values: Values) => { population_shape: Shape; population_mean: number; population_standard_deviation: number; sample_size: number; histogramCounts: number[]; latestSample: number[] }; let summarize: (values: Values) => ReturnType<typeof normalizeState> & { latestMean: number | null; repetitions: number; standardError: number }; let populationDensity: (shape: Shape, standardized: number) => number; let sampleMeanDensity: (shape: Shape, standardized: number, sampleSize: number) => number; let curvePoints: (options: { density: (standardized: number) => number; populationMean: number; populationStandardDeviation: number; baseline: number; height: number }) => Array<{ x: number; y: number }>; let runSimulation: (values: Values, repetitions: number, random: () => number) => ReturnType<typeof normalizeState>; let resetSimulation: (values: Values) => ReturnType<typeof normalizeState>; let manifestReady = false; let modelReady = false;
-function initializeManifest(): void { if (manifestReady) return; manifestReady = true; manifest = { type: "SAMPLING_DISTRIBUTION", version: 2, thumbnailAssetKey: "sampling-distribution-v1", parameters: { population_shape: { kind: "enum", defaultValue: "normal", allowedValues: ["normal", "right-skewed"] }, population_mean: { kind: "number", defaultValue: 50, min: -10000, max: 10000 }, population_standard_deviation: { kind: "number", defaultValue: 12, min: 0.1, max: 1000 }, sample_size: { kind: "integer", defaultValue: 10, min: 2, max: 100 } } }; }
-function initializeModel(): void { if (modelReady) return; modelReady = true; initializeManifest(); const shapes: Shape[] = ["normal", "right-skewed"]; const parameters = manifest.parameters; normalizeShape = value => shapes.find(shape => shape === value) ?? shapes[0]; const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value)); const numeric = (value: number | null | undefined, parameter: { defaultValue: number; min: number; max: number }) => typeof value === "number" && Number.isFinite(value) ? clamp(value, parameter.min, parameter.max) : parameter.defaultValue; const count = (value: number | null | undefined) => typeof value === "number" && Number.isFinite(value) ? Math.min(Number.MAX_SAFE_INTEGER, Math.max(0, Math.round(value))) : 0; const counts = (values?: number[] | null) => Array.from({ length: 96 }, (_, index) => count(values?.[index])); normalizeState = values => { const sample_size = Math.round(numeric(values.sample_size, parameters.sample_size)); return { population_shape: normalizeShape(values.population_shape ?? parameters.population_shape.defaultValue), population_mean: numeric(values.population_mean, parameters.population_mean), population_standard_deviation: numeric(values.population_standard_deviation, parameters.population_standard_deviation), sample_size, histogramCounts: counts(Array.isArray(values.histogramCounts) ? values.histogramCounts : undefined), latestSample: Array.isArray(values.latestSample) ? values.latestSample.filter(Number.isFinite).slice(0, sample_size) : [] }; }; summarize = values => { const normalized = normalizeState(values); return { ...normalized, latestMean: normalized.latestSample.length > 0 ? normalized.latestSample.reduce((sum, value) => sum + value, 0) / normalized.latestSample.length : null, repetitions: normalized.histogramCounts.reduce((sum, value) => sum + value, 0), standardError: normalized.population_standard_deviation / Math.sqrt(normalized.sample_size) }; }; const safeRandom = (random: () => number) => clamp(random(), Number.EPSILON, 1 - Number.EPSILON); const bin = (mean: number, populationMean: number, populationStandardDeviation: number) => Math.max(0, Math.min(95, Math.floor(((mean - populationMean) / populationStandardDeviation - chartMinimum) / 9 * 96))); const logGamma = (value: number) => { const coefficients = [0.9999999999998099, 676.5203681218851, -1259.1392167224028, 771.3234287776531, -176.6150291621406, 12.507343278686905, -0.13857109526572012, 9.984369578019572e-6, 1.5056327351493116e-7]; const shifted = value - 1; let sum = coefficients[0] ?? 1; for (let index = 1; index < coefficients.length; index += 1) sum += (coefficients[index] ?? 0) / (shifted + index); const t = shifted + 7.5; return 0.5 * Math.log(2 * Math.PI) + (shifted + 0.5) * Math.log(t) - t + Math.log(sum); }; populationDensity = (shape, standardized) => shape === "normal" ? Math.exp(-0.5 * standardized * standardized) : standardized < -1 ? 0 : Math.exp(-(standardized + 1)); sampleMeanDensity = (shape, standardized, sampleSize) => { if (shape === "normal") return Math.exp(-0.5 * sampleSize * standardized * standardized); const shifted = standardized + 1; return shifted <= 0 ? 0 : Math.exp(sampleSize * Math.log(sampleSize) + (sampleSize - 1) * Math.log(shifted) - sampleSize * shifted - logGamma(sampleSize)); }; curvePoints = options => { const raw = Array.from({ length: 321 }, (_, index) => { const standardizedValue = chartMinimum + index / 320 * 9; return { standardizedValue, density: options.density(standardizedValue) }; }); const maximum = Math.max(...raw.map(point => point.density), Number.EPSILON); return raw.map(point => ({ x: options.populationMean + point.standardizedValue * options.populationStandardDeviation, y: options.baseline + point.density / maximum * options.height })); }; const draw = (shape: Shape, mean: number, standardDeviation: number, random: () => number) => { if (shape === "right-skewed") return mean + standardDeviation * (-Math.log(1 - safeRandom(random)) - 1); const first = safeRandom(random); const second = safeRandom(random); return mean + standardDeviation * Math.sqrt(-2 * Math.log(first)) * Math.cos(2 * Math.PI * second); }; runSimulation = (values, repetitions, random) => { const normalized = normalizeState(values); const histogramCounts = [...normalized.histogramCounts]; let latestSample = [...normalized.latestSample]; for (let repetition = 0; repetition < Math.max(0, Math.floor(repetitions)); repetition += 1) { latestSample = Array.from({ length: normalized.sample_size }, () => draw(normalized.population_shape, normalized.population_mean, normalized.population_standard_deviation, random)); const mean = latestSample.reduce((sum, value) => sum + value, 0) / latestSample.length; const index = bin(mean, normalized.population_mean, normalized.population_standard_deviation); histogramCounts[index] = Math.min(Number.MAX_SAFE_INTEGER, (histogramCounts[index] ?? 0) + 1); } return { ...normalized, histogramCounts, latestSample }; }; resetSimulation = values => ({ ...normalizeState(values), histogramCounts: Array.from({ length: 96 }, () => 0), latestSample: [] }); }
-export { curvePoints as a, normalizeShape as c, initializeManifest as d, manifest as f, summarize as i, populationDensity as l, chartMinimum as n, initializeModel as o, runSimulation as r, resetSimulation as s, chartMaximum as t, sampleMeanDensity as u };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i;
+function a() {
+  return (a = e(() => {
+    ((t = `SAMPLING_DISTRIBUTION`),
+      (n = `sampling-distribution-v1`),
+      (r = {
+        population_shape: {
+          kind: `enum`,
+          defaultValue: `normal`,
+          allowedValues: [`normal`, `right-skewed`],
+        },
+        population_mean: { kind: `number`, defaultValue: 50, min: -1e4, max: 1e4 },
+        population_standard_deviation: { kind: `number`, defaultValue: 12, min: 0.1, max: 1e3 },
+        sample_size: { kind: `integer`, defaultValue: 10, min: 2, max: 100 },
+      }),
+      (i = { type: t, version: 2, thumbnailAssetKey: n, parameters: r }));
+  }))();
+}
+var o, s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C, w, T, E;
+function D() {
+  return (D = e(() => {
+    (a(),
+      (o = [`normal`, `right-skewed`]),
+      (s = i.parameters),
+      (c = -3.5),
+      (l = 5.5),
+      (u = 320),
+      (d = (e) => o.find((t) => t === e) ?? o[0]),
+      (f = (e, t, n) => Math.min(n, Math.max(t, e))),
+      (p = (e, t) => (Number.isFinite(e) ? f(e ?? t.defaultValue, t.min, t.max) : t.defaultValue)),
+      (m = (e) =>
+        Number.isFinite(e) ? Math.min(2 ** 53 - 1, Math.max(0, Math.round(e ?? 0))) : 0),
+      (h = (e) => Array.from({ length: 96 }, (t, n) => m(e?.[n]))),
+      (g = (e) => {
+        let t = d(e.population_shape ?? s.population_shape.defaultValue),
+          n = p(e.population_mean, s.population_mean),
+          r = p(e.population_standard_deviation, s.population_standard_deviation),
+          i = Math.round(p(e.sample_size, s.sample_size));
+        return {
+          population_shape: t,
+          population_mean: n,
+          population_standard_deviation: r,
+          sample_size: i,
+          histogramCounts: h(Array.isArray(e.histogramCounts) ? e.histogramCounts : void 0),
+          latestSample: Array.isArray(e.latestSample)
+            ? e.latestSample.filter(Number.isFinite).slice(0, i)
+            : [],
+        };
+      }),
+      (_ = (e) => {
+        let t = g(e),
+          n =
+            t.latestSample.length > 0
+              ? t.latestSample.reduce((e, t) => e + t, 0) / t.latestSample.length
+              : null;
+        return {
+          ...t,
+          latestMean: n,
+          repetitions: t.histogramCounts.reduce((e, t) => e + t, 0),
+          standardError: t.population_standard_deviation / Math.sqrt(t.sample_size),
+        };
+      }),
+      (v = (e) => f(e(), 2 ** -52, 1 - 2 ** -52)),
+      (y = (e, t, n) => {
+        let r = (((e - t) / n - c) / 9) * 96;
+        return Math.max(0, Math.min(95, Math.floor(r)));
+      }),
+      (b = (e) => {
+        let t = [
+            0.9999999999998099, 676.5203681218851, -1259.1392167224028, 771.3234287776531,
+            -176.6150291621406, 12.507343278686905, -0.13857109526572012, 9984369578019572e-21,
+            1.5056327351493116e-7,
+          ],
+          n = e - 1,
+          r = t[0] ?? 1;
+        for (let e = 1; e < t.length; e += 1) r += (t[e] ?? 0) / (n + e);
+        let i = n + 7.5;
+        return 0.5 * Math.log(2 * Math.PI) + (n + 0.5) * Math.log(i) - i + Math.log(r);
+      }),
+      (x = (e, t) => (e === `normal` ? Math.exp(-0.5 * t * t) : t < -1 ? 0 : Math.exp(-(t + 1)))),
+      (S = (e, t, n) => {
+        if (e === `normal`) return Math.exp(-0.5 * n * t * t);
+        let r = t + 1;
+        return r <= 0 ? 0 : Math.exp(n * Math.log(n) + (n - 1) * Math.log(r) - n * r - b(n));
+      }),
+      (C = ({
+        density: e,
+        populationMean: t,
+        populationStandardDeviation: n,
+        baseline: r,
+        height: i,
+      }) => {
+        let a = Array.from({ length: 321 }, (t, n) => {
+            let r = c + (n / u) * 9;
+            return { standardizedValue: r, density: e(r) };
+          }),
+          o = Math.max(...a.map((e) => e.density), 2 ** -52);
+        return a.map((e) => ({ x: t + e.standardizedValue * n, y: r + (e.density / o) * i }));
+      }),
+      (w = (e, t, n, r) => {
+        if (e === `right-skewed`) return t + n * (-Math.log(1 - v(r)) - 1);
+        let i = v(r),
+          a = v(r);
+        return t + n * Math.sqrt(-2 * Math.log(i)) * Math.cos(2 * Math.PI * a);
+      }),
+      (T = (e, t, n) => {
+        let r = g(e),
+          i = [...r.histogramCounts],
+          a = [...r.latestSample];
+        for (let e = 0; e < Math.max(0, Math.floor(t)); e += 1) {
+          a = Array.from({ length: r.sample_size }, () =>
+            w(r.population_shape, r.population_mean, r.population_standard_deviation, n),
+          );
+          let e = a.reduce((e, t) => e + t, 0) / a.length,
+            t = y(e, r.population_mean, r.population_standard_deviation);
+          i[t] = Math.min(2 ** 53 - 1, (i[t] ?? 0) + 1);
+        }
+        return { ...r, histogramCounts: i, latestSample: a };
+      }),
+      (E = (e) => ({
+        ...g(e),
+        histogramCounts: Array.from({ length: 96 }, () => 0),
+        latestSample: [],
+      })));
+  }))();
+}
+export {
+  C as a,
+  d as c,
+  a as d,
+  i as f,
+  _ as i,
+  x as l,
+  c as n,
+  D as o,
+  T as r,
+  E as s,
+  l as t,
+  S as u,
+};

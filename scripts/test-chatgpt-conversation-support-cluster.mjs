@@ -7,7 +7,7 @@ import * as esbuild from "esbuild";
 import { assertReleaseOwner } from "./release-owner-test-helpers.mjs";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const MODULES = ["conversation-summary", "archived-conversation-preview-footer", "chatgpt-sources-message", "chatgpt-entity-side-panel-tab"];
+const MODULES = ["conversation-summary", "chatgpt-sources-message", "chatgpt-entity-side-panel-tab"];
 const state = globalThis.__chatGptConversationSupportTest = { stateUpdates: [] };
 state.jsx = {
   Fragment: "Fragment",
@@ -58,22 +58,7 @@ const screenAssertions = assertReleaseOwner("conversation-screen", [
 
 assertReleaseOwner("conversation-summary");
 
-// archived-conversation-preview-footer: 10
-const footer = await bundle("archived-conversation-preview-footer");
-assert.deepEqual(Object.keys(footer).sort(), ["n", "t"]);
-let recovered, done = 0, failure;
-const archived = footer.t({ conversationId: "c1", kind: "cloud", onRecover: (input) => { recovered = input; } });
-assert.equal(archived.type, "footer");
-assert.match(find(archived, (node) => node.type === "p").props.children, /archived chat preview/);
-assert.equal(find(archived, (node) => node.type === "Button").props.children, "Restore chat");
-await find(archived, (node) => node.type === "Button").props.onClick(); assert.deepEqual(recovered, { conversationId: "c1", kind: "cloud" });
-const restored = footer.t({ conversationId: "c1", kind: "chatgpt", restored: true, onDone: () => done++ });
-assert.equal(find(restored, (node) => node.type === "p").props.children, "Chat restored");
-find(restored, (node) => node.type === "Button").props.onClick(); assert.equal(done, 1);
-assert.equal(find(footer.t({ conversationId: "c1", kind: "local", restoring: true }), (node) => node.type === "Button").props.disabled, true);
-const rejected = footer.t({ conversationId: "c2", kind: "local", onRecover: () => Promise.reject(new Error("no")), onError: (error) => { failure = error; } });
-await find(rejected, (node) => node.type === "Button").props.onClick(); assert.equal(failure.message, "no");
-footer.n(); assert.equal(typeof footer.t, "function");
+assertReleaseOwner("archived-conversation-preview-footer");
 
 // chatgpt-sources-message: 7
 const messages = await bundle("chatgpt-sources-message");

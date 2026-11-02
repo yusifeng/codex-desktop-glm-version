@@ -1,61 +1,194 @@
-// Composer dialog for editing an attached annotation comment.
-
-import "@rchunk/rolldown-runtime";
-import * as appSharedChunk from "@rchunk/app-shared";
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as annotationCardChunk from "@rchunk/annotation-comment-editor-card";
-
-type StateUpdater<Value> = Value | ((current: Value) => Value);
-interface JsxRuntime { jsx(type: unknown, props: object, key?: string): unknown; jsxs(type: unknown, props: object, key?: string): unknown }
-interface ReactRuntime { useContext<Value>(context: unknown): Value; useState<Value>(initialValue: Value): [Value, (next: StateUpdater<Value>) => void] }
-interface IntlShape { formatMessage(descriptor: Record<string, unknown>): string }
-interface Annotation { localBrowserAttachedImages?: unknown[]; localBrowserDesignChange?: { group?: { declarations: unknown[]; text?: string | null; annotationControlChanges?: unknown[]; comment?: string | null } }; [key: string]: unknown }
-interface EditorResult { body: string }
-
-const shared = appSharedChunk as unknown as { $3?: () => void; I3: () => JsxRuntime; Ih?: unknown; K2?: () => void; Rh?: unknown; Y2?: unknown; b_?: (value: number, maximum: number) => number; e6: () => ReactRuntime; n4: () => IntlShape; wL?: () => void; x_?: () => unknown; y_?: () => void; zh?: () => void };
-const initial = appInitialChunk as unknown as { E7?: () => void; Lpn?: (annotation: Annotation) => string; Rpn?: () => number; T7?: unknown };
-const annotationCard = annotationCardChunk as unknown as { n?: () => void; t?: unknown };
-const { $3: initializeSharedRuntime, I3: getJsxRuntime, Ih: Dialog, K2: initializeReactCompilerRuntime, Rh: VisuallyHidden, Y2: FormattedMessage, b_: clampHeight, e6: getReactRuntime, n4: useIntl, wL: initializeSharedLinks, x_: useModifierState, y_: initializeSharedTheme, zh: initializeIcons } = shared;
-const { E7: initializeAnnotationRuntime, Lpn: getAnnotationComment, Rpn: getMaximumEditorHeight, T7: portalContainerContext } = initial;
-const { n: initializeAnnotationCard, t: AnnotationCommentEditorCard } = annotationCard;
-
-let jsx: JsxRuntime;
-let React: ReactRuntime;
-let maximumEditorHeight = 480;
-let initialized = false;
-
-function initializeComposerAnnotationEditor(): void {
-  if (initialized) return;
-  initializeSharedRuntime?.();
-  initializeSharedLinks?.();
-  const configuredMaximum = getMaximumEditorHeight?.();
-  if (typeof configuredMaximum === "number") maximumEditorHeight = configuredMaximum;
-  React = getReactRuntime();
-  initializeReactCompilerRuntime?.();
-  initializeAnnotationRuntime?.();
-  initializeSharedTheme?.();
-  initializeAnnotationCard?.();
-  initializeIcons?.();
-  jsx = getJsxRuntime();
-  initialized = true;
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import {
+  $3 as t,
+  I3 as n,
+  Ih as r,
+  K2 as i,
+  Rh as a,
+  Y2 as o,
+  b_ as s,
+  e6 as c,
+  n4 as l,
+  wL as u,
+  x_ as d,
+  y_ as f,
+  zh as p,
+} from "@rchunk/app-shared";
+import { E7 as m, Lpn as h, Rpn as g, T7 as _ } from "@rchunk/app-initial";
+import { n as v, t as y } from "@rchunk/annotation-comment-editor-card";
+function b(e) {
+  let t = (0, x.c)(39),
+    { annotation: n, cwd: i, onClose: c, onRemove: u, onSave: f } = e,
+    p = l(),
+    m = (0, S.useContext)(_),
+    g = d(),
+    [v, b] = (0, S.useState)(120),
+    [w, T] = (0, S.useState)(!0),
+    E = n.localBrowserDesignChange?.group,
+    D;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((D = { "aria-describedby": void 0, style: { maxWidth: 294 } }), (t[0] = D))
+    : (D = t[0]);
+  let O = !w,
+    k;
+  t[1] === c
+    ? (k = t[2])
+    : ((k = (e) => {
+        e || c();
+      }),
+      (t[1] = c),
+      (t[2] = k));
+  let A;
+  t[3] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((A = (0, C.jsx)(a, {
+        className: `sr-only`,
+        children: (0, C.jsx)(o, {
+          id: `composer.annotationEditor.title`,
+          defaultMessage: `Edit annotation`,
+          description: `Title of the editor for an annotation attached to the composer`,
+        }),
+      })),
+      (t[3] = A))
+    : (A = t[3]);
+  let j;
+  t[4] === v ? (j = t[5]) : ((j = { height: v }), (t[4] = v), (t[5] = j));
+  let M =
+      E != null &&
+      (E.declarations.length > 0 ||
+        E.text != null ||
+        (E.annotationControlChanges?.length ?? 0) > 0),
+    N;
+  t[6] === p
+    ? (N = t[7])
+    : ((N = p.formatMessage({
+        id: `composer.annotationEditor.comment`,
+        defaultMessage: `Annotation comment`,
+        description: `Accessible label for editing an annotation's comment from the composer`,
+      })),
+      (t[6] = p),
+      (t[7] = N));
+  let P;
+  t[8] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((P = { mode: `edit`, commentId: `composer-annotation` }), (t[8] = P))
+    : (P = t[8]);
+  let F;
+  t[9] !== n || t[10] !== E
+    ? ((F = E == null ? h(n) : (E.comment ?? ``)), (t[9] = n), (t[10] = E), (t[11] = F))
+    : (F = t[11]);
+  let I;
+  t[12] !== n.localBrowserAttachedImages || t[13] !== i || t[14] !== F
+    ? ((I = {
+        sessionId: `composer-annotation-edit`,
+        target: P,
+        body: F,
+        attachedImages: n.localBrowserAttachedImages,
+        cwd: i,
+        previewAlignment: `center`,
+        surfaceMode: `editor`,
+      }),
+      (t[12] = n.localBrowserAttachedImages),
+      (t[13] = i),
+      (t[14] = F),
+      (t[15] = I))
+    : (I = t[15]);
+  let L;
+  t[16] === f
+    ? (L = t[17])
+    : ((L = (e) => {
+        let { body: t } = e;
+        return f(t);
+      }),
+      (t[16] = f),
+      (t[17] = L));
+  let R;
+  t[18] === g
+    ? (R = t[19])
+    : ((R = (e, t) => {
+        t != null && b(s(t.height, g));
+      }),
+      (t[18] = g),
+      (t[19] = R));
+  let z;
+  t[20] === f
+    ? (z = t[21])
+    : ((z = (e) => {
+        let { body: t } = e;
+        return f(t);
+      }),
+      (t[20] = f),
+      (t[21] = z));
+  let B;
+  t[22] !== c ||
+  t[23] !== u ||
+  t[24] !== I ||
+  t[25] !== L ||
+  t[26] !== R ||
+  t[27] !== z ||
+  t[28] !== M ||
+  t[29] !== N
+    ? ((B = (0, C.jsx)(y, {
+        allowDirectSubmit: !1,
+        allowEmptySubmit: M,
+        allowImageAttachments: !1,
+        inputAriaLabel: N,
+        session: I,
+        showAdjustEntry: !1,
+        windowHeight: 120,
+        onCancel: c,
+        onDelete: u,
+        onDirectSubmit: L,
+        onEscape: c,
+        onLightDismissibilityChange: T,
+        onMounted: R,
+        onSubmit: z,
+      })),
+      (t[22] = c),
+      (t[23] = u),
+      (t[24] = I),
+      (t[25] = L),
+      (t[26] = R),
+      (t[27] = z),
+      (t[28] = M),
+      (t[29] = N),
+      (t[30] = B))
+    : (B = t[30]);
+  let V;
+  t[31] !== B || t[32] !== j
+    ? ((V = (0, C.jsx)(`div`, { className: `relative max-w-full`, style: j, children: B })),
+      (t[31] = B),
+      (t[32] = j),
+      (t[33] = V))
+    : (V = t[33]);
+  let H;
+  return (
+    t[34] !== m || t[35] !== V || t[36] !== O || t[37] !== k
+      ? ((H = (0, C.jsxs)(r, {
+          open: !0,
+          contentClassName: `top-toolbar inset-x-4 mt-4`,
+          contentPosition: `anchored`,
+          contentProps: D,
+          portalContainer: m,
+          showDialogClose: !1,
+          shouldIgnoreClickOutside: O,
+          unstyledContent: !0,
+          onOpenChange: k,
+          children: [A, V],
+        })),
+        (t[34] = m),
+        (t[35] = V),
+        (t[36] = O),
+        (t[37] = k),
+        (t[38] = H))
+      : (H = t[38]),
+    H
+  );
 }
-
-function ComposerAnnotationEditor({ annotation, cwd, onClose, onRemove, onSave }: { annotation: Annotation; cwd?: string | null; onClose(): void; onRemove(): void; onSave(body: string): unknown }): unknown {
-  initializeComposerAnnotationEditor();
-  const intl = useIntl();
-  const portalContainer = React.useContext<unknown>(portalContainerContext);
-  useModifierState?.();
-  const [height, setHeight] = React.useState(120);
-  const [lightDismissible, setLightDismissible] = React.useState(true);
-  const group = annotation.localBrowserDesignChange?.group;
-  const allowEmptySubmit = group != null && (group.declarations.length > 0 || group.text != null || (group.annotationControlChanges?.length ?? 0) > 0);
-  const body = group == null ? getAnnotationComment?.(annotation) ?? "" : group.comment ?? "";
-  const session = { sessionId: "composer-annotation-edit", target: { mode: "edit", commentId: "composer-annotation" }, body, attachedImages: annotation.localBrowserAttachedImages, cwd, previewAlignment: "center", surfaceMode: "editor" };
-  const submit = ({ body: nextBody }: EditorResult) => onSave(nextBody);
-  const card = jsx.jsx(AnnotationCommentEditorCard ?? "div", { allowDirectSubmit: false, allowEmptySubmit, allowImageAttachments: false, inputAriaLabel: intl.formatMessage({ id: "composer.annotationEditor.comment", defaultMessage: "Annotation comment" }), session, showAdjustEntry: false, windowHeight: 120, onCancel: onClose, onDelete: onRemove, onDirectSubmit: submit, onEscape: onClose, onLightDismissibilityChange: setLightDismissible, onMounted: (_element: unknown, size: { height: number } | null) => { if (size != null) setHeight(clampHeight?.(size.height, maximumEditorHeight) ?? Math.min(size.height, maximumEditorHeight)); }, onSubmit: submit });
-  const title = jsx.jsx(VisuallyHidden ?? "span", { className: "sr-only", children: jsx.jsx(FormattedMessage ?? "span", { id: "composer.annotationEditor.title", defaultMessage: "Edit annotation" }) });
-  return jsx.jsxs(Dialog ?? "dialog", { open: true, contentClassName: "top-toolbar inset-x-4 mt-4", contentPosition: "anchored", contentProps: { "aria-describedby": undefined, style: { maxWidth: 294 } }, portalContainer, showDialogClose: false, shouldIgnoreClickOutside: !lightDismissible, unstyledContent: true, onOpenChange: (open: boolean) => { if (!open) onClose(); }, children: [title, jsx.jsx("div", { className: "relative max-w-full", style: { height }, children: card })] });
+var x, S, C;
+function w() {
+  return (w = e(() => {
+    ((x = t()), u(), g(), (S = c()), i(), m(), f(), v(), p(), (C = n()));
+  }))();
 }
-
-initializeComposerAnnotationEditor();
-export { ComposerAnnotationEditor };
+w();
+export { b as ComposerAnnotationEditor };

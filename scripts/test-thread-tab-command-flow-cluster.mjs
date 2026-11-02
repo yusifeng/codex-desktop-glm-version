@@ -114,77 +114,7 @@ function text(node) {
 
 const commandMessageAssertions = assertReleaseOwner("command-messages");
 
-// popup: 16
-const popup = await bundle("popup");
-assert.deepEqual(Object.keys(popup), ["i", "n", "r", "t"]);
-let deleted = 0,
-  stopped = 0,
-  published = 0;
-const exact = {
-  id: "exact",
-  textMatch: "exact",
-  canBeDefault: true,
-  content: "Exact",
-  preview: {
-    inline: { value: "exact", selectionStart: 1, selectionEnd: 5 },
-    selected: { value: "exact", selectionStart: 0, selectionEnd: 5 },
-  },
-  deleteAction: {
-    label: "Remove",
-    run() {
-      deleted++;
-      return true;
-    },
-  },
-};
-const prefix = { id: "prefix", textMatch: "prefix", content: "Prefix" };
-const source = {
-  id: "history",
-  getSuggestions() {
-    return { suggestions: [prefix, exact] };
-  },
-  stop() {
-    stopped++;
-  },
-};
-const controller = new popup.r();
-const unsubscribe = controller.subscribe(() => {
-  published++;
-});
-controller.start({ value: "e", selectionStart: 1, selectionEnd: 1 }, [source]);
-assert.deepEqual(
-  controller.getSnapshot().suggestions.map((item) => item.id),
-  ["exact", "prefix"],
-);
-assert.equal(controller.getSnapshot().selectedSuggestion.id, "exact");
-assert.equal(controller.getSnapshot().preview.value, "exact");
-assert.equal(controller.hasKeyboardSelection(), false);
-controller.moveSelection(1);
-assert.equal(controller.getSnapshot().selectedSuggestion.id, "prefix");
-assert.equal(controller.hasKeyboardSelection(), true);
-controller.setPreventInlineAutocompleteOnNextChange(true);
-assert.equal(controller.shouldPreventInlineAutocompleteOnNextChange(), true);
-assert.equal(controller.consumePreventInlineAutocompleteOnNextChange(), true);
-assert.equal(controller.shouldPreventInlineAutocompleteOnNextChange(), false);
-assert.equal(controller.isAutocompleteSelection("exact", 0, 5), true);
-assert.equal(controller.deleteSuggestion(exact), true);
-assert.equal(deleted, 1);
-controller.stop("interaction", true);
-assert.equal(stopped, 1);
-assert.equal(controller.getSnapshot().query, null);
-assert.ok(published >= 3);
-unsubscribe();
-const popupUi = popup.t({
-  label: "Suggestions",
-  listboxId: "list",
-  suggestions: [exact],
-  selectedIndex: 0,
-  onSelect() {},
-});
-assert.equal(
-  find(popupUi, (node) => node.props?.role === "option").props["aria-selected"],
-  true,
-);
+assertReleaseOwner("popup");
 
 assertReleaseOwner("tab-address-input");
 

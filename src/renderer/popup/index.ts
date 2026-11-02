@@ -1,258 +1,390 @@
-import "@rchunk/rolldown-runtime";
-import * as sharedChunk from "@rchunk/app-shared";
-import type { JsxRuntime } from "@rchunk/app-shared";
-
-export interface AddressSuggestionPreview { selectionEnd: number; selectionStart: number; value: string }
-export interface AddressSuggestion {
-  ariaLabel?: string;
-  canBeDefault?: boolean;
-  content?: unknown;
-  deleteAction?: { label: string; run(): boolean };
-  id: string;
-  isEmphasized?: boolean;
-  isExistingDestination?: boolean;
-  preview?: { inline?: AddressSuggestionPreview | null; selected?: AddressSuggestionPreview | null };
-  renderKey?: string;
-  textMatch?: "exact" | "prefix" | "substring";
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  $3 as n,
+  BO as r,
+  I3 as i,
+  ag as a,
+  cg as o,
+  dw as s,
+  h4 as c,
+  ig as l,
+  m4 as u,
+  ug as d,
+  uw as f,
+} from "@rchunk/app-shared";
+var p, m, h;
+function g() {
+  return (g = e(() => {
+    ((p = t(r(), 1)),
+      (m = { exact: 0, prefix: 1, substring: 2 }),
+      (h = class {
+        query = null;
+        sources = [];
+        selection = null;
+        frozenIds = null;
+        retainedPreview = null;
+        retainedDisplayedId;
+        pendingDeletion = null;
+        isComposing = !1;
+        preventInlineAutocompleteOnNextChange = !1;
+        cached = null;
+        listeners = new Set();
+        subscribe = (e, t = this.sources) => {
+          this.listeners.add(e);
+          let n = t.flatMap(
+            (e) =>
+              e.subscribe?.(() => {
+                ((this.cached = null), this.publish());
+              }) ?? [],
+          );
+          return () => {
+            (this.listeners.delete(e), n.forEach((e) => e()));
+          };
+        };
+        getSnapshot = (e = this.sources) => {
+          let t = this.query;
+          if (this.cached?.sources !== e) {
+            let n =
+              t == null
+                ? []
+                : e.flatMap((e) => {
+                    let n = e.getSuggestions(t.value);
+                    return n == null ? [] : [{ source: e, result: n }];
+                  });
+            this.cached = {
+              sources: e,
+              results: n,
+              suggestions: (0, p.default)(
+                n.flatMap(({ result: e }) => e.suggestions),
+                [
+                  ({ textMatch: e }) => (e == null ? 3 : m[e]),
+                  ({ isExistingDestination: e }) => !e,
+                ],
+              ),
+              snapshot: null,
+            };
+          }
+          if (this.cached.snapshot != null) return this.cached.snapshot;
+          let { results: n, suggestions: r } = this.cached,
+            i = new Map(r.map((e) => [e.id, e])),
+            a = this.frozenIds == null ? r : this.frozenIds.flatMap((e) => i.get(e) ?? []),
+            o = new Set(
+              n
+                .filter(({ result: e }) => e.isRetained)
+                .flatMap(({ result: e }) => e.suggestions.map(({ id: e }) => e)),
+            ),
+            s =
+              this.retainedDisplayedId != null && o.has(this.retainedDisplayedId)
+                ? this.retainedPreview
+                : null,
+            c = this.selection?.id ?? (s == null ? void 0 : this.retainedDisplayedId),
+            l = a.findIndex(({ id: e }) => e === c),
+            u = a[l] ?? null,
+            d =
+              l < 0 &&
+              t?.value !== `` &&
+              this.retainedDisplayedId != null &&
+              o.has(this.retainedDisplayedId)
+                ? a.findIndex(({ id: e }) => e === this.retainedDisplayedId)
+                : l,
+            f = null;
+          u != null &&
+            (s == null
+              ? this.selection?.keyboard === !0
+                ? (f = u.preview?.selected ?? null)
+                : t?.preventInlineAutocomplete || (f = u.preview?.inline ?? null)
+              : (f = s));
+          let h = {
+            query: t?.value ?? null,
+            suggestions: a,
+            selectedSuggestion: u,
+            isSelectedSuggestionMissing: this.selection != null && u == null,
+            isKeyboardSelection: this.hasKeyboardSelection(),
+            selectedIndex: l,
+            displayedSelectedIndex: d,
+            preview: f,
+          };
+          return ((this.cached.snapshot = h), h);
+        };
+        start(e, t) {
+          if (e.value.length > 0 && e.value.trim().length === 0) {
+            this.stop(`clobbered`, !1);
+            return;
+          }
+          let n = this.getSnapshot(t),
+            r = n.preview,
+            { value: i, selectionStart: a, selectionEnd: o } = e,
+            s =
+              i.length === 0 ||
+              !!e.preventInlineAutocomplete ||
+              this.isComposing ||
+              a !== i.length ||
+              o !== i.length,
+            c =
+              !s &&
+              !this.hasKeyboardSelection() &&
+              n.query != null &&
+              r != null &&
+              r.selectionStart === n.query.length &&
+              r.selectionEnd === r.value.length &&
+              r.selectionStart < r.selectionEnd &&
+              i.length > n.query.length &&
+              i.toLowerCase().startsWith(n.query.toLowerCase()) &&
+              r.value.toLowerCase().startsWith(i.toLowerCase());
+          ((this.retainedPreview = c
+            ? {
+                selectionEnd: r.value.length,
+                selectionStart: i.length,
+                value: `${i}${r.value.slice(i.length)}`,
+              }
+            : null),
+            (this.retainedDisplayedId = n.suggestions[n.displayedSelectedIndex]?.id),
+            (this.selection = null),
+            (this.frozenIds = null),
+            (this.pendingDeletion = null));
+          let l = { value: i, selectionStart: a, selectionEnd: o, preventInlineAutocomplete: s };
+          ((this.query = l), (this.cached = null));
+          for (let e of this.sources)
+            t.some(({ id: t }) => t === e.id) || e.stop?.(`interaction`, !1);
+          this.sources = t;
+          for (let e of t)
+            e.start?.(l, () => {
+              this.query === l && this.onSourceChange(e);
+            });
+          (this.selectDefault(t), this.publish());
+        }
+        stop(e, t) {
+          ((this.query = null),
+            (this.selection = null),
+            (this.frozenIds = null),
+            (this.retainedPreview = null),
+            (this.retainedDisplayedId = void 0),
+            (this.pendingDeletion = null),
+            (this.preventInlineAutocompleteOnNextChange = !1),
+            t && (this.isComposing = !1));
+          for (let n of this.sources) n.stop?.(e, t);
+          ((this.sources = []), (this.cached = null), this.publish());
+        }
+        moveSelection(e, t = this.sources) {
+          let n = this.getSnapshot(t),
+            r = this.query;
+          if (n.suggestions.length === 0 || r == null) return;
+          let i = (n.selectedIndex + e + n.suggestions.length) % n.suggestions.length;
+          n.selectedIndex < 0 && (i = e > 0 ? 0 : n.suggestions.length - 1);
+          let a = n.suggestions[i],
+            o = t.find((e) => {
+              let t = e.getSuggestions(r.value);
+              return t != null && !t.isRetained && t.suggestions.some(({ id: e }) => e === a.id);
+            });
+          o != null &&
+            ((this.frozenIds = this.frozenIds ?? n.suggestions.map(({ id: e }) => e)),
+            (this.selection = { id: a.id, sourceId: o.id, keyboard: !0 }),
+            this.publish());
+        }
+        deleteSuggestion(e, t = this.sources) {
+          let n = this.query;
+          if (e.deleteAction == null || n == null) return !1;
+          let r = t.find((t) =>
+            t.getSuggestions(n.value)?.suggestions.some(({ id: t }) => t === e.id),
+          );
+          return (
+            r != null &&
+            ((this.pendingDeletion = {
+              sourceId: r.id,
+              id: e.id,
+              index:
+                r.getSuggestions(n.value)?.suggestions.findIndex(({ id: t }) => t === e.id) ?? -1,
+            }),
+            e.deleteAction.run()
+              ? ((this.frozenIds = null), this.publish(), !0)
+              : ((this.pendingDeletion = null), !1))
+          );
+        }
+        hasKeyboardSelection() {
+          return this.selection?.keyboard === !0;
+        }
+        setComposing(e) {
+          this.isComposing = e;
+        }
+        setPreventInlineAutocompleteOnNextChange(e) {
+          this.preventInlineAutocompleteOnNextChange = e;
+        }
+        shouldPreventInlineAutocompleteOnNextChange() {
+          return this.preventInlineAutocompleteOnNextChange;
+        }
+        consumePreventInlineAutocompleteOnNextChange() {
+          let e = this.preventInlineAutocompleteOnNextChange;
+          return ((this.preventInlineAutocompleteOnNextChange = !1), e);
+        }
+        isAutocompleteSelection(e, t, n, r = this.sources) {
+          let i = this.getSnapshot(r),
+            a = (r) => r?.value === e && r.selectionStart === t && r.selectionEnd === n;
+          return (
+            (this.query?.value === e &&
+              this.query.selectionStart === t &&
+              this.query.selectionEnd === n) ||
+            a(i.preview) ||
+            i.suggestions.some(({ preview: e }) => a(e?.inline) || a(e?.selected))
+          );
+        }
+        onSourceChange(e) {
+          let t = this.cached?.sources ?? this.sources,
+            n = t.find(({ id: t }) => t === e.id);
+          if (this.query == null || n == null) return;
+          let r = n.getSuggestions(this.query.value);
+          if (((this.cached = null), r == null)) {
+            this.publish();
+            return;
+          }
+          let i = this.pendingDeletion;
+          if (i?.sourceId === n.id && !r.suggestions.some(({ id: e }) => e === i.id)) {
+            if (this.selection?.id === i.id) {
+              let e = r.suggestions[Math.min(i.index, r.suggestions.length - 1)];
+              this.selection = e == null ? null : { ...this.selection, id: e.id };
+            }
+            this.pendingDeletion = null;
+          } else
+            !r.isRetained &&
+              !this.hasKeyboardSelection() &&
+              (this.selection == null || this.selection.sourceId === n.id) &&
+              this.selectDefault(t);
+          this.publish();
+        }
+        selectDefault(e) {
+          let t = this.getSnapshot(e);
+          for (let e of t.suggestions) {
+            if (!e.canBeDefault) continue;
+            let t = this.cached?.results.find(
+              ({ result: t }) => !t.isRetained && t.suggestions.some(({ id: t }) => t === e.id),
+            )?.source;
+            if (t != null) {
+              this.selection = { id: e.id, sourceId: t.id, keyboard: !1 };
+              return;
+            }
+          }
+          this.selection = null;
+        }
+        publish() {
+          (this.cached != null && (this.cached.snapshot = null),
+            this.listeners.forEach((e) => e()));
+        }
+      }));
+  }))();
 }
-export interface AddressSuggestionResult { isRetained?: boolean; suggestions: AddressSuggestion[] }
-export interface AddressSuggestionSource {
-  getSuggestions(value: string): AddressSuggestionResult | null;
-  id: string;
-  start?(query: AddressSuggestionQuery, changed: () => void): void;
-  stop?(reason: string, resetComposition: boolean): void;
-  subscribe?(changed: () => void): (() => void) | void;
-}
-export interface AddressSuggestionQuery extends AddressSuggestionPreview { preventInlineAutocomplete?: boolean }
-export interface AddressSuggestionSnapshot {
-  displayedSelectedIndex: number;
-  isKeyboardSelection: boolean;
-  isSelectedSuggestionMissing: boolean;
-  preview: AddressSuggestionPreview | null;
-  query: string | null;
-  selectedIndex: number;
-  selectedSuggestion: AddressSuggestion | null;
-  suggestions: AddressSuggestion[];
-}
-
-interface CachedSuggestions {
-  sources: AddressSuggestionSource[];
-  results: Array<{ result: AddressSuggestionResult; source: AddressSuggestionSource }>;
-  suggestions: AddressSuggestion[];
-  snapshot: AddressSuggestionSnapshot | null;
-}
-
-const matchRank = { exact: 0, prefix: 1, substring: 2 } as const;
-const shared = sharedChunk as unknown as Record<string, any>;
-const classNames = (...values: unknown[]): string => typeof shared.m4 === "function" ? shared.m4(...values) : values.flat().filter(Boolean).join(" ");
-
-class AddressSuggestionController {
-  private listeners = new Set<() => void>();
-  private query: AddressSuggestionQuery | null = null;
-  private selection: { id: string; keyboard: boolean; sourceId: string } | null = null;
-  private sources: AddressSuggestionSource[] = [];
-  private frozenIds: string[] | null = null;
-  private retainedPreview: AddressSuggestionPreview | null = null;
-  private retainedDisplayedId: string | undefined;
-  private pendingDeletion: { id: string; index: number; sourceId: string } | null = null;
-  private cached: CachedSuggestions | null = null;
-  private composing = false;
-  private preventInlineAutocomplete = false;
-
-  subscribe = (listener: () => void, sources = this.sources): (() => void) => {
-    this.listeners.add(listener);
-    const unsubscribe: Array<() => void> = [];
-    sources.forEach(source => {
-      const cleanup = source.subscribe?.(() => { this.cached = null; this.publish(); });
-      if (typeof cleanup === "function") unsubscribe.push(cleanup);
-    });
-    return () => { this.listeners.delete(listener); unsubscribe.forEach(cleanup => cleanup()); };
-  };
-
-  getSnapshot = (sources = this.sources): AddressSuggestionSnapshot => {
-    const query = this.query;
-    if (this.cached?.sources !== sources) {
-      const results = query == null ? [] : sources.flatMap(source => {
-        const result = source.getSuggestions(query.value);
-        return result == null ? [] : [{ result, source }];
-      });
-      const suggestions = results.flatMap(({ result }) => result.suggestions).sort((left, right) => {
-        const leftRank = left.textMatch == null ? 3 : matchRank[left.textMatch];
-        const rightRank = right.textMatch == null ? 3 : matchRank[right.textMatch];
-        return leftRank - rightRank || Number(Boolean(right.isExistingDestination)) - Number(Boolean(left.isExistingDestination));
-      });
-      this.cached = { sources, results, suggestions, snapshot: null };
-    }
-    if (this.cached.snapshot != null) return this.cached.snapshot;
-    const { results, suggestions: allSuggestions } = this.cached;
-    const byId = new Map(allSuggestions.map(item => [item.id, item]));
-    const suggestions = this.frozenIds == null ? allSuggestions : this.frozenIds.flatMap(id => byId.get(id) ?? []);
-    const retainedIds = new Set(results.filter(({ result }) => result.isRetained).flatMap(({ result }) => result.suggestions.map(item => item.id)));
-    const retainedPreview = this.retainedDisplayedId != null && retainedIds.has(this.retainedDisplayedId) ? this.retainedPreview : null;
-    const selectedId = this.selection?.id ?? (retainedPreview == null ? undefined : this.retainedDisplayedId);
-    const selectedIndex = suggestions.findIndex(item => item.id === selectedId);
-    const selectedSuggestion = suggestions[selectedIndex] ?? null;
-    const displayedSelectedIndex = selectedIndex < 0 && query?.value !== "" && this.retainedDisplayedId != null && retainedIds.has(this.retainedDisplayedId)
-      ? suggestions.findIndex(item => item.id === this.retainedDisplayedId) : selectedIndex;
-    let preview: AddressSuggestionPreview | null = null;
-    if (selectedSuggestion != null) {
-      if (retainedPreview != null) preview = retainedPreview;
-      else if (this.selection?.keyboard) preview = selectedSuggestion.preview?.selected ?? null;
-      else if (!query?.preventInlineAutocomplete) preview = selectedSuggestion.preview?.inline ?? null;
-    }
-    const snapshot = { displayedSelectedIndex, isKeyboardSelection: this.hasKeyboardSelection(), isSelectedSuggestionMissing: this.selection != null && selectedSuggestion == null, preview, query: query?.value ?? null, selectedIndex, selectedSuggestion, suggestions };
-    this.cached.snapshot = snapshot;
-    return snapshot;
-  };
-
-  start(query: AddressSuggestionQuery, sources: AddressSuggestionSource[]): void {
-    if (query.value.length > 0 && query.value.trim().length === 0) { this.stop("clobbered", false); return; }
-    const previous = this.getSnapshot(sources);
-    const oldPreview = previous.preview;
-    const { value, selectionStart, selectionEnd } = query;
-    const preventInlineAutocomplete = value.length === 0 || !!query.preventInlineAutocomplete || this.composing || selectionStart !== value.length || selectionEnd !== value.length;
-    const canRetainPreview = !preventInlineAutocomplete && !this.hasKeyboardSelection() && previous.query != null && oldPreview != null
-      && oldPreview.selectionStart === previous.query.length && oldPreview.selectionEnd === oldPreview.value.length
-      && oldPreview.selectionStart < oldPreview.selectionEnd && value.length > previous.query.length
-      && value.toLowerCase().startsWith(previous.query.toLowerCase()) && oldPreview.value.toLowerCase().startsWith(value.toLowerCase());
-    this.retainedPreview = canRetainPreview ? { selectionEnd: oldPreview.value.length, selectionStart: value.length, value: `${value}${oldPreview.value.slice(value.length)}` } : null;
-    this.retainedDisplayedId = previous.suggestions[previous.displayedSelectedIndex]?.id;
-    this.selection = null;
-    this.frozenIds = null;
-    this.pendingDeletion = null;
-    const nextQuery = { value, selectionStart, selectionEnd, preventInlineAutocomplete };
-    this.query = nextQuery;
-    this.cached = null;
-    for (const source of this.sources) if (!sources.some(next => next.id === source.id)) source.stop?.("interaction", false);
-    this.sources = sources;
-    sources.forEach(source => source.start?.(nextQuery, () => { if (this.query === nextQuery) this.onSourceChange(source); }));
-    this.selectDefault(sources);
-    this.publish();
-  }
-
-  stop(reason: string, resetComposition: boolean): void {
-    this.query = null; this.selection = null; this.frozenIds = null; this.retainedPreview = null;
-    this.retainedDisplayedId = undefined; this.pendingDeletion = null; this.preventInlineAutocomplete = false;
-    if (resetComposition) this.composing = false;
-    this.sources.forEach(source => source.stop?.(reason, resetComposition));
-    this.sources = []; this.cached = null;
-    this.publish();
-  }
-
-  moveSelection(offset: number, sources = this.sources): void {
-    const snapshot = this.getSnapshot(sources);
-    if (snapshot.suggestions.length === 0 || this.query == null) return;
-    const index = snapshot.selectedIndex < 0
-      ? offset > 0 ? 0 : snapshot.suggestions.length - 1
-      : (snapshot.selectedIndex + offset + snapshot.suggestions.length) % snapshot.suggestions.length;
-    const suggestion = snapshot.suggestions[index];
-    const source = sources.find(candidate => {
-      const result = candidate.getSuggestions(this.query!.value);
-      return result != null && !result.isRetained && result.suggestions.some(item => item.id === suggestion.id);
-    });
-    if (source != null) {
-      this.frozenIds ??= snapshot.suggestions.map(item => item.id);
-      this.selection = { id: suggestion.id, keyboard: true, sourceId: source.id };
-      this.publish();
-    }
-  }
-
-  deleteSuggestion(suggestion: AddressSuggestion, sources = this.sources): boolean {
-    if (suggestion.deleteAction == null || this.query == null) return false;
-    const source = this.sourceFor(suggestion.id, sources);
-    if (source == null) return false;
-    this.pendingDeletion = { sourceId: source.id, id: suggestion.id, index: source.getSuggestions(this.query.value)?.suggestions.findIndex(item => item.id === suggestion.id) ?? -1 };
-    if (suggestion.deleteAction.run()) { this.frozenIds = null; this.publish(); return true; }
-    this.pendingDeletion = null;
-    return false;
-  }
-
-  hasKeyboardSelection(): boolean { return this.selection?.keyboard === true; }
-  setComposing(value: boolean): void { this.composing = value; }
-  setPreventInlineAutocompleteOnNextChange(value: boolean): void { this.preventInlineAutocomplete = value; }
-  shouldPreventInlineAutocompleteOnNextChange(): boolean { return this.preventInlineAutocomplete; }
-  consumePreventInlineAutocompleteOnNextChange(): boolean { const value = this.preventInlineAutocomplete; this.preventInlineAutocomplete = false; return value; }
-  isAutocompleteSelection(value: string, selectionStart: number, selectionEnd: number, sources = this.sources): boolean {
-    const same = (preview?: AddressSuggestionPreview | null) => preview?.value === value && preview.selectionStart === selectionStart && preview.selectionEnd === selectionEnd;
-    const snapshot = this.getSnapshot(sources);
-    return same(this.query) || same(snapshot.preview) || snapshot.suggestions.some(item => same(item.preview?.inline) || same(item.preview?.selected));
-  }
-
-  private sourceFor(id: string, sources = this.sources): AddressSuggestionSource | undefined {
-    return sources.find(source => source.getSuggestions(this.query?.value ?? "")?.suggestions.some(item => item.id === id));
-  }
-  private onSourceChange(source: AddressSuggestionSource): void {
-    const sources = this.cached?.sources ?? this.sources;
-    const current = sources.find(candidate => candidate.id === source.id);
-    if (this.query == null || current == null) return;
-    const result = current.getSuggestions(this.query.value);
-    this.cached = null;
-    if (result == null) { this.publish(); return; }
-    const deletion = this.pendingDeletion;
-    if (deletion?.sourceId === current.id && !result.suggestions.some(item => item.id === deletion.id)) {
-      if (this.selection?.id === deletion.id) {
-        const replacement = result.suggestions[Math.min(deletion.index, result.suggestions.length - 1)];
-        this.selection = replacement == null ? null : { ...this.selection, id: replacement.id };
-      }
-      this.pendingDeletion = null;
-    } else if (!result.isRetained && !this.hasKeyboardSelection() && (this.selection == null || this.selection.sourceId === current.id)) this.selectDefault(sources);
-    this.publish();
-  }
-  private selectDefault(sources: AddressSuggestionSource[]): void {
-    const snapshot = this.getSnapshot(sources);
-    for (const suggestion of snapshot.suggestions) {
-      if (!suggestion.canBeDefault) continue;
-      const source = this.cached?.results.find(({ result }) => !result.isRetained && result.suggestions.some(item => item.id === suggestion.id))?.source;
-      if (source != null) { this.selection = { id: suggestion.id, sourceId: source.id, keyboard: false }; return; }
-    }
-    this.selection = null;
-  }
-  private publish(): void { if (this.cached != null) this.cached.snapshot = null; this.listeners.forEach(listener => listener()); }
-}
-
-interface SuggestionListProps { label: string; listboxId: string; suggestions: AddressSuggestion[]; selectedIndex: number; onDelete?(suggestion: AddressSuggestion): void; onDeleteBlur?(target: EventTarget | null): void; onSelect(suggestion: AddressSuggestion): void }
-let runtime: JsxRuntime | undefined;
-function jsx(): JsxRuntime { runtime ??= shared.I3(); return runtime; }
-function AddressSuggestionList({ label, listboxId, suggestions, selectedIndex, onDelete, onDeleteBlur, onSelect }: SuggestionListProps): unknown {
-  return jsx().jsx("div", {
-    id: listboxId,
-    className: "flex max-h-[inherit] w-full flex-col overflow-y-auto rounded-xl border border-primary-outline bg-primary-soft p-1 text-default shadow-lg",
-    "aria-label": label,
-    role: "listbox",
-    children: suggestions.map((suggestion, index) => {
-      const selected = index === selectedIndex;
-      const DeleteIcon = shared.cg;
-      return jsx().jsxs("div", { className: "group relative", role: "presentation", children: [
-        jsx().jsx("button", {
-          id: `${listboxId}-option-${index}`,
-          className: classNames(
-            "flex h-9 w-full shrink-0 cursor-interaction items-center gap-2.5 rounded-lg px-2.5 pe-9 text-start text-[13px] outline-none select-none",
-            selected && suggestion.isEmphasized && "bg-primary-soft-active",
-            selected && !suggestion.isEmphasized && "bg-primary-ghost-hover",
-            !selected && "hover:bg-background-primary-ghost-hover/60",
-          ),
-          tabIndex: -1, type: "button", "aria-label": suggestion.ariaLabel, "aria-selected": selected,
-          "data-browser-sidebar-skip-address-commit": "true", role: "option",
-          onClick: () => onSelect(suggestion), onPointerDown: (event: { preventDefault(): void }) => event.preventDefault(), children: suggestion.content,
+function _(e) {
+  let t = (0, b.c)(17),
+    {
+      label: n,
+      listboxId: r,
+      suggestions: i,
+      onDelete: a,
+      onDeleteBlur: c,
+      onSelect: d,
+      selectedIndex: f,
+    } = e,
+    p;
+  if (t[0] !== r || t[1] !== a || t[2] !== c || t[3] !== d || t[4] !== f || t[5] !== i) {
+    let e;
+    (t[7] !== r || t[8] !== a || t[9] !== c || t[10] !== d || t[11] !== f
+      ? ((e = (e, t) => {
+          let n = t === f;
+          return (0, x.jsxs)(
+            `div`,
+            {
+              className: `group relative`,
+              role: `presentation`,
+              children: [
+                (0, x.jsx)(`button`, {
+                  id: `${r}-option-${t}`,
+                  className: u(
+                    `flex h-9 w-full shrink-0 cursor-interaction items-center gap-2.5 rounded-lg px-2.5 pe-9 text-start text-[13px] outline-none select-none`,
+                    n && e.isEmphasized && `bg-primary-soft-active`,
+                    n && !e.isEmphasized && `bg-primary-ghost-hover`,
+                    !n && `hover:bg-background-primary-ghost-hover/60`,
+                  ),
+                  tabIndex: -1,
+                  type: `button`,
+                  "aria-label": e.ariaLabel,
+                  "aria-selected": n,
+                  "data-browser-sidebar-skip-address-commit": `true`,
+                  role: `option`,
+                  onClick: () => d(e),
+                  onPointerDown: y,
+                  children: e.content,
+                }),
+                a != null && e.deleteAction != null
+                  ? (0, x.jsx)(`button`, {
+                      className: u(
+                        `absolute end-2.5 top-1/2 flex size-5 -translate-y-1/2 cursor-interaction items-center justify-center rounded-md text-tertiary outline-none hover:bg-primary-ghost-hover hover:text-default focus-visible:ring-1 focus-visible:ring-ring`,
+                        !n && `opacity-0 group-hover:opacity-100 focus-visible:opacity-100`,
+                      ),
+                      type: `button`,
+                      "aria-label": e.deleteAction.label,
+                      "data-browser-sidebar-autocomplete-delete": `true`,
+                      "data-browser-sidebar-skip-address-commit": `true`,
+                      onBlur: (e) => c?.(e.relatedTarget),
+                      onClick: (t) => {
+                        (t.stopPropagation(), a(e));
+                      },
+                      onPointerDown: v,
+                      children: (0, x.jsx)(o, {
+                        legacyIcon: l,
+                        asset16: s,
+                        legacyClassName: `icon-2xs`,
+                        "aria-hidden": !0,
+                      }),
+                    })
+                  : null,
+              ],
+            },
+            e.renderKey ?? e.id,
+          );
         }),
-        onDelete != null && suggestion.deleteAction != null ? jsx().jsx("button", {
-          className: classNames(
-            "absolute end-2.5 top-1/2 flex size-5 -translate-y-1/2 cursor-interaction items-center justify-center rounded-md text-tertiary outline-none hover:bg-primary-ghost-hover hover:text-default focus-visible:ring-1 focus-visible:ring-ring",
-            !selected && "opacity-0 group-hover:opacity-100 focus-visible:opacity-100",
-          ),
-          type: "button", "aria-label": suggestion.deleteAction.label,
-          "data-browser-sidebar-autocomplete-delete": "true", "data-browser-sidebar-skip-address-commit": "true",
-          onBlur: (event: { relatedTarget: EventTarget | null }) => onDeleteBlur?.(event.relatedTarget),
-          onClick: (event: { stopPropagation(): void }) => { event.stopPropagation(); onDelete(suggestion); },
-          onPointerDown: (event: { preventDefault(): void; stopPropagation(): void }) => { event.preventDefault(); event.stopPropagation(); },
-          children: typeof DeleteIcon === "function" ? jsx().jsx(DeleteIcon, { legacyIcon: shared.ig, asset16: shared.dw, legacyClassName: "icon-2xs", "aria-hidden": true }) : "Delete",
-        }) : null,
-      ] }, suggestion.renderKey ?? suggestion.id);
-    }),
-  });
+        (t[7] = r),
+        (t[8] = a),
+        (t[9] = c),
+        (t[10] = d),
+        (t[11] = f),
+        (t[12] = e))
+      : (e = t[12]),
+      (p = i.map(e)),
+      (t[0] = r),
+      (t[1] = a),
+      (t[2] = c),
+      (t[3] = d),
+      (t[4] = f),
+      (t[5] = i),
+      (t[6] = p));
+  } else p = t[6];
+  let m;
+  return (
+    t[13] !== n || t[14] !== r || t[15] !== p
+      ? ((m = (0, x.jsx)(`div`, {
+          id: r,
+          className: `flex max-h-[inherit] w-full flex-col overflow-y-auto rounded-xl border border-primary-outline bg-primary-soft p-1 text-default shadow-lg`,
+          "aria-label": n,
+          role: `listbox`,
+          children: p,
+        })),
+        (t[13] = n),
+        (t[14] = r),
+        (t[15] = p),
+        (t[16] = m))
+      : (m = t[16]),
+    m
+  );
 }
-function initializePopupSuggestions(): void {
-  for (const candidate of [shared.BO, shared.uw, shared.h4, shared.ug, shared.ag]) if (typeof candidate === "function") candidate();
-  void jsx();
+function v(e) {
+  (e.preventDefault(), e.stopPropagation());
 }
-export { initializePopupSuggestions as i, initializePopupSuggestions as n, AddressSuggestionController as r, AddressSuggestionList as t };
+function y(e) {
+  return e.preventDefault();
+}
+var b, x;
+function S() {
+  return (S = e(() => {
+    ((b = n()), f(), c(), d(), a(), (x = i()));
+  }))();
+}
+export { g as i, S as n, h as r, _ as t };

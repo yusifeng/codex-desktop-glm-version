@@ -1,19 +1,152 @@
-import * as appInitialChunk from "@rchunk/app-initial";
-import * as appSharedChunk from "@rchunk/app-shared";
-import { n as initializeRequestContext, r as requestContextQuery } from "@rchunk/request-context";
-import "@rchunk/rolldown-runtime";
-
-interface Product { id?: string | null; title: string; url?: string | null; query?: string | null; provider?: string | null; product_lookup_key?: string | null; image_urls?: string[] | null; }
-interface FavoriteRequest { saved_target: { identity: { namespace: "product"; key: string }; sidebar_params: { name: string; category: "product_rationale_and_reviews"; multi_message_mode: true; extra_params: Record<string, unknown> } }; display_data: { name: string; image_url: string | null } }
-interface FavoriteActionProps { className?: string; context: { conversationId: string; messageId: string; [key: string]: unknown }; product: Product; loadedProduct?: Product | null; savedRequest?: FavoriteRequest | null; surface?: string; reference?: unknown; }
-interface TurnContext { contentReferences: unknown[]; contentReferenceMessageIds?: string[]; messageId: string; shouldBlockExternalEgress?: boolean; [key: string]: unknown; }
-interface SharedApi { $3(): void; BX<Value>(query: unknown, input: unknown): Value; FX(): void; HX<Value>(signal: unknown): Value; I3(): import("@rchunk/app-shared").JsxRuntime; UX: unknown; }
-interface InitialApi { HK: unknown; MG: unknown; NG(): void; Qgn(): void; Sun(): void; Wz(): void; _it(): TurnContext | null; _un: unknown; afn(id: string): { get(key: string, fallback: string[]): string[] }; git(): void; ifn(): void; lK(): void; mun: unknown; o_n(): (destination: string) => void; rK: unknown; }
-const { $3: initializeCompilerRuntime, BX: useRequestContext, FX: initializeSignalRuntime, HX: useSignalValue, I3: getJsxRuntime, UX: ScopedProvider } = appSharedChunk as unknown as SharedApi;
-const { HK: savedEntityStateSignal, MG: SavedEntityAction, NG: initializeSavedEntities, Qgn: initializeAccountRuntime, Sun: initializeSessionState, Wz: initializeSavedEntityUi, _it: useTurnContext, _un: userIdSignal, afn: useFeatureConfig, git: initializeTurnContext, ifn: initializeProductEntities, lK: initializeEntityRuntime, mun: accountIdSignal, o_n: useNavigate, rK: savedEntityScope } = appInitialChunk as unknown as InitialApi;
-function buildSavedProductRequest(product: Product, rewrittenQueries?: string[]): FavoriteRequest | null { const id = product.id?.trim(); const title = product.title.trim(); if (id == null || id.length === 0 || title.length === 0 || product.url == null || product.query == null || product.provider == null) return null; return { saved_target: { identity: { namespace: "product", key: id }, sidebar_params: { name: title, category: "product_rationale_and_reviews", multi_message_mode: true, extra_params: { product_lookup_key: product.product_lookup_key ?? undefined, rewritten_queries: rewrittenQueries?.length ? rewrittenQueries : undefined, saved_product_shell: { id, url: product.url, query: product.query, provider: product.provider } } } }, display_data: { name: title, image_url: product.image_urls?.[0] ?? null } }; }
-function ProductFavoriteAction(props: Omit<FavoriteActionProps, "context">): unknown { const turn = useTurnContext(); const accountId = useSignalValue<string | null>(accountIdSignal); const userId = useSignalValue<string | null>(userIdSignal); useSignalValue(savedEntityStateSignal); const feature = useFeatureConfig("2347841422"); if (turn == null || accountId == null || userId == null || turn.shouldBlockExternalEgress || !feature.get("enabled_entity_categories", []).includes("product_rationale_and_reviews")) return null; const index = props.reference == null ? -1 : turn.contentReferences.indexOf(props.reference); const messageId = turn.contentReferenceMessageIds?.[index] ?? turn.messageId; const jsx = getJsxRuntime(); return jsx.jsx(ScopedProvider, { scope: savedEntityScope, value: { accountId, userId }, children: jsx.jsx(ProductFavoriteActionContent, { ...props, context: { ...turn, messageId } }) }); }
-function ProductFavoriteActionContent(props: FavoriteActionProps): unknown { const navigate = useNavigate(); const result = useRequestContext<{ isSourceCatalog: boolean; rewrittenQueries?: string[] }>(requestContextQuery, { context: props.context, product: props.product }); const request = props.savedRequest ?? buildSavedProductRequest(props.product, result.rewrittenQueries) ?? (props.loadedProduct == null ? null : buildSavedProductRequest(props.loadedProduct, result.rewrittenQueries)); if (result.isSourceCatalog || request == null) return null; const isSaved = props.savedRequest != null; return getJsxRuntime().jsx(SavedEntityAction, { className: props.className, appearance: props.surface === "product_card" ? "product-card" : "entity-header", conversationId: isSaved ? undefined : props.context.conversationId, messageId: isSaved ? undefined : props.context.messageId, request, surface: props.surface, onOpenLibrary: (id: string | null) => navigate(id == null ? "/library?tab=favorites" : `/library/d/${encodeURIComponent(id)}`) }); }
-let initialized = false;
-function initializeProductFavoriteAction(): void { if (initialized) return; initialized = true; initializeCompilerRuntime(); initializeSignalRuntime(); initializeAccountRuntime(); initializeSessionState(); initializeTurnContext(); initializeSavedEntities(); initializeEntityRuntime(); initializeSavedEntityUi(); initializeProductEntities(); initializeRequestContext(); }
-export { initializeProductFavoriteAction as n, ProductFavoriteAction as t };
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, BX as n, FX as r, HX as i, I3 as a, UX as o } from "@rchunk/app-shared";
+import {
+  HK as s,
+  MG as c,
+  NG as l,
+  Qgn as u,
+  Sun as d,
+  Wz as f,
+  _it as p,
+  _un as m,
+  afn as h,
+  git as g,
+  ifn as _,
+  lK as v,
+  mun as y,
+  o_n as b,
+  rK as x,
+} from "@rchunk/app-initial";
+import { n as S, r as C } from "@rchunk/request-context";
+function w(e, t) {
+  let n = e.id?.trim(),
+    r = e.title.trim();
+  return !n || !r || e.url == null || e.query == null || e.provider == null
+    ? null
+    : {
+        saved_target: {
+          identity: { namespace: `product`, key: n },
+          sidebar_params: {
+            name: r,
+            category: `product_rationale_and_reviews`,
+            multi_message_mode: !0,
+            extra_params: {
+              product_lookup_key: e.product_lookup_key ?? void 0,
+              rewritten_queries: t?.length ? t : void 0,
+              saved_product_shell: { id: n, url: e.url, query: e.query, provider: e.provider },
+            },
+          },
+        },
+        display_data: { name: r, image_url: e.image_urls?.[0] ?? null },
+      };
+}
+function T(e) {
+  let t = (0, D.c)(12),
+    n = p(),
+    r = i(s),
+    a = i(y),
+    c = i(m),
+    l = h(`2347841422`);
+  if (
+    !r ||
+    a == null ||
+    c == null ||
+    n == null ||
+    n.shouldBlockExternalEgress ||
+    !l.get(`enabled_entity_categories`, []).includes(`product_rationale_and_reviews`)
+  )
+    return null;
+  let u = e.reference == null ? -1 : n.contentReferences.indexOf(e.reference),
+    d;
+  t[0] !== a || t[1] !== c
+    ? ((d = { accountId: a, userId: c }), (t[0] = a), (t[1] = c), (t[2] = d))
+    : (d = t[2]);
+  let f = n.contentReferenceMessageIds?.[u] ?? n.messageId,
+    g;
+  t[3] !== n || t[4] !== f
+    ? ((g = { ...n, messageId: f }), (t[3] = n), (t[4] = f), (t[5] = g))
+    : (g = t[5]);
+  let _;
+  t[6] !== e || t[7] !== g
+    ? ((_ = (0, O.jsx)(E, { ...e, context: g })), (t[6] = e), (t[7] = g), (t[8] = _))
+    : (_ = t[8]);
+  let v;
+  return (
+    t[9] !== d || t[10] !== _
+      ? ((v = (0, O.jsx)(o, { scope: x, value: d, children: _ })),
+        (t[9] = d),
+        (t[10] = _),
+        (t[11] = v))
+      : (v = t[11]),
+    v
+  );
+}
+function E(e) {
+  let t = (0, D.c)(18),
+    { className: r, context: i, product: a, loadedProduct: o, savedRequest: s, surface: l } = e,
+    u = b(),
+    d;
+  t[0] !== i || t[1] !== a
+    ? ((d = { context: i, product: a }), (t[0] = i), (t[1] = a), (t[2] = d))
+    : (d = t[2]);
+  let { isSourceCatalog: f, rewrittenQueries: p } = n(C, d),
+    m;
+  t[3] !== o || t[4] !== a || t[5] !== p || t[6] !== s
+    ? ((m = s ?? w(a, p) ?? (o == null ? null : w(o, p))),
+      (t[3] = o),
+      (t[4] = a),
+      (t[5] = p),
+      (t[6] = s),
+      (t[7] = m))
+    : (m = t[7]);
+  let h = m;
+  if (f || h == null) return null;
+  let g = l === `product_card` ? `product-card` : `entity-header`,
+    _ = s == null ? i.conversationId : void 0,
+    v = s == null ? i.messageId : void 0,
+    y;
+  t[8] === u
+    ? (y = t[9])
+    : ((y = (e) => {
+        u(e == null ? `/library?tab=favorites` : `/library/d/${encodeURIComponent(e)}`);
+      }),
+      (t[8] = u),
+      (t[9] = y));
+  let x;
+  return (
+    t[10] !== r ||
+    t[11] !== h ||
+    t[12] !== l ||
+    t[13] !== g ||
+    t[14] !== _ ||
+    t[15] !== v ||
+    t[16] !== y
+      ? ((x = (0, O.jsx)(c, {
+          className: r,
+          appearance: g,
+          conversationId: _,
+          messageId: v,
+          request: h,
+          surface: l,
+          onOpenLibrary: y,
+        })),
+        (t[10] = r),
+        (t[11] = h),
+        (t[12] = l),
+        (t[13] = g),
+        (t[14] = _),
+        (t[15] = v),
+        (t[16] = y),
+        (t[17] = x))
+      : (x = t[17]),
+    x
+  );
+}
+var D, O;
+function k() {
+  return (k = e(() => {
+    ((D = t()), r(), u(), d(), g(), l(), v(), f(), _(), S(), (O = a()));
+  }))();
+}
+export { k as n, T as t };

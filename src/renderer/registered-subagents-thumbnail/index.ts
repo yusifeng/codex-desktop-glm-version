@@ -1,22 +1,157 @@
-import * as Rolldown from "@rchunk/rolldown-runtime";
-import * as Shared from "@rchunk/app-shared";
-import * as Initial from "@rchunk/app-initial";
-import * as SubagentRow from "@rchunk/subagent-row";
-import * as RegisteredConversation from "@rchunk/registered";
-interface JsxRuntime { jsx(type: unknown, props: Record<string, unknown>, key?: string): unknown }
-const shared = Shared as unknown as { $3(): { c(n: number): unknown[] }; BX(f: unknown, p: unknown): unknown; FX(): void; I3(): JsxRuntime; K2(): void; LS: unknown; Qh: unknown; Vx: unknown; Y2: unknown; lw(): void; oZ(s: unknown, f: unknown): unknown; sw: unknown; $h(): void; BO(): unknown };
-const initial = Initial as unknown as { HZt(): void; Xd: unknown; Zd(): void; cet: unknown; let(): void; vZt: unknown };
-const row = SubagentRow as unknown as { n(): void; t: unknown };
-const registered = RegisteredConversation as unknown as { n(): void; t: unknown };
-let compiler: { c(n: number): unknown[] }, jsx: JsxRuntime, descendants: unknown;
-function RegisteredSubagentsThumbnail({ parentConversationId, hostId, requestedConversationId, requestedDisplayName, title }: Record<string, string | null | undefined>): unknown {
-  compiler.c(10);
-  if (requestedConversationId != null) return jsx.jsx(registered.t, { conversationId: requestedConversationId, hostId, title: requestedDisplayName ?? title });
-  const agents = shared.BX(descendants, { parentConversationId, hostId }) as Array<Record<string, unknown>> | null;
-  if (!agents?.length) return null;
-  const ordered = [...agents].sort((a, b) => Number((a.status as { type: string }).type !== "active") - Number((b.status as { type: string }).type !== "active")).slice(0, 4);
-  return jsx.jsx(initial.Xd, { icon: jsx.jsx(shared.LS, {}), title, subtitle: jsx.jsx(shared.Y2, { id: "tabThumbnail.subagents.loadedCount", defaultMessage: "{count, plural, one {# loaded agent} other {# loaded agents}}", values: { count: agents.length } }), sections: ordered.map((agent) => ({ kind: "block", content: jsx.jsx(row.t, { avatarSeed: agent.id, name: agent.name ?? agent.agentNickname ?? agent.preview, status: (agent.status as { type: string }).type }) })) });
+// @ts-nocheck
+import { n as e, o as t } from "@rchunk/rolldown-runtime";
+import {
+  $3 as n,
+  $h as r,
+  BO as i,
+  BX as a,
+  FX as o,
+  I3 as s,
+  K2 as c,
+  LS as l,
+  Qh as u,
+  Vx as d,
+  Y2 as f,
+  lw as p,
+  oZ as m,
+  sw as h,
+} from "@rchunk/app-shared";
+import {
+  HZt as g,
+  Xd as _,
+  Zd as v,
+  cet as y,
+  let as b,
+  vZt as x,
+} from "@rchunk/app-initial";
+import { n as S, t as C } from "@rchunk/subagent-row";
+import { n as w, t as T } from "@rchunk/registered-conversation-thumbnail-core";
+function E(e) {
+  let t = (0, A.c)(10),
+    {
+      parentConversationId: n,
+      hostId: r,
+      requestedConversationId: i,
+      requestedDisplayName: o,
+      title: s,
+    } = e,
+    c = i == null ? n : null,
+    l;
+  t[0] !== r || t[1] !== c
+    ? ((l = { parentConversationId: c, hostId: r }), (t[0] = r), (t[1] = c), (t[2] = l))
+    : (l = t[2]);
+  let u = a(P, l);
+  if (i != null) {
+    let e = o ?? s,
+      n;
+    return (
+      t[3] !== r || t[4] !== i || t[5] !== e
+        ? ((n = (0, M.jsx)(T, { conversationId: i, hostId: r, title: e })),
+          (t[3] = r),
+          (t[4] = i),
+          (t[5] = e),
+          (t[6] = n))
+        : (n = t[6]),
+      n
+    );
+  }
+  let d;
+  return (
+    t[7] !== u || t[8] !== s
+      ? ((d = u == null ? null : (0, M.jsx)(D, { title: s, agents: u })),
+        (t[7] = u),
+        (t[8] = s),
+        (t[9] = d))
+      : (d = t[9]),
+    d
+  );
 }
-function initialize(): void { compiler = shared.$3(); void Rolldown.o; shared.FX(); shared.K2(); initial.HZt(); initial.Zd(); initial.let(); shared.lw(); shared.$h(); row.n(); registered.n(); jsx = shared.I3(); descendants = shared.oZ(initial.cet, ({ parentConversationId, hostId }: { parentConversationId: string | null; hostId?: string }, { scope }: { scope: { get(k: unknown, p: unknown): { getSubagentDescendantSnapshot(id: string): { descendantThreads: unknown } } } }) => parentConversationId == null ? null : scope.get(initial.vZt, hostId).getSubagentDescendantSnapshot(parentConversationId).descendantThreads); }
-initialize();
-export { RegisteredSubagentsThumbnail };
+function D(e) {
+  let t = (0, A.c)(9),
+    { agents: n, title: r } = e;
+  if (n.length === 0) return null;
+  let i;
+  t[0] === Symbol.for(`react.memo_cache_sentinel`)
+    ? ((i = (0, M.jsx)(l, {})), (t[0] = i))
+    : (i = t[0]);
+  let a;
+  t[1] === n.length
+    ? (a = t[2])
+    : ((a = (0, M.jsx)(f, {
+        id: `tabThumbnail.subagents.loadedCount`,
+        defaultMessage: `{count, plural, one {# loaded agent} other {# loaded agents}}`,
+        description: `Number of subagents already loaded in memory, which may be less than the total`,
+        values: { count: n.length },
+      })),
+      (t[1] = n.length),
+      (t[2] = a));
+  let o;
+  t[3] === n ? (o = t[4]) : ((o = (0, j.default)(n, k).slice(0, 4).map(O)), (t[3] = n), (t[4] = o));
+  let s;
+  return (
+    t[5] !== a || t[6] !== o || t[7] !== r
+      ? ((s = (0, M.jsx)(_, { icon: i, title: r, subtitle: a, sections: o })),
+        (t[5] = a),
+        (t[6] = o),
+        (t[7] = r),
+        (t[8] = s))
+      : (s = t[8]),
+    s
+  );
+}
+function O(e) {
+  return {
+    kind: `block`,
+    content: (0, M.jsx)(C, {
+      avatarSeed: e.id,
+      name: e.name || e.agentNickname || e.preview,
+      status: (0, M.jsxs)(M.Fragment, {
+        children: [
+          N[e.status.type],
+          (0, M.jsx)(`span`, {
+            className: `sr-only`,
+            children: (0, M.jsx)(f, {
+              id: `tabThumbnail.subagents.runtimeStatus`,
+              defaultMessage: `{status, select, active {Working} idle {Idle} systemError {Failed} other {}}`,
+              description: `Known runtime status of a cached subagent in a thumbnail`,
+              values: { status: e.status.type },
+            }),
+          }),
+        ],
+      }),
+    }),
+  };
+}
+function k(e) {
+  return e.status.type !== `active`;
+}
+var A, j, M, N, P;
+function F() {
+  return (F = e(() => {
+    ((A = n()),
+      (j = t(i(), 1)),
+      o(),
+      c(),
+      g(),
+      v(),
+      b(),
+      p(),
+      r(),
+      S(),
+      w(),
+      (M = s()),
+      (N = {
+        active: (0, M.jsx)(u, { className: `icon-xs text-info`, as: `span` }),
+        idle: (0, M.jsx)(d, {}),
+        systemError: (0, M.jsx)(h, { className: `text-danger` }),
+        notLoaded: null,
+      }),
+      (P = m(y, ({ parentConversationId: e, hostId: t }, { scope: n }) =>
+        e == null
+          ? null
+          : (n.get(x, t)?.getSubagentDescendantSnapshot(e).descendantThreads ?? null),
+      )));
+  }))();
+}
+F();
+export { E as RegisteredSubagentsThumbnail };

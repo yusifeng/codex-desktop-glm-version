@@ -1,5 +1,140 @@
-// Student's t-distribution teaching model. Release chunk: model-3df6827423e2.js.
-import "@rchunk/rolldown-runtime";
-interface Input{degrees_of_freedom?:number;central_probability?:number}
-const degreesOfFreedomParameter={kind:"integer",defaultValue:5,min:3,max:60}; const centralProbabilityParameter={kind:"number",defaultValue:.95,min:.9,max:.99}; const specification={type:"T_DISTRIBUTION",version:1,thumbnailAssetKey:"t-distribution-v1",canonicalFormula:"T=\\frac{\\bar{x}-\\mu}{s/\\sqrt{n}}",parameters:{degrees_of_freedom:degreesOfFreedomParameter,central_probability:centralProbabilityParameter}}; const clamp=(v:number,a:number,b:number)=>Math.min(Math.max(v,a),b); const finiteOr=(v:number|undefined,f:number)=>Number.isFinite(v)?v??f:f; const normalize=(input:Input)=>({degrees_of_freedom:clamp(Math.round(finiteOr(input.degrees_of_freedom,5)),3,60),central_probability:clamp(finiteOr(input.central_probability,.95),.9,.99)}); const coefficients=[676.5203681218851,-1259.1392167224028,771.3234287776531,-176.6150291621406,12.507343278686905,-.13857109526572012,9984369578019572e-21,15056327351493116e-23]; const logGamma=(value:number)=>{const shifted=value-1;let sum=.9999999999998099;for(let index=0;index<coefficients.length;index+=1)sum+=coefficients[index]/(shifted+index+1);const t=shifted+coefficients.length-.5;return.5*Math.log(2*Math.PI)+(shifted+.5)*Math.log(t)-t+Math.log(sum);}; const betaFraction=(a:number,b:number,x:number)=>{const tiny=1e-30;let c=1,d=1-(a+b)*x/(a+1);d=Math.abs(d)<tiny?tiny:d;d=1/d;let result=d;for(let iteration=1;iteration<=160;iteration+=1){const doubled=2*iteration;let delta=iteration*(b-iteration)*x/((a+doubled-1)*(a+doubled));d=1+delta*d;d=Math.abs(d)<tiny?tiny:d;c=1+delta/c;c=Math.abs(c)<tiny?tiny:c;d=1/d;result*=d*c;delta=-((a+iteration)*(a+b+iteration)*x)/((a+doubled)*(a+doubled+1));d=1+delta*d;d=Math.abs(d)<tiny?tiny:d;c=1+delta/c;c=Math.abs(c)<tiny?tiny:c;d=1/d;const change=d*c;result*=change;if(Math.abs(change-1)<3e-14)break;}return result;}; const regularizedBeta=(x:number,a:number,b:number)=>{if(x<=0)return 0;if(x>=1)return 1;const factor=Math.exp(logGamma(a+b)-logGamma(a)-logGamma(b)+a*Math.log(x)+b*Math.log1p(-x));return x<(a+1)/(a+b+2)?factor*betaFraction(a,b,x)/a:1-factor*betaFraction(b,a,1-x)/b;}; const tDensity=(x:number,degrees:number)=>{const df=Math.max(1,degrees),base=logGamma((df+1)/2)-logGamma(df/2)-.5*Math.log(df*Math.PI);return Math.exp(base-(df+1)/2*Math.log1p(x*x/df));}; const normalDensity=(x:number)=>Math.exp(-.5*x*x)/Math.sqrt(2*Math.PI); const tCdf=(x:number,degrees:number)=>{if(x===0)return.5;const df=Math.max(1,degrees),beta=regularizedBeta(df/(df+x*x),df/2,.5);return x>0?1-beta/2:beta/2;}; const criticalT=(degrees:number,probability:number)=>{const target=(1+probability)/2;let low=0,high=1;while(tCdf(high,degrees)<target)high*=2;for(let iteration=0;iteration<70;iteration+=1){const middle=(low+high)/2;if(tCdf(middle,degrees)<target)low=middle;else high=middle;}return(low+high)/2;}; const inverseNormal=(p:number)=>{const a=[-39.69683028665376,220.9460984245205,-275.9285104469687,138.357751867269,-30.66479806614716,2.506628277459239],b=[-54.47609879822406,161.5858368580409,-155.6989798598866,66.80131188771972,-13.28068155288572],c=[-.007784894002430293,-.3223964580411365,-2.400758277161838,-2.549732539343734,4.374664141464968,2.938163982698783],d=[.007784695709041462,.3224671290700398,2.445134137142996,3.754408661907416];if(p>.97575){const q=Math.sqrt(-2*Math.log1p(-p)),num=(((((c[0]*q+c[1])*q+c[2])*q+c[3])*q+c[4])*q+c[5]),den=(((d[0]*q+d[1])*q+d[2])*q+d[3])*q+1;return-num/den;}const q=p-.5,r=q*q;return(((((a[0]*r+a[1])*r+a[2])*r+a[3])*r+a[4])*r+a[5])*q/(((((b[0]*r+b[1])*r+b[2])*r+b[3])*r+b[4])*r+1);}; const cache=new Map<string,ReturnType<typeof normalize>&{sampleSize:number;tailProbability:number;tCritical:number;zCritical:number}>(); const calculate=(input:Input)=>{const safe=normalize(input),key=`${safe.degrees_of_freedom}:${safe.central_probability}`,cached=cache.get(key);if(cached)return cached;const result={...safe,sampleSize:safe.degrees_of_freedom+1,tailProbability:(1-safe.central_probability)/2,tCritical:criticalT(safe.degrees_of_freedom,safe.central_probability),zCritical:inverseNormal((1+safe.central_probability)/2)};if(cache.size>=256)cache.clear();cache.set(key,result);return result;}; function initializeSpecification():void{} function initializeModel():void{}
-export{normalDensity as a,specification as c,initializeModel as i,degreesOfFreedomParameter as n,tDensity as o,calculate as r,initializeSpecification as s,centralProbabilityParameter as t};
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+var t, n, r, i, a;
+function o() {
+  return (o = e(() => {
+    ((t = `T_DISTRIBUTION`),
+      (n = `t-distribution-v1`),
+      (r = `T=\\frac{\\bar{x}-\\mu}{s/\\sqrt{n}}`),
+      (i = {
+        degrees_of_freedom: { kind: `integer`, defaultValue: 5, min: 3, max: 60 },
+        central_probability: { kind: `number`, defaultValue: 0.95, min: 0.9, max: 0.99 },
+      }),
+      (a = { type: t, version: 1, thumbnailAssetKey: n, canonicalFormula: r, parameters: i }));
+  }))();
+}
+var s, c, l, u, d, f, p, m, h, g, _, v, y, b, x, S, C;
+function w() {
+  return (w = e(() => {
+    (o(),
+      (s = a.parameters.degrees_of_freedom),
+      (c = a.parameters.central_probability),
+      (l = (e, t, n) => Math.min(Math.max(e, t), n)),
+      (u = (e, t) => (Number.isFinite(e) ? (e ?? t) : t)),
+      (d = [
+        676.5203681218851, -1259.1392167224028, 771.3234287776531, -176.6150291621406,
+        12.507343278686905, -0.13857109526572012, 9984369578019572e-21, 1.5056327351493116e-7,
+      ]),
+      (f = (e) => ({
+        degrees_of_freedom: l(Math.round(u(e.degrees_of_freedom, s.defaultValue)), s.min, s.max),
+        central_probability: l(u(e.central_probability, c.defaultValue), c.min, c.max),
+      })),
+      (p = (e) => {
+        let t = e - 1,
+          n = 0.9999999999998099;
+        for (let e = 0; e < d.length; e += 1) n += d[e] / (t + e + 1);
+        let r = t + d.length - 0.5;
+        return 0.5 * Math.log(2 * Math.PI) + (t + 0.5) * Math.log(r) - r + Math.log(n);
+      }),
+      (m = (e, t, n) => {
+        let r = 1e-30,
+          i = 1,
+          a = 1 - ((e + t) * n) / (e + 1);
+        ((a = Math.abs(a) < r ? r : a), (a = 1 / a));
+        let o = a;
+        for (let s = 1; s <= 160; s += 1) {
+          let c = 2 * s,
+            l = (s * (t - s) * n) / ((e + c - 1) * (e + c));
+          ((a = 1 + l * a),
+            (a = Math.abs(a) < r ? r : a),
+            (i = 1 + l / i),
+            (i = Math.abs(i) < r ? r : i),
+            (a = 1 / a),
+            (o *= a * i),
+            (l = -((e + s) * (e + t + s) * n) / ((e + c) * (e + c + 1))),
+            (a = 1 + l * a),
+            (a = Math.abs(a) < r ? r : a),
+            (i = 1 + l / i),
+            (i = Math.abs(i) < r ? r : i),
+            (a = 1 / a));
+          let u = a * i;
+          if (((o *= u), Math.abs(u - 1) < 3e-14)) break;
+        }
+        return o;
+      }),
+      (h = (e, t, n) => {
+        if (e <= 0) return 0;
+        if (e >= 1) return 1;
+        let r = Math.exp(p(t + n) - p(t) - p(n) + t * Math.log(e) + n * Math.log1p(-e));
+        return e < (t + 1) / (t + n + 2) ? (r * m(t, n, e)) / t : 1 - (r * m(n, t, 1 - e)) / n;
+      }),
+      (g = (e, t) => {
+        let n = Math.max(1, t),
+          r = p((n + 1) / 2) - p(n / 2) - 0.5 * Math.log(n * Math.PI);
+        return Math.exp(r - ((n + 1) / 2) * Math.log1p((e * e) / n));
+      }),
+      (_ = (e) => Math.exp(-0.5 * e * e) / Math.sqrt(2 * Math.PI)),
+      (v = (e, t) => {
+        if (e === 0) return 0.5;
+        let n = Math.max(1, t),
+          r = h(n / (n + e * e), n / 2, 0.5);
+        return e > 0 ? 1 - r / 2 : r / 2;
+      }),
+      (y = (e, t) => {
+        let n = (1 + t) / 2,
+          r = 0,
+          i = 1;
+        for (; v(i, e) < n;) i *= 2;
+        for (let t = 0; t < 70; t += 1) {
+          let t = (r + i) / 2;
+          v(t, e) < n ? (r = t) : (i = t);
+        }
+        return (r + i) / 2;
+      }),
+      (b = (e) => {
+        let t = [
+            -39.69683028665376, 220.9460984245205, -275.9285104469687, 138.357751867269,
+            -30.66479806614716, 2.506628277459239,
+          ],
+          n = [
+            -54.47609879822406, 161.5858368580409, -155.6989798598866, 66.80131188771972,
+            -13.28068155288572,
+          ],
+          r = [
+            -0.007784894002430293, -0.3223964580411365, -2.400758277161838, -2.549732539343734,
+            4.374664141464968, 2.938163982698783,
+          ],
+          i = [0.007784695709041462, 0.3224671290700398, 2.445134137142996, 3.754408661907416];
+        if (e > 0.97575) {
+          let t = Math.sqrt(-2 * Math.log1p(-e)),
+            n = ((((r[0] * t + r[1]) * t + r[2]) * t + r[3]) * t + r[4]) * t + r[5],
+            a = (((i[0] * t + i[1]) * t + i[2]) * t + i[3]) * t + 1;
+          return -n / a;
+        }
+        let a = e - 0.5,
+          o = a * a;
+        return (
+          ((((((t[0] * o + t[1]) * o + t[2]) * o + t[3]) * o + t[4]) * o + t[5]) * a) /
+          (((((n[0] * o + n[1]) * o + n[2]) * o + n[3]) * o + n[4]) * o + 1)
+        );
+      }),
+      (x = new Map()),
+      (S = 256),
+      (C = (e) => {
+        let t = f(e),
+          n = `${t.degrees_of_freedom}:${t.central_probability}`,
+          r = x.get(n);
+        if (r) return r;
+        let i = (1 - t.central_probability) / 2,
+          a = {
+            ...t,
+            sampleSize: t.degrees_of_freedom + 1,
+            tailProbability: i,
+            tCritical: y(t.degrees_of_freedom, t.central_probability),
+            zCritical: b((1 + t.central_probability) / 2),
+          };
+        return (x.size >= S && x.clear(), x.set(n, a), a);
+      }));
+  }))();
+}
+export { _ as a, a as c, w as i, s as n, g as o, C as r, o as s, c as t };

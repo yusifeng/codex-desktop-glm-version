@@ -1,23 +1,147 @@
-import { I3 as getJsxRuntime, type JsxRuntime } from "@rchunk/app-shared";
-import "@rchunk/app-initial";
-import "@rchunk/use-search-plugins";
-import "@rchunk/plugin-detail-page-core";
-import { t as PluginDetailView } from "@rchunk/plugin-detail-view";
-
-export interface ProfilePluginDetailsProps { invocation: { plugin_id?: string | null; plugin_name: string }; onClose(): void; onCloseAutoFocus?(): void; plugin?: { id?: string; name: string; [key: string]: unknown } | null; searchResults?: Array<{ installedPlugin?: { id?: string; name: string; [key: string]: unknown }; name: string; pluginId?: string; remoteMarketplaceName?: string; remotePluginId?: string; scope?: string }>; searchError?: Error | null; searchLoading?: boolean }
-let jsx: JsxRuntime;
-function ProfilePluginDetails(props: ProfilePluginDetailsProps): unknown {
-  const runtime = ensureJsx();
-  const [name = "", source] = props.invocation.plugin_id?.split("@") ?? [];
-  const scope = source === "openai-curated-remote" ? "GLOBAL" : source === "workspace-directory" ? "WORKSPACE" : source === "created-by-me-remote" ? "USER" : undefined;
-  const found = props.searchResults?.find((item) => item.pluginId === props.invocation.plugin_id || item.remotePluginId === props.invocation.plugin_id || (scope != null && item.scope === scope && item.name === name));
-  const plugin = props.plugin ?? found?.installedPlugin;
-  const body = plugin != null
-    ? runtime.jsx("article", { "data-plugin-id": plugin.id, children: runtime.jsx("h1", { children: plugin.name }) })
-    : props.searchLoading ? runtime.jsx(PluginDetailView, { state: "loading" })
-      : props.searchError != null ? runtime.jsx(PluginDetailView, { state: "error", errorMessage: props.searchError.message })
-        : runtime.jsx(PluginDetailView, { state: "missing" });
-  return runtime.jsxs("dialog", { open: true, onClose: props.onClose, children: [runtime.jsx("span", { className: "sr-only", children: props.invocation.plugin_name }), body] });
+// @ts-nocheck
+import { n as e } from "@rchunk/rolldown-runtime";
+import { $3 as t, I3 as n, Ih as r, Rh as i, wL as a, zh as o } from "@rchunk/app-shared";
+import { E4t as s, fgn as c, ugn as l, w4t as u } from "@rchunk/app-initial";
+import { n as d, t as f } from "@rchunk/use-search-plugins";
+import { n as p, r as m } from "@rchunk/plugin-detail-page-core";
+import { n as h, t as g } from "@rchunk/plugin-detail-view";
+function _(e) {
+  let t = (0, v.c)(34),
+    { invocation: n, plugin: a, onClose: o, onCloseAutoFocus: s } = e,
+    c;
+  t[0] === n.plugin_id
+    ? (c = t[1])
+    : ((c = n.plugin_id?.split(`@`) ?? []), (t[0] = n.plugin_id), (t[1] = c));
+  let [f, m] = c,
+    h;
+  if (t[2] !== m) {
+    bb0: switch (m) {
+      case `openai-curated-remote`:
+        h = `GLOBAL`;
+        break bb0;
+      case `workspace-directory`:
+        h = `WORKSPACE`;
+        break bb0;
+      case `created-by-me-remote`:
+        h = `USER`;
+        break bb0;
+    }
+    ((t[2] = m), (t[3] = h));
+  } else h = t[3];
+  let _ = a == null ? (f ?? ``) : ``,
+    b;
+  t[4] === _ ? (b = t[5]) : ((b = { searchTerm: _ }), (t[4] = _), (t[5] = b));
+  let { data: x, error: S, isLoading: C } = d(b),
+    w;
+  t[6] !== n.plugin_id || t[7] !== f || t[8] !== h || t[9] !== x
+    ? ((w = x?.find(
+        (e) =>
+          e.pluginId === n.plugin_id ||
+          e.remotePluginId === n.plugin_id ||
+          (h != null && e.scope === h && e.name === f),
+      )),
+      (t[6] = n.plugin_id),
+      (t[7] = f),
+      (t[8] = h),
+      (t[9] = x),
+      (t[10] = w))
+    : (w = t[10]);
+  let T = w,
+    E = a ?? T?.installedPlugin,
+    D;
+  t[11] === E ? (D = t[12]) : ((D = E == null ? null : u(E)), (t[11] = E), (t[12] = D));
+  let O = D;
+  if (O == null && T?.remotePluginId != null) {
+    let e = T.remoteMarketplaceName ?? `chatgpt-workspace`,
+      n;
+    (t[13] !== T.remotePluginId || t[14] !== e
+      ? ((n = { pluginName: T.remotePluginId, remoteMarketplaceName: e }),
+        (t[13] = T.remotePluginId),
+        (t[14] = e),
+        (t[15] = n))
+      : (n = t[15]),
+      (O = n));
+  }
+  let k;
+  if (O != null) {
+    let e;
+    (t[16] !== O || t[17] !== o
+      ? ((e = (0, y.jsx)(p, {
+          ...O,
+          hostId: l,
+          presentation: `dialog`,
+          onBack: o,
+          onBeforeOpenInstall: o,
+        })),
+        (t[16] = O),
+        (t[17] = o),
+        (t[18] = e))
+      : (e = t[18]),
+      (k = e));
+  } else if (C) {
+    let e;
+    (t[19] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, y.jsx)(g, { state: `loading` })), (t[19] = e))
+      : (e = t[19]),
+      (k = e));
+  } else if (S != null) {
+    let e;
+    (t[20] === S.message
+      ? (e = t[21])
+      : ((e = (0, y.jsx)(g, { state: `error`, errorMessage: S.message })),
+        (t[20] = S.message),
+        (t[21] = e)),
+      (k = e));
+  } else {
+    let e;
+    (t[22] === Symbol.for(`react.memo_cache_sentinel`)
+      ? ((e = (0, y.jsx)(g, { state: `missing` })), (t[22] = e))
+      : (e = t[22]),
+      (k = e));
+  }
+  let A;
+  t[23] === o
+    ? (A = t[24])
+    : ((A = (e) => {
+        e || o();
+      }),
+      (t[23] = o),
+      (t[24] = A));
+  let j;
+  t[25] === s
+    ? (j = t[26])
+    : ((j = { "aria-describedby": void 0, onCloseAutoFocus: s }), (t[25] = s), (t[26] = j));
+  let M;
+  t[27] === n.plugin_name
+    ? (M = t[28])
+    : ((M = (0, y.jsx)(i, { className: `sr-only`, children: n.plugin_name })),
+      (t[27] = n.plugin_name),
+      (t[28] = M));
+  let N;
+  return (
+    t[29] !== k || t[30] !== A || t[31] !== j || t[32] !== M
+      ? ((N = (0, y.jsxs)(r, {
+          open: !0,
+          size: `editor`,
+          contentClassName: `flex flex-col`,
+          onOpenChange: A,
+          contentProps: j,
+          children: [M, k],
+        })),
+        (t[29] = k),
+        (t[30] = A),
+        (t[31] = j),
+        (t[32] = M),
+        (t[33] = N))
+      : (N = t[33]),
+    N
+  );
 }
-function ensureJsx(): JsxRuntime { if (jsx == null) jsx = getJsxRuntime(); return jsx; }
-export { ProfilePluginDetails };
+var v, y;
+function b() {
+  return (b = e(() => {
+    ((v = t()), a(), o(), m(), h(), f(), s(), c(), (y = n()));
+  }))();
+}
+b();
+export { _ as ProfilePluginDetails };
