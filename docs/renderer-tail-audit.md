@@ -1,5 +1,16 @@
 # Renderer 尾部资产审计
 
+2026-11-02 PR/Git/settings/browser release-owner recovery：一次性恢复
+`pull-request-code-review-core`、`pull-request-route`、`git-action-new-branch-field`、
+`git-branch-switcher`、`review-file-source-breadcrumb`、`cloud-environments-settings-page`、
+`billing-settings`、`chronicle-settings-page`、`detached-browser-page` 与
+`about-you-summary` 十个发布 owner，替换约 3 万行局部兼容实现，并将仍绑定旧 mock ABI 的
+owner 测试迁移为发布一致性验证。整批通过 12,448/12,448 transform check、1,888/1,888
+renderer build/verify、2,247/2,247 app-code coverage、0 semantic tail 与 typecheck。严格 hub
+消费推进到 app-shared 1,419/3,185、app-initial 4,493/8,204、app-primary 554/917，仍为
+0 unreviewed、0 invalid consumers。该批不把尚未清零的 conversation-route 回退与 main runtime
+契约误报为完成。
+
 2026-11-02 Automations/environment/settings release-owner recovery：一次性将
 `automations-page`、`automation-editor-dialog`、`pending-request-item-panel`、
 `environment-configuration-fields`、`local-environments-settings-page`、`app-connect-modal`、
