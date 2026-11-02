@@ -133,6 +133,69 @@ if (mode === "smoke-readonly") {
     await command('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...point });
     await command('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...point });
   };
+  const openMenuBySelector = async (selector, timeoutMs = 10_000) => {
+    const point = await evaluate(`(() => {
+      const target = document.querySelector(${JSON.stringify(selector)});
+      if (target == null) throw new Error('Menu trigger not found: ' + ${JSON.stringify(selector)});
+      target.scrollIntoView({ block: 'center', inline: 'nearest' });
+      const rect = target.getBoundingClientRect();
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    })()`);
+    await command('Input.dispatchMouseEvent', { type: 'mouseMoved', ...point });
+    await command('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...point });
+    await command('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...point });
+    const deadline = Date.now() + timeoutMs;
+    do {
+      const open = await evaluate(`(() => {
+        const target = document.querySelector(${JSON.stringify(selector)});
+        const menu = [...document.querySelectorAll('[role="menu"]')].find((element) => {
+          const rect = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+        });
+        const triggerOpen = target?.getAttribute('aria-expanded') === 'true' || target?.dataset.state === 'open';
+        return triggerOpen && menu != null;
+      })()`);
+      if (open) return;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    } while (Date.now() < deadline);
+    throw new Error(`Timed out opening menu: ${selector}`);
+  };
+  const closeMenuWithEscape = async (selector, timeoutMs = 10_000) => {
+    await command('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' });
+    await command('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape' });
+    const deadline = Date.now() + timeoutMs;
+    do {
+      if (await evaluate(`(() => {
+        const target = document.querySelector(${JSON.stringify(selector)});
+        const triggerOpen = target?.getAttribute('aria-expanded') === 'true' || target?.dataset.state === 'open';
+        const visibleMenu = [...document.querySelectorAll('[role="menu"]')].some((element) => {
+          const rect = element.getBoundingClientRect();
+          const style = getComputedStyle(element);
+          return rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+        });
+        return !triggerOpen && !visibleMenu;
+      })()`)) return;
+      await new Promise((resolve) => setTimeout(resolve, 100));
+    } while (Date.now() < deadline);
+    throw new Error(`Timed out closing menu: ${selector}`);
+  };
+  const clickVisibleMenuItem = async (text) => {
+    const point = await evaluate(`(() => {
+      const target = [...document.querySelectorAll('[role="menuitem"]')].find((element) => {
+        const rect = element.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        return element.innerText?.trim().split('\\n')[0] === ${JSON.stringify(text)} &&
+          rect.width > 0 && rect.height > 0 && style.display !== 'none' && style.visibility !== 'hidden';
+      });
+      if (target == null) throw new Error('Visible menu item not found: ' + ${JSON.stringify(text)});
+      const rect = target.getBoundingClientRect();
+      return { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+    })()`);
+    await command('Input.dispatchMouseEvent', { type: 'mouseMoved', ...point });
+    await command('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, ...point });
+    await command('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, ...point });
+  };
   const waitForBodyText = async (expected, timeoutMs = 15_000) => {
     const texts = Array.isArray(expected) ? expected : [expected];
     const recoveryText = ['ChatGPT hit a snag', 'ChatGPT 遇到了问题', 'Something went wrong. Try again to continue', '出了点问题。请重试以继续'];
@@ -238,11 +301,35 @@ if (mode === "smoke-readonly") {
         return style.display !== 'none' && style.visibility !== 'hidden' && rect.width > 0 && rect.height > 0;
       };
       const contentRoot = document.body;
+      const textRootSelector = ${JSON.stringify(expectations.textRootSelector ?? null)};
+      const textRoots = textRootSelector == null
+        ? [contentRoot]
+        : [...document.querySelectorAll(textRootSelector)].filter(visible);
+      const visibleText = textRootSelector == null ? bodyText : textRoots.flatMap((root) => {
+        const rootRect = root.getBoundingClientRect();
+        const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+        const texts = [];
+        for (let node = walker.nextNode(); node != null; node = walker.nextNode()) {
+          const text = node.textContent?.trim();
+          if (!text || !visible(node.parentElement)) continue;
+          const range = document.createRange();
+          range.selectNodeContents(node);
+          const intersectsRoot = [...range.getClientRects()].some((rect) =>
+            rect.width > 0 && rect.height > 0 &&
+            rect.right > rootRect.left && rect.left < rootRect.right &&
+            rect.bottom > rootRect.top && rect.top < rootRect.bottom &&
+            rect.right > 0 && rect.left < window.innerWidth && rect.bottom > 0 && rect.top < window.innerHeight
+          );
+          if (intersectsRoot) texts.push(text);
+        }
+        return texts;
+      }).join(' ');
       const interactive = [...contentRoot.querySelectorAll('button, input, textarea, select, [role="switch"], [role="tab"], [role="combobox"]')].filter(visible);
       const brokenImages = [...contentRoot.querySelectorAll('img')].filter((image) => visible(image) && image.complete && image.naturalWidth === 0);
       const documentWidth = Math.max(document.documentElement.scrollWidth, document.body?.scrollWidth ?? 0);
       return {
         bodyText,
+        visibleText,
         brokenImages: brokenImages.length,
         controlText: interactive.map((element) => [
           element.getAttribute('aria-label'),
@@ -256,7 +343,7 @@ if (mode === "smoke-readonly") {
       };
     })()`);
     for (const text of expectations.text) {
-      if (!result.bodyText.includes(text) && !result.controlText.includes(text)) {
+      if (!result.visibleText.includes(text) && (expectations.textRootSelector == null && !result.controlText.includes(text))) {
         throw new Error(`${name} is missing visual content: ${text}`);
       }
     }
@@ -627,6 +714,116 @@ if (mode === "smoke-readonly") {
     allowHorizontalOverflow: true,
   });
 
+  for (const popup of [
+    {
+      selector: '[aria-label="打开个人资料菜单"], [aria-label="Open profile menu"]',
+      name: 'profile-menu',
+      text: ['使用情况', '设置', '退出登录'],
+      minimumInteractive: 12,
+    },
+    {
+      selector: '[aria-label^="切换模式"], [aria-label^="Switch mode"]',
+      name: 'mode-menu',
+      text: ['ChatGPT', 'Codex'],
+      minimumInteractive: 10,
+    },
+    {
+      selector: '[aria-label="打开帮助菜单"], [aria-label="Open help menu"]',
+      name: 'help-menu',
+      text: ['新功能', '键盘快捷键', '帮助'],
+      minimumInteractive: 10,
+    },
+    {
+      selector: '[data-composer-navigation-target="permissions"]',
+      name: 'composer-permissions-menu',
+      text: ['应如何批准 ChatGPT 操作？', '请求批准', '帮我批准', '完全访问权限'],
+      minimumInteractive: 10,
+    },
+    {
+      selector: '[data-composer-navigation-target="reasoning"]',
+      name: 'composer-model-menu',
+      text: ['GPT-5.6 Sol', '中'],
+      minimumInteractive: 14,
+    },
+  ]) {
+    await openMenuBySelector(popup.selector);
+    await waitForBodyText(popup.text);
+    await assertVisualPage(`app/${popup.name}`, {
+      text: popup.text,
+      textRootSelector: '[role="menu"]',
+      minimumInteractive: popup.minimumInteractive,
+      allowHorizontalOverflow: true,
+    });
+    if (popup.name === 'composer-model-menu') {
+      await clickAriaWithMouse('选择模型');
+      const expandedDeadline = Date.now() + 10_000;
+      do {
+        const expanded = await evaluate(`(() => {
+          const menu = [...document.querySelectorAll('[role="menu"]')].find((element) => {
+            const rect = element.getBoundingClientRect();
+            return rect.width > 0 && rect.height > 200;
+          });
+          return menu?.innerText?.includes('GPT-6.1 Sol') ?? false;
+        })()`);
+        if (expanded) break;
+        if (Date.now() >= expandedDeadline) throw new Error('Timed out expanding the model selector');
+        await new Promise((resolve) => setTimeout(resolve, 100));
+      } while (true);
+      await assertVisualPage('app/composer-model-list', {
+        text: ['推荐模型集', 'GPT-6.1 Sol', 'GPT-6 Astra', 'GPT-5.6 Sol'],
+        textRootSelector: '[role="menu"]',
+        minimumInteractive: 14,
+        allowHorizontalOverflow: true,
+      });
+      await clickAriaWithMouse('选择模型');
+      await new Promise((resolve) => setTimeout(resolve, 200));
+    }
+    await closeMenuWithEscape(popup.selector);
+    await new Promise((resolve) => setTimeout(resolve, 200));
+  }
+
+  const modeSelector = '[aria-label^="切换模式"], [aria-label^="Switch mode"]';
+  const originalMode = await evaluate(`(() => {
+    const label = document.querySelector(${JSON.stringify(modeSelector)})?.getAttribute('aria-label') ?? '';
+    return label.includes('ChatGPT') ? 'ChatGPT' : 'Codex';
+  })()`);
+  const alternateMode = originalMode === 'Codex' ? 'ChatGPT' : 'Codex';
+  await openMenuBySelector(modeSelector);
+  await clickVisibleMenuItem(alternateMode);
+  const alternateModeDeadline = Date.now() + 15_000;
+  do {
+    const active = await evaluate(`document.querySelector(${JSON.stringify(modeSelector)})?.getAttribute('aria-label') ?? ''`);
+    if (active.includes(alternateMode)) break;
+    if (Date.now() >= alternateModeDeadline) throw new Error(`Timed out switching to ${alternateMode} mode`);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  } while (true);
+  await assertVisualPage(`app/${alternateMode.toLowerCase()}-mode`, {
+    text: [alternateMode, '新对话'],
+    minimumInteractive: 8,
+    allowHorizontalOverflow: true,
+  });
+  if (alternateMode === 'ChatGPT') {
+    await clickText('工作');
+    await new Promise((resolve) => setTimeout(resolve, 750));
+    await assertVisualPage('app/chatgpt-work-tab', {
+      text: ['工作', '我们要做什么？', '使用 ChatGPT Work', '选择项目', '插件'],
+      minimumInteractive: 8,
+      allowHorizontalOverflow: true,
+    });
+    await clickText('聊天');
+    await new Promise((resolve) => setTimeout(resolve, 500));
+  }
+  await openMenuBySelector(modeSelector);
+  await clickVisibleMenuItem(originalMode);
+  const restoredModeDeadline = Date.now() + 15_000;
+  do {
+    const active = await evaluate(`document.querySelector(${JSON.stringify(modeSelector)})?.getAttribute('aria-label') ?? ''`);
+    if (active.includes(originalMode)) break;
+    if (Date.now() >= restoredModeDeadline) throw new Error(`Timed out restoring ${originalMode} mode`);
+    await new Promise((resolve) => setTimeout(resolve, 100));
+  } while (true);
+  checkpoints.push({ name: 'app/mode-switch-restored', originalMode, alternateMode });
+
   const explorePoint = await evaluate(`(() => {
     const target = [...document.querySelectorAll('nav button')].find((button) => button.innerText?.trim() === '探索');
     if (target == null) throw new Error('Explore navigation button not found');
@@ -803,7 +1000,12 @@ if (mode === "smoke-readonly") {
     button.click();
   })()`);
   await waitForBodyText('Control the in-app browser');
-  await assertHealthy('conversation/add-context');
+  await assertVisualPage('conversation/add-context', {
+    text: ['文件和文件夹', 'Control the in-app browser'],
+    textRootSelector: '[role="menu"]',
+    minimumInteractive: 8,
+    allowHorizontalOverflow: true,
+  });
   await command('Input.dispatchKeyEvent', { type: 'keyDown', key: 'Escape', code: 'Escape' });
   await command('Input.dispatchKeyEvent', { type: 'keyUp', key: 'Escape', code: 'Escape' });
 
@@ -1436,6 +1638,7 @@ if (mode === "smoke-readonly") {
     return { clicked: false, tagName: target.tagName, text: target.innerText, x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
   })()`);
   await command('Input.dispatchMouseEvent', { type: 'mouseMoved', x: result.x, y: result.y });
+  await new Promise((resolve) => setTimeout(resolve, 200));
   await command('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, x: result.x, y: result.y });
   await command('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, x: result.x, y: result.y });
   result.clicked = true;
@@ -1562,9 +1765,18 @@ if (mode === "smoke-readonly") {
       element.getAttribute('aria-label') === ${JSON.stringify(argument)}
     );
     if (target == null) throw new Error('No clickable element with the requested aria-label');
-    target.click();
-    return { clicked: true, tagName: target.tagName, ariaLabel: target.getAttribute('aria-label') };
+    target.scrollIntoView({ block: 'center', inline: 'nearest' });
+    const rect = target.getBoundingClientRect();
+    return {
+      ariaLabel: target.getAttribute('aria-label'),
+      tagName: target.tagName,
+      x: rect.left + rect.width / 2,
+      y: rect.top + rect.height / 2,
+    };
   })()`);
+  await command('Input.dispatchMouseEvent', { type: 'mouseMoved', x: result.x, y: result.y });
+  await command('Input.dispatchMouseEvent', { type: 'mousePressed', button: 'left', clickCount: 1, x: result.x, y: result.y });
+  await command('Input.dispatchMouseEvent', { type: 'mouseReleased', button: 'left', clickCount: 1, x: result.x, y: result.y });
   await new Promise((resolve) => setTimeout(resolve, 1500));
   console.log(JSON.stringify({
     mode,
@@ -1612,6 +1824,27 @@ if (mode === "smoke-readonly") {
   if (exceptions.length > 0 || errors.length > 0) {
     throw new Error(`Renderer runtime errors detected: ${JSON.stringify({ exceptions, errors })}`);
   }
+} else if (mode === "dump-overlays") {
+  console.log(JSON.stringify(await evaluate(`(() => {
+    const visible = (element) => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return rect.width > 0 && rect.height > 0 && style.visibility !== 'hidden' && style.display !== 'none';
+    };
+    return [...document.querySelectorAll('[role="menu"], [role="dialog"], [role="listbox"], [data-radix-popper-content-wrapper]')]
+      .filter(visible)
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          controls: [...element.querySelectorAll('button, a, [role="menuitem"], [role="option"], [role="radio"]')]
+            .filter(visible)
+            .map((control) => ({ ariaLabel: control.getAttribute('aria-label'), role: control.getAttribute('role'), text: control.innerText?.trim() ?? '' })),
+          rect: { height: rect.height, width: rect.width, x: rect.x, y: rect.y },
+          role: element.getAttribute('role'),
+          text: element.innerText?.trim() ?? '',
+        };
+      });
+  })()`), null, 2));
 } else if (mode === "inspect") {
   console.log(JSON.stringify(await composerState(), null, 2));
 } else if (mode === "dump-controls") {
