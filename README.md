@@ -35,6 +35,8 @@
 
 ## 目录结构
 
+完整的源码分层、目录用途和开发入口说明见 [`docs/project-directory-guide.md`](docs/project-directory-guide.md)。
+
 ```
 ├── src/                          # 源码（编辑这里）
 │   ├── main/
